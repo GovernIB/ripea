@@ -3,21 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
@@ -54,6 +39,20 @@ import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
@@ -332,8 +331,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
 		
-		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(tascaId);
-		
+//		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(tascaId);
+		ExpedientTascaEntity tasca = null;
+
 		try {
 			tasca = tascaHelper.comprovarTasca(tascaId);
 		} catch (Exception e) {

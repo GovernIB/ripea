@@ -259,26 +259,27 @@
 							<div class="dropdown">
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
-									<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/contingut/{{:expedient.id}}?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
-									{{if estat == 'PENDENT'}}					
+									<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+									<li class="divider"></li>
+									<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/contingut/{{:expedient.id}}?tascaId={{:id}}&origenTasques=true"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
+									{{if estat == 'PENDENT'}}
 										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
-										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>	 
-									{{else}}
-										{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
-											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
-										{{/if}}
-									{{/if}}
-									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
-										<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
-									{{/if}}
-									{{if estat != 'FINALITZADA'}}
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
+									 {{/if}}
+									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
+										<li class="divider"></li>
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
 										{{if !delegada}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/delegar"/>" data-toggle="modal"><span class="fa fa-share"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegar"/></a></li>
 										{{else delegada && !usuariActualDelegat}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/retomar"/>" data-toggle="modal"><span class="fa fa-remove"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegacio.desfer"/></a></li>
 										{{/if}}
+										<li class="divider"></li>
+										<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
+										<li><a href="<c:url value="/expedientTasca/{{:id}}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
 									{{/if}}
-
 									{{if estat == 'FINALITZADA'}}
 										<li><a href="<c:url value="/expedientTasca/{{:id}}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reobrir"/></a></li>
 									{{/if}}
@@ -287,7 +288,7 @@
 						{{/if}}
 					</script>
 				</th>
-				
+
 			</tr>
 		</thead>
 	</table>

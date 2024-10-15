@@ -1,11 +1,17 @@
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.war.command.TascaCancelarDelegacioCommand;
+import es.caib.ripea.war.command.TascaDelegarCommand;
+import es.caib.ripea.war.command.UsuariTascaFiltreCommand;
+import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -19,18 +25,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.war.command.TascaCancelarDelegacioCommand;
-import es.caib.ripea.war.command.TascaDelegarCommand;
-import es.caib.ripea.war.command.UsuariTascaFiltreCommand;
-import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Controlador per al llistat de tasques d'usuaris.
@@ -99,18 +97,29 @@ public class UsuariTascaController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
 			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
+			@RequestParam(value = "origenTasques", required = false) Boolean origenTasques,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		ExpedientTascaDto tasca = expedientTascaService.canviarTascaEstat(
-				expedientTascaId,
-				TascaEstatEnumDto.INICIADA,
-				null,
-				RolHelper.getRolActual(request));
+		ExpedientTascaDto tasca = expedientTascaService.findOne(expedientTascaId);
+
+		if (!TascaEstatEnumDto.INICIADA.equals(tasca.getEstat())) {
+			tasca = expedientTascaService.canviarTascaEstat(
+					expedientTascaId,
+					TascaEstatEnumDto.INICIADA,
+					null,
+					RolHelper.getRolActual(request));
+			}
 		
 		Long expedientId = tasca.getExpedient().getId();
+		String url = "redirect:/usuariTasca";
+		if (redirectATasca != null && redirectATasca) {
+			url = "redirect:/contingut/" + expedientId + "?tascaId=" + expedientTascaId + "&origenTasques=" + origenTasques;
+		} else if (origenTasques == null || !origenTasques) {
+			url = "redirect:/contingut/" + expedientId + "#tasques";
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				redirectATasca != null && redirectATasca == true ? "redirect:/contingut/" + expedientId + "?tascaId=" + expedientTascaId : "redirect:/usuariTasca",
+				url,
 				"expedient.tasca.controller.iniciada.ok",
 				new Object[]{tasca.getTitol()!=null?tasca.getTitol():tasca.getMetaExpedientTascaDescAbrv()});
 		
@@ -155,6 +164,7 @@ public class UsuariTascaController extends BaseUserController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/usuariTasca",
+//				redirectAExpedient != null && redirectAExpedient == true ? "redirect:/contingut/" + expedientTascaDto.getExpedient().getId() + "?tascaId=" + command.getId() : "redirect:/usuariTasca",
 				"expedient.tasca.controller.rebutjada.ok",
 				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
@@ -166,6 +176,8 @@ public class UsuariTascaController extends BaseUserController {
 	public String expedientTascaFinalitzar(
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
+			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
+			@RequestParam(value = "origenTasques", required = false) Boolean origenTasques,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.canviarTascaEstat(
@@ -173,10 +185,16 @@ public class UsuariTascaController extends BaseUserController {
 				TascaEstatEnumDto.FINALITZADA,
 				null,
 				RolHelper.getRolActual(request));
-		
+
+		String url = "redirect:/usuariTasca";
+		if (redirectATasca != null && redirectATasca) {
+			url = "redirect:/contingut/" + expedientTascaDto.getExpedient().getId() + "?tascaId=" + expedientTascaId + "&origenTasques=" + origenTasques;
+		} else if (origenTasques == null || !origenTasques) {
+			url = "redirect:/contingut/" + expedientTascaDto.getExpedient().getId() + "#tasques";
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/usuariTasca",
+				url,
 				"expedient.tasca.controller.finalitzada.ok",
 				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
@@ -225,6 +243,7 @@ public class UsuariTascaController extends BaseUserController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
+//				redirectAExpedient != null && redirectAExpedient == true ? "redirect:/contingut/" + expedientTascaDto.getExpedient().getId() + "?tascaId=" + expedientTascaId : "redirect:/usuariTasca",
 				"expedient.tasca.controller.delegar.ok",
 				new String [] {expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv(), command.getDelegatCodi()});
 	}
@@ -263,6 +282,7 @@ public class UsuariTascaController extends BaseUserController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
+//				redirectAExpedient != null && redirectAExpedient == true ? "redirect:/contingut/" + expedientTascaDto.getExpedient().getId() + "?tascaId=" + expedientTascaId : "redirect:/usuariTasca",
 				"expedient.tasca.controller.cancelar.delegacio.ok",
 				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}

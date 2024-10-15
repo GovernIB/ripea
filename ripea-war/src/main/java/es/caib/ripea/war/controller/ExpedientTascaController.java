@@ -38,7 +38,6 @@ import es.caib.ripea.war.command.TascaReassignarCommand;
 import es.caib.ripea.war.command.TascaReobrirCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
 /**
@@ -129,12 +128,11 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		expedientTascaService.changeTascaPrioritat(command);
-		MissatgesHelper.success(request, getMessage(request, "tasca.controller.prioritatModificat.ok", new Object[]{command.getTitol()}));
-		return modalUrlTancar();
-//		return getModalControllerReturnValueSuccess(
-//				request,
-//				"redirect:../expedient",
-//				"expedient.controller.prioritatModificat.ok");
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"tasca.controller.prioritatModificat.ok",
+				new Object[]{command.getTitol()});
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/cancellar", method = RequestMethod.GET)
@@ -153,10 +151,11 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
+				"redirect:/expedientTasca",
+//				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
 				"expedient.tasca.controller.cancellada.ok",
 				new Object[]{expedientTascaDto.getTitol()});
-		
+
 	}	
 	
 	@RequestMapping(value="/{expedientId}/tasca", method = RequestMethod.POST)
