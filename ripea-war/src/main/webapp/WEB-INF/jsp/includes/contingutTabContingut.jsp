@@ -51,12 +51,43 @@
     .toast-top-right { margin-top: 100px; }
 </style>
 
-
 <script>
 
 	const quedenDocumentsPerAdjuntar = ${not empty metaDocumentsNoPinbalLeft};
 	const potModificar = ${potModificar};
+	var   documentDrag = null; //Variable global, fitxer origen del drag&drop
 
+	//Funcio que es crida quant es fa un drop de un document de la mateixa taula
+	//NO quant es molla un fitxer de disc damunt la table, per aquesta funcionalitat cercar dataTransfer.files 	
+	function dropFitxerDinsCarpeta(event) {
+		try {
+			if (documentDrag!=null) {
+				let vistaActiva = $('#vistes').children("a.active").attr('id');
+				if (vistaActiva == 'vistaTreetablePerCarpetes') {
+					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+					let destiDocDrag = event.target.id;
+					window.location = documentDrag + "/moure/" + destiDocDrag;
+				} else if (vistaActiva == 'vistaGrid') {
+					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+					let destiDocDrag = event.target.id;
+					window.location = documentDrag + "/moure/" + destiDocDrag;
+					dropped = true;
+					$(event.target).addClass('dropped');
+				} else {
+					showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
+					let destiDocDrag = event.target.id;
+					let updateUrl = '${pageContext.request.contextPath}/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/updateTipusDocumentDragDrop/' + documentDrag + '/' + destiDocDrag
+					window.location = updateUrl;			
+				}
+			}
+		} catch (error) {
+			console.error("Se ha producido un error en dropFitxerDinsCarpeta: ", error.message);
+		} finally {
+			//Netejam la variable que indicava que un document s'estava arrastrant
+			documentDrag = null;
+		}
+	}
+	
 	//################################################## document ready START ##############################################################
 	$(document).ready(function () {
 
@@ -168,8 +199,13 @@
 		});
 
 		let vistaActiva = $('#vistes').children("a.active").attr('id');
-		//-------------------------------- VISTA GRID -----------------------------------------﻿
+
+		//-------------------------------------------------------------------------------------﻿
+		//-------------------------------- VISTA GRID -----------------------------------------
+		//-------------------------------------------------------------------------------------
+		﻿
 		if (vistaActiva == 'vistaGrid') {
+			
 			// Habilitar selecció múltiple
 			$('#habilitar-mult').on('click', function () {
 				var contenidorContingut = document.getElementById('grid-documents');
@@ -227,7 +263,6 @@
 				}
 			});
 
-
 			// move to another folder by drag and drop (jquery-ui widget)
 			// TODO: revise, is necessary for vista icones?
 			$('.element-draggable').draggable({
@@ -237,7 +272,8 @@
 				revertDuration: 200,
 				opacity: 0.50,
 				zIndex: 100,
-				start: function () {
+				start: function(event, ui) {
+					documentDrag = this.id;
 					$('div.element-noclick', this).addClass('noclick');
 					$('div.element-noclick', this).tooltip('hide');
 					$('div.element-noclick', this).tooltip('disable');
@@ -246,21 +282,16 @@
 					$('div.element-noclick', this).tooltip('enable');
 				}
 			});
+			
 			$('.element-droppable').children(":not('.ordre-col')").droppable({
 				accept: '.element-draggable',
 				tolerance: 'pointer',
 				activeClass: 'element-target',
 				hoverClass: 'element-hover',
 				drop: function (event, ui) {
-					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-					var origenId = ui.draggable.attr('id');
-					var destiId = $(this).parent().attr('id');
-					window.location = origenId + "/moure/" + destiId;
-					dropped = true;
-					$(event.target).addClass('dropped');
+					dropFitxerDinsCarpeta(event);
 				}
 			});
-
 
 			$('li.element-contingut .caption p').each(function () {
 				$clamp(this, {
@@ -268,7 +299,6 @@
 					useNativeClamp: true
 				});
 			});
-
 
 			$('#grid-documents li').mouseover(function () {
 				$('a.btn', this).removeClass('hidden');
@@ -280,7 +310,10 @@
 				return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
 			});
 
-			//-------------------------------------- VISTA NOT GRID ------------------------------------
+		//-------------------------------------------------------------------------------------﻿
+		//-------------------------------- VISTA  NO  GRID ------------------------------------
+		//-------------------------------------------------------------------------------------
+
 		} else {
 
 			if (!$('#table-documents .treetable-expander').length) {
@@ -308,7 +341,6 @@
 				} else {
 					deselectAll();
 				}
-
 			});
 
 			// Select one
@@ -316,11 +348,9 @@
 				selectCheckbox($(this));
 			});
 
-
 			if (vistaActiva == 'vistaTreetablePerCarpetes') {
 				dragAndDropVistaCarpetes();
 			} else if (vistaActiva == 'vistaTreetablePerTipusDocuments') {
-				debugger;
 				// change tipus de document by drag and drop (jquery-ui widget)
 				$('.element-draggable').draggable({
 					containment: 'parent',
@@ -328,21 +358,19 @@
 					revert: true,
 					revertDuration: 200,
 					opacity: 0.50,
+					start: function(event, ui) {
+						documentDrag = this.id;
+					}
 				});
 
 				$('.element-droppable').droppable({
 					accept: '.element-draggable',
 					tolerance: 'pointer',
 					drop: function (event, ui) {
-						showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
-						let origenId = ui.draggable.attr('id');
-						let destiId = $(this).attr('id');
-						let updateUrl = '${pageContext.request.contextPath}/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/updateTipusDocumentDragDrop/' + origenId + '/' + destiId
-						window.location = updateUrl;
+						dropFitxerDinsCarpeta(event);
 					}
 				});
 			}
-
 		}
 
 		<c:if test="${isMantenirEstatCarpetaActiu}">
@@ -399,8 +427,6 @@
 			getDetallsSignants($('#detallSignants'), contingutId, false);
 		});
 
-// 		removeTransactionId();
-
 		<c:if test="${contingut.document}">
 
 		$('form#nodeDades').on('submit', function() {
@@ -428,13 +454,7 @@
 									$(this).removeAttr('title');
 								}
 							});
-	// 						$.get(
-	// 								'../ajax/contingutDada/${contingut.id}/count',
-	// 								function (data) 
-	<%-- 									<meta name="subtitle" content="${serveiPerTitol}"/>{ --%>
-	// 									$('#dades-count').html(data);
-	// 								});
-							
+
 						} else {
 							$('#nodeDades input').each(function() {
 								for (var i = 0; i < data.errorsCamps.length; i++) {
@@ -452,7 +472,7 @@
 								}
 							});
 						}
-	// 					webutilRefreshMissatges();
+
 						location.reload();
 					});
 			return false;
@@ -556,33 +576,33 @@
 		enableDisableMultipleButtons(idsSelected);
 	}
 
-function dragAndDropVistaCarpetes() {
-	// move to another folder by drag and drop (jquery-ui widget) 
-	$('.element-draggable').draggable({
-		containment: 'parent',
-		helper: 'clone',
-		revert: true,
-		revertDuration: 200,
-		opacity: 0.50,
-		start: function(event, ui) {
-	        var dropdownVisible = $(this).find('.dropdown-menu').is(':visible');
-	        if (dropdownVisible) {
-	            ui.helper.remove();
-	            return false;
-	        }
-		}
-	});
-	$('.element-droppable').droppable({
-		accept: '.element-draggable',
-		tolerance: 'pointer',
-		drop: function(event, ui) {
-			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-			let origenId = ui.draggable.attr('id');
-			let destiId = $(this).attr('id');
-			window.location = origenId + "/moure/" + destiId;
-		}
-	});
-}
+	function dragAndDropVistaCarpetes() {
+		// move to another folder by drag and drop (jquery-ui widget) 
+		$('.element-draggable').draggable({
+			containment: 'parent',
+			helper: 'clone',
+			revert: true,
+			revertDuration: 200,
+			opacity: 0.50,
+			start: function(event, ui) {
+				// #1533 Problema de moure document sense voler a carpetes
+		        var dropdownVisible = $(this).find('.dropdown-menu').is(':visible');
+		        if (dropdownVisible) {
+		            ui.helper.remove();
+		            return false;
+		        } else {
+		        	documentDrag = this.id;
+			    }
+			}
+		});
+		$('.element-droppable').droppable({
+			accept: '.element-draggable',
+			tolerance: 'pointer',
+			drop: function(event, ui) {
+				dropFitxerDinsCarpeta(event);
+			}
+		});
+	}
 
 	function updateTableEvents() {
 		<c:if test="${isMantenirEstatCarpetaActiu}">
@@ -715,21 +735,27 @@ function dragAndDropVistaCarpetes() {
 
 				// Executat quan un fitxer es deixa anar a l'àrea de drop, abans de començar la càrrega
 				drop: function (e) {
-					e.preventDefault();
-					dragCounter = 0;
-					$dropArea.css('border-color', 'transparent');
-					$dropMessage.css('display', 'none');
-					$dragArea.show();
-					if (quedenDocumentsPerAdjuntar) {
-						let files = e.originalEvent.dataTransfer.files;
-						if (!(files.length > 1)) {
-							document.querySelector('#dropped-files').files = files;
-							$('#document-new').trigger('click');
+					//S'està arrastrant un fitxer desde fora del navegador
+					if (e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files) {
+						e.preventDefault();
+						dragCounter = 0;
+						$dropArea.css('border-color', 'transparent');
+						$dropMessage.css('display', 'none');
+						$dragArea.show();
+						if (quedenDocumentsPerAdjuntar) {
+							let files = e.originalEvent.dataTransfer.files;
+							if (!(files.length > 1)) {
+								document.querySelector('#dropped-files').files = files;
+								$('#document-new').trigger('click');
+							}
+						} else {
+							alert("<spring:message code="contingut.document.alerta.max"/>");
 						}
+						return false;
 					} else {
-						alert("<spring:message code="contingut.document.alerta.max"/>");
+						//S'esta arrastrant un document dins una carpeta desde la mateixa taula
+						dropFitxerDinsCarpeta(e);
 					}
-					return false;
 				},
 			});
 		}
@@ -1570,7 +1596,6 @@ function dragAndDropVistaCarpetes() {
 					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
 						<a href="<c:url value="/contingut/${contingut.id}/descarregarMultiples?tascaId=${tascaId}"/>" class="btn btn-default con-mult">
 							<span class="fa fa-download"></span>
-
 							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a>
 					</div>
@@ -1591,12 +1616,10 @@ function dragAndDropVistaCarpetes() {
 							<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
 								<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
 									<span class="fa fa-check-square"></span>
-
 									<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 								</a>
 								<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
 									<span class="fa fa-check-square"></span>
-
 									<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 								</a>
 							</div>
@@ -1604,7 +1627,6 @@ function dragAndDropVistaCarpetes() {
 						<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
 							<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default con-mult">
 								<span class="fa fa-arrows"></span>
-
 								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 							</a>
 						</div>
