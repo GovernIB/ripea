@@ -26,16 +26,17 @@
 		function aturaSpin() { $(".fa-refresh").removeClass("fa-spin"); }
 		
 		$(document).ready(function() {
+			
 			$('#duracio').on('blur', function(event) { 
 				$('#dataInici').focus();
 				event.preventDefault();
 				return false;
-			});			
+			});
+			
 			$('#duracio').on('change', function(event) {
 				if ($('#duracio').val()!='' && $('#duracio').val()!='0') {
 					$(".fa-refresh").addClass("fa-spin");
-					$.post("<c:url value="/expedientTasca/"/>" + $('#id').val() + "/changedDuracio",
-					$("#expedientTascaDto").serialize())
+					$.post('<c:url value="/expedientTasca/changedDuracio"/>', $('#expedientTascaDto').serialize())
 					.done(function(data) {
 						//Ara canviam el valor del camp dataLimit, pero no volem executar el onchange
 						userTriggered = false;
@@ -49,34 +50,35 @@
 					});
 				} else {
 					$('#duracio').val('');
-					userTriggered = false;
 					$('#dataLimit').val('');
 					$('#dataLimit').datepicker('update', '');
 				}
 			});
 		
 			$('#dataLimit').on('change', function(event) {
-				if (userTriggered) {
-					$(".fa-refresh").addClass("fa-spin");
-					$.post("<c:url value="/expedientTasca/"/>" + $('#id').val() + "/changedDataLimit",
-					$("#expedientTascaDto").serialize())
-					.done(function(data){
-						if (data.duracio>0) {
-							$('#duracio').val(data.duracio);
-						} else {
-							$('#duracio').val('');
-							userTriggered = false;
-							$('#dataLimit').val('');
-							$('#dataLimit').datepicker('update', '');
-						}
-						setTimeout(aturaSpin, 500);
-						remarcaElement($('#duracio'), '#d9edf7');
-					})
-					.fail(function() {
-						alert("<spring:message code="error.jquery.ajax"/>");
-					});
+				if ($('#dataLimit').val()!='') {
+					if (userTriggered) {
+						$(".fa-refresh").addClass("fa-spin");
+						$.post('<c:url value="/expedientTasca/changedDataLimit"/>', $('#expedientTascaDto').serialize())
+						.done(function(data){
+							if (data.duracio>0) {
+								$('#duracio').val(data.duracio);
+							} else {
+								$('#duracio').val('');
+								$('#dataLimit').val('');
+								$('#dataLimit').datepicker('update', '');
+							}
+							setTimeout(aturaSpin, 500);
+							remarcaElement($('#duracio'), '#d9edf7');
+						})
+						.fail(function() {
+							alert("<spring:message code="error.jquery.ajax"/>");
+						});
+					} else {
+						userTriggered = true;
+					}
 				} else {
-					userTriggered = true;
+					$('#duracio').val('');
 				}
 			});
 		});

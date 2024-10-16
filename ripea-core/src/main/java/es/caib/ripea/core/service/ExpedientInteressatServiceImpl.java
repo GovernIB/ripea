@@ -158,11 +158,10 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 								representantProcessar = interessatRepository.findOne(representantCreatDto.getId());
 								representantProcessar.updateEsRepresentant(true);
 								logger.debug("   > S'ha creat el representant perque no existia al expedient.");
-								numInteressatsIns++;
 
 							} else {
+								
 								representantProcessar = expedientInteressatHelper.mergeInteressat(representantProcessar.getId(), interessat.getRepresentant());
-								numInteressatsUpd++;
 								logger.debug("   > S'ha mergeat el representant perque ja existia al expedient.");
 							}
 							

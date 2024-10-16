@@ -212,11 +212,10 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	}
 	
 	//Han canviat la duració del command, recalculam la data limit
-	@RequestMapping(value = "{metaExpedientTascaId}/changedDuracio", method = RequestMethod.POST)
+	@RequestMapping(value = "/changedDuracio", method = RequestMethod.POST)
 	@ResponseBody
 	public ExpedientTascaCommand changedDuracio(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientTascaId,
 			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
 			Model model) {
 		if (expedientTascaCommand.getDuracio()!=null && expedientTascaCommand.getDuracio()>0) {
@@ -235,11 +234,10 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	}
 	
 	//Han canviat la data limit del command, recalculam la duracio
-	@RequestMapping(value = "{metaExpedientTascaId}/changedDataLimit", method = RequestMethod.POST)
+	@RequestMapping(value = "/changedDataLimit", method = RequestMethod.POST)
 	@ResponseBody
 	public ExpedientTascaCommand changedDataLimit(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientTascaId,
 			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
 			Model model) {
 		

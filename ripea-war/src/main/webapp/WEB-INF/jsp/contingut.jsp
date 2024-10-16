@@ -152,8 +152,6 @@ span a {
 #alerta-no-agafat {
 	margin-bottom: 15px;
 }
-
-
 .disabled {
 	pointer-events: none;
     opacity: 0.4; 

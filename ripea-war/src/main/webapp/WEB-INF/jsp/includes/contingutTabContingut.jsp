@@ -167,15 +167,6 @@
 			});
 		});
 
-
-		// Ja has afegit tots els documents a l'expedient
-		$(".document-new-empty-metadocuments").click(function (e) {
-			alert("<spring:message code="contingut.document.alerta.max"/>");
-			e.preventDefault();
-		});
-
-		// ##### Added to updateTableEvents()
-
 		let vistaActiva = $('#vistes').children("a.active").attr('id');
 		//-------------------------------- VISTA GRID -----------------------------------------﻿
 		if (vistaActiva == 'vistaGrid') {
@@ -329,6 +320,7 @@
 			if (vistaActiva == 'vistaTreetablePerCarpetes') {
 				dragAndDropVistaCarpetes();
 			} else if (vistaActiva == 'vistaTreetablePerTipusDocuments') {
+				debugger;
 				// change tipus de document by drag and drop (jquery-ui widget)
 				$('.element-draggable').draggable({
 					containment: 'parent',
@@ -337,7 +329,6 @@
 					revertDuration: 200,
 					opacity: 0.50,
 				});
-
 
 				$('.element-droppable').droppable({
 					accept: '.element-draggable',
@@ -1679,37 +1670,43 @@ function dragAndDropVistaCarpetes() {
 								</li>
 							</c:if>
 							<%---- Document... ----%>
-							<li>
-								<c:choose>
-									<c:when test="${empty metaDocumentsNoPinbalLeft}">
-										<a href="#" class="document-new-empty-metadocuments">
+							
+							<c:choose>
+								<c:when test="${empty metaDocumentsNoPinbalLeft}">
+									<li style="opacity: 0.4; cursor: default;">
+										<a href='#' class='document-new-empty-metadocuments' title='<spring:message code="contingut.document.alerta.max"/>' >
 											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 										</a>
-									</c:when>
-									<c:otherwise>
+									</li>
+								</c:when>
+								<c:otherwise>
+									<li>
 										<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true">
 											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 										</a>
-									</c:otherwise>
-								</c:choose>
-							</li>
+									</li>
+								</c:otherwise>
+							</c:choose>
+							
 							<c:if test="${!isTasca}">
 								<%---- Consulta PINBAL... ----%>
 								<c:if test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">
-									<li>
-										<c:choose>
-											<c:when test="${empty metaDocumentsPinbalLeft}">
-												<a href="#" class="document-new-empty-metadocuments">
+									<c:choose>
+										<c:when test="${empty metaDocumentsPinbalLeft}">
+											<li style="opacity: 0.4; cursor: default;">
+												<a href='#' class='document-new-empty-metadocuments' title='<spring:message code="contingut.document.alerta.pinbal.max"/>' >
 													<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
 												</a>
-											</c:when>
-											<c:otherwise>
+											</li>
+										</c:when>
+										<c:otherwise>
+											<li>
 												<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
 													<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
 												</a>
-											</c:otherwise>
-										</c:choose>
-									</li>
+											</li>
+										</c:otherwise>
+									</c:choose>
 								</c:if>
 								<%---- Carpeta... ----%>
 								<c:if test="${isCreacioCarpetesActiva}">
