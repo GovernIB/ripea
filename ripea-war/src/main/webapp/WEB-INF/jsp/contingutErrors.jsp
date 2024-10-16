@@ -47,6 +47,7 @@
 			<c:if test="${error.errorMetaDocument}"><c:set var="hiHaMetaDocuments" value="${true}"/></c:if>
 			<c:if test="${error.documentsWithoutMetaDocument}"><c:set var="hiHaDocumentsSenseMetaNode" value="${true}"/></c:if>
 			<c:if test="${error.withNotificacionsNoFinalitzades}"><c:set var="hiHaNotificacionsNoFinalitzades" value="${true}"/></c:if>
+			<c:if test="${error.expedientWithoutInteressats}"><c:set var="expedientAmbInteressatObligatori" value="${true}"/></c:if>
 		</c:forEach>
 		<c:if test="${hiHaMetaDades}">
 			<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.falten.metadades"/></h4>
@@ -78,6 +79,12 @@
 		<c:if test="${hiHaNotificacionsNoFinalitzades}">
 			<div class="${!hiHaMetaDades && !hiHaMetaDocuments ? 'altura' : ''}">
 				<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.notificacions.nofinalitzades"/></h4>
+			</div>
+		</c:if>
+		
+		<c:if test="${expedientAmbInteressatObligatori}">
+			<div class="${!hiHaMetaDades && !hiHaMetaDocuments ? 'altura' : ''}">
+				<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.interessat"/></h4>
 			</div>
 		</c:if>
 	</c:if>

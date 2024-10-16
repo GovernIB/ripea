@@ -472,6 +472,9 @@ function calculateClassificacioId() {
 				</c:if>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 				
+				<c:if test="${isObligarInteressatActiu}">
+					<rip:inputCheckbox name="interessatObligatori" textKey="metaexpedient.form.camp.interessat"/>
+				</c:if>
 				<c:if test="${ not empty metaExpedientCommand.id}">
 					<div style="min-height: 60px;">
 						<div class="alert well-sm alert-info" >
@@ -483,7 +486,6 @@ function calculateClassificacioId() {
 						</div>				
 					</div>
 				</c:if>
-				
 			</div>
 			<%-- <div role="tabpanel" class="tab-pane" id="notificacions">
 				<rip:inputCheckbox name="notificacioActiva" textKey="metaexpedient.form.camp.notificacio.activa" disabled="${bloquejarCamps}"/>

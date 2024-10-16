@@ -565,7 +565,7 @@ public class MetaExpedientController extends BaseAdminController {
 				metaExpedientExport.setClassificacio(command.getClassificacioId());
 			}
 			metaExpedientExport.setSerieDocumental(command.getSerieDocumental());
-
+			metaExpedientExport.setInteressatObligatori(command.isInteressatObligatori());
 			if (command.getOrganGestorId() != null) {
 				OrganGestorDto organ = new OrganGestorDto();
 				organ.setId(command.getOrganGestorId());
@@ -687,6 +687,8 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 		}
 		metaExpedientImportEditCommand.setEntitatId(entitatActual.getId());
+		metaExpedientImportEditCommand.setInteressatObligatori(metaExpedientExport.isInteressatObligatori());
+		model.addAttribute("isObligarInteressatActiu", isObligarInteressatActiu());
 		model.addAttribute(metaExpedientImportEditCommand);
 		model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
 
@@ -1233,6 +1235,8 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("organsGestors", organGestorsList);
 		
 		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
+
+		model.addAttribute("isObligarInteressatActiu", isObligarInteressatActiu());
 	}
 
 	@RequestMapping(value = "/sincronitzar", method = RequestMethod.GET)
@@ -1273,6 +1277,10 @@ public class MetaExpedientController extends BaseAdminController {
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		return metaExpedientService.getProgresActualitzacio(entitat.getCodi());
+	}
+	
+	private boolean isObligarInteressatActiu() {
+		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.permetre.obligar.interessat");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientController.class);

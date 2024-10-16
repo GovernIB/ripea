@@ -15,6 +15,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -278,6 +279,13 @@ public class CacheHelper {
 					break;
 				}
 			}
+			boolean isObligarInteressatActiu = configHelper.getAsBoolean("es.caib.ripea.permetre.obligar.interessat");
+			MetaExpedientEntity procediment = expedient.getMetaExpedient();
+			if (isObligarInteressatActiu && procediment.isInteressatObligatori()
+					&& (expedient.getInteressatsORepresentants() == null
+							|| expedient.getInteressatsORepresentants().isEmpty())) {
+				errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.INTERESSATS));
+			}
 		}
 		if (!errors.isEmpty()) {
 			// TODO: registrar a la base de dades
@@ -290,7 +298,7 @@ public class CacheHelper {
 	public void evictErrorsValidacioPerNode(
 			NodeEntity node) {
 	}
-
+	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(
 			String usuariCodi) {

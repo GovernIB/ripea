@@ -80,6 +80,7 @@ public class MetaExpedientCommand {
 	
 	private boolean crearReglaDistribucio;
 	
+	private boolean interessatObligatori;
 	
 	public void setId(Long id) {
 		this.id = id;
@@ -214,6 +215,9 @@ public class MetaExpedientCommand {
 	}
 	public void setClassificacioId(String classificacioId) {
 		this.classificacioId = classificacioId;
+	}
+	public void setInteressatObligatori(boolean interessatObligatori) {
+		this.interessatObligatori = interessatObligatori;
 	}
 
 	

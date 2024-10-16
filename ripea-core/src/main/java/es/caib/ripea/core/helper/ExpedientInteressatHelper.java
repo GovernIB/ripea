@@ -49,7 +49,8 @@ public class ExpedientInteressatHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ContingutHelper contingutHelper;
-
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	@Transactional
 	public InteressatEntity create(
@@ -83,6 +84,8 @@ public class ExpedientInteressatHelper {
 		if (propagarArxiu && expedient.getArxiuUuid() != null) {
 			arxiuPropagarInteressats(expedient, interessatEntity);
 		}
+		
+		cacheHelper.evictErrorsValidacioPerNode(expedient);
 		
 		return conversioTipusHelper.convertir(
 							interessatEntity,
@@ -549,6 +552,8 @@ public class ExpedientInteressatHelper {
 					null,
 					false,
 					false);
+			
+			cacheHelper.evictErrorsValidacioPerNode(expedient);
 		} else {
 			logger.error("No s'ha trobat l'interessat a l'expedient ("
 					+ "expedientId=" + expedientId + ", "

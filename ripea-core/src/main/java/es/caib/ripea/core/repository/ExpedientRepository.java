@@ -782,4 +782,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
     void updatePrioritats(
 			@Param("expedientsId") Collection<Long> expedientsId,
 			@Param("prioritat") String  prioritat);
+
+	List<ExpedientEntity> findByMetaExpedientAndEsborrat(
+			MetaExpedientEntity metaExpedient, 
+			int esborrat);
 }

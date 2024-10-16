@@ -164,7 +164,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitat,
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
-				metaExpedient.isGestioAmbGrupsActiva()).
+				metaExpedient.isGestioAmbGrupsActiva(),
+				metaExpedient.isInteressatObligatori()).
 				expressioNumero(metaExpedient.getExpressioNumero()).
 				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
@@ -215,7 +216,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(), 
-				metaExpedient.getTipusClassificacio());
+				metaExpedient.getTipusClassificacio(),
+				metaExpedient.isInteressatObligatori());
 		
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -223,6 +225,18 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedient.getEstructuraCarpetes(), 
 					metaExpedientEntity);
 		}
+		
+		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedientAndEsborrat(metaExpedientEntity, 0);
+		
+		long t0 = System.currentTimeMillis();
+		logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode start (total expedients:" + (expedients.size()) + "");
+		
+		for (ExpedientEntity expedient: expedients) {
+			cacheHelper.evictErrorsValidacioPerNode(expedient);
+		}
+		
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientServiceImpl.update evictErrorsValidacioPerNode end:  " + (System.currentTimeMillis() - t0) + " ms");
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			if (estatAnterior == MetaExpedientRevisioEstatEnumDto.DISSENY && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT)
@@ -286,7 +300,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitat,
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
-				metaExpedient.isGestioAmbGrupsActiva()).
+				metaExpedient.isGestioAmbGrupsActiva(),
+				metaExpedient.isInteressatObligatori()).
 				expressioNumero(metaExpedient.getExpressioNumero()).
 				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);

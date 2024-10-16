@@ -53,6 +53,8 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     
     private boolean procedimentComu;
 	
+    private boolean interessatObligatori;
+    
     public String getCodiSiaINom() {
     	if(this.classificacio!=null && !"".equals(classificacio)) {
     		return classificacio + " - " + nom;

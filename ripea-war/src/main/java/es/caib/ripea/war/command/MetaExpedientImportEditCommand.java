@@ -54,7 +54,7 @@ public class MetaExpedientImportEditCommand {
     private List<ExpedientEstatCommand> estats = new ArrayList<>();
     private List<MetaExpedientTascaCommand> tasques = new ArrayList<>();
 	
-
+    private boolean interessatObligatori;
 
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;
@@ -94,6 +94,9 @@ public class MetaExpedientImportEditCommand {
 	}
 	public void setTipusClassificacio(TipusClassificacioEnumDto tipusClassificacio) {
 		this.tipusClassificacio = tipusClassificacio;
+	}
+	public void setInteressatObligatori(boolean interessatObligatori) {
+		this.interessatObligatori = interessatObligatori;
 	}
 
 

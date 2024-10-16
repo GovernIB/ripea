@@ -172,7 +172,9 @@ function calculateClassificacioId() {
 				<form:hidden path="comu" />
 			</c:otherwise>
 		</c:choose>
-
+		<c:if test="${isObligarInteressatActiu}">
+			<form:hidden path="interessatObligatori" />
+		</c:if>
 		<c:if test="${!metaExpedientImportEditCommand.comu}">
 			<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 			<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>

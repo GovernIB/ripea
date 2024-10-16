@@ -41,6 +41,7 @@ public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements S
     private List<GrupDto> grups;
     private Set<MetaExpedientTascaDto> tasques;
 
+    private boolean interessatObligatori;
 	
 	public boolean isComu() {
 		if (organGestor == null) {

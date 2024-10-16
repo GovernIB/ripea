@@ -19,6 +19,7 @@ public class ValidacioErrorDto implements Serializable {
 	private MultiplicitatEnumDto multiplicitat;
 	private boolean documentsWithoutMetaDocument;
 	private boolean withNotificacionsNoFinalitzades;
+	private boolean expedientWithoutInteressats;
 	
 	public ValidacioErrorDto(
 			MetaDadaDto metaDada,
@@ -42,6 +43,9 @@ public class ValidacioErrorDto implements Serializable {
 				break;
 			case NOTIFICACIONS:
 				this.withNotificacionsNoFinalitzades = true;
+				break;
+			case INTERESSATS:
+				this.expedientWithoutInteressats = true;
 				break;
 		}
 	}
@@ -83,6 +87,9 @@ public class ValidacioErrorDto implements Serializable {
 	}
 	public boolean isWithNotificacionsNoFinalitzades() {
 		return withNotificacionsNoFinalitzades;
+	}
+	public boolean isExpedientWithoutInteressats() {
+		return expedientWithoutInteressats;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

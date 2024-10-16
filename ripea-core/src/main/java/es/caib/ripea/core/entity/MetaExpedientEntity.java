@@ -135,6 +135,9 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@Column(name = "organ_no_sinc", nullable = false)
 	private boolean organNoSincronitzat;
 
+	@Column(name = "interessat_obligatori", nullable = false)
+    private boolean interessatObligatori;
+	
 	public void updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat) {
 		this.crearReglaDistribucioEstat = crearReglaDistribucioEstat;
 	}
@@ -167,7 +170,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			MetaExpedientEntity pare,
 			OrganGestorEntity organGestor,
 			boolean gestioAmbGrupsActiva, 
-			TipusClassificacioEnumDto tipusClassificacio) {
+			TipusClassificacioEnumDto tipusClassificacio,
+			boolean interessatObligatori) {
         super.update(codi, nom, descripcio);
         this.classificacio = classificacio;
         this.serieDocumental = serieDocumental;
@@ -179,6 +183,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.organGestor = organGestor;
         this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
         this.tipusClassificacio = tipusClassificacio;
+        this.interessatObligatori = interessatObligatori;
 
     }
 	
@@ -210,7 +215,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			EntitatEntity entitat,
 			MetaExpedientEntity pare,
 			OrganGestorEntity organGestor,
-			boolean gestioAmbGrupsActiva) {
+			boolean gestioAmbGrupsActiva,
+			boolean interessatObligatori) {
 		return new Builder(
 				codi,
 				nom,
@@ -222,8 +228,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				notificacioActiva,
 				permetMetadocsGenerals,
 				organGestor,
-				gestioAmbGrupsActiva
-				);
+				gestioAmbGrupsActiva,
+				interessatObligatori);
 	}
 
     public static class Builder {
@@ -240,7 +246,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				boolean notificacioActiva,
 				boolean permetMetadocsGenerals,
 				OrganGestorEntity organGestor,
-				boolean gestioAmbGrupsActiva) {
+				boolean gestioAmbGrupsActiva,
+				boolean interessatObligatori) {
             built = new MetaExpedientEntity();
             built.codi = codi;
             built.nom = nom;
@@ -256,6 +263,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.permetMetadocsGenerals = permetMetadocsGenerals;
             built.organGestor = organGestor;
             built.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
+            built.interessatObligatori = interessatObligatori;
         }
 
         public Builder expressioNumero(String expressioNumero) {
