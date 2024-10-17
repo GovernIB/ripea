@@ -19,12 +19,6 @@
 		</c:choose>
 	</c:otherwise>
 </c:choose>
-
-
-
-
-
-
 <html>
 <head>
 	<title>${titol}</title>
@@ -255,7 +249,6 @@ $(document).ready(function(){
 				        		showConfirmDialog = true;
 				        		${fn:escapeXml(contingut.nom)}
 				        		confirmDialogMsg = "<spring:message code='metaexpedient.form.submit.sia.no.comprovat'/>";
-
 				        	} else {
 				        		let exists = json.data;
 				        		showConfirmDialog = !exists;
@@ -323,7 +316,6 @@ function disableClassificacioButtons(){
 	$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
 }
 
-
 function calculateClassificacioId() {
 	let organGestorId = $('#organGestorId').val();
 	$.ajax({
@@ -333,18 +325,12 @@ function calculateClassificacioId() {
 			$('#classificacioId').val(id);
 		}
 	});
-	
 }
-
-
 
 </script>	
 	
-	
-	
 </head>
 <body>
-
 
 	<c:if test="${metaExpedientDto!=null && metaExpedientDto.organsNous != null && !empty metaExpedientDto.organsNous}">
 

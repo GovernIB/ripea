@@ -1,5 +1,28 @@
 package es.caib.ripea.core.service;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
@@ -39,70 +62,28 @@ import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.MultiHashMap;
-import org.apache.commons.collections.MultiMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
 
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private ConfigHelper configHelper;
-	
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ConfigHelper configHelper;
 	
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
@@ -110,11 +91,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public void actualitzarOrganCodi(String organCodi) {
 		organGestorHelper.actualitzarOrganCodi(organCodi);
 	}
+
 	@Override
 	public String getOrganCodi() {
 		return configHelper.getOrganActualCodi();
 	}
-
 
 	@Override
 	@Transactional(readOnly = true)

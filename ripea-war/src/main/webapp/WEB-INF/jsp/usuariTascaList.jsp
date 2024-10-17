@@ -195,6 +195,7 @@
 				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="8%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+				<th data-col-name="dataLimitExpirada" data-visible="false"></th>
 				<th data-col-name="duracioFormat" data-visible="false"></th>
 				<th data-col-name="agafada" data-visible="false"></th>
 				<th data-col-name="usuariActualObservador" data-visible="false"></th>
@@ -202,17 +203,24 @@
 				<th data-col-name="usuariActualDelegat" data-visible="false"></th>
 				<th data-col-name="responsableActual.codi" data-orderable="false" width="12%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
 				<th data-col-name="dataLimitString" width="8%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
-					<spring:message code="expedient.tasca.list.boto.dataLimit"/>
+					<spring:message code="expedient.tasca.list.columna.dataLimit"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
-					{{if shouldNotifyAboutDeadline}}
+					{{if dataLimitExpirada}}
 							<span style="color: red;" title="Duració estimada {{:duracioFormat}}">                            
                                 {{:dataLimitString}}
                                 <span class="fa fa-clock-o"></span>
                             </span>
-                    {{else}}
-						<span title="Duració estimada {{:duracioFormat}}">  
-                        	{{:dataLimitString}}
-						</span>
+					{{else}}
+						{{if shouldNotifyAboutDeadline}}
+							<span style="color: orange;" title="Duració estimada {{:duracioFormat}}">                            
+                                {{:dataLimitString}}
+                                <span class="fa fa-clock-o"></span>
+                            </span>
+                    	{{else}}
+							<span title="Duració estimada {{:duracioFormat}}">  
+                        		{{:dataLimitString}}
+							</span>
+                    	{{/if}}
                     {{/if}}
 					</script>
 				</th>
@@ -251,24 +259,31 @@
 							<div class="dropdown">
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
-									<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/contingut/{{:expedient.id}}?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
-									{{if estat == 'PENDENT'}}					
-										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
-										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>	 
-									{{else}}						
-										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>	
+									<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+									{{if estat != 'CANCELLADA' && estat != 'REBUTJADA'}}
+										<li class="divider"></li>
 									{{/if}}
-									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
-										<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
+									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/contingut/{{:expedient.id}}?tascaId={{:id}}&origenTasques=true"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
 									{{/if}}
-									{{if estat != 'FINALITZADA'}}
+									{{if estat == 'PENDENT'}}
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>" data-toggle="ajax"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
+									 {{/if}}
+									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
+										<li class="divider"></li>
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
 										{{if !delegada}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/delegar"/>" data-toggle="modal"><span class="fa fa-share"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegar"/></a></li>
 										{{else delegada && !usuariActualDelegat}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/retomar"/>" data-toggle="modal"><span class="fa fa-remove"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegacio.desfer"/></a></li>
 										{{/if}}
+										<li class="divider"></li>
+										<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
+										<li><a href="<c:url value="/expedientTasca/{{:id}}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
 									{{/if}}
-
 									{{if estat == 'FINALITZADA'}}
 										<li><a href="<c:url value="/expedientTasca/{{:id}}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reobrir"/></a></li>
 									{{/if}}
@@ -277,7 +292,7 @@
 						{{/if}}
 					</script>
 				</th>
-				
+
 			</tr>
 		</thead>
 	</table>

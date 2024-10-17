@@ -169,6 +169,11 @@ function enableNotificar() {
 	$('.btnNotificar').attr("href", url);
 }
 
+function descarregarDocumentExport() {
+	//Despres de tancar la modal de exportació, iniciam la descarrega del Json guardat a sessió
+	window.location.href='<c:url value="/expedient/${expedientId}/interessat/descarregarDocumentExport"/>';
+}
+
 </script>
 
 
@@ -176,7 +181,7 @@ function enableNotificar() {
 	id="taulaInteressats" 
 	data-url="<c:url value="/contingut/${expedientId}/interessat/datatable"/>" 
 	data-paging-enabled="false"
-	data-botons-template="#taulaInteressatsNouBoton" 
+	data-botons-template="#taulaInteressatsNouBoton"
 	class="table table-striped table-bordered" 
 	style="width:100%"
 	data-row-info="true">
@@ -268,7 +273,7 @@ function enableNotificar() {
 </table>
 <script id="taulaInteressatsNouBoton" type="text/x-jsrender">
 	<div style="float: right;">
-		<a href="<c:url value="/expedient/${expedientId}/interessat/exportar"/>" id="exportInteressatBtn" class="btn btn-default">
+		<a href="<c:url value="/expedient/${expedientId}/interessat/exportar"/>" id="exportInteressatBtn" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="descarregarDocumentExport">
 			<span class="fa fa-upload"></span>&nbsp;<spring:message code="contingut.boto.exp.interessat"/>
 		</a>
 		<c:if test="${potModificar}">

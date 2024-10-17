@@ -182,7 +182,7 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 
 	@Override
 	@RolesAllowed("tothom")
-	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats) throws NotFoundException {
-		return delegate.importarInteressats(entitatId, expedientId, rolActual, interessats);
+	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats) throws NotFoundException {
+		return delegate.importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
 	}
 }

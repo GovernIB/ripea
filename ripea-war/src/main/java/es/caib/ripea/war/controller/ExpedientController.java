@@ -240,9 +240,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				pagina,
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
-
 	}
-
 	
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody
@@ -574,6 +572,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			bindingResult.rejectValue("nom", "Size", new Object[] { null, 239, 0 }, null);
 		}
 		
+		if (command.getPrioritat()!=null && !command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL) && Utils.isEmpty(command.getPrioritatMotiu())) {
+			bindingResult.rejectValue("prioritatMotiu", "PrioritatNecessitaObservacions");
+		} else if (command.getPrioritat()!=null && command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL)) {
+			command.setPrioritatMotiu(null);
+		}
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
@@ -604,7 +608,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					null, 
 					null,
 					null,
-					command.getPrioritat());
+					command.getPrioritat(),
+					command.getPrioritatMotiu());
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			
@@ -668,6 +673,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (Utils.isBiggerThan(command.getNom(), 239)) {
 			bindingResult.rejectValue("nom", "Size", new Object[] { null, 239, 0 }, null);
 		}
+		if (command.getPrioritat()!=null && !command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL) && Utils.isEmpty(command.getPrioritatMotiu())) {
+			bindingResult.rejectValue("prioritatMotiu", "PrioritatNecessitaObservacions");
+		} else if (command.getPrioritat()!=null && command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL)) {
+			command.setPrioritatMotiu(null);
+		}
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
@@ -691,7 +701,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getOrganGestorId(), 
 					RolHelper.getRolActual(request), 
 					command.getGrupId(),
-					command.getPrioritat());
+					command.getPrioritat(),
+					command.getPrioritatMotiu());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
@@ -1406,6 +1417,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+		if (command.getPrioritat()!=null && !command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL) && Utils.isEmpty(command.getPrioritatMotiu())) {
+			bindingResult.rejectValue("prioritatMotiu", "PrioritatNecessitaObservacions");
+		} else if (command.getPrioritat()!=null && command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL)) {
+			command.setPrioritatMotiu(null);
+		}
+		
 		if (bindingResult.hasErrors()) {
 			return "expedientChoosePrioritatForm";
 		}
@@ -1413,7 +1430,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		ExpedientDto expedientDto = expedientService.changeExpedientPrioritat(
 				entitatActual.getId(),
 				command.getId(),
-				command.getPrioritat());
+				command.getPrioritat(),
+				command.getPrioritatMotiu());
 		
 		return getModalControllerReturnValueSuccess(
 				request,

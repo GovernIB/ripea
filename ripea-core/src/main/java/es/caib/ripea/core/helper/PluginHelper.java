@@ -4107,7 +4107,7 @@ public class PluginHelper {
 			persona.setNom(unitatOrganitzativaDto.getDenominacioCooficial());
 			persona.setCodiDir3(unitatOrganitzativaDto.getCodi());
 		}
-		persona.setTelefon(interessat.getTelefon());
+		persona.setTelefon(Utils.extractNumbers(interessat.getTelefon()));
 		persona.setEmail(interessat.getEmail());
 		persona.setIncapacitat(interessat.getIncapacitat());
 		return persona;

@@ -115,6 +115,7 @@ public class ConversioTipusHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private TascaHelper tascaHelper;
+	@Autowired private MessageHelper messageHelper;
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
 	
 	public ConversioTipusHelper() {
@@ -169,7 +170,6 @@ public class ConversioTipusHelper {
 						target.setAdministrationComuns(source.isAdministrationComuns());
 						target.setOrganGestorId(source.getOrganGestorId());
 						target.setOrganGestorNom(source.getOrganGestorNom());
-
 						return target;
 					}
 				});
@@ -697,6 +697,10 @@ public class ConversioTipusHelper {
 						target.setTipusTransicio(source.getTipusTransicio());
 						target.setCif(source.getCif());
 						target.setUtilitzarCifPinbal(source.isUtilitzarCifPinbal());
+						try {
+							if (target.getEstat()!=null)
+								target.setEstatMessage(messageHelper.getMessage("OrganEstatEnumDto."+target.getEstat()));
+						} catch (Exception ex) {}
 						return target;
 					}
 				});

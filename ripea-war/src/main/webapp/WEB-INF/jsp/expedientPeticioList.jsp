@@ -77,7 +77,7 @@ table.dataTable td {
 		<div class="row">
 		<!--  optionMinimumResultsForSearch -->		
 			<div class="col-md-4">					
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nomICodiSia" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>
 <%--
 			<div class="col-md-4">					

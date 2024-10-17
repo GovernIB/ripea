@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
 
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
@@ -59,6 +56,15 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	public String getIdentificador() {
 		return this.organNom;
 	}
+	
+	@Override
+	public void merge(InteressatDto dto) {
+		super.merge(dto);
+		InteressatAdministracioDto admDto = (InteressatAdministracioDto) dto;
+		if (admDto.getOrganCodi()!=null) { this.organCodi = admDto.getOrganCodi(); }
+		if (admDto.getOrganNom()!=null) { this.organNom = admDto.getOrganNom(); }
+		if (admDto.getAmbOficinaSir()!=null) { this.ambOficinaSir = admDto.getAmbOficinaSir(); }
+	}	
 	
 	public void update(
 			String organCodi,
@@ -251,7 +257,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			return built;
 		}
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

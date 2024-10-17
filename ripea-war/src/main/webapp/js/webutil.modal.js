@@ -94,7 +94,8 @@
 								segonaModal: plugin.settings.segonaModal,
 								height: plugin.settings.height,
 								width: plugin.settings.width,
-								funcToCallOnTancar: plugin.settings.funcToCallOnTancar
+								funcToCallOnTancar: plugin.settings.funcToCallOnTancar,
+								elementOrigin: element
 							});
 							
 						} else {
@@ -113,7 +114,8 @@
 								segonaModal: plugin.settings.segonaModal,
 								height: plugin.settings.height,
 								width: plugin.settings.width,
-								funcToCallOnTancar: plugin.settings.funcToCallOnTancar
+								funcToCallOnTancar: plugin.settings.funcToCallOnTancar,
+								elementOrigin: element
 							});
 						}
 						$('#' + modalDivId).data('elementRetorn', plugin.settings.elementRetorn);
@@ -149,138 +151,141 @@
 	}
 
 	$.fn.webutilModalShow = function(settings) {
-		return this.filter("div").each(function() {
-			var modalobj = $('div.modal', this);
-			if (!modalobj.data('modal-configurada')) {
-				var iframe = $('iframe', modalobj);
-				modalobj.on('show.bs.modal', function () {
-					iframe.empty();
-					if (settings.height)
-						iframe.css('height', '' + settings.height + 'px');
-					iframe.attr("src", settings.contentUrl);
-					iframe.load(function() {
-						// S'oculta l'icona loader
-						$('.modal-body .datatable-dades-carregant').hide();
-						if(!iframe.attr("hidden")){
-							iframe.show();
-						}
-						// Copiar el titol de la modal
-						var titol = $(this).contents().find("title").html();
-						$('.modal-header h4', $(this).parent().parent()).html(titol);
-						// Copiar botons
-						$('.modal-footer', $(iframe).parent().parent()).empty();
-						var dataBotons = $('body', $(iframe).contents()).data('modal-botons');
-						var modalBotons = (dataBotons) ? $(dataBotons, $(iframe).contents()) : $(settings.elementBotons, $(iframe).contents());
-						if (modalBotons.length) {
-							$('.modal-footer *', $(this).parent().parent()).remove();
-							$('.btn', modalBotons).each(function() {
-								var element = $(this);
-								var clon = element.clone();
-								if (element.data('elementNoTancar')==true) {
-									clon.on('click', function () {
-									});
-								} else if (element.data(settings.elementTancarData)) {
-									clon.on('click', function () {
-										$(iframe).parent().parent().parent().parent().data(settings.elementTancarData, 'true');
-										$(iframe).parent().parent().parent().parent().modal('hide');
-										return false;
-									});
-								} else {
-									clon.on('click', function () {
-										// When click submit show loading
-										if ($(this).attr('type') === 'submit' && !$(this).data('noloading')) {
-											iframe.hide();
-											$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
-											$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
-											$('.modal-body .datatable-dades-carregant').show();
-											$(this).attr('disabled', true);
-										}
-										element.click();
-										return false;
-									});
-									element.on('showloading', function () {
-										console.log('>>> showloading');
-									});
-								}
-								$('.modal-footer', $(iframe).parent().parent()).append(clon);
-							});
-							modalBotons.hide();
-						}
-						// Evaluar URL del formulari
-						var dataForm = $('body', $(iframe).contents()).data('modal-form');
-						
-						
-						
-						var modalForm = (dataForm) ? $(dataForm, $(iframe).contents()) : $(settings.elementForm, $(iframe).contents());
-						if (modalForm.length) {
-							modalForm.attr('action', webutilUrlAmbPrefix(modalForm.attr('action'), '/modal'));
-						}
-						if (settings.width) {
-							$('.modal-dialog', modalobj).css('width', 'min(98%, ' + settings.width + ')');
-						}
-						if (settings.maximized) {
-							// Maximitzar
-							$('.modal-dialog', modalobj).css('width', '98%');
-							$('.modal-dialog', modalobj).css('top', '10px');
-							$('.modal-dialog', modalobj).css('margin', 'auto');
-							iframe.attr('height', '100%');
-							var contentHeight = $(iframe).contents().find("html").outerHeight();
-							var modalobj = $(iframe).parent().parent().parent();
-							var taraModal = $('.modal-header', modalobj).outerHeight() + $('.modal-footer', modalobj).outerHeight();
-							var maxBodyHeight = $(window.top).height() - taraModal - 20;
-							$(iframe).height(maxBodyHeight + 'px');
-							$('.modal-body', modalobj).css('height', maxBodyHeight + 'px');
-							$(iframe).contents().find("body").css('height', maxBodyHeight + 'px');
-						}
-						webutilModalAdjustHeight(iframe);
-					});
-				});
-				
-				modalobj.on('hidden.bs.modal', function () {
-					if (settings.refreshTancar) {
-						window.location.reload(true);
-					}
-				});
-				
-				iframe.on('load', function () {
-					localStorage['relval_' + settings.dataTableId] = undefined;
-					var pathname;
-					if (this.contentDocument) {
-						pathname = this.contentDocument.location.pathname;
-					}
-					if (pathname && pathname.startsWith(webutilModalTancarPath())) {
-						let redirectUrlAfterClosingModal = new URL(this.contentDocument.location.href).searchParams.get('redirectUrlAfterClosingModal');
-						if (redirectUrlAfterClosingModal) {
-							window.location.href = redirectUrlAfterClosingModal;
-						} else {
-							$('button.close', $(this).closest('.modal-dialog')).trigger('click');
-							if (settings.refreshMissatges && !settings.refreshPagina) {
-								webutilRefreshMissatges();
+		//La modal no s'obre en elements deshabilitats
+		if (settings.elementOrigin && !settings.elementOrigin.hasAttribute('disabled')) {
+			return this.filter("div").each(function() {
+				var modalobj = $('div.modal', this);
+				if (!modalobj.data('modal-configurada')) {
+					var iframe = $('iframe', modalobj);
+					modalobj.on('show.bs.modal', function () {
+						iframe.empty();
+						if (settings.height)
+							iframe.css('height', '' + settings.height + 'px');
+						iframe.attr("src", settings.contentUrl);
+						iframe.load(function() {
+							// S'oculta l'icona loader
+							$('.modal-body .datatable-dades-carregant').hide();
+							if(!iframe.attr("hidden")){
+								iframe.show();
 							}
-							if (settings.refreshDatatable) {
-								$('#' + settings.dataTableId).webutilDatatable('refresh');
+							// Copiar el titol de la modal
+							var titol = $(this).contents().find("title").html();
+							$('.modal-header h4', $(this).parent().parent()).html(titol);
+							// Copiar botons
+							$('.modal-footer', $(iframe).parent().parent()).empty();
+							var dataBotons = $('body', $(iframe).contents()).data('modal-botons');
+							var modalBotons = (dataBotons) ? $(dataBotons, $(iframe).contents()) : $(settings.elementBotons, $(iframe).contents());
+							if (modalBotons.length) {
+								$('.modal-footer *', $(this).parent().parent()).remove();
+								$('.btn', modalBotons).each(function() {
+									var element = $(this);
+									var clon = element.clone();
+									if (element.data('elementNoTancar')==true) {
+										clon.on('click', function () {
+										});
+									} else if (element.data(settings.elementTancarData)) {
+										clon.on('click', function () {
+											$(iframe).parent().parent().parent().parent().data(settings.elementTancarData, 'true');
+											$(iframe).parent().parent().parent().parent().modal('hide');
+											return false;
+										});
+									} else {
+										clon.on('click', function () {
+											// When click submit show loading
+											if ($(this).attr('type') === 'submit' && !$(this).data('noloading')) {
+												iframe.hide();
+												$('.modal-body .datatable-dades-carregant').css('padding-bottom', '0px');
+												$('.modal-body .datatable-dades-carregant').css('padding-top', '60px');
+												$('.modal-body .datatable-dades-carregant').show();
+												$(this).attr('disabled', true);
+											}
+											element.click();
+											return false;
+										});
+										element.on('showloading', function () {
+											console.log('>>> showloading');
+										});
+									}
+									$('.modal-footer', $(iframe).parent().parent()).append(clon);
+								});
+								modalBotons.hide();
 							}
-							if (settings.refreshPagina) {
-								window.location.reload(true);
-							}
-							if (settings.funcToCallOnTancar) {
-								window[settings.funcToCallOnTancar]();
-							}
+							// Evaluar URL del formulari
+							var dataForm = $('body', $(iframe).contents()).data('modal-form');
 							
 							
-						}
-					}
-				});
-				modalobj.data('modal-configurada', true);
-				modalobj.data({
-							backdrop: 'static',	//no tancar en cas de pitjar defora de la modal
-							keyboard: false //no tancar en cas de pitjar ESC
+							
+							var modalForm = (dataForm) ? $(dataForm, $(iframe).contents()) : $(settings.elementForm, $(iframe).contents());
+							if (modalForm.length) {
+								modalForm.attr('action', webutilUrlAmbPrefix(modalForm.attr('action'), '/modal'));
+							}
+							if (settings.width) {
+								$('.modal-dialog', modalobj).css('width', 'min(98%, ' + settings.width + ')');
+							}
+							if (settings.maximized) {
+								// Maximitzar
+								$('.modal-dialog', modalobj).css('width', '98%');
+								$('.modal-dialog', modalobj).css('top', '10px');
+								$('.modal-dialog', modalobj).css('margin', 'auto');
+								iframe.attr('height', '100%');
+								var contentHeight = $(iframe).contents().find("html").outerHeight();
+								var modalobj = $(iframe).parent().parent().parent();
+								var taraModal = $('.modal-header', modalobj).outerHeight() + $('.modal-footer', modalobj).outerHeight();
+								var maxBodyHeight = $(window.top).height() - taraModal - 20;
+								$(iframe).height(maxBodyHeight + 'px');
+								$('.modal-body', modalobj).css('height', maxBodyHeight + 'px');
+								$(iframe).contents().find("body").css('height', maxBodyHeight + 'px');
+							}
+							webutilModalAdjustHeight(iframe);
 						});
-			}
-			$('.modal-body iframe *', modalobj).remove();
-			$('.modal-footer *', modalobj).remove();
-			modalobj.modal('show');
-		});
+					});
+					
+					modalobj.on('hidden.bs.modal', function () {
+						if (settings.refreshTancar) {
+							window.location.reload(true);
+						}
+					});
+					
+					iframe.on('load', function () {
+						localStorage['relval_' + settings.dataTableId] = undefined;
+						var pathname;
+						if (this.contentDocument) {
+							pathname = this.contentDocument.location.pathname;
+						}
+						if (pathname && pathname.startsWith(webutilModalTancarPath())) {
+							let redirectUrlAfterClosingModal = new URL(this.contentDocument.location.href).searchParams.get('redirectUrlAfterClosingModal');
+							if (redirectUrlAfterClosingModal) {
+								window.location.href = redirectUrlAfterClosingModal;
+							} else {
+								$('button.close', $(this).closest('.modal-dialog')).trigger('click');
+								if (settings.refreshMissatges && !settings.refreshPagina) {
+									webutilRefreshMissatges();
+								}
+								if (settings.refreshDatatable) {
+									$('#' + settings.dataTableId).webutilDatatable('refresh');
+								}
+								if (settings.refreshPagina) {
+									window.location.reload(true);
+								}
+								if (settings.funcToCallOnTancar) {
+									window[settings.funcToCallOnTancar]();
+								}
+								
+								
+							}
+						}
+					});
+					modalobj.data('modal-configurada', true);
+					modalobj.data({
+								backdrop: 'static',	//no tancar en cas de pitjar defora de la modal
+								keyboard: false //no tancar en cas de pitjar ESC
+							});
+				}
+				$('.modal-body iframe *', modalobj).remove();
+				$('.modal-footer *', modalobj).remove();
+				modalobj.modal('show');
+			});
+		}
 	};
 
 	$.fn.webutilModal = function(options) {

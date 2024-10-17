@@ -19,7 +19,7 @@
 	#grid-documents .caption .dropdown-menu { text-align: left; }
 	#grid-documents .caption .dropdown-menu li { width: 100%; margin: 0; padding: 0; }
 	#contingut-botons { margin-bottom: .8em; }
-	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); }
 	.ordre-col { cursor: move; vertical-align: middle !important; }
 	.popover { max-width: none; z-index: 100; cursor: default; width: 500px; }
 	.popover .close { position: relative; top: -3px; }
@@ -51,12 +51,43 @@
     .toast-top-right { margin-top: 100px; }
 </style>
 
-
 <script>
 
 	const quedenDocumentsPerAdjuntar = ${not empty metaDocumentsNoPinbalLeft};
 	const potModificar = ${potModificar};
+	var   documentDrag = null; //Variable global, fitxer origen del drag&drop
 
+	//Funcio que es crida quant es fa un drop de un document de la mateixa taula
+	//NO quant es molla un fitxer de disc damunt la table, per aquesta funcionalitat cercar dataTransfer.files 	
+	function dropFitxerDinsCarpeta(event) {
+		try {
+			if (documentDrag!=null) {
+				let vistaActiva = $('#vistes').children("a.active").attr('id');
+				if (vistaActiva == 'vistaTreetablePerCarpetes') {
+					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+					let destiDocDrag = event.target.id;
+					window.location = documentDrag + "/moure/" + destiDocDrag;
+				} else if (vistaActiva == 'vistaGrid') {
+					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+					let destiDocDrag = event.target.id;
+					window.location = documentDrag + "/moure/" + destiDocDrag;
+					dropped = true;
+					$(event.target).addClass('dropped');
+				} else {
+					showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
+					let destiDocDrag = event.target.id;
+					let updateUrl = '${pageContext.request.contextPath}/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/updateTipusDocumentDragDrop/' + documentDrag + '/' + destiDocDrag
+					window.location = updateUrl;			
+				}
+			}
+		} catch (error) {
+			console.error("Se ha producido un error en dropFitxerDinsCarpeta: ", error.message);
+		} finally {
+			//Netejam la variable que indicava que un document s'estava arrastrant
+			documentDrag = null;
+		}
+	}
+	
 	//################################################## document ready START ##############################################################
 	$(document).ready(function () {
 
@@ -167,18 +198,14 @@
 			});
 		});
 
-
-		// Ja has afegit tots els documents a l'expedient
-		$(".document-new-empty-metadocuments").click(function (e) {
-			alert("<spring:message code="contingut.document.alerta.max"/>");
-			e.preventDefault();
-		});
-
-		// ##### Added to updateTableEvents()
-
 		let vistaActiva = $('#vistes').children("a.active").attr('id');
-		//-------------------------------- VISTA GRID -----------------------------------------﻿
+
+		//-------------------------------------------------------------------------------------﻿
+		//-------------------------------- VISTA GRID -----------------------------------------
+		//-------------------------------------------------------------------------------------
+		﻿
 		if (vistaActiva == 'vistaGrid') {
+			
 			// Habilitar selecció múltiple
 			$('#habilitar-mult').on('click', function () {
 				var contenidorContingut = document.getElementById('grid-documents');
@@ -236,7 +263,6 @@
 				}
 			});
 
-
 			// move to another folder by drag and drop (jquery-ui widget)
 			// TODO: revise, is necessary for vista icones?
 			$('.element-draggable').draggable({
@@ -246,7 +272,8 @@
 				revertDuration: 200,
 				opacity: 0.50,
 				zIndex: 100,
-				start: function () {
+				start: function(event, ui) {
+					documentDrag = this.id;
 					$('div.element-noclick', this).addClass('noclick');
 					$('div.element-noclick', this).tooltip('hide');
 					$('div.element-noclick', this).tooltip('disable');
@@ -255,21 +282,16 @@
 					$('div.element-noclick', this).tooltip('enable');
 				}
 			});
+			
 			$('.element-droppable').children(":not('.ordre-col')").droppable({
 				accept: '.element-draggable',
 				tolerance: 'pointer',
 				activeClass: 'element-target',
 				hoverClass: 'element-hover',
 				drop: function (event, ui) {
-					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-					var origenId = ui.draggable.attr('id');
-					var destiId = $(this).parent().attr('id');
-					window.location = origenId + "/moure/" + destiId;
-					dropped = true;
-					$(event.target).addClass('dropped');
+					dropFitxerDinsCarpeta(event);
 				}
 			});
-
 
 			$('li.element-contingut .caption p').each(function () {
 				$clamp(this, {
@@ -277,7 +299,6 @@
 					useNativeClamp: true
 				});
 			});
-
 
 			$('#grid-documents li').mouseover(function () {
 				$('a.btn', this).removeClass('hidden');
@@ -289,7 +310,10 @@
 				return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
 			});
 
-			//-------------------------------------- VISTA NOT GRID ------------------------------------
+		//-------------------------------------------------------------------------------------﻿
+		//-------------------------------- VISTA  NO  GRID ------------------------------------
+		//-------------------------------------------------------------------------------------
+
 		} else {
 
 			if (!$('#table-documents .treetable-expander').length) {
@@ -317,14 +341,12 @@
 				} else {
 					deselectAll();
 				}
-
 			});
 
 			// Select one
 			$('.checkbox').change(function () {
 				selectCheckbox($(this));
 			});
-
 
 			if (vistaActiva == 'vistaTreetablePerCarpetes') {
 				dragAndDropVistaCarpetes();
@@ -336,22 +358,19 @@
 					revert: true,
 					revertDuration: 200,
 					opacity: 0.50,
+					start: function(event, ui) {
+						documentDrag = this.id;
+					}
 				});
-
 
 				$('.element-droppable').droppable({
 					accept: '.element-draggable',
 					tolerance: 'pointer',
 					drop: function (event, ui) {
-						showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
-						let origenId = ui.draggable.attr('id');
-						let destiId = $(this).attr('id');
-						let updateUrl = '${pageContext.request.contextPath}/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/updateTipusDocumentDragDrop/' + origenId + '/' + destiId
-						window.location = updateUrl;
+						dropFitxerDinsCarpeta(event);
 					}
 				});
 			}
-
 		}
 
 		<c:if test="${isMantenirEstatCarpetaActiu}">
@@ -408,20 +427,16 @@
 			getDetallsSignants($('#detallSignants'), contingutId, false);
 		});
 
-// 		removeTransactionId();
-
 		<c:if test="${contingut.document}">
 
 		$('form#nodeDades').on('submit', function() {
 
-			debugger;
 			showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
 			
 			$.post(
 					'../ajax/contingutDada/${contingutId}/save',
 					$(this).serialize(),
 					function (data) {
-						debugger;
 						if (data.estatOk) {
 							$('#nodeDades input').each(function() {
 								var $pare = $(this).parent();
@@ -439,13 +454,7 @@
 									$(this).removeAttr('title');
 								}
 							});
-	// 						$.get(
-	// 								'../ajax/contingutDada/${contingut.id}/count',
-	// 								function (data) 
-	<%-- 									<meta name="subtitle" content="${serveiPerTitol}"/>{ --%>
-	// 									$('#dades-count').html(data);
-	// 								});
-							
+
 						} else {
 							$('#nodeDades input').each(function() {
 								for (var i = 0; i < data.errorsCamps.length; i++) {
@@ -463,13 +472,20 @@
 								}
 							});
 						}
-	// 					webutilRefreshMissatges();
+
 						location.reload();
 					});
 			return false;
 		});
 		</c:if>
+
+		$(window).resize(resizeDropZone);
+
 	});//################################################## document ready END ##############################################################
+
+	const resizeDropZone = () => {
+		$('#drop-area').css('height', ($('div.panel-body').height() - 54) + 'px');
+	}
 
 	$(document).on('change', '.checkbox', function () {
 		selectCheckbox($(this));
@@ -560,33 +576,33 @@
 		enableDisableMultipleButtons(idsSelected);
 	}
 
-function dragAndDropVistaCarpetes() {
-	// move to another folder by drag and drop (jquery-ui widget) 
-	$('.element-draggable').draggable({
-		containment: 'parent',
-		helper: 'clone',
-		revert: true,
-		revertDuration: 200,
-		opacity: 0.50,
-		start: function(event, ui) {
-	        var dropdownVisible = $(this).find('.dropdown-menu').is(':visible');
-	        if (dropdownVisible) {
-	            ui.helper.remove();
-	            return false;
-	        }
-		}
-	});
-	$('.element-droppable').droppable({
-		accept: '.element-draggable',
-		tolerance: 'pointer',
-		drop: function(event, ui) {
-			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-			let origenId = ui.draggable.attr('id');
-			let destiId = $(this).attr('id');
-			window.location = origenId + "/moure/" + destiId;
-		}
-	});
-}
+	function dragAndDropVistaCarpetes() {
+		// move to another folder by drag and drop (jquery-ui widget) 
+		$('.element-draggable').draggable({
+			containment: 'parent',
+			helper: 'clone',
+			revert: true,
+			revertDuration: 200,
+			opacity: 0.50,
+			start: function(event, ui) {
+				// #1533 Problema de moure document sense voler a carpetes
+		        var dropdownVisible = $(this).find('.dropdown-menu').is(':visible');
+		        if (dropdownVisible) {
+		            ui.helper.remove();
+		            return false;
+		        } else {
+		        	documentDrag = this.id;
+			    }
+			}
+		});
+		$('.element-droppable').droppable({
+			accept: '.element-draggable',
+			tolerance: 'pointer',
+			drop: function(event, ui) {
+				dropFitxerDinsCarpeta(event);
+			}
+		});
+	}
 
 	function updateTableEvents() {
 		<c:if test="${isMantenirEstatCarpetaActiu}">
@@ -665,6 +681,10 @@ function dragAndDropVistaCarpetes() {
 			// Add new document by dragging it to #drop-area
 			var $dropArea = $('#drop-area');
 			var $dropMessage = $('#drop-message');
+			var $dragArea = $('#drag-area')
+			var dragCounter = 0;
+
+			resizeDropZone();
 
 			$('#drop-area').filedrop({
 				// paramname: 'file', // El nom del paràmetre que es passarà al servidor
@@ -691,34 +711,51 @@ function dragAndDropVistaCarpetes() {
 					}
 				},
 
-				// Executat quan un fitxer està sobre l'àrea
-				dragOver: function () {
-					debugger;
+				dragEnter: function() {
+					dragCounter++;
 					$dropArea.css('border-color', '#ffd351');
 					$dropMessage.css('display', 'block');
+					$dragArea.hide();
+				},
+
+				// Executat quan un fitxer està sobre l'àrea
+				dragOver: function (e) {
+					e.preventDefault();
 				},
 
 				// Executat quan un fitxer surt de l'àrea de drop
 				dragLeave: function () {
-					$dropArea.css('border-color', 'transparent');
-					$dropMessage.css('display', 'none');
+					dragCounter--;
+					if (dragCounter === 0) {
+						$dropArea.css('border-color', 'transparent');
+						$dropMessage.css('display', 'none');
+						$dragArea.show();
+					}
 				},
 
 				// Executat quan un fitxer es deixa anar a l'àrea de drop, abans de començar la càrrega
 				drop: function (e) {
-					$dropArea.css('border-color', 'transparent');
-					$dropMessage.css('display', 'none');
-					if (quedenDocumentsPerAdjuntar) {
-						let files = e.originalEvent.dataTransfer.files;
-						if (!(files.length > 1)) {
-							document.querySelector('#dropped-files').files = files;
-							$('#document-new').trigger('click');
-						}
-					} else {
-						alert("<spring:message code="contingut.document.alerta.max"/>");
+					//S'està arrastrant un fitxer desde fora del navegador
+					if (e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files) {
 						e.preventDefault();
+						dragCounter = 0;
+						$dropArea.css('border-color', 'transparent');
+						$dropMessage.css('display', 'none');
+						$dragArea.show();
+						if (quedenDocumentsPerAdjuntar) {
+							let files = e.originalEvent.dataTransfer.files;
+							if (!(files.length > 1)) {
+								document.querySelector('#dropped-files').files = files;
+								$('#document-new').trigger('click');
+							}
+						} else {
+							alert("<spring:message code="contingut.document.alerta.max"/>");
+						}
+						return false;
+					} else {
+						//S'esta arrastrant un document dins una carpeta desde la mateixa taula
+						dropFitxerDinsCarpeta(e);
 					}
-					return false;
 				},
 			});
 		}
@@ -1494,12 +1531,19 @@ function dragAndDropVistaCarpetes() {
 			<c:if test="${isTasca}">
 				<div id="tascaBtn" style="float: right">
 					<c:if test="${tascaEstat=='INICIADA'}">
-						<a href="<c:url value="/usuariTasca/${tascaId}/finalitzar"/>" class="btn btn-default" style="float: right;" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzarTasca" /></a>
+						<a href="<c:url value="/usuariTasca/${tascaId}/finalitzar?redirectATasca=true&origenTasques=${origenTasques}"/>" class="btn btn-default" style="float: right;" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzarTasca" /></a>
 					</c:if>
 					<c:if test="${tascaEstat=='PENDENT'}">
-						<a href="<c:url value="/usuariTasca/${tascaId}/iniciar?redirectATasca=true"/>" class="btn btn-default" style="float: right;"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a>
+						<a href="<c:url value="/usuariTasca/${tascaId}/iniciar?redirectATasca=true&origenTasques=${origenTasques}"/>" class="btn btn-default" style="float: right;"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a>
 					</c:if>
-					<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+					<c:choose>
+						<c:when test="${origenTasques}">
+							<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+						</c:when>
+						<c:otherwise>
+							<a href="<c:url value="/contingut/${expedientId}#tasques"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</c:if>
 
@@ -1552,7 +1596,6 @@ function dragAndDropVistaCarpetes() {
 					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
 						<a href="<c:url value="/contingut/${contingut.id}/descarregarMultiples?tascaId=${tascaId}"/>" class="btn btn-default con-mult">
 							<span class="fa fa-download"></span>
-
 							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a>
 					</div>
@@ -1573,12 +1616,10 @@ function dragAndDropVistaCarpetes() {
 							<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
 								<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
 									<span class="fa fa-check-square"></span>
-
 									<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 								</a>
 								<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
 									<span class="fa fa-check-square"></span>
-
 									<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 								</a>
 							</div>
@@ -1586,7 +1627,6 @@ function dragAndDropVistaCarpetes() {
 						<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
 							<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default con-mult">
 								<span class="fa fa-arrows"></span>
-
 								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 							</a>
 						</div>
@@ -1652,37 +1692,43 @@ function dragAndDropVistaCarpetes() {
 								</li>
 							</c:if>
 							<%---- Document... ----%>
-							<li>
-								<c:choose>
-									<c:when test="${empty metaDocumentsNoPinbalLeft}">
-										<a href="#" class="document-new-empty-metadocuments">
+							
+							<c:choose>
+								<c:when test="${empty metaDocumentsNoPinbalLeft}">
+									<li style="opacity: 0.4; cursor: default;">
+										<a href='#' class='document-new-empty-metadocuments' title='<spring:message code="contingut.document.alerta.max"/>' >
 											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 										</a>
-									</c:when>
-									<c:otherwise>
+									</li>
+								</c:when>
+								<c:otherwise>
+									<li>
 										<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true">
 											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 										</a>
-									</c:otherwise>
-								</c:choose>
-							</li>
+									</li>
+								</c:otherwise>
+							</c:choose>
+							
 							<c:if test="${!isTasca}">
 								<%---- Consulta PINBAL... ----%>
 								<c:if test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">
-									<li>
-										<c:choose>
-											<c:when test="${empty metaDocumentsPinbalLeft}">
-												<a href="#" class="document-new-empty-metadocuments">
+									<c:choose>
+										<c:when test="${empty metaDocumentsPinbalLeft}">
+											<li style="opacity: 0.4; cursor: default;">
+												<a href='#' class='document-new-empty-metadocuments' title='<spring:message code="contingut.document.alerta.pinbal.max"/>' >
 													<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
 												</a>
-											</c:when>
-											<c:otherwise>
+											</li>
+										</c:when>
+										<c:otherwise>
+											<li>
 												<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
 													<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
 												</a>
-											</c:otherwise>
-										</c:choose>
-									</li>
+											</li>
+										</c:otherwise>
+									</c:choose>
 								</c:if>
 								<%---- Carpeta... ----%>
 								<c:if test="${isCreacioCarpetesActiva}">
@@ -2180,20 +2226,19 @@ function dragAndDropVistaCarpetes() {
 				</c:when>
 			</c:choose>
 
+			<c:if test="${potModificar}">
+				<div id="drag-area" class="drag_activated">
+					<span class="down fa fa-upload"></span>
+					<p><spring:message code="contingut.drag.info" /></p>
+				</div>
+			</c:if>
+
 		</div>
 
 		<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >
 			<iframe id="container" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
 		</div>
 
-<%--		<c:if test="${potModificar}">--%>
-<%--			<div id="drag_container" class="drag_activated">--%>
-<%--				<span class="down fa fa-upload"></span>--%>
-<%--				<p>--%>
-<%--					<spring:message code="contingut.drag.info" />--%>
-<%--				</p>--%>
-<%--			</div>--%>
-<%--		</c:if>--%>
 		<input class="hidden" id="dropped-files" type="file"/>
 
 	</c:otherwise>

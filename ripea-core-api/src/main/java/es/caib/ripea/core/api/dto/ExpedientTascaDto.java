@@ -8,6 +8,7 @@ import es.caib.ripea.core.api.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,8 @@ public class ExpedientTascaDto {
 	@SuppressWarnings("unused")
 	private String dataLimitString;
 	private boolean shouldNotifyAboutDeadline;
+	@SuppressWarnings("unused")
+	private boolean dataLimitExpirada;
 	private String comentari;
 	private long numComentaris;
 	private boolean usuariActualResponsable;
@@ -56,8 +59,23 @@ public class ExpedientTascaDto {
 	}
 	
 	public String getDuracioFormat() {
-		return Utils.duracioEnDiesToString(this.duracio);
+		String resultat = Utils.duracioEnDiesToString(this.duracio);
+		String restants = Utils.diesRestantsToString(this.dataLimit);
+		if (resultat!=null) {
+			if (this.dataLimit==null) {
+				return resultat;
+			} else {
+				resultat+=" ("+restants+")";
+			}
+		} else {
+			return restants;
+		}
+		return resultat;
 	}	
+	
+	public boolean isDataLimitExpirada() {
+		return (this.dataLimit!=null && this.dataLimit.before(Calendar.getInstance().getTime()));
+	}
 	
 	public boolean isAgafada() {
 		return responsableActual != null;

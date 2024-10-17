@@ -3,11 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.util.List;
+
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 /**
  * Informació d'una dada.
@@ -30,8 +31,8 @@ public class OrganGestorDto extends AuditoriaDto {
     private List<PermisDto> permisos;
     private boolean gestioDirect;
     private OrganEstatEnumDto estat;
+    private String estatMessage;
     private TipusTransicioEnumDto tipusTransicio;
-    
     private String cif;
     private boolean utilitzarCifPinbal;
     
@@ -45,13 +46,17 @@ public class OrganGestorDto extends AuditoriaDto {
     public String getCodiINom() {
     	return codi + " - " + nom;
     }
-    
+
     public String getCodiAmbEstatINom() {
     	if (OrganEstatEnumDto.E.equals(this.estat) || OrganEstatEnumDto.A.equals(this.estat)) {
-    		return codi + " <span class='fa fa-warning text-danger' style='margin-top: 3px;'></span> - " + nom;
+        	String txtObsolet = "";
+        	if (Utils.isNotEmpty(this.estatMessage)) {
+        		txtObsolet = "title='"+this.estatMessage+"'";
+        	}
+    		return codi + " <span class='fa fa-warning text-danger' "+txtObsolet+" style='margin-top: 3px;'></span> - " + nom;
     	} else {
     		return codi + " - " + nom;
-    	}    	
+    	}
     }
     
     public String getNomICodi() {
@@ -67,10 +72,8 @@ public class OrganGestorDto extends AuditoriaDto {
     public String getCodiINomIEntitat() {
 		return codi + " - " + nom + " (" + entitatCodi + ")";
     }
-    
 	
 	public boolean isObsolet() {
 		return estat != OrganEstatEnumDto.V;
 	}
-       
 }

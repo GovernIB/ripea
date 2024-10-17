@@ -97,7 +97,7 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 			String nom,
 			String descripcio) {
 		this.codi = codi;
-		this.nom = nom;
+		this.nom = nom!=null?nom.trim():null;
 		this.descripcio = StringUtils.abbreviate(descripcio, 1000);
 	}
 

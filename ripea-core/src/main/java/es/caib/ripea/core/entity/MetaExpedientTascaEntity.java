@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -66,6 +67,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			String descripcio,
 			String responsable,
 			Date dataLimit,
+			Integer duracio,
+			PrioritatEnumDto prioritat,
 			ExpedientEstatEntity estatCrearTasca,
 			ExpedientEstatEntity estatFinalitzarTasca) {
 		this.codi = codi;
@@ -73,6 +76,13 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 		this.descripcio = descripcio;
 		this.responsable = responsable;
 		this.dataLimit = dataLimit;
+		this.duracio = duracio;
+		if (duracio!=null) {
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DAY_OF_YEAR, duracio);
+			this.dataLimit = cal.getTime();
+		}
+		this.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
 		this.estatCrearTasca = estatCrearTasca;
 		this.estatFinalitzarTasca = estatFinalitzarTasca;
 	}
@@ -124,8 +134,12 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.responsable = responsable;
 			built.metaExpedient = metaExpedient;
 			built.activa = true;
-			built.dataLimit = dataLimit;
-			built.duracio = duracio != null ? duracio : 10;
+			built.duracio = duracio;
+			if (duracio!=null) {
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.DAY_OF_YEAR, duracio);
+				built.dataLimit = cal.getTime();
+			}
 			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
 			built.estatCrearTasca = estatCrearTasca;
 			built.estatFinalitzarTasca = estatFinalitzarTasca;

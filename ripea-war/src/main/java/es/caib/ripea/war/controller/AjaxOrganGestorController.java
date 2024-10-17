@@ -112,7 +112,6 @@ public class AjaxOrganGestorController extends BaseAdminController{
 			organGestorsList = organGestorService.findAll(
 					text);
 		}
-			
 		
 		if (text == null) {
 			return organGestorsList.subList(0, 5);
@@ -120,6 +119,5 @@ public class AjaxOrganGestorController extends BaseAdminController{
 
 		return organGestorsList;
 	}
-	
 	
 }

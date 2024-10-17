@@ -47,7 +47,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
-			PrioritatEnumDto prioritat) {
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -62,7 +63,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				anexosIdsMetaDocsIdsMap, 
 				justificantIdMetaDoc,
 				interessatsAccionsMap,
-				prioritat);
+				prioritat,
+				prioritatMotiu);
 	}
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
@@ -259,8 +261,18 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat) {
-		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId, prioritat);
+	public ExpedientDto update(
+			Long entitatId,
+			Long id,
+			String nom,
+			int any,
+			Long metaExpedientDominiId,
+			Long organGestorId,
+			String rolActual,
+			Long grupId,
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
+		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId, prioritat, prioritatMotiu);
 	}
 
 
@@ -476,8 +488,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	public ExpedientDto changeExpedientPrioritat(
 			Long entitatId,
 			Long expedientId,
-			PrioritatEnumDto prioritat) {
-		return delegate.changeExpedientPrioritat(entitatId, expedientId, prioritat);
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
+		return delegate.changeExpedientPrioritat(entitatId, expedientId, prioritat, prioritatMotiu);
 	}
 
     @Override

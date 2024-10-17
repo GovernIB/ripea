@@ -31,7 +31,6 @@ import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.war.command.ExpedientTascaCommand;
@@ -39,7 +38,6 @@ import es.caib.ripea.war.command.TascaReassignarCommand;
 import es.caib.ripea.war.command.TascaReobrirCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
 /**
@@ -54,7 +52,6 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	@Autowired private ExpedientTascaService expedientTascaService;
 	@Autowired private ExpedientService expedientService;
 	@Autowired private AplicacioService aplicacioService;
-	@Autowired private ConfigService configService;
 
 	@RequestMapping(value = "/{expedientId}/datatable", method = RequestMethod.GET)
 	@ResponseBody
@@ -131,12 +128,11 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		expedientTascaService.changeTascaPrioritat(command);
-		MissatgesHelper.success(request, getMessage(request, "tasca.controller.prioritatModificat.ok", new Object[]{command.getTitol()}));
-		return modalUrlTancar();
-//		return getModalControllerReturnValueSuccess(
-//				request,
-//				"redirect:../expedient",
-//				"expedient.controller.prioritatModificat.ok");
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"tasca.controller.prioritatModificat.ok",
+				new Object[]{command.getTitol()});
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/cancellar", method = RequestMethod.GET)
@@ -144,21 +140,20 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
 			Model model) {
+		
 		getEntitatActualComprovantPermisos(request);
 		
-		expedientTascaService.canviarTascaEstat(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.canviarTascaEstat(
 				expedientTascaId,
 				TascaEstatEnumDto.CANCELLADA,
 				null,
 				RolHelper.getRolActual(request));
-		//TODO Es necessari recuperar de nou la tasca? canviarTascaEstat ja retorna un objecte ExpedientTascaDto 
-		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
+				"redirect:/expedientTasca",
 				"expedient.tasca.controller.cancellada.ok",
-				new Object[]{expedientTascaDto.getTitol()});
-		
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}	
 	
 	@RequestMapping(value="/{expedientId}/tasca", method = RequestMethod.POST)
@@ -207,22 +202,20 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			@PathVariable Long metaExpedientTascaId,
 			Model model) {
 		MetaExpedientTascaDto resultat = expedientTascaService.findMetaExpedientTascaById(metaExpedientTascaId);
-		Calendar cal = Calendar.getInstance();
-		if (resultat.getDuracio()==null) {
-			String duracioTascaConf = configService.getConfigValue("es.caib.ripea.duracio.tasca");
-			resultat.setDuracio(duracioTascaConf!=null?Integer.parseInt(duracioTascaConf):10);
-		}		
-		cal.add(Calendar.DAY_OF_YEAR, resultat.getDuracio());
-		resultat.setDataLimit(cal.getTime());
+		//Com que estam creant una tasca nova, la data limit no es la del procediment, sino avui+duració de la tasca.
+		if (resultat.getDuracio()!=null) {
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DAY_OF_YEAR, resultat.getDuracio());
+			resultat.setDataLimit(cal.getTime());
+		}
 		return resultat;
 	}
 	
 	//Han canviat la duració del command, recalculam la data limit
-	@RequestMapping(value = "{metaExpedientTascaId}/changedDuracio", method = RequestMethod.POST)
+	@RequestMapping(value = "/changedDuracio", method = RequestMethod.POST)
 	@ResponseBody
 	public ExpedientTascaCommand changedDuracio(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientTascaId,
 			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
 			Model model) {
 		if (expedientTascaCommand.getDuracio()!=null && expedientTascaCommand.getDuracio()>0) {
@@ -241,20 +234,27 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	}
 	
 	//Han canviat la data limit del command, recalculam la duracio
-	@RequestMapping(value = "{metaExpedientTascaId}/changedDataLimit", method = RequestMethod.POST)
+	@RequestMapping(value = "/changedDataLimit", method = RequestMethod.POST)
 	@ResponseBody
 	public ExpedientTascaCommand changedDataLimit(
 			HttpServletRequest request,
-			@PathVariable Long metaExpedientTascaId,
 			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
 			Model model) {
+		
 		if (expedientTascaCommand.getDataLimit()!=null) {
-			long avui  = Calendar.getInstance().getTimeInMillis();
-			long limit = expedientTascaCommand.getDataLimit().getTime();
-			long diff = limit-avui;
-			//La data limit no pot ser anterior al dia d'avui
+			
+			//La data limit no podrà ser anterior a la data d'inici de la tasca (si s'esta creant, serà la data d'avui)
+			Calendar calIni = Calendar.getInstance();
+			if (expedientTascaCommand.getDataInici()!=null) {
+				calIni.setTime(expedientTascaCommand.getDataInici());
+			}
+			
+			Calendar calFin = Calendar.getInstance();
+			calFin.setTime(expedientTascaCommand.getDataLimit());
+			
+			long diff = calFin.getTimeInMillis()-calIni.getTimeInMillis();
+
 			if (diff<=0) {
-				expedientTascaCommand.setDataLimit(Calendar.getInstance().getTime());
 				expedientTascaCommand.setDuracio(0);
 			} else {
 				//La data de limit es posterior a avui, calculam durada

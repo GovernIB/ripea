@@ -134,32 +134,6 @@
 				$('table').dataTable().api().state.clear();
 			});
 			$('table').data("page-length", ${dadesUsuariActual.numElementsPagina});
-
-			/**
-			 * Funcions per posar un doble submenu a RIPEA.
-			 * El pare (tipicament un li) ha de tenir la classe ripea-doble-menu
-			 * El fill, ha de ser un "ul" inmediatament a continuació en el codi, i amb la classe ripea-submenu-list
-			 */
-			$('.ripea-doble-menu a').click(function(event) {
-				event.preventDefault();
-				return false;
-			});
-			$('.ripea-doble-menu').mouseover(function(event) {
-				let submenu = $(this).next();
-				$(submenu).mouseleave(function(event) { $(this).hide(); });
-				let coordPare = $(this)[0].getBoundingClientRect();
-				$(submenu).show();
-				let coordSubm = $(submenu)[0].getBoundingClientRect();
-				$(submenu).css('top', coordPare.top+"px");
-				$(submenu).css('left', (coordPare.left-coordSubm.width)+"px");
-			});
-			$('.ripea-doble-menu').mouseleave(function(event) {
-				let rect = this.getBoundingClientRect();
-				if(event.clientX > rect.left) {
-					let submenu = $(this).next();
-					$(submenu).hide();
-				}
-			});
 		});
 		
 	</script>
@@ -352,7 +326,6 @@ body {
 				</div>
 			</div>
 			</div>
-			
 	
 			<%------------------------ MENU BUTTONS ------------------------%>
 			<div class="btn-group navbar-btn navbar-right" style="margin-top: 25px;">
@@ -376,39 +349,8 @@ body {
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
 								<li><a href="<c:url value="/pinbalServei"/>"><spring:message code="decorator.menu.pinbal.servei"/></a></li>
-								<li class="ripea-doble-menu"><a href="#"><spring:message code="decorator.menu.reinici.scheduler"/></a></li>
-								<ul class="ripea-submenu-list" style="display: none;width: 420px;">
-									<li><a href="<c:url value="/scheduled/restart/actualitzacioDeProcediments"/>"><spring:message code="decorator.menu.reinici.scheduler.pr"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/enviarEmailsInformantDeNouComentariPerProcediment"/>"><spring:message code="decorator.menu.reinici.scheduler.em"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/tancarExpedientsEnArxiu"/>"><spring:message code="decorator.menu.reinici.scheduler.ta"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/consultaDeCanvisAlOrganigrama"/>"><spring:message code="decorator.menu.reinici.scheduler.or"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/consultarIGuardarAnotacionsPendents"/>"><spring:message code="decorator.menu.reinici.scheduler.an"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/enviarEmailsAgrupats"/>"><spring:message code="decorator.menu.reinici.scheduler.ag"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/enviarDocumentsAlPortafirmes"/>"><spring:message code="decorator.menu.reinici.scheduler.fi"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/canviarEstatEnDistribucio"/>"><spring:message code="decorator.menu.reinici.scheduler.di"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/guardarEnArxiuContingutsPendents"/>"><spring:message code="decorator.menu.reinici.scheduler.ax"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/guardarEnArxiuInteressats"/>"><spring:message code="decorator.menu.reinici.scheduler.ai"/></a></li>
-									<li><a href="<c:url value="/scheduled/restart/tots"/>"><spring:message code="decorator.menu.reinici.scheduler.xx"/></a></li>
-								</ul>
-								<li class="ripea-doble-menu"><a href="#"><spring:message code="decorator.menu.reinici.plugin"/></a></li>
-								<ul class="ripea-submenu-list" style="display: none;width: 240px;">
-									<li><a href="<c:url value="/plugin/restart/ax"/>"><spring:message code="decorator.menu.reinici.plugin.ax"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/di"/>"><spring:message code="decorator.menu.reinici.plugin.di"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/no"/>"><spring:message code="decorator.menu.reinici.plugin.no"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/cd"/>"><spring:message code="decorator.menu.reinici.plugin.cd"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/us"/>"><spring:message code="decorator.menu.reinici.plugin.us"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/pi"/>"><spring:message code="decorator.menu.reinici.plugin.pi"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/de"/>"><spring:message code="decorator.menu.reinici.plugin.de"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/ro"/>"><spring:message code="decorator.menu.reinici.plugin.ro"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/dg"/>"><spring:message code="decorator.menu.reinici.plugin.dg"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/pf"/>"><spring:message code="decorator.menu.reinici.plugin.pf"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/vf"/>"><spring:message code="decorator.menu.reinici.plugin.vf"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/gd"/>"><spring:message code="decorator.menu.reinici.plugin.gd"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/fs"/>"><spring:message code="decorator.menu.reinici.plugin.fs"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/si"/>"><spring:message code="decorator.menu.reinici.plugin.si"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/vi"/>"><spring:message code="decorator.menu.reinici.plugin.vi"/></a></li>
-									<li><a href="<c:url value="/plugin/restart/xx"/>"><spring:message code="decorator.menu.reinici.plugin.xx"/></a></li>
-								</ul>
+								<li><a href="<c:url value="/scheduled"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.reinici.scheduler"/> ...</a></li>
+								<li><a href="<c:url value="/plugin"/>" data-toggle="modal"><spring:message code="decorator.menu.reinici.plugin"/> ...</a></li>
 							</ul>
 						</div>
 						
@@ -524,49 +466,32 @@ body {
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
 						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary">
-								<spring:message code="decorator.menu.expedients"/>
-						</a>
+						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
 						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
-							<spring:message code="decorator.menu.expedientPeticions"/>
-							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
-						</a>
+						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedientPeticions"/> <span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a>
 						<%---- Tasques ----%>
-						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary">
-							<spring:message code="decorator.menu.tasques"/>
-							<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
-						</a>
-						<%---- Estadístiques ----%>
- 						<c:if test="${teAccesEstadistiques}">
- 							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary">
- 								<spring:message code="decorator.menu.accions.estadistiques"/>
- 							</a>
- 						</c:if>
+						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.tasques"/> <span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span></a>
 						<%-- Fluxos --%>
 						<c:if test="${isCreacioFluxUsuariActiu}">
-							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary">
-									<spring:message code="decorator.menu.fluxosusuari"/>
-							</a>
+							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.fluxosusuari"/></a>
 						</c:if>
-						<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
-							<%-- Consulta enviaments --%>
+						<%-- Consulta --%>
+						<c:if test="${teAccesEstadistiques or isMostrarSeguimentEnviamentsUsuariActiu}">
 							<div class="btn-group">
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
 								<ul class="dropdown-menu">
-									<li>
-										<a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true">
-											<spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/>
-										</a>
-									</li>
-									<li>
-										<a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true">
-											<spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/>
-										</a>
-									</li>						
+									<%---- Estadístiques ----%>
+									<c:if test="${teAccesEstadistiques}">
+										<li><a href="<c:url value="/historic"/>" data-maximized="true"><spring:message code="decorator.menu.accions.estadistiques"/></a></li>
+									</c:if>
+									<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
+										<%-- Consulta enviaments --%>
+										<li><a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/></a></li>
+										<li><a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/></a></li>
+									</c:if>
 								</ul>
-							</div>		
-						</c:if>			
+							</div>
+						</c:if>
 					</c:when>
 				</c:choose>
 				<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">
@@ -579,7 +504,7 @@ body {
 							<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
 							<li><a href="<c:url value="/massiu/firmasimpleweb"/>"><spring:message code="massiu.firmasimpleweb"/></a></li>
 							<c:if test="${isConvertirDefinitiuActiu}">
-							<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
+								<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
 							</c:if>
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 							<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
@@ -606,29 +531,11 @@ body {
 							<spring:message code="decorator.menu.revisioProcediments"/>
 					</a>
 				</c:if>
-				
-				
-				<%--c:if test="${isRolActualUsuari or isRolActualAdministrador}">
-					<div class="btn-group">
-						<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="execucions.massives.boto.user"/>&nbsp;<span class="caret caret-white"></span></button>
-						<ul class="dropdown-menu">
-							<c:if test="${isRolActualUsuari}">
-								<li><a href="<c:url value="/massiu/portafirmes"/>"><span class="fa fa-file-o "></span> <spring:message code="execucions.massives.boto.option.portafirmes"/></a></li>
-								<li role="separator" class="divider"></li>
-							</c:if>
-							<li><a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-tasks"></span> <spring:message code="execucions.massives.boto.option.consulta"/></a></li>
-						</ul>
-					</div>
-				</c:if--%>
-			</div>		
-			
+			</div>			
 		</div>
 	</div>
 
-	
-	
-	<div class="container container-main container-caib">
-	
+	<div class="container container-main container-caib">	
 		<c:if test="${not empty avisos}">
 			<div id="accordion">
 				<c:forEach var="avis" items="${avisos}" varStatus="status">

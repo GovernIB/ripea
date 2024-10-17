@@ -231,6 +231,23 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		this.entregaDehObligat = dto.getEntregaDehObligat();
 		this.incapacitat = dto.getIncapacitat();
 	}
+	
+	public void merge(InteressatDto dto) {
+		if (dto.getDocumentTipus()!=null) { this.documentTipus = dto.getDocumentTipus(); }
+		if (dto.getDocumentNum()!=null) { this.documentNum = dto.getDocumentNum(); }
+		if (dto.getPais()!=null) { this.pais = dto.getPais(); }
+		if (dto.getProvincia()!=null) { this.provincia =  dto.getProvincia(); }
+		if (dto.getMunicipi()!=null) { this.municipi =  dto.getMunicipi(); }
+		if (dto.getAdresa()!=null) { this.adresa =  dto.getAdresa(); }
+		if (dto.getCodiPostal()!=null) { this.codiPostal =  dto.getCodiPostal(); }
+		if (dto.getEmail()!=null) { this.email =  dto.getEmail(); }
+		if (dto.getTelefon()!=null) { this.telefon =  dto.getTelefon(); }
+		if (dto.getObservacions()!=null) { this.observacions =  dto.getObservacions(); }
+		if (dto.getPreferenciaIdioma()!=null) { this.preferenciaIdioma =  dto.getPreferenciaIdioma(); }
+		if (dto.getEntregaDeh()!=null) { this.entregaDeh = dto.getEntregaDeh(); }
+		if (dto.getEntregaDehObligat()!=null) { this.entregaDehObligat = dto.getEntregaDehObligat(); }
+		if (dto.getIncapacitat()!=null) { this.incapacitat = dto.getIncapacitat(); }
+	}
 
 	public static Builder getBuilder(
 			InteressatDto dto,
@@ -251,6 +268,10 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 //	public InteressatEntity getRepresentat() {
 //		return !CollectionUtils.isEmpty(representats) ? representats.get(0) : null;
 //	}
+
+	public void setRepresentant(InteressatEntity representant) {
+		this.representant = representant;
+	}
 
 	public abstract static class Builder {
 		public abstract InteressatEntity build();

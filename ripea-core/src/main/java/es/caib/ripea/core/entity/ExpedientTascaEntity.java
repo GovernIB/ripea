@@ -149,7 +149,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
-			built.duracio = duracio != null ? duracio : 10;
+			built.duracio = duracio;
 			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
 			built.titol = titol;
 			built.observacions = observacions;

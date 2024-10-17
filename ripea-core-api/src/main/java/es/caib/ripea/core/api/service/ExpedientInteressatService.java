@@ -267,5 +267,5 @@ public interface ExpedientInteressatService {
 			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
-	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats) throws NotFoundException;
+	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats);
 }

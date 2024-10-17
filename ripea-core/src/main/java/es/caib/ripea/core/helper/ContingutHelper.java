@@ -554,6 +554,7 @@ public class ContingutHelper {
 		dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 		dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
         dto.setPrioritat(expedient.getPrioritat());
+        dto.setPrioritatMotiu(expedient.getPrioritatMotiu());
 	}
 
 	private void setExpedientPermisos(ExpedientDto dto, Long expedientId) {
@@ -1554,7 +1555,8 @@ public class ContingutHelper {
 			Integer any,
 			boolean agafar,
 			Long grupId,
-			PrioritatEnumDto prioritat) {
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1574,7 +1576,8 @@ public class ContingutHelper {
 				ntiFechaApertura,
 				metaExpedient.getClassificacio(),
 				organGestor,
-				prioritat).
+				prioritat,
+				prioritatMotiu).
 				agafatPer(agafatPer).
 				grup(grupEntity).
 				build();

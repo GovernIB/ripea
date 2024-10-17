@@ -19,14 +19,11 @@ import java.util.Locale;
 public class MessageHelper implements MessageSourceAware {
 
 	private static ThreadLocal<Locale> currentLocale = new ThreadLocal<>();
-
+	private MessageSource messageSource;
+	
 	public static void setCurrentLocale(Locale locale) {
 		MessageHelper.currentLocale.set(locale);
 	}
-
-
-	private MessageSource messageSource;
-
 
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 		String msg = "???" + (keys.length > 0 ? keys[keys.length-1] : "") + "???";
