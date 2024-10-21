@@ -528,8 +528,9 @@ public class ExpedientHelper {
 					updateRepresentant(expedientId, interessat.getId(), permission, rolActual, representantOverwritten);
 				}
 			} else {
-				InteressatEntity representant = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, representantDistribucio.getDocumentNumero());
-				if (distinctDocNum(interessat.getDocumentNum(),representant.getDocumentNum())) {
+				if (representantDistribucio != null 
+						&& distinctDocNum(interessat.getDocumentNum(), representantDistribucio.getDocumentNumero())) {
+					InteressatEntity representant = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, representantDistribucio.getDocumentNumero());
 					if (representant == null) {
 						createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
 					} else {
