@@ -15,6 +15,11 @@ public class SistemaExternCodiMissatgeException extends SistemaExternException {
 	private String missatge;
 
 	public SistemaExternCodiMissatgeException(
+			String missatge) {
+		super(missatge);
+	}
+	
+	public SistemaExternCodiMissatgeException(
 			String codi,
 			String missatge) {
 		super("[" + codi + "] " + missatge);
