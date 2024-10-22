@@ -20,6 +20,6 @@ Actualment encara es troba en procés però es pot dir que les principals caract
 * [Manual d'usuari](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf)
 * [Manual d'administrador](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf)
 ## <a name="v_estable"></a> Versió estable
-### [v0.9.108](https://github.com/GovernIB/ripea/releases/tag/v0.9.108)
+### [v0.9.110](https://github.com/GovernIB/ripea/releases/tag/v0.9.110)
 ## <a name="b_activa"></a> Branca activa
 ### [ripea-dev](https://github.com/GovernIB/ripea/tree/ripea-dev)
