@@ -27,6 +27,7 @@ public class IntegracioAccioDto implements Serializable {
 	private Long timestamp;
 	private Date data;
 	private String descripcio;
+	private String endpoint;
 	private Map<String, String> parametres;
 	private IntegracioDto integracio;
 	private IntegracioAccioTipusEnumDto tipus;
