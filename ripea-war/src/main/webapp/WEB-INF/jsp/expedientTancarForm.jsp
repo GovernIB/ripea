@@ -77,6 +77,12 @@
 				<spring:message code="contingut.expedient.tancar.notif"/>
 			</div>
 		</c:if>
+		<c:if test="${expedient.conteDocumentsDeAnotacionesNoMogutsASerieFinal}">
+			<div class="alert well-sm alert-warning">
+				<span class="fa fa-warning"></span>
+				<spring:message code="contingut.expedient.tancar.annex"/>
+			</div>
+		</c:if>
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" id="btnSubmit" class="btn btn-success" data-noloading="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/></button>
@@ -87,7 +93,7 @@
 setTimeout(() => {
 	$(document).ready(function() {
 		$('#select-all-docs').on('click', function(event) {
-			$('input[name=documentsPerFirmar]:checkbox').prop('checked', event.currentTarget.checked);
+			$('input[type="checkbox"][name="documentsPerFirmar"]:not(:disabled)').prop('checked', event.currentTarget.checked);
 		});
 		$('input[name=documentsPerFirmar]').on('change', function(event) {
 			const total = $('input[name=documentsPerFirmar]:checkbox').length;

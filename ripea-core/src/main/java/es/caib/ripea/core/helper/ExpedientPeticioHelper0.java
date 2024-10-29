@@ -3,6 +3,15 @@
  */
 package es.caib.ripea.core.helper;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.Estat;
@@ -11,54 +20,19 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.repository.RegistreInteressatRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 
 @Component
 public class ExpedientPeticioHelper0 {
 	
-	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private RegistreRepository registreRepository;
-	@Autowired
-	private RegistreInteressatRepository registreInteressatRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;  
-	@Autowired
-	private EntitatRepository entitatRepository; 
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Resource
-	private OrganGestorHelper organGestorHelper;
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private EmailHelper emailHelper;
-	
-	
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private EntitatRepository entitatRepository; 
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private EmailHelper emailHelper;
+	@Resource private OrganGestorHelper organGestorHelper;
+	@Resource private OrganGestorRepository organGestorRepository;
 
 	public void consultarIGuardarAnotacioPeticioPendent(
 			Long expedientPeticioId,
@@ -204,7 +178,6 @@ public class ExpedientPeticioHelper0 {
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("anotacioGuardar consultaAll ja guardat end (" + expedientPeticioId + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		}
-		
 	}
 	
 	public void comunicarAnotacioPendent(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {

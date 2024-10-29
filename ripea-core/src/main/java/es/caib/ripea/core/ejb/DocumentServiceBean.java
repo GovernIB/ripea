@@ -3,24 +3,50 @@
  */
 package es.caib.ripea.core.ejb;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.PinbalException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.api.service.DocumentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.interceptor.Interceptors;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.dto.Resum;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PinbalException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.service.DocumentService;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -91,6 +117,18 @@ public class DocumentServiceBean implements DocumentService {
 				entitatId,
 				id,
 				versio, 
+				tascaId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto descarregarOriginalDistribucio(
+			Long entitatId,
+			Long id,
+			Long tascaId) {
+		return delegate.descarregarOriginalDistribucio(
+				entitatId,
+				id,
 				tascaId);
 	}
 
@@ -261,6 +299,16 @@ public class DocumentServiceBean implements DocumentService {
 			Long entitatId,
 			Long id) {
 		return delegate.convertirPdfPerFirmaClient(
+				entitatId,
+				id);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto getFitxerPDF(
+			Long entitatId,
+			Long id) {
+		return delegate.getFitxerPDF(
 				entitatId,
 				id);
 	}

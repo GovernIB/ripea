@@ -1004,7 +1004,6 @@ public class ExpedientHelper {
 		ContingutEntity pare = docEntity.getPare();
 		ExpedientEntity expedientEntity = docEntity.getExpedient();
 		Exception exception = null;
-
 		
 		String uuidToMove = null;
 //		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
@@ -1016,6 +1015,10 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(uuidToMove);
 		
 		try {
+			
+			boolean provocarError = false;
+			if (provocarError) { throw new Exception("Error moguent arxiu."); }
+			
 			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
 			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
 					uuidToMove,
@@ -1392,7 +1395,24 @@ public class ExpedientHelper {
 
 		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
 		
-		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar);
+		/**
+		 * #1579 Adaptar tancament d'expedients a annexes d'anotacions no moguts
+		 * 
+		 * 1.- Reprocessar annexes amb error.
+		 */		
+		List<Long> documentsClonar = expedientHelper2.reprocessarAnnexesAnotacionsAmbError(expedientId);
+		
+		/**
+		 * Els documents detectats amb firma inválida o que no s'ha pogut mourer, els clonam i relacionam clon amb original.
+		 * El document clonat, s'ha de firmar en servidor, per tant s'afegeix a la llista de 'documentsPerFirmar'
+		 */
+		//El document no es clona, es machaca amb un document sense les firmes i el original es podra descarregar desde la carpeta a Arxiu de la anotació.
+//		expedientHelper2.clonarDocumentsAmbFirmaInvalida(expedientId, documentsClonar, documentsPerFirmar);
+		
+		/**
+		 * Firmam en servidor els documents sense firma, o els clons dels que tenien error d'anotació.
+		 */
+		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar, documentsClonar);
 		
 		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsPerFirmar);
 		
@@ -2034,9 +2054,6 @@ public class ExpedientHelper {
 		}
 		return organs;
 	}
-	
-
-	
 	
 	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity, Long existingInteressatId) {
 		InteressatDto interessatDto = null;

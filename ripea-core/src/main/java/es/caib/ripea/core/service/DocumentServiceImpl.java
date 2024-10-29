@@ -3,10 +3,70 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipOutputStream;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ConsultaPinbalEstatEnumDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.dto.Resum;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.core.api.dto.ViaFirmaRespostaDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -36,10 +96,8 @@ import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
@@ -68,27 +126,6 @@ import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -149,15 +186,11 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
-	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
-	@Autowired
 	private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EntitatRepository entitatRepository;
-    @Autowired
-    private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -200,7 +233,6 @@ public class DocumentServiceImpl implements DocumentService {
 				expedientTascaEntity.updateResponsableActual(responsableActual);
 			}
 		}
-		
 
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
@@ -570,10 +602,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 	}
 	
-
-
-
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
@@ -592,7 +620,6 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		return dtos;
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -830,6 +857,38 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
+	public FitxerDto descarregarOriginalDistribucio(Long entitatId, Long id, Long tascaId) {
+		
+		logger.debug("Descarregant contingut original del document (entitatId=" + entitatId + ", id=" + id+")");
+		
+		try {
+			DocumentEntity document = null;
+			if (tascaId == null) {
+				document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+						entitatId,
+						id,
+						true,
+						false);
+			} else {
+				document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+						tascaId,
+						id);
+			}
+			
+			return documentHelper.getFitxerOriginalDistribucio(document);
+			
+		} catch (Exception e) {
+
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundException.class)) {
+				throw new ArxiuNotFoundDocumentException();
+			} else {
+				throw e;
+			}
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
@@ -866,7 +925,6 @@ public class DocumentServiceImpl implements DocumentService {
 				throw e;
 			}
 		}
-
 	}
 
 	@Transactional(readOnly = true)
@@ -1813,7 +1871,6 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return firmaViaFirmaHelper.viaFirmaCallback(documentViaFirma, callbackEstat);
 	}
-
 	
 	@Transactional
 	@Override
@@ -1821,6 +1878,18 @@ public class DocumentServiceImpl implements DocumentService {
 			Long entitatId,
 			Long id) {
 		return documentHelper.convertirPdfPerFirmaClient(
+				entitatId,
+				id);
+	}
+	
+	@Transactional
+	@Override
+	//Obtenir el fitxer en PDF, sense estampar ni operacions extres, nomes per previsualitzat al navegador.
+	//Si el fitxer ja es un PDF, es retorna directament.
+	public FitxerDto getFitxerPDF(
+			Long entitatId,
+			Long id) {
+		return documentHelper.getFitxerPDF(
 				entitatId,
 				id);
 	}
@@ -2105,15 +2174,12 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 	}
 	
-
-	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
-
 
 	@Override
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId) throws SistemaExternException {

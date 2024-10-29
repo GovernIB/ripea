@@ -4,6 +4,7 @@ package es.caib.ripea.core.firma;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +51,11 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	private DocumentRepository documentRepository;
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public ArxiuFirmaDto firmar(Long documentId, String motiu) {
-		return doFirmar(documentId, motiu);
+	public ArxiuFirmaDto firmar(Long documentId, String motiu, List<Long> documentsClonar) {
+		return removeFirmesInvalidesAndFirmaServidor(documentId, motiu, documentsClonar);
 	}
 	
-	public ArxiuFirmaDto doFirmar(Long documentId, String motiu) {
+	public ArxiuFirmaDto removeFirmesInvalidesAndFirmaServidor(Long documentId, String motiu, List<Long> documentsClonar) {
 
 		DocumentEntity document = documentRepository.getOne(documentId);
 		if (document != null) {
@@ -62,6 +63,13 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
 				
 				if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null) {
+					if (documentsClonar!=null && documentsClonar.contains(document.getId())) {
+						//En cas de que sigui un fitxer que prove de un annex de una anotació amb firma inválida, guardam el uuid actual al camp de distribució
+						//ja que haurà donat un error 
+						document.setUuid_distribucio(document.getArxiuUuid()); //Copiam el uuid actual de distribucio al camp corresponent.
+						//borram el camp uuid per que al "arxiuPropagarModificacio" crei un document nou al arxiu dins la carpeta del contingut pare.
+						document.setArxiuUuid(null);  
+					}
 					//remove invalid signature
 					fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
 				}
@@ -132,6 +140,12 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				}
 
 				document.setArxiuUuidFirma(null);
+				
+				//Ja podem eliminar el error de validacio de firma ara que hem clonat i firmat en servidor.
+				document.setValidacioFirmaCorrecte(true);
+				document.setValidacioFirmaErrorMsg(null);
+				
+				
 				logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 				return arxiuFirma;
 			} catch (Exception e) {

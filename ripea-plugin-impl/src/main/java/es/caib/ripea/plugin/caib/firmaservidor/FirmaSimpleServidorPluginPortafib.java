@@ -1,15 +1,10 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.firmaservidor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
 
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
-import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleCommonInfo;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleFile;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleFileInfoSignature;
@@ -26,7 +21,6 @@ import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.SignaturaConsulta;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
-import es.caib.ripea.plugin.firmaservidor.TipusMime;
 
 /**
  * Implementació del plugin de signatura emprant el portafirmes
@@ -34,7 +28,7 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-	public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
+public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
 
 
 	public FirmaSimpleServidorPluginPortafib() {
@@ -147,25 +141,25 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 		}
 	}
 
-	private void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
-
-		    final String languagesUI[] = new String[] { "ca", "es" };
-
-		    for (String languageUI : languagesUI) {
-		      logger.info(" ==== LanguageUI : " + languageUI + " ===========");
-
-		      List<FirmaSimpleAvailableProfile> listProfiles = api.getAvailableProfiles(languageUI);
-		      if (listProfiles.size() == 0) {
-		        logger.info("NO HI HA PERFILS PER AQUEST USUARI APLICACIÓ");
-		      } else {
-		        for (FirmaSimpleAvailableProfile ap : listProfiles) {
-		          logger.info("  + " + ap.getName() + ":");
-		          logger.info("      * Codi: " + ap.getCode());
-		          logger.info("      * Desc: " + ap.getDescription());
-		        }
-		      }
-		    }
-	 }
+//	private void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
+//
+//		    final String languagesUI[] = new String[] { "ca", "es" };
+//
+//		    for (String languageUI : languagesUI) {
+//		      logger.info(" ==== LanguageUI : " + languageUI + " ===========");
+//
+//		      List<FirmaSimpleAvailableProfile> listProfiles = api.getAvailableProfiles(languageUI);
+//		      if (listProfiles.size() == 0) {
+//		        logger.info("NO HI HA PERFILS PER AQUEST USUARI APLICACIÓ");
+//		      } else {
+//		        for (FirmaSimpleAvailableProfile ap : listProfiles) {
+//		          logger.info("  + " + ap.getName() + ":");
+//		          logger.info("      * Codi: " + ap.getCode());
+//		          logger.info("      * Desc: " + ap.getDescription());
+//		        }
+//		      }
+//		    }
+//	 }
 
 	private String getPropertyEndpoint() {
 		return getProperty("plugin.firmaservidor.portafib.endpoint");

@@ -6,7 +6,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-
 <style>
 	#grid-documents { margin-left: 0; margin-right: -11px; }
 	#grid-documents li.element-contingut { margin: 0; padding: 0 10px 0 0; min-height: 140px; display: -moz-inline-stack; display: inline-block; vertical-align: top; zoom: 1; *display: inline; _height: 140px; }
@@ -42,7 +41,7 @@
 	.importat.fa.fa-info-circle { color: #02CDA2; }
 	.viewer-content { width: 100%; padding-top: 1% !important; }
 	.viewer-padding { padding: 0% 2% 0% 2%; }
-	.rmodal_loading { background: rgba(255, 255, 255, .8) url('<c:url value="../img/loading.gif"/>') 50% 50% no-repeat; }
+	.rmodal_loading { background: rgba(255, 255, 255, .8) url('<c:url value="../img/loading.gif"/>') 50% 80% no-repeat; }
 	.ui-droppable-hover { background: #999999 !important; }
 	#drop-area { border: 4px dashed transparent; }
 	#drop-area.dragover { border-color: #ffd351; }
@@ -898,9 +897,8 @@
 			localStorage.removeItem('tmpTransaccioId');
 		}
 	}
-
-
-	//------------------ VISOR ------------------------------
+	
+	//------------------ VISOR PDF ------------------------------
 	function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 		if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 5 || event.target.cellIndex === 6)) return;
 		var resumViewer = $('#resum-viewer');
@@ -916,9 +914,11 @@
 		resetBackground();
 		event.srcElement.parentElement.closest('tr').style = "background: #c1c0c0";
 		previousDocumentId = documentId;
-
+		
 		// Mostrar contingut capçalera visor
 		resumViewer.find('*').not('#container').remove();
+		$('#container').hide();
+		
 		var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px; display: flex; flex-wrap: wrap;">\
 										<table style="width: 453px; flex-basis: calc(100%/3); margin-bottom: 10px;">\
 											<tbody id="detallSignantsPreview">\
@@ -941,19 +941,24 @@
 
 		if (contingutCustodiat) {
 			viewerContent += signantsViewerContent;
+		} else {
+			resumViewer.addClass('rmodal_loading');
 		}
 		resumViewer.prepend(viewerContent);
 		if (contingutCustodiat) {
 			getDetallsSignants($("#detallSignantsPreview"), documentId, true);
 		}
-
-
-		// Recuperar i mostrar document al visor
-		var urlDescarrega = "<c:url value="/contingut/${contingut.id}/document/"/>" + documentId + "/returnFitxer";
-		$('#container').attr('src', '');
-		$('#container').addClass('rmodal_loading');
-		showDocument(urlDescarrega);
-
+		
+		var urlDescarrega = "<c:url value="/contingut/document/"/>" + documentId + "/getPDF";
+		$('#container').attr('src', urlDescarrega);
+		$('#container').on('load', function() {
+			resumViewer.removeClass('rmodal_loading');
+			$('#container').show();
+			$([document.documentElement, document.body]).animate({
+				scrollTop: $("#resum-viewer").offset().top - 110
+			}, 500);
+		});
+		
 		$([document.documentElement, document.body]).animate({
 			scrollTop: $("#resum-viewer").offset().top - 110
 		}, 500);
@@ -966,43 +971,9 @@
 		});
 	}
 
-	function showDocument(arxiuUrl) {
-		// Fa la petició a la url de l'arxiu
-		$.ajax({
-			type: 'GET',
-			url: arxiuUrl,
-			responseType: 'arraybuffer',
-			success: function (json) {
-
-				if (json.error) {
-					$('#container').removeClass('rmodal_loading');
-					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
-				} else if (json.warning) {
-					$('#container').removeClass('rmodal_loading');
-					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
-				} else {
-					response = json.data;
-					var blob = base64toBlob(response.contingut, response.contentType);
-					var file = new File([blob], response.contentType, {type: response.contentType});
-		            link = URL.createObjectURL(file);
-
-		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.13.216/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-				    $('#container').removeClass('rmodal_loading');
-				    $('#container').attr('src', viewerUrl);
-				}
-
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				$('#container').removeClass('rmodal_loading');
-				alert(thrownError);
-			}
-		});
-	}
-
 	// Amagar visor
 	function closeViewer() {
-		$('#resum-viewer').slideUp(500, function () {
-		});
+		$('#resum-viewer').slideUp(500, function () {});
 	}
 
 	function getEnviamentsDocument(document) {
@@ -2236,7 +2207,7 @@
 		</div>
 
 		<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >
-			<iframe id="container" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
+			<iframe id="container" class="viewer-padding ocult" width="100%" height="540" frameBorder="0"></iframe>
 		</div>
 
 		<input class="hidden" id="dropped-files" type="file"/>

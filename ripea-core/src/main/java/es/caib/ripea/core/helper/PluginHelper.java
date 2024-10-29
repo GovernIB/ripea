@@ -3541,9 +3541,30 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma, fitxer.getContentType());
+			SignaturaResposta firma = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma, fitxer.getContentType());
+			
+			if (StringUtils.isEmpty(firma.getTipusFirmaEni()) || StringUtils.isEmpty(firma.getPerfilFirmaEni())) {
+				logger.warn("El tipus o perfil de firma s'ha retornat buit i això pot provocar error guardant a l'Arxiu [tipus: " + 
+						firma.getTipusFirmaEni() + ", perfil: " + firma.getPerfilFirmaEni() + "]");
+				if ("cades".equals(StringUtils.lowerCase(firma.getTipusFirma()))) {
+					logger.warn("Fixant el tipus de firma a TF04 i perfil BES");
+					if (StringUtils.isEmpty(firma.getTipusFirmaEni()))
+						firma.setTipusFirmaEni("TF04");
+					if (StringUtils.isEmpty(firma.getPerfilFirmaEni()))
+						firma.setPerfilFirmaEni("AdES-BES");
+				} else if ("pades".equals(StringUtils.lowerCase(firma.getTipusFirma()))) {
+					logger.warn("Fixant el tipus de firma a TF06 i perfil BES");
+					if (StringUtils.isEmpty(firma.getTipusFirmaEni()))
+						firma.setTipusFirmaEni("TF06");
+					if (StringUtils.isEmpty(firma.getPerfilFirmaEni()))
+						firma.setPerfilFirmaEni("AdES-BES");
+				}
+			}
+
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_FIRMASERV, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0);
-			return resposta;
+			
+			return firma;
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
 			integracioHelper.addAccioError(IntegracioHelper.INTCODI_FIRMASERV, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);

@@ -88,7 +88,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		Map<String, String> errorsNotificant = documentNotificacioHelper.crear(notificacioDto, documentEntity);
 		
 		if (documentEntity.getFitxerContentType().equals("application/zip")) {
-			documentFirmaServidorFirma.doFirmar(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents");
+			documentFirmaServidorFirma.removeFirmesInvalidesAndFirmaServidor(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents", null);
 		}
 
 		return errorsNotificant;
