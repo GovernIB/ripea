@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.SistemaExternNoTrobatException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 
@@ -105,7 +106,7 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 		} else if(usuaris.size() == 0){
 			usuaris = findAmbFiltre(valor);
 			if (usuaris.size() == 0) {
-				throw new SistemaExternException(
+				throw new SistemaExternNoTrobatException(
 						"La consulta d'usuari únic no ha retornat cap resultat (" +
 						"filtre=" + filtre + ", " +
 						"valor=" + valor + ")");

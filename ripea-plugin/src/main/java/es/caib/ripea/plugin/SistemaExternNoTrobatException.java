@@ -13,6 +13,10 @@ public class SistemaExternNoTrobatException extends SistemaExternCodiMissatgeExc
 
 	private String id;
 
+	public SistemaExternNoTrobatException(String missatge) {
+		super(missatge);
+	}
+	
 	public SistemaExternNoTrobatException(
 			String id,
 			String codi,

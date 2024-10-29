@@ -147,6 +147,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
+import es.caib.ripea.plugin.SistemaExternNoTrobatException;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -285,6 +286,10 @@ public class PluginHelper {
 			DadesUsuari dadesUsuari = getDadesUsuariPlugin().findAmbCodi(usuariCodi);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_USUARIS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 			return dadesUsuari;
+		} catch (SistemaExternNoTrobatException snte) {
+			String errorDescripcio = "No s'ha trobat cap usuari al sistema extern";
+			integracioHelper.addAccioError(IntegracioHelper.INTCODI_USUARIS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, snte);
+			return null;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(IntegracioHelper.INTCODI_USUARIS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
