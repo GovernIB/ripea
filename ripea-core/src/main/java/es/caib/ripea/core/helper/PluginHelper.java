@@ -1116,63 +1116,11 @@ public class PluginHelper {
 				ex);
 	}
 	
-	
-	private IntegracioAccioDto getIntegracioAccio(
-			String accioDescripcio,
-			Map<String, String> accioParams,
-			String integracioCodi,
-			IntegracioAccioTipusEnumDto integracioAccioTipus) {
-		
-		IntegracioAccioDto integracioAccio = new IntegracioAccioDto(
-				accioDescripcio,
-				accioParams,
-				System.currentTimeMillis());
-		
-		integracioAccio.setTipus(integracioAccioTipus);
-		integracioAccio.setIntegracio(integracioHelper.novaIntegracio(integracioCodi));
-		
-		return integracioAccio;
-	}
-	
-	
-	private void accioOk(
-			IntegracioAccioDto integracioAccio) {
-		integracioHelper.addAccioOk(
-				integracioAccio.getIntegracio().getCodi(),
-				integracioAccio.getDescripcio(),
-				integracioAccio.getParametres(),
-				integracioAccio.getTipus(),
-				System.currentTimeMillis() - integracioAccio.getTempsInici());
-	}
-	
-	private SistemaExternException accioError(
-			String errorDescripcio,
-			IntegracioAccioDto integracioAccio,
-			Exception ex) {
-		integracioHelper.addAccioError(
-				integracioAccio.getIntegracio().getCodi(),
-				integracioAccio.getDescripcio(),
-				integracioAccio.getParametres(),
-				integracioAccio.getTipus(),
-				System.currentTimeMillis() - integracioAccio.getTempsInici(),
-				errorDescripcio,
-				ex);
-		return new SistemaExternException(
-				integracioAccio.getIntegracio().getCodi(),
-				errorDescripcio,
-				ex);
-	}
-	
-	
-	
 	private ContingutEntity getContingutPare(DocumentEntity document){
 		boolean utilitzarCarpetesEnArxiu = !isCarpetaLogica();
 		ContingutEntity contingutPare = utilitzarCarpetesEnArxiu ? document.getPare() : document.getExpedient();
 		return contingutPare;
 	}
-	
-
-	
 	
 	/**
 	 * 
@@ -2262,13 +2210,9 @@ public class PluginHelper {
 	
 	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles(String idioma) {
 		
+		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idioma", idioma);
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
-				"Recuperant perfils disponibles",
-				accioParams,
-				IntegracioHelper.INTCODI_DIGITALITZACIO,
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
 		
 		List<DigitalitzacioPerfilDto> perfilsDto = new ArrayList<DigitalitzacioPerfilDto>();;
 		try {
@@ -2284,32 +2228,38 @@ public class PluginHelper {
 				}
 			}
 			
-			accioOk(integracioAccio);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Recuperant perfils disponibles",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);	
 			
 		} catch (Exception ex) {
-
-			throw accioError(
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Recuperant perfils disponibles",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
-					integracioAccio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Error al accedir al plugin de digitalitzacio",
 					ex);
 		}
 		return perfilsDto;
 	}
 	
 	public DigitalitzacioTransaccioRespostaDto digitalitzacioIniciarProces(String idioma, String codiPerfil, UsuariDto funcionari, String urlReturn) {
-
 		
+		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idioma", idioma);
 		accioParams.put("codiPerfil", codiPerfil);
 		accioParams.put("funcionari", funcionari.getCodi());
 		accioParams.put("urlReturn", urlReturn);
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
-				"Iniciant procés digitalització",
-				accioParams,
-				IntegracioHelper.INTCODI_DIGITALITZACIO,
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
 		
 		DigitalitzacioTransaccioRespostaDto respostaDto = new DigitalitzacioTransaccioRespostaDto();
 		try {
@@ -2321,12 +2271,25 @@ public class PluginHelper {
 				respostaDto.setReturnSignedFile(resposta.isReturnSignedFile());
 			}
 			
-			accioOk(integracioAccio);
-		} catch (Exception ex) {
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Iniciant procés digitalització",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
 
-			throw accioError(
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Recuperant perfils disponibles",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
-					integracioAccio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Error al accedir al plugin de digitalitzacio",
 					ex);
 		}
 		return respostaDto;
@@ -2334,15 +2297,11 @@ public class PluginHelper {
 	
 	public DigitalitzacioResultatDto digitalitzacioRecuperarResultat(String idTransaccio, boolean returnScannedFile, boolean returnSignedFile) {
 
+		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idTransaccio", idTransaccio);
 		accioParams.put("returnScannedFile", String.valueOf(returnScannedFile));
 		accioParams.put("returnSignedFile", String.valueOf(returnSignedFile));
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
-				"Recuperant resultat digitalització",
-				accioParams,
-				IntegracioHelper.INTCODI_DIGITALITZACIO,
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
 		
 		DigitalitzacioResultatDto resultatDto = new DigitalitzacioResultatDto();
 		try {
@@ -2358,13 +2317,25 @@ public class PluginHelper {
 				resultatDto.setIdioma(resultat.getIdioma());
 				resultatDto.setResolucion(resultat.getResolucion());
 				
-				accioOk(integracioAccio);
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_DIGITALITZACIO,
+						"Recuperant resultat digitalització",
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);	
 			}
 		} catch (Exception ex) {
-			
-			throw accioError(
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Recuperant perfils disponibles",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
-					integracioAccio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Error al accedir al plugin de digitalitzacio",
 					ex);
 			
 		}
@@ -2373,23 +2344,31 @@ public class PluginHelper {
 	
 	public void digitalitzacioTancarTransaccio(String idTransaccio) {
 		
+		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idTransaccio", idTransaccio);
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
-				"Tancant transacció digitalització",
-				accioParams,
-				IntegracioHelper.INTCODI_DIGITALITZACIO,
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
 
 		try {
 			getDigitalitzacioPlugin().tancarTransaccio(idTransaccio);
 			
-			accioOk(integracioAccio);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Tancant transacció digitalització",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);	
 		} catch (Exception ex) {
-			
-			throw accioError(
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Recuperant perfils disponibles",
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de digitalitzacio",
-					integracioAccio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_DIGITALITZACIO,
+					"Error al accedir al plugin de digitalitzacio",
 					ex);
 		}
 	}
@@ -3330,29 +3309,32 @@ public class PluginHelper {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-
-	
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 		
+		long t0 = System.currentTimeMillis();
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		ExpedientEntity expedient = notificacio.getExpedient();
+		DocumentEntity document = notificacio.getDocument();
 		DocumentNotificacioEstatEnumDto estatAnterior = notificacio.getNotificacioEstat();
-
 		ConfigHelper.setEntitat(conversioTipusHelper.convertir(expedient.getEntitat(), EntitatDto.class));
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
-		
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
-				"Consulta d'estat d'una notificació electrònica",
-				getAccioParams(documentEnviamentInteressatEntity),
-				IntegracioHelper.INTCODI_NOTIFICACIO,
-				IntegracioAccioTipusEnumDto.RECEPCIO);
 
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
+		accioParams.put("expedientId", expedient.getId().toString());
+		accioParams.put("expedientTitol", expedient.getNom());
+		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
+		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
+		accioParams.put("documentNom", document.getNom());
+		if (notificacio.getTipus() != null) {
+			accioParams.put("enviamentTipus", notificacio.getTipus().name());
+		}
+		accioParams.put("concepte", notificacio.getAssumpte());
+		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
+		
 		try {
 			
-			// ====================================== CONSULTAR ENVIAMENT ==================================================
 			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
 			
 			documentEnviamentInteressatEntity.updateEnviamentEstat(
@@ -3373,8 +3355,6 @@ public class PluginHelper {
 					documentEnviamentInteressatEntity,
 					resposta);
 			
-			
-			// ====================================== CONSULTAR NOTIFICACIO ==================================================
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(notificacio.getNotificacioIdentificador());
 			notificacio.updateNotificacioEstat(
 					respostaNotificioEstat.getEstat(),
@@ -3383,7 +3363,6 @@ public class PluginHelper {
 					respostaNotificioEstat.getErrorDescripcio(),
 					respostaNotificioEstat.getDataEnviada(), 
 					respostaNotificioEstat.getDataFinalitzada());
-			
 
 			DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
 			if (estatAnterior != estatDespres && (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
@@ -3393,14 +3372,28 @@ public class PluginHelper {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
 			
-			accioOk(integracioAccio);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Consulta d'estat d'una notificació electrònica",
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			
 			return resposta;
 			
 		} catch (Exception ex) {
-			throw accioError(
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Consulta d'estat d'una notificació electrònica",
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
-					integracioAccio,
 					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					"Error al accedir al plugin de notificacions",
+					ex);			
 		}
 	}
 	
@@ -4242,27 +4235,6 @@ public class PluginHelper {
 			accioParams.put("annexosIds", annexosIds.toString());
 			accioParams.put("annexosTitols", annexosTitols.toString());
 		}
-		return accioParams;
-	}
-
-	private Map<String, String> getAccioParams(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-
-		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		ExpedientEntity expedient = notificacio.getExpedient();
-		DocumentEntity document = notificacio.getDocument();
-
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("setEmisorDir3Codi", expedient.getEntitat().getUnitatArrel());
-		accioParams.put("expedientId", expedient.getId().toString());
-		accioParams.put("expedientTitol", expedient.getNom());
-		accioParams.put("expedientTipusId", expedient.getMetaNode().getId().toString());
-		accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-		accioParams.put("documentNom", document.getNom());
-		if (notificacio.getTipus() != null) {
-			accioParams.put("enviamentTipus", notificacio.getTipus().name());
-		}
-		accioParams.put("concepte", notificacio.getAssumpte());
-		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
 		return accioParams;
 	}
 

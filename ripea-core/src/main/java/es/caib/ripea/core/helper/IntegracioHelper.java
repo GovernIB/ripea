@@ -239,6 +239,11 @@ public class IntegracioHelper {
 			integracio.setNom("Arxiu digital");
 		} else if (INTCODI_PINBAL.equals(codi)) {
 			integracio.setNom("PINBAL");
+			String endpointName = configHelper.getConfig("es.caib.ripea.pinbal.base.endpointName");
+			if (Utils.isEmpty(endpointName)) {
+				endpointName = configHelper.getConfig("es.caib.ripea.pinbal.base.url");
+			}
+			integracio.setEndpoint(endpointName);
 		} else if (INTCODI_CONVERT.equals(codi)) {
 			integracio.setNom("Conversió doc.");
 		} else if (INTCODI_USUARIS.equals(codi)) {
