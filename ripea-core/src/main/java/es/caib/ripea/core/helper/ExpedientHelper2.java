@@ -126,7 +126,7 @@ public class ExpedientHelper2 {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void deleteDocumentsNotSelectedDB(Long entitatId, Long expedientId, Long[] documentsPerFirmar) {
+	public void deleteDocumentsNotSelectedDB(Long entitatId, Long expedientId, List<Long> documentsPerFirmar) {
 
 		List<DocumentEntity> docsToDelete = new ArrayList<>();
 		docsToDelete.addAll(findNotSelected(entitatId, expedientId, documentsPerFirmar));
@@ -140,7 +140,6 @@ public class ExpedientHelper2 {
 			
 			documentHelper.deleteDefinitiu(docToDelete);
 		}
-
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -205,11 +204,7 @@ public class ExpedientHelper2 {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public List<DocumentEntity> findNotSelected(Long entitatId, Long expedientId, Long[] documentsSelected) {
-		List<Long> documentsSelectedList = new ArrayList<>();
-		if (ArrayUtils.isNotEmpty(documentsSelected)) {
-			documentsSelectedList = Arrays.asList(documentsSelected);
-		}
+	public List<DocumentEntity> findNotSelected(Long entitatId, Long expedientId, List<Long> documentsSelected) {
 		
 		List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatId,
@@ -218,7 +213,7 @@ public class ExpedientHelper2 {
 		List<DocumentEntity> notSelected = new ArrayList<>();
 		
 		for (DocumentEntity esborrany : esborranys) {
-			if (!documentsSelectedList.contains(esborrany.getId())) {
+			if (!documentsSelected.contains(esborrany.getId())) {
 				notSelected.add(esborrany);
 			}
 		}
@@ -312,13 +307,11 @@ public class ExpedientHelper2 {
 		}
 	}
 	
-	public void signDocumentsSelected(String motiu, Long[] documentsPerFirmar, List<Long> documentsClonar) {
-		// Firmam els documents seleccionats
-		if (ArrayUtils.isNotEmpty(documentsPerFirmar)) {
-			for (Long documentPerFirmar : documentsPerFirmar) {
-				if (documentPerFirmar!=null) {
-					documentFirmaServidorFirma.firmar(documentPerFirmar, motiu, documentsClonar);
-				}
+	public void signDocumentsSelected(String motiu, List<Long> documentsPerFirmar, List<Long> documentsClonar) {
+		// Firmam els documents seleccionats en servidor
+		for (Long documentPerFirmar : documentsPerFirmar) {
+			if (documentPerFirmar!=null) {
+				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu, documentsClonar);
 			}
 		}
 	}

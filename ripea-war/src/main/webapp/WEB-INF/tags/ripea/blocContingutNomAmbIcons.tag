@@ -18,16 +18,16 @@
 </c:if> 
 <c:if test="${contingut.document && contingut.estat == 'FIRMAT' && contingut.gesDocFirmatId != null}">
 	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span>
-</c:if> 
+</c:if>
 <c:if test="${contingut.document && contingut.pendentMoverArxiu && contingut.uuid_distribucio == null}">
 	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentMoverArxiu"/>"></span>
-</c:if> 
+</c:if>
 <c:if test="${contingut.document && !contingut.validacioFirmaCorrecte}">
-	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${contingut.validacioFirmaErrorMsg}"/>"></span>
-</c:if> 
+	<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${contingut.validacioFirmaErrorMsg}"/>"></span>
+</c:if>
 <c:if test="${contingut.document && contingut.estat == 'DEFINITIU'}">
 	<span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span>
-</c:if> 
+</c:if>
 <c:if test="${contingut.document && contingut.ambNotificacions}">
 	<c:choose>
 		<c:when

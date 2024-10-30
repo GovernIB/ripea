@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1402,19 +1403,27 @@ public class ExpedientHelper {
 		 */		
 		List<Long> documentsClonar = expedientHelper2.reprocessarAnnexesAnotacionsAmbError(expedientId);
 		
-		/**
-		 * Els documents detectats amb firma inválida o que no s'ha pogut mourer, els clonam i relacionam clon amb original.
-		 * El document clonat, s'ha de firmar en servidor, per tant s'afegeix a la llista de 'documentsPerFirmar'
-		 */
-		//El document no es clona, es machaca amb un document sense les firmes i el original es podra descarregar desde la carpeta a Arxiu de la anotació.
-//		expedientHelper2.clonarDocumentsAmbFirmaInvalida(expedientId, documentsClonar, documentsPerFirmar);
-		
+		//Si el ID del document a clonar, no es troba dins la llista de documents a firmar no es clonara,
+		//perque la funcio signDocumentsSelected nomes actua sobre la llista de documents a firmar.
+		//Tot document que es vulgui clonar, ha de estar dins la llista de documents a firmar
+		List<Long> documentsSelectedList = new ArrayList<>();
+		if (documentsPerFirmar!=null) {
+			documentsSelectedList = Arrays.asList(documentsPerFirmar);
+		}
+		if (documentsClonar!=null) {
+			for (Long docClon: documentsClonar) {
+				if (!documentsSelectedList.contains(docClon)) {
+					documentsSelectedList.add(docClon);
+				}
+			}
+		}
+
 		/**
 		 * Firmam en servidor els documents sense firma, o els clons dels que tenien error d'anotació.
 		 */
-		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar, documentsClonar);
+		expedientHelper2.signDocumentsSelected(motiu, documentsSelectedList, documentsClonar);
 		
-		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsPerFirmar);
+		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsSelectedList);
 		
 		expedientHelper2.markAllDocumentsEsborranysAsDefinitiusArxiu(expedientId);
 		
