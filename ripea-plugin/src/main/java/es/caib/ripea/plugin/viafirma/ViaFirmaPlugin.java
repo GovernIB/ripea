@@ -1,19 +1,16 @@
-/**
- * 
- */
+
 package es.caib.ripea.plugin.viafirma;
 
 import java.util.List;
-
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
-
 
 /**
  * Interfície per enviar els document al sistema viaFirma
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface ViaFirmaPlugin {
+public interface ViaFirmaPlugin extends RipeaEndpointPluginInfo {
 
 	public ViaFirmaResponse uploadDocument(ViaFirmaParams parametresViaFirma) throws SistemaExternException;
 	

@@ -74,6 +74,7 @@ public class MCGDwsImpl implements MCGDws {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_CALLBACK,
 					accioDescripcio,
+					null,
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					0,
@@ -97,6 +98,7 @@ public class MCGDwsImpl implements MCGDws {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,
 							accioDescripcio,
+							null,
 							accioParams,
 							IntegracioAccioTipusEnumDto.RECEPCIO,
 							0);
@@ -111,6 +113,7 @@ public class MCGDwsImpl implements MCGDws {
 					integracioHelper.addAccioError(
 							IntegracioHelper.INTCODI_CALLBACK,
 							accioDescripcio,
+							null,
 							accioParams,
 							IntegracioAccioTipusEnumDto.RECEPCIO,
 							0,
@@ -128,6 +131,7 @@ public class MCGDwsImpl implements MCGDws {
 				integracioHelper.addAccioError(
 						IntegracioHelper.INTCODI_CALLBACK,
 						accioDescripcio,
+						null,
 						accioParams,
 						IntegracioAccioTipusEnumDto.RECEPCIO,
 						0,

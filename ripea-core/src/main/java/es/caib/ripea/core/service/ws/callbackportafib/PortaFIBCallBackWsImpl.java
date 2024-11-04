@@ -99,6 +99,7 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_CALLBACK,
 					accioDescripcio,
+					null,
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					0,
@@ -124,6 +125,7 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_CALLBACK,
 							accioDescripcio,
+							null,
 							accioParams,
 							IntegracioAccioTipusEnumDto.RECEPCIO,
 							0);
@@ -161,6 +163,7 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 		integracioHelper.addAccioError(
 				IntegracioHelper.INTCODI_CALLBACK,
 				accioDescripcio,
+				null,
 				accioParams,
 				IntegracioAccioTipusEnumDto.RECEPCIO,
 				0,

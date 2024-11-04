@@ -3,6 +3,7 @@ package es.caib.ripea.plugin.portafirmes;
 import java.util.Date;
 import java.util.List;
 
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 
 /**
@@ -10,7 +11,7 @@ import es.caib.ripea.plugin.SistemaExternException;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface PortafirmesPlugin {
+public interface PortafirmesPlugin extends RipeaEndpointPluginInfo {
 
 	/**
 	 * Envia un document a firmar al portafirmes.

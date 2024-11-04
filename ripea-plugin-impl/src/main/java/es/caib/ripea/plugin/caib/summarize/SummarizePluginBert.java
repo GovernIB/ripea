@@ -7,6 +7,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import es.caib.ripea.core.api.dto.Resum;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.summarize.SummarizePlugin;
@@ -89,6 +90,15 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
         return resum;
     }
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.summarize.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getUrl();
+		}
+		return endpoint;
+	}
+	
     public boolean isActive() {
 
         String bertUrl = getUrl();

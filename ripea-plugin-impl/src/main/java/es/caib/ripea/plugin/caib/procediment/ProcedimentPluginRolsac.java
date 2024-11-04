@@ -143,8 +143,14 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 		return dto;
 	}
 	
-	
-	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.procediment.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}	
 
 	private Client getJerseyClient() {
 		if (jerseyClient == null) {
@@ -210,13 +216,6 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 			return null;
 		}
 	}
-
-
-	
-	
-	
-	
-	
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcedimentPluginRolsac.class);
 

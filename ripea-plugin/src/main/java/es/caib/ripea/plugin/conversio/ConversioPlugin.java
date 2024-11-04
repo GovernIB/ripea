@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.plugin.conversio;
 
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 
 
@@ -11,7 +12,7 @@ import es.caib.ripea.plugin.SistemaExternException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface ConversioPlugin {
+public interface ConversioPlugin extends RipeaEndpointPluginInfo {
 
 	/**
 	 * Converteix un arxiu a format PDF.

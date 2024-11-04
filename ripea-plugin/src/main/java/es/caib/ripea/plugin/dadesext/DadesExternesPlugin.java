@@ -1,19 +1,15 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.dadesext;
 
 import java.util.List;
-
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
-
 
 /**
  * Interfície per consultar dades externes.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface DadesExternesPlugin {
+public interface DadesExternesPlugin extends RipeaEndpointPluginInfo {
 
 	/**
 	 * Consulta la llista de paisos disponibles.

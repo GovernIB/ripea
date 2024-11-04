@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.CodiValor;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -274,7 +275,16 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 			throw new SistemaExternException("No s'han pogut consultar els tipus de via", ex);
 		}
 	}
-
+	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = properties.getProperty("plugin.dadesext.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}
+	
 	private String getServiceUrl() {
 		String url = properties.getProperty(propertyKeyBase + "plugin.dadesext.dir3.service.url");
 		if (url == null) {

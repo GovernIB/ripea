@@ -72,8 +72,8 @@
 				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="integracio.list.columna.data"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
 				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
-				<th data-col-name="integracio.endpoint" data-orderable="false"><spring:message code="integracio.list.codi.endpoint"/></th>
-				<th data-col-name="entitatCodi" data-orderable="false"><spring:message code="integracio.list.codi.entitat"/></th>c
+				<th data-col-name="endpoint" data-orderable="false"><spring:message code="integracio.list.codi.endpoint"/></th>
+				<th data-col-name="entitatCodi" data-orderable="false"><spring:message code="integracio.list.codi.entitat"/></th>
 				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
 					<spring:message code="integracio.list.columna.temps.resposta"/>
 					<script id="cellTempsTemplate" type="text/x-jsrender">{{:tempsResposta}} ms</script>

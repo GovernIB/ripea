@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.viafirma;
 
 import java.util.ArrayList;
@@ -97,9 +94,14 @@ public class ViaFirmaPluginMock extends RipeaAbstractPluginProperties implements
 		return viaFirmaDispositius;
 	}
 	
+	@Override
+	public String getEndpointURL() {
+		return "ViaFirmaPluginMock";
+	}
+	
 	private String getTestLink() {
 		return getProperty("plugin.viafirma.mock.link");
 	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ViaFirmaPluginMock.class);
-
 }

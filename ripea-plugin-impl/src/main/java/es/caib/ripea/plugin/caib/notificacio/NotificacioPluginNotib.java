@@ -429,6 +429,15 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.notificacio.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getUrl();
+		}
+		return endpoint;
+	}
+	
 	private es.caib.notib.client.domini.Persona toPersonaNotib(Persona persona) {
 		es.caib.notib.client.domini.Persona p = null;
 		if (persona != null) {
@@ -448,8 +457,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 		return p;
 	}
-
-	
 	
 	private InteressatTipusEnumDto toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
 		InteressatTipusEnumDto interessatTipusEnumDtoWS = null;
@@ -481,7 +488,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 		return clientV2;
 	}
-	
 
 	private String getUrl() {
 		return getProperty(
@@ -500,10 +506,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		return getAsBoolean(
 				"plugin.notificacio.debug");
 	}
-	
-	
-
-
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioPluginNotib.class);
 }

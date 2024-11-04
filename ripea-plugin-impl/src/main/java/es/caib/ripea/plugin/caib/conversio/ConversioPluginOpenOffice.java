@@ -28,6 +28,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
@@ -261,9 +262,19 @@ public class ConversioPluginOpenOffice extends RipeaAbstractPluginProperties imp
 		return getProperty(
 				"plugin.conversio.ooffice.host");
 	}
+	
 	private int getOpenOfficePort() {
 		return getAsInt(
 				"plugin.conversio.ooffice.port");
+	}
+	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.conversio.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getOpenOfficeHost();
+		}
+		return endpoint;
 	}
 
 }

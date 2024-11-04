@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.unitat;
 
 import java.net.MalformedURLException;
@@ -18,7 +15,6 @@ import es.caib.ripea.plugin.caib.procediment.ProcedimentPluginMock;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
-
 
 public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
 
@@ -481,12 +477,16 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			Timestamp fechaSincronizacion) throws SistemaExternException {
 		throw new RuntimeException("Method not supported");
 	}
-	
 
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(
 			String pareCodi) throws SistemaExternException {
 		throw new RuntimeException("Method not supported");
+	}
+	
+	@Override
+	public String getEndpointURL() {
+		return "UnitatsOrganitzativesPluginMock";
 	}
 	
 	public String name(String name) {
@@ -587,5 +587,5 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	    FIRST,
 	    SECOND;
 	}
-	
+
 }

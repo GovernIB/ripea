@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.IArxiuPluginWrapper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
@@ -268,7 +269,8 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		Mockito.when(arxiuPluginMock.documentCrear(null, null)).thenThrow(NullPointerException.class);
 		Mockito.when(arxiuPluginMock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.anyBoolean())).thenReturn(documentArxiuAmbContingut);
 		Mockito.when(arxiuPluginMock.carpetaCrear(Mockito.any(Carpeta.class), Mockito.anyString())).thenReturn(carpetaArxiu);
-		pluginHelper.setArxiuPlugin(entitat.getCodi(), arxiuPluginMock);
+		IArxiuPluginWrapper IArxiuPluginWrapper = new es.caib.ripea.core.helper.IArxiuPluginWrapper(arxiuPluginMock, "BaseExpedientServiceTest.Mock");
+		pluginHelper.setArxiuPlugin(entitat.getCodi(), IArxiuPluginWrapper);
 	}
 
 	@SuppressWarnings("unchecked")

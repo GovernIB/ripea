@@ -8,6 +8,7 @@ import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWs;
 import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
 import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
 import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
@@ -94,7 +95,6 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 	public PortafirmesPluginPortafib(String propertyKeyBase, Properties properties) {
 		super(propertyKeyBase, properties);
 	}
-	
 	
 	@Override
 	public String upload(
@@ -593,6 +593,14 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		}
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.portafirmes.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getUrlFirmaSimpleAsync();
+		}
+		return endpoint;
+	}
 
 //	@Override
 //	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(
@@ -1048,8 +1056,6 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return api;
 	}
 	
-
-	
 	// currently doesn't exit equivalent in REST
 	// email 2023.04.25 13:55: "(1.B) métodos del webservice /ws/v1/PortaFIBUsuariEntitat:  Com que aquest WS no afecta a Peticions de Firma encara no està migrat i el podeu fer servir sense problemes."
 	private PortaFIBUsuariEntitatWs getUsuariEntitatWs() throws MalformedURLException {
@@ -1113,9 +1119,6 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return getProperty(
 				"plugin.portafirmes.usuarientitatws.password");
 	}
-	
-	
-	
 	private boolean isLogMissatgesActiu() {
 		return getAsBoolean(
 				"plugin.portafirmes.portafib.log.actiu");
@@ -1177,6 +1180,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			}
 		}
 	}
+	
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PortafirmesPluginPortafib.class);
 
 }

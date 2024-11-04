@@ -25,6 +25,7 @@ import es.caib.dir3caib.ws.api.catalogo.CatProvinciaTF;
 import es.caib.dir3caib.ws.api.catalogo.CatTipoVia;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWs;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWsService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -237,8 +238,15 @@ public class DadesExternesPluginDir3 extends RipeaAbstractPluginProperties imple
 		}
 	}
 
-
-
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.dadesext.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}
+	
 	private List<Municipi> municipis = null;
 	private Long municipisDataActualitzacio = 0L;
 	private List<Municipi> municipiFindAll() throws MalformedURLException {

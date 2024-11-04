@@ -1,15 +1,10 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.firmaservidor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
 
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
-import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleCommonInfo;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleFile;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleFileInfoSignature;
@@ -21,12 +16,12 @@ import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaEnServidorSimpleJ
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.SignaturaConsulta;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
-import es.caib.ripea.plugin.firmaservidor.TipusMime;
 
 /**
  * Implementació del plugin de signatura emprant el portafirmes
@@ -34,8 +29,7 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-	public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
-
+public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
 
 	public FirmaSimpleServidorPluginPortafib() {
 		super();
@@ -46,10 +40,18 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 	
 	@Override
 	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, String idioma, String contentType) throws SistemaExternException {
-
 		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).contentType(contentType).contingut(contingut).build());
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.firmaservidor.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getPropertyEndpoint();
+		}
+		return endpoint;
+	}
+	
 	public SignaturaResposta signar(SignaturaConsulta consulta) {
 
 		try {
@@ -147,7 +149,7 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 		}
 	}
 
-	private void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
+	/*private void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
 
 		    final String languagesUI[] = new String[] { "ca", "es" };
 
@@ -165,7 +167,7 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 		        }
 		      }
 		    }
-	 }
+	 }*/
 
 	private String getPropertyEndpoint() {
 		return getProperty("plugin.firmaservidor.portafib.endpoint");

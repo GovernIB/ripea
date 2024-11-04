@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.viafirma;
 
 import java.nio.charset.StandardCharsets;
@@ -27,6 +24,7 @@ import com.viafirma.documents.sdk.java.model.Signature;
 import com.viafirma.documents.sdk.java.model.Signature.CertificationLevelEnum;
 import com.viafirma.documents.sdk.java.model.Workflow;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.viafirma.OAuthType;
@@ -43,7 +41,6 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements ViaFirmaPlugin {
-
 	
 	public ViaFirmaPluginImpl() {
 		super();
@@ -277,6 +274,16 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
         
         return callbackAuthorization;
 	}
+	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.viafirma.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getApiUrl();
+		}
+		return endpoint;
+	}
+	
 	private String getApiUrl() {
 		return getProperty(
 				"plugin.viafirma.caib.apiurl");
@@ -334,5 +341,4 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ViaFirmaPluginImpl.class);
-
 }

@@ -1,9 +1,7 @@
 package es.caib.ripea.plugin.procediment;
 
-
-import java.util.List;
-
 import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 
 /**
@@ -11,7 +9,7 @@ import es.caib.ripea.plugin.SistemaExternException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface ProcedimentPlugin {
+public interface ProcedimentPlugin extends RipeaEndpointPluginInfo {
 
 	/**
 	 * Retorna el procediment associats a un codi SIA.

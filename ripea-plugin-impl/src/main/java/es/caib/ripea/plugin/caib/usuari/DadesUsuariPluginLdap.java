@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.usuari;
 
 import java.util.ArrayList;
@@ -21,6 +18,7 @@ import javax.naming.ldap.LdapContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.SistemaExternNoTrobatException;
@@ -34,7 +32,6 @@ import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
  */
 public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties implements DadesUsuariPlugin {
 
-	
 	public DadesUsuariPluginLdap() {
 		super();
 	}
@@ -90,7 +87,14 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 		}
 	}
 
-
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.dades.usuari.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getLdapServerUrl();
+		}
+		return endpoint;
+	}
 
 	private DadesUsuari consultaUsuariUnic(
 			String filtre,

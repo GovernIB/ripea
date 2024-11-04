@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.dadesext;
 
 import java.net.HttpURLConnection;
@@ -14,6 +11,7 @@ import java.util.Properties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -342,4 +340,12 @@ public class DadesExternesPluginCaib extends RipeaAbstractPluginProperties imple
 		}
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.dadesextpinbal.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getBaseUrl();
+		}
+		return endpoint;
+	}
 }

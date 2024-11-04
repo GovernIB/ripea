@@ -5,6 +5,7 @@ package es.caib.ripea.plugin.usuari;
 
 import java.util.List;
 
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 
 
@@ -13,7 +14,7 @@ import es.caib.ripea.plugin.SistemaExternException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface DadesUsuariPlugin {
+public interface DadesUsuariPlugin extends RipeaEndpointPluginInfo {
 
 	/**
 	 * Retorna la informació d'un usuari donat el codi d'usuari.

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.usuari;
 
 import java.util.ArrayList;
@@ -17,7 +14,6 @@ import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
  */
 public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 
-
 	@Override
 	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
 		ArrayList<String> rols = new ArrayList<String>();
@@ -26,7 +22,6 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 		rols.add("IPA_SUPER");
 		return rols;
 	}
-
 	
 	@Override
 	public DadesUsuari findAmbCodi(
@@ -47,11 +42,13 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 		throw new SistemaExternException("Mètode no implementat");
 	}
 	
-	
 	@Override
 	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException{
-		
 		return null;
 	}
 
+	@Override
+	public String getEndpointURL() {
+		return "Mock";
+	}
 }

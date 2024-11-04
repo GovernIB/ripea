@@ -688,6 +688,7 @@ public class PinbalHelper {
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PINBAL,
 					accioDescripcio,
+					getPinbalEndpointName(),
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
@@ -699,6 +700,7 @@ public class PinbalHelper {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_PINBAL,
 					accioDescripcio,
+					getPinbalEndpointName(),
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
@@ -847,6 +849,7 @@ public class PinbalHelper {
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PINBAL,
 					accioDescripcio,
+					getPinbalEndpointName(),
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
@@ -856,6 +859,7 @@ public class PinbalHelper {
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_PINBAL,
 					accioDescripcio,
+					getPinbalEndpointName(),
 					getAccioParams(solicitud, serveiScsp),
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
@@ -882,6 +886,7 @@ public class PinbalHelper {
 		integracioHelper.addAccioError(
 				IntegracioHelper.INTCODI_PINBAL,
 				accioDescripcio,
+				getPinbalEndpointName(),
 				getAccioParams(solicitud, serveiScsp),
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				System.currentTimeMillis() - t0,
@@ -1164,6 +1169,13 @@ public class PinbalHelper {
 	
 	private String getPinbalBaseUrl() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");
+	}
+	private String getPinbalEndpointName() {
+		String resultat = configHelper.getConfig("es.caib.ripea.pinbal.endpointName");
+		if (Utils.isEmpty(resultat)) {
+			resultat = configHelper.getConfig("es.caib.ripea.pinbal.base.url");
+		}
+		return resultat;
 	}
 	private String getPinbalUser() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.user");

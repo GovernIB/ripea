@@ -1625,7 +1625,7 @@ public class DocumentHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.document.enviar.contingut.existent");
 	}
 	public boolean isArxiuCaib() {
-		return pluginHelper.getArxiuPlugin() instanceof ArxiuPluginCaib;
+		return pluginHelper.getArxiuPlugin().getPlugin() instanceof ArxiuPluginCaib;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);

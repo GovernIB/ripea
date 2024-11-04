@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -155,6 +156,15 @@ public class DadesUsuariPluginJdbc extends RipeaAbstractPluginProperties impleme
 		return llistaUsuaris;
 	}
 	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.dades.usuari.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getDatasourceJndiName();
+		}
+		return endpoint;
+	}
+	
 	private List<String> consultaRolsUsuariUnic(
 			String sqlQuery,
 			String paramName,
@@ -215,5 +225,4 @@ public class DadesUsuariPluginJdbc extends RipeaAbstractPluginProperties impleme
 		return getProperty("plugin.dades.usuari.jdbc.query.rols");
 	}
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);
-
 }

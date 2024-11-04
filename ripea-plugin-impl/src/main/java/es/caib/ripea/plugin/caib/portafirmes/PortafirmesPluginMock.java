@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.portafirmes;
 
 import java.util.ArrayList;
@@ -10,7 +7,6 @@ import java.util.Properties;
 
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
@@ -28,7 +24,6 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class PortafirmesPluginMock extends RipeaAbstractPluginProperties implements PortafirmesPlugin {
-
 	
 	public PortafirmesPluginMock() {
 		super();
@@ -195,5 +190,10 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public String getEndpointURL() {
+		return "PortafirmesPluginMock";
 	}
 }

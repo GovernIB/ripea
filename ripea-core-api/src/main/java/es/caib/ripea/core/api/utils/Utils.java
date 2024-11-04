@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
@@ -379,5 +381,33 @@ public class Utils {
 			}
 		}
 		return numbers.toString();
+	}
+	
+	public static String getEndpointNameFromProperties(Properties propiedades) {
+		String valorEndpoint = null;
+		String valorURL = null;
+		String comodin = null;
+		if (propiedades!=null) {
+			Enumeration<?> nombres = propiedades.propertyNames();
+			while (nombres.hasMoreElements()) {
+				String clave = (String) nombres.nextElement();
+				String valor = propiedades.getProperty(clave);
+				if (clave.endsWith("endpoint")) {
+					valorEndpoint = valor;
+				} else if (clave.endsWith("url")) {
+					valorURL = valor;
+				} else if(valor.startsWith("http")) {
+					comodin = valor;
+				}
+			}
+		}
+		//Si hem trobat alguna property que acabi amb "endpoint" la retornam
+		if (Utils.isNotEmpty(valorEndpoint)) { return valorEndpoint; }
+		//Si no, retornam la que haguem trobat que acabi amb URL
+		if (Utils.isNotEmpty(valorURL)) { return valorURL; }
+		//Com darrera opció, retornam la que començi per http 
+		if (Utils.isNotEmpty(comodin)) { return comodin; }
+		//Finalment si no hem trobat res, retornam null.
+		return null;
 	}
 }

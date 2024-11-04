@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.unitat;
 
 import java.io.File;
@@ -38,7 +35,6 @@ import lombok.SneakyThrows;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class UnitatsOrganitzativesPluginCaibMock extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
-
 
 	public UnitatsOrganitzativesPluginCaibMock() {
 		super();
@@ -202,4 +198,9 @@ public class UnitatsOrganitzativesPluginCaibMock extends RipeaAbstractPluginProp
 			Timestamp fechaSincronizacion) throws SistemaExternException {
 		return findAmbPare(pareCodi);
 	}
+	@Override
+	public String getEndpointURL() {
+		return "UnitatsOrganitzativesPluginCaibMock";
+	}
+
 }

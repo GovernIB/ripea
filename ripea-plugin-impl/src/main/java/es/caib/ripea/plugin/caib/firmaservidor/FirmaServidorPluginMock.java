@@ -55,5 +55,9 @@ public class FirmaServidorPluginMock extends RipeaAbstractPluginProperties imple
 		}
 		return resposta;
 	}
-
+	
+	@Override
+	public String getEndpointURL() {
+		return "FirmaServidorPluginMock";
+	}
 }

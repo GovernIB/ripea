@@ -25,6 +25,7 @@ import org.fundaciobit.apisib.apimassivescanwebsimple.v1.jersey.ApiMassiveScanWe
 import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioEstat;
@@ -336,6 +337,15 @@ public class DigitalitzacioPluginDigitalIB extends RipeaAbstractPluginProperties
 		return api;
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.digitalitzacio.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getBaseUrl();
+		}
+		return endpoint;
+	}
+	
 	private String getBaseUrl() {
 		return getProperty("plugin.digitalitzacio.digitalib.base.url");
 	}

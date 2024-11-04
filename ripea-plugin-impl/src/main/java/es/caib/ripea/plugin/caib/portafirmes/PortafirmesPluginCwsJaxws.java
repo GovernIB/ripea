@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.caib.cws.*;
@@ -367,6 +368,15 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 		return uploadRequestDocument;
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.portafirmes.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}
+	
 	private Cws getCwsService() throws Exception {
 		Service service = Service.create(
 				new URL(getServiceUrl() + "?wsdl"),

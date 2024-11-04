@@ -104,6 +104,9 @@ public class ProcedimentPluginMock extends RipeaAbstractPluginProperties impleme
 	public ProcedimentPluginMock(String propertyKeyBase, Properties properties) {
 		super(propertyKeyBase, properties);
 	}
-	
 
+	@Override
+	public String getEndpointURL() {
+		return "ProcedimentPluginMock";
+	}
 }

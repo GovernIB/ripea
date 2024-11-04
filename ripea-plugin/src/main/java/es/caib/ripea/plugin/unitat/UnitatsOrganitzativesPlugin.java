@@ -1,8 +1,6 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.unitat;
 
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 
 import java.net.MalformedURLException;
@@ -17,7 +15,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface UnitatsOrganitzativesPlugin {
+public interface UnitatsOrganitzativesPlugin extends RipeaEndpointPluginInfo {
 
     /**
      * Obté l'organigrama complet que conté la unitat organitzativa del codi donat

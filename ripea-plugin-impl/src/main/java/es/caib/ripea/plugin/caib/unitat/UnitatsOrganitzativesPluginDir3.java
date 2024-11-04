@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
@@ -250,8 +251,15 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
                     ex);
         }
     }
-
-
+    
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.unitats.organitzatives.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}
 
     private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
 
@@ -280,8 +288,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
         }
         return client;
     }
-    
-
 	
 	private UnitatsOrganitzativesRestClient getUnitatsOrganitzativesRestClient() {
 		UnitatsOrganitzativesRestClient unitatsOrganitzativesRestClient = new UnitatsOrganitzativesRestClient(
@@ -291,8 +297,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 
 		return unitatsOrganitzativesRestClient;
 	}
-	
-    
 	
     private UnitatOrganitzativa toUnitatOrganitzativa(UnidadRest unidad) {
         UnitatOrganitzativa unitat = UnitatOrganitzativa.builder()
@@ -318,7 +322,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 
         return unitat;
     }
-	
 
     private UnitatOrganitzativa toUnitatOrganitzativa(UnidadTF unidad) {
         UnitatOrganitzativa unitat = UnitatOrganitzativa.builder()
@@ -425,4 +428,5 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
             nodeToOrganigrama(fill, organigrama);
         }
     }
+
 }
