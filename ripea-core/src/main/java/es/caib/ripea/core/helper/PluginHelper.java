@@ -4421,7 +4421,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("ORGANISMES", entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_UNITATS, entitatCodi));
 			unitatsOrganitzativesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4431,7 +4431,6 @@ public class PluginHelper {
 
 	public IArxiuPlugin getArxiuPlugin() {
 		
-
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
@@ -4450,7 +4449,7 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("ARXIU", entitatCodi, organCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(IntegracioHelper.INTCODI_ARXIU, entitatCodi, organCodi));
 					arxiuPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
@@ -4471,19 +4470,13 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("ARXIU", entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_ARXIU, entitatCodi));
 			arxiuPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
 		}
-		
 	}
-
-	
-	
-
-
 
 	private PortafirmesPlugin getPortafirmesPlugin() {
 		
@@ -4497,8 +4490,8 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		if (cacheHelper.mostrarLogsIntegracio()) {
 			logger.info("[PFI] Obtenint plugin de portafirmes amb Entitat: '" + entitatCodi + "' i Organ: '" + (organCodi != null ? organCodi : "null") + "'");
-		}
-
+		}	
+		
 		if (organCodi != null) {
 			plugin = portafirmesPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) {
@@ -4509,7 +4502,7 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (PortafirmesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("PORTAFIRMES", entitatCodi, organCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(IntegracioHelper.INTCODI_PFIRMA, entitatCodi, organCodi));
 					portafirmesPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
@@ -4531,7 +4524,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (PortafirmesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class).
-						newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("PORTAFIRMES", entitatCodi));
+						newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_PFIRMA, entitatCodi));
 			portafirmesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4559,7 +4552,7 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (ConversioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("CONVERSIO", entitatCodi, organCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(IntegracioHelper.INTCODI_CONVERT, entitatCodi, organCodi));
 					conversioPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
@@ -4570,7 +4563,6 @@ public class PluginHelper {
 
 		// ENTITAT/GENERAL PLUGIN
 		plugin = conversioPlugins.get(entitatCodi);
-//		loadPluginProperties("CONVERSIO");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -4581,7 +4573,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ConversioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("CONVERSIO", entitatCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_CONVERT, entitatCodi));
 			conversioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4607,7 +4599,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DigitalitzacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("DIGITALITZACIO", entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_DIGITALITZACIO, entitatCodi));
 			digitalitzacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4755,11 +4747,11 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("VALIDATE_SIGNATURE", entitatCodi, organCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(IntegracioHelper.INTCODI_VALIDASIG, entitatCodi, organCodi));
 					validaSignaturaPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de validació de signatures ("+organCodi+")", ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_VALIDASIG, "Error al crear la instància del plugin de validació de signatures ("+organCodi+")", ex);
 				}
 			}
 		}
@@ -4777,7 +4769,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("VALIDATE_SIGNATURE", entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_VALIDASIG, entitatCodi));
 			validaSignaturaPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4805,11 +4797,11 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (NotificacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("NOTIB", entitatCodi, organCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(IntegracioHelper.INTCODI_NOTIFICACIO, entitatCodi, organCodi));
 					notificacioPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de notificació ("+organCodi+")", ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, "Error al crear la instància del plugin de notificació ("+organCodi+")", ex);
 				}
 			}
 		}
@@ -4827,7 +4819,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (NotificacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("NOTIB", entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_NOTIFICACIO, entitatCodi));
 			notificacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4855,11 +4847,11 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("FIRMA_SERVIDOR", entitatCodi, organCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(IntegracioHelper.INTCODI_FIRMASERV, entitatCodi, organCodi));
 					firmaServidorPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de firma en servidor (" + organCodi + ")", ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, "Error al crear la instància del plugin de firma en servidor (" + organCodi + ")", ex);
 				}
 			}
 		}
@@ -4877,7 +4869,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("FIRMA_SERVIDOR", entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_FIRMASERV, entitatCodi));
 			firmaServidorPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4899,7 +4891,7 @@ public class PluginHelper {
 		viaFirmaPluginConfiguracioProvada = true;
 		String pluginClass = getPropertyPluginViaFirma();
 		if (Strings.isNullOrEmpty(pluginClass)) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "La classe del plugin de via firma no està configurada");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA, "La classe del plugin de via firma no està configurada");
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -4930,7 +4922,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			procedimentPlugin = (ProcedimentPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("GESCONADM", entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_PROCEDIMENT, entitatCodi));
 			procedimentPlugins.put(entitatCodi, procedimentPlugin);
 			return procedimentPlugin;
 		} catch (Exception ex) {
@@ -4951,12 +4943,12 @@ public class PluginHelper {
 		}
 		String pluginClass = getPropertyPluginGestioDocumental();
 		if (Strings.isNullOrEmpty(pluginClass)) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "La classe del plugin de gestió documental no està configurada");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, "La classe del plugin de gestió documental no està configurada");
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (GestioDocumentalPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("GES_DOC", entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_GESDOC, entitatCodi));
 			gestioDocumentalPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4964,11 +4956,7 @@ public class PluginHelper {
 		}
 	}
 	
-	
-	
-	
 	private FirmaWebPlugin getFirmaSimpleWebPlugin() {
-		
 
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -5038,11 +5026,11 @@ public class PluginHelper {
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					plugin = (SummarizePlugin) clazz.getDeclaredConstructor(String.class, Properties.class)
-							.newInstance("es.caib.ripea.", configHelper.getGroupPropertiesEntitatOrGeneral("SUMMARIZE", entitatCodi));
+							.newInstance("es.caib.ripea.", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_SUMMARIZE, entitatCodi));
 					summarizePlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new RuntimeException(ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_SUMMARIZE, "Error al crear la instància del plugin de servidor de IA.", ex);
 				}
 			}
 		}
@@ -5059,15 +5047,13 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (SummarizePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance("es.caib.ripea.", configHelper.getGroupPropertiesEntitatOrGeneral("SUMMARIZE", entitatCodi));
+					.newInstance("es.caib.ripea.", configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_SUMMARIZE, entitatCodi));
 			summarizePlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
-			throw new RuntimeException("Error al crear la instància del plugin de Summarize", ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_SUMMARIZE, "Error al crear la instància del plugin de servidor de IA.", ex);
 		}
-
 	}
-	
 
 	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
 	private synchronized void loadPluginProperties(String codeProperties) {
@@ -5180,7 +5166,6 @@ public class PluginHelper {
 	private String getPropertyNotificacioForsarEntitat() {
 		return configHelper.getConfig("es.caib.ripea.notificacio.forsar.entitat");
 	}
-
 	private boolean getPropertyGuardarCertificacioExpedient() {
 		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
@@ -5193,16 +5178,13 @@ public class PluginHelper {
 	private boolean isComprovacioNomsDesactivada() {
 		return configHelper.getAsBoolean("es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu");
 	}
-	
 	private String getPropertyPluginRegistreExpedientSerieDocumental() {
 		return configHelper.getConfig(
 				"es.caib.ripea.anotacions.registre.expedient.serie.documental");
 	}
-	
 	public boolean isCarpetaLogica() {
 		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
 	}
-	
 	public boolean isPropagarNumeroExpedientActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.numero.expedient.propagar.arxiu");
 	}
@@ -5215,16 +5197,15 @@ public class PluginHelper {
 	public void setArxiuPlugin(String entitatCodi, IArxiuPlugin arxiuPlugin) {
 		arxiuPlugins.put(entitatCodi, arxiuPlugin);
 	}
-	
 	public void setUnitatsOrganitzativesPlugin(String entitatCodi, UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
 		unitatsOrganitzativesPlugins.put(entitatCodi, unitatsOrganitzativesPlugin);
 	}
-
 	public void setPortafirmesPlugin(String entitatCodi, PortafirmesPlugin portafirmesPlugin) {
 		portafirmesPlugins.put(entitatCodi, portafirmesPlugin);
 	}
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}
+
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 }
