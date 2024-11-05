@@ -392,7 +392,7 @@ public class Utils {
 			while (nombres.hasMoreElements()) {
 				String clave = (String) nombres.nextElement();
 				String valor = propiedades.getProperty(clave);
-				if (clave.endsWith("endpoint")) {
+				if (clave.endsWith("endpointName")) {
 					valorEndpoint = valor;
 				} else if (clave.endsWith("url")) {
 					valorURL = valor;
