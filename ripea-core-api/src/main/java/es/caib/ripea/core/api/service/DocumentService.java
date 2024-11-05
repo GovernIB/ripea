@@ -214,6 +214,12 @@ public interface DocumentService {
 			Long id,
 			String versio, 
 			Long tascaId) throws NotFoundException;
+	
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto descarregarOriginalDistribucio(
+			Long entitatId,
+			Long id,
+			Long tascaId) throws NotFoundException;
 
 	/**
 	 * Crea un nou document associat a una consulta a PINBAL.
@@ -509,6 +515,11 @@ public interface DocumentService {
 			Long entitatId,
 			Long id) throws NotFoundException, SistemaExternException;
 
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto getFitxerPDF(
+			Long entitatId,
+			Long id) throws NotFoundException, SistemaExternException;
+	
 	/**
 	 * Genera un identificador del document per firmar en el navegador
 	 * del client.

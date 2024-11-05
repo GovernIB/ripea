@@ -133,13 +133,7 @@ public class DocumentEntity extends NodeEntity {
 	// firma separada
 	@Column(name = "ges_doc_adjunt_firma_id", length = 256)
 	private String gesDocAdjuntFirmaId;
-	
-	
-//	// firma separada of document saved as esborrany in arxiu
-//	@Column(name = "ges_doc_esborrany_firma_id", length = 256)
-//	private String gesDocEsborranyFirmaSeparadaId;
-	
-	
+
 	// firma separada of document saved as esborrany in arxiu
 	@Column(name = "arxiu_uuid_firma", length = 36)
 	private String arxiuUuidFirma;
@@ -155,7 +149,6 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "annex_estat")
 	private ArxiuEstatEnumDto annexArxiuEstat;
 	
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "arxiu_estat", length = 16)
 	private ArxiuEstatEnumDto arxiuEstat;
@@ -164,12 +157,10 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "doc_firma_tipus", length = 16)
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	
-	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_estat_id")
 	@ForeignKey(name = "ipa_expestat_document_fk")
 	private ExpedientEstatEntity expedientEstatAdditional;
-	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	@OrderBy("createdDate DESC")
@@ -180,7 +171,8 @@ public class DocumentEntity extends NodeEntity {
 	@OrderBy("createdDate DESC")
 	protected List<DocumentNotificacioEntity> notificacions;
 	
-	
+	//TODO: No sé perque hi ha un llistat d'annexos que apunten al document, si tant per crear expedient com per incorporar, partint de una anotació
+	//es crea sempre un document per annex, i l'annex apunta a aquest document.
 	@OneToMany(mappedBy = "document")
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
 
@@ -190,6 +182,11 @@ public class DocumentEntity extends NodeEntity {
 	@OneToOne
 	@JoinColumn(name = "id")
 	private ContingutEntity contingut;
+	
+	//Uuid del annex de la anotació a la carpeta de distribució del arxiu, nomes en cas exp. tancats amb annexes amb firma inválida.
+	//El camp arxiuUuid de Contingut entity és el principal i contendrá una copia del arxiu sense les firmes a la carpeta de arxiu del expedient RIPEA.
+	@Column(name = "uuid_distribucio")
+	private String uuid_distribucio;
 	
 	@Transient
 	protected boolean ambNotificacions;
@@ -208,9 +205,7 @@ public class DocumentEntity extends NodeEntity {
 		return pare.getId();
 	}
 	
-	
     /**
-
      * @deprecated
      * DocumentEntity already has field expedient, there is no need to calculate it
      * <p> Use {@link #getExpedient()} instead.
@@ -223,12 +218,12 @@ public class DocumentEntity extends NodeEntity {
 		}
 		
 		return contingutPare != null ? (ExpedientEntity) contingutPare : null;
-		
 	}
 
 	public MetaDocumentEntity getMetaDocument() {
 		return (MetaDocumentEntity)getMetaNode();
 	}
+	
 	@Transient
 	public boolean isFirmat() {
 		return	DocumentEstatEnumDto.FIRMAT.equals(estat) ||
@@ -259,6 +254,13 @@ public class DocumentEntity extends NodeEntity {
 	
 	public void updateArxiuEstat(ArxiuEstatEnumDto arxiuEstat) {
 		this.arxiuEstat = arxiuEstat;
+	}
+	
+	public void eliminaDadesArxiu() {
+		this.setArxiuUuid(null);
+		this.setArxiuUuidFirma(null);
+		this.setArxiuEstat(null);
+		this.setArxiuDataActualitzacio(null);
 	}
 	
 	public void updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto documentFirmaTipus) {
@@ -417,7 +419,6 @@ public class DocumentEntity extends NodeEntity {
 	public boolean isDocFromAnnex() {
 		return this.getExpedientPare().getPeticions() != null && !this.getExpedientPare().getPeticions().isEmpty() && this.getPare() instanceof CarpetaEntity && this.getPare().getNom().startsWith("Registre entrada:");
 	}
-
 	
 	public static Builder getBuilder(
 			DocumentTipusEnumDto documentTipus,

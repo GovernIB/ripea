@@ -815,10 +815,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		
 		long t1 = System.currentTimeMillis();
 		
-		
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
-		// Dels meta-documents actius pel meta-expedient només deixa els que
-		// encara es poden afegir segons la multiplicitat.
+		
+		// Dels meta-documents actius pel meta-expedient només deixa els que encara es poden afegir segons la multiplicitat.
 		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndActiuTrue(
 				expedient != null ? expedient.getMetaExpedient() : metaExpedient);
 		
@@ -827,10 +826,12 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		}
 		
 		if (expedient != null) {
+			
 			// Nomes retorna els documents que no s'hagin esborrat
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
 					expedient,
 					0);
+			
 			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
 				boolean afegir = true;
 				for (DocumentEntity document: documents) {
@@ -861,7 +862,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		}
 
 		
-    	if (cacheHelper.mostrarLogsRendiment())
+    	if (expedient != null && cacheHelper.mostrarLogsRendiment())
     		logger.info("findMetaDocumentsDisponiblesPerCreacio time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		
 		return metaDocuments;

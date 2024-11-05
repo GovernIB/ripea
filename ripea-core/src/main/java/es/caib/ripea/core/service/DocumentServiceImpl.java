@@ -233,7 +233,6 @@ public class DocumentServiceImpl implements DocumentService {
 				expedientTascaEntity.updateResponsableActual(responsableActual);
 			}
 		}
-		
 
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
@@ -603,10 +602,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 	}
 	
-
-
-
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
@@ -625,7 +620,6 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		return dtos;
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -863,6 +857,38 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
+	public FitxerDto descarregarOriginalDistribucio(Long entitatId, Long id, Long tascaId) {
+		
+		logger.debug("Descarregant contingut original del document (entitatId=" + entitatId + ", id=" + id+")");
+		
+		try {
+			DocumentEntity document = null;
+			if (tascaId == null) {
+				document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+						entitatId,
+						id,
+						true,
+						false);
+			} else {
+				document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+						tascaId,
+						id);
+			}
+			
+			return documentHelper.getFitxerOriginalDistribucio(document);
+			
+		} catch (Exception e) {
+
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundException.class)) {
+				throw new ArxiuNotFoundDocumentException();
+			} else {
+				throw e;
+			}
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
@@ -899,7 +925,6 @@ public class DocumentServiceImpl implements DocumentService {
 				throw e;
 			}
 		}
-
 	}
 
 	@Transactional(readOnly = true)
@@ -1852,7 +1877,6 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return firmaViaFirmaHelper.viaFirmaCallback(documentViaFirma, callbackEstat);
 	}
-
 	
 	@Transactional
 	@Override
@@ -1860,6 +1884,18 @@ public class DocumentServiceImpl implements DocumentService {
 			Long entitatId,
 			Long id) {
 		return documentHelper.convertirPdfPerFirmaClient(
+				entitatId,
+				id);
+	}
+	
+	@Transactional
+	@Override
+	//Obtenir el fitxer en PDF, sense estampar ni operacions extres, nomes per previsualitzat al navegador.
+	//Si el fitxer ja es un PDF, es retorna directament.
+	public FitxerDto getFitxerPDF(
+			Long entitatId,
+			Long id) {
+		return documentHelper.getFitxerPDF(
 				entitatId,
 				id);
 	}
@@ -2144,15 +2180,12 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 	}
 	
-
-	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
-
 
 	@Override
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId) throws SistemaExternException {

@@ -2,7 +2,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ attribute name="contingut" required="true" rtexprvalue="true" type="java.lang.Object"%>
 
-
 <c:if test="${contingut.document && contingut.estat == 'REDACCIO'}">
 	<span class="icona-esborrany fa fa-bold" title="<spring:message code="contingut.info.estat.redaccio"/>"></span>
 </c:if> 
@@ -13,19 +12,22 @@
 </c:if> 
 <c:if test="${contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'ADJUNT_FIRMAT')}">
 	<span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span>
+</c:if>
+<c:if test="${contingut.document && contingut.uuid_distribucio!=null}">
+	<span class="firmat fa fa-files-o" style="color: orange;" title="<spring:message code="contingut.info.estat.duplicat"/>"></span>
 </c:if> 
 <c:if test="${contingut.document && contingut.estat == 'FIRMAT' && contingut.gesDocFirmatId != null}">
 	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span>
-</c:if> 
-<c:if test="${contingut.document && contingut.pendentMoverArxiu}">
+</c:if>
+<c:if test="${contingut.document && contingut.pendentMoverArxiu && contingut.uuid_distribucio == null}">
 	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentMoverArxiu"/>"></span>
-</c:if> 
+</c:if>
 <c:if test="${contingut.document && !contingut.validacioFirmaCorrecte}">
-	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${contingut.validacioFirmaErrorMsg}"/>"></span>
-</c:if> 
+	<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${contingut.validacioFirmaErrorMsg}"/>"></span>
+</c:if>
 <c:if test="${contingut.document && contingut.estat == 'DEFINITIU'}">
 	<span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span>
-</c:if> 
+</c:if>
 <c:if test="${contingut.document && contingut.ambNotificacions}">
 	<c:choose>
 		<c:when

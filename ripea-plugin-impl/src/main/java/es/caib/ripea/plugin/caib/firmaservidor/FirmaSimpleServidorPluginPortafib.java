@@ -149,26 +149,6 @@ public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProper
 		}
 	}
 
-	/*private void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
-
-		    final String languagesUI[] = new String[] { "ca", "es" };
-
-		    for (String languageUI : languagesUI) {
-		      logger.info(" ==== LanguageUI : " + languageUI + " ===========");
-
-		      List<FirmaSimpleAvailableProfile> listProfiles = api.getAvailableProfiles(languageUI);
-		      if (listProfiles.size() == 0) {
-		        logger.info("NO HI HA PERFILS PER AQUEST USUARI APLICACIÓ");
-		      } else {
-		        for (FirmaSimpleAvailableProfile ap : listProfiles) {
-		          logger.info("  + " + ap.getName() + ":");
-		          logger.info("      * Codi: " + ap.getCode());
-		          logger.info("      * Desc: " + ap.getDescription());
-		        }
-		      }
-		    }
-	 }*/
-
 	private String getPropertyEndpoint() {
 		return getProperty("plugin.firmaservidor.portafib.endpoint");
 	}

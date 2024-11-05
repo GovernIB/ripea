@@ -330,9 +330,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
-		
-//		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(tascaId);
-		ExpedientTascaEntity tasca = null;
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(tascaId);
 
 		try {
 			tasca = tascaHelper.comprovarTasca(tascaId);
@@ -348,7 +346,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					true, 
 					rolActual);
 		}
-		
 		
 		TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
 		

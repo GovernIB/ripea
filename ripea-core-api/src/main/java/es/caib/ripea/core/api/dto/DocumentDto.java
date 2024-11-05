@@ -63,7 +63,6 @@ public class DocumentDto extends NodeDto {
 	private boolean docFromAnnex;
 	
 	private String gesDocFirmatId;
-	
 	private String gesDocAdjuntId;
 	private String gesDocAdjuntFirmaId;
 	
@@ -75,10 +74,11 @@ public class DocumentDto extends NodeDto {
 	private boolean validacioFirmaCorrecte;
 	private String validacioFirmaErrorMsg;
 	private ArxiuEstatEnumDto annexArxiuEstat; // Estat a l'arxiu en l'origen
-	
 	private ArxiuEstatEnumDto arxiuEstat;
-	
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
+
+	//Uuid del annex de la anotació a la carpeta de distribució del arxiu, nomes en cas exp. tancats amb annexes amb firma inválida.
+	private String uuid_distribucio;
 	
 	private boolean arxiuEstatDefinitiu;
 	private boolean documentDeAnotacio;
@@ -132,7 +132,14 @@ public class DocumentDto extends NodeDto {
 		return copia;
 	}
 	
-	
+	public void eliminaDadesFirma() {
+		this.setFirmaContentType(null);
+		this.setFirmaContingut(null);
+		this.setFirmaNom(null);
+		this.setFirmaSeparada(false);
+		this.setAmbFirma(false);
+		this.setDocumentFirmaTipus(null);
+	}
 	
 	public String getFitxerTamanyStr() {
 		return Utils.getTamanyString(this.fitxerTamany);

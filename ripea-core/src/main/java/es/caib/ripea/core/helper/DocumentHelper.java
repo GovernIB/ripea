@@ -134,7 +134,6 @@ public class DocumentHelper {
 			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
 		}
 		
-		
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
 				document.getNom(),
@@ -244,7 +243,6 @@ public class DocumentHelper {
 						firmes,
 						arxiuEstat);
 				
-				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
 							gestioDocumentalAdjuntId,
@@ -258,10 +256,7 @@ public class DocumentHelper {
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					entity.setGesDocAdjuntFirmaId(null);
 				}	
-				
-
 			}
-
 			
 		} catch (Exception ex) {
 			logger.error("Error al custodiar document en arxiu  (" +
@@ -274,9 +269,6 @@ public class DocumentHelper {
  						DocumentEntity.class,
  						ex.getMessage());
  			}
-//			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
-//				removeFirmaSeparadaOfEsborranyFromGestioDocumental(entity);
-//			}
 		}
 		entity.updateArxiuIntent();
 		
@@ -286,40 +278,7 @@ public class DocumentHelper {
 			dto.setId(entity.getId());
 		return dto;
 	}
-	
 
-	
-//	
-//	private void saveFirmaSeparadaOfEsborranyInGestioDocumental(
-//			byte[] contingut,
-//			DocumentEntity entity) {
-//		String gesDocEsborranyFirmaSeparadaId = pluginHelper.gestioDocumentalCreate(
-//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
-//				new ByteArrayInputStream(contingut));
-//		entity.setGesDocEsborranyFirmaSeparadaId(gesDocEsborranyFirmaSeparadaId);
-//	}
-//	
-//	private void removeFirmaSeparadaOfEsborranyFromGestioDocumental(
-//			DocumentEntity entity) {
-//		pluginHelper.gestioDocumentalDelete(
-//				entity.getGesDocEsborranyFirmaSeparadaId(),
-//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
-//		entity.setGesDocAdjuntFirmaId(null);
-//		
-//	}
-//	
-//	private byte[] getFirmaSeparadaOfEsborranyFromGestioDocumental(
-//			DocumentEntity entity) {
-//		ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-//		pluginHelper.gestioDocumentalGet(
-//				entity.getGesDocEsborranyFirmaSeparadaId(),
-//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
-//				streamAnnex);
-//		return streamAnnex.toByteArray();
-//	}
-//	
-	
-	
 	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus, DocumentEstatEnumDto estatAnterior) {
 		boolean isFirmatPujatArxiu = documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu();
 		boolean isEsborranyConvertit = documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA && (estatAnterior != null && estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU));
@@ -1067,6 +1026,23 @@ public class DocumentHelper {
 			document.updateFitxerNom(oldNameWithoutExtension + ".pdf");
 		}
 	}
+	
+	public FitxerDto getFitxerOriginalDistribucio(DocumentEntity document) {
+		FitxerDto fitxer = new FitxerDto();
+        String fitxerNom = document.getFitxerNom();
+        String fitxerFirmatNom = document.getNomFitxerFirmat();
+		fitxer = new FitxerDto();
+        fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
+        fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
+		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+				null,
+				document.getUuid_distribucio(),
+				null,
+				true,
+				false);
+		fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+		return fitxer;
+	}
 
 	public FitxerDto getFitxerAssociat(
 			DocumentEntity document,
@@ -1163,7 +1139,6 @@ public class DocumentHelper {
 		}
 		return fitxer;
 	}
-	
 	
 	public List<DocumentEntity> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
@@ -1550,6 +1525,29 @@ public class DocumentHelper {
             return pluginHelper.conversioConvertirPdf(
                     getFitxerAssociat(document, null),
                     null);
+        } else {
+            return getFitxerAssociat(document, null);
+        }
+	}
+	
+	public FitxerDto getFitxerPDF(
+			Long entitatId,
+			Long id) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
+		logger.debug("Converteix un document en PDF per a la firma client ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		DocumentEntity document = comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				id,
+				true,
+				false);
+
+        if (!document.getFitxerNom().endsWith(".pdf")) {
+//            return pluginHelper.conversioConvertirPdf(
+//                    getFitxerAssociat(document, null),
+//                    null);
+        	return null;
         } else {
             return getFitxerAssociat(document, null);
         }

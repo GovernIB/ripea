@@ -9,9 +9,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.repository.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -25,13 +22,28 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
 For new transactions
@@ -67,6 +79,8 @@ public class ExpedientHelper2 {
 	private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
 	@Autowired
 	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkIfExpedientCanBeClosed(Long expedientId) {
@@ -91,9 +105,9 @@ public class ExpedientHelper2 {
 		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, contingutHelper.getArxiuMaxReintentsDocuments()))) {
 			throw new ValidationException("No es pot tancar un expedient amb documents amb reintents pendents de guardar a l'arxiu");
 		}
-		if (CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient))) {
-			throw new ValidationException("No es pot tancar un expedient amb documents d'anotacions no moguts a la sèrie documental final");
-		}
+//		if (CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient))) {
+//			throw new ValidationException("No es pot tancar un expedient amb documents d'anotacions no moguts a la sèrie documental final");
+//		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -112,7 +126,7 @@ public class ExpedientHelper2 {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void deleteDocumentsNotSelectedDB(Long entitatId, Long expedientId, Long[] documentsPerFirmar) {
+	public void deleteDocumentsNotSelectedDB(Long entitatId, Long expedientId, List<Long> documentsPerFirmar) {
 
 		List<DocumentEntity> docsToDelete = new ArrayList<>();
 		docsToDelete.addAll(findNotSelected(entitatId, expedientId, documentsPerFirmar));
@@ -126,7 +140,6 @@ public class ExpedientHelper2 {
 			
 			documentHelper.deleteDefinitiu(docToDelete);
 		}
-
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -191,11 +204,7 @@ public class ExpedientHelper2 {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public List<DocumentEntity> findNotSelected(Long entitatId, Long expedientId, Long[] documentsSelected) {
-		List<Long> documentsSelectedList = new ArrayList<>();
-		if (ArrayUtils.isNotEmpty(documentsSelected)) {
-			documentsSelectedList = Arrays.asList(documentsSelected);
-		}
+	public List<DocumentEntity> findNotSelected(Long entitatId, Long expedientId, List<Long> documentsSelected) {
 		
 		List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatId,
@@ -204,7 +213,7 @@ public class ExpedientHelper2 {
 		List<DocumentEntity> notSelected = new ArrayList<>();
 		
 		for (DocumentEntity esborrany : esborranys) {
-			if (!documentsSelectedList.contains(esborrany.getId())) {
+			if (!documentsSelected.contains(esborrany.getId())) {
 				notSelected.add(esborrany);
 			}
 		}
@@ -212,11 +221,97 @@ public class ExpedientHelper2 {
 		return notSelected;
 	}
 	
-	public void signDocumentsSelected(String motiu, Long[] documentsPerFirmar) {
-		// Firmam els documents seleccionats
-		if (ArrayUtils.isNotEmpty(documentsPerFirmar)) {
-			for (Long documentPerFirmar : documentsPerFirmar) {
-				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu);
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public List<Long> reprocessarAnnexesAnotacionsAmbError(Long expedientId) {
+		
+		List<Long> documentsClonar = new ArrayList<Long>();
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		List<RegistreAnnexEntity> annexesReprocessar = registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient);
+		
+		if(annexesReprocessar!=null) {
+			for (RegistreAnnexEntity ra: annexesReprocessar) {
+				//El registre té errors de processament
+				if (Utils.isNotEmpty(ra.getError())) {
+					//Si no esta creat el document, no podem crear-lo, ja que no sabriem quin tipus ha de tenir. Això es selecciona al acceptar la anotacio.
+					//La segona condició es perque no volem comprovar documents que ja ham estat clonats. Ja que el error de la anotació el mantenim.
+					//i si es reintenta el tancar expedient, pot ser aquest annex ja estigui tractat i clonat (tendrá Uuid_distribucio)
+					if (ra.getDocument()!=null && ra.getDocument().getUuid_distribucio()==null) {
+						boolean clonarDocument = false;
+						//Ja ens avisa distribució, que la firma no es correcte
+						if (!ra.isValidacioFirmaCorrecte()) {
+							clonarDocument = true;
+						} else {
+							
+							//Reintentam mourer annex al Arxiu...
+							Exception excepcio = expedientHelper.moveAnnexArxiu(ra.getId());
+							
+							//Novament ha donat un error al mourer el annex al arxiu.
+							if (excepcio!=null) {
+								clonarDocument = true;
+							}
+						}
+						
+						if (clonarDocument) {
+							//Afegim al document per clonar en una llista, es farà en una funcio REQUIRES_NEW posterior
+							//Necessitam posar la variable firma correcte a false, perque la funció de firmaEnServidor elimini la firma actual
+							ra.getDocument().setValidacioFirmaCorrecte(false);
+							documentsClonar.add(ra.getDocument().getId());
+						}
+					}
+				}
+			}
+		}
+		return documentsClonar;
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void clonarDocumentsAmbFirmaInvalida(Long expedientId, List<DocumentEntity> documentsClonar, Long[] documentsPerFirmar) {
+		if (documentsClonar!=null) {
+			ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+			for (DocumentEntity document: documentsClonar) {
+				
+				//Cream un document igual al anterior, pero sense les firmes.
+				DocumentDto docDto = conversioTipusHelper.convertir(document, DocumentDto.class);
+				docDto.setId(null);
+				docDto.eliminaDadesFirma();
+				docDto.setArxiuUuid(null);
+				
+				docDto.setNom(Utils.addSuffixToFileName(docDto.getNom(), "_copiaFirmaServidor"));
+				
+				//Crea un nou document a la mateixa ubicació que l'anterior, pero sense tipus (metaDocument=null) per evitar error de multiplicitat
+				DocumentDto nouDocument = documentHelper.crearDocument(
+						docDto,
+						document.getPare(),
+						expedient,
+						null, //document.getMetaDocument()
+						false);
+				
+				//Relacionam els dos documents, original i clon
+//				document.setDocumentClonId(nouDocument.getId());
+				
+				//Eliminam les dades de arxiu del document original amb errors, a arxiu hi haurà el clon
+				document.eliminaDadesArxiu();
+				
+				//Si el document original tenia annexes amb error de processament, esborram el error
+				if (document.getAnnexos()!=null) {
+					for (RegistreAnnexEntity ra: document.getAnnexos()) {
+						ra.updateError(null);
+					}
+				}
+				
+				//El document creat, el voldrem firmam en servidor a una passa posterior, l'afegim a la llista
+				documentsPerFirmar = Utils.addElementToArray(documentsPerFirmar, nouDocument.getId());
+				//Mentre que el document original, el retiram de la llista, perque no volem eliminar les firmes ni firmarlo en servidor.
+				documentsPerFirmar = Utils.removeElementFromArray(documentsPerFirmar, document.getId());
+			}
+		}
+	}
+	
+	public void signDocumentsSelected(String motiu, List<Long> documentsPerFirmar, List<Long> documentsClonar) {
+		// Firmam els documents seleccionats en servidor
+		for (Long documentPerFirmar : documentsPerFirmar) {
+			if (documentPerFirmar!=null) {
+				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu, documentsClonar);
 			}
 		}
 	}

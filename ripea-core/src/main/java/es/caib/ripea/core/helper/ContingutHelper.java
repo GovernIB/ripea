@@ -785,7 +785,8 @@ public class ContingutHelper {
 		dto.setDataCaptura(document.getDataCaptura());
 		dto.setVersioDarrera(document.getVersioDarrera());
 		dto.setVersioCount(document.getVersioCount());
-
+		dto.setUuid_distribucio(document.getUuid_distribucio());
+		
 		if (params.isAmbVersions() && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == NO_ESBORRAT) {
 			setVersions(dto, document);
 		}
@@ -1725,14 +1726,7 @@ public class ContingutHelper {
 					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public void arxiuPropagarModificacio(
 			ExpedientEntity expedient) {
 

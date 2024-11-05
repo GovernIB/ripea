@@ -3,37 +3,23 @@
  */
 package es.caib.ripea.war.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.core.api.service.ExpedientPeticioService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.GrupService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.war.command.ExpedientPeticioAcceptarCommand;
-import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
-import es.caib.ripea.war.command.ExpedientPeticioModificarCommand;
-import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
-import es.caib.ripea.war.command.RegistreAnnexCommand;
-import es.caib.ripea.war.helper.AnotacionsPendentsHelper;
-import es.caib.ripea.war.command.RegistreInteressatsCommand;
-import es.caib.ripea.war.helper.ConversioTipusHelper;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.JsonResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,21 +36,56 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.RegistreInteressatDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.GrupService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.war.command.ExpedientPeticioAcceptarCommand;
+import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
+import es.caib.ripea.war.command.ExpedientPeticioModificarCommand;
+import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
+import es.caib.ripea.war.command.RegistreAnnexCommand;
+import es.caib.ripea.war.command.RegistreInteressatsCommand;
+import es.caib.ripea.war.helper.AnotacionsPendentsHelper;
+import es.caib.ripea.war.helper.ConversioTipusHelper;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al llistat d'expedients peticions.
@@ -188,7 +209,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
     	
     	return dr;
 	}
-	
 
 	@RequestMapping(value = "/{registreAnnexId}/{expedientPeticioId}/reintentar", method = RequestMethod.GET)
 	public String retryCreateDocFromAnnex(HttpServletRequest request, @PathVariable Long registreAnnexId, @PathVariable Long expedientPeticioId, Model model) {
@@ -1118,19 +1138,15 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	}
 	
 	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
-	@ResponseBody
-	public JsonResponse descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
-
+	public void descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
 		try {
 			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, true);
-			return new JsonResponse(fitxer);
-				
+			response.setContentType("application/pdf");
+			response.setHeader("Content-Disposition", "inline; filename=\""+fitxer.getNom()+"\"");
+			response.getOutputStream().write(fitxer.getContingut());
 		} catch (Exception e) {
 			logger.error("Errol al descarregarBase64", e);
-			return new JsonResponse(true, e.getMessage());
 		}
-		
-		
 	}
 	
 	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)

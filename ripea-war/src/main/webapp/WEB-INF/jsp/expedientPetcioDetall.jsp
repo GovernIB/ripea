@@ -14,7 +14,6 @@
 	<title>${titol}</title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	<script src="<c:url value="/webjars/pdf-js/2.13.216/build/pdf.js"/>" type="module"></script>
 	<rip:modalHead/>
 <style>
 body {
@@ -210,42 +209,8 @@ tr.clicable {
 
 	    // Recuperar i mostrar document al visor
 		var urlDescarrega = "<c:url value="/expedientPeticio/annex/"/>" + annexId + "/content";
-		$('#container').attr('src', '');
 		$('#container').addClass('rmodal_loading');
-		showDocument(urlDescarrega);
-	}
-
-	function showDocument(arxiuUrl) {
-		// Fa la petició a la url de l'arxiu
-		$.ajax({
-			type: 'GET',
-			url: arxiuUrl,
-			responseType: 'arraybuffer',
-			success: function(json) {
-				
-				if (json.error) {
-					$('#container').removeClass('rmodal_loading');
-					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
-				} else if (json.warning) {
-					$('#container').removeClass('rmodal_loading');
-					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
-				} else {
-					response = json.data;
-					var blob = base64toBlob(response.contingut, response.contentType);
-		            var file = new File([blob], response.contentType, {type: response.contentType});
-		            link = URL.createObjectURL(file);
-		            
-		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.13.216/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-				    $('#container').removeClass('rmodal_loading');
-				    $('#container').attr('src', viewerUrl);
-				}
-			    
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				$('#container').removeClass('rmodal_loading');
-				alert(thrownError);
-			}
-		});
+		$('#container').attr('src', urlDescarrega);
 	}
 
 	// Amagar visor

@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -528,8 +529,9 @@ public class ExpedientHelper {
 					updateRepresentant(expedientId, interessat.getId(), permission, rolActual, representantOverwritten);
 				}
 			} else {
-				InteressatEntity representant = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, representantDistribucio.getDocumentNumero());
-				if (distinctDocNum(interessat.getDocumentNum(),representant.getDocumentNum())) {
+				if (representantDistribucio != null 
+						&& distinctDocNum(interessat.getDocumentNum(), representantDistribucio.getDocumentNumero())) {
+					InteressatEntity representant = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, representantDistribucio.getDocumentNumero());
 					if (representant == null) {
 						createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
 					} else {
@@ -1003,7 +1005,6 @@ public class ExpedientHelper {
 		ContingutEntity pare = docEntity.getPare();
 		ExpedientEntity expedientEntity = docEntity.getExpedient();
 		Exception exception = null;
-
 		
 		String uuidToMove = null;
 //		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
@@ -1015,6 +1016,10 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(uuidToMove);
 		
 		try {
+			
+			boolean provocarError = false;
+			if (provocarError) { throw new Exception("Error moguent arxiu."); }
+			
 			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
 			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
 					uuidToMove,
@@ -1391,9 +1396,34 @@ public class ExpedientHelper {
 
 		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
 		
-		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar);
+		/**
+		 * #1579 Adaptar tancament d'expedients a annexes d'anotacions no moguts
+		 * 
+		 * 1.- Reprocessar annexes amb error.
+		 */		
+		List<Long> documentsClonar = expedientHelper2.reprocessarAnnexesAnotacionsAmbError(expedientId);
 		
-		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsPerFirmar);
+		//Si el ID del document a clonar, no es troba dins la llista de documents a firmar no es clonara,
+		//perque la funcio signDocumentsSelected nomes actua sobre la llista de documents a firmar.
+		//Tot document que es vulgui clonar, ha de estar dins la llista de documents a firmar
+		List<Long> documentsSelectedList = new ArrayList<>();
+		if (documentsPerFirmar!=null) {
+			documentsSelectedList = Arrays.asList(documentsPerFirmar);
+		}
+		if (documentsClonar!=null) {
+			for (Long docClon: documentsClonar) {
+				if (!documentsSelectedList.contains(docClon)) {
+					documentsSelectedList.add(docClon);
+				}
+			}
+		}
+
+		/**
+		 * Firmam en servidor els documents sense firma, o els clons dels que tenien error d'anotació.
+		 */
+		expedientHelper2.signDocumentsSelected(motiu, documentsSelectedList, documentsClonar);
+		
+		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsSelectedList);
 		
 		expedientHelper2.markAllDocumentsEsborranysAsDefinitiusArxiu(expedientId);
 		
@@ -2033,9 +2063,6 @@ public class ExpedientHelper {
 		}
 		return organs;
 	}
-	
-
-	
 	
 	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity, Long existingInteressatId) {
 		InteressatDto interessatDto = null;

@@ -189,49 +189,10 @@ function showViewer(event, annexId, observacions, dataCaptura, origen, ntiTipoDo
 			}
 	);
 
-
     // Recuperar i mostrar document al visor
 	var urlDescarrega = "<c:url value="/expedientPeticio/annex/"/>" + annexId + "/content";
-	$('#container-previs').attr('src', '');
 	$('#container-previs').addClass('rmodal_loading');
-	showDocument(urlDescarrega, annexId);
-
-	// scroll down
-// 	$([document.documentElement, document.body]).animate({
-//         scrollTop: $("#annex-viewer").offset().top - 40
-//     }, 500);
-}
-
-function showDocument(arxiuUrl, annexId) {
-	// Fa la petició a la url de l'arxiu
-	$.ajax({
-		type: 'GET',
-		url: arxiuUrl,
-		responseType: 'arraybuffer',
-		success: function(json) {
-			
-			if (json.error) {
-				$('#container-previs').removeClass('rmodal_loading');
-				$('#annex-viewer .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
-			} else if (json.warning) {
-				$('#container-previs-').removeClass('rmodal_loading');
-				$('#annex-viewer .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
-			} else {
-				response = json.data;
-				var blob = base64toBlob(response.contingut, response.contentType);
-	            var file = new File([blob], response.contentType, {type: response.contentType});
-	            link = URL.createObjectURL(file);
-	            
-	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.13.216/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-			    $('#container-previs').removeClass('rmodal_loading');
-			    $('#container-previs').attr('src', viewerUrl);
-			}
-		    
-		},
-		error: function(xhr, ajaxOptions, thrownError) {
-			$('#container-previs').removeClass('rmodal_loading');
-		}
-	});
+	$('#container-previs').attr('src', urlDescarrega);
 }
 
 // Amagar visor
@@ -240,13 +201,10 @@ function closeViewer() {
 	});
 }
 
-
-
 </script>
 
 </head>
 <body>
-
 
 	<c:set var="formAction">
 	<c:choose>

@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -196,6 +197,32 @@ public class Utils {
 		}
 	}
 	
+	public static String addSuffixToFileName(String originalName, String suffix) {
+		String fileNameWithoutExtension = originalName.substring(0, originalName.lastIndexOf('.'));
+		String fileExtension = originalName.substring(originalName.lastIndexOf('.'));
+		return fileNameWithoutExtension + suffix + fileExtension;
+	}
+	
+	public static <T> T[] addElementToArray(T[] objects, T newElement) {
+		if (objects!=null) {
+			objects = Arrays.copyOf(objects, objects.length + 1);
+			objects[objects.length-1]=newElement;
+		}
+		return objects;
+	}
+	
+	public static Long[] removeElementFromArray(Long[] oldArray, Long oldElement) {
+		Long[] newArray = null;
+		if (oldArray!=null && oldArray.length>0) {
+			newArray = new Long[oldArray.length - 1];
+			for (int i = 0, j = 0; i < oldArray.length; i++) {
+				if (!oldArray[i].equals(oldElement)) {
+					newArray[j++] = oldArray[i];
+				}
+			}
+		}
+		return newArray;
+	}
 	
 	/**
 	 * PostgreSQL doesn't allow null value for string parameter
