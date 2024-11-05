@@ -264,46 +264,4 @@ public class IntegracioHelper {
 		}
 		return integracio;
 	}
-	
-	/*public void addAccioOk(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			IntegracioAccioTipusEnumDto tipus,
-			long tempsResposta) {
-		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(integracioCodi));
-		accio.setData(new Date());
-		accio.setDescripcio(descripcio);
-		accio.setParametres(parametres);
-		accio.setTipus(tipus);
-		accio.setTempsResposta(tempsResposta);
-		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
-		addAccio(integracioCodi, accio);
-	}
-
-	public void addAccioError(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			IntegracioAccioTipusEnumDto tipus,
-			long tempsResposta,
-			String errorDescripcio,
-			Throwable throwable) {
-
-		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(integracioCodi));
-		accio.setData(new Date());
-		accio.setDescripcio(descripcio);
-		accio.setParametres(parametres);
-		accio.setTipus(tipus);
-		accio.setTempsResposta(tempsResposta);
-		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
-		accio.setErrorDescripcio(errorDescripcio);
-		if (throwable != null) {
-			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
-			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
-		}
-		addAccio(integracioCodi, accio);
-	}*/
 }
