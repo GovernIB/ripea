@@ -63,9 +63,9 @@ $(document).ready(function() {
 			let valor = '${selectedMetaDada}';
 			$('#codi').addClass('disabled');
 			//la implementació actual no permet multiplicitat per camps tipus select
-			$('#multiplicitat').val('M_0_1');
-			$('#multiplicitat').trigger('change');
-			$('#multiplicitat').nextAll('span:first').addClass('disabled');
+			//$('#multiplicitat').val('M_0_1');
+			//$('#multiplicitat').trigger('change');
+			//$('#multiplicitat').nextAll('span:first').addClass('disabled');
 			
 			$('#domini').parent().parent().show();
 			$('#valorString').parent().parent().hide();

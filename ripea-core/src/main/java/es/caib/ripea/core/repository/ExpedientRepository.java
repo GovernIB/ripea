@@ -108,7 +108,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select count(*) from DadaEntity dada where dada.metaDada.codi = :metaExpedientDominiCodi and dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
+			"		or  (select count(*) from DadaEntity dada " + 
+			"				where dada.metaDada.codi = :metaExpedientDominiCodi " + 
+			"				and dada.node = e.id " + 
+			"				and (" + 
+			"						dada.valor = :metaExpedientDominiValor" + 
+			"					 	or dada.valor like '%'  || :metaExpedientDominiValor || ',%'" + 
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" + 
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+ 
+			"					 ) != 0) " +
 			"and (:isAdmin = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
@@ -230,7 +238,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select count(*) from DadaEntity dada where dada.metaDada.codi = :metaExpedientDominiCodi and dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
+			"		or  (select count(*) from DadaEntity dada " + 
+			"				where dada.metaDada.codi = :metaExpedientDominiCodi " + 
+			"				 and dada.node = e.id " + 
+			"				 and (" + 
+			"						(dada.valor = :metaExpedientDominiValor)" + 
+			"					 	or (dada.valor like '%,' || :metaExpedientDominiValor || '%')" + 
+			"						or (dada.valor like '%,' || :metaExpedientDominiValor || ',%')" + 
+			"						or (dada.valor like '%' || :metaExpedientDominiValor || ',%'))"	+ 
+			"					 ) != 0) " +
 			"and (:isAdmin = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
