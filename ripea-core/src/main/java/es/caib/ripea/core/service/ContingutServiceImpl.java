@@ -2540,6 +2540,11 @@ public class ContingutServiceImpl implements ContingutService {
 				dadaRepository.delete(dades.get(i));
 			}
 		}
+		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+			String valorsDomini = StringUtils.join(valorsSenseNull, ",");
+		    valorsSenseNull.clear();
+		    valorsSenseNull.add(valorsDomini);
+		}
 		// Modifica o crea les dades
 		for (int i = 0; i < valorsSenseNull.size(); i++) {
 			DadaEntity dada = (i < dades.size()) ? dades.get(i) : null;
@@ -2580,9 +2585,11 @@ public class ContingutServiceImpl implements ContingutService {
 				// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
 				if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
 					DominiDto domini = dominiService.findByCodiAndEntitat(metaDada.getCodi(), entitatId);
+					String valorDomini = dada.getValorComString();
 					
-					ResultatConsultaDto resultat = dominiService.getSelectedDomini(entitatId, domini, dada.getValorComString());
-					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, resultat.getId());
+					String idsDomini = buildIdsDominiString(valorDomini, entitatId, domini);
+					
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, idsDomini);
 				} else {
 					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, dada.getValorComString());
 				}
@@ -2632,6 +2639,24 @@ public class ContingutServiceImpl implements ContingutService {
     
 	public boolean isPropagarMetadadesActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
+	}
+	
+	private String buildIdsDominiString(String valorDomini, Long entitatId, DominiDto domini) {
+	    if (valorDomini == null || valorDomini.isEmpty()) {
+	        return "";
+	    }
+	    List<String> valorDominiArr = Arrays.asList(valorDomini.split(","));
+	    StringBuilder idsDomini = new StringBuilder();
+	    for (int i = 0; i < valorDominiArr.size(); i++) {
+			ResultatConsultaDto resultat = dominiService.getSelectedDomini(entitatId, domini, valorDominiArr.get(i));
+				if (resultat != null) {
+				idsDomini.append(resultat.getId());
+				if (i < valorDominiArr.size() - 1) {
+					idsDomini.append(",");
+	            }
+			}
+		}
+	    return idsDomini.toString();
 	}
 	
 	private List<String> getOrgansAmbNoms(List<String> organsCodis) {

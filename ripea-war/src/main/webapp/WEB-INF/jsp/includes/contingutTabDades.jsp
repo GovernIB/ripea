@@ -144,18 +144,36 @@ function recuperarResultatDomini(
 	var selDomini = $("#" + metaDadaCodi);
 
 	if (dadaValor != '' && dadaValor != 'NO_APLICA') {
-		$.ajax({
-	        type: "GET",
-	        url: dadaValorUrl,
-	        data: {dadaValor: dadaValor},
-	        success: function (resultat) {
-	        	var newOption = new Option(resultat.text, resultat.id, false, false);
-	        	selDomini.append(newOption);
-	        	selDomini.val(resultat.id).trigger('change');
-			}
-	    });
+		if (dadaValor.includes(',')) {
+			var dades = dadaValor.split(',');
+			dades.forEach(function(dada) {
+				$.ajax({
+			        type: "GET",
+			        url: dadaValorUrl,
+			        data: {dadaValor: dada},
+			        async: false,
+			        success: function (resultat) {
+			        	var newOption = new Option(resultat.text, resultat.id, false, false);
+			        	selDomini.append(newOption);
+					}
+			    });
+			});
+			selDomini.val(dades).trigger('change');
+		} else {
+		
+			$.ajax({
+		        type: "GET",
+		        url: dadaValorUrl,
+		        data: {dadaValor: dadaValor},
+		        success: function (resultat) {
+		        	var newOption = new Option(resultat.text, resultat.id, false, false);
+		        	selDomini.append(newOption);
+		        	selDomini.val(resultat.id).trigger('change');
+				}
+		    });
+		}
 	}
-	selDomini.empty();
+	//selDomini.empty();
 	var select2Options = {
 			language: "${requestLocale}",
 	        theme: 'bootstrap',
@@ -267,7 +285,7 @@ function setCheckboxTrue($checkbox) {
 						<td>
 							<c:choose>
 								<c:when test="${potModificar}">
-									<div class="form-group ${metaDada.tipus == 'DOMINI' ? '' :''}" ${metaDada.tipus == 'DOMINI' ? 'style="width: 100%;margin-bottom: -10px;"' :''} <c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
+									<div class="form-group ${metaDada.tipus == 'DOMINI' ? '' :''}" ${metaDada.tipus == 'DOMINI' ? 'style="width: 100%;margin-bottom: -10px;"' :''} <c:if test="${isMultiple}"> data-toggle="${metaDada.tipus != 'DOMINI' ? 'multifield' : ''}" data-nou="true"</c:if>>
 										<label class="hidden" for="${metaDada.codi}"></label>
 										<div class="controls">
 											<c:choose>
@@ -290,7 +308,7 @@ function setCheckboxTrue($checkbox) {
 												</c:when>
 												<c:when test="${metaDada.tipus == 'DOMINI'}">
 												
-													<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" cssClass="form-control${multipleClass} dominis" multiple="false"/>
+													<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" cssClass="form-control${multipleClass} dominis" multiple="${isMultiple ? true : false}"/>
 													<script type="text/javascript">
 													recuperarResultatDomini(
 															"${contingut.metaNode.id}",
@@ -308,7 +326,7 @@ function setCheckboxTrue($checkbox) {
 									</div>
 								</c:when>
 								<c:when test="${expedientTancat && (metaDada.tipus == 'DOMINI')}">
-									<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="false" disabled="true"/>
+									<form:select path="${metaDada.codi}" id="${metaDada.codi}" cssStyle="width: 100%" data-toggle="select2" cssClass="form-control${multipleClass} dominis" multiple="${isMultiple ? true : false }" disabled="true"/>
 									<script type="text/javascript">
 										recuperarResultatDomini(
 												"${contingut.metaNode.id}",
