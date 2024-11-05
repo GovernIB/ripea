@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.firmaweb;
 
 import java.util.List;
@@ -21,6 +18,7 @@ import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaWebSimpleJersey;
 
 import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FirmaResultatDto.FirmaSignatureStatus;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -30,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties implements FirmaWebPlugin {
-
 	
 	private ApiFirmaWebSimple api = null;
 	
@@ -40,9 +37,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 	public FirmaSimpleWebPluginPortafib(
 			String propertyKeyBase,
 			Properties properties) {
-		super(
-				propertyKeyBase,
-				properties);
+		super(propertyKeyBase, properties);
 	}
 
 	@Override
@@ -226,9 +221,16 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 		return firmaResultat;
 
 	}
-	
-	
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.firmasimpleweb.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getPropertyEndpoint();
+		}
+		return endpoint;
+	}
+	
 	private FirmaResultatDto processStatusFileOfSign(
 			ApiFirmaWebSimple api,
 			String transactionID,
@@ -310,8 +312,6 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 
 		return firmaResultat;
 	}
-	
-	
 
 	private ApiFirmaWebSimple getApi() {
 		if (api == null) {
@@ -342,6 +342,5 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 	private boolean getPropertyDebug() {
 		return getAsBoolean("plugin.firmasimpleweb.debug");
 	}
-
 
 }

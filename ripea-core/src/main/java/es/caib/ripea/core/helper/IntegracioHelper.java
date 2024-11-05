@@ -52,6 +52,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_UNITATS = "ORGANISMES";
 	public static final String INTCODI_CIUTADA = "CIUTADA"; //No implementat (Sede electrónica)
 	public static final String INTCODI_PFIRMA = "PORTAFIRMES";
+	public static final String INTCODI_FIRMASIMPLE = "FIRMA_SIMPLE_WEB";
 	public static final String INTCODI_ARXIU = "ARXIU";
 	public static final String INTCODI_PINBAL = "PINBAL";
 	public static final String INTCODI_CONVERT = "CONVERSIO";
@@ -74,9 +75,11 @@ public class IntegracioHelper {
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
 		integracions.add(novaIntegracio(INTCODI_PFIRMA));
+		integracions.add(novaIntegracio(INTCODI_FIRMASIMPLE));
 		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
 		integracions.add(novaIntegracio(INTCODI_CALLBACK));
 		integracions.add(novaIntegracio(INTCODI_ARXIU));
+		integracions.add(novaIntegracio(INTCODI_GESDOC));
 		integracions.add(novaIntegracio(INTCODI_PINBAL));
 		integracions.add(novaIntegracio(INTCODI_USUARIS));
 		integracions.add(novaIntegracio(INTCODI_CONVERT));
@@ -85,6 +88,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_VIAFIRMA));
 		integracions.add(novaIntegracio(INTCODI_DIGITALITZACIO));
 		integracions.add(novaIntegracio(INTCODI_VALIDASIG));
+		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
 		return integracions;
 	}
 

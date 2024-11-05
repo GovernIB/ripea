@@ -5,6 +5,8 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import es.caib.ripea.core.api.dto.FitxerDto;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -436,5 +438,19 @@ public class Utils {
 		if (Utils.isNotEmpty(comodin)) { return comodin; }
 		//Finalment si no hem trobat res, retornam null.
 		return null;
+	}
+	
+	public static String getFileNames(List<FitxerDto> fitxersPerFirmar) {
+		String resultat = "";
+		if (fitxersPerFirmar!=null) {
+			for (FitxerDto fitxerDto: fitxersPerFirmar) {
+				if (resultat == "") {
+					resultat+=fitxerDto.getNom();
+				} else {
+					resultat+=", "+fitxerDto.getNom();
+				}
+			}
+		}
+		return resultat;
 	}
 }

@@ -1,20 +1,17 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.gesdoc;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
-
 
 /**
  * Interfície per accedir al gestor documental.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface GestioDocumentalPlugin {
+public interface GestioDocumentalPlugin extends RipeaEndpointPluginInfo {
 
 	/**
 	 * Puja un document a la gestió documental.

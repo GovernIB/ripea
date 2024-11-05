@@ -567,3 +567,39 @@ databaseChangeLog:
               - column:
                   name: configurable_org_descendents
                   value: ${booleanFalse}
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.plugin.firmasimpleweb.endpointName
+              - column:
+                  name: description
+                  value: Nom del endpoint del plugin de Firma Simple REST.
+              - column:
+                  name: group_code
+                  value: FIRMA_SIMPLE_WEB
+              - column:
+                  name: position
+                  value: 3
+              - column:
+                  name: jboss_property
+                  value: ${booleanFalse}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable_organ
+                  value: ${booleanFalse}
+              - column:
+                  name: configurable_entitat_actiu
+                  value: ${booleanFalse}
+              - column:
+                  name: configurable_organ_actiu
+                  value: ${booleanFalse}
+              - column:
+                  name: configurable
+                  value: ${booleanTrue}
+              - column:
+                  name: configurable_org_descendents
+                  value: ${booleanFalse}

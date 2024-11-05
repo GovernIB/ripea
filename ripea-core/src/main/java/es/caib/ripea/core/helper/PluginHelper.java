@@ -3916,7 +3916,7 @@ public class PluginHelper {
 			String codiDir3,
 			String codiSia) {
 
-		String accioDescripcio = "Consulta del procediment pel codi SIA";
+		String accioDescripcio = "Consulta del procediment per codi SIA";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("codiDir3",	codiDir3);
 		accioParams.put("codiSia", codiSia);
@@ -3933,7 +3933,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			return procediment;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de procediments: " + ex.getMessage();
+			String errorDescripcio = "Error al consultar el procediment per codi SIA: " + ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_PROCEDIMENT,
 					accioDescripcio,
@@ -4295,7 +4295,7 @@ public class PluginHelper {
 		String accioDescripcio = "Consulta dels municipis d'una província per consultes a PINBAL";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("provinciaCodi", provinciaCodi);
-		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
+		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPinbalPlugin();
 		
 		try {
 			List<Municipi> municipis = dadesExternesPlugin.municipiFindByProvincia(provinciaCodi);
@@ -4308,7 +4308,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0);
 			return municipis;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de dades externes";
+			String errorDescripcio = "Error al accedir al plugin de dades externes PINBAL";
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DADESEXT,
 					accioDescripcio,
@@ -5116,13 +5116,34 @@ public class PluginHelper {
 			String agrupacio,
 			InputStream contingut) {
 
+		String accioDescripcio = "Crear document al gestor documental";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("agrupacio", agrupacio);
+		
+		long t0 = System.currentTimeMillis();
+		GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
+
 		try {
-			String gestioDocumentalId = getGestioDocumentalPlugin().create(
-					agrupacio,
-					contingut);
-			return gestioDocumentalId;
+			String resultat = gestioDocumentalPlugin.create(agrupacio, contingut);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_GESDOC,
+					accioDescripcio,
+					gestioDocumentalPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return resultat;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de gestió documental";
+			String errorDescripcio = "Error al crear document al gestor documental";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_GESDOC,
+					accioDescripcio,
+					gestioDocumentalPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5131,13 +5152,35 @@ public class PluginHelper {
 			String id,
 			String agrupacio,
 			InputStream contingut) {
+		
+		String accioDescripcio = "Update document al gestor documental";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", id);
+		accioParams.put("agrupacio", agrupacio);
+		
+		long t0 = System.currentTimeMillis();
+		GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
+
 		try {
-			getGestioDocumentalPlugin().update(
-					id,
-					agrupacio,
-					contingut);
+			gestioDocumentalPlugin.update(id, agrupacio, contingut);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_GESDOC,
+					accioDescripcio,
+					gestioDocumentalPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de gestió documental";
+			String errorDescripcio = "Error al update document al gestor documental";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_GESDOC,
+					accioDescripcio,
+					gestioDocumentalPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5146,12 +5189,34 @@ public class PluginHelper {
 			String id,
 			String agrupacio) {
 		if (id != null) {
+			String accioDescripcio = "Delete document al gestor documental";
+			Map<String, String> accioParams = new HashMap<String, String>();
+			accioParams.put("id", id);
+			accioParams.put("agrupacio", agrupacio);
+			
+			long t0 = System.currentTimeMillis();
+			GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
+
 			try {
-				getGestioDocumentalPlugin().delete(
-						id,
-						agrupacio);
+				gestioDocumentalPlugin.delete(id, agrupacio);
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_GESDOC,
+						accioDescripcio,
+						gestioDocumentalPlugin.getEndpointURL(),
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
 			} catch (Exception ex) {
-				String errorDescripcio = "Error al accedir al plugin de gestió documental";
+				String errorDescripcio = "Error al eliminar document al gestor documental";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_GESDOC,
+						accioDescripcio,
+						gestioDocumentalPlugin.getEndpointURL(),
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorDescripcio,
+						ex);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 			}
 		}
@@ -5162,13 +5227,34 @@ public class PluginHelper {
 			String agrupacio,
 			OutputStream contingutOut) {
 
+		String accioDescripcio = "GET document al gestor documental";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", id);
+		accioParams.put("agrupacio", agrupacio);
+		
+		long t0 = System.currentTimeMillis();
+		GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
+
 		try {
-			getGestioDocumentalPlugin().get(
-					id,
-					agrupacio,
-					contingutOut);
+			gestioDocumentalPlugin.get(id, agrupacio, contingutOut);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_GESDOC,
+					accioDescripcio,
+					gestioDocumentalPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de gestió documental";
+			String errorDescripcio = "Error al consultar document al gestor documental";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_GESDOC,
+					accioDescripcio,
+					gestioDocumentalPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5412,24 +5498,77 @@ public class PluginHelper {
 			UsuariDto usuariActual,
 			String urlReturnToRipea) {
 
+		String accioDescripcio = "Iniciant firma simple";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("motiu", motiu);
+		if (usuariActual!=null)
+			accioParams.put("usuariActual", usuariActual.getCodiAndNom());
+		accioParams.put("urlReturnToRipea", urlReturnToRipea);
+		accioParams.put("fitxersPerFirmar", Utils.getFileNames(fitxersPerFirmar));
+		
+		long t0 = System.currentTimeMillis();
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
 
-		return firmaWebPlugin.firmaSimpleWebStart(
-				fitxersPerFirmar,
-				motiu,
-				usuariActual,
-				urlReturnToRipea);
-
+		try {
+			String resultat = firmaWebPlugin.firmaSimpleWebStart(
+					fitxersPerFirmar,
+					motiu,
+					usuariActual,
+					urlReturnToRipea);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_FIRMASIMPLE,
+					accioDescripcio,
+					firmaWebPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return resultat;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al iniciar la firma simple.";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_FIRMASIMPLE,
+					accioDescripcio,
+					firmaWebPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASIMPLE, errorDescripcio, ex);
+		}
 	}
 
-	public FirmaResultatDto firmaSimpleWebEnd(
-			String transactionID) {
+	public FirmaResultatDto firmaSimpleWebEnd(String transactionID) {
 
+		String accioDescripcio = "Finalitzant firma simple";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("transactionID", transactionID);	
+		long t0 = System.currentTimeMillis();
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
 
-		return firmaWebPlugin.firmaSimpleWebEnd(
-				transactionID);
-
+		try {
+			FirmaResultatDto resultat = firmaWebPlugin.firmaSimpleWebEnd(transactionID);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_FIRMASIMPLE,
+					accioDescripcio,
+					firmaWebPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return resultat;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al finalitzar la firma simple.";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_FIRMASIMPLE,
+					accioDescripcio,
+					firmaWebPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASIMPLE, errorDescripcio, ex);
+		}
 	}
 
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(
@@ -7271,7 +7410,7 @@ public class PluginHelper {
 							Properties.class).newInstance(
 									ConfigDto.prefix + ".",
 									configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
-											"FIRMA_SIMPLE_WEB",
+											IntegracioHelper.INTCODI_FIRMASIMPLE,
 											entitatCodi,
 											organCodi));
 					firmaSimpleWebPlugins.put(
@@ -7303,7 +7442,7 @@ public class PluginHelper {
 					Properties.class).newInstance(
 							ConfigDto.prefix + ".",
 							configHelper.getGroupPropertiesEntitatOrGeneral(
-									"FIRMA_SIMPLE_WEB",
+									IntegracioHelper.INTCODI_FIRMASIMPLE,
 									entitatCodi));
 			firmaSimpleWebPlugins.put(
 					entitatCodi,

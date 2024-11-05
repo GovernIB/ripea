@@ -121,8 +121,6 @@ public class GestioDocumentalPluginFilesystem extends RipeaAbstractPluginPropert
 		}
 	}
 
-
-
 	private String getBaseDir(String agrupacio) {
 		String baseDir = getProperty(
 				"plugin.gesdoc.filesystem.base.dir");
@@ -134,5 +132,10 @@ public class GestioDocumentalPluginFilesystem extends RipeaAbstractPluginPropert
 			}
 		}
 		return baseDir;
+	}
+	
+	@Override
+	public String getEndpointURL() {
+		return null;
 	}
 }
