@@ -37,7 +37,7 @@ public class DocumentNotificacionsCommand {
 	private DocumentNotificacioTipusEnumDto tipus;
 	private DocumentEnviamentEstatEnumDto estat;
 	@NotEmpty(groups = {Create.class, Update.class})
-	@Size(max = 64, groups = {Create.class, Update.class})
+	@Size(max = 64, min = 3, groups = {Create.class, Update.class})
 	private String assumpte;
 	@Size(groups = {Create.class, Update.class}, max = 256)
 	private String observacions;

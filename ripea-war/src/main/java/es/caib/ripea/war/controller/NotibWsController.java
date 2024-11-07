@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import es.caib.notib.client.domini.NotificacioCanviClient;
 import es.caib.ripea.core.api.service.DocumentService;
 
-
 /**
  * Controlador per a les peticions al servei REST de Notib
  * 
@@ -39,7 +38,5 @@ public class NotibWsController {
 				notificacioCanvi.getIdentificador(), 
 				notificacioCanvi.getReferenciaEnviament());
 	}
-	
-
 
 }

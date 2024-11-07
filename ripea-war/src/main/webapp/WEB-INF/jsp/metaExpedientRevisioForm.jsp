@@ -5,13 +5,10 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-
 <c:choose>
 	<c:when test="${modificar}"><c:set var="titol"><spring:message code="metaexpedient.revisio.form.titol.canviarEstatRevisio"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.revisio.form.titol.estatRevisio"/></c:set></c:otherwise>
 </c:choose>
-
-
 
 <html>
 <head>
@@ -23,19 +20,18 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 	
-	
-<script>
-	$(document).ready(function(){
-		$('#revisioEstat').on('change', function() {
-			var estat = $(this).val();
-			if (estat=='REBUTJAT') {
-            	$("label[for='revisioComentari']").append( " *" );
-			} else {
-				$("label[for='revisioComentari']").text( $("label[for='revisioComentari']").text().replace(' *', '') );
-			}
+	<script>
+		$(document).ready(function(){
+			$('#revisioEstat').on('change', function() {
+				var estat = $(this).val();
+				if (estat=='REBUTJAT') {
+	            	$("label[for='revisioComentari']").append( " *" );
+				} else {
+					$("label[for='revisioComentari']").text( $("label[for='revisioComentari']").text().replace(' *', '') );
+				}
+			});
 		});
-	});
-</script>	
+	</script>
 	
 </head>
 <body>
@@ -47,7 +43,10 @@
 		<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}" disabled="${!modificar}"/>
 
 		<div id="modal-botons">
-			<c:if test="${modificar}"><button type="submit" class="btn btn-success" <span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>
+			<c:if test="${modificar}"><button type="submit" class="btn btn-success">
+				<span class="fa fa-save"></span>
+				<spring:message code="comu.boto.guardar"/>
+			</button></c:if>
 			<a href="<c:url value="/entitat"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

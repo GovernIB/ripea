@@ -86,7 +86,7 @@ $(document).ready(function(){
 				
 					<table class="table table-bordered">
 						<tbody>
-						<tr>						
+						<tr>
 							<td><strong><spring:message code="notificacio.info.camp.emisor"/></strong></td>
 							<td>${notificacio.emisor.nom} <br> <small>${notificacio.emisor.codi}</small> </td>				
 						</tr>						
@@ -102,7 +102,6 @@ $(document).ready(function(){
 							<td><strong><spring:message code="notificacio.info.camp.estat"/></strong></td>
 							<td><spring:message code="notificacio.notificacioEstat.enum.${notificacio.notificacioEstat}"/></td>
 						</tr>						
-						
 						<tr>				
 							<td><strong><spring:message code="notificacio.info.camp.data"/></strong></td>
 							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
@@ -117,7 +116,6 @@ $(document).ready(function(){
 							<td><strong><spring:message code="notificacio.info.camp.tipus"/></strong></td>
 							<td><spring:message code="notificacio.tipus.enum.${notificacio.tipus}"/></td>
 						</tr>				
-						</tr>
 						<c:if test="${notificacio.notificacioEstat!='PENDENT'}">
 							<tr><td colspan="2">
 								<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/descarregarJustificantEnviamentNotib'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
@@ -128,9 +126,6 @@ $(document).ready(function(){
 						</tbody>
 					</table>	
 				</div>
-				
-				
-				
 				
 				<!----------------- DOCUMENT ------------------->
 				<div class="panel panel-default">
@@ -155,11 +150,9 @@ $(document).ready(function(){
 								</a>
 							</td>
 						</tr>
-										
 						</tbody>
 					</table>	
 				</div>				
-				
 				
 				<!----------------- ENVIAMENTS INFO ------------------->
 				<c:forEach var="enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
@@ -167,6 +160,7 @@ $(document).ready(function(){
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title"><strong><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</strong></h3>
+							<span style="display: none;">${notificacio.notificacioIdentificador}&nbsp;-&nbsp;${enviament.enviamentReferencia}</span>
 						</div>
 						<table class="table table-bordered" width="100%">
 						  <!------- INTERESSAT ------->							
