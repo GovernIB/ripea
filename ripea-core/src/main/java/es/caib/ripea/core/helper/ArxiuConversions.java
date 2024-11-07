@@ -500,11 +500,9 @@ public class ArxiuConversions {
 		}
 		
 		return firmaTipus;
-	
 	}
 
 	public static FirmaPerfil getFirmaPerfil(ArxiuFirmaPerfilEnumDto arxiuFirmaPerfilEnum) {
-	
 	
 		FirmaPerfil firmaPerfil  = null;
 		
@@ -564,13 +562,6 @@ public class ArxiuConversions {
 		return firmaPerfil;
 	}
 
-
-
-
-
-
-
-
 	public static ArxiuFirmaPerfilEnumDto toArxiuFirmaPerfilEnum(String perfil) {
 	
 		ArxiuFirmaPerfilEnumDto perfilFirma = null;
@@ -623,8 +614,6 @@ public class ArxiuConversions {
 		return tipusFirma;
 	}
 
-
-
 	public static String[] getNtiCsv(Document documentArxiu) {
 		String [] ntiCsv = new String[2]; 
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
@@ -637,10 +626,5 @@ public class ArxiuConversions {
 		}
 		return ntiCsv;
 	}
-	
-	
-	
-
-
 
 }

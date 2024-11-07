@@ -1437,7 +1437,7 @@
 					<td><strong><spring:message code="contingut.info.nti.doc.origen.id"/></strong></td>
 					<td>${contingut.ntiIdDocumentoOrigen}</td>
 				</c:if>
-				<c:if test="${!empty contingut.ntiCsv}">		
+				<c:if test="${not empty contingut.ntiCsv}">		
 					<tr>
 						<td><strong><spring:message code="contingut.document.camp.firma.csv" /></strong></td>
 						<td>
@@ -1469,6 +1469,7 @@
 								</c:if>
 							</td>
 						</tr>
+						<c:if test="${not empty contingut.ntiCsv}">
 						<tr>
 							<td><strong><spring:message code="contingut.document.camp.firma.csv"/></strong></td>
 							<td>
@@ -1476,9 +1477,9 @@
 								<c:if test="${not empty concsvBaseUrl}">
 									<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
 								</c:if>		
-							
 							</td>
 						</tr>
+						</c:if>
 						<tr>
 							<td><strong><spring:message code="contingut.document.camp.firma.csv.regulacio"/></strong></td>
 							<td>${contingut.ntiCsvRegulacion}</td>
