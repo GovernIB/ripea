@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.notificacio;
 
 import java.util.ArrayList;
@@ -25,13 +22,12 @@ import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.Datat;
 import es.caib.notib.client.domini.DocumentV2;
 import es.caib.notib.client.domini.EntregaDeh;
-import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
+import es.caib.notib.client.domini.EntregaPostalV2;
+import es.caib.notib.client.domini.EntregaPostalVia;
 import es.caib.notib.client.domini.EnviamentReferenciaV2;
-import es.caib.notib.client.domini.EnviamentTipusEnum;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioCanviClient;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Registre;
@@ -40,6 +36,7 @@ import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.ServeiTipus;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
@@ -79,20 +76,28 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}
 	
 	@Override
-	public RespostaEnviar enviar(
-			Notificacio notificacio) throws SistemaExternException {
+	public RespostaEnviar enviar(Notificacio notificacio) throws SistemaExternException {
+		
 		try {
 			NotificacioV2 notificacioNotib = new NotificacioV2();
 
+			boolean provaLocal = false;
+			if (provaLocal) {
+				notificacioNotib.setProcedimentCodi("894623");
+				notificacioNotib.setOrganGestor("A04027005");
+			} else {
+				notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
+				notificacioNotib.setOrganGestor(notificacio.getOrganGestor());				
+			}
 			
 			notificacioNotib.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());
-			notificacioNotib.setEnviamentTipus(notificacio.getEnviamentTipus() != null ? EnviamentTipusEnum.valueOf(notificacio.getEnviamentTipus().toString()) : null);
+			notificacioNotib.setEnviamentTipus(notificacio.getEnviamentTipus() != null ? EnviamentTipus.valueOf(notificacio.getEnviamentTipus().toString()) : null);
 			notificacioNotib.setConcepte(notificacio.getConcepte());
 			notificacioNotib.setDescripcio(notificacio.getDescripcio());
 			notificacioNotib.setEnviamentDataProgramada(notificacio.getEnviamentDataProgramada());
 			notificacioNotib.setRetard(notificacio.getRetard());
 			notificacioNotib.setCaducitat(notificacio.getCaducitat());
-			notificacioNotib.setOrganGestor(notificacio.getOrganGestor());
+			
 			DocumentV2 document = new DocumentV2();
 			document.setArxiuNom(notificacio.getDocumentArxiuNom());
 			if (notificacio.getDocumentArxiuContingut() != null) {
@@ -101,25 +106,22 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				document.setUuid(notificacio.getDocumentArxiuUuid());
 			}
 			notificacioNotib.setDocument(document);
-			notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
 			notificacioNotib.setUsuariCodi(notificacio.getUsuariCodi());
 			notificacioNotib.setNumExpedient(notificacio.getNumExpedient());
 			if (notificacio.getEnviaments() != null) {
 				for (Enviament enviament : notificacio.getEnviaments()) {
-					es.caib.notib.client.domini.Enviament enviamentNotib = new es.caib.notib.client.domini.Enviament();
-					enviamentNotib.setTitular(
-							toPersonaNotib(enviament.getTitular()));
+					es.caib.notib.client.domini.EnviamentV2 enviamentNotib = new es.caib.notib.client.domini.EnviamentV2();
+					enviamentNotib.setTitular(toPersonaNotib(enviament.getTitular()));
 					if (enviament.getDestinataris() != null) {
 						for (Persona destinatari: enviament.getDestinataris()) {
-							enviamentNotib.getDestinataris().add(
-									toPersonaNotib(destinatari));
+							enviamentNotib.getDestinataris().add(toPersonaNotib(destinatari));
 						}
 					}
 					if (enviament.isEntregaPostalActiva()) {
-						EntregaPostal entregaPostal = new EntregaPostal();
-						entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.valueOf(enviament.getEntregaPostalTipus().toString()));
+						EntregaPostalV2 entregaPostal = new EntregaPostalV2();
+						entregaPostal.setTipus(NotificaDomiciliConcretTipus.valueOf(enviament.getEntregaPostalTipus().toString()));
 						entregaPostal.setViaTipus(enviament.getEntregaPostalViaTipus() != null
-								? EntregaPostalViaTipusEnum.valueOf(enviament.getEntregaPostalViaTipus().toString()) : null);
+								? EntregaPostalVia.valueOf(enviament.getEntregaPostalViaTipus().toString()) : null);
 						entregaPostal.setViaNom(enviament.getEntregaPostalViaNom());
 						entregaPostal.setNumeroCasa(enviament.getEntregaPostalNumeroCasa());
 						entregaPostal.setNumeroQualificador(enviament.getEntregaPostalNumeroQualificador());
@@ -148,14 +150,14 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 						EntregaDeh entregaDeh = new EntregaDeh();
 						entregaDeh.setObligat(enviament.getEntregaDehObligat());
 						entregaDeh.setProcedimentCodi(enviament.getEntregaDehProcedimentCodi());
-						entregaDeh.setEmisorNif(enviament.getEntregaNif());
+//						entregaDeh.setEmisorNif(enviament.getEntregaNif());
 						enviamentNotib.setEntregaDeh(entregaDeh);
 						enviamentNotib.setEntregaDehActiva(true);
 					} else {
 						enviamentNotib.setEntregaDehActiva(false);
 					}
 					
-					enviamentNotib.setServeiTipus(NotificaServeiTipusEnumDto.valueOf(notificacio.getServeiTipusEnum().toString()));
+					enviamentNotib.setServeiTipus(ServeiTipus.valueOf(notificacio.getServeiTipusEnum().toString()));
 					notificacioNotib.getEnviaments().add(enviamentNotib);
 				}
 			}
@@ -169,7 +171,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				Throwable rootCause = Utils.getRootCauseOrItself(e1);
 				if (rootCause != null && rootCause instanceof UniformInterfaceException) {
 					logger.info("UniformInterfaceException on getNotificacioRestClient().alta(notificacioNotib)" +  rootCause.getMessage() + ". Resetting client and retrying...");
-					getNotificacioRestClient().resetClient();
+					//Ja no existeix la funció resetClient a la versió 2.0.1 de notibClient
+					//getNotificacioRestClient().resetClient();
 					respostaAlta = getNotificacioRestClient().alta(notificacioNotib);
 				} else {
 					throw e1;
@@ -259,7 +262,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				Throwable rootCause = Utils.getRootCauseOrItself(e1);
 				if (rootCause != null && rootCause instanceof UniformInterfaceException) {
 					logger.info("UniformInterfaceException on getNotificacioRestClient().consultaEstatNotificacio(identificador)" +  rootCause.getMessage() + ". Resetting client and retrying...");
-					getNotificacioRestClient().resetClient();
+					//Ja no existeix la funció resetClient a la versió 2.0.1 de notibClient
+					//getNotificacioRestClient().resetClient();
 					respostaConsultaEstat = getNotificacioRestClient().consultaEstatNotificacio(identificador);
 				} else {
 					throw e1;
@@ -298,7 +302,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				Throwable rootCause = Utils.getRootCauseOrItself(e1);
 				if (rootCause != null && rootCause instanceof UniformInterfaceException) {
 					logger.info("UniformInterfaceException on getNotificacioRestClient().consultaEstatEnviament(referencia);" +  rootCause.getMessage() + ". Resetting client and retrying...");
-					getNotificacioRestClient().resetClient();
+					//Ja no existeix la funció resetClient a la versió 2.0.1 de notibClient
+					//getNotificacioRestClient().resetClient();
 					respostaConsultaEstat = getNotificacioRestClient().consultaEstatEnviament(referencia);
 				} else {
 					throw e1;
@@ -405,7 +410,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 	}
 	
-	
 	@Override
 	public RespostaJustificantEnviamentNotib consultaJustificantEnviament(
 			String identificador) throws SistemaExternException {
@@ -438,10 +442,10 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		return endpoint;
 	}
 	
-	private es.caib.notib.client.domini.Persona toPersonaNotib(Persona persona) {
-		es.caib.notib.client.domini.Persona p = null;
+	private es.caib.notib.client.domini.PersonaV2 toPersonaNotib(Persona persona) {
+		es.caib.notib.client.domini.PersonaV2 p = null;
 		if (persona != null) {
-			p = new es.caib.notib.client.domini.Persona();
+			p = new es.caib.notib.client.domini.PersonaV2();
 			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
 				p.setDir3Codi(persona.getCodiDir3());
 			}
@@ -458,18 +462,18 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		return p;
 	}
 	
-	private InteressatTipusEnumDto toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
-		InteressatTipusEnumDto interessatTipusEnumDtoWS = null;
+	private InteressatTipus toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
+		InteressatTipus interessatTipusEnumDtoWS = null;
 		if (interessatTipusEnumDto != null) {
 			switch (interessatTipusEnumDto) {
 			case PERSONA_FISICA:
-				interessatTipusEnumDtoWS = InteressatTipusEnumDto.FISICA;
+				interessatTipusEnumDtoWS = InteressatTipus.FISICA;
 				break;
 			case PERSONA_JURIDICA:
-				interessatTipusEnumDtoWS = InteressatTipusEnumDto.JURIDICA;
+				interessatTipusEnumDtoWS = InteressatTipus.JURIDICA;
 				break;
 			case ADMINISTRACIO:
-				interessatTipusEnumDtoWS = InteressatTipusEnumDto.ADMINISTRACIO;
+				interessatTipusEnumDtoWS = InteressatTipus.ADMINISTRACIO;
 				break;				
 			}
 		}
@@ -477,14 +481,12 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}	
 	
 	private NotificacioRestClientV2 getNotificacioRestClient() {
-
 		if (clientV2 == null) {
 			clientV2 = NotificacioRestClientFactory.getRestClientV2(
 					getUrl(),
 					getUsername(),
 					getPassword(),
 					isDebug());
-
 		}
 		return clientV2;
 	}
