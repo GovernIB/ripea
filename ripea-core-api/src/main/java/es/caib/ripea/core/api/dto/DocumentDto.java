@@ -58,6 +58,7 @@ public class DocumentDto extends NodeDto {
 	private String estatDarreraNotificacio;
 	private boolean errorEnviamentPortafirmes;
 	private String descripcio;
+	private boolean obligatori;
 	
 	private Long pareId;
 	private boolean docFromAnnex;

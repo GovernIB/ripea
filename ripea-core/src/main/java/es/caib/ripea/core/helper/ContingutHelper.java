@@ -62,6 +62,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PrioritatEnumDto;
@@ -773,6 +774,13 @@ public class ContingutHelper {
 		dto.setEstat(document.getEstat());
 		dto.setUbicacio(document.getUbicacio());
 		dto.setData(document.getData());
+		if(document.getMetaDocument()!=null && 
+			document.getMetaDocument().getMultiplicitat()!=null &&				
+			(document.getMetaDocument().getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || 
+			 document.getMetaDocument().getMultiplicitat().equals(MultiplicitatEnumDto.M_1_N))) {
+				//Si la obligatorietat es M_1 o M1_N
+				dto.setObligatori(true);
+		}
 	}
 
 	private void setDocumentFitxerProperties(DocumentDto dto, DocumentEntity document, ToContingutParams params) {
@@ -1392,6 +1400,9 @@ public class ContingutHelper {
 		
 		// Cancel·lar enviament si el document conté enviaments pendents
 		if (contingut instanceof DocumentEntity) {
+			if (expedientPare != null) {
+				cacheHelper.evictErrorsValidacioPerNode(expedientPare);
+			}
 			DocumentEntity document = (DocumentEntity)contingut;
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
 				firmaPortafirmesHelper.portafirmesCancelar(

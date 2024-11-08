@@ -57,15 +57,15 @@
 						<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${esborrany.createdBy.nom}</td>
 						<c:choose>
-							<c:when test="${esborrany.documentDeAnotacio}">
-								<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" checked="checked" disabled="true"/></td>
+							<c:when test="${esborrany.documentDeAnotacio or esborrany.obligatori}">
+								<spring:message code="contingut.expedient.tancar.oblig" var="titleCheckOblig"/>
+								<td><form:checkbox title="${titleCheckOblig}" path="documentsPerFirmar" value="${esborrany.id}" checked="checked" disabled="true"/></td>
 								<input type="hidden" name="documentsPerFirmar" value="${esborrany.id}">
 							</c:when>
 							<c:otherwise>
 								<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" /></td>
 							</c:otherwise>
 						</c:choose>
-						
 					</tr>
 				</c:forEach>
 			</tbody>
