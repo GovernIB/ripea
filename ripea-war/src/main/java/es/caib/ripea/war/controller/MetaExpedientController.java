@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -197,6 +198,14 @@ public class MetaExpedientController extends BaseAdminController {
 		return "metaExpedientForm";
 	}
 	
+	@RequestMapping(value = "/getDadesProcediment/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public MetaExpedientDto get(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+		return metaExpedientService.findById(
+				EntitatHelper.getEntitatActual(request).getId(),
+				metaExpedientId);
+	}
+	
 	public void getMetaExpedient(
 			HttpServletRequest request,
 			Long metaExpedientId,
@@ -245,21 +254,15 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		
 		model.addAttribute("isRolActualAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
-		
 		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
-		
 		model.addAttribute("metaExpedientDto", metaExpedient);
-		
-
 		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 		
 		fillFormModel(
 				request,
 				metaExpedient,
 				model);
-		
 	}
-	
 	
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
@@ -371,7 +374,6 @@ public class MetaExpedientController extends BaseAdminController {
 		return organGestor.getCodi() +  "_PRO_" + String.format("%030d", System.currentTimeMillis()) + "3F";
 	}
 	
-	
 	@RequestMapping(value = "/checkIfExistsInRolsac/{codiSia}", method = RequestMethod.GET)
 	@ResponseBody
 	public JsonResponse checkIfExistsInRolsac(
@@ -402,10 +404,7 @@ public class MetaExpedientController extends BaseAdminController {
 		} else {
 			return new JsonResponse(new Boolean(true));
 		}
-		
 	}
-	
-
 	
 	@RequestMapping(value = "/{metaExpedientId}/export", method = RequestMethod.GET)
 	public String export(HttpServletRequest request, HttpServletResponse response, @PathVariable Long metaExpedientId) {
@@ -441,11 +440,8 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			Model model) {
 		getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-
 		boolean isRolAdminOrgan = RolHelper.isRolActualAdministradorOrgan(request);
 		model.addAttribute("isRolAdminOrgan", isRolAdminOrgan);
-		
-		
 		return "importMetaExpedientFileForm";
 	}
 	
@@ -467,8 +463,10 @@ public class MetaExpedientController extends BaseAdminController {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
-
-		MetaExpedientExportDto metaExpedientExport = objectMapper.readValue(command.getFile().getBytes(), MetaExpedientExportDto.class);
+		
+		String jsonString = new String(command.getFile().getBytes(), StandardCharsets.UTF_8);
+		
+		MetaExpedientExportDto metaExpedientExport = objectMapper.readValue(jsonString, MetaExpedientExportDto.class);
 		MetaExpedientImportEditCommand metaExpedientImportEditCommand = new MetaExpedientImportEditCommand();
 		fillImportEditForm(metaExpedientExport, model, entitatActual, request, metaExpedientImportEditCommand);
 		
@@ -477,7 +475,6 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 		
 		return "importMetaExpedientEditForm";
-		
 	}
 	
 	@RequestMapping(value = "/importFitxerEdit", method = RequestMethod.POST)
@@ -486,6 +483,7 @@ public class MetaExpedientController extends BaseAdminController {
 			@Valid MetaExpedientImportEditCommand command,
 			BindingResult bindingResult,
 			Model model) throws JsonParseException, IOException {
+		
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
@@ -496,6 +494,7 @@ public class MetaExpedientController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
 			model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
+			model.addAttribute("procedimentsActuals", metaExpedientService.findByEntitat(entitatActual.getId()));
 			return "importMetaExpedientEditForm";
 		}
 		
@@ -524,10 +523,8 @@ public class MetaExpedientController extends BaseAdminController {
 												request,
 												"metaexpedient.import.controller.fluxIdNotFound",
 												new Object[] {metaDocumentDto.getPortafirmesFluxId(), metaDocumentDto.getCodi()}));
-								
 										
 								metaDocumentDto.setPortafirmesFluxId(null);
-
 							}
 						}
 					}
@@ -691,14 +688,26 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isObligarInteressatActiu", isObligarInteressatActiu());
 		model.addAttribute(metaExpedientImportEditCommand);
 		model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
-
+		model.addAttribute("procedimentsActuals", metaExpedientService.findByEntitat(entitatActual.getId()));
 	}
-	
 	
 	private void importEditValidation(			
 			HttpServletRequest request,
 			MetaExpedientImportEditCommand command,
 			BindingResult bindingResult) {
+		
+		if (command.getTipusClassificacio()!=null && 
+			command.getTipusClassificacio().equals(TipusClassificacioEnumDto.ID) &&
+			Utils.isEmpty(command.getClassificacioId())) {
+			bindingResult.reject("metaexpedient.import.form.validation.notId");
+		}
+		
+		if (command.getTipusClassificacio()!=null && 
+			command.getTipusClassificacio().equals(TipusClassificacioEnumDto.SIA) &&
+			Utils.isEmpty(command.getClassificacioSia())) {
+			bindingResult.reject("metaexpedient.import.form.validation.notSia");
+		}
+		
 		if (!command.isComu() && command.getOrganGestorId() == null) {
 			bindingResult.reject("metaexpedient.import.form.validation.organ.obligatori");
 		}
@@ -731,9 +740,6 @@ public class MetaExpedientController extends BaseAdminController {
 			bindingResult.reject("metaexpedient.import.form.validation.codisia.repetit");
 		}
 	}
-	
-	
-	
 	
 	@RequestMapping(value = "/importRolsac", method = RequestMethod.GET)
 	public String importRolsacGet(

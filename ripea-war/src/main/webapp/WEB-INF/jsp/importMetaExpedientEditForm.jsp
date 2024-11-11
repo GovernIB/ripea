@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%pageContext.setAttribute("idioma", org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());%>
 
 <html>
 <head>
@@ -17,7 +18,6 @@
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
-	
 	
 	<c:if test="${hasPermisAdmComu}">
 		<script type="text/javascript">
@@ -39,84 +39,109 @@
 		</script>
 	</c:if>	
 	
-	
-	
-	
-	
-<script>
-//################################################## document ready START ##############################################################	
-$(document).ready(function(){
+	<script type="text/javascript">
 
-	$('input[type=radio][name=tipusClassificacio]').on('change', function() {
-		showHideClassificacioInput();
-	})
-	showHideClassificacioInput();
-	$('#organGestorId').on('change', function() {
-		$('input[name="tipusClassificacio"][value="ID"]').removeClass('focus');
-		disableEnableClassificacioIdButton();
-		calculateClassificacioId();
-	})
+		$(document).ready(function(){
 
-	disableEnableClassificacioIdButton();
-	if (!$('#id').val()) {
-		calculateClassificacioId();
-	}
-	
+			$('.importarSubmitBtn').click(function(e) {
+				if ($('#id').val()=='' || confirm('<spring:message code="metaexpedient.form.camp.updateProc.confirm"/>')) {
+					$('#metaExpedientImportEditCommand').submit();
+				}
+			});				
+
+			$('#id').on('change', function() {
+				procedimentSelectChanged(false);
+			});
 			
-});//################################################## document ready END ##############################################################
-
-
-function showHideClassificacioInput() {
-
-	let selected = $('input[name="tipusClassificacio"]:checked').val();
-
-	if (selected == 'SIA') {
-		$('#classificacioSia').parent().show();
-		$('#classificacioId').parent().hide();
-	} else {
-		$('#classificacioSia').val('');
-		$('#classificacioSia').parent().hide();
-		$('#classificacioId').parent().show();
-		if ($('#organGestorId').val() && !$('#classificacioId').val()) {
-			calculateClassificacioId();
-		}
-	}
-}
-
-function disableEnableClassificacioIdButton(){
-	if ($('#organGestorId').val()) {
-		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", false);
-		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", "");
-	} else {
-		$('#classificacioId').val('');
-		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
-		let disabledTitle = '<spring:message code="metaexpedient.form.camp.classificacio.id.disabled.title"/>';
-		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", disabledTitle);
-		$('input[name="tipusClassificacio"][value="SIA"]').click();
+			$('input[type=radio][name=tipusClassificacio]').on('change', function() {
+				showHideClassificacioInput();
+			});
+			
+			showHideClassificacioInput();
+			
+			$('#organGestorId').on('change', function() {
+				$('input[name="tipusClassificacio"][value="ID"]').removeClass('focus');
+				disableEnableClassificacioIdButton();
+				calculateClassificacioId();
+			})
 		
-	}
-}
+			disableEnableClassificacioIdButton();
+			if (!$('#id').val()) {
+				calculateClassificacioId();
+			}
 
-function disableClassificacioButtons(){
-	$('input[name="tipusClassificacio"][value="SIA"]').parent().attr("disabled", true);
-	$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
-}
+			procedimentSelectChanged(true);
+		});
 
-
-function calculateClassificacioId() {
-	let organGestorId = $('#organGestorId').val();
-	$.ajax({
-		type: 'GET',
-		url: '<c:url value="/metaExpedient/calculateClassificacioId"/>/' + organGestorId,
-		success: function(id) {
-			$('#classificacioId').val(id);
+		function procedimentSelectChanged(isOnLoadCall) {
+			let idSel = $('#id').val();
+			if (idSel=='') {
+				$("#codi").removeAttr('readonly');
+				$('#codi').val('${metaExpedientImportEditCommand.codi}');
+				$('#classificacioSia').val('${metaExpedientImportEditCommand.classificacioSia}');
+			} else {
+				$("#codi").attr('readonly', 'readonly');
+				$.ajax({
+					type: 'GET',
+					url: '<c:url value="/metaExpedient/getDadesProcediment"/>/' + idSel,
+					success: function(data) {
+						$('#codi').val(data.codi);
+						if (!isOnLoadCall) {
+							$('#classificacioSia').val(data.classificacio);
+							remarcaElement($('#codi'));
+							remarcaElement($('#classificacioSia'));
+						}
+					}
+				});
+			}
 		}
-	});
-	
-}
 
-
-</script>	
+		function showHideClassificacioInput() {
+		
+			let selected = $('input[name="tipusClassificacio"]:checked').val();
+		
+			if (selected == 'SIA') {
+				$('#classificacioSia').parent().show();
+				$('#classificacioId').parent().hide();
+			} else {
+				$('#classificacioSia').val('');
+				$('#classificacioSia').parent().hide();
+				$('#classificacioId').parent().show();
+				if ($('#organGestorId').val() && !$('#classificacioId').val()) {
+					calculateClassificacioId();
+				}
+			}
+		}
+		
+		function disableEnableClassificacioIdButton(){
+			if ($('#organGestorId').val()) {
+				$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", false);
+				$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", "");
+			} else {
+				$('#classificacioId').val('');
+				$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
+				let disabledTitle = '<spring:message code="metaexpedient.form.camp.classificacio.id.disabled.title"/>';
+				$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", disabledTitle);
+				$('input[name="tipusClassificacio"][value="SIA"]').click();
+			}
+		}
+		
+		function disableClassificacioButtons(){
+			$('input[name="tipusClassificacio"][value="SIA"]').parent().attr("disabled", true);
+			$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
+		}
+		
+		function calculateClassificacioId() {
+			let organGestorId = $('#organGestorId').val();
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/metaExpedient/calculateClassificacioId"/>/' + organGestorId,
+				success: function(id) {
+					$('#classificacioId').val(id);
+				}
+			});
+		}
+	</script>
 	
 </head>
 <body>
@@ -124,6 +149,16 @@ function calculateClassificacioId() {
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportEditCommand" role="form">
 
 		<form:hidden path="entitatId"/>
+		
+		<rip:inputSelect 
+			name="id"
+			textKey="metaexpedient.form.camp.updateProc"
+			comment="metaexpedient.form.camp.updateProc.help"
+			optionItems="${procedimentsActuals}"
+			optionValueAttribute="id"
+			optionTextAttribute="nomICodiSia"
+			emptyOption="true"
+			emptyOptionText=" "/>
 		
 		<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" />
 		
@@ -189,7 +224,6 @@ function calculateClassificacioId() {
 					disabled="${bloquejarCamps}"/>
 		</c:if>
 
-
 		<c:if test="${!empty metaExpedientImportEditCommand.metaDocuments}"><legend><spring:message code="metaexpedient.import.form.metadocuments" /></legend>
 			<c:forEach items="${metaExpedientImportEditCommand.metaDocuments}" varStatus="vs">
 				<div class="well"> 
@@ -212,12 +246,8 @@ function calculateClassificacioId() {
 								suggestTextAddicional="nif"
 								required="${metaExpedientImportEditCommand.metaDocuments[vs.index].firmaPortafirmesActiva}"/>							
 						</c:when>
-						<c:otherwise>
-						</c:otherwise>
-					
+						<c:otherwise></c:otherwise>
 					</c:choose>
-							
-
 				</div>
 			</c:forEach>
 		</c:if>
@@ -262,7 +292,7 @@ function calculateClassificacioId() {
 		</c:if>
 
 		<div id="modal-botons">
-			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.importar"/></button>
+			<button type="button" data-toggle="modal" class="btn btn-success importarSubmitBtn"><span class="fa fa-save"></span> <spring:message code="comu.boto.importar"/></button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

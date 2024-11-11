@@ -278,13 +278,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedient.getRevisioComentari(),
 					rolActual);
 		}
-
 		
 		return metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	public void createFromImport(Long entitatId, MetaExpedientExportDto metaExpedient, String rolActual, Long organId) {

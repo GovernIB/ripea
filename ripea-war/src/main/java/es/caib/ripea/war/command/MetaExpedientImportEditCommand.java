@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.command;
 
 import java.util.ArrayList;
@@ -16,17 +13,12 @@ import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
 import lombok.Getter;
 
-
 @Getter
-//@MetaExpedientCodiSiaNoRepetit
-//@OrganGestorMetaExpedientNotNull
 @CodiMetaExpedientNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
 public class MetaExpedientImportEditCommand {
 
 	private Long id;
-	
 	private Long entitatId;
-	
 	@NotEmpty
 	@Size(max = 64)
 	private String codi;
@@ -35,7 +27,6 @@ public class MetaExpedientImportEditCommand {
 	private String nom;
 	@Size(max = 1024)
 	private String descripcio;
-
     private TipusClassificacioEnumDto tipusClassificacio;
 	@Size(max = 30)
 	private String classificacioSia;
@@ -43,19 +34,18 @@ public class MetaExpedientImportEditCommand {
 	@NotEmpty
 	@Size(max = 30)
 	private String serieDocumental;
-
 	private Long organGestorId;
-
 	private boolean comu;
-	
 	private boolean isRolAdminOrgan;
-	
     private List<MetaDocumentCommand> metaDocuments = new ArrayList<>();
     private List<ExpedientEstatCommand> estats = new ArrayList<>();
     private List<MetaExpedientTascaCommand> tasques = new ArrayList<>();
-	
     private boolean interessatObligatori;
 
+    
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;
 	}
@@ -98,6 +88,4 @@ public class MetaExpedientImportEditCommand {
 	public void setInteressatObligatori(boolean interessatObligatori) {
 		this.interessatObligatori = interessatObligatori;
 	}
-
-
 }

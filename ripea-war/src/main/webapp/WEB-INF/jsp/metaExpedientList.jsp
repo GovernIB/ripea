@@ -70,7 +70,7 @@
 		<div>
 			<div class="btn-group">
 				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
- 						<span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
+ 						<span class="fa fa-download"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
 					<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
@@ -267,7 +267,7 @@
 							<ul class="dropdown-menu">
 								<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
+								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
 								<c:if test="${isRolAdmin || isRolAdminOrgan}">
 									<li><a href="metaExpedient/{{:id}}/regla" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.regla"/></a></li>
 								</c:if>

@@ -13,6 +13,7 @@ function webutilRefreshMissatges() {
 }
 
 function remarcaElement(jQueryElem, color) {
+	if (typeof color === 'undefined') { color = '#d9edf7'; }
 	jQueryElem[0].animate({ backgroundColor: color }, 500);
 }
 
