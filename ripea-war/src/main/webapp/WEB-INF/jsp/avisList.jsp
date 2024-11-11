@@ -14,12 +14,57 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	
+	<script src="<c:url value="/webjars/datatables.net-select/1.3.1/js/dataTables.select.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.2.3/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<!-- A la funció datatable del controlador, s'ha de afegir la variable id de la taula i la que guarda en sessió el llistat de seleccionats -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#avisos').on('selectionchange.dataTable', function (e, accio, ids) {
+				$.get(
+					"avis/toggleSelection",
+					{ids: ids, accio: accio},
+					function(data) {
+						$("#seleccioCount").html(data);
+					}
+				);
+			});
+		});
+
+		function avisAcccioMassiu(accio) {
+
+			let msgAccio = '<spring:message code="avis.list.accio.massiva.activar"/>';
+			if (accio=='desactivar') {
+				msgAccio = '<spring:message code="avis.list.accio.massiva.desactivar"/>';
+			} else if (accio=='eliminar') {
+				msgAccio = '<spring:message code="avis.list.accio.massiva.eliminar"/>';
+			}
+			
+			if (confirm(msgAccio)) {
+				$.get(
+					"avis/accioMassiva",
+					{accio: accio},
+					function(data) {
+						window.location.reload();
+					}
+				);
+			}
+		}
+	</script>
 </head>
 <body>
-	<table id="avisos" data-toggle="datatable" data-url="<c:url value="/avis/datatable"/>" data-search-enabled="false" data-default-order="2" data-default-dir="asc" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%">
+	<table
+		id="avisos"
+		data-toggle="datatable"
+		data-url="<c:url value="/avis/datatable"/>"
+		class="table table-striped table-bordered"
+		data-default-order="1"
+		data-default-dir="asc"
+		data-botons-template="#botonsTemplate"
+		data-selection-enabled="true"
+		data-search-enabled="false">
 		<thead>
 			<tr>
-				<th data-col-name="id" data-visible="false"></th>
 				<th data-col-name="assumpte" width="50%"><spring:message code="avis.list.columna.assumpte"/></th>
 				<th data-col-name="dataInici" data-converter="date"><spring:message code="avis.list.columna.dataInici"/></th>
 				<th data-col-name="dataFinal" data-converter="date"><spring:message code="avis.list.columna.dataFinal"/></th>
@@ -62,6 +107,27 @@
 		</thead>
 	</table>
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="avis/new" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="avis.list.boto.nova.avis"/></a></p>
-	</script>
+	<div class="pull-right">
+		<div class="dropdown pull-left" style="padding-right: 15px;">
+			<button class="btn btn-default" data-toggle="dropdown">
+				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span>&nbsp;
+				<spring:message code="expedient.list.user.opcions"/>&nbsp;<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a href="JavaScript:avisAcccioMassiu('activar');" data-refresh-pagina="true">
+						<span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/>
+				</a></li>
+				<li><a href="JavaScript:avisAcccioMassiu('desactivar');" data-refresh-pagina="true">
+					<span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/>
+				</a></li>
+				<li><a href="JavaScript:avisAcccioMassiu('eliminar');" data-refresh-pagina="true">
+					<span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/>
+				</a></li>
+			</ul>
+		</div>
+		<a class="btn btn-default pull-right" href="avis/new" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
+			<span class="fa fa-plus"></span>&nbsp;<spring:message code="avis.list.boto.nova.avis"/>
+		</a>
+	</div>
+	</script>	
 </body>
