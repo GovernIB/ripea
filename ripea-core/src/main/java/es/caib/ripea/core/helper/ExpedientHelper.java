@@ -1397,6 +1397,12 @@ public class ExpedientHelper {
 		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
 		
 		/**
+		 * #1525 Permetre tancar un expedient encara que hi hagi remeses tipus comunicació no finalitzades
+		 */
+		logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
+		expedientHelper2.actualitzaEstatNotificacionsCaducades(expedientId);
+		
+		/**
 		 * #1579 Adaptar tancament d'expedients a annexes d'anotacions no moguts
 		 * 
 		 * 1.- Reprocessar annexes amb error.

@@ -1,8 +1,8 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -59,10 +59,8 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "servei_tipus", length = 10)
 	private ServeiTipusEnumDto serveiTipusEnum;
-	
 	@Column(name="entrega_postal")
 	private Boolean entregaPostal;
-
 	@Column(name="not_env_registre_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date registreData;
@@ -70,30 +68,23 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	private Integer registreNumero;
 	@Column(name="not_env_registre_num_formatat", length = 50)
 	private String registreNumeroFormatat;
-	
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "not_emisor_id")
 	private OrganGestorEntity emisor;
-	
-	
 	@Column(name = "not_data_enviada")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataEnviada;
 	@Column(name = "not_data_finalitzada")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataFinalitzada;
-	
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
 			orphanRemoval = true)
 	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
-	
-	
 	@Column(name = "notificacio_estat")
 	@Enumerated(EnumType.STRING)
 	protected DocumentNotificacioEstatEnumDto notificacioEstat;
-	
 
 	public void update(
 			DocumentNotificacioEstatEnumDto notificacioEstat,
@@ -112,7 +103,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		this.notificacioIdentificador = notificacioIdentificador;
 		this.enviatData = enviatData;
 		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
-
 	}
 	
 	public void updateEnviatError(
@@ -138,8 +128,6 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		this.dataEnviada = dataEnviada;
 		this.dataFinalitzada = dataFinalitzada;
 	}
-	
-	
 	
 	public void updateNotificacioInfoRegistre(
 			Date registreData,
@@ -219,6 +207,17 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		}
 	}
 
+	public boolean isNotificacioFinalitzada() {
+		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
+				DocumentNotificacioEstatEnumDto.FINALITZADA, 
+				DocumentNotificacioEstatEnumDto.PROCESSADA));
+		return estatsFinals.contains(this.getNotificacioEstat());
+	}
+	
+	public boolean isCaducada() {
+		return (this.getDataCaducitat()!=null && this.getDataCaducitat().before(Calendar.getInstance().getTime()));
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -230,6 +229,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		result = prime * result + ((tipus == null) ? 0 : tipus.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -268,5 +268,4 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;
-
 }

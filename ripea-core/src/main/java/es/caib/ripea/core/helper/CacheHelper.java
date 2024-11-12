@@ -3,7 +3,57 @@
  */
 package es.caib.ripea.core.helper;
 
-import es.caib.ripea.core.api.dto.*;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.ComunitatDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.MunicipiDto;
+import es.caib.ripea.core.api.dto.NivellAdministracioDto;
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.OrganismeDto;
+import es.caib.ripea.core.api.dto.PaisDto;
+import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.dto.TipusViaDto;
+import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -33,35 +83,6 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.MutableAclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -269,7 +290,7 @@ public class CacheHelper {
 			}
 			
 			for (DocumentEntity document : documents) {
-				if (hasNotificacionsNoCaducadesPendents(document)) {
+				if (hasNotificacionsSenseErrorNoCaducadesPendents(document)) {
 					errors.add(
 							crearValidacioError(
 									null,
@@ -666,21 +687,17 @@ public class CacheHelper {
 		return false;
 	}
 	
-	
-	private boolean hasNotificacionsNoCaducadesPendents(DocumentEntity document) {
-		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
-				DocumentNotificacioEstatEnumDto.FINALITZADA, 
-				DocumentNotificacioEstatEnumDto.PROCESSADA));
+	private boolean hasNotificacionsSenseErrorNoCaducadesPendents(DocumentEntity document) {
 		List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
 		//No permetrem tancar l'expedient si té alguna notificacio:
 		// - Que esta pendent
 		// - Que no té error
 		// - Que no esta caducada
 		if (Utils.isNotEmpty(notificacionsPendents) &&
-			!estatsFinals.contains(notificacionsPendents.get(0).getNotificacioEstat()) &&
+			!notificacionsPendents.get(0).isNotificacioFinalitzada() &&
 			!notificacionsPendents.get(0).isError() &&
-			(notificacionsPendents.get(0).getDataCaducitat()==null || notificacionsPendents.get(0).getDataCaducitat().after(Calendar.getInstance().getTime()))) {
-			return true;
+			!notificacionsPendents.get(0).isCaducada()) {
+				return true;
 		}
 		return false;
 	}
