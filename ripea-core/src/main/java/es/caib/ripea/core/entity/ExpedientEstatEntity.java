@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
 
 import java.util.List;
@@ -21,17 +18,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.Getter;
 
-/**
- * Classe del model de dades que representa un expedient.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter
 @Entity
 @Table(name = "ipa_expedient_estat")
 @EntityListeners(AuditingEntityListener.class)
 public class ExpedientEstatEntity extends RipeaAuditable<Long>{
-	
 
 	@Column(name = "codi", length = 256, nullable = false)
 	private String codi;
@@ -43,17 +34,12 @@ public class ExpedientEstatEntity extends RipeaAuditable<Long>{
 	private String color;
 	@Column(name = "inicial")
 	private boolean inicial;
-	
 	@Column(name = "responsable_codi")
 	private String responsableCodi;
-	
-	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaexpedient_id")
 	@ForeignKey(name = "ipa_metaexp_expedientestat_fk")
 	private MetaExpedientEntity metaExpedient;
-	
-	
 	@OneToMany(
 			mappedBy = "estatAdditional",
 			cascade = CascadeType.ALL,

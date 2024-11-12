@@ -480,14 +480,32 @@ public class MetaExpedientHelper {
 		return metaExpedients;
 	}
 
+	public MetaExpedientTascaEntity tascaUpdate(
+			MetaExpedientTascaEntity metaExpTascaEntity,
+			MetaExpedientTascaDto metaExpedientTasca) throws NotFoundException {
+		metaExpTascaEntity.update(
+				metaExpedientTasca.getCodi(),
+				metaExpedientTasca.getNom(),
+				metaExpedientTasca.getDescripcio(),
+				metaExpedientTasca.getResponsable(),
+				metaExpedientTasca.getDataLimit(),
+				metaExpedientTasca.getDuracio(),
+				metaExpedientTasca.getPrioritat(),
+				metaExpedientTasca.getEstatIdCrearTasca()==null?null:expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdCrearTasca()),
+				metaExpedientTasca.getEstatIdFinalitzarTasca()==null?null:expedientEstatRepository.findOne(metaExpedientTasca.getEstatIdFinalitzarTasca()));
+		return metaExpTascaEntity;
+	}
 
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
-			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException {
+			MetaExpedientTascaDto metaExpedientTasca,
+			String rolActual,
+			Long organId) throws NotFoundException {
 		logger.debug(
 				"Creant una nova tasca del meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
 						metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
@@ -514,6 +532,9 @@ public class MetaExpedientHelper {
 		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
 	}
 	
+	public MetaExpedientTascaEntity findTascaByMetaExpedientAndCodi(MetaExpedientEntity metaExpedient, String codi) {
+		return metaExpedientTascaRepository.findByMetaExpedientAndCodi(metaExpedient, codi);
+	}
 
 	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId, Long organId) {
 
@@ -538,8 +559,7 @@ public class MetaExpedientHelper {
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, organId);
 
 		if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
-			metaExpedientEntity.updateRevisioEstat(
-					MetaExpedientRevisioEstatEnumDto.DISSENY);
+			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.DISSENY);
 			// No s'envia email mentre el meta-expedient està en DISSENY;
 			// s'enviarà quan el IPA_ORGAN_ADMIN canviï el seu estat a PENDENT
 		}

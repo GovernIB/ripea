@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -100,33 +99,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitat,
 				metaNode,
 				metaDada.getId());
-		
-		
-		Object valor = null;
-		if (metaDada.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
-			valor = metaDada.getValorBoolea();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.DATA) {
-			valor = metaDada.getValorData();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
-			valor = metaDada.getValorFlotant();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
-			valor = metaDada.getValorImport();
-		} else if (metaDada.getTipus()==MetaDadaTipusEnumDto.SENCER) {
-			valor = metaDada.getValorSencer();
-		}  else if (metaDada.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDada.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
-			valor = metaDada.getValorString();
-		}
-		entity.update(
-				metaDada.getCodi(),
-				metaDada.getNom(),
-				metaDada.getTipus(),
-				metaDada.getMultiplicitat(),
-				valor,
-				metaDada.getDescripcio(),
-				metaDada.isReadOnly(),
-				metaDada.isNoAplica(),
-				metaDada.isEnviable(),
-				metaDada.getMetadadaArxiu());
+
+		entity.update(metaDada);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;
@@ -137,9 +111,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 			}
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
-		return conversioTipusHelper.convertir(
-				entity,
-				MetaDadaDto.class);
+		
+		return conversioTipusHelper.convertir(entity, MetaDadaDto.class);
 	}
 	
 	@Transactional

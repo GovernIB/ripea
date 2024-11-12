@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 import java.util.List;
@@ -29,5 +26,4 @@ public class MetaNodeAmbMetaDadesDto extends MetaNodeDto {
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

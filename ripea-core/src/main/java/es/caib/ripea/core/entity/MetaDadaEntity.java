@@ -16,6 +16,7 @@ import javax.persistence.Version;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
@@ -110,43 +111,39 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 		return metadadaArxiu;
 	}
 	
-	public void update(
-			String codi,
-			String nom,
-			MetaDadaTipusEnumDto tipus,
-			MultiplicitatEnumDto multiplicitat,
-			Object valor,
-			String descripcio,
-			boolean readOnly,
-			boolean noAplica,
-			boolean enviable,
-			String metadadaArxiu) {
-		this.codi = codi;
-		this.nom = nom;
-		this.tipus = tipus;
-		this.multiplicitat = multiplicitat;
+	public void update(MetaDadaDto metaDadaDto) {
+		
+		Object valor = null;
+		if (metaDadaDto.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
+			valor = metaDadaDto.getValorBoolea();
+		} else if (metaDadaDto.getTipus()==MetaDadaTipusEnumDto.DATA) {
+			valor = metaDadaDto.getValorData();
+		} else if (metaDadaDto.getTipus()==MetaDadaTipusEnumDto.FLOTANT) {
+			valor = metaDadaDto.getValorFlotant();
+		} else if (metaDadaDto.getTipus()==MetaDadaTipusEnumDto.IMPORT) {
+			valor = metaDadaDto.getValorImport();
+		} else if (metaDadaDto.getTipus()==MetaDadaTipusEnumDto.SENCER) {
+			valor = metaDadaDto.getValorSencer();
+		}  else if (metaDadaDto.getTipus()==MetaDadaTipusEnumDto.TEXT || metaDadaDto.getTipus()==MetaDadaTipusEnumDto.DOMINI) {
+			valor = metaDadaDto.getValorString();
+		}
+		
+		this.codi = metaDadaDto.getCodi();
+		this.nom = metaDadaDto.getNom();
+		this.tipus = metaDadaDto.getTipus();
+		this.multiplicitat = metaDadaDto.getMultiplicitat();
 		this.valor = DadaEntity.getDadaValorPerEmmagatzemar(tipus, valor);
-		this.descripcio = descripcio;
-		this.readOnly = readOnly;
-		this.noAplica = noAplica;
-		this.enviable = enviable;
-		this.metadadaArxiu = metadadaArxiu;
+		this.descripcio = metaDadaDto.getDescripcio();
+		this.readOnly = metaDadaDto.isReadOnly();
+		this.noAplica = metaDadaDto.isNoAplica();
+		this.enviable = metaDadaDto.isEnviable();
+		this.metadadaArxiu = metaDadaDto.getMetadadaArxiu();
 	}
-	public void update(
-			String codi,
-			String nom,
-			MetaDadaTipusEnumDto tipus,
-			String descripcio,
-			boolean readOnly) {
-		this.codi = codi;
-		this.nom = nom;
-		this.tipus = tipus;
-		this.descripcio = descripcio;
-		this.readOnly = readOnly;
-	}
+	
 	public void updateActiva(boolean activa) {
 		this.activa = activa;
 	}
+	
 	public void updateOrdre(int ordre) {
 		this.ordre = ordre;
 	}

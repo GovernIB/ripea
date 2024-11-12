@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import java.util.List;
@@ -16,33 +13,31 @@ import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-
 
 @Component
 public class ExpedientEstatHelper {
-	@Resource
-	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private DocumentRepository documentRepository;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
+	
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Resource  private ConversioTipusHelper conversioTipusHelper;
+	@Resource  private EntityComprovarHelper entityComprovarHelper;
+	@Resource  private MetaExpedientHelper metaExpedientHelper;
 
-
+	public ExpedientEstatEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedientEntity, String codi) {
+		return expedientEstatRepository.findByMetaExpedientAndCodi(metaExpedientEntity, codi);
+	}
+	
+	public ExpedientEstatEntity updateExpedientEstat(
+			MetaExpedientEntity metaExpedientEntity,
+			ExpedientEstatEntity expEstatEntity,
+			Long entitatId,
+			ExpedientEstatDto estat, 
+			String rolActual, 
+			Long organId) {
+		expEstatEntity.update(estat.getCodi(), estat.getNom(), estat.getColor(), metaExpedientEntity, estat.getResponsableCodi());
+		return expEstatEntity;
+	}
+	
 	public ExpedientEstatDto createExpedientEstat(
 			Long entitatId,
 			ExpedientEstatDto estat, 

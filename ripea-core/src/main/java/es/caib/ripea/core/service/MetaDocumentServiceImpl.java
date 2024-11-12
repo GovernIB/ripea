@@ -527,8 +527,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					codi);	
 		}
 		else {
-			entity = metaDocumentRepository.findByMetaExpedientAndCodi(
-					codi);	
+			entity = metaDocumentRepository.findByMetaExpedientNullAndCodi(codi);	
 		}
 		
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(

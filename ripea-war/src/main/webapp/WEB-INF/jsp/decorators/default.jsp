@@ -144,9 +144,7 @@ body {
 	color:#666666;
 	padding-top: 120px;
 }
-.select2-container--bootstrap .select2-results__option {
-	min-height: 30px;
-}
+.select2-container--bootstrap .select2-results__option { min-height: 30px; }
 <%-- If capsaleraColorFons is defined for entitat use it, if not look if there is capsaleraColorFons defined for application and use it, if not default color is used 	--%>
 <c:if test="${not isRolActualSuperusuari}">
 	<c:choose>

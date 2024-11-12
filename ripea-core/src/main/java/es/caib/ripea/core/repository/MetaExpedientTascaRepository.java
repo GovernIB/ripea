@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.repository;
 
 import java.util.List;
@@ -45,7 +42,7 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 
 	List<MetaExpedientTascaEntity> findByActivaTrue();
 	
+	MetaExpedientTascaEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedient, String codi);
 	
 	int countByMetaExpedient(MetaExpedientEntity metaExpedient);
-
 }

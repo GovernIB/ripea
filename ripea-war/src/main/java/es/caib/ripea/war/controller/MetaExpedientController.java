@@ -551,6 +551,7 @@ public class MetaExpedientController extends BaseAdminController {
 				}
 			}
 			
+			metaExpedientExport.setId(command.getId());
 			metaExpedientExport.setCodi(command.getCodi());
 			metaExpedientExport.setNom(command.getNom());
 			metaExpedientExport.setDescripcio(command.getDescripcio());
@@ -571,12 +572,19 @@ public class MetaExpedientController extends BaseAdminController {
 				metaExpedientExport.setOrganGestor(null);
 			}
 			
-			metaExpedientService.createFromImport(entitatActual.getId(), metaExpedientExport, rolActual, EntitatHelper.getOrganGestorActualId(request));
+			String messageSuccess = null;
+			if (metaExpedientExport.getId()==null) {
+				metaExpedientService.createFromImport(entitatActual.getId(), metaExpedientExport, rolActual, EntitatHelper.getOrganGestorActualId(request));
+				messageSuccess = "metaexpedient.import.controller.create.ok";
+			} else {
+				metaExpedientService.updateFromImport(entitatActual.getId(), metaExpedientExport, rolActual, EntitatHelper.getOrganGestorActualId(request));
+				messageSuccess = "metaexpedient.import.controller.update.ok";
+			}
 
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
-					"metaexpedient.import.controller.import.ok",
+					messageSuccess,
 					new String[] {command.getNom() });
 			
 		} catch (Exception e) {

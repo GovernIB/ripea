@@ -560,6 +560,13 @@ public interface MetaExpedientService {
 			MetaExpedientExportDto metaExpedient,
 			String rolActual,
 			Long organId);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	public void updateFromImport(
+			Long entitatId,
+			MetaExpedientExportDto metaExpedient,
+			String rolActual,
+			Long organId);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public CrearReglaResponseDto reintentarCreacioReglaDistribucio(

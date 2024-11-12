@@ -214,12 +214,15 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public boolean isPinbalUtilitzarCifOrgan() {
 		return pinbalUtilitzarCifOrgan;
 	}
-
 	
 	public void updateOrdre(int ordre) {
 		this.ordre = ordre;
 	}
-
+	
+	public void setPinbalUtilitzarCifOrgan(
+			boolean pinbalUtilitzarCifOrgan) {
+		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
+	}
 	
 	public void update(
 			String codi,
@@ -244,10 +247,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			MetaDocumentPinbalServeiEnumDto pinbalServei,
 			String pinbalFinalitat,
 			boolean pinbalUtilitzarCifOrgan) {
-		update(
-				codi,
-				nom,
-				descripcio);
+		update(codi, nom, descripcio);
 		this.multiplicitat = multiplicitat;
 		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
 		this.portafirmesDocumentTipus = portafirmesDocumentTipus;
@@ -268,7 +268,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.pinbalServei = pinbalServei;
 		this.pinbalFinalitat = pinbalFinalitat;
 		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
-		
 	}
 
 	public void updatePlantilla(
@@ -341,9 +340,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.pinbalActiu = pinbalActiu;
 			built.pinbalFinalitat = pinbalFinalitat;
 			built.ordre = ordre;
-			
-			
 		}
+		
 		public Builder biometricaLectura(boolean biometricaLectura) {
 			built.biometricaLectura = biometricaLectura;
 			return this;

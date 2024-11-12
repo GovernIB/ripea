@@ -44,6 +44,9 @@
 		
 	</script>
 	<decorator:head />
+	<style>
+		.select2-container--bootstrap .select2-results__option { min-height: 30px; }
+	</style>
 </head>
 <body>
 	<div class="container-nocappeus">

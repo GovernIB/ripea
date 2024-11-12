@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import javax.annotation.Resource;
@@ -21,25 +18,21 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 
-
 @Component
 public class MetaDadaHelper {
-	@Resource
-	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private DocumentRepository documentRepository;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private MetaExpedientHelper metaExpedientHelper;
-    
+	
+	@Resource private MetaDocumentRepository metaDocumentRepository;
+	@Resource private EntitatRepository entitatRepository;
+	@Resource private MetaDadaRepository metaDadaRepository;
+	@Resource private DocumentRepository documentRepository;
+	@Resource private ConversioTipusHelper conversioTipusHelper;
+	@Resource private EntityComprovarHelper entityComprovarHelper;
+	@Resource private MetaExpedientHelper metaExpedientHelper;
 
+	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
+		return metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi);
+	}
+	
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,

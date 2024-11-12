@@ -439,6 +439,20 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				rolActual,
 				organId);
 	}
+	
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public void updateFromImport(
+			Long entitatId,
+			MetaExpedientExportDto metaExpedient,
+			String rolActual,
+			Long organId) {
+		delegate.updateFromImport(
+				entitatId,
+				metaExpedient,
+				rolActual,
+				organId);
+	}
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
