@@ -72,6 +72,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 	private static final String COOKIE_FIRMA_PENDENT = "firma_pendent";
+	private static final String COOKIE_EXPS_SEGUITS = "expedients_seguits";
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
 	private static final String SESSION_ATTRIBUTE_RELACIONATS_FILTRE = "ExpedientUserController.session.relacionats.filtre";
 	
@@ -90,6 +91,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public String get(
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
 			@CookieValue(value = COOKIE_FIRMA_PENDENT, defaultValue = "false") boolean firmaPendent,
+			@CookieValue(value = COOKIE_EXPS_SEGUITS, defaultValue = "false") boolean expedientsSeguits,
 			HttpServletRequest request,
 			Model model) {
 		
@@ -148,6 +150,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isDominisEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis"));
 		model.addAttribute("nomCookieFirmaPendent", COOKIE_FIRMA_PENDENT);
 		model.addAttribute("firmaPendent", firmaPendent);
+		
+		model.addAttribute("nomCookieExpsSeguits", COOKIE_EXPS_SEGUITS);
+		model.addAttribute("expedientsSeguits", expedientsSeguits);
 		
 		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
 		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
@@ -224,14 +229,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		long t0 = System.currentTimeMillis();
 		if (aplicacioService.mostrarLogsRendiment())
 			logger.info("ExpedientController.datatable start");
-		
+
 		PaginaDto<ExpedientDto> pagina = expedientService.findAmbFiltreUser(
 				entitatActual.getId(),
 				ExpedientFiltreCommand.asDto(filtreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request), 
 				RolHelper.getRolActual(request),
 				EntitatHelper.getOrganGestorActualId(request));
-		
+
 		if (aplicacioService.mostrarLogsRendiment())
 			logger.info("ExpedientController.datatable end " + (System.currentTimeMillis() - t0) + " ms");
 		
@@ -2047,6 +2052,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		Cookie cookieFirmaPendent = WebUtils.getCookie(request, COOKIE_FIRMA_PENDENT);
 		filtreCommand.setAmbFirmaPendent(cookieFirmaPendent != null && "true".equals(cookieFirmaPendent.getValue()));
+		
+		Cookie cookieExpsSeguits = WebUtils.getCookie(request, COOKIE_EXPS_SEGUITS);
+		filtreCommand.setExpedientsSeguits(cookieExpsSeguits != null && "true".equals(cookieExpsSeguits.getValue()));
 		
 		return filtreCommand;
 	}

@@ -1752,6 +1752,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getChosenEstat(),
 					expedientFiltreCalculat.getAgafatPer() == null,
 					expedientFiltreCalculat.getAgafatPer(),
+					expedientFiltreCalculat.getSeguitPer() == null,
+					expedientFiltreCalculat.getSeguitPer(),				
 					filtre.getTipusId() == null,
 					filtre.getTipusId(),
 					expedientFiltreCalculat.getExpedientsToBeExluded() == null,
@@ -1837,6 +1839,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getChosenEstat(),
 					expedientFiltreCalculat.getAgafatPer() == null,
 					expedientFiltreCalculat.getAgafatPer(),
+					expedientFiltreCalculat.getSeguitPer() == null,
+					expedientFiltreCalculat.getSeguitPer(),						
 					filtre.getTipusId() == null,
 					filtre.getTipusId(),
 					expedientFiltreCalculat.getExpedientsToBeExluded() == null,
@@ -1859,14 +1863,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 		}
-		
-			
-		return result;
-	
-	}
 
-	
-	
+		return result;
+	}
 	
 	private ExpedientFiltreCalculat calculateFilter(
 			ExpedientFiltreDto filtre,
@@ -1915,6 +1914,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedientFiltreCalculat.setAgafatPer(agafatPer);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("getUsuariAgafat time:  " + (System.currentTimeMillis() - t4) + " ms");
+			
+			if (filtre.isExpedientsSeguits()) {
+				expedientFiltreCalculat.setSeguitPer(usuariHelper.getUsuariAutenticat());
+			}
 			
 			long t5 = System.currentTimeMillis();
 			// estats

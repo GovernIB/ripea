@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 import java.io.Serializable;
@@ -10,7 +7,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
-
 
 /**
  * Informació del filtre d'expedients.
@@ -29,21 +25,18 @@ public class ExpedientFiltreDto implements Serializable {
 	private String numero;
 	private Long expedientEstatId;
 	private ExpedientEstatEnumDto estat;
-	private Date dataTancatInici;
-	
+	private Date dataTancatInici;	
 	private Date dataTancatFi;
 	private boolean meusExpedients;
 	private String agafatPer;
-	private String search;
-	
+	private String search;	
 	private Long tipusId;
 	private String interessat;
 	private String metaExpedientDominiValor;
-
 	private boolean ambFirmaPendent;
-	private String numeroRegistre;
-	
-	private Long grupId;
+	private String numeroRegistre;	
+	private Long grupId;	
+	private boolean expedientsSeguits;
 	
 	@Override
 	public String toString() {
@@ -51,5 +44,4 @@ public class ExpedientFiltreDto implements Serializable {
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

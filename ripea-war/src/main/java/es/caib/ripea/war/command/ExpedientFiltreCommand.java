@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.command;
 
 import java.util.Date;
@@ -33,14 +30,12 @@ public class ExpedientFiltreCommand {
 	private Date dataTancatFi;
 	private boolean meusExpedients;
 	private String agafatPer;
-
 	private Long tipusId;
 	private String interessat;
 	private String metaExpedientDominiValor;
-
 	private boolean ambFirmaPendent;
-	private String numeroRegistre;
-	
+	private String numeroRegistre;	
+	private boolean expedientsSeguits;	
 	private Long grupId;
 	
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {
@@ -53,7 +48,6 @@ public class ExpedientFiltreCommand {
 				command,
 				ExpedientFiltreDto.class);
 	}
-	
 
 	@Override
 	public String toString() {
@@ -116,5 +110,8 @@ public class ExpedientFiltreCommand {
 	public void setGrupId(Long grupId) {
 		this.grupId = grupId;
 	}
-
+	public void setExpedientsSeguits(
+			boolean expedientsSeguits) {
+		this.expedientsSeguits = expedientsSeguits;
+	}
 }

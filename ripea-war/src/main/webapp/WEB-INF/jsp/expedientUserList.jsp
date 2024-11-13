@@ -155,7 +155,7 @@ $(document).ready(function() {
 		setCookie("${nomCookieMeusExpedients}", mostrarMeusExpedients);
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
-	})
+	});
 	$('#ambFirmaPendentBtn').click(function() {
 		mostrarExpedientsFirmaPendent = !$(this).hasClass('active');
 		// Modifica el formulari
@@ -165,7 +165,17 @@ $(document).ready(function() {
 		setCookie("${nomCookieFirmaPendent}", mostrarExpedientsFirmaPendent);
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
-	})
+	});
+	$('#expSeguitsBtn').click(function() {
+		let mostrarExpedientsSeguits = !$(this).hasClass('active');
+		// Modifica el formulari
+		$('#expedientsSeguits').val(mostrarExpedientsSeguits);
+		$(this).blur();
+		// Estableix el valor de la cookie
+		setCookie("${nomCookieExpsSeguits}", mostrarExpedientsSeguits);
+		// Amaga la columna i refresca la taula
+		$('#taulaDades').webutilDatatable('refresh');
+	});
 	$(".email-user").click(function(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -538,19 +548,22 @@ function removeCookie(cname) {
 			 	</c:when>
 			 	<c:otherwise>
 					<div class="col-md-2" style="width: auto;">
-						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-						<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
-					</div>		
+						<button id="meusExpedientsBtn"	class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
+						<button id="ambFirmaPendentBtn"	class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+						<button id="expSeguitsBtn"		class="btn btn-default <c:if test="${expedientsSeguits}">active</c:if>" data-toggle="button"><span class="fa fa-user-plus"></span> <spring:message code="expedient.list.user.seguits"/></button>
+					</div>
 			 	</c:otherwise>
 			 </c:choose>
 
 			<rip:inputHidden name="meusExpedients"/>
 			<rip:inputHidden name="ambFirmaPendent"/>
+			<rip:inputHidden name="expedientsSeguits"/>
+			
 			<div class="col-md-3 pull-right" style="${rolActual == 'tothom' ? 'width:auto;' : ''}">
 				<c:if test="${rolActual!='tothom'}">
 					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
 				</c:if>
-				<div class="pull-right">
+				<div class="pull-right" style="padding-top: 15px;">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
