@@ -1,8 +1,4 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
-
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,28 +21,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
-import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.war.command.SeguimentArxiuPendentsFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -67,21 +59,10 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	private static final String SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS = "SeguimentPortafirmesController.session.seleccio.documents";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_INTERESSATS = "SeguimentPortafirmesController.session.seleccio.interessats";
 
-    @Autowired
-    private SeguimentService seguimentService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private ExpedientInteressatService expedientInteressatService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
-	@Autowired
-	private AplicacioService aplicacioService;
-
+    @Autowired private SeguimentService seguimentService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private AplicacioService aplicacioService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -525,17 +506,13 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		return seleccio.size();
 	}
 
-
 	@RequestMapping(value = "/expedients/reintentar", method = RequestMethod.GET)
-	public String expedientsReintentar(
-			HttpServletRequest request) {
+	public String expedientsReintentar(HttpServletRequest request) {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO_EXPEDIENTS));
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_EXPEDIENTS));
 
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(
@@ -545,33 +522,11 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 					null);
 		}
 
-		int errors = 0;
-		int correctes = 0;
 		Date dataInici = new Date();
 		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 
-		for (Long expedientId : seleccio) {
-			Date dataIniciElement = new Date();
-			
-			Exception exception = expedientService.guardarExpedientArxiu(expedientId);
-
-			if (exception instanceof ArxiuJaGuardatException) {
-				exception = null;
-			}
-			if (exception != null ) {
-				logger.error("Error guardant expedient en arxiu", exception);
-				errors++;
-			} else {
-				correctes++;
-			}
-			
-			execucioMassivaElements.add(
-					new ExecucioMassivaContingutDto(
-							dataIniciElement,
-							new Date(),
-							expedientId,
-							exception));
-
+		for (Long expedientId : seleccio) {	
+			execucioMassivaElements.add(new ExecucioMassivaContingutDto(dataInici, null, expedientId, ExecucioMassivaEstatDto.ESTAT_PENDENT));
 		}
 		
 		execucioMassivaService.saveExecucioMassiva(
@@ -579,35 +534,22 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				new ExecucioMassivaDto(
 						ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
 						dataInici,
-						new Date(),
+						null,
 						RolHelper.getRolActual(request)),
 				execucioMassivaElements, 
 				ElementTipusEnumDto.EXPEDIENT);
 
-		if (correctes > 0){
-			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.expedients.massiu.correctes", new Object[]{correctes}));
-		}
-		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.expedients.massiu.errors", new Object[]{errors}), null);
-		}
-
+		MissatgesHelper.success(request, getMessage(request, "seguiment.controller.expedients.massiu.correctes", new Object[]{seleccio.size()}));
 		seleccio.clear();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO_EXPEDIENTS,
-				seleccio);
-
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_EXPEDIENTS, seleccio);
 		return "redirect:/seguimentArxiuPendents";
 	}
 
 	@RequestMapping(value = "/documents/reintentar", method = RequestMethod.GET)
-	public String documentsReintentar(
-			HttpServletRequest request) {
+	public String documentsReintentar(HttpServletRequest request) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS));
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS));
 
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(
@@ -618,68 +560,11 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		}
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
-		int errors = 0;
-		int correctes = 0;
 		Date dataInici = new Date();
 		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 		
 		for (Long documentId : seleccio) {
-			Date dataIniciElement = new Date();
-			
-			DocumentDto document = documentService.findById(entitatActual.getId(), documentId, null);
-			Exception exception = null;
-			if (document.getArxiuUuid() == null) { //documents uploaded manually in ripea that were not saved in arxiu
-				try {
-					exception = documentService.guardarDocumentArxiu(documentId);
-				} catch (Exception e) {
-					exception = e;
-				}
-				if (exception instanceof ArxiuJaGuardatException) {
-					exception = null;
-				}
-				if (exception != null ) {
-					logger.error("Error guardant document en arxiu", exception);
-					errors++;
-				} else {
-					correctes++;
-				}
-			} else if (document.isPendentMoverArxiu()) { //documents from distribucio that were not moved in arxiu to ripea expedient
-				try {
-					exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
-				} catch (Exception e) {
-					exception = e;
-				}
-				if (exception != null ) {
-					logger.error("Error mover annex en arxiu", exception);
-					errors++;
-				} else {
-					correctes++;
-				}
-			} else if (document.getGesDocFirmatId() != null) { // documents signed in portafirmes that arrived in callback and were not saved in arxiu 
-				try {
-					exception = documentService.portafirmesReintentar(
-							entitatActual.getId(),
-							documentId,
-							RolHelper.getRolActual(request), 
-							null);
-				} catch (Exception e) {
-					exception = e;
-				}
-				if (exception != null ) {
-					logger.error("Error guardant document portafirmes en arxiu", exception);
-					errors++;
-				} else {
-					correctes++;
-				}				
-
-			}
-			execucioMassivaElements.add(
-					new ExecucioMassivaContingutDto(
-							dataIniciElement,
-							new Date(),
-							documentId,
-							exception));
+			execucioMassivaElements.add(new ExecucioMassivaContingutDto(dataInici, null, documentId, ExecucioMassivaEstatDto.ESTAT_PENDENT));
 		}
 		
 		execucioMassivaService.saveExecucioMassiva(
@@ -687,37 +572,24 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				new ExecucioMassivaDto(
 						ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
 						dataInici,
-						new Date(),
+						null,
 						RolHelper.getRolActual(request)),
 				execucioMassivaElements, 
 				ElementTipusEnumDto.DOCUMENT);
 		
-		if (correctes > 0){
-			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.documents.massiu.correctes", new Object[]{correctes}));
-		}
-		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.documents.massiu.errors", new Object[]{errors}), null);
-		}
-
+		MissatgesHelper.success(request, getMessage(request, "seguiment.controller.documents.massiu.correctes", new Object[]{seleccio.size()}));
 		seleccio.clear();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS,
-				seleccio);
-
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS, seleccio);
 		return "redirect:/seguimentArxiuPendents/#documents";
 	}
 
 	@RequestMapping(value = "/interessats/reintentar", method = RequestMethod.GET)
-	public String interessatsReintentar(
-			HttpServletRequest request) {
+	public String interessatsReintentar(HttpServletRequest request) {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO_INTERESSATS));
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_INTERESSATS));
 
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(
@@ -727,33 +599,11 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 					null);
 		}
 
-		int errors = 0;
-		int correctes = 0;
 		Date dataInici = new Date();
 		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 
 		for (Long interessatId : seleccio) {
-			Date dataIniciElement = new Date();
-			Exception exception = null;
-			try {
-				Long expedientId = expedientInteressatService.findExpedientIdByInteressat(interessatId);
-				exception = expedientInteressatService.guardarInteressatsArxiu(expedientId);
-			} catch (Exception ex) {
-				exception = ex;
-			}
-			if (exception != null ) {
-				logger.error("Error guardant interessat en arxiu", exception);
-				errors++;
-			} else {
-				correctes++;
-			}
-			
-			execucioMassivaElements.add(
-					new ExecucioMassivaContingutDto(
-							dataIniciElement,
-							new Date(),
-							interessatId,
-							exception));
+			execucioMassivaElements.add(new ExecucioMassivaContingutDto(dataInici, null, interessatId, ExecucioMassivaEstatDto.ESTAT_PENDENT));
 		}
 		
 		execucioMassivaService.saveExecucioMassiva(
@@ -761,26 +611,17 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				new ExecucioMassivaDto(
 						ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
 						dataInici,
-						new Date(),
+						null,
 						RolHelper.getRolActual(request)),
 				execucioMassivaElements, 
 				ElementTipusEnumDto.INTERESSAT);
 
-		if (correctes > 0){
-			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.interessats.massiu.correctes", new Object[]{correctes}));
-		}
-		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.interessats.massiu.errors", new Object[]{errors}), null);
-		}
-
+		MissatgesHelper.success(request, getMessage(request, "seguiment.controller.interessats.massiu.correctes", new Object[]{seleccio.size()}));
 		seleccio.clear();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO_INTERESSATS,
-				seleccio);
-
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_INTERESSATS, seleccio);
 		return "redirect:/seguimentArxiuPendents/#interessats";
 	}
 
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(SeguimentArxiuPendentsController.class);
 }

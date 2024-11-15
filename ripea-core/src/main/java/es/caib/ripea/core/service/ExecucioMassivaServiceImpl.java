@@ -3,32 +3,66 @@
  */
 package es.caib.ripea.core.service;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.helper.*;
-import es.caib.ripea.core.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExecucioMassivaEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.AlertaHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.ExecucioMassivaHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.core.repository.ExecucioMassivaRepository;
+import es.caib.ripea.core.repository.ExpedientPeticioRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -210,11 +244,6 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	}
 
 	@Override
-	public void executarExecucioMassiva(Long execucioMassivaContingutId) {
-//		execucioMassivaHelper.executarExecucioMassiva(execucioMassivaContingutId);
-	}
-
-	@Override
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -257,47 +286,66 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 
 	@Transactional
 	@Override
-	public void comprovarExecucionsMassives() {
+	public void executeNextMassiveScheduledTask() {
 		logger.trace("Execució tasca periòdica: Execucions massives");
 
 		try {
 			List<ExecucioMassivaEntity> massives = execucioMassivaRepository.getMassivesPerProcessar(new Date());
 
-			if (massives != null) {
-				for (ExecucioMassivaEntity execucioMassiva : massives) {
+			if (massives != null && massives.size()>0) {
+				
+				ExecucioMassivaEntity execucioMassiva = massives.get(0);
+				
+//				for (ExecucioMassivaEntity execucioMassiva : massives) {
 
-					EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
-					ConfigHelper.setEntitat(entitat);
-					
-					if (execucioMassiva.getContinguts() != null) {
+				EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
+				ConfigHelper.setEntitat(entitat);
+				
+				if (execucioMassiva.getContinguts() != null) {
 
-						if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
-							//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
-							generaZipDocumentsExpedients(execucioMassiva);
-						} else {
-							for (ExecucioMassivaContingutEntity execucioMassivaEntity : execucioMassiva.getContinguts()) {
-								executarExecucioMassivaContingut(execucioMassivaEntity.getId());
+					if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
+						
+						//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
+						generaZipDocumentsExpedients(execucioMassiva);
+						
+					} else {
+						
+						for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
+							
+							String throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(
+									execucioMassivaItemEntity.getId());
+							
+							if (throwable != null) {
+								alertaHelper.crearAlerta(
+										messageHelper.getMessage(
+												"alertes.segon.pla.executar.execucio.massiva.error",
+												new Object[] {execucioMassivaItemEntity.getId()}),
+										throwable,
+										false,
+										execucioMassivaItemEntity.getElementId());
 							}
 						}
 					}
-					execucioMassiva.updateDataFi(new Date());
-					execucioMassivaRepository.save(execucioMassiva);
-					
-					if (execucioMassiva.getEnviarCorreu()) {
-						try {
-							emailHelper.execucioMassivaFinalitzada(execucioMassiva);
-						} catch (Exception e) {
-							logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
-						}
+				}
+				execucioMassiva.updateDataFi(new Date());
+				execucioMassivaRepository.save(execucioMassiva);
+				
+				if (execucioMassiva.getEnviarCorreu()!=null && execucioMassiva.getEnviarCorreu().booleanValue()) {
+					try {
+						emailHelper.execucioMassivaFinalitzada(execucioMassiva);
+					} catch (Exception e) {
+						logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
 					}
 				}
 			}
+//			}
 
 		} catch (Exception e) {
 			logger.error("Error al fer execucio massiva", e);
 		}
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	private void generaZipDocumentsExpedients(ExecucioMassivaEntity execucioMassiva) throws IOException {
 
 		long t1 = Calendar.getInstance().getTimeInMillis();
@@ -305,7 +353,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		ZipOutputStream out = new ZipOutputStream(baos);
 		ZipEntry ze;
 		int numFiles = 0;
-		Set<String> nomsArxius = new HashSet<String>();
+		List<String> nomsArxius = new ArrayList<String>();
 		List<DocumentDto> docsExp = new ArrayList<DocumentDto>();
 
 		double maxMbFitxer	= Integer.parseInt(configHelper.getConfig("es.caib.ripea.segonpla.arxiu.maxMb", "100"));
@@ -393,59 +441,22 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		}
 	}
 
-	private String getZipRecursNom(String nomEntrada, Set<String> nomsArxius) {
+	private String getZipRecursNom(String nomEntrada, List<String> nomsArxius) {
 		int contador = 0;
 		for (String nom : nomsArxius) {
 			if (nom!=null && nom.equals(nomEntrada)) {
 				contador++;
 			}
 		}
+		//Guardam al llistat de noms de documents abans de modificar-lo amb un contador.
+		nomsArxius.add(nomEntrada+""); //Ens asseguram que es guarda un nou string, no un apuntador.
 		if (contador > 0) {
 			nomEntrada = nomEntrada.substring(0, nomEntrada.lastIndexOf(".")) +
 					" (" + contador + ")" +
 					nomEntrada.substring(nomEntrada.lastIndexOf(".")+1);
 		}
-		nomsArxius.add(nomEntrada);
 		return nomEntrada;
 	}
-
-	public Throwable executarExecucioMassivaContingut(Long execucioMassivaContingutId) {
-
-		Throwable throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(execucioMassivaContingutId);
-		
-		if (throwable != null) {
-			ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findOne(execucioMassivaContingutId);
-			
-			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(throwable);
-			
-			String error = ExecucioMassivaHelper.getExceptionString(
-					emc,
-					excepcioRetorn);
-			
-			emc.updateError(
-					new Date(), 
-					error);
-			
-			execucioMassivaContingutRepository.save(emc);
-			
-			alertaHelper.crearAlerta(
-					messageHelper.getMessage(
-							"alertes.segon.pla.executar.execucio.massiva.error",
-							new Object[] {execucioMassivaContingutId}),
-					error,
-					false,
-					emc.getElementId());
-			}
-
-		return throwable;
-	}
-	
-	
-	
-	
-
-
-
 
 	private List<ExecucioMassivaDto> recompteErrors(List<ExecucioMassivaEntity> exmEntities) {
 		List<ExecucioMassivaDto> dtos = new ArrayList<ExecucioMassivaDto>();
@@ -481,10 +492,5 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	    return Math.round(value * 100 / total);
 	}
 
-
-
-
-
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
 }

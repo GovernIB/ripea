@@ -34,20 +34,13 @@ public interface ExecucioMassivaService {
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId);
 
-	/**
-	 * Executa un contingut massiu
-	 * 
-	 * @param cmasiu_id id del contingut massiu a executar
-	 */
-	public void executarExecucioMassiva(Long cmasiu_id) throws NotFoundException, ValidationException;
-	
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException;
 	
 	public List<ExecucioMassivaDto> findExecucionsMassivesGlobals() throws NotFoundException;
 	
 	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException;
 
-	public void comprovarExecucionsMassives();
+	public void executeNextMassiveScheduledTask();
 
 	@PreAuthorize("hasRole('tothom')")
 	public void saveExecucioMassiva(

@@ -41,13 +41,6 @@ public class ExecucioMassivaServiceBean implements ExecucioMassivaService {
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
 		return delegate.descarregarDocumentExecMassiva(entitatId, execMassivaId);
 	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public void executarExecucioMassiva(Long cmasiu_id) throws NotFoundException, ValidationException {
-		delegate.executarExecucioMassiva(cmasiu_id);
-	}
-
 	
 	@Override
 	@RolesAllowed("tothom")
@@ -67,8 +60,8 @@ public class ExecucioMassivaServiceBean implements ExecucioMassivaService {
 		return delegate.findContingutPerExecucioMassiva(exm_id);
 	}
 
-	public void comprovarExecucionsMassives() {
-		delegate.comprovarExecucionsMassives();
+	public void executeNextMassiveScheduledTask() {
+		delegate.executeNextMassiveScheduledTask();
 	}
 
 	@Override

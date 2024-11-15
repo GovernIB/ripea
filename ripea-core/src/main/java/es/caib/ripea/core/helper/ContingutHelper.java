@@ -751,7 +751,7 @@ public class ContingutHelper {
 		setEnviamentProperties(dto, document);
 
 		if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
-			setAnnexProperties(dto, document);
+			setAnnexProperties(dto, document, document.getAnnexos().get(0));
 		}
 
 		dto.setMetaNode(conversioTipusHelper.convertir(document.getMetaNode(), MetaDocumentDto.class));
@@ -871,12 +871,8 @@ public class ContingutHelper {
 		dto.setDocFromAnnex(document.isDocFromAnnex());
 	}
 
-	private void setAnnexProperties(DocumentDto dto, DocumentEntity document) {
-		RegistreAnnexEntity annex = document.getAnnexos().get(0);
-		String error = annex.getError();
-		if (error != null && !error.isEmpty()) {
-			dto.setPendentMoverArxiu(true);
-		}
+	private void setAnnexProperties(DocumentDto dto, DocumentEntity document, RegistreAnnexEntity annex) {
+		dto.setPendentMoverArxiu(document.isPendentMoverArxiu());
 		dto.setAnnexId(annex.getId());
 		dto.setDocumentDeAnotacio(true);
 	}

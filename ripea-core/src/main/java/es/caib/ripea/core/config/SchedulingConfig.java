@@ -137,7 +137,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
                         monitorTasquesService.inici(codiEnviarDocumentsAlPortafirmes);
                         try {
-                            execucioMassivaService.comprovarExecucionsMassives();
+                            execucioMassivaService.executeNextMassiveScheduledTask();
                             monitorTasquesService.fi(codiEnviarDocumentsAlPortafirmes);
                         } catch (Throwable th) {
                             tractarErrorTascaSegonPla(th, codiEnviarDocumentsAlPortafirmes);
@@ -529,7 +529,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     } catch (Exception e) {
                         log.error("Error getting next execution date for comprovarExecucionsMassives()", e);
                     }
-                    trigger.setFixedRate(true);
+                    //El intervalo se mide desde el tiempo de finalización de cada ejecución.
+                    //Esto significa que el siguiente ciclo de ejecución no comenzará hasta que la tarea actual haya terminado.
+                    //No volem que s'agafin noves execucions massives fins que les actuals hagin acabat, ja que sino es processen repetides.
+                    trigger.setFixedRate(false);
                     // Només la primera vegada que s'executa
                     long registrarEnviamentsPendentsInitialDelayLong = 0L;
                     if (primeraVez[0]) {

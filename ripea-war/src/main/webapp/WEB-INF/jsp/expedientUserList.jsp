@@ -561,7 +561,8 @@ function removeCookie(cname) {
 			
 			<div class="col-md-3 pull-right" style="${rolActual == 'tothom' ? 'width:auto;' : ''}">
 				<c:if test="${rolActual!='tothom'}">
-					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+					<button id="ambFirmaPendentBtn" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+					<button id="expSeguitsBtn"		class="btn btn-default <c:if test="${expedientsSeguits}">active</c:if>" data-toggle="button"><span class="fa fa-user-plus"></span> <spring:message code="expedient.list.user.seguits"/></button>
 				</c:if>
 				<div class="pull-right" style="padding-top: 15px;">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

@@ -77,7 +77,6 @@ public class DocumentEntity extends NodeEntity {
 	private String fitxerContentType;
 	@Column(name = "fitxer_tamany")
 	private Long fitxerTamany;
-	//@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "fitxer_contingut")
 	private byte[] fitxerContingut;
@@ -98,7 +97,6 @@ public class DocumentEntity extends NodeEntity {
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Column(name = "nti_tipdoc", length = 4, nullable = false)
-//	@Enumerated(EnumType.STRING)
 	private String ntiTipoDocumental;
 	@Column(name = "nti_idorig", length = 48)
 	private String ntiIdDocumentoOrigen;
@@ -111,7 +109,6 @@ public class DocumentEntity extends NodeEntity {
 	private String ntiCsvRegulacion;
 	@Column(name = "descripcio", length = 512)
 	protected String descripcio;
-
 	
 	//Tipus de document firmat:
 		//Document firmat putjat manualment
@@ -200,6 +197,26 @@ public class DocumentEntity extends NodeEntity {
 	private Integer resolucion;
 	@Transient
 	private String idioma;
+	@Transient
+	private boolean pendentMoverArxiu;
+	
+	public boolean isPendentMoverArxiu() {
+		if (this.getAnnexos()!=null && this.getAnnexos().size()>0) {
+			RegistreAnnexEntity annex = this.getAnnexos().get(0);
+			if (annex.getError() != null && !annex.getError().isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Long getAnnexAnotacioId() {
+		if (this.getAnnexos()!=null && this.getAnnexos().size()>0) {
+			RegistreAnnexEntity annex = this.getAnnexos().get(0);
+			return annex.getId();
+		}
+		return null;
+	}
 	
 	public Long getPareId() {
 		return pare.getId();

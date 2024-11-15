@@ -165,10 +165,14 @@ public class DocumentDto extends NodeDto {
 	
 	@Override
 	public String toString() {
-		return "DocumentDto: [ \n"
-					+ "id" + id + "\n"
-					+ "ntiTipoDocumental: " + ntiTipoDocumental + "\n"
-					+ "ntiTipoDocumentalNom: " + ntiTipoDocumentalNom + "]";
+		return "DocumentDto [id=" + id 
+				+ ", nom=" + nom
+				+ ", arxiuUuid=" + arxiuUuid				
+				+ ", documentTipus=" + documentTipus 
+				+ ", estat=" + estat 
+				+ ", fitxerNom=" + fitxerNom
+				+ ", ambFirma=" + ambFirma 
+				+ ", arxiuEstat=" + arxiuEstat				 
+				+ "]";
 	}
-
 }

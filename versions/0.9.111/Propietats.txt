@@ -1,0 +1,6 @@
+Revisar la propietat:
+
+es.caib.ripea.segonpla.massives.periode.comprovacio
+
+Ha d'estar en un valor de 30000 (=30 segons) ja que ara la funció de executar tasques en segon pla no es solapará, i n'executará una cada cop,
+per no mesclar execucions massives de diferents tipus en la mateixa transacció i que no duri tant el procés.

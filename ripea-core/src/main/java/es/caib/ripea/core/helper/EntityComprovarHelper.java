@@ -1,7 +1,23 @@
-/**
- * 
- */
 package es.caib.ripea.core.helper;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -33,7 +49,6 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
@@ -45,23 +60,6 @@ import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
@@ -101,8 +99,6 @@ public class EntityComprovarHelper {
 	private DocumentPublicacioRepository documentPublicacioRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ExpedientOrganPareRepository expedientOrganPareRepository;
 	@Autowired
 	private PermisosHelper permisosHelper;
     @Autowired
