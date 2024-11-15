@@ -249,8 +249,6 @@ public class ExpedientHelper2 {
 						
 						if (clonarDocument) {
 							//Afegim al document per clonar en una llista, es farà en una funcio REQUIRES_NEW posterior
-							//Necessitam posar la variable firma correcte a false, perque la funció de firmaEnServidor elimini la firma actual
-							ra.getDocument().setValidacioFirmaCorrecte(false);
 							documentsClonar.add(ra.getDocument().getId());
 						}
 					}
