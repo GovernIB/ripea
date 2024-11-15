@@ -315,19 +315,6 @@ $(document).ready(function() {
 	});
 });
 
-function exportaZipMassiu() {
-	$.ajax({
-		type: 'GET',
-		async: true,
-		url: '<c:url value="/expedient/exportarZipMassiu"/>',
-		success: function (data) {
-			$(".rmodal").hide();
-			webutilRefreshMissatges();
-		}
-	});
-	return false;
-}
-
 function findActiusPerLectura(organId) {
 	var findUrl;
 	if (organId != undefined) {
@@ -596,7 +583,7 @@ function removeCookie(cname) {
 						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
 						<li><a class="fileDownload" href="expedient/exportarEni"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/></a></li>
-						<li><a class="fileDownload" href="#" onclick="exportaZipMassiu();"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.mass"/></a></li>
+						<li><a class="fileDownload" href="expedient/exportarZipMassiu" data-toggle="modal"><span class="fa fa-file-archive-o"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.mass"/></a></li>
 					</ul>
 				</div>
 			</div>

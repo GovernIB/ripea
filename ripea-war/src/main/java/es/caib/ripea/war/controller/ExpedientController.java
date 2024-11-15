@@ -283,6 +283,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		return seleccio.size();
 	}
+
 	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselect(
@@ -407,15 +408,31 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	}
 
 	@RequestMapping(value = "/exportarZipMassiu", method = RequestMethod.GET)
-	@ResponseBody
 	public String exportarZipMassiu(
 			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+			HttpServletResponse response,
+			Model model) throws IOException {
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientExportarZipOptions expedientExportarZipOptions = new ExpedientExportarZipOptions();
+		expedientExportarZipOptions.setExpedientsIds(seleccio);
+		model.addAttribute(expedientExportarZipOptions);
+		return "exportarZipMassiu";
+	}
 
+	@RequestMapping(value = "/exportarZipMassiu", method = RequestMethod.POST)
+	public String exportarZipMassiuPost(HttpServletRequest request,
+			ExpedientExportarZipOptions command,
+			BindingResult bindingResult,
+			Model model) throws IOException {
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		/*
 		if (seleccio!=null && seleccio.size()>0) {
 
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -449,10 +466,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.error(
 					request,
 					getMessage(request,"expedient.controller.exportacio.seleccio.buida"));
-		}
-		return "OK";
+		}*/
+		MissatgesHelper.info(request, getMessage(
+				request,
+				"expedient.controller.exportacio.mass",
+				new Object[]{seleccio.size()}));
+		return modalUrlTancar();
 	}
-
+	
 	@RequestMapping(value = "/exportarEni", method = RequestMethod.GET)
 	public String exportarEniMassiu(
 			@RequestParam(required = false) boolean ambDocuments,
