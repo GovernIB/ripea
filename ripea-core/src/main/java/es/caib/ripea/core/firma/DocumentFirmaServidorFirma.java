@@ -58,14 +58,19 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	public ArxiuFirmaDto removeFirmesInvalidesAndFirmaServidor(Long documentId, String motiu, List<Long> documentsClonar) {
 
 		DocumentEntity document = documentRepository.getOne(documentId);
-		if (document != null) {
-			try {
-				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
 				
-				if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null) {
-					if (documentsClonar!=null && documentsClonar.contains(document.getId())) {
-						//En cas de que sigui un fitxer que prove de un annex de una anotació amb firma inválida, guardam el uuid actual al camp de distribució
-						//ja que haurà donat un error 
+		if (document != null) {
+			
+			try {
+				
+				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
+				boolean esPerClonar = documentsClonar.contains(document.getId());
+				
+				if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null || esPerClonar) {
+
+					if (esPerClonar) {
+						//En cas de que sigui un fitxer que prove de un annex de una anotació amb firma inválida, 
+						//guardam el uuid actual al camp de distribució ja que haurà donat un error 
 						document.setUuid_distribucio(document.getArxiuUuid()); //Copiam el uuid actual de distribucio al camp corresponent.
 						//borram el camp uuid per que al "arxiuPropagarModificacio" crei un document nou al arxiu dins la carpeta del contingut pare.
 						document.setArxiuUuid(null);  
@@ -145,9 +150,9 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				document.setValidacioFirmaCorrecte(true);
 				document.setValidacioFirmaErrorMsg(null);
 				
-				
 				logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 				return arxiuFirma;
+
 			} catch (Exception e) {
 				throw new FirmaServidorException(document.getNom(), Utils.getRootMsg(e));
 			}

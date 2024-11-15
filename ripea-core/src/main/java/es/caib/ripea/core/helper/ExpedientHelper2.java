@@ -5,12 +5,9 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,8 +147,6 @@ public class ExpedientHelper2 {
 			expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
 			expedient.updateEstatAdditional(null);
 			contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-			logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
-			actualitzaEstatNotificacionsCaducades(expedient);
 			logger.debug("Tancant expedient a l'arxiu per acció iniciada per usuari...");
 			pluginHelper.arxiuExpedientTancar(expedient);
 		} else {
@@ -165,24 +160,25 @@ public class ExpedientHelper2 {
 	public void closeExpedientArxiu(ExpedientEntity expedient) {
 		expedient.updateTancatData();
 		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-		logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
-		actualitzaEstatNotificacionsCaducades(expedient);
 		logger.debug("Tancant expedient a l'arxiu desde acció en segon pla...");		
 		pluginHelper.arxiuExpedientTancar(expedient);
 	}
 	
-	private void actualitzaEstatNotificacionsCaducades(ExpedientEntity expedient) {
-        List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
-        for (DocumentEntity document : documents) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void actualitzaEstatNotificacionsCaducades(Long expedientId) {
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		for (DocumentEntity document : documents) {
 	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
 	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
-	            if (notificacionsPendents.get(0).getDataCaducitat()!=null && 
-	            	notificacionsPendents.get(0).getDataCaducitat().before(Calendar.getInstance().getTime())) {
+	            if (notificacionsPendents.get(0).isCaducada() && !notificacionsPendents.get(0).isNotificacioFinalitzada()) {
 	        		if (notificacionsPendents.get(0).getDocumentEnviamentInteressats()!=null) {
 	        			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity: notificacionsPendents.get(0).getDocumentEnviamentInteressats()) {
 	        				try {
 	        					pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
-	        				} catch (Exception ex) {logger.warn("No s'ha pogut actualitzar l'estat de la notificació "+notificacionsPendents.get(0).getNotificacioIdentificador());}
+	        				} catch (Exception ex) {
+	        					logger.warn("No s'ha pogut actualitzar l'estat de la notificació "+notificacionsPendents.get(0).getNotificacioIdentificador());
+	        				}
 	        			}
 	        		}
 	            }
@@ -253,8 +249,6 @@ public class ExpedientHelper2 {
 						
 						if (clonarDocument) {
 							//Afegim al document per clonar en una llista, es farà en una funcio REQUIRES_NEW posterior
-							//Necessitam posar la variable firma correcte a false, perque la funció de firmaEnServidor elimini la firma actual
-							ra.getDocument().setValidacioFirmaCorrecte(false);
 							documentsClonar.add(ra.getDocument().getId());
 						}
 					}

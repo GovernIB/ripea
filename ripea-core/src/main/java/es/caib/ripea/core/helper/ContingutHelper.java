@@ -538,10 +538,9 @@ public class ContingutHelper {
         for (DocumentEntity document : documents) {
 	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
 	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
-	            if (notificacionsPendents.get(0).getDataCaducitat()!=null && 
-	            	notificacionsPendents.get(0).getDataCaducitat().before(Calendar.getInstance().getTime())) {
-	            		notificacionsCaducades = true;
-	            		break;
+	        	if (notificacionsPendents.get(0).isCaducada() && !notificacionsPendents.get(0).isNotificacioFinalitzada()) {
+	            	notificacionsCaducades = true;
+	            	break;
 	            }
 	        }
 	        if (notificacionsCaducades) break;

@@ -1397,6 +1397,12 @@ public class ExpedientHelper {
 		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
 		
 		/**
+		 * #1525 Permetre tancar un expedient encara que hi hagi remeses tipus comunicació no finalitzades
+		 */
+		logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
+		expedientHelper2.actualitzaEstatNotificacionsCaducades(expedientId);
+		
+		/**
 		 * #1579 Adaptar tancament d'expedients a annexes d'anotacions no moguts
 		 * 
 		 * 1.- Reprocessar annexes amb error.
@@ -1406,9 +1412,9 @@ public class ExpedientHelper {
 		//Si el ID del document a clonar, no es troba dins la llista de documents a firmar no es clonara,
 		//perque la funcio signDocumentsSelected nomes actua sobre la llista de documents a firmar.
 		//Tot document que es vulgui clonar, ha de estar dins la llista de documents a firmar
-		List<Long> documentsSelectedList = new ArrayList<>();
+		List<Long> documentsSelectedList = new ArrayList<Long>();
 		if (documentsPerFirmar!=null) {
-			documentsSelectedList = Arrays.asList(documentsPerFirmar);
+			documentsSelectedList = new ArrayList<Long>(Arrays.asList(documentsPerFirmar));
 		}
 		if (documentsClonar!=null) {
 			for (Long docClon: documentsClonar) {
@@ -1416,6 +1422,8 @@ public class ExpedientHelper {
 					documentsSelectedList.add(docClon);
 				}
 			}
+		} else {
+			documentsClonar = new ArrayList<Long>();
 		}
 
 		/**
