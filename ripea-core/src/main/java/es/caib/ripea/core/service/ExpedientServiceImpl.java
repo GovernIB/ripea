@@ -1346,20 +1346,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-
 		// Passam la Collection a List
 		List<Long> ids = new ArrayList<>(expedientIds != null ? expedientIds : new ArrayList<Long>());
-
-		List<Long> metaExpedientIds = metaExpedientRepository.findDistinctMetaExpedientIdsByExpedients(expedientIds);
-		for (Long metaExpedientId : metaExpedientIds) {
-			entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					true,
-					false,
-					false,
-					false, false, null, null);
-		}
 		List<ExpedientEntity> expedients = expedientRepositoryCommnand.findByEntitatAndIdInOrderByIdAsc(
 				entitat,
 				ids);
@@ -1386,6 +1374,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<String[]> files = new ArrayList<String[]>();
 		int dadesIndex = 0;
 		for (ExpedientEntity expedient : expedients) {
+			
+			entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					expedient.getMetaExpedient().getId(),
+					true,
+					false,
+					false,
+					false, false, null, null);
+			
 			String[] fila = new String[numColumnes];
 			fila[0] = expedient.getNumero();
 			fila[1] = expedient.getNom();
@@ -1470,7 +1467,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			for (String[] fila : files) {
 				csvHelper.afegirLinia(sb, fila, ';');
 			}
-			fitxer.setContingut(sb.toString().getBytes());
+			fitxer.setContingut(sb.toString().getBytes("UTF-8"));
 		} else {
 			throw new ValidationException("Format de fitxer no suportat: " + format);
 		}

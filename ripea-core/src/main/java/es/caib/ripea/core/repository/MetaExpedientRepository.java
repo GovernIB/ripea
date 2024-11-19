@@ -121,53 +121,6 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
 			Pageable pageable);
 
-	@Query(	"select" +
-			"    distinct e.metaExpedient.id " +
-			"from" +
-			"    ExpedientEntity e " +
-			"where " +
-			"    e.id in (:ids) order by e.metaExpedient.nom ASC")
-	List<Long> findDistinctMetaExpedientIdsByExpedients(
-			@Param("ids") Collection<Long> ids);
-
-//	Sembla que necessita com a mínim spring 4.0 --> Ho deixam preparat per quan passem a jboss7
-//	===========================================
-//	@Query( "select " +
-//			"    distinct me " +
-//			"from " +
-//			"    MetaExpedientEntity me " +
-//			"	left join me.metaExpedientOrganGestors meog " +
-//			"	left join me.organGestor og " +
-//			"where " +
-//			"    me.entitat = :#{#filtre.entitat} " +
-//			"and (:#{#filtre.esNullActiu} = true or me.actiu = :#{#filtre.actiu}) " +
-//			"and (:#{#filtre.revisioActiva} = false or me.revisioEstat = 'REVISAT') " +
-//			"and (:#{#filtre.esNullFiltre} = true or lower(me.nom) like lower('%'||:#{#filtre.filtre}||'%') or lower(me.classificacio) like lower('%'||:#{#filtre.filtre}||'%')) " +
-//			"and (:#{#filtre.organGestorIComu} = false or (og = :#{#filtre.organ} or og is null)) " +
-//			"and (:#{#filtre.esAdminEntitat} = true " +
-//			" 	  or (:#{#filtre.esAdminOrgan} = true and :#{#filtre.esNullOrganCodiPermesos} = false " +
-//			"			and ( og.codi in (:#{#filtre.organCodiPermesosSplit[0]}) " +
-//			"				or og.codi in (:#{#filtre.organCodiPermesosSplit[1]}) " +
-//			"				or og.codi in (:#{#filtre.organCodiPermesosSplit[2]}) " +
-//			"				or og.codi in (:#{#filtre.organCodiPermesosSplit[3]})) " +
-//			"     or (:#{#filtre.esNullMetaExpedientIdPermesos} = false " +
-//			"			and ( me.id in (:#{#filtre.metaExpedientIdPermesosSplit[0]}) " +
-//			"				or me.id in (:#{#filtre.metaExpedientIdPermesosSplit[1]}) " +
-//			"				or me.id in (:#{#filtre.metaExpedientIdPermesosSplit[2]}) " +
-//			"				or me.id in (:#{#filtre.metaExpedientIdPermesosSplit[3]}))) " +
-//			"     or (og is not null and :#{#filtre.esNullOrganCodiPermesos} = false " +
-//			"			and ( og.codi in (:#{#filtre.organCodiPermesosSplit[0]})" +
-//			"				or og.codi in (:#{#filtre.organCodiPermesosSplit[1]}) " +
-//			"				or og.codi in (:#{#filtre.organCodiPermesosSplit[2]}) " +
-//			"				or og.codi in (:#{#filtre.organCodiPermesosSplit[3]}))) " +
-//			"     or (og is null and :#{#filtre.esNullMetaExpedientOrganIdPermesos} = false " +
-//			"			and ( meog.id in (:#{#filtre.metaExpedientOrganIdPermesosSplit[0]}) " +
-//			"				or meog.id in (:#{#filtre.metaExpedientOrganIdPermesosSplit[1]}) " +
-//			"				or meog.id in (:#{#filtre.metaExpedientOrganIdPermesosSplit[2]}) " +
-//			"				or meog.id in (:#{#filtre.metaExpedientOrganIdPermesosSplit[3]}))) " +
-//			"	  or (:#{#filtre.allComuns} = true and og is null)))")
-//	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(MetaExpedientFiltre filtre);
-
 	@Query( "select distinct me " +
 			"from MetaExpedientEntity me " +
 			"	left outer join me.metaExpedientOrganGestors meog " +
