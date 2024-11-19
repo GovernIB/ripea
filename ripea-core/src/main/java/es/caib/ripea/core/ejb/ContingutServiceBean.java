@@ -146,14 +146,6 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ContingutDto getContingutAmbFillsPerPath(
-			Long entitatId,
-			String path) {
-		return delegate.getContingutAmbFillsPerPath(entitatId, path);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
 	public List<ValidacioErrorDto> findErrorsValidacio(
 			Long entitatId,
 			Long contingutId) {

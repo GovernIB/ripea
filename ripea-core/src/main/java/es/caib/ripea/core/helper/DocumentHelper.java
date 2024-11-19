@@ -1079,26 +1079,18 @@ public class DocumentHelper {
 			}
 
 		} else {
+			
 			fitxer = new FitxerDto();
-
 			fitxer.setNom(document.getFitxerNom());
 			fitxer.setContentType(document.getFitxerContentType());
-//			fitxer.setContingut(document.getFitxerContingut());
-
 			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					document.getGesDocAdjuntId(),
 					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 					streamAnnex);
 			fitxer.setContingut(streamAnnex.toByteArray());
-			
-		
 		}
-//		if (versio == null && DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
-//			fitxer.setNom(
-//					pluginHelper.conversioConvertirPdfArxiuNom(
-//							document.getFitxerNom()));
-//		}
+
 		return fitxer;
 	}
 	

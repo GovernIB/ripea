@@ -252,22 +252,6 @@ public interface ContingutService {
 			Long contingutId) throws NotFoundException;
 
 	/**
-	 * Obté la informació s'un contingut juntament el seu contingut donat el path.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @param path
-	 *            Path del contingut dins l'entitat.
-	 * @return El contingut i el seu contingut.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public ContingutDto getContingutAmbFillsPerPath(
-			Long entitatId,
-			String path) throws NotFoundException;
-
-	/**
 	 * Obté els errors de validació associades a un contingut.
 	 * 
 	 * @param entitatId

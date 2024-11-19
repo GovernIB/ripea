@@ -402,6 +402,14 @@ public class DocumentEntity extends NodeEntity {
 		return false;
 	}
 	
+	public String getExtensio() {
+		try {
+			return this.fitxerNom.substring(this.fitxerNom.lastIndexOf("."), this.fitxerNom.length());
+		} catch (Exception ex) {
+			return "";
+		}				
+	}
+	
 	public String getEstatDarreraNotificacio() {
 		if (notificacions != null && !notificacions.isEmpty() && notificacions.get(0) instanceof DocumentNotificacioEntity) {
 			DocumentNotificacioEntity lastNofificacio = (DocumentNotificacioEntity) notificacions.get(0);

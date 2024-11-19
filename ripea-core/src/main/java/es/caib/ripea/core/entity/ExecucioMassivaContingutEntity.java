@@ -103,6 +103,10 @@ public class ExecucioMassivaContingutEntity extends RipeaAuditable<Long> {
 		this.dataFi = dataFi;
 		this.estat = ExecucioMassivaEstatDto.ESTAT_FINALITZAT;
 	}
+	public void updateCancelat(Date dataFi) {
+		this.dataFi = dataFi;
+		this.estat = ExecucioMassivaEstatDto.ESTAT_CANCELAT;
+	}
 	public void updateEstatDataFi(
 			ExecucioMassivaEstatDto estat,
 			Date dataFi) {

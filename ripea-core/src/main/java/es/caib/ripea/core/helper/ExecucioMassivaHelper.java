@@ -208,6 +208,12 @@ public class ExecucioMassivaHelper{
 		return exc;
 	}
 	
+	public static String getExceptionString(Throwable cause, int retalla) {
+		StringWriter out = new StringWriter();
+		cause.printStackTrace(new PrintWriter(out));
+		return Utils.abbreviate(out.toString(), retalla);
+	}
+	
 	public static String getExceptionString(
 			ExecucioMassivaContingutEntity emc,
 			Throwable cause) {

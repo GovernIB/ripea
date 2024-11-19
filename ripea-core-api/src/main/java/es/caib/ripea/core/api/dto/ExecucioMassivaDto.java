@@ -25,6 +25,10 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private ExecucioMassivaTipusDto tipus;
 	private Date dataInici;
 	private Date dataFi;
+//	Paràmetres generació de ZIP
+	private Boolean carpetes;
+	private Boolean versioImprimible;
+	private FileNameOption nomFitxer;
 //	Paràmetres enviament portafirmes
 	private String motiu;
 	private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;

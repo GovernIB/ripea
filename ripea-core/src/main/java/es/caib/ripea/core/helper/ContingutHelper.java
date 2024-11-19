@@ -1695,14 +1695,20 @@ public class ContingutHelper {
 
 	public void findDescendants(
 			ContingutEntity contingut,
-			List<ContingutEntity> descendants) {
+			List<ContingutEntity> descendants,
+			boolean onlyDocuments,
+			boolean includeEsborrats) {
 
+		//Serà un document o bé una carpeta buida
 		if (contingut.getFills() == null || contingut.getFills().isEmpty()) {
-			descendants.add(contingut);
+			if (!onlyDocuments || (contingut instanceof DocumentEntity)) {
+				if (includeEsborrats || contingut.getEsborrat()==0) {
+					descendants.add(contingut);
+				}
+			}
 		} else {
 			for (ContingutEntity contingutEntity : contingut.getFills()) {
-				findDescendants(contingutEntity,
-						descendants);
+				findDescendants(contingutEntity, descendants, onlyDocuments, includeEsborrats);
 			}
 		}
 	}

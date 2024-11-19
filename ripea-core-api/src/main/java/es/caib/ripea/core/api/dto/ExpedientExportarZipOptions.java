@@ -1,7 +1,6 @@
 package es.caib.ripea.core.api.dto;
 
 import java.io.Serializable;
-import java.util.Set;
 
 public class ExpedientExportarZipOptions implements Serializable {
 
@@ -9,50 +8,45 @@ public class ExpedientExportarZipOptions implements Serializable {
 	
 	private Long entitatId;
 	private String usuariCodi;
-	private Set<Long> expedientsIds;
+	private Integer numExps;
 	private boolean carpetes = true;
 	private boolean versioImprimible = false;
-	private PrincipalTipusEnumDto nomFitxer = PrincipalTipusEnumDto.USUARI;
+	private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
 	
 	public Long getEntitatId() {
 		return entitatId;
 	}
-	public void setEntitatId(
-			Long entitatId) {
+	public void setEntitatId(Long entitatId) {
 		this.entitatId = entitatId;
 	}
 	public String getUsuariCodi() {
 		return usuariCodi;
 	}
-	public void setUsuariCodi(
-			String usuariCodi) {
+	public void setUsuariCodi(String usuariCodi) {
 		this.usuariCodi = usuariCodi;
 	}
-	public Set<Long> getExpedientsIds() {
-		return expedientsIds;
+	public Integer getNumExps() {
+		return numExps;
 	}
-	public void setExpedientsIds(Set<Long> expedientsIds) {
-		this.expedientsIds = expedientsIds;
+	public void setNumExps(Integer numExps) {
+		this.numExps = numExps;
 	}
 	public boolean isCarpetes() {
 		return carpetes;
 	}
-	public void setCarpetes(
-			boolean carpetes) {
+	public void setCarpetes(boolean carpetes) {
 		this.carpetes = carpetes;
 	}
 	public boolean isVersioImprimible() {
 		return versioImprimible;
 	}
-	public void setVersioImprimible(
-			boolean versioImprimible) {
+	public void setVersioImprimible(boolean versioImprimible) {
 		this.versioImprimible = versioImprimible;
 	}
-	public PrincipalTipusEnumDto getNomFitxer() {
+	public FileNameOption getNomFitxer() {
 		return nomFitxer;
 	}
-	public void setNomFitxer(
-			PrincipalTipusEnumDto nomFitxer) {
+	public void setNomFitxer(FileNameOption nomFitxer) {
 		this.nomFitxer = nomFitxer;
 	}	
 }

@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler implements MessageSourceAware {
 	
-	
 	MessageSource messageSource;
 	
     @ExceptionHandler({MultipartException.class})
@@ -68,7 +67,6 @@ public class GlobalExceptionHandler implements MessageSourceAware {
 	}
 	
 	private String modalUrlTancar() {
-		//return "redirect:/nodeco/util/modalTancar";
 		return "redirect:" + ModalHelper.ACCIO_MODAL_TANCAR;
 	}
 	

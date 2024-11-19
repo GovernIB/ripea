@@ -3,6 +3,30 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
@@ -10,8 +34,42 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.api.Firma;
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.AlertaDto;
+import es.caib.ripea.core.api.dto.ArxiuContingutDto;
+import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.CodiValorDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
+import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutMovimentDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -62,30 +120,6 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -268,7 +302,7 @@ public class ContingutServiceImpl implements ContingutService {
 		
 		if (contingut instanceof ExpedientEntity && contingut.getFills() != null && !contingut.getFills().isEmpty()) {
 			List<ContingutEntity> descendants = new ArrayList<>();
-			contingutHelper.findDescendants(contingut, descendants);
+			contingutHelper.findDescendants(contingut, descendants, false, true);
 			
 			Iterator<ContingutEntity> itr = descendants.iterator();
 			while (itr.hasNext()) {
@@ -943,19 +977,6 @@ public class ContingutServiceImpl implements ContingutService {
 				contingut,
 				false, 
 				false);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public ContingutDto getContingutAmbFillsPerPath(
-			Long entitatId,
-			String path) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Obtenint contingut amb fills donat el seu path ("
-				+ "entitatId=" + entitatId + ", "
-				+ "path=" + path + ", "
-				+ "usuariCodi=" + auth.getName() + ")");
-		return null;
 	}
 
 	@Transactional(readOnly = true)

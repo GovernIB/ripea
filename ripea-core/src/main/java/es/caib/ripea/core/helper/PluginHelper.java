@@ -2464,30 +2464,19 @@ public class PluginHelper {
 
 		String accioDescripcio = "Obtenir versió imprimible del document";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				document.getId().toString());
-		accioParams.put(
-				"títol",
-				document.getNom());
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+		
 		try {
-			DocumentContingut documentContingut = arxiuPluginWrapper.getPlugin().documentImprimible(
-					document.getArxiuUuid());
+			DocumentContingut documentContingut = arxiuPluginWrapper.getPlugin().documentImprimible(document.getArxiuUuid());
 			FitxerDto fitxer = new FitxerDto();
-
-			String titol = document.getFitxerNom().replace(
-					".pdf",
-					"_imprimible.pdf");
-			fitxer.setNom(
-					titol);
-			fitxer.setContentType(
-					documentContingut.getTipusMime());
-			fitxer.setTamany(
-					documentContingut.getTamany());
-			fitxer.setContingut(
-					documentContingut.getContingut());
+			String titol = document.getFitxerNom().replace(".pdf", "_imprimible.pdf");
+			fitxer.setNom(titol);
+			fitxer.setContentType(documentContingut.getTipusMime());
+			fitxer.setTamany(documentContingut.getTamany());
+			fitxer.setContingut(documentContingut.getContingut());
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,

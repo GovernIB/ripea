@@ -7,6 +7,7 @@
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
+<%@ attribute name="comment" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="disabled"><c:choose><c:when test="${not empty disabled}">${disabled}</c:when><c:otherwise>false</c:otherwise></c:choose></c:set>
@@ -28,6 +29,7 @@
 					<form:checkbox path="${campPath}" cssClass="span12" id="${campPath}" disabled="${disabled}"/>
 				</label>
 			</div>
+			<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>
 	</c:when>
@@ -39,6 +41,7 @@
 				<c:when test="${not empty text}">${text}</c:when>
 				<c:otherwise>${campPath}</c:otherwise>
 			</c:choose>
+			<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 		</label>
 	</c:otherwise>
 </c:choose>

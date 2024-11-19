@@ -21,6 +21,7 @@ import javax.persistence.TemporalType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.core.api.dto.FileNameOption;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
@@ -41,6 +42,14 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_fi")
 	private Date dataFi;
+//	Paràmetres generació de ZIP
+	@Column(name = "zip_carpetes")
+	private Boolean carpetes;
+	@Column(name = "zip_imprimible")
+	private Boolean versioImprimible;
+	@Column(name = "zip_nomFitxer")
+	@Enumerated(EnumType.STRING)
+	private FileNameOption nomFitxer;	
 	// Enviament a Portafirmes
 	@Column(name = "pfirmes_motiu", length = MOTIU_TAMANY)
 	private String motiu;
@@ -130,11 +139,29 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public void removeContingut(ExecucioMassivaContingutEntity contingut) {
 		getContinguts().remove(contingut);
 	}
-
 	public void updateDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
 
+	public Boolean getCarpetes() {
+		if (carpetes!=null) return carpetes; else return Boolean.FALSE;
+	}
+	public void setCarpetes(Boolean carpetes) {
+		this.carpetes = carpetes;
+	}
+	public Boolean getVersioImprimible() {
+		if (versioImprimible!=null) return versioImprimible; else return Boolean.FALSE;
+	}
+	public void setVersioImprimible(Boolean versioImprimible) {
+		this.versioImprimible = versioImprimible;
+	}
+	public FileNameOption getNomFitxer() {
+		return nomFitxer;
+	}
+	public void setNomFitxer(
+			FileNameOption nomFitxer) {
+		this.nomFitxer = nomFitxer;
+	}
 	public static Builder getBuilder(
 			ExecucioMassivaTipusDto tipus,
 			Date dataInici,

@@ -417,7 +417,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
 		ExpedientExportarZipOptions expedientExportarZipOptions = new ExpedientExportarZipOptions();
-		expedientExportarZipOptions.setExpedientsIds(seleccio);
+		if (seleccio!=null) {
+			expedientExportarZipOptions.setNumExps(seleccio.size());
+		} else {
+			expedientExportarZipOptions.setNumExps(0);
+		}
 		model.addAttribute(expedientExportarZipOptions);
 		return "exportarZipMassiu";
 	}
@@ -432,7 +436,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
-		/*
+		
 		if (seleccio!=null && seleccio.size()>0) {
 
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -448,13 +452,19 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				execucioMassivaElements.add(execMass);
 			}
 
+			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
+					ExecucioMassivaTipusDto.EXPORTAR_ZIP,
+					new Date(),
+					null,
+					RolHelper.getRolActual(request));
+			
+			execMassDto.setCarpetes(command.isCarpetes());
+			execMassDto.setVersioImprimible(command.isVersioImprimible());
+			execMassDto.setNomFitxer(command.getNomFitxer());
+			
 			execucioMassivaService.saveExecucioMassiva(
 					entitatActual.getId(),
-					new ExecucioMassivaDto(
-							ExecucioMassivaTipusDto.EXPORTAR_ZIP,
-							new Date(),
-							null,
-							RolHelper.getRolActual(request)),
+					execMassDto,
 					execucioMassivaElements,
 					ElementTipusEnumDto.EXPEDIENT);
 
@@ -466,11 +476,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.error(
 					request,
 					getMessage(request,"expedient.controller.exportacio.seleccio.buida"));
-		}*/
-		MissatgesHelper.info(request, getMessage(
-				request,
-				"expedient.controller.exportacio.mass",
-				new Object[]{seleccio.size()}));
+		}
+
 		return modalUrlTancar();
 	}
 	

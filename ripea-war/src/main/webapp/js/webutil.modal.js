@@ -127,6 +127,7 @@
 								$(nomElementRetorn).val(valorCodi);
 								$(nomElementRetorn).trigger('blur');
 							}
+							$("body").removeClass("loading");
 						});
 					} else {
 						window.open(href, '_blank');
@@ -210,10 +211,9 @@
 								});
 								modalBotons.hide();
 							}
+							
 							// Evaluar URL del formulari
 							var dataForm = $('body', $(iframe).contents()).data('modal-form');
-							
-							
 							
 							var modalForm = (dataForm) ? $(dataForm, $(iframe).contents()) : $(settings.elementForm, $(iframe).contents());
 							if (modalForm.length) {
@@ -270,8 +270,6 @@
 								if (settings.funcToCallOnTancar) {
 									window[settings.funcToCallOnTancar]();
 								}
-								
-								
 							}
 						}
 					});
@@ -316,6 +314,5 @@
 			}
 		});
 	});
-	
 
 }(jQuery));
