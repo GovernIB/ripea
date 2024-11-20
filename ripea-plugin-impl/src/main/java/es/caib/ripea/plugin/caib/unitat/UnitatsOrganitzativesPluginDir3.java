@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -179,7 +180,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 
         List<UnitatOrganitzativa> unitats = new ArrayList<>();
         try {
-            URL url = new URL(getServiceCercaUrl() + "?codigo=" + codi + "&denominacion=" + denominacio
+            URL url = new URL(getServiceCercaUrl() + "?codigo=" + codi + "&denominacion=" + URLEncoder.encode(denominacio, "UTF-8")
                     + "&codNivelAdministracion=" + (nivellAdministracio != null ? nivellAdministracio : "-1")
                     + "&codComunidadAutonoma=" + (comunitatAutonoma != null ? comunitatAutonoma : "-1")
                     + "&conOficinas=" + (ambOficines != null && ambOficines ? "true" : "false")
