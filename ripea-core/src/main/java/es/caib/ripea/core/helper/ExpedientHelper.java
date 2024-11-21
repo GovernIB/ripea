@@ -1343,13 +1343,10 @@ public class ExpedientHelper {
 		return expedient;
 	}
 
-
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
 			String nom) {
-
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
-
 		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
 				metaExpedient,
 				null,
@@ -1357,7 +1354,6 @@ public class ExpedientHelper {
 				0);
 		return expedient != null ? expedient.getId() : null;
 	}
-
 
 	@Transactional(readOnly = true)
 	public ExpedientDto toExpedientDto(

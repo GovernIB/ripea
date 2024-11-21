@@ -101,6 +101,7 @@ public class DocumentHelper {
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
 			boolean returnDetail) {
+		
 		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
@@ -190,6 +191,7 @@ public class DocumentHelper {
 		} else {
 			throw new ValidationException("No es pot crear el document sense especificar el contingut");
 		}
+		
 		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			if (document.getFirmaContingut() != null) {
@@ -209,6 +211,7 @@ public class DocumentHelper {
 				
 				List<ArxiuFirmaDto> firmes = null;
 				if (isDocumentFromPinbal(entity)) {
+					
 					ArxiuFirmaDto firma = getArxiuFirmaPades(fitxer.getNom(), fitxer.getContingut());
 					firmes = Arrays.asList(firma);
 					
@@ -224,18 +227,13 @@ public class DocumentHelper {
 						throw new ValidacioFirmaException(e.getMessage());
 					}
 				}
-				
-//				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
-//					saveFirmaSeparadaOfEsborranyInGestioDocumental(
-//							document.getFirmaContingut(),
-//							entity);
-//				}
-				
+
 				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 					pluginHelper.arxiuPropagarFirmaSeparada(
 							entity,
 							firmes.get(0).getFitxer());
 				}
+				
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
@@ -270,12 +268,14 @@ public class DocumentHelper {
  						ex.getMessage());
  			}
 		}
+
 		entity.updateArxiuIntent();
-		
+
 		if (returnDetail)		
 			dto = toDocumentDto(entity);
 		else
 			dto.setId(entity.getId());
+
 		return dto;
 	}
 
@@ -288,16 +288,13 @@ public class DocumentHelper {
 	
 	public ArxiuFirmaDto getArxiuFirmaPades(String nom, byte[] contingut){
 		ArxiuFirmaDto firma = new ArxiuFirmaDto();
-		
 		firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
 		firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
 		firma.setTipusMime("application/pdf");
-		
 		firma.setFitxerNom(nom);
 		firma.setContingut(contingut);
 		return firma;
 	}
-	
 	
 	public static boolean isDocumentFromRipea(DocumentEntity document) {
 		return getDocumentOrigen(document) == DocumentOrigenEnumDto.RIPEA;
@@ -323,7 +320,6 @@ public class DocumentHelper {
 			return DocumentOrigenEnumDto.RIPEA;
 		}
 	}
-	
 	
 	public DocumentDto updateDocument(
 			Long entitatId,
@@ -1327,7 +1323,6 @@ public class DocumentHelper {
 				throw new ArxiuJaGuardatException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
 			}
 			
-			
 			try {
 				
 				expedientHelper.concurrencyCheckExpedientJaTancat(documentEntity.getExpedient());
@@ -1389,7 +1384,6 @@ public class DocumentHelper {
 						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 						firmes,
 						arxiuEstat);
-
 			
 				if (documentEntity.getGesDocAdjuntId() != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -1397,12 +1391,14 @@ public class DocumentHelper {
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					documentEntity.setGesDocAdjuntId(null);
 				}
+				
 				if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
 					pluginHelper.gestioDocumentalDelete(
 							documentEntity.getGesDocAdjuntFirmaId(),
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					documentEntity.setGesDocAdjuntFirmaId(null);
 				}
+
 			} catch (Exception ex) {
 				
 				logger.error("Error al custodiar en arxiu document adjunt  (" +
@@ -1417,7 +1413,6 @@ public class DocumentHelper {
 		documentEntity.updateArxiuIntent();
 		return exception;
 	}
-	
 
 	public List<ArxiuFirmaDto> validaFirmaDocument(
 			DocumentEntity document,
