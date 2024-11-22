@@ -88,9 +88,10 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 							"ca");
 				} catch (Exception e) {
 					logger.error("Error al firmar en servidor el documento, documentId=" + document.getId() + ", documentNom=" + document.getNom(), e);
-					// if document has signature but it was not detected by ripea/distribucio (this can happen if signature is corrupted as in issue #1375) then remove signature and try signing again
-					if (Utils.getRootMsg(e).contains("Error no controlat cridant al validador de firmes Plugin Validacio Firmes afirma CXF")) {
-
+					//El document té firma errònia que no ha estat detectada previament.
+					//Per tant no ha passat per el removeSignaturesPdfUsingPdfWriterCopyPdf anterior.
+					if (Utils.getRootMsg(e).contains("Error no controlat cridant al validador de firmes Plugin Validacio Firmes afirma CXF") ||
+						Utils.getRootMsg(e).contains("InvalidNotSignerCertificate")) {
 						fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
 						firma = pluginHelper.firmaServidorFirmar(
 								document,
