@@ -122,11 +122,11 @@ public class DocumentServiceBean implements DocumentService {
 	
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto descarregarOriginalDistribucio(
+	public FitxerDto descarregarContingutOriginal(
 			Long entitatId,
 			Long id,
 			Long tascaId) {
-		return delegate.descarregarOriginalDistribucio(
+		return delegate.descarregarContingutOriginal(
 				entitatId,
 				id,
 				tascaId);

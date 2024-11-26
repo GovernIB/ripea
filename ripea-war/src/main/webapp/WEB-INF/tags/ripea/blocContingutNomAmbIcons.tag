@@ -13,13 +13,13 @@
 <c:if test="${contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'ADJUNT_FIRMAT')}">
 	<span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span>
 </c:if>
-<c:if test="${contingut.document && contingut.uuid_distribucio!=null}">
+<c:if test="${contingut.document && contingut.gesDocOriginalId!=null}">
 	<span class="firmat fa fa-files-o" style="color: orange;" title="<spring:message code="contingut.info.estat.duplicat"/>"></span>
 </c:if> 
 <c:if test="${contingut.document && contingut.estat == 'FIRMAT' && contingut.gesDocFirmatId != null}">
 	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span>
 </c:if>
-<c:if test="${contingut.document && contingut.pendentMoverArxiu && contingut.uuid_distribucio == null}">
+<c:if test="${contingut.document && contingut.pendentMoverArxiu && contingut.gesDocOriginalId == null}">
 	<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentMoverArxiu"/>"></span>
 </c:if>
 <c:if test="${contingut.document && !contingut.validacioFirmaCorrecte}">
