@@ -581,6 +581,7 @@ public class EmailHelper {
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String rebutjMotiu = "";
 		String responsableRebuig = "";
+		boolean isFirmaParcial = documentPortafirmes.getFirmaParcial() != null && documentPortafirmes.getFirmaParcial();
 		if (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.REBUTJAT) {
 			rebutjMotiu = "\tMotiu: " + documentPortafirmes.getMotiuRebuig() + "\n";
 			if (documentPortafirmes.getName() != null)
@@ -595,6 +596,7 @@ public class EmailHelper {
 						"\tDocument nom: " + document.getNom() + "\n" +
 						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+						(isFirmaParcial ? "\tFirma parcial: Sí" : "" ) + "\n" +
 						"Estat del document:" + estat + "\n" +
 						rebutjMotiu +
 						responsableRebuig +
@@ -1269,11 +1271,10 @@ public class EmailHelper {
 		return Utils.isNotEmpty(usuari.getEmailAlternatiu()) ? usuari.getEmailAlternatiu() : usuari.getEmail();
 	}
 
-
 	private String getRemitent() {
 		return configHelper.getConfig("es.caib.ripea.email.remitent");
 	}
-
+	
 	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);
 
 }

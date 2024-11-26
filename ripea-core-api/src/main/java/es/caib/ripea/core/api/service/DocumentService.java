@@ -262,6 +262,8 @@ public interface DocumentService {
 	 * 			  Indicar si rebre correus canvi estat de firmes parcials
 	 * @param dataCaducitat
 	 *            La data màxima per a firmar el document.
+	 * @param firmaParcial 
+	 * 			  Tractar la firma final de Portafirmes com una firma parcial
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws IllegalStateException
@@ -283,7 +285,8 @@ public interface DocumentService {
 			String transaccioId, 
 			String rolActual, 
 			Long tascaId,
-			boolean avisFirmaParcial) throws NotFoundException, IllegalStateException, SistemaExternException;
+			boolean avisFirmaParcial,
+			boolean firmaParcial) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Recupera els dispositius disponibles per un usuari

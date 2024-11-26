@@ -127,6 +127,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute("tascaId", tascaId);
 		model.addAttribute(command);
 		model.addAttribute("isHabilitarAvisFirmaParcialActiu", isHabilitarAvisFirmaParcialActiu());
+		model.addAttribute("isFirmaParcialHabilitada", isFirmaParcialHabilitada());
 		model.addAttribute("isCreacioFluxUsuariActiu", isCreacioFluxUsuariActiu());
 		return "portafirmesForm";
 	}
@@ -199,7 +200,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					transaccioId, 
 					RolHelper.getRolActual(request), 
 					tascaId,
-					command.isAvisFirmaParcial());
+					command.isAvisFirmaParcial(),
+					command.isFirmaParcial());
 			
 			return this.getModalControllerReturnValueSuccess(
 					request,
@@ -785,6 +787,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	
 	private boolean isHabilitarAvisFirmaParcialActiu() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
+	}
+	
+	private boolean isFirmaParcialHabilitada() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.firma.parcial"));
 	}
 	
 	private boolean isCreacioFluxUsuariActiu() {

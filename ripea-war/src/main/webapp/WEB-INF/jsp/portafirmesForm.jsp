@@ -717,8 +717,8 @@ function isDniNie(value) {
 			<rip:inputSelect name="annexos" textKey="metadocument.form.camp.portafirmes.annexos" optionValueAttribute="id" optionTextAttribute="nom" optionItems="${annexos}" multiple="true"/>
 			<label class="control-label success-label hidden col-xs-4"></label>
 			<rip:inputSelect name="portafirmesEnviarFluxId" textKey="metadocument.form.camp.portafirmes.flux" emptyOption="true" botons="true" icon="fa fa-external-link" iconAddicional="fa fa-eye-slash"/>
-			<label class="control-label col-xs-4"></label>
 			<c:if test="${!nouFluxDeFirma}">
+				<label class="control-label col-xs-4"></label>
 				<p class="comentari col-xs-8"><spring:message code="metadocument.form.camp.portafirmes.flux.comment" /></p>
 			</c:if>
 			<%--
@@ -734,6 +734,12 @@ function isDniNie(value) {
 			--%>
 		</c:when>
 		</c:choose>
+		
+		<c:if test="${isFirmaParcialHabilitada}">
+			<div>
+				<rip:inputCheckbox name="firmaParcial" textKey="contenidor.document.portafirmes.camp.parcial" comment="contenidor.document.portafirmes.camp.parcial.comentari"/>
+			</div>
+		</c:if>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><spring:message code="contenidor.document.portafirmes.enviar"/></button>
 			<a href="<c:url value="/contenidor/${document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

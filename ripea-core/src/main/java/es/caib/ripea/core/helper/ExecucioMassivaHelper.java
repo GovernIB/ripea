@@ -200,7 +200,8 @@ public class ExecucioMassivaHelper{
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesFluxTipus(),
 					null,
 					em.getPortafirmesTransaccioId(),
-					em.getPortafirmesAvisFirmaParcial());
+					em.getPortafirmesAvisFirmaParcial(),
+					em.getPortafirmesFirmaParcial());
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut enviar el document al portasignatures", ex);
 			exc = ex;

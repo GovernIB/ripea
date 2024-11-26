@@ -59,6 +59,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	private String motiuRebuig;
 	@Column(name = "pf_avis_firma_parcial")
 	private Boolean avisFirmaParcial;
+	@Column(name = "pf_firma_parcial")
+	private Boolean firmaParcial;
 	
 	@Transient
 	private String name;
@@ -111,7 +113,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			String fluxId,
 			ExpedientEntity expedient,
 			DocumentEntity document,
-			Boolean avisFirmaParcial) {
+			Boolean avisFirmaParcial,
+			Boolean firmaParcial) {
 		return new Builder(
 				estat,
 				assumpte,
@@ -124,7 +127,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				fluxId,
 				expedient,
 				document,
-				avisFirmaParcial);
+				avisFirmaParcial,
+				firmaParcial);
 	}
 
 	public static class Builder {
@@ -141,7 +145,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				String fluxId,
 				ExpedientEntity expedient,
 				DocumentEntity document,
-				Boolean avisFirmaParcial) {
+				Boolean avisFirmaParcial,
+				Boolean firmaParcial) {
 			built = new DocumentPortafirmesEntity();
 			built.inicialitzar();
 			built.estat = estat;
@@ -156,6 +161,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			built.expedient = expedient;
 			built.document = document;
 			built.avisFirmaParcial = avisFirmaParcial;
+			built.firmaParcial = firmaParcial;
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;

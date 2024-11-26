@@ -126,7 +126,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					dto.getEnviarCorreu(),
 					entitat,
 					dto.getRolActual(),
-					dto.getPortafirmesAvisFirmaParcial()).build();
+					dto.getPortafirmesAvisFirmaParcial(),
+					dto.getPortafirmesFirmaParcial()).build();
 		}
 		
 		int ordre = 0;
