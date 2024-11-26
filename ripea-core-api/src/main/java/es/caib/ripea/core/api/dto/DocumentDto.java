@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 import java.util.Date;
@@ -10,11 +7,6 @@ import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Informació d'un document.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter
 @Setter
 public class DocumentDto extends NodeDto {
@@ -63,6 +55,7 @@ public class DocumentDto extends NodeDto {
 	private Long pareId;
 	private boolean docFromAnnex;
 	
+	private String gesDocOriginalId;
 	private String gesDocFirmatId;
 	private String gesDocAdjuntId;
 	private String gesDocAdjuntFirmaId;
@@ -77,13 +70,9 @@ public class DocumentDto extends NodeDto {
 	private ArxiuEstatEnumDto annexArxiuEstat; // Estat a l'arxiu en l'origen
 	private ArxiuEstatEnumDto arxiuEstat;
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
-
-	//Uuid del annex de la anotació a la carpeta de distribució del arxiu, nomes en cas exp. tancats amb annexes amb firma inválida.
-	private String uuid_distribucio;
 	
 	private boolean arxiuEstatDefinitiu;
 	private boolean documentDeAnotacio;
-	
 	private boolean scanned;
 	
 	private Integer resolucion;

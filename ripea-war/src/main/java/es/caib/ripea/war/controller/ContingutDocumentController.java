@@ -757,7 +757,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
 		try {
-			FitxerDto fitxer = documentService.descarregarOriginalDistribucio(
+			FitxerDto fitxer = documentService.descarregarContingutOriginal(
 					entitatActual.getId(),
 					documentId,
 					tascaId);

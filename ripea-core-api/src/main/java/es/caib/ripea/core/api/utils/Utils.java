@@ -344,6 +344,16 @@ public class Utils {
 		}
 	}
 	
+	public static boolean isNumeric(String str) {
+		try {
+			if (str==null) return false;
+			Long.parseLong(str);
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+	
 	public static String duracioEnDiesToString(Integer dies) {
 		
 		if (dies!=null) {

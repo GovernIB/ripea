@@ -1,6 +1,5 @@
 package es.caib.ripea.core.firma;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
@@ -39,22 +38,26 @@ import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 @Component
 public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private DocumentRepository documentRepository;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private DocumentRepository documentRepository;
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public ArxiuFirmaDto firmar(Long documentId, String motiu, List<Long> documentsClonar) {
 		return removeFirmesInvalidesAndFirmaServidor(documentId, motiu, documentsClonar);
 	}
 	
+	/**
+	 * Casos possibles de firma en servidor:
+	 * 1.- Annex de anotació de registre no mogut (esPerClonar=true), tendrà uuid de distribució.
+	 * 2.- Altres documents:
+	 * 		> Té firmes inválides i ja es troba a l'arxiu: Copia en local, firmar en servidor i guardar a arxiu.
+	 *  	> Té firmes inválides i NO es troba a l'arxiu: Copia en local, firmar en servidor i guardar a arxiu.
+	 * 		> No té firmes inválides i ja es troba a l'arxiu: Firmar en servidor i actualitzar a arxiu.
+	 * 		> No té firmes inválides i NO es troba a l'arxiu: Firmar en servidor i guardar a arxiu.
+	 */
 	public ArxiuFirmaDto removeFirmesInvalidesAndFirmaServidor(Long documentId, String motiu, List<Long> documentsClonar) {
 
 		DocumentEntity document = documentRepository.getOne(documentId);
@@ -67,37 +70,28 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				boolean esPerClonar = documentsClonar.contains(document.getId());
 				
 				if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null || esPerClonar) {
-
-					if (esPerClonar) {
-						//En cas de que sigui un fitxer que prove de un annex de una anotació amb firma inválida, 
-						//guardam el uuid actual al camp de distribució ja que haurà donat un error 
-						document.setUuid_distribucio(document.getArxiuUuid()); //Copiam el uuid actual de distribucio al camp corresponent.
-						//borram el camp uuid per que al "arxiuPropagarModificacio" crei un document nou al arxiu dins la carpeta del contingut pare.
-						document.setArxiuUuid(null);  
-					}
-					//remove invalid signature
+					//Guarda copia del arxiu original
+					preparaDocumentPerFirmaEnServidor(fitxer.getContingut(), document);
+					//Elimina firmes del PDF
 					fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
 				}
 				
 				SignaturaResposta firma = null;
 				try {
-					firma = pluginHelper.firmaServidorFirmar(
-							document,
-							fitxer,
-							motiu,
-							"ca");
+					firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
 				} catch (Exception e) {
 					logger.error("Error al firmar en servidor el documento, documentId=" + document.getId() + ", documentNom=" + document.getNom(), e);
 					//El document té firma errònia que no ha estat detectada previament.
 					//Per tant no ha passat per el removeSignaturesPdfUsingPdfWriterCopyPdf anterior.
 					if (Utils.getRootMsg(e).contains("Error no controlat cridant al validador de firmes Plugin Validacio Firmes afirma CXF") ||
 						Utils.getRootMsg(e).contains("InvalidNotSignerCertificate")) {
+						
+						//Guarda copia del arxiu original
+						preparaDocumentPerFirmaEnServidor(fitxer.getContingut(), document);
+						//Elimina firmes del PDF
 						fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
-						firma = pluginHelper.firmaServidorFirmar(
-								document,
-								fitxer,
-								motiu,
-								"ca");
+						firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
+						
 					} else {
 						throw e;
 					}
@@ -161,6 +155,21 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		} else {
 			throw new NotFoundException(documentId, DocumentEntity.class);
 		}
+	}
+	
+	private void preparaDocumentPerFirmaEnServidor(byte[] contingut, DocumentEntity document) {
+
+		//Es guarda a fileSystem
+		String gestioDocumentalAdjuntId = pluginHelper.gestioDocumentalCreate(
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_ORIGINALS,
+				new ByteArrayInputStream(contingut));
+
+		//Realment no es un uuid, pero d'aquesta manera tenim un sol cap per apuntar al document original.
+		//El métode de descarregar document original ja s'encarrega de anar-lo a cercar a arxiu o file system. 
+		document.setGesDocOriginalId(gestioDocumentalAdjuntId); 
+		
+		//borram el camp uuid per que al "arxiuPropagarModificacio" crei un document nou al arxiu dins la carpeta del contingut pare.
+		document.setArxiuUuid(null);
 	}
 	
 	private DocumentFirmaTipusEnumDto getDocumentFirmaTipus(SignaturaResposta firma){

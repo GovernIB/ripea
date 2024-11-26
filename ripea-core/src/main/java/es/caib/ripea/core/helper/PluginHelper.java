@@ -208,15 +208,10 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; // documents signed by portafib
-																						// that haven't been saved in
-																						// arxiu
-	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating
-																				// document that haven't been saved in
-																				// arxiu
-
-	public static final String GESDOC_AGRUPACIO_DOCS_ESBORRANYS = "docsEsborranys"; // firma separada of documents which
-																					// are saved in arxiu as esborannys
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu  
+	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating document that haven't been saved in arxiu
+	public static final String GESDOC_AGRUPACIO_DOCS_ORIGINALS = "docsOriginals"; // documents amb firma inválida
+	public static final String GESDOC_AGRUPACIO_DOCS_ESBORRANYS = "docsEsborranys"; // firma separada of documents which are saved in arxiu as esborannys
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugins = new HashMap<>();

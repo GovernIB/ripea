@@ -216,7 +216,7 @@ public interface DocumentService {
 			Long tascaId) throws NotFoundException;
 	
 	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto descarregarOriginalDistribucio(
+	public FitxerDto descarregarContingutOriginal(
 			Long entitatId,
 			Long id,
 			Long tascaId) throws NotFoundException;

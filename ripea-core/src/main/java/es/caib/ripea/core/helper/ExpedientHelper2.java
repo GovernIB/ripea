@@ -230,8 +230,8 @@ public class ExpedientHelper2 {
 				if (Utils.isNotEmpty(ra.getError())) {
 					//Si no esta creat el document, no podem crear-lo, ja que no sabriem quin tipus ha de tenir. Això es selecciona al acceptar la anotacio.
 					//La segona condició es perque no volem comprovar documents que ja ham estat clonats. Ja que el error de la anotació el mantenim.
-					//i si es reintenta el tancar expedient, pot ser aquest annex ja estigui tractat i clonat (tendrá Uuid_distribucio)
-					if (ra.getDocument()!=null && ra.getDocument().getUuid_distribucio()==null) {
+					//i si es reintenta el tancar expedient, pot ser aquest annex ja estigui tractat i clonat (tendrá GesDocOriginalId)
+					if (ra.getDocument()!=null && ra.getDocument().getGesDocOriginalId()==null) {
 						boolean clonarDocument = false;
 						//Ja ens avisa distribució, que la firma no es correcte
 						if (!ra.isValidacioFirmaCorrecte()) {

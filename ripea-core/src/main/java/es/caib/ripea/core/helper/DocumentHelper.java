@@ -1023,20 +1023,30 @@ public class DocumentHelper {
 		}
 	}
 	
-	public FitxerDto getFitxerOriginalDistribucio(DocumentEntity document) {
+	public FitxerDto getContingutOriginal(DocumentEntity document) {
 		FitxerDto fitxer = new FitxerDto();
         String fitxerNom = document.getFitxerNom();
         String fitxerFirmatNom = document.getNomFitxerFirmat();
 		fitxer = new FitxerDto();
         fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
         fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
-		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-				null,
-				document.getUuid_distribucio(),
-				null,
-				true,
-				false);
-		fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+        //El contingut pot estar a distribució o a file system
+        try {
+			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(
+					document.getGesDocOriginalId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ORIGINALS,
+					streamAnnex);
+			fitxer.setContingut(streamAnnex.toByteArray());
+        } catch (Exception ex) {
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					null,
+					document.getGesDocOriginalId(),
+					null,
+					true,
+					false);
+			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+        }
 		return fitxer;
 	}
 

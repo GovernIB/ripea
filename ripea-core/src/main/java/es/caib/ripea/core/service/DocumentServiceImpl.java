@@ -857,7 +857,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto descarregarOriginalDistribucio(Long entitatId, Long id, Long tascaId) {
+	public FitxerDto descarregarContingutOriginal(Long entitatId, Long id, Long tascaId) {
 		
 		logger.debug("Descarregant contingut original del document (entitatId=" + entitatId + ", id=" + id+")");
 		
@@ -875,7 +875,7 @@ public class DocumentServiceImpl implements DocumentService {
 						id);
 			}
 			
-			return documentHelper.getFitxerOriginalDistribucio(document);
+			return documentHelper.getContingutOriginal(document);
 			
 		} catch (Exception e) {
 

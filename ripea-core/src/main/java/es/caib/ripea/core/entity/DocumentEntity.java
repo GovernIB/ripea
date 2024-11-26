@@ -180,10 +180,9 @@ public class DocumentEntity extends NodeEntity {
 	@JoinColumn(name = "id")
 	private ContingutEntity contingut;
 	
-	//Uuid del annex de la anotació a la carpeta de distribució del arxiu, nomes en cas exp. tancats amb annexes amb firma inválida.
-	//El camp arxiuUuid de Contingut entity és el principal i contendrá una copia del arxiu sense les firmes a la carpeta de arxiu del expedient RIPEA.
+	//ID del contingut original guardat al sistema de fitxers
 	@Column(name = "uuid_distribucio")
-	private String uuid_distribucio;
+	private String gesDocOriginalId;
 	
 	@Transient
 	protected boolean ambNotificacions;
