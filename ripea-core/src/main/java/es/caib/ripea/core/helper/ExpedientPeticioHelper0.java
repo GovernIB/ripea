@@ -50,6 +50,7 @@ public class ExpedientPeticioHelper0 {
 			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 			anotacioRegistreId.setIndetificador(identificador);
 			anotacioRegistreId.setClauAcces(epInfo.getClauAcces());
+			
 			try {
 				
 				boolean throwMockException = false; // throwMockException = true
@@ -66,13 +67,17 @@ public class ExpedientPeticioHelper0 {
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar consulta end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t2) + " ms");
-
 				
 				long t3 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar crearRegistrePerPeticio start (" + identificador + ", " + expedientPeticioId + ")");
-				
-				// create anotació in db and associate it with expedient peticion
+
+				/**
+				 * Guarda les dades a:
+				 *	> RegistreEntity = ipa_registre
+				 *	> RegistreAnnexEntity = ipa_registre_annex
+				 *	> RegistreInteressatEntity = ipa_registre_interessat
+				 */
 				expedientPeticioHelper.crearRegistrePerPeticio(
 						registre,
 						expedientPeticioId);
@@ -80,19 +85,11 @@ public class ExpedientPeticioHelper0 {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar crearRegistrePerPeticio end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t3) + " ms");
 				
-				
 				long t4 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
-				
 
-				// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 				try {
-//					boolean throwMockException1 = false; // throwMockException1 = true
-//					if (throwMockException1) {
-//						throw new RuntimeException("Mock exception al canviar estat de l'anotació a BACK_REBUDA en distribució");
-//					}
-					
 					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
@@ -106,7 +103,6 @@ public class ExpedientPeticioHelper0 {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar canviEstat end (" + expedientPeticioId + "):  " + (System.currentTimeMillis() - t4) + " ms");
 				
-				
 				long t5 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar evictCountAnotacionsPendents start (" + identificador + ", " + expedientPeticioId + ")");
@@ -117,8 +113,6 @@ public class ExpedientPeticioHelper0 {
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar evictCountAnotacionsPendents end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t5) + " ms");
-				
-				
 				
 				long t6 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -168,7 +162,6 @@ public class ExpedientPeticioHelper0 {
 				if (throwException) {
 					throw e;
 				}
-				
 				
 			} finally {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())

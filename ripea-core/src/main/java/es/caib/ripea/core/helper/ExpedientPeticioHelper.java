@@ -193,8 +193,6 @@ public class ExpedientPeticioHelper {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
 		
-//		System.out.println("crearRegistrePerPeticio before getBuilder, identificador: " + registreEntrada.getIdentificador());
-		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
 				registreEntrada.getData(),
@@ -236,8 +234,6 @@ public class ExpedientPeticioHelper {
 		registreRepository.save(registreEntity);
 		expedientPeticioEntity.updateRegistre(registreEntity);
 		
-//		System.out.println("crearRegistrePerPeticio before findByEntitatAndClassificacioSia, identificador: " + registreEntrada.getIdentificador());
-		
 		// set metaexpedient to which expedient will belong if peticion is accepted
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioOrderByNomAsc(
 				entitat,
@@ -267,15 +263,13 @@ public class ExpedientPeticioHelper {
 		}
 		expedientPeticioRepository.save(expedientPeticioEntity);
 		
-//		System.out.println("crearRegistrePerPeticio before interessats, identificador: " + registreEntrada.getIdentificador());
-		
 		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
 					crearInteressatEntity(
 							interessat,
 							registreEntity));
 		}
-//		System.out.println("crearRegistrePerPeticio before annexos, identificador: " + registreEntrada.getIdentificador());
+
 		for (Annex annex: registreEntrada.getAnnexos()) {
 			
 			// Guardar annexos de les anotacions en FileSystem (instal·lació de Ripea i Distribució en servidors separats)
@@ -305,15 +299,10 @@ public class ExpedientPeticioHelper {
 							registreEntity));
 			
 		}
-		
-//		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
-		// change state of expedient peticio to pendent de processar
+
 		canviEstatExpedientPeticio(
 				expedientPeticioEntity,
 				ExpedientPeticioEstatEnumDto.PENDENT);
-		
-//		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
-		
 	}
 	
 	private void calcularGrup(ExpedientPeticioEntity expedientPeticioEntity) {

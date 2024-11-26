@@ -876,15 +876,6 @@ public class ExpedientHelper {
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = expedientPeticioEntity.getRegistre().getEntitat();
 
-//		if (registreAnnexEntity.getAnnexEstat() == null) {
-//			try {
-//				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(null, registreAnnexEntity.getUuid(), null, false);
-//				registreAnnexEntity.updateAnnexEstat(DocumentEstat.ESBORRANY.equals(documentArxiu.getEstat()) ? ArxiuEstatEnumDto.ESBORRANY : ArxiuEstatEnumDto.DEFINITIU);
-//			} catch (Exception ex) {
-//				logger.debug("No s'ha pogut obtenir informació del document a l'arxiu");
-//			}
-//		}
-
 		if (expedientEntity.getArxiuUuid() == null) {
 			throw new RuntimeException("Annex no s'ha processat perque l'expedient no s'ha creat a l'arxiu");
 		}
@@ -923,11 +914,11 @@ public class ExpedientHelper {
 			//	Recuperar tipus document per defecte
 			MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
 			
-			
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
 					expedientEntity,
 					metaDocument,
 					0);
+			
 			if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
 				throw new ValidationException(
 						"<creacio>",
@@ -937,9 +928,8 @@ public class ExpedientHelper {
 						"metaDocumentId=" + metaDocumentId + ", " +
 						"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 						"expedientId=" + expedientEntity.getId() + ")");
-			}
-			
-		
+			}			
+
 			DocumentEntity docEntity = documentHelper.crearDocumentDB(
 					documentDto.getDocumentTipus(),
 					documentDto.getNom(),
@@ -968,16 +958,14 @@ public class ExpedientHelper {
 					documentDto.getFitxerContentType(),
 					documentDto.getFitxerTamany());
 			
-			documentHelper.actualitzarFitxerDB(
-					docEntity,
-					fitxer);
-			
+			documentHelper.actualitzarFitxerDB(docEntity, fitxer);
+
 			docEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
-			
+
 			if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
 				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 			} 
-			
+
 			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
 				if (registreAnnexEntity.getFirmaTipus() != null) {
 					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
@@ -990,13 +978,8 @@ public class ExpedientHelper {
 			contingutLogHelper.logCreacio(docEntity, true, true);
 		}
 
-		Exception exception = null;
-		
-		// ############################ MOVE ANNEX IN ARXIU ####################
-		exception = moveAnnexArxiu(registreAnnexEntity.getId());
-		return exception;
+		return moveAnnexArxiu(registreAnnexEntity.getId());
 	}
-	
 	
 	public Exception moveAnnexArxiu(Long registreAnnexId) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(registreAnnexId));
@@ -1066,8 +1049,8 @@ public class ExpedientHelper {
 				registreAnnexEntity.updateError(ExceptionUtils.getStackTrace(e));
 			}
 		}
+
 		return exception;
-		
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
