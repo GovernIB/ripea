@@ -292,18 +292,13 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 		this.estat = estat;
 	}
 	public void updateError(String error) {
-		this.error = StringUtils.abbreviate(
-				error,
-				1000);
+		this.error = StringUtils.abbreviate(error, 1000);
 	}
 	public void updateDocument(DocumentEntity document) {
 		this.document = document;
 	}
-
-//	public void updateUuidDispatched(String uuidDispatched) {
-//		this.uuidDispatched = uuidDispatched;
-//	}
-	
-	
-	
+	public void setFirmaInvalida(String errorFirma) {
+		this.validacioFirmaCorrecte = false;
+		this.validacioFirmaErrorMsg = StringUtils.abbreviate(errorFirma, 1000);
+	}
 }

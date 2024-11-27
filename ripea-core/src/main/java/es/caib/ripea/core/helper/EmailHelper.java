@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
@@ -40,7 +37,6 @@ import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -48,45 +44,23 @@ import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
-/**
- * Mètodes per a l'enviament de correus.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class EmailHelper {
 
-
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private JavaMailSender mailSender;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private EmailPendentEnviarRepository emailPendentEnviarRepository;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-    @Autowired
-    private OrganGestorHelper organGestorHelper;
-    @Autowired
-    private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private JavaMailSender mailSender;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private EmailPendentEnviarRepository emailPendentEnviarRepository;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+    @Autowired private OrganGestorHelper organGestorHelper;
+    @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
     
 	public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
@@ -338,10 +312,8 @@ public class EmailHelper {
 		EntitatEntity entitat = registre.getEntitat();
 		OrganGestorEntity organ = organGestorRepository.findByCodi(registre.getDestiCodi());
 
-
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
-		
 		
 		long t2 = System.currentTimeMillis();
 		// Administradors d'entitats
@@ -581,6 +553,7 @@ public class EmailHelper {
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String rebutjMotiu = "";
 		String responsableRebuig = "";
+		boolean isFirmaParcial = documentPortafirmes.getFirmaParcial() != null && documentPortafirmes.getFirmaParcial();
 		if (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.REBUTJAT) {
 			rebutjMotiu = "\tMotiu: " + documentPortafirmes.getMotiuRebuig() + "\n";
 			if (documentPortafirmes.getName() != null)
@@ -595,6 +568,7 @@ public class EmailHelper {
 						"\tDocument nom: " + document.getNom() + "\n" +
 						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+						(isFirmaParcial ? "\tFirma parcial: Sí" : "" ) + "\n" +
 						"Estat del document:" + estat + "\n" +
 						rebutjMotiu +
 						responsableRebuig +
@@ -883,7 +857,6 @@ public class EmailHelper {
 		enviarEmailModificacioDataLimitTasca(
 				expedientTascaEntity, 
 				responsables);
-
 	}	
 
 	public void sendEmailAvisMencionatComentari(
@@ -892,17 +865,14 @@ public class EmailHelper {
 			ExpedientEntity expedient,
 			String comentari) {
 		logger.debug("Enviament email comentari a destinatari");
-		
 		SimpleMailMessage missatge = new SimpleMailMessage();
 		missatge.setTo(emailDestinatari);
 		missatge.setFrom(getRemitent());
 		missatge.setSubject(getPrefixRipea() + " Mencionat al comentari d'un expedient [" + expedient.getNom() + "]");
-		EntitatEntity entitat = expedient.getEntitat();
 		missatge.setText(
 				"L'usuari " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ") t'ha mencionat al comentari d'un expedient [" + expedient.getNom() + "]: \n" +
 				"\tNom expedient: " + (expedient != null ? expedient.getNom() : "") + "\n" +
 				"\tComentari: " + comentari + "\n");
-		
 		mailSender.send(missatge);
 	}
 	
@@ -911,7 +881,6 @@ public class EmailHelper {
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
 		return baseUrl != null ? enllacExpedient : "";
 	}
-	
 	
 	private Set<DadesUsuari> getGestors(
 			boolean isTasca,
@@ -1269,11 +1238,10 @@ public class EmailHelper {
 		return Utils.isNotEmpty(usuari.getEmailAlternatiu()) ? usuari.getEmailAlternatiu() : usuari.getEmail();
 	}
 
-
 	private String getRemitent() {
 		return configHelper.getConfig("es.caib.ripea.email.remitent");
 	}
-
+	
 	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);
 
 }

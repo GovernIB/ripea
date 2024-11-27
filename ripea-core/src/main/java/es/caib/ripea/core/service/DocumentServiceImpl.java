@@ -1211,7 +1211,8 @@ public class DocumentServiceImpl implements DocumentService {
 			String transaccioId, 
 			String rolActual, 
 			Long tascaId,
-			boolean avisFirmaParcial) {
+			boolean avisFirmaParcial,
+			boolean firmaParcial) {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 		logger.debug("Enviant document a portafirmes (" +
@@ -1252,7 +1253,8 @@ public class DocumentServiceImpl implements DocumentService {
 					portafirmesFluxTipus,
 					annexosIds,
 					transaccioId,
-					avisFirmaParcial);
+					avisFirmaParcial,
+					firmaParcial);
 		} catch (Exception e) {
 			Throwable wsValidationException = ExceptionHelper.findThrowableInstance(e, WsValidationException.class, 6);
 			if (wsValidationException != null && (wsValidationException.getMessage().contains("Destinatari ID") || wsValidationException.getMessage().contains("ha trobat cap usuari"))

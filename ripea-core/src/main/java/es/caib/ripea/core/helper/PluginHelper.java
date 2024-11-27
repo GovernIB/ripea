@@ -5762,18 +5762,12 @@ public class PluginHelper {
 		ArxiuFirmaDto primeraFirma = new ArxiuFirmaDto();
 
 		if (firmes != null && !firmes.isEmpty()) {
-			primeraFirma = firmes.get(
-					0);
-			if (primeraFirma.getTipus() != null && TIPUS_FIRMES_ATTACHED.contains(
-					FirmaTipus.valueOf(
-							primeraFirma.getTipus().name()))) {
-				if (ArxiuFirmaTipusEnumDto.PADES.equals(
-						primeraFirma.getTipus())) {
+			primeraFirma = firmes.get(0);
+			if (primeraFirma.getTipus() != null && TIPUS_FIRMES_ATTACHED.contains(FirmaTipus.valueOf(primeraFirma.getTipus().name()))) {
+				if (ArxiuFirmaTipusEnumDto.PADES.equals(primeraFirma.getTipus())) {
 					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
 					// PluginArxiuFileSystem - linia 513
-					firmes.get(
-							0).setFitxerNom(
-									fitxer.getNom());
+					firmes.get(0).setFitxerNom(fitxer.getNom());
 				} else {
 					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
 				}

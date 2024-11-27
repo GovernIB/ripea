@@ -104,7 +104,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
 			String transaccioId,
-			boolean avisFirmaParcial) {
+			boolean avisFirmaParcial,
+			boolean firmaParcial) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +
@@ -165,7 +166,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
 				document,
-				avisFirmaParcial).build();
+				avisFirmaParcial,
+				firmaParcial).build();
 
 		if (annexosIds != null) {
 			for (Long annexId : annexosIds) {
@@ -347,8 +349,10 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						document.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
 					}
 					
-					// ============================== SAVE IN ARXIU ==========================
-					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
+					boolean isFirmaParcial = documentPortafirmes.getFirmaParcial() != null && documentPortafirmes.getFirmaParcial();
+					ArxiuEstatEnumDto arxiuEstat = isFirmaParcial ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
+
+					// ============================== SAVE IN ARXIU ==========================					
 					if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
 						
 						List<ArxiuFirmaDto> firmes = null;
@@ -483,7 +487,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		DocumentEntity document = documentPortafirmes.getDocument();
 		
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
-		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		document.updateEstat(documentPortafirmes.getFirmaParcial() ? DocumentEstatEnumDto.FIRMA_PARCIAL : DocumentEstatEnumDto.FIRMAT);
 		logFirmat(document);
 
 		PortafirmesDocument portafirmesDocument = null;

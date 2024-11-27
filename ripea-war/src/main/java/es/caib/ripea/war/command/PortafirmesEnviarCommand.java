@@ -38,7 +38,7 @@ public class PortafirmesEnviarCommand {
 	private String portafirmesFluxDescripcio;
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private Long[] annexos;
-	
+	private boolean firmaParcial;
 	private boolean avisFirmaParcial;
 	
 	public String[] getPortafirmesResponsables() {
@@ -144,6 +144,14 @@ public class PortafirmesEnviarCommand {
 
 	public void setEnviarCorreu(boolean enviarCorreu) {
 		this.enviarCorreu = enviarCorreu;
+	}
+
+	public boolean isFirmaParcial() {
+		return firmaParcial;
+	}
+
+	public void setFirmaParcial(boolean firmaParcial) {
+		this.firmaParcial = firmaParcial;
 	}
 
 	@Override

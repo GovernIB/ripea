@@ -175,7 +175,8 @@ public class DocumentServiceBean implements DocumentService {
 			String transaccioId, 
 			String rolActual, 
 			Long tascaId,
-			boolean avisFirmaParcial) {
+			boolean avisFirmaParcial,
+			boolean firmaParcial) {
 		delegate.portafirmesEnviar(
 				entitatId,
 				id,
@@ -189,7 +190,8 @@ public class DocumentServiceBean implements DocumentService {
 				transaccioId, 
 				rolActual, 
 				tascaId,
-				avisFirmaParcial);
+				avisFirmaParcial,
+				firmaParcial);
 	}
 
 	@Override

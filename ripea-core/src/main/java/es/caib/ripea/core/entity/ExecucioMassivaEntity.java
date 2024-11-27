@@ -84,6 +84,9 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	private Boolean portafirmesAvisFirmaParcial;
 	@Column(name = "document_nom")
 	private String documentNom;
+
+	@Column(name = "pfirmes_firma_parcial")
+	private Boolean portafirmesFirmaParcial;
 	
 	public ExecucioMassivaTipusDto getTipus() {
 		return tipus;
@@ -133,6 +136,10 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public String getDocumentNom() { return documentNom; }
 	public void setDocumentNom(String documentNom) { this.documentNom = documentNom; }
 
+	public Boolean getPortafirmesFirmaParcial() {
+		return portafirmesFirmaParcial;
+	}
+	
 	public void addContingut(ExecucioMassivaContingutEntity contingut) {
 		getContinguts().add(contingut);
 	}
@@ -175,7 +182,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			boolean enviarCorreu,
 			EntitatEntity entitat,
 			String rolActual,
-			boolean portafirmesAvisFirmaParcial) {
+			boolean portafirmesAvisFirmaParcial,
+			boolean portafirmesFirmaParcial) {
 		return new Builder(
 				tipus,
 				dataInici,
@@ -189,7 +197,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				enviarCorreu,
 				entitat,
 				rolActual,
-				portafirmesAvisFirmaParcial);
+				portafirmesAvisFirmaParcial,
+				portafirmesFirmaParcial);
 	}
 	public static class Builder {
 		ExecucioMassivaEntity built;
@@ -205,7 +214,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				boolean enviarCorreu,
 				EntitatEntity entitat,
 				String rolActual,
-				boolean portafirmesAvisFirmaParcial) {
+				boolean portafirmesAvisFirmaParcial,
+				boolean portafirmesFirmaParcial) {
 			built = new ExecucioMassivaEntity();
 			built.tipus = tipus;
 			built.dataInici = dataInici;
@@ -220,6 +230,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			built.entitat = entitat;
 			built.rolActual = rolActual;
 			built.portafirmesAvisFirmaParcial = portafirmesAvisFirmaParcial;
+			built.portafirmesFirmaParcial = portafirmesFirmaParcial;
 		}
 		
 		Builder(ExecucioMassivaTipusDto tipus,

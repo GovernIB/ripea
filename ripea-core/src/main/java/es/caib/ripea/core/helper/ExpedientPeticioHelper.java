@@ -3,6 +3,17 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnnexEstat;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
@@ -35,17 +46,6 @@ import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -55,40 +55,23 @@ import java.util.List;
 @Component
 public class ExpedientPeticioHelper {
 	
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private RegistreRepository registreRepository;
-	@Autowired
-	private RegistreInteressatRepository registreInteressatRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;  
-	@Autowired
-	private EntitatRepository entitatRepository; 
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Resource
-	private OrganGestorHelper organGestorHelper;
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Resource
-	private PluginHelper pluginHelper;
-    @Autowired
-    private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private RegistreRepository registreRepository;
+	@Autowired private RegistreInteressatRepository registreInteressatRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;  
+	@Autowired private EntitatRepository entitatRepository; 
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private PluginHelper pluginHelper;
+    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
@@ -529,6 +512,7 @@ public class ExpedientPeticioHelper {
 				validacioFirmaErrorMsg(annex.getDocumentError()).
 				annexArxiuEstat(getAnnexEstat(annex.getEstat())).
 				build();
+		//Els tipus de Firma PAdES i CAdES ditribució les envia correctament, pero les XAdES no
 		if (annex.getFirmaTipus() != null) {
 			annexEntity.updateFirmaTipus(annex.getFirmaTipus());
 		}
@@ -545,9 +529,46 @@ public class ExpedientPeticioHelper {
 		return ArxiuEstatEnumDto.DEFINITIU;
 	}
 
+/*	private FirmaTipus firmaTipusRipeaToDistribucio(ArxiuFirmaTipusEnumDto tipusRipea) {
+		if (tipusRipea!=null) {
+			switch (tipusRipea) {
+				case CADES_ATT: return FirmaTipus.CADES_ATT;
+				case CADES_DET: return FirmaTipus.CADES_DET;
+				case CSV: return FirmaTipus.CSV;
+				case ODT: return FirmaTipus.ODT;
+				case OOXML: return FirmaTipus.OOXML;
+				case PADES: return FirmaTipus.PADES;
+				case SMIME: return FirmaTipus.SMIME;
+				case XADES_DET: return FirmaTipus.XADES_DET;
+				case XADES_ENV: return FirmaTipus.XADES_ENV;
+			}
+		}
+		return null;
+	}
+	
+	private FirmaPerfil firmaPerfilRipeaToDistribucio(ArxiuFirmaPerfilEnumDto tipusRipea) {
+		if (tipusRipea!=null) {
+			switch (tipusRipea) {
+				case A: return FirmaPerfil.A;
+				case BASELINE_B_LEVEL: return FirmaPerfil.BASELINE_B_LEVEL;
+				case BASELINE_LT_LEVEL: return FirmaPerfil.BASELINE_LT_LEVEL;
+				case BASELINE_LTA_LEVEL: return FirmaPerfil.BASELINE_LTA_LEVEL;
+				case BASELINE_T: return FirmaPerfil.BASELINE_T;
+				case BASELINE_T_LEVEL: return FirmaPerfil.BASELINE_T_LEVEL;
+				case BASIC: return FirmaPerfil.BASIC;
+				case Basic: return FirmaPerfil.BASIC;
+				case BES: return FirmaPerfil.BES;
+				case C: return FirmaPerfil.C;
+				case EPES: return FirmaPerfil.EPES;
+				case LTA: return FirmaPerfil.LTA;
+				case LTV: return FirmaPerfil.LTV;
+				case T: return FirmaPerfil.T;
+				case X: return FirmaPerfil.X;
+				case XL: return FirmaPerfil.XL;
+			}
+		}
+		return null;
+	}
+	*/
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioHelper.class);
-
 }
-	
-	
-	
