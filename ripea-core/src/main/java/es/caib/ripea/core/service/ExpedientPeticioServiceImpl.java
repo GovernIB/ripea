@@ -433,35 +433,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<ArxiuFirmaDto> annexFirmaInfo(String fitxerArxiuUuid) {
-		log.debug("Obtenint annex firma info (" +
-				"fitxerArxiuUuid=" +
-				fitxerArxiuUuid +
-				")");
-
-		Document document = pluginHelper.arxiuDocumentConsultar(null,
-				fitxerArxiuUuid,
-				null,
-				true);
-
-		if (document != null && document.getFirmes() != null) {
-			for (Firma arxiuFirma : document.getFirmes()) {
-
-				if (!FirmaTipus.CSV.equals(arxiuFirma.getTipus())) {
-
-					byte[] documentContingut = document.getContingut() != null ? document.getContingut().getContingut() : null;
-					byte[] firmaContingut = arxiuFirma.getContingut();
-					String contentType = document.getContingut().getTipusMime();
-
-					return pluginHelper.validaSignaturaObtenirFirmes(
-							documentContingut,
-							firmaContingut,
-							contentType, 
-							false);
-				}
-			}
-		}
-
-		return null;
+		log.debug("Obtenint annex firma info (fitxerArxiuUuid=" + fitxerArxiuUuid +	")");
+		return pluginHelper.validaSignaturaObtenirFirmes(fitxerArxiuUuid, false);
 	}
 	
 	@Transactional
@@ -567,30 +540,24 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		expedientPeticioEntity.setExpedient(null);
 		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.PENDENT);
 	}
-	
 
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getAnnexFirmaContingut(Long annexId) {
+		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.findOne(annexId);
 		FitxerDto arxiu = new FitxerDto();
-
 		Document document = null;
-		document = pluginHelper.arxiuDocumentConsultar(null,
-				annex.getUuid(),
-				null,
-				true);
+		document = pluginHelper.arxiuDocumentConsultar(null, annex.getUuid(), null, true);
 
 		if (document != null) {
 			List<Firma> firmes = document.getFirmes();
-			if (firmes != null &&
-					firmes.size() > 0) {
-
+			if (firmes != null && firmes.size() > 0) {
 				Iterator<Firma> it = firmes.iterator();
 				while (it.hasNext()) {
 					Firma firma = it.next();
-					if (firma.getTipus() == FirmaTipus.CSV) {
+					if (!FirmaTipus.CADES_DET.equals(firma.getTipus())) {
 						it.remove();
 					}
 				}
@@ -598,8 +565,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				Firma firma = firmes.get(0);
 
 				if (firma != null) {
-					arxiu.setNom(annex.getFirmaNom());
-					arxiu.setContentType(firma.getTipusMime());
+					arxiu.setNom(document.getNom()+"_signature.csig");
+					arxiu.setContentType("application/octet-stream");
 					arxiu.setContingut(firma.getContingut());
 					arxiu.setTamany(firma.getContingut() != null ? Long.valueOf(firma.getContingut().length) : null);
 				}
@@ -607,7 +574,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return arxiu;
 	}
-
 	
 	@Transactional
 	@Override

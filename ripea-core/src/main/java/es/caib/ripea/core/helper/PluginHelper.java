@@ -1477,6 +1477,7 @@ public class PluginHelper {
 				logger.debug(
 						"Validant firmes annex Distribució...");
 				firmes = validaSignaturaObtenirFirmes(
+						annex.getNom(),
 						annex.getContingut(),
 						annex.getFirmaContingut(),
 						annex.getTipusMime(),
@@ -4483,12 +4484,24 @@ public class PluginHelper {
 		}
 	}
 
+	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(String uuid, boolean throwExceptionIfNotValid) {
+		Document arxiuDocument = arxiuDocumentConsultar(null, uuid, null, true, false);
+		//La firma sempre esta en el contingut, excepte per CADES_DET (TF04)
+		return validaSignaturaObtenirFirmes(
+				arxiuDocument.getNom(),
+				documentHelper.getContingutFromArxiuDocument(arxiuDocument),
+				documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
+				null,
+				throwExceptionIfNotValid);
+	}
+	
 	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(
+			String nomFitxer,
 			byte[] documentContingut,
 			byte[] firmaContingut,
 			String firmaContentType,
 			boolean throwExceptionIfNotValid) {
-
+		
 		String accioDescripcio = "Obtenir informació de document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		if (documentContingut != null) {
@@ -4505,7 +4518,7 @@ public class PluginHelper {
 		
 		long t0 = System.currentTimeMillis();
 		IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin();
-		
+		if (nomFitxer==null) {nomFitxer="ContingutFirma";}
 		try {
 			
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
@@ -4547,21 +4560,23 @@ public class PluginHelper {
 					}
 					InformacioCertificat certificateInfo = signatureInfo.getCertificateInfo();
 					if (certificateInfo != null) {
+						
 						if (certificateInfo.getNifResponsable() != null)
 							detall.setResponsableNif(certificateInfo.getNifResponsable());
 						else
 							detall.setResponsableNif(certificateInfo.getEntitatSubscriptoraNif());
+						
 						if (certificateInfo.getNomCompletResponsable() != null)
 							detall.setResponsableNom(certificateInfo.getNomCompletResponsable());
 						else
 							detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
+						
 						detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
 					}
 
 					if (isObtenirDataFirmaFromAtributDocument() && detall.getResponsableNif() != null) {
 						try {
-							PDDocument document = PDDocument.load(
-									new ByteArrayInputStream(documentContingut));
+							PDDocument document = PDDocument.load(new ByteArrayInputStream(documentContingut));
 							for (PDSignature signature : document.getSignatureDictionaries()) {
 								if (signature.getName() != null && signature.getName().contains(detall.getResponsableNif())) {
 									detall.setData(signature.getSignDate().getTime());
@@ -4589,6 +4604,11 @@ public class PluginHelper {
 								validateSignatureResponse.getSignType(),
 								validateSignatureResponse.getSignFormat()));
 				firma.setTipusMime(firmaContentType);
+				if (ArxiuFirmaTipusEnumDto.CADES_DET.equals(firma.getTipus())) {
+					firma.setFitxerNom(nomFitxer+"_signature.csig");
+				} else {
+					firma.setFitxerNom(nomFitxer);
+				}
 				firmes.add(firma);
 			}
 			integracioHelper.addAccioOk(

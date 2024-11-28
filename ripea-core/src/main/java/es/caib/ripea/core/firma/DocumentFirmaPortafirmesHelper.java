@@ -357,7 +357,12 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						
 						List<ArxiuFirmaDto> firmes = null;
 						if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
-							firmes = pluginHelper.validaSignaturaObtenirFirmes(portafirmesDocument.getArxiuContingut(), null, "application/pdf", true);
+							firmes = pluginHelper.validaSignaturaObtenirFirmes(
+									portafirmesDocument.getArxiuNom(),
+									portafirmesDocument.getArxiuContingut(),
+									null,
+									"application/pdf",
+									true);
 						} else {
 							ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(portafirmesDocument.getArxiuNom(), portafirmesDocument.getArxiuContingut());
 							firmes = Arrays.asList(firma);

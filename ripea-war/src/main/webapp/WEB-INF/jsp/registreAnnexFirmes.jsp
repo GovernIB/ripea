@@ -28,7 +28,7 @@
 				<td><strong><spring:message code="registre.annex.detalls.camp.firmaPerfil"/></strong></td>
 				<td>${firma.perfil}</td>
 			</tr>
-			<c:if test="${firma.tipus != 'PADES' and firma.tipus != 'CADES_ATT' and firma.tipus != 'XADES_ENV'}">
+			<c:if test="${firma.tipus=='CADES_DET'}">
 				<tr>
 					<td><strong><spring:message code="registre.annex.detalls.camp.fitxer"/></strong></td>
 					<td>

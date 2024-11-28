@@ -104,8 +104,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			ViaFirmaDocument viaFirmaDocument = null;
 			// Descarrega el document firmat del portafirmes
 			try {
-				viaFirmaDocument = pluginHelper.viaFirmaDownload(
-						documentViaFirma);
+				viaFirmaDocument = pluginHelper.viaFirmaDownload(documentViaFirma);
 			} catch (Exception ex) {
 				logger.error("Error al descarregar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
 				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
@@ -120,22 +119,16 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 				// Actualitza la informació de firma a l'arxiu.
 				if (viaFirmaDocument != null) {
 					byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
-
-					documentViaFirma.updateProcessat(
-								true,
-								new Date());
-					
-					
+					documentViaFirma.updateProcessat(true, new Date());
 					List<ArxiuFirmaDto> firmes = null;
 					if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
-						firmes = pluginHelper.validaSignaturaObtenirFirmes(contingut, null, "application/pdf", true);
+						firmes = pluginHelper.validaSignaturaObtenirFirmes(viaFirmaDocument.getNomFitxer(), contingut, null, "application/pdf", true);
 					} else {
 						ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(viaFirmaDocument.getNomFitxer(), contingut);
 						firmes = Arrays.asList(firma);
 					}
 					
 					document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-					
 					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
 					contingutHelper.arxiuPropagarModificacio(
 							document,
@@ -143,8 +136,6 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
 							firmes,
 							arxiuEstat);
-
-
 				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);

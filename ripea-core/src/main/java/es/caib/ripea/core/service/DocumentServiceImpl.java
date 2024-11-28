@@ -833,23 +833,9 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "versio=" + versio + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-				entitatId,
-				id,
-				true,
-				false);
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatId, id, true, false);
 		if (document.getArxiuUuid() != null) {
-			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-					document,
-					null,
-					versio,
-					true,
-					false);
-			List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
-					documentHelper.getContingutFromArxiuDocument(arxiuDocument),
-					documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
-					null, 
-					false);
+			List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(document.getArxiuUuid(), false);
 			return arxiuFirmes.get(0).getDetalls();
 		}
 		return null;

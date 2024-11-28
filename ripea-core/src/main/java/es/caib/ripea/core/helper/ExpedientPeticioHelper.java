@@ -512,13 +512,9 @@ public class ExpedientPeticioHelper {
 				validacioFirmaErrorMsg(annex.getDocumentError()).
 				annexArxiuEstat(getAnnexEstat(annex.getEstat())).
 				build();
-		//Els tipus de Firma PAdES i CAdES ditribució les envia correctament, pero les XAdES no
-		if (annex.getFirmaTipus() != null) {
-			annexEntity.updateFirmaTipus(annex.getFirmaTipus());
-		}
-		if (annex.getFirmaPerfil() != null) {
-			annexEntity.updateFirmaPerfil(annexEntity.getFirmaPerfil());
-		}
+
+		annexEntity.updateFirmaTipus(annex.getFirmaTipus());
+		annexEntity.updateFirmaPerfil(annexEntity.getFirmaPerfil());
 		registreAnnexRepository.save(annexEntity);
 		return annexEntity;
 	}

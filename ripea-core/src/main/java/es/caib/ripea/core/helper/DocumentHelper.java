@@ -932,8 +932,6 @@ public class DocumentHelper {
 		documentRepository.delete(document);
 	}
 	
-	
-	
 	public DocumentFirmaTipusEnumDto getDocumentFirmaTipus(DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto) {
 		
 		DocumentFirmaTipusEnumDto documentFirmaTipus = null;
@@ -947,8 +945,6 @@ public class DocumentHelper {
 		return documentFirmaTipus;
 	}
 	
-	
-	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto) contingutHelper.toContingutDto(
@@ -956,8 +952,6 @@ public class DocumentHelper {
 				false, 
 				false);
 	}
-
-
 
 	public void actualitzarVersionsDocument(
 			DocumentEntity document) {
@@ -1443,6 +1437,7 @@ public class DocumentHelper {
 		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
 				+ "documentID=" + document.getId() + ")");
 		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
+				document.getFitxerNom(),
 				fitxer.getContingut(), 
 				(contingutFirma != null && contingutFirma.length > 0) ? contingutFirma : null,
 				fitxer.getContentType(), 

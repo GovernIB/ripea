@@ -48,11 +48,9 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
@@ -962,16 +960,21 @@ public class ExpedientHelper {
 
 			docEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 
-			if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
-				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
-			}
+//			if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
+//				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
+//			}
 			
 			//Distribució no ens envia correctament la informació de les firmes XAdES
-			if (registreAnnexEntity.getNom()!=null && registreAnnexEntity.getNom().endsWith(".xsig") && registreAnnexEntity.getUuid()!=null) {
+/*			if (registreAnnexEntity.getNom()!=null && registreAnnexEntity.getNom().endsWith(".xsig") && registreAnnexEntity.getUuid()!=null) {
 				try {
 					Document docArxiu = pluginHelper.arxiuDocumentConsultar(registreAnnexEntity.getUuid());
 					if (docArxiu.getContingut()!=null) {
-						List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(null, docArxiu.getContingut().getContingut(), docArxiu.getContingut().getTipusMime(), true);
+						List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
+								docArxiu.getNom(),
+								null,
+								docArxiu.getContingut().getContingut(),
+								docArxiu.getContingut().getTipusMime(),
+								true);
 						docEntity.setValidacioFirmaCorrecte(true);
 						docEntity.setValidacioFirmaErrorMsg(null);
 						
@@ -987,7 +990,7 @@ public class ExpedientHelper {
 					docEntity.setValidacioFirmaErrorMsg(ex.getMessage());
 				}
 			}
-
+*/
 			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
 				if (registreAnnexEntity.getFirmaTipus() != null) {
 					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);

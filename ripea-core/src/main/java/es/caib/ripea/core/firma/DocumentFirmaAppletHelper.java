@@ -63,7 +63,7 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 		
 		List<ArxiuFirmaDto> firmes = null;
 		if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
-			firmes = pluginHelper.validaSignaturaObtenirFirmes(arxiuContingut, null, "application/pdf", true);
+			firmes = pluginHelper.validaSignaturaObtenirFirmes(arxiuNom, arxiuContingut, null, "application/pdf", true);
 		} else {
 			ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(arxiuNom, arxiuContingut);
 			firmes = Arrays.asList(firma);
