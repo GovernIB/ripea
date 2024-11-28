@@ -223,36 +223,24 @@
 				<%---- Visualitzar ----%>
 				<li class="${(contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" data-nom="${fn:escapeXml(contingut.nom)}" onclick="showViewer(event, ${contingut.id}, this.getAttribute('data-nom'), ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
-					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
+					<li><a href="#" class="hrefCopycsvLink${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>
-					$('a[href="#copy_${contingut.id}"]').click(function(){
-
+					$('.hrefCopycsvLink${contingut.id}').click(function(){
 					    $.ajax({
 					        url: "../document/" + ${contingut.id} + "/urlValidacio",
 					        type: "GET",
 					        success: function(data) {
-					            var dummy = $('<input>').val(data).appendTo('body').select();
-					            document.execCommand("copy");
-					            $(dummy).remove();
-					            var successDiv = $("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
-
-					            toastr.options = {
-									"positionClass": "toast-top-right"
-					            };
-					            
-					            toastr.success("<spring:message code='comu.boto.urlValidacio.copiat'/>");
+								debugger;
+					        	navigator.clipboard.writeText(data).then(() => {
+									toastr.options = {"positionClass": "toast-top-right"};
+						            toastr.success("<spring:message code='comu.boto.urlValidacio.copiat'/>");
+								}).catch(err => {
+									toastr.options = {"positionClass": "toast-top-right"};
+								    toastr.error("<spring:message code='comu.boto.urlValidacio.error'/>"+": "+err);
+								});
 					        },
 					        error: function(xhr, status, error) {
-							    var errorDiv = $("<div class='copy alert alert-danger' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.error'/> " + error + "</div>");
-
-					        	var dummy = $('<input>').val("<spring:message code='comu.boto.urlValidacio.error'/>" + " " + error).appendTo('body').select();
-					            document.execCommand("copy");
-							    $(dummy).remove();
-							    
-							    toastr.options = {
-									"positionClass": "toast-top-right"
-					            };
-					            
+							    toastr.options = {"positionClass": "toast-top-right"};
 							    toastr.error("<spring:message code='comu.boto.urlValidacio.error'/>");
 					        }
 					    });

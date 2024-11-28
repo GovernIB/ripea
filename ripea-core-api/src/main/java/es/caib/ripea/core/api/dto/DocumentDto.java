@@ -152,6 +152,20 @@ public class DocumentDto extends NodeDto {
 		return true;
 	}
 	
+	public void copiaDadesFirmaAFitxer() {
+		//Copiam les dades de la firma al fitxer principal
+		this.setFitxerContingut(this.getFirmaContingut());
+		this.setFitxerNom(this.getFirmaNom());
+		this.setFitxerContentType(this.getFirmaContentType());
+		//Anulam les dades de la firma
+		this.setFirmaContingut(null);
+		this.setFirmaNom(null);
+		this.setFirmaContentType(null);
+		//Actualitzam flags de firma per que es consideri com a firma ATTACHED
+		this.setAmbFirma(true);
+		this.setFirmaSeparada(false);
+	}
+	
 	@Override
 	public String toString() {
 		return "DocumentDto [id=" + id 

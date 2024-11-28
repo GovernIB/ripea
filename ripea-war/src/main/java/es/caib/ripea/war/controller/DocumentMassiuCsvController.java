@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.*;
@@ -34,20 +31,13 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuCsvController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuCsvController.session.seleccio";
 
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
-	@Autowired
-	private OrganGestorService organGestorService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private OrganGestorService organGestorService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String portafirmesGet(
@@ -120,9 +110,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 			Model model) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(
 					request,
@@ -132,19 +120,15 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		}
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url");
+		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url");
 		String enllacCsv = "";
 		
 		if (urlValidacio != null) {
 			for (Long documentId : seleccio) {
-				ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
-						entitatActual.getId(),
-						documentId);
-				enllacCsv += urlValidacio + arxiuDetall.getMetadadesAddicionals().get("csv") + "\n";
+				DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
+				enllacCsv += urlValidacio + "/view.xhtml?hash=" + documentDto.getNtiCsv();
 			}
-			MissatgesHelper.success(
-					request,
-					getMessage(request, "accio.massiva.csv.copiat.ok"));
+			MissatgesHelper.success(request, getMessage(request, "accio.massiva.csv.copiat.ok"));
 		} else {
 			return getModalControllerReturnValueError(
 					request,

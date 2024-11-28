@@ -8,7 +8,8 @@
 <c:if test="${contingut.document && contingut.documentTipus == 'IMPORTAT'}">
 	<span class="importat fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span>
 </c:if> 
-<c:if test="${contingut.node and not contingut.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span>
+<c:if test="${contingut.node and not contingut.valid}">
+	&nbsp;<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.error.valid"/>"></span>
 </c:if> 
 <c:if test="${contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'ADJUNT_FIRMAT')}">
 	<span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span>

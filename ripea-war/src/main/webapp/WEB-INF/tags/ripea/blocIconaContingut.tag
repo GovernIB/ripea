@@ -40,11 +40,22 @@
 					</c:when>	
 					<c:when test="${contingut.fitxerExtension=='zip'}">
 						<span class="fa fa-file-zip-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
-					</c:when>		
-<%-- 					<c:when test="${contingut.fitxerExtension=='odt'}"> --%>
-<%-- 						<span class="fa fa-file-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}" style="position: relative;left: 10px;"></span> --%>
-<%-- 						<span style="font-size: 18px;position: relative;right: 15px;">O</span> --%>
-<%-- 					</c:when>				 --%>
+					</c:when>
+					<c:when test="${contingut.fitxerExtension=='xsig' or contingut.fitxerExtension=='xml' or contingut.fitxerExtension=='json' or contingut.fitxerExtension=='html'}">
+						<span class="fa fa-file-code-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
+					</c:when>
+					<c:when test="${contingut.fitxerExtension=='jpeg' or contingut.fitxerExtension=='png' or contingut.fitxerExtension=='bmp' or contingut.fitxerExtension=='jpg'}">
+						<span class="fa fa-file-image-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
+					</c:when>
+					<c:when test="${contingut.fitxerExtension=='txt'}">
+						<span class="fa fa-file-text-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
+					</c:when>
+					<c:when test="${contingut.fitxerExtension=='mp3' or contingut.fitxerExtension=='wav'}">
+						<span class="fa fa-file-audio-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
+					</c:when>
+					<c:when test="${contingut.fitxerExtension=='mpeg' or contingut.fitxerExtension=='avi'}">
+						<span class="fa fa-file-video-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
+					</c:when>					
 					<c:otherwise>
 						<span class="fa fa-file-o ${iconaTamany}" title="<spring:message code="contingut.icona.document"/> ${contingut.fitxerExtensionUpperCase}"></span>
 					</c:otherwise>

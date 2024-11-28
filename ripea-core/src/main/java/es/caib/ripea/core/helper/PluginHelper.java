@@ -4459,7 +4459,13 @@ public class PluginHelper {
 			if (validationStatus.getStatus() == 1) {
 				return new SignatureInfoDto(true, false, null);
 			} else {
-				return new SignatureInfoDto(true, true, validationStatus.getErrorMsg());
+				String missatge = validationStatus.getErrorMsg();
+				if (missatge==null) {
+					missatge = "Error no especificado al validar la firma del fichero.";
+				} else if (missatge.indexOf("SignedDataNotProvided")>0) {
+					missatge = "SignedDataNotProvided: Se debe aportar el fichero original.";
+				}
+				return new SignatureInfoDto(true, true, missatge);
 			}
 		} catch (Exception e) {
 			Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
@@ -4501,15 +4507,6 @@ public class PluginHelper {
 		IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin();
 		
 		try {
-
-			//Casos en que han adjuntat document original i document firmat, pero el firmat ja conté el original (firmes attached)
-			if (documentContingut!=null && firmaContingut!=null && firmaContingut.length>documentContingut.length) {
-				//Han adjuntat un XML, i el Xsig del arxiu firmat ja conté tot el contingut del XML original mes la firma
-				if ("text/xml".equals(firmaContentType)) {
-					documentContingut = null;
-					firmaContentType = "application/octet-stream";
-				}
-			}
 			
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
 			if (firmaContingut != null) {

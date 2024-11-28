@@ -338,7 +338,7 @@ function setCheckboxTrue($checkbox) {
 								</c:when>
 								<c:otherwise>
 									<c:choose>
-										<c:when test="${metaDada.tipus == 'BOOLEA'}">
+										<c:when test="${metaDada.tipus == 'BOOLEA' && not empty dadaValor}">
 											<spring:message code="comu.${dadaValor}"/>
 										</c:when>
 										<c:otherwise>${dadaValor}</c:otherwise>

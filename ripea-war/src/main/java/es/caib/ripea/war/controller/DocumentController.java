@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -679,18 +678,12 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/{documentId}/urlValidacio", method = RequestMethod.GET)
 	@ResponseBody
-	public String getUrlValidacio(
-			HttpServletRequest request,
-			@PathVariable Long documentId) {
+	public String getUrlValidacio(HttpServletRequest request, @PathVariable Long documentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url");
-		
-		ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
-				entitatActual.getId(),
-				documentId);
-		
-		if (urlValidacio != null) {
-			return urlValidacio + arxiuDetall.getMetadadesAddicionals().get("csv");
+		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url");
+		DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
+		if (documentDto!=null && documentDto.getNtiCsv()!=null) {
+			return urlValidacio +"/view.xhtml?hash=" + documentDto.getNtiCsv();
 		}
 		return urlValidacio;
 	}

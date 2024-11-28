@@ -102,6 +102,16 @@ public class DocumentHelper {
 			MetaDocumentEntity metaDocument,
 			boolean returnDetail) {
 		
+		//Casos en que han adjuntat document original i document firmat, pero el firmat ja conté el original (firmes attached)
+		if (document.getFitxerContingut()!=null && 
+			document.getFirmaContingut()!=null && 
+			document.getFirmaContingut().length>document.getFitxerContingut().length) {
+			//Han adjuntat un XML, i el Xsig del arxiu firmat ja conté tot el contingut del XML original mes la firma
+			if (document.getFirmaNom().endsWith(".xsig") || document.getFirmaNom().endsWith(".csig")) {
+				document.copiaDadesFirmaAFitxer();
+			}
+		}
+		
 		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
@@ -1161,7 +1171,6 @@ public class DocumentHelper {
 		}
 		return documentsChosen;
 	}
-	
 
 	@SuppressWarnings("incomplete-switch")
 	public byte[] getContingutFromArxiuDocument(Document arxiuDocument) {
@@ -1178,6 +1187,7 @@ public class DocumentHelper {
 					switch(firma.getTipus()) {
 					case CADES_ATT:
 					case XADES_ENV:
+					case XADES_DET: //Tot i que el nom es detached, es troba en el mateix arxiu de firma. Només que en un node separat del XML original.
 					case PADES:
 					case ODT:
 					case OOXML:
@@ -1185,7 +1195,6 @@ public class DocumentHelper {
 						contingut = isArxiuCaib ? firma.getContingut() : document.getContingut();
 						break;
 					case CADES_DET:
-					case XADES_DET:
 						contingut = isArxiuCaib ? document.getContingut() : firma.getContingut();
 						break;
 					}
@@ -1194,6 +1203,7 @@ public class DocumentHelper {
 		}
 		return contingut;
 	}
+	
 	@SuppressWarnings("incomplete-switch")
 	public byte[] getFirmaDetachedFromArxiuDocument(Document arxiuDocument) {
 		byte[] firmaDetached = null;
@@ -1201,8 +1211,7 @@ public class DocumentHelper {
 			for (Firma firma: arxiuDocument.getFirmes()) {
 				if (firma.getTipus() != FirmaTipus.CSV) {
 					switch(firma.getTipus()) {
-					case CADES_DET:
-					case XADES_DET:
+					case CADES_DET: //És la unica firma realment detached (2 fitxers separats)
 						firmaDetached = firma.getContingut();
 						break;
 					}
