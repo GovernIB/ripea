@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
@@ -862,6 +865,62 @@ public class DocumentServiceImpl implements DocumentService {
 			}
 			
 			return documentHelper.getContingutOriginal(document);
+			
+		} catch (Exception e) {
+
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundException.class)) {
+				throw new ArxiuNotFoundDocumentException();
+			} else {
+				throw e;
+			}
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto descarregarFirmaSeparada(Long entitatId, Long id, Long tascaId) {
+		
+		logger.debug("Descarregant contingut original del document (entitatId=" + entitatId + ", id=" + id+")");
+		
+		try {
+			DocumentEntity documentEntity = null;
+			if (tascaId == null) {
+				documentEntity = documentHelper.comprovarDocumentDinsExpedientAccessible(
+						entitatId,
+						id,
+						true,
+						false);
+			} else {
+				documentEntity = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+						tascaId,
+						id);
+			}
+			
+			FitxerDto arxiu = new FitxerDto();
+			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(documentEntity, null, null, true);
+
+			if (documentArxiu != null) {
+				List<Firma> firmes = documentArxiu.getFirmes();
+				if (firmes != null && firmes.size() > 0) {
+					Iterator<Firma> it = firmes.iterator();
+					while (it.hasNext()) {
+						Firma firma = it.next();
+						if (!FirmaTipus.CADES_DET.equals(firma.getTipus())) {
+							it.remove();
+						}
+					}
+
+					Firma firma = firmes.get(0);
+
+					if (firma != null) {
+						arxiu.setNom(documentArxiu.getNom()+"_signature.csig");
+						arxiu.setContentType("application/octet-stream");
+						arxiu.setContingut(firma.getContingut());
+						arxiu.setTamany(firma.getContingut() != null ? Long.valueOf(firma.getContingut().length) : null);
+					}
+				}
+			}
+			return arxiu;
 			
 		} catch (Exception e) {
 

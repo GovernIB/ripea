@@ -960,37 +960,6 @@ public class ExpedientHelper {
 
 			docEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 
-//			if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
-//				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
-//			}
-			
-			//Distribució no ens envia correctament la informació de les firmes XAdES
-/*			if (registreAnnexEntity.getNom()!=null && registreAnnexEntity.getNom().endsWith(".xsig") && registreAnnexEntity.getUuid()!=null) {
-				try {
-					Document docArxiu = pluginHelper.arxiuDocumentConsultar(registreAnnexEntity.getUuid());
-					if (docArxiu.getContingut()!=null) {
-						List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
-								docArxiu.getNom(),
-								null,
-								docArxiu.getContingut().getContingut(),
-								docArxiu.getContingut().getTipusMime(),
-								true);
-						docEntity.setValidacioFirmaCorrecte(true);
-						docEntity.setValidacioFirmaErrorMsg(null);
-						
-						if (firmes!=null && firmes.size()>0) {
-							docEntity.setEstat(DocumentEstatEnumDto.FIRMAT);
-							docEntity.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-						} else {
-							docEntity.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-						}
-					}
-				} catch (Exception ex) {
-					docEntity.setValidacioFirmaCorrecte(false);
-					docEntity.setValidacioFirmaErrorMsg(ex.getMessage());
-				}
-			}
-*/
 			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
 				if (registreAnnexEntity.getFirmaTipus() != null) {
 					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
@@ -1054,11 +1023,9 @@ public class ExpedientHelper {
 		
 		if (exception == null) {
 			try {
-				// ###################### UPDATE DOCUMENT WITH INFO FROM ARXIU ###############
 				// save ntiIdentitficador generated in arxiu in db
 				Document documentDetalls = pluginHelper.arxiuDocumentConsultar(docEntity, null, null, true, false);
-				documentDetalls.getMetadades().getIdentificadorOrigen();
-				docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
+				pluginHelper.propagarMetadadesDocument(documentDetalls, docEntity);
 				documentRepository.save(docEntity);
 				
 				// comprovar si el justificant s'ha importat anteriorment
@@ -1251,11 +1218,14 @@ public class ExpedientHelper {
 				}
 			}
 		}
-		// save ntiIdentitficador generated in arxiu in db
-		documentDetalls.getMetadades().getIdentificadorOrigen();
-		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
+		
+		// save nti data generated in arxiu in db
+		pluginHelper.propagarMetadadesDocument(documentDetalls, docEntity);
+
 		documentRepository.save(docEntity);
+		
 		contingutLogHelper.logCreacio(docEntity, true, true);
+		
 		return docEntity;
 	}
 	

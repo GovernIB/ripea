@@ -793,6 +793,52 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 	
+	@RequestMapping(value = "/{pareId}/document/{documentId}/descarregarFirma", method = RequestMethod.GET)
+	public String descarregarFirma(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+		try {
+			FitxerDto fitxer = documentService.descarregarFirmaSeparada(
+					entitatActual.getId(),
+					documentId,
+					tascaId);
+			writeFileToResponse(fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
+			
+		} catch (Exception e) {
+			logger.error("Error al descarregar un document", e);
+			
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundDocumentException.class)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../",
+						"document.controller.descarregar.error.arxiuNoTrobat",
+						e);
+			} else {
+				
+				Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+				
+				if (root.getMessage() != null && root.getMessage().contains("timed out")) {
+					MissatgesHelper.error(
+							request, 
+							getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
+				} else {
+					MissatgesHelper.error(
+							request, 
+							getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
+				}
+				return "redirect:../../../../contingut/" + pareId;
+			}
+		}
+	}
+	
 	@RequestMapping(value = "/{pareId}/document/{documentId}/descarregar", method = RequestMethod.GET)
 	public String descarregar(
 			HttpServletRequest request,

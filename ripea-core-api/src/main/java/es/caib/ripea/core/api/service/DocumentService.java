@@ -209,18 +209,14 @@ public interface DocumentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto descarregar(
-			Long entitatId,
-			Long id,
-			String versio, 
-			Long tascaId) throws NotFoundException;
+	public FitxerDto descarregar(Long entitatId, Long id, String versio, Long tascaId) throws NotFoundException;
 	
 	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto descarregarContingutOriginal(
-			Long entitatId,
-			Long id,
-			Long tascaId) throws NotFoundException;
+	public FitxerDto descarregarContingutOriginal(Long entitatId, Long id, Long tascaId) throws NotFoundException;
 
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto descarregarFirmaSeparada(Long entitatId, Long id, Long tascaId);
+	
 	/**
 	 * Crea un nou document associat a una consulta a PINBAL.
 	 * 

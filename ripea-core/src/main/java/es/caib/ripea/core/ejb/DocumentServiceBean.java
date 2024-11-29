@@ -649,4 +649,13 @@ public class DocumentServiceBean implements DocumentService {
 				tascaId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto descarregarFirmaSeparada(
+			Long entitatId,
+			Long id,
+			Long tascaId) {
+		return delegate.descarregarFirmaSeparada(entitatId, id, tascaId);
+	}
+
 }

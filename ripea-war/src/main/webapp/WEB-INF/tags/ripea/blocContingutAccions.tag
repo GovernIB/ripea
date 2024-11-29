@@ -220,6 +220,10 @@
 				<c:if test="${contingut.gesDocOriginalId!=null}">
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarOriginal?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.original"/></a></li>
 				</c:if>
+				<%---- Descarregar firma per separat en cas de CAdES detached ----%>
+				<c:if test="${contingut.ntiTipoFirma=='TF04'}">
+				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarFirma?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar.firma"/></a></li>
+				</c:if>				
 				<%---- Visualitzar ----%>
 				<li class="${(contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" data-nom="${fn:escapeXml(contingut.nom)}" onclick="showViewer(event, ${contingut.id}, this.getAttribute('data-nom'), ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">

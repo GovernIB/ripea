@@ -107,9 +107,21 @@ public class DocumentHelper {
 			document.getFirmaContingut()!=null && 
 			document.getFirmaContingut().length>document.getFitxerContingut().length) {
 			//Han adjuntat un XML, i el Xsig del arxiu firmat ja conté tot el contingut del XML original mes la firma
-			if (document.getFirmaNom().endsWith(".xsig") || document.getFirmaNom().endsWith(".csig")) {
+			boolean isXsig = document.getFirmaNom().endsWith(".xsig");
+			boolean isCsig = document.getFirmaNom().endsWith(".csig");
+			if (isXsig || isCsig) {
 				document.copiaDadesFirmaAFitxer();
+				if (isXsig) {
+					//Los archivos con extensión .XSIG son archivos de firma digital en formato XAdES (XML Advanced Electronic Signatures). 
+					//El content-type correspondiente para estos archivos es generalmente application/xml
+					//https://fileinfobase.com/es/extension/xsighttps://amazingalgorithms.com/file-extensions/xsig/.
+					document.setFitxerContentType("application/xml");
+				}
 			}
+		} else if (document.getFitxerNom()!=null && document.getFitxerNom().endsWith(".xsig")) {
+			//Corregim el content type assignat per el MultipartFormData, de application/octet-stream --> application/xml
+			//Igualant així com ens arriben els arxius XSIG de distribució
+			document.setFitxerContentType("application/xml");
 		}
 		
 		DocumentDto dto =  new DocumentDto();
@@ -173,9 +185,7 @@ public class DocumentHelper {
 				document.getFitxerContentType(),
 				document.getFitxerContingut());
 
-		actualitzarFitxerDB(
-				entity,
-				fitxer);
+		actualitzarFitxerDB(entity, fitxer);
 		
 		if (document.isScanned()) {
 			contingutLogHelper.log(

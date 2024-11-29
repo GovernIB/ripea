@@ -548,8 +548,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.findOne(annexId);
 		FitxerDto arxiu = new FitxerDto();
-		Document document = null;
-		document = pluginHelper.arxiuDocumentConsultar(null, annex.getUuid(), null, true);
+		Document document = pluginHelper.arxiuDocumentConsultar(null, annex.getUuid(), null, true);
 
 		if (document != null) {
 			List<Firma> firmes = document.getFirmes();
