@@ -4,6 +4,7 @@
 package es.caib.ripea.core.api.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -43,6 +44,9 @@ public interface ImportacioService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<DocumentDto> consultaExpedientsAmbImportacio();
+	
+	@PreAuthorize("hasRole('tothom')")
+	public Map<String, String> consultaDocumentsWithExpedient();
 
 
 }

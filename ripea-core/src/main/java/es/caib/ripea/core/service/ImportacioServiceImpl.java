@@ -4,6 +4,7 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -79,6 +81,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
+	public Map<String, String> documentAlreadyHasExpedient = new HashMap<String, String>();
+	
 	@Transactional
 	@Override
 	public int importarDocuments(
@@ -116,6 +120,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		// IMPORTAR DETALLS DE CADA DOCUMENT I CREACIÓ DOCUMENT A L'EXPEDIENT
 		List<Document> documents = new ArrayList<Document>();
 		expedientsWithImportacio = new ArrayList<DocumentDto>();
+		documentAlreadyHasExpedient = new HashMap<String, String>();
 		
 		// ### CREA O RECUPERA CARPETA/EXPEDIENT DESTÍ
 		Map<String, Long> desti = carpetaHelper.crearEstructuraCarpetes(
@@ -153,6 +158,13 @@ public class ImportacioServiceImpl implements ImportacioService {
 					null, 
 					true, 
 					false);
+			DocumentMetadades metadadesDocument = contingutArxiu.getDocumentMetadades();
+			if (metadadesDocument != null) {
+				Map<String, Object> metadadesAddicionals = metadadesDocument.getMetadadesAddicionals();
+				if (metadadesAddicionals != null) {
+					documentAlreadyHasExpedient.put(documentArxiu.getNom(), (String) metadadesAddicionals.get("expedienteId"));
+				}
+			}
 			documents.add(documentArxiu);
 		}
 		
@@ -212,6 +224,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 	@Override
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return expedientsWithImportacio;
+	}
+	
+	@Override
+	public Map<String, String> consultaDocumentsWithExpedient() {
+		return documentAlreadyHasExpedient;
 	}
 	
 	private List<ContingutArxiu> cercarDocumentsArxiu(ImportacioDto params) {
