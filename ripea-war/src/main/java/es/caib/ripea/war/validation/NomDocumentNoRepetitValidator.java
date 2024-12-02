@@ -50,7 +50,7 @@ public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDoc
 			for (ContingutDto contingut: fills) {
 				if (contingut.isDocument()) {
 					if (contingut.getNom().equals(nom)) {
-						if (id == null || id != contingut.getId()) {
+						if (id == null || !id.equals(contingut.getId())) {
 							context.disableDefaultConstraintViolation();
 							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NomDocumentNoRepetit"))
 								.addNode("nom")

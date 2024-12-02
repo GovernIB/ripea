@@ -130,50 +130,46 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long documentId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) throws ClassNotFoundException, IOException {
+		
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
 		FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = null;
-		if (documentId != null) {
-			document = documentService.findById(
-					entitatActual.getId(),
-					documentId, 
-					tascaId);
-		}
 		DocumentCommand command = null;
+		
+		if (documentId != null) {
+			document = documentService.findById(entitatActual.getId(), documentId, tascaId);
+		}
+		
 		if (document != null) {
+			
 			command = DocumentCommand.asCommand(document);
+			//TODO: El pare de un document no s'assigna correctament a ContingutHelper.toContingutDto
+			//Al modificar un document, se li passava un ID del pare que no era l'expedient, sino un altre document...
+			command.setPareId(document.getExpedientId());
 			
 			if(document.getFitxerNom() != null) {
 				model.addAttribute("nomDocument", document.getFitxerNom());
 			}
+
 			model.addAttribute("documentEstat", document.getEstat());
 			
 			setTipusFirma(command, document);
 			
 			model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
-			omplirModelFormulari(
-					request,
-					command,
-					documentId,
-					model,
-					tascaId);
 			
+			omplirModelFormulari(request, command, documentId, model, tascaId);
+
 		} else {
 			command = new DocumentCommand();
 			LocalDateTime ara = new LocalDateTime();
 			command.setDataTime(ara);
 			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			omplirModelFormulari(
-					request,
-					command,
-					pareId,
-					model, 
-					tascaId);
+			command.setPareId(pareId);
+			omplirModelFormulari(request, command, pareId, model, tascaId);
 		}
 
 		command.setEntitatId(entitatActual.getId());
-		command.setPareId(pareId);
 		command.setOrigen(DocumentFisicOrigenEnum.DISC);
 		
 		model.addAttribute(command);
@@ -184,13 +180,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("tascaId", tascaId);
 		}
 
-		
 		return "contingutDocumentForm";
 	}
 
-
 	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
-		
 		if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 			command.setAmbFirma(false);
 			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
@@ -201,7 +194,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			command.setAmbFirma(true);
 			command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
 		}
-
 	}
 	
 	@RequestMapping(value = "/{pareId}/document/summarize", method = RequestMethod.POST)
@@ -318,10 +310,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
-		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
-				request,
-				command,
-				model);
+		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(request, command, model);
 		
 		if (command.isOnlyFileSubmit()) {
 			fillModelFileSubmit(command, model, request);
@@ -344,12 +333,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 				
 		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					command,
-					contingutId,
-					model, 
-					tascaId);
+			if (command.getId()!=null) {
+				EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+				DocumentDto document = documentService.findById(entitatActual.getId(), command.getId(), tascaId);
+				model.addAttribute("nomDocument", document.getFitxerNom());
+				command.setValidacioFirmaCorrecte(true);
+			}
+			omplirModelFormulari(request, command, contingutId, model, tascaId);			
 			return "contingutDocumentForm";
 		}
 		try {

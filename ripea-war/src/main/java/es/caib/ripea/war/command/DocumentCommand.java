@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.command;
 
 import java.io.IOException;
@@ -43,7 +40,7 @@ import es.caib.ripea.war.validation.ValidIfSeparada;
  */
 
 @ArxiuNoBuit(groups = {CreateDigital.class, CreateFirmaSeparada.class})
-@NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class})
+@NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class})
 //@DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
 @ValidIfSeparada(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 @ExpedientODocumentNom(groups = {CreateDigital.class, UpdateDigital.class})
