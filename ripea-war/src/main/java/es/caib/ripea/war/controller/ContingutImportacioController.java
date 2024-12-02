@@ -151,6 +151,8 @@ public class ContingutImportacioController extends BaseUserController {
 			return modalUrlTancar();
 		}
 		
+		addWarningDocumentWithExpedients(request);
+		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + contingutId,
@@ -240,6 +242,26 @@ public class ContingutImportacioController extends BaseUserController {
 					getMessage(
 						request, 
 						"expedient.peticio.controller.acceptat.duplicat.warning",
+						new Object[] {sb.toString()}));
+		}
+	}
+	
+	private void addWarningDocumentWithExpedients(HttpServletRequest request) {
+		Map<String, String> documentsWithExpedient = importacioService.consultaDocumentsWithExpedient();
+		if (documentsWithExpedient != null && !documentsWithExpedient.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("<ul>");
+			for (Map.Entry<String, String> documentExpedient: documentsWithExpedient.entrySet()) {
+				sb.append("<li>");
+				sb.append(documentExpedient.getKey() + "<br>&nbsp;&nbsp;&nbsp;<strong>Expedient: " + documentExpedient.getValue() + "</strong>");
+				sb.append("</li>");
+			}
+			sb.append("</ul>");
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+						request, 
+						"document.controller.importacio.exists.expedient",
 						new Object[] {sb.toString()}));
 		}
 	}

@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -43,6 +44,12 @@ public class ImportacioServiceBean implements ImportacioService {
 	@RolesAllowed("tothom")
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return delegate.consultaExpedientsAmbImportacio();
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Map<String, String> consultaDocumentsWithExpedient() {
+		return delegate.consultaDocumentsWithExpedient();
 	}
 
 	
