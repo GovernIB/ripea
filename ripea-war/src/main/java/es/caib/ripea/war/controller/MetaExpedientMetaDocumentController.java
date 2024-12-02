@@ -481,10 +481,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/metaDocument/flux/returnurl/", method = RequestMethod.GET)
 	public String transaccioEstat(HttpServletRequest request, Model model) {
-		model.addAttribute(
-				"FluxCreat",
-				getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
-		model.addAttribute("isEdicio", true);
+		model.addAttribute("FluxCreat", getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
+//		model.addAttribute("isEdicio", true);
 		return "portafirmesModalTancar";
 	}
 
