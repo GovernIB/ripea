@@ -395,7 +395,7 @@ public class ExpedientEntity extends NodeEntity {
 		Iterator<InteressatEntity> it = interessats.iterator();
 		while (it.hasNext()) {
 			InteressatEntity ie = it.next();
-			if (ie.equals(interessat))
+			if (ie.getDocumentNum()!=null && ie.getDocumentNum().equals(interessat.getDocumentNum()))
 				it.remove();
 		}
 	}

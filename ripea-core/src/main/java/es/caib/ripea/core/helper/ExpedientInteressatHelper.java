@@ -249,9 +249,7 @@ public class ExpedientInteressatHelper {
 		return expedient;
 	}
 	
-	
 	public InteressatDto update(
-//			Long entitatId,
 			Long expedientId,
 			Long interessatId,
 			InteressatDto interessatRepresentant,
@@ -260,13 +258,11 @@ public class ExpedientInteressatHelper {
 			boolean propagarArxiu) {
 		if (interessatId != null) {
 			logger.debug("Modificant un representant ("
-//					+ "entitatId=" + entitatId + ", "
 					+ "expedientId=" + expedientId + ", "
 					+ "interessatId=" + interessatId + ", "
 					+ "interessat=" + interessatRepresentant + ")");
 		} else {
 			logger.debug("Modificant un interessat ("
-//					+ "entitatId=" + entitatId + ", "
 					+ "expedientId=" + expedientId + ", "
 					+ "interessat=" + interessatRepresentant + ")");
 		}
@@ -412,38 +408,6 @@ public class ExpedientInteressatHelper {
 				interessat instanceof InteressatAdministracioEntity && InteressatTipusEnumDto.ADMINISTRACIO.equals(tipus);
 	}
 
-	public InteressatEntity update(
-			Long expedientId,
-			InteressatDto interessat,
-			PermissionEnumDto permission,
-			String rolActual) {
-
-		logger.debug("Modificant un interessat (expedientId=" + expedientId + ", interessat=" + interessat + ")");
-
-		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
-		InteressatEntity interessatEntity = interessatRepository.findOne(interessat.getId());
-
-//		InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
-//		deproxied.update(interessat);
-		interessatEntity.update(interessat);
-		interessatEntity.updateEsRepresentant(false);
-		interessatEntity = interessatRepository.save(interessatEntity);
-
-		// Registra al log la modificació de l'interessat
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				interessatEntity,
-				LogObjecteTipusEnumDto.INTERESSAT,
-				LogTipusEnumDto.MODIFICACIO,
-				null,
-				null,
-				false,
-				false);
-
-		return interessatEntity;
-	}
-
 	public InteressatEntity updateRepresentant(
 			Long expedientId,
 			Long interessatId,
@@ -503,11 +467,12 @@ public class ExpedientInteressatHelper {
 		if (usosRepresentant < 1) {
 			representant.getExpedient().deleteInteressat(representant);
 			interessatRepository.delete(representant.getId());
+			if (interessat.getExpedient().getArxiuUuid() != null) {
+				arxiuPropagarInteressats(interessat.getExpedient(), null);
+			}
 		}
 
 	}
-	
-	
 
 	public void delete(
 			Long entitatId,
@@ -543,6 +508,11 @@ public class ExpedientInteressatHelper {
 
 			interessatRepository.delete(interessat);
 			expedient.deleteInteressat(interessat);
+			
+			if (expedient.getArxiuUuid() != null) {
+				arxiuPropagarInteressats(expedient, null);
+			}
+			
 			// Registra al log la baixa de l'interessat
 			contingutLogHelper.log(
 					expedient,
@@ -566,8 +536,6 @@ public class ExpedientInteressatHelper {
 					"No s'ha trobat l'interessat a l'expedient (expedientId=" + expedientId + ")");
 		}
 	}
-	
-	
 
 	public void deleteRepresentant(
 			Long entitatId,
@@ -603,6 +571,11 @@ public class ExpedientInteressatHelper {
 
 				interessatRepository.delete(representant);
 				expedient.deleteInteressat(representant);
+				
+				if (expedient.getArxiuUuid() != null) {
+					arxiuPropagarInteressats(expedient, null);
+				}
+				
 				// Registra al log la baixa de l'interessat
 				contingutLogHelper.log(
 						expedient,
