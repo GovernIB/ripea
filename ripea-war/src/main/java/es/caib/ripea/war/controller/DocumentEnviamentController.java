@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
@@ -47,12 +44,15 @@ import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.war.command.DocumentNotificacionsCommand;
 import es.caib.ripea.war.command.DocumentPublicacioCommand;
+import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -78,7 +78,6 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			Model model) throws JsonProcessingException {
 		DocumentNotificacionsCommand command = new DocumentNotificacionsCommand();
-		
 		Integer numDies = 10;
 		command.setCaducitatDiesNaturals(numDies.toString());
 		command.setDataCaducitat(sumarDiesNaturals(numDies));
@@ -107,6 +106,22 @@ public class DocumentEnviamentController extends BaseUserController {
 		
 		if (command.getTipus() == DocumentNotificacioTipusEnumDto.COMUNICACIO && documentEnviamentService.checkIfDocumentIsZip(documentId) && documentEnviamentService.checkIfAnyInteressatIsAdministracio(command.getInteressatsIds())) {
 			bindingResult.reject("notificacio.controller.reject.comunicacio.zip.administracio");
+		}
+		
+		boolean nifsErrorPostal = false;
+		if (command.getEntregaPostal()!=null && command.getEntregaPostal().booleanValue()) {
+			for (NotificacioEnviamentCommand enviament: command.getEnviaments()) {
+				if (Utils.isEmpty(enviament.getTitular().getPais()) || Utils.isEmpty(enviament.getTitular().getProvincia()) ||
+					Utils.isEmpty(enviament.getTitular().getMunicipi()) || Utils.isEmpty(enviament.getTitular().getCodiPostal()) ||
+					Utils.isEmpty(enviament.getTitular().getAdresa())) {
+						nifsErrorPostal = true;
+						break;
+				}
+			}
+		}
+		
+		if (nifsErrorPostal) {
+			bindingResult.reject("notificacio.controller.reject.postal");
 		}
 		
 		if (bindingResult.hasErrors()) {
@@ -148,8 +163,10 @@ public class DocumentEnviamentController extends BaseUserController {
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			if (root instanceof NotibRepostaException) {
 				msg += getMessage(request, "contingut.enviament.errorReposta.notib") + " " + root.getMessage();
-			} else if (root instanceof ConnectException || root.getMessage().contains("timed out")){
+			} else if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 				msg += getMessage(request, "error.notib.connectTimedOut");
+			} else if (root instanceof NotFoundException) {
+				msg += getMessage(request, "error.notib.postalNotFound");
 			} else {
 				root.getMessage();
 				msg += root.getMessage();
@@ -194,7 +211,6 @@ public class DocumentEnviamentController extends BaseUserController {
 		return "notificacioInfo";
 	}
 	
-	
 	@RequestMapping(value = "/notificacio/actualitzarEstat/{identificador}")
 	public String notificacioActualitzarEstat(
 			HttpServletRequest request,
@@ -236,8 +252,6 @@ public class DocumentEnviamentController extends BaseUserController {
 					e);
 		}
 	}
-
-	
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/descarregarJustificantEnviamentNotib", method = RequestMethod.GET)
 	public String notificacioConsultarIDescarregarJustificant(

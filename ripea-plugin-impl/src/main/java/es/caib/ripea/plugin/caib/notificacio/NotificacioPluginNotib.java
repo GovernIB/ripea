@@ -448,8 +448,9 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			p = new es.caib.notib.client.domini.PersonaV2();
 			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
 				p.setDir3Codi(persona.getCodiDir3());
+			} else {
+				p.setNif(persona.getNif());
 			}
-			p.setNif(persona.getNif());
 			p.setNom(persona.getNom());
 			p.setLlinatge1(persona.getLlinatge1());
 			p.setLlinatge2(persona.getLlinatge2());

@@ -58,7 +58,8 @@ pageContext.setAttribute(
 .title-container {
 	text-align: center;
 	background-color: #696666;
-	width: 12%;
+	width: 20%;
+	padding-top: 5px;
 }
 </style>
 
@@ -114,7 +115,6 @@ $(document).ready(function() {
 		} else {
 			$("#alertNoNif").hide();
 		}
-		
 
 		mostrarNotificacions(notificacionsSeleccionades);
 		$('#entregaPostal').trigger('change');
@@ -124,14 +124,10 @@ $(document).ready(function() {
 
 		event.stopImmediatePropagation();
 		event.preventDefault();
-
+		
 		let continuar = true;
-
-
 		const notificacioSenseNifMsg = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm" />";
-
 		let enviamentsSenseNif = getNotificacionsSenseNif();
-
 
 		if (enviamentsSenseNif.length > 0) {
 			continuar = false;
@@ -234,7 +230,6 @@ function submitNotificacio(){
 	$('.modal-body .datatable-dades-carregant', parent.document).css('padding-top', '60px');
 	$('.modal-body .datatable-dades-carregant', parent.document).show();
 	$('.notificarSubmit', parent.document).attr('disabled', true);
-	
 }
 
 function getNotificacionsSenseNif() {
@@ -397,21 +392,37 @@ function setDestinatari(notificacio) {
 	}
 }
 
+//En cas de notificacio postal, es notificará a la adressa del representant si n'hi ha.
+//Tot i que al controlador. s'envien en el objecte de TITULAR: enviaments[n].titular.adresa
 function setEntregaPostal(notificacio) {
+	
 	var paisNom, provinciaNom, municipiNom;
 	var paisos = eval(${paisos});
 	var provincies = eval(${provincies});
 
+	var paisDeLaNotificacio = notificacio.titular.pais;
+	if (notificacio.destinatari!=null) { paisDeLaNotificacio = notificacio.destinatari.pais; }
+	
+	var provinciaDeLaNotificacio = notificacio.titular.provincia;
+	if (notificacio.destinatari!=null) { provinciaDeLaNotificacio = notificacio.destinatari.provincia; }
+
+	var municipiDeLaNotificacio = notificacio.titular.municipi;
+	if (notificacio.destinatari!=null) { municipiDeLaNotificacio = notificacio.destinatari.municipi; }
+
+	var cpDeLaNotificacio = notificacio.titular.codiPostal;
+	if (notificacio.destinatari!=null) { cpDeLaNotificacio = notificacio.destinatari.codiPostal; }
+	
+	var adresaDeLaNotificacio = notificacio.titular.adresa;
+	if (notificacio.destinatari!=null) { adresaDeLaNotificacio = notificacio.destinatari.adresa; }
+	
 	$(paisos).each(function(index, pais) {
-		//if selected
-		if (pais.codi == notificacio.titular.pais) {
+		if (pais.codi == paisDeLaNotificacio) {
     		paisNom = pais.nom
 		}
     });
 	
 	$(provincies).each(function(index, provincia) {
-		//if selected
-		if (provincia.codi == notificacio.titular.provincia) {
+		if (provincia.codi == provinciaDeLaNotificacio) {
     		provinciaNom = provincia.nom
     		$.ajax({
 				type: 'GET',
@@ -420,7 +431,7 @@ function setEntregaPostal(notificacio) {
 				success: function(municipis) {
 					if (municipis && municipis.length > 0) {
 						municipis.forEach(function(municipi) {
-							if(municipi.codi == notificacio.titular.municipi) {
+							if(municipi.codi == municipiDeLaNotificacio) {
 								municipiNom = municipi.nom
 							}
 						})
@@ -429,6 +440,12 @@ function setEntregaPostal(notificacio) {
 			});
 		}
     });
+
+	if(paisNom==null) {paisNom = '';}
+	if(provinciaNom==null) {provinciaNom = '';}
+	if(municipiNom==null) {municipiNom = '';}
+	if(cpDeLaNotificacio==null) {cpDeLaNotificacio = '';}
+	if(adresaDeLaNotificacio==null) {adresaDeLaNotificacio = '';}
 	
 	return '<!---------------------------------------  ENTREGA POSTAL  ---------------------------------------> \
 			<div class="entrega_postal hidden"> \
@@ -442,27 +459,27 @@ function setEntregaPostal(notificacio) {
 					<!----  PAIS ----> \
 					<div class="col-md-6"> \
 						<div class="form-group"> \
-							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.paisNom"><spring:message code="notificacio.form.entregapostal.camp.pais"/></label> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.pais"><spring:message code="notificacio.form.entregapostal.camp.pais"/></label> \
 							<div class="controls col-xs-8"> \
-								<input disabled="true" id="enviaments[#num_notificacio#].titular.paisNom" name="enviaments[#num_notificacio#].titular.paisNom" class="form-control " type="text" value="' + paisNom +'"> \
+								<input readonly="readonly" id="enviaments[#num_notificacio#].titular.pais" name="enviaments[#num_notificacio#].titular.pais" class="form-control " type="text" value="' + paisNom +'"> \
 							</div> \
 						</div> \
 					</div> \
 					<!----  PROVINCIA ----> \
 					<div class="col-md-6"> \
 						<div class="form-group"> \
-							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.provinciaNom"><spring:message code="notificacio.form.entregapostal.camp.provincia"/></label> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.provincia"><spring:message code="notificacio.form.entregapostal.camp.provincia"/></label> \
 							<div class="controls col-xs-8"> \
-								<input disabled="true" id="enviaments[#num_notificacio#].titular.provinciaNom" name="enviaments[#num_notificacio#].titular.provinciaNom" class="form-control " type="text" value="' + provinciaNom +'"> \
+								<input readonly="readonly" id="enviaments[#num_notificacio#].titular.provincia" name="enviaments[#num_notificacio#].titular.provincia" class="form-control " type="text" value="' + provinciaNom +'"> \
 							</div> \
 						</div> \
 					</div> \
 					<!---- MUNICIPI ----> \
 					<div class="col-md-6"> \
 						<div class="form-group"> \
-							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.municipiNom"><spring:message code="notificacio.form.entregapostal.camp.municipi"/></label> \
+							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.municipi"><spring:message code="notificacio.form.entregapostal.camp.municipi"/></label> \
 							<div class="controls col-xs-8"> \
-								<input disabled="true" id="enviaments[#num_notificacio#].titular.municipiNom" name="enviaments[#num_notificacio#].titular.municipiNom" class="form-control " type="text" value="' + municipiNom +'"> \
+								<input readonly="readonly" id="enviaments[#num_notificacio#].titular.municipi" name="enviaments[#num_notificacio#].titular.municipi" class="form-control " type="text" value="' + municipiNom +'"> \
 							</div> \
 						</div> \
 					</div> \
@@ -471,7 +488,7 @@ function setEntregaPostal(notificacio) {
 						<div class="form-group"> \
 							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.codiPostal"><spring:message code="notificacio.form.entregapostal.camp.codipostal"/></label> \
 							<div class="controls col-xs-8"> \
-								<input disabled="true" id="enviaments[#num_notificacio#].titular.codiPostal" name="enviaments[#num_notificacio#].titular.codiPostal" class="form-control " type="text" value="' + (notificacio.titular.codiPostal != null ? notificacio.titular.codiPostal : "") +'"> \
+								<input readonly="readonly" id="enviaments[#num_notificacio#].titular.codiPostal" name="enviaments[#num_notificacio#].titular.codiPostal" class="form-control " type="text" value="' + cpDeLaNotificacio +'"> \
 							</div> \
 						</div> \
 					</div> \
@@ -480,7 +497,7 @@ function setEntregaPostal(notificacio) {
 						<div class="form-group"> \
 							<label class="control-label col-xs-2 " for="enviaments[#num_notificacio#].titular.adresa"><spring:message code="notificacio.form.entregapostal.camp.adresa"/></label> \
 							<div class="controls col-xs-10"> \
-								<textarea disabled="true" id="enviaments[#num_notificacio#].titular.adresa" name="enviaments[#num_notificacio#].titular.adresa" class="form-control ">' + (notificacio.titular.adresa != null ? notificacio.titular.adresa : "") +'</textarea> \
+								<textarea readonly="readonly" id="enviaments[#num_notificacio#].titular.adresa" name="enviaments[#num_notificacio#].titular.adresa" class="form-control ">' + adresaDeLaNotificacio +'</textarea> \
 							</div> \
 						</div> \
 					</div> \

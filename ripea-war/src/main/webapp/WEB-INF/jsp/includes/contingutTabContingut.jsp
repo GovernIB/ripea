@@ -1581,7 +1581,8 @@
 					<div class="btn-group">
 						<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>" id="notificar-mult" class="btn-group">
 							<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true">
-								<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
+								<span class="fa fa-envelope-o"></span>
+								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 							</a>
 						</div>
 						<c:if test="${convertirDefinitiu}">

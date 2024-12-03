@@ -6,7 +6,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <html>
 <head>
-	
 	<c:choose>
 		<c:when test="${notificacio.tipus == 'NOTIFICACIO'}">
 			<title><spring:message code="notificacio.info.titol"/></title>
@@ -15,14 +14,10 @@
 			<title><spring:message code="notificacio.info.titol.comunicacio"/></title>
 		</c:otherwise>
 	</c:choose>
-	
-	
-	
 	<rip:modalHead/>
-	
 <style type="text/css">
 .panel>.table-bordered>tbody>tr:last-child>td{
-border: 1px solid #ddd;
+	border: 1px solid #ddd;
 }
 </style>	
 
@@ -39,17 +34,7 @@ $(document).ready(function(){
 				console.log("loaded...");   
 			}    
 		});
-		
-//		$.ajax({
-//			type: 'GET',
-//			url: "<c:url value="/document/${notificacio.document.id}/notificacio/${notificacio.id}/registre/info"/>",
-//			success: function(data) {
-//				$('.numRegistre').text(data.numRegistreFormatat); 
-//				$('.dataRegistre').text(data.dataRegistre); 
-//			}
-//		});
-//	});
-	
+	});
 });
 </script>
 </head>
@@ -115,7 +100,11 @@ $(document).ready(function(){
 						<tr>						
 							<td><strong><spring:message code="notificacio.info.camp.tipus"/></strong></td>
 							<td><spring:message code="notificacio.tipus.enum.${notificacio.tipus}"/></td>
-						</tr>				
+						</tr>
+						<tr>						
+							<td><strong><spring:message code="notificacio.form.camp.entregaPostal"/></strong></td>
+							<td><spring:message code="comu.${notificacio.entregaPostal}"/></td>
+						</tr>						
 						<c:if test="${notificacio.notificacioEstat!='PENDENT'}">
 							<tr><td colspan="2">
 								<a href="<rip:modalUrl value='/document/${notificacio.document.id}/notificacio/${notificacio.id}/descarregarJustificantEnviamentNotib'/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
