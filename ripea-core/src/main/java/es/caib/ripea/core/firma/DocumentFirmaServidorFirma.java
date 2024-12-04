@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.exception.FirmaServidorException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.utils.Utils;
@@ -68,15 +69,36 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
 				boolean esPerClonar = documentsClonar.contains(document.getId());
+				boolean eliminaFirmes = false;
 				
-				if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null || esPerClonar) {
-					//Guarda copia del arxiu original
-					preparaDocumentPerFirmaEnServidor(fitxer.getContingut(), document);
-					//Elimina firmes del PDF
-					fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
+				//Si s'ha detectat previament alguna firma incorrecte, l'eliminarem posteriorment (si es per clonar s'eliminaríen igualment)
+				if (!document.isValidacioFirmaCorrecte() || esPerClonar) {
+					eliminaFirmes = true;
+				} else {
+					logger.info("Detectant firmes per el document "+documentId);
+					//Si no s'ha detectat previament, ho comprovam ara. En cas de detectar firmes incorrectes, s'eliminarán
+					SignatureInfoDto firmes = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(fitxer.getContingut(), fitxer.getContentType());
+					if (firmes!=null && firmes.isSigned() && firmes.isError()) {
+						logger.info("Firmes erronies detectades per el document "+documentId);
+						eliminaFirmes = true;
+					}
 				}
 				
-				SignaturaResposta firma = null;
+				if (eliminaFirmes || document.getArxiuUuid() == null || esPerClonar) {
+					//Guarda copia del arxiu original
+					if (eliminaFirmes || esPerClonar) {
+						logger.info("Creant còpia per el document "+documentId);
+						preparaDocumentPerFirmaEnServidor(fitxer.getContingut(), document);
+					}
+					//Elimina firmes del PDF
+					fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
+					logger.info("Firmes eliminades per el document "+documentId);
+				}
+				
+				SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
+				logger.info("El document "+documentId +" s'ha firma en servidor.");
+				
+				/*SignaturaResposta firma = null;
 				try {
 					firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
 				} catch (Exception e) {
@@ -95,7 +117,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 					} else {
 						throw e;
 					}
-				}
+				}*/
 				
 				ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 				arxiuFirma.setFitxerNom(firma.getNom());
