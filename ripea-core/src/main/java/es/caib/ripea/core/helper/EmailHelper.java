@@ -81,27 +81,21 @@ public class EmailHelper {
 				"\tTipus: " + tipus + "\n" +
 				"\tNom: " + contingut.getNom() + "\n\n" + 
 				"\tPersona que ho ha agafat: " + usuariNou.getNom() + "(" + usuariNou.getCodi() + ").";
-		
-
 		sendOrSaveEmail(
 				usuariOriginal.getCodi(),
 				subject,
 				text,
 				EventTipusEnumDto.AGAFAT_ALTRE_USUARI);
-		
-		
 	}
 
 	public void contingutAlliberat(ExpedientEntity expedient, UsuariEntity usuariCreador, UsuariEntity usuariActual) {
 		String tipus = "expedient";
-		String subject = getPrefixRipea() + " Element de l'escriptori s'ha alliberat per un usuari: (" + tipus + ") " + expedient.getNom();
+		String subject = getPrefixRipea() + " Element de l'escriptori s'ha retornat per un usuari: (" + tipus + ") " + expedient.getNom();
 		String text = 
 				"Informació de l'element de l'escriptori:\n" +
 				"\tTipus: " + tipus + "\n" +
 				"\tNom: " + expedient.getNom() + "\n\n" + 
-				"\tPersona que ho ha alliberat: " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ").";
-		
-
+				"\tPersona que vos ho ha retornat: " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ").";
 		sendOrSaveEmail(
 				usuariCreador.getCodi(),
 				subject,

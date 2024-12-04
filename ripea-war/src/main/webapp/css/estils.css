@@ -561,3 +561,30 @@ dd.no_color {
 .ripea-submenu-list li a:hover {
     text-decoration: none;
 }
+
+.fa-stack-ripea {
+    position: relative;
+    display: inline-block;
+    height: 15px;
+    width: 12px;
+}
+
+.fa-stack-principal {
+	line-height: inherit;
+    position: absolute;
+    font-size: medium;
+    top: -3px;
+    left: -1px;
+    width: 100%;
+    text-align: center;
+}
+
+.fa-stack-secundari {
+	line-height: inherit;
+    position: absolute;
+    font-size: small;
+    width: 100%;
+    text-align: center;	
+    left: -9px;
+    top: 4px;
+}

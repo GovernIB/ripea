@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
 
 import java.io.ByteArrayOutputStream;
@@ -134,68 +131,37 @@ import es.caib.ripea.core.security.ExtendedPermission;
 @Service
 public class ExpedientServiceImpl implements ExpedientService {
 
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private ExpedientRepositoryCommnand expedientRepositoryCommnand;
-	@Autowired
-	private ExpedientComentariRepository expedientComentariRepository;
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private DadaRepository dadaRepository;
-	@Autowired
-	private AlertaRepository alertaRepository;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private CsvHelper csvHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private CarpetaHelper carpetaHelper;
-	@Autowired
-	private CarpetaRepository carpetaRepository;
-	@Autowired
-	private GrupRepository grupRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private EmailHelper emailHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
+	@Autowired private ExpedientComentariRepository expedientComentariRepository;
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private DadaRepository dadaRepository;
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private CsvHelper csvHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private CarpetaHelper carpetaHelper;
+	@Autowired private CarpetaRepository carpetaRepository;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private EmailHelper emailHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -218,7 +184,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			PrioritatEnumDto prioritat,
 			String prioritatMotiu) {
-		
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorRepository.findOne(organGestorId).getCodi());
 		logger.info(
@@ -927,6 +892,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null);
 		return expedientHelper.alliberar(expedient);
+	}
+	
+	@Transactional
+	@Override
+	public String retornaUser(Long entitatId, Long id) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug(
+				"Alliberant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
+						"usuari=" + auth.getName() + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				id,
+				true,
+				false,
+				false,
+				false,
+				false,
+				null);
+		return expedientHelper.retornar(expedient);
 	}
 
 	@Transactional

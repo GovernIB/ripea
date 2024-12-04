@@ -195,18 +195,16 @@ public interface ExpedientService {
 
 	/**
 	 * Allibera un expedient agafat per l'usuari actual.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany l'expedient.
-	 * @param id
-	 *            Atribut id de l'expedient.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * EL DEIXA SENSE ASSIGNAR.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public String alliberarUser(
-			Long entitatId,
-			Long id) throws NotFoundException;
+	public String alliberarUser(Long entitatId, Long id) throws NotFoundException;
+	
+	/**
+	 * Retorna un expedient agafat per l'usuari actual al creador del expedient.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public String retornaUser(Long entitatId, Long id) throws NotFoundException;
 
 	/**
 	 * Allibera un expedient agafat per qualsevol usuari.

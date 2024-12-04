@@ -1506,23 +1506,23 @@ public class ExpedientHelper {
 	}
 	
 	public String alliberar(ExpedientEntity expedient) {
+		expedient.updateAgafatPer(null);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, null, null, false, false);
+		return expedient.getNom();
+	}
+	
+	public String retornar(ExpedientEntity expedient) {
+		
 		UsuariEntity usuariActual = expedient.getAgafatPer();
 		UsuariEntity usuariCreador = expedient.getCreatedBy();
-
-		boolean agafatPerUsuariActual = false;
 		
-		if (usuariActual != null && usuariCreador != null && usuariActual.getCodi().equalsIgnoreCase(usuariCreador.getCodi())) {
-			agafatPerUsuariActual = true;
-			expedient.updateAgafatPer(null);
-		} else {
-			expedient.updateAgafatPer(usuariCreador);
-		}
+		expedient.updateAgafatPer(usuariCreador);
 		
-		if (usuariCreador != null && !agafatPerUsuariActual) {
+		if (usuariCreador!=null && !usuariActual.getCodi().equalsIgnoreCase(usuariCreador.getCodi())) {
 			// Avisa a l'usuari que li han retornat
 			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
 		}
-		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, usuariActual.getCodi(), null, false, false);
+		contingutLogHelper.log(expedient, LogTipusEnumDto.RETORNAR, usuariActual.getCodi(), null, false, false);
 		return expedient.getNom();
 	}
 	

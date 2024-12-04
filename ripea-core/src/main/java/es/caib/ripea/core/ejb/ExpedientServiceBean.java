@@ -504,4 +504,10 @@ public class ExpedientServiceBean implements ExpedientService {
 	public MoureDestiVistaEnumDto getVistaMoureUsuariActual() {
 		return delegate.getVistaMoureUsuariActual();
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public String retornaUser(Long entitatId, Long id) throws NotFoundException {
+		return delegate.retornaUser(entitatId, id);
+	}
 }

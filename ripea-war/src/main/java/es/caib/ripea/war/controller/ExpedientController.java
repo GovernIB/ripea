@@ -1083,24 +1083,44 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			String expNom = expedientService.alliberarUser(
-					entitatActual.getId(),
-					expedientId);
+			String expNom = expedientService.alliberarUser(entitatActual.getId(), expedientId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
 					"expedient.controller.alliberat.ok",
 					new Object[] { expNom });
-			
 		} catch (Exception e) {
 			logger.error("Error al alliberar un expedient", e);
-			
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
 					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
 					ExceptionHelper.getRootCauseOrItself(e).getMessage(),
 					e);
-
+		}
+	}
+	
+	@RequestMapping(value = "/{expedientId}/retornar", method = RequestMethod.GET)
+	public String retornar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam(required = false) String contingutId,
+			Model model) {
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			String expNom = expedientService.retornaUser(entitatActual.getId(), expedientId);
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
+					"expedient.controller.retornat.ok",
+					new Object[] { expNom });
+		} catch (Exception e) {
+			logger.error("Error al retornar un expedient", e);
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
+					ExceptionHelper.getRootCauseOrItself(e).getMessage(),
+					e);
 		}
 	}
 	
@@ -1110,20 +1130,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletResponse response,
 			Model model) throws IOException {
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		ExpedientFiltreCommand command = getFiltreCommand(request);
 		if (seleccio == null || seleccio.isEmpty() || command == null) {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.exportacio.seleccio.buida"),
-					null);
+			MissatgesHelper.error(request, getMessage(request, "expedient.controller.exportacio.seleccio.buida"), null);
 			return "redirect:/expedient";
 		} else {
-			
 			
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
@@ -1131,19 +1143,18 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			int errors = 0;
 			for (Long expedientId : seleccio) {
 				try {
-					expedientService.alliberarUser(
-							entitatActual.getId(),
-							expedientId);
+					expedientService.alliberarUser(entitatActual.getId(), expedientId);
 					ok++;
 				} catch (Exception e) {
 					errors++;
 					logger.error("Error al alliberar expedeint", e);
 					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
 					MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}), e);
-				
 				}
 			}
+			
 			deselect(request, null);
+			
 			if (errors > 0) {
 				MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple", new Object[]{errors}), null);
 			}
@@ -1152,9 +1163,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			
 			return "redirect:/expedient";
-			
-			
-
 		}
 	}
 	
@@ -1164,10 +1172,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-
 		ExpedientAssignarCommand command = new ExpedientAssignarCommand();
 		model.addAttribute(command);
-		
 		return "expedientAssignarForm";
 	}
 	

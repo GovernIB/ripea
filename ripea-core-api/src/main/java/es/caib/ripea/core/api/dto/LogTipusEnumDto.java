@@ -20,6 +20,7 @@ public enum LogTipusEnumDto {
 	DESACTIVACIO,
 	AGAFAR,
 	ALLIBERAR,
+	RETORNAR,
 	COPIA,
 	MOVIMENT,
 	
