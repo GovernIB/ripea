@@ -480,7 +480,6 @@ function removeCookie(cname) {
 		</div>
 		
 		<div class="row">
-			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 			<c:if test="${isDominisEnabled}">
 				<div class="col-md-3">
 				<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
@@ -516,48 +515,48 @@ function removeCookie(cname) {
 						inline="true" />
 				</div>			
 			</c:if>		
-				
-			<c:choose>
-			 	<c:when test="${rolActual!='tothom'}">
-					<div class="col-md-2">
-						<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-						<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-						<rip:inputSuggest 
-							name="agafatPer" 
-							urlConsultaInicial="${urlConsultaInicial}" 
-							urlConsultaLlistat="${urlConsultaLlistat}" 
-							placeholderKey="expedient.list.user.placeholder.agafatPer"
-							suggestValue="codi"
-							suggestText="codiAndNom"
-							inline="true"
-							required="true"/>
-					</div>
-			 	</c:when>
-			 	<c:otherwise>
-					<div class="col-md-2" style="width: auto;">
-						<button id="meusExpedientsBtn"	class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-						<button id="ambFirmaPendentBtn"	class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
-						<button id="expSeguitsBtn"		class="btn btn-default <c:if test="${expedientsSeguits}">active</c:if>" data-toggle="button"><span class="fa fa-user-plus"></span> <spring:message code="expedient.list.user.seguits"/></button>
-					</div>
-			 	</c:otherwise>
-			 </c:choose>
+
+		 	<c:if test="${rolActual!='tothom'}">
+				<div class="col-md-2">
+					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<rip:inputSuggest 
+						name="agafatPer" 
+						urlConsultaInicial="${urlConsultaInicial}" 
+						urlConsultaLlistat="${urlConsultaLlistat}" 
+						placeholderKey="expedient.list.user.placeholder.agafatPer"
+						suggestValue="codi"
+						suggestText="codiAndNom"
+						inline="true"
+						required="true"/>
+				</div>
+		 	</c:if>
 
 			<rip:inputHidden name="meusExpedients"/>
 			<rip:inputHidden name="ambFirmaPendent"/>
 			<rip:inputHidden name="expedientsSeguits"/>
 			
-			<div class="col-md-3 pull-right" style="${rolActual == 'tothom' ? 'width:auto;' : ''}">
-				<c:if test="${rolActual!='tothom'}">
-					<button id="ambFirmaPendentBtn" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+		</div>
+		
+		<!-- Botons de filtres rapids (esquerra) i botons de filtrar i netejar (dreta) -->
+		<div class="row">
+			<div class="col-md-10 pull-left" style="width: auto;">
+				<button id="meusExpedientsBtn"	class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
+				<button id="ambFirmaPendentBtn"	class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+				<c:if test="${rolActual=='tothom'}">
 					<button id="expSeguitsBtn"		class="btn btn-default <c:if test="${expedientsSeguits}">active</c:if>" data-toggle="button"><span class="fa fa-user-plus"></span> <spring:message code="expedient.list.user.seguits"/></button>
 				</c:if>
-				<div class="pull-right" style="padding-top: 15px;">
-					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
-				</div>
 			</div>
-			
+			<div class="col-md-2 pull-right">
+				<button type="submit" name="accio" value="filtrar" class="btn btn-primary pull-right">
+					<span class="fa fa-filter"></span>&nbsp;<spring:message code="comu.boto.filtrar"/>
+				</button>
+				<button type="submit" name="accio" value="netejar" class="btn btn-default pull-right" style="margin-right: 15px;">
+					<span class="fa fa-eraser"></span>&nbsp;<spring:message code="comu.boto.netejar"/>
+				</button>				
+			</div>			
 		</div>
+		
 	</form:form>
 	<div class="rmodal"></div>
 	<!-- TODO --> 

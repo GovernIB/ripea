@@ -1,19 +1,19 @@
-Revisar les propietats:
------------------------------------------------------
+Revisar el valor de les seguents propietats al fitxer de Jboss (haurien de existir previament, si no es el cas, crear-les amb el valor indicat):
+------------------------------------------------------------------------------------------------------------------------------------------------
 
 es.caib.ripea.segonpla.massives.periode.comprovacio
 
-Ha d'estar en un valor de 30000 (=30 segons) ja que ara la funció de executar tasques en segon pla no es solapará, i n'executará una cada cop,
-per no mesclar execucions massives de diferents tipus en la mateixa transacció i que no duri tant el procés.
+Integer, representa milisegons, ha d'estar en un valor de 30000 (=30 segons) ja que ara la funció de executar tasques en segon pla no es solapará,
+i n'executará una cada cop, per no mesclar execucions massives de diferents tipus en la mateixa transacció i que no duri tant el procés.
 
------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------
 
 es.caib.ripea.segonpla.arxiu.maxTempsExec
 
-En minuts, el maxim temps que pot tardar el procés en segon pla de generació de ZIP de documents d'expedients. (per defecte 10)
+Integer, representa minuts, el maxim temps que pot tardar el procés en segon pla de generació de ZIP de documents d'expedients. (per defecte 10)
 
------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------
 
 es.caib.ripea.segonpla.arxiu.maxMb
 
-En MegaBytes, el maxim tamany que pot ocupar el ZIP generat en segon pla per la acció de generar ZIP per documents d'expedients. (per defecte 100)
+Integer, representa MegaBytes, el maxim tamany que pot ocupar el ZIP generat en segon pla per la acció de generar ZIP per documents d'expedients. (per defecte 100)

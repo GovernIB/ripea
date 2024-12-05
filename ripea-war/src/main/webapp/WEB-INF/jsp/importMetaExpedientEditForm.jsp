@@ -5,6 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%pageContext.setAttribute("idioma", org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());%>
+<spring:message code="metaexpedient.form.camp.updateProc.confirm" var="confirmUpdateProcediment"/>
 
 <html>
 <head>
@@ -44,7 +45,7 @@
 		$(document).ready(function(){
 
 			$('.importarSubmitBtn').click(function(e) {
-				if ($('#id').val()=='' || confirm('<spring:message code="metaexpedient.form.camp.updateProc.confirm"/>')) {
+				if ($('#id').val()=='' || confirm("${confirmUpdateProcediment}")) {
 					$('#metaExpedientImportEditCommand').submit();
 				}
 			});				

@@ -68,7 +68,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 			try {
 				
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-				boolean esPerClonar = documentsClonar.contains(document.getId());
+				boolean esPerClonar = (documentsClonar!=null && documentsClonar.contains(document.getId()));
 				boolean eliminaFirmes = false;
 				
 				//Si s'ha detectat previament alguna firma incorrecte, l'eliminarem posteriorment (si es per clonar s'eliminaríen igualment)
@@ -171,6 +171,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				return arxiuFirma;
 
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new FirmaServidorException(document.getNom(), Utils.getRootMsg(e));
 			}
 			

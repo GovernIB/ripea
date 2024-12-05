@@ -1555,10 +1555,8 @@ public class DocumentHelper {
 				false);
 
         if (!document.getFitxerNom().endsWith(".pdf")) {
-//            return pluginHelper.conversioConvertirPdf(
-//                    getFitxerAssociat(document, null),
-//                    null);
-        	return null;
+        	FitxerDto fitxerNoPdf = getFitxerAssociat(document, null);
+            return pluginHelper.conversioConvertirPdf(fitxerNoPdf, null);
         } else {
             return getFitxerAssociat(document, null);
         }

@@ -633,8 +633,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			if (metaExpedientDto.getMetaDades() != null) {
 				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
 					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-						DominiEntity domini = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi()).get(0);
-						metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+						List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+						if (dominis != null && !dominis.isEmpty()) {
+							DominiEntity domini = dominis.get(0);
+							metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+						}
 					}
 				}
 			}

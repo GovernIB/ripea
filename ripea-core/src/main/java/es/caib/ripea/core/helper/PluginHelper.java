@@ -6850,21 +6850,17 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		DadesExternesPlugin plugin = dadesExternesPlugins.get(
-				entitatCodi);
-		// loadPluginProperties("DADES_EXT");
+		DadesExternesPlugin plugin = dadesExternesPlugins.get(entitatCodi);
 		if (plugin != null) {
 			return plugin;
 		}
 		String pluginClass = getPropertyPluginDadesExternes();
-		if (Strings.isNullOrEmpty(
-				pluginClass)) {
+		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT,
 					"No està configurada la classe per al plugin de dades externes");
 		}
 		try {
-			Class<?> clazz = Class.forName(
-					pluginClass);
+			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DadesExternesPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance(
@@ -6874,10 +6870,9 @@ public class PluginHelper {
 											"DADES_EXT",
 											"ORGANISMES"),
 									entitatCodi));
-			dadesExternesPlugins.put(
-					entitatCodi,
-					plugin);
+			dadesExternesPlugins.put(entitatCodi,plugin);
 			return plugin;
+
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT,
 					"Error al crear la instància del plugin de consulta de dades externes", ex);
@@ -7112,22 +7107,17 @@ public class PluginHelper {
 			}
 		}
 
-		// ENTITAT/GENERAL PLUGIN
-		plugin = firmaServidorPlugins.get(
-				entitatCodi);
-		// loadPluginProperties("FIRMA_SERVIDOR");
+		plugin = firmaServidorPlugins.get(entitatCodi);
 		if (plugin != null) {
 			return plugin;
 		}
 		String pluginClass = getPropertyPluginFirmaServidor();
-		if (Strings.isNullOrEmpty(
-				pluginClass)) {
+		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV,
 					"No està configurada la classe per al plugin de firma en servidor");
 		}
 		try {
-			Class<?> clazz = Class.forName(
-					pluginClass);
+			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (FirmaServidorPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance(
@@ -7135,9 +7125,7 @@ public class PluginHelper {
 							configHelper.getGroupPropertiesEntitatOrGeneral(
 									IntegracioHelper.INTCODI_FIRMASERV,
 									entitatCodi));
-			firmaServidorPlugins.put(
-					entitatCodi,
-					plugin);
+			firmaServidorPlugins.put(entitatCodi,plugin);
 			return plugin;
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV,
@@ -7151,33 +7139,28 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		ViaFirmaPlugin plugin = viaFirmaPlugins.get(
-				entitatCodi);
-		// loadPluginProperties("FIRMA_VIAFIRMA");
+		ViaFirmaPlugin plugin = viaFirmaPlugins.get(entitatCodi);
 		boolean viaFirmaPluginConfiguracioProvada = false;
 		if (plugin != null || viaFirmaPluginConfiguracioProvada) {
 			return plugin;
 		}
 		viaFirmaPluginConfiguracioProvada = true;
 		String pluginClass = getPropertyPluginViaFirma();
-		if (Strings.isNullOrEmpty(
-				pluginClass)) {
+		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA,
 					"La classe del plugin de via firma no està configurada");
 		}
 		try {
-			Class<?> clazz = Class.forName(
-					pluginClass);
+			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ViaFirmaPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance(
 							ConfigDto.prefix + ".",
 							configHelper.getAllPropertiesEntitatOrGeneral(
 									entitatCodi));
-			viaFirmaPlugins.put(
-					entitatCodi,
-					plugin);
+			viaFirmaPlugins.put(entitatCodi,plugin);
 			return plugin;
+
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA,
 					"Error al crear la instància del plugin de via firma", ex);
@@ -7190,21 +7173,17 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		ProcedimentPlugin procedimentPlugin = procedimentPlugins.get(
-				entitatCodi);
-		// loadPluginProperties("GESCONADM");
+		ProcedimentPlugin procedimentPlugin = procedimentPlugins.get(entitatCodi);
 		if (procedimentPlugin != null) {
 			return procedimentPlugin;
 		}
 		String pluginClass = getPropertyPluginProcediment();
-		if (Strings.isNullOrEmpty(
-				pluginClass)) {
+		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT,
 					"No està configurada la classe per al plugin de procediments");
 		}
 		try {
-			Class<?> clazz = Class.forName(
-					pluginClass);
+			Class<?> clazz = Class.forName(pluginClass);
 			procedimentPlugin = (ProcedimentPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance(
@@ -7212,10 +7191,9 @@ public class PluginHelper {
 							configHelper.getGroupPropertiesEntitatOrGeneral(
 									IntegracioHelper.INTCODI_PROCEDIMENT,
 									entitatCodi));
-			procedimentPlugins.put(
-					entitatCodi,
-					procedimentPlugin);
+			procedimentPlugins.put(entitatCodi,procedimentPlugin);
 			return procedimentPlugin;
+			
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT,
 					"Error al crear la instància del plugin de procediments", ex);

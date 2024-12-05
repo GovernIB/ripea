@@ -723,11 +723,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long documentId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-
-			FitxerDto convertit = documentService.getFitxerPDF(
-					entitatActual.getId(),
-					documentId);
-
+			FitxerDto convertit = documentService.getFitxerPDF(entitatActual.getId(), documentId);
 			response.setContentType("application/pdf");
 			response.setHeader("Content-Disposition", "inline; filename=\""+convertit.getNom()+"\"");
 			response.getOutputStream().write(convertit.getContingut());
