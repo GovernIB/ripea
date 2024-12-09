@@ -771,8 +771,8 @@ function removeCookie(cname) {
 											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 										{{else}}
 											<li><a href="expedient/{{:id}}/retornar"  data-toggle="ajax" title="<spring:message code="comu.boto.retornar.info"/>"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.retornar"/></a></li>
-											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax" title="<spring:message code="comu.boto.alliberar.info"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 										{{/if}}
+										<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax" title="<spring:message code="comu.boto.alliberar.info"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 									{{/if}}
 								{{/if}}	
 
@@ -852,7 +852,6 @@ function removeCookie(cname) {
 				<th data-col-name="expedientAgafatPerUsuariActual" data-visible="false"></th>
 				<th data-col-name="potTancar" data-visible="false"></th>
 				<th data-col-name="conteDocuments" data-visible="false"></th>	
-				
 			</tr>
 		</thead>
 	</table>

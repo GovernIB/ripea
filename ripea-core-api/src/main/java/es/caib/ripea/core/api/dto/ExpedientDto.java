@@ -1,22 +1,11 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-
-
-/**
- * Informació d'un expedient.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter
 @Setter
 public class ExpedientDto extends NodeDto {

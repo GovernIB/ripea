@@ -113,11 +113,23 @@
 			</c:if>
 		</c:if>
 		<%---- Agafar/Alliberar ... ----%>
-		<c:if test="${contingut.expedient && expedientAgafatPerUsuariActual}">
-			<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
-		</c:if>
-		<c:if test="${contingut.expedient && not expedientAgafatPerUsuariActual}">
-			<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+		<c:if test="${contingut.expedient}">
+			<c:if test="${not contingut.agafat}">
+				<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+			</c:if>
+			<c:if test="${contingut.agafat}">
+				<c:if test="${not expedientAgafatPerUsuariActual}">
+					<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+				</c:if>
+				<c:if test="${expedientAgafatPerUsuariActual}">
+					<li><a href="<c:url value="/expedient/${contingut.id}/retornar"/>" title="<spring:message code="comu.boto.retornar.info"/>">
+						<span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.retornar"/></a>
+					</li>
+				</c:if>
+				<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>" title="<spring:message code="comu.boto.alliberar.info"/>">
+					<span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a>
+				</li>
+			</c:if>
 		</c:if>
 		<c:if test="${(potModificar) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">

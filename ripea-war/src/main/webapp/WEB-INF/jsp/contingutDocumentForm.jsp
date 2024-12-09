@@ -169,13 +169,15 @@ $(document).ready(function() {
 	}
 
     const submitValidation = (e) => {
-        $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
-        $('#onlyFileSubmit').val(true);
-        $('#loading').show();
-        $('#arxiuInput').hide();
-        $('#inputAmbFirma').removeClass('hidden');
-        $("#documentCommand").prop("target", 'target_iframe');
-        $('#documentCommand').submit();
+    	<c:if test="${isDeteccioFirmaAutomaticaActiva}">
+	        $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+	        $('#onlyFileSubmit').val(true);
+	        $('#loading').show();
+	        $('#arxiuInput').hide();
+	        $('#inputAmbFirma').removeClass('hidden');
+	        $("#documentCommand").prop("target", 'target_iframe');
+	        $('#documentCommand').submit();
+		</c:if>
     }
 
 	// METADOCUMENT CHANGE
@@ -349,7 +351,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	
 	//Iniciar procés digitalització després de triar perfil
 	$(document).on('click', '.scan-profile', function(){
 		$('.scan-profile').hide();
@@ -375,7 +376,6 @@ $(document).ready(function() {
 					webutilModalAdjustHeight();
 					$body = $("body");
 					$body.addClass("loading");
-
 				}
 			},
 			error: function(err) {
@@ -414,9 +414,7 @@ $(document).ready(function() {
 
 	//if validation errors on scanning
 	if ('${documentCommand.origen}' === 'ESCANER') {
-
 		leaveOnlyCopiaDelDocumentEnPapel();
-		
 	}
 	
 	$('#escaneigTab').on('click', function(){
@@ -455,10 +453,7 @@ $(document).ready(function() {
 		}
 		$('#ntiEstadoElaboracion').val(''); 
 		$('#ntiEstadoElaboracion').trigger('change');
-
-		
 		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
-
 	});
 	
 	$('#ntiEstadoElaboracion').on('change', function() {
@@ -470,8 +465,11 @@ $(document).ready(function() {
 			$('#ntiIdDocumentoOrigenDiv').hide();
 		}
 	});
+	
 	$('#ntiEstadoElaboracion').trigger('change');
+	
 	<c:if test="${isDeteccioFirmaAutomaticaActiva}">
+	
 		$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
 			 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
 		     $('#loading').show();
@@ -494,10 +492,10 @@ $(document).ready(function() {
 		$("#inputDoc .fileinput").on("change.bs.fileinput", submitValidation);
 		
 		$('#target_iframe').load(function() {
+			
 		    $("#documentCommand").prop("target", '');
 		    $('#unselect').val(false);
 			$('#onlyFileSubmit').val(false);
-	
 			
 		    var isSignedAttached = $('iframe[name=target_iframe]').contents().find('#isSignedAttached').val();
 		    var isSignedAttachedTrue = (isSignedAttached === 'true');
@@ -533,7 +531,6 @@ $(document).ready(function() {
 			    $('#tipusFirma1').click();
 			}
 	
-	
 		    var isError = $('iframe[name=target_iframe]').contents().find('#isError').val();
 		    var isErrorTrue = (isError === 'true');
 			if (isErrorTrue) {
@@ -543,20 +540,16 @@ $(document).ready(function() {
 			} else {
 				$('#inputDoc').find('div.alert.alert-danger').remove();
 			}
-		   
 	
 		    $('#loading').hide();
 		    $('#arxiuInput').show();
-		    
-			//if (!isErrorTrue) {
-				$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
-			//}
-	
+			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
 		});
 		
 		if(${not empty nomDocument}){
 			$('#inputAmbFirma').removeClass('hidden');
 		}
+
 	    if($('#ambFirma').prop('checked') && $('#tipusFirma1').is(":checked")){
 	        $('#ambFirma').attr('onclick', 'return false;');
 	        $('#tipusFirma1').parent().show();

@@ -587,7 +587,7 @@ function removeCookie(cname) {
 	  				<spring:message code="contingut.info.agafat.per"/>:
 	  				${expedient.agafatPer.codiAndNom}&nbsp;
 	  				<c:if test="${expedientAgafatPerUsuariActual}">
-	  					<a href="<c:url value="/expedient/${expedient.id}/alliberar?contingutId=${contingut.id}"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
+	  					<a href="<c:url value="/expedient/${expedient.id}/retornar?contingutId=${contingut.id}"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.retornar"/>"><span class="fa fa-unlock"></span></a>
 	  				</c:if>
 	  			</li>
 	  		</ul>
