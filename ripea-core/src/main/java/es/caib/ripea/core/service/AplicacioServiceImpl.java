@@ -222,8 +222,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 			PortafirmesCarrecDto carrec = pluginHelper.portafirmesRecuperarCarrec(codi);
 			
 			if (carrec != null) {
+				String nom = carrec.getCarrecName();
+			    if (carrec.getUsuariPersonaNom() != null) {
+			        nom += " - " + carrec.getUsuariPersonaNom();
+			    }
 				usuariDto.setCodi(carrec.getCarrecId());
-				usuariDto.setNom(carrec.getCarrecName() + " - " + carrec.getUsuariPersonaNom());
+				usuariDto.setNom(nom);
 				usuariDto.setNif(carrec.getUsuariPersonaNif());
 			} else {
 				throw new NotFoundException(
