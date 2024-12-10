@@ -2584,22 +2584,24 @@ public class ContingutServiceImpl implements ContingutService {
 						false,
 						false);
 			} else {
-				dada = DadaEntity.getBuilder(
-						metaDada,
-						node,
-						valorsSenseNull.get(i),
-						i).build();
-				dadaRepository.save(dada);
-				contingutLogHelper.log(
-						node,
-						LogTipusEnumDto.MODIFICACIO,
-						dada,
-						LogObjecteTipusEnumDto.DADA,
-						LogTipusEnumDto.CREACIO,
-						dadaCodi,
-						dada.getValorComString(),
-						false,
-						false);
+				if (valorsSenseNull.get(i)!=null && !"".equals(valorsSenseNull.get(i))) {
+					dada = DadaEntity.getBuilder(
+							metaDada,
+							node,
+							valorsSenseNull.get(i),
+							i).build();
+					dadaRepository.save(dada);
+					contingutLogHelper.log(
+							node,
+							LogTipusEnumDto.MODIFICACIO,
+							dada,
+							LogObjecteTipusEnumDto.DADA,
+							LogTipusEnumDto.CREACIO,
+							dadaCodi,
+							dada.getValorComString(),
+							false,
+							false);
+				}
 			}
 			
 			if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {

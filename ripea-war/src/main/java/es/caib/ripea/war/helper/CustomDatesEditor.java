@@ -46,16 +46,19 @@ public class CustomDatesEditor extends PropertyEditorSupport {
 	@Override
 	public String getAsText() {
 		
-		List<Date> listE = Arrays.asList((Date[]) getValue());
+		Object valor = getValue();
 		String valuesString = "";
 		
-		for (int i = 0; i < listE.size(); i++) {
-			if (i != 0) {
-				valuesString += ",";
+		if (valor!=null) {
+			List<Date> listE = Arrays.asList((Date[]) getValue());
+			
+			for (int i = 0; i < listE.size(); i++) {
+				if (i != 0) {
+					valuesString += ",";
+				}
+				valuesString += this.dateFormat.format(listE.get(i));
 			}
-			valuesString += this.dateFormat.format(listE.get(i));
 		}
-
 		return valuesString;
 	}
 

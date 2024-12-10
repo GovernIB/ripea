@@ -140,7 +140,7 @@ $(document).ready(function() {
 		data-toggle="datatable" 
 		data-url="<c:url value="/massiu/tancament/datatable"/>"
 		class="table table-bordered table-striped" 
-		data-default-order="6" 
+		data-default-order="7" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"

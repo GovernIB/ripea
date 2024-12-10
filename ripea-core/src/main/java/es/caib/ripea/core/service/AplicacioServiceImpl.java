@@ -14,6 +14,7 @@ import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -223,7 +224,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			
 			if (carrec != null) {
 				String nom = carrec.getCarrecName();
-			    if (carrec.getUsuariPersonaNom() != null) {
+			    if (!Utils.isBlank(carrec.getUsuariPersonaNom())) {
 			        nom += " - " + carrec.getUsuariPersonaNom();
 			    }
 				usuariDto.setCodi(carrec.getCarrecId());

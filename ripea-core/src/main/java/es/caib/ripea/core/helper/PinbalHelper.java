@@ -720,7 +720,7 @@ public class PinbalHelper {
 		EntitatEntity entitat = metaDocument.getEntitat();
 		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
 		String codiSia = getPinbalDefaultSia();
-
+		
 		String identificadorSolicitante;
 		String nombreSolicitante;
 		OrganGestorEntity organGestorCIF = null;
@@ -734,6 +734,8 @@ public class PinbalHelper {
 				}
 			}
 		}
+		
+		//Per proves en local cap a SE, utilitzar: S0711001H - Govern de les Illes Balears
 		if (organGestorCIF != null) {
 			identificadorSolicitante = organGestorCIF.getCif();
 			nombreSolicitante = organGestorCIF.getNom();
@@ -945,15 +947,12 @@ public class PinbalHelper {
 	}
 
 	private ClientSvddgpciws02 getClientSvddgpciws02() {
-		ClientSvddgpciws02 clientSvddgpciws02 = new ClientSvddgpciws02(
-				getPinbalBaseUrl(),
-				getPinbalUser(),
-				getPinbalPassword(),
-				getPinbalBasicAuth(),
-				null,
-				null);
-		if (log.isDebugEnabled())
-			clientSvddgpciws02.enableLogginFilter();
+		String  baseURL = getPinbalBaseUrl();
+		String  baseUsr = getPinbalUser();
+		String  basePas = getPinbalPassword();
+		boolean baseAut = getPinbalBasicAuth();
+		ClientSvddgpciws02 clientSvddgpciws02 = new ClientSvddgpciws02(baseURL, baseUsr, basePas, baseAut, null, null);
+		if (log.isDebugEnabled()) clientSvddgpciws02.enableLogginFilter();
 		return clientSvddgpciws02;
 	}
 

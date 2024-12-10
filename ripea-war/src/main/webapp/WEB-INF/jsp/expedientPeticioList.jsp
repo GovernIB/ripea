@@ -167,7 +167,7 @@ table.dataTable td {
 								<li><a href="<c:url value="/expedientPeticio/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								{{if estatView == 'PENDENT' && !pendentEnviarDistribucio}}
 									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
-									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
+									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="false"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
 									<c:if test="${isRolActualAdmin}">
 										<li><a href="<c:url value="/expedientPeticio/canviarProcediment/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 									</c:if>
