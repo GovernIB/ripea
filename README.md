@@ -1,4 +1,4 @@
-# ![Logo](https://github.com/GovernIB/maven/raw/binaris/ripea/projectinfo_Attachments/icon.jpg) RIPEA
+# ![Logo](https://github.com/GovernIB/ripea/blob/ripea-wip/ripea-war/src/main/webapp/img/logo.png)
 
 **Descripció**
 
@@ -26,5 +26,20 @@ Actualment encara es troba en procés però es pot dir que les principals caract
 
 **Captures de pantalla**
 
-![Plana Principal](https://github.com/GovernIB/maven/raw/binaris/ripea/projectinfo_Attachments/screenshots/Captura_1.png)<br/>
+![Plana Principal](https://github.com/GovernIB/ripea/blob/ripea-wip/doc/screenshots/PlanaPrincipal.JPG)<br/>
 Plana Principal
+
+**Documentació**
+
+* [Manual d'usuari](https://github.com/GovernIB/ripea/blob/ripea-dev/doc/pdf/01_ripea_manual_usuari.pdf)
+* [Manual d'administrador](https://github.com/GovernIB/ripea/blob/ripea-dev/doc/pdf/02_ripea_manual_administradors.pdf)
+
+**Versió actual**
+
+* [Versió actual: 0.9.111](https://github.com/GovernIB/ripea/releases/tag/v0.9.111)
+
+**Branques**
+
+* [Desenvolupament local: ripea-wip](https://github.com/GovernIB/ripea/tree/ripea-wip)
+* [Versió estable develop: ripea-dev](https://github.com/GovernIB/ripea/tree/ripea-dev)
+* [Releases PRO: ripea-0.9](https://github.com/GovernIB/ripea/tree/ripea-0.9)
