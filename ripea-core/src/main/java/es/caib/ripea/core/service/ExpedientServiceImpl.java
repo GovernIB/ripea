@@ -885,11 +885,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"usuari=" + auth.getName() + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				id,
-				true,
-				false,
-				false,
-				false,
-				false,
+				false, //Agafat per usuari actual
+				false, //Permis read
+				true,  //Permis write
+				false, //Permis create
+				false, //Permis delete
 				null);
 		return expedientHelper.alliberar(expedient);
 	}

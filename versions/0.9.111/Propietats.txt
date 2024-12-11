@@ -1,9 +1,9 @@
-Revisar el valor de les seguents propietats al fitxer de Jboss (haurien de existir previament, si no es el cas, crear-les amb el valor indicat):
+Revisar el valor de les seguents propietats (Configuració > Propietats configurables > Configuració de les tasques periòdiques):
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
 es.caib.ripea.segonpla.massives.periode.comprovacio
 
-Integer, representa milisegons, ha d'estar en un valor de 30000 (=30 segons) ja que ara la funció de executar tasques en segon pla no es solapará,
+Integer, representa milisegons, ha d'estar en un valor de 30000 (=30 segons) ja que ara, la funció de executar tasques en segon pla no es solapará,
 i n'executará una cada cop, per no mesclar execucions massives de diferents tipus en la mateixa transacció i que no duri tant el procés.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
