@@ -259,7 +259,7 @@
 							<div class="dropdown">
 								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+									<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="false" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 									{{if estat != 'CANCELLADA' && estat != 'REBUTJADA'}}
 										<li class="divider"></li>
 									{{/if}}

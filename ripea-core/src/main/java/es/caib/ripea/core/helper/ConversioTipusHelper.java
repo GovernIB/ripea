@@ -196,23 +196,27 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient(), false, false));
 						target.setMetaExpedientTasca(convertir(source.getMetaTasca(), MetaExpedientTascaDto.class));
-						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));
+						
+						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
+						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));
+						target.setObservadors(convertirList(source.getObservadors(), UsuariDto.class));
+						target.setDelegat(convertir(source.getDelegat(), UsuariDto.class));
+						
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
 						target.setTitol(source.getTitol());
 						target.setObservacions(source.getObservacions());
 						target.setEstat(source.getEstat());
 						target.setMotiuRebuig(source.getMotiuRebuig());
-						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setDataLimit(source.getDataLimit());
 						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source));
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
 						target.setDuracio(source.getDuracio());
 						target.setPrioritat(source.getPrioritat()!=null?source.getPrioritat():PrioritatEnumDto.B_NORMAL);
-						target.setDelegat(convertir(source.getDelegat(), UsuariDto.class));
 						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+						
 						boolean usuariActualReposnable = false;
 						for (UsuariEntity usuari : source.getResponsables()) {
 							if (usuari.getCodi().equals(auth.getName())) {
@@ -220,6 +224,7 @@ public class ConversioTipusHelper {
 							}
 						}
 						target.setUsuariActualResponsable(usuariActualReposnable);
+						
 						boolean usuariActualObservador = false;
 						for (UsuariEntity usuari : source.getObservadors()) {
 							if (usuari.getCodi().equals(auth.getName())) {
@@ -227,6 +232,7 @@ public class ConversioTipusHelper {
 							}
 						}
 						target.setUsuariActualObservador(usuariActualObservador);
+						
 						target.setUsuariActualDelegat(source.getDelegat() != null && source.getDelegat().getCodi().equals(auth.getName()));
 						return target;
 					}

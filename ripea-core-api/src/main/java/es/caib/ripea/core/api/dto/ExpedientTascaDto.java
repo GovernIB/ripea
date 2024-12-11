@@ -19,15 +19,12 @@ public class ExpedientTascaDto {
 	private Long id;
 	private ExpedientDto expedient;
 	private MetaExpedientTascaDto metaExpedientTasca;
-	private UsuariDto responsableActual; 
-	private List<UsuariDto> responsables;
 	private Date dataInici;
 	private Date dataFi;
 	private TascaEstatEnumDto estat;
 	private List<String> responsablesCodi;
 	private Long metaExpedientTascaId;
 	private String motiuRebuig;
-	private UsuariDto createdBy;
 	private Date dataLimit;
 	@SuppressWarnings("unused")
 	private String dataLimitString;
@@ -36,17 +33,24 @@ public class ExpedientTascaDto {
 	private boolean dataLimitExpirada;
 	private String comentari;
 	private long numComentaris;
+	
 	private boolean usuariActualResponsable;
+	private boolean usuariActualObservador;
+	private boolean usuariActualDelegat;
+	
 	private String titol;
 	private String observacions;
 	private Integer duracio;
 	@SuppressWarnings("unused")
 	private String duracioFormat;
 	private PrioritatEnumDto prioritat;
-	private List<String> observadorsCodi;
+	
+	private UsuariDto createdBy;
+	private UsuariDto responsableActual; 
+	private List<UsuariDto> responsables;
 	private List<UsuariDto> observadors;
-	private boolean usuariActualObservador;
-	private boolean usuariActualDelegat;
+	private List<UsuariDto> seguidors;
+	private List<String> observadorsCodi;
 	private UsuariDto delegat;
 	
 	public String getDataLimitString() {
