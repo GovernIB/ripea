@@ -8,6 +8,7 @@ import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidacioFirmaException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.CarpetaService;
@@ -279,26 +280,33 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "contingutDocumentForm";
 		} catch (Exception ex) {
 			logger.error("Error al crear un document", ex);
-			Throwable throwable = Utils.getRootCauseOrItself(ex);
-			MissatgesHelper.error(
-					request,
-					throwable.getMessage(),
-					throwable);
-			if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ValidacioFirmaException.class)) {
+				try {
+					MissatgesHelper.error(request, getMessage(request, ex.getMessage().split(":")[1].trim()));
+				} catch (Exception ex2) {
+					MissatgesHelper.error(request, getMessage(request, ex.getMessage()));
+				}
 				return modalUrlTancar();
 			} else {
-				omplirModelFormulari(
+				Throwable throwable = Utils.getRootCauseOrItself(ex);
+				MissatgesHelper.error(
 						request,
-						command,
-						pareId,
-						model, 
-						tascaId);
-				return "contingutDocumentForm";
+						throwable.getMessage(),
+						throwable);
+				if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+					return modalUrlTancar();
+				} else {
+					omplirModelFormulari(
+							request,
+							command,
+							pareId,
+							model, 
+							tascaId);
+					return "contingutDocumentForm";
+				}
 			}
 		} 
 	}
-	
-
 	
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
 	public String postUpdate(
@@ -358,7 +366,34 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					model, 
 					tascaId);
 			return "contingutDocumentForm";
-		}
+		} catch (Exception ex) {
+			logger.error("Error al crear un document", ex);
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ValidacioFirmaException.class)) {
+				try {
+					MissatgesHelper.error(request, getMessage(request, ex.getMessage().split(":")[1].trim()));
+				} catch (Exception ex2) {
+					MissatgesHelper.error(request, getMessage(request, ex.getMessage()));
+				}
+				return modalUrlTancar();
+			} else {
+				Throwable throwable = Utils.getRootCauseOrItself(ex);
+				MissatgesHelper.error(
+						request,
+						throwable.getMessage(),
+						throwable);
+				if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+					return modalUrlTancar();
+				} else {
+					omplirModelFormulari(
+							request,
+							command,
+							contingutId,
+							model, 
+							tascaId);
+					return "contingutDocumentForm";
+				}
+			}
+		} 
 	}
 
 	@RequestMapping(value = "/{pareId}/document/modificarTipus/{documentId}", method = RequestMethod.GET)
@@ -1621,7 +1656,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			DocumentCommand command,
 			boolean comprovarMetaExpedient,
 			String rolActual, 
-			Long tascaId) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+			Long tascaId) throws NotFoundException, ValidationException, ValidacioFirmaException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 

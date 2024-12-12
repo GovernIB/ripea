@@ -154,7 +154,7 @@
 		data-toggle="datatable" 
 		data-url="<c:url value="/usuariTasca/datatable"/>" 
 		data-save-state="true"
-		data-default-order="7" 
+		data-default-order="8" 
 		data-default-dir="desc" 
 		class="table table-striped table-bordered" 
 		data-rowhref-template="#rowhrefTemplate"
