@@ -366,8 +366,8 @@ div.dropdown-menu.loading .rmodal_carrecs {
 
 		$("#pinbalActiu").on('change', function() {
 			if ($(this).prop("checked")) {
-				$('#pinbalServei').removeAttr('disabled');
-				$('#pinbalServei').parent().parent().css('display', 'block');
+				$("[id='pinbalServei.id']").removeAttr('disabled');
+				$("[id='pinbalServei.id']").parent().parent().css('display', 'block');
 				$('#pinbalFinalitat').removeAttr('disabled');
 				$('#pinbalFinalitat').parent().parent().css('display', 'block');
 				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'block');
@@ -375,8 +375,8 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				$('#avisPermis').show();
 					
 			} else {
-				$('#pinbalServei').attr('disabled', 'disabled');
-				$('#pinbalServei').parent().parent().css('display', 'none');
+				$("[id='pinbalServei.id']").attr('disabled', 'disabled');
+				$("[id='pinbalServei.id']").parent().parent().css('display', 'none');
 				$('#pinbalFinalitat').attr('disabled', 'disabled');
 				$('#pinbalFinalitat').parent().parent().css('display', 'none');
 				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'none');
@@ -561,19 +561,18 @@ function removeLoading() {
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
 				<div id="avisPermis"><div id="contingut-missatges"><div class="alert alert-warning"><spring:message code='metadocument.form.camp.pinbal.avis.permis'/></div></div></div>
-				
 				<rip:inputSelect 
-					name="pinbalServei" 
+					name="pinbalServei.id"
 					textKey="metadocument.form.camp.pinbal.servei" 
 					required="true" 
-					optionItems="${pinbalServeiEnumOptions}" 
-					optionValueAttribute="value" 
-					optionTextKeyAttribute="text" 
+					optionItems="${pinbalServeiEnumOptions}"
+					optionValueAttribute="id" 
+					optionTextAttribute="nomAmbActiu"
 					disabled="${bloquejarCamps}" 
 					optionMinimumResultsForSearch="0"/>
 				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" maxlength="256" disabled="${bloquejarCamps}" required="true"/>
 				<rip:inputCheckbox name="pinbalUtilitzarCifOrgan" textKey="metadocument.form.camp.pinbal.utilitzar.cif.organ" disabled="${bloquejarCamps}"/>
-				
+				<form:hidden path="pinbalServei.actiu"/>
 			</div>
 		</div>
 		<div id="modal-botons">

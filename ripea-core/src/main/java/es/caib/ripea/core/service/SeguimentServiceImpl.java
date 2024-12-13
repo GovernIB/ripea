@@ -1,5 +1,20 @@
 package es.caib.ripea.core.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
@@ -44,66 +59,33 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.repository.command.ExpedientRepositoryCommnand;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class SeguimentServiceImpl implements SeguimentService {
 
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private MetaExpedientTascaRepository metaExpedientTascaRepository;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Resource
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	@Resource
-	private ConsultaPinbalRepository consultaPinbalRepository;
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-    @Autowired
-    private ExpedientRepositoryCommnand expedientRepositoryCommnand;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Resource  private ExpedientPeticioHelper expedientPeticioHelper;
+	@Resource  private ConsultaPinbalRepository consultaPinbalRepository;
+	@Resource  private UsuariRepository usuariRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+    @Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -150,9 +132,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 		
 		return paginacioHelper.toPaginaDto(docsEnvs, SeguimentDto.class);
-		
 	}
-	
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -162,11 +142,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 			PaginacioParamsDto paginacioParams) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
-		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientNumeroTitol", new String[] { "exp.nom" });
 		ordenacioMap.put("procedimentCodiNom", new String[] { "metaexp.nom" });
-		
 		
 		Page<ConsultaPinbalEntity> cons = consultaPinbalRepository.findAmbFiltrePaginat(
 				entitat,
@@ -174,7 +152,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 				filtre.getExpedientId(),
 				filtre.getMetaExpedientId() == null,
 				filtre.getMetaExpedientId(),
-				filtre.getServei() == null, 
+				!Utils.hasValue(filtre.getServei()), 
 				filtre.getServei(),
 				filtre.getCreatedByCodi() == null,
 				filtre.getCreatedByCodi() != null ? usuariRepository.findOne(filtre.getCreatedByCodi()) : null,
@@ -186,12 +164,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 				filtre.getEstat(), 
 				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 		
-		return paginacioHelper.toPaginaDto(cons, SeguimentConsultaPinbalDto.class);
-		
+		return paginacioHelper.toPaginaDto(cons, SeguimentConsultaPinbalDto.class);		
 	}
-	
-	
-	
 	
 	@Override
 	@Transactional(readOnly = true)

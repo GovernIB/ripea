@@ -16,9 +16,9 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PinbalServeiDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
 import es.caib.ripea.war.validation.ResponsableNotEmpty;
@@ -73,7 +73,7 @@ public class MetaDocumentCommand {
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private String plantillaNom;
 	private boolean pinbalActiu;
-	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	private PinbalServeiDto pinbalServei;
 	private String pinbalFinalitat;
 	private boolean pinbalUtilitzarCifOrgan;
 	
@@ -100,9 +100,13 @@ public class MetaDocumentCommand {
 		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE)
 			command.setPortafirmesFluxId(null);
 		
-		return ConversioTipusHelper.convertir(
-				command,
-				MetaDocumentDto.class);
+		MetaDocumentDto resultat = ConversioTipusHelper.convertir(command, MetaDocumentDto.class);
+//		if (command.getPinbalServei()!=null && command.getPinbalServei()>0) {
+//			PinbalServeiDto psDto = new PinbalServeiDto();
+//			psDto.setId(command.getPinbalServei());
+//			resultat.setPinbalServei(psDto);
+//		}
+		return resultat;
 	}
 
 	public boolean isComu() {
@@ -214,7 +218,7 @@ public class MetaDocumentCommand {
 		this.pinbalActiu = pinbalActiu;
 	}
 
-	public void setPinbalServei(MetaDocumentPinbalServeiEnumDto pinbalServei) {
+	public void setPinbalServei(PinbalServeiDto pinbalServei) {
 		this.pinbalServei = pinbalServei;
 	}
 
@@ -225,7 +229,4 @@ public class MetaDocumentCommand {
 	public void setPinbalUtilitzarCifOrgan(boolean pinbalUtilitzarCifOrgan) {
 		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
 	}
-
-
-	
 }

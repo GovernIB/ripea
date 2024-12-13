@@ -361,7 +361,13 @@ function removeLoading() {
 			</c:if>
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu"/>
-				<rip:inputSelect name="pinbalServei" textKey="metadocument.form.camp.pinbal.servei" required="true" optionItems="${pinbalServeiEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<rip:inputSelect 
+					name="pinbalServei"
+					textKey="metadocument.form.camp.pinbal.servei"
+					required="true"
+					optionItems="${pinbalServeiEnumOptions}"
+					optionValueAttribute="codi"
+					optionTextAttribute="nom"/>
 			</div>
 		</div>
 		<div id="modal-botons">

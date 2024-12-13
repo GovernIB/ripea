@@ -29,14 +29,10 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/pinbalServei")
 public class PinbalServeiController extends BaseUserController {
 	
-	@Autowired
-	private PinbalServeiService pinbalServeiService;
-
-	
+	@Autowired private PinbalServeiService pinbalServeiService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(Model model, HttpServletRequest request) {
-
 		return "pinbalServeiList";
 	}
 
@@ -48,7 +44,6 @@ public class PinbalServeiController extends BaseUserController {
 				pinbalServeiService.findPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
 	}
 
-
 	@RequestMapping(value = "/{serveiId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -56,16 +51,9 @@ public class PinbalServeiController extends BaseUserController {
 			Model model) {
 		PinbalServeiDto dto = pinbalServeiService.findById(serveiId);
 		PinbalServeiCommand command = PinbalServeiCommand.asCommand(dto);
-
-		command.setNom(getMessage(request,"pinbal.servei." + dto.getCodi()));
-
 		model.addAttribute(command);
-
 		return "pinbalServeiForm";
 	}
-
-	
-
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid PinbalServeiCommand command, BindingResult bindingResult) throws NotFoundException, IOException {
@@ -74,14 +62,11 @@ public class PinbalServeiController extends BaseUserController {
 			return "pinbalServeiForm";
 		}
 		
-		pinbalServeiService.update(PinbalServeiCommand.asDto(command));
+		PinbalServeiDto resultat = pinbalServeiService.update(PinbalServeiCommand.asDto(command));
 
 		return getModalControllerReturnValueSuccess(request,
 				"redirect:pinbalServei",
 				"pinbalServei.controller.modificat.ok",
-				new Object[] { command.getCodi() });
+				new Object[] { resultat.getCodi() });
 	}
-	
-
-
 }

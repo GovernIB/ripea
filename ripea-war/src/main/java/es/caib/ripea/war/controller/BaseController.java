@@ -39,6 +39,7 @@ public class BaseController implements MessageSourceAware {
 	@Autowired private ContingutService contingutService;
 	@Autowired private DadesExternesService dadesExternesService;
 	@Autowired private AplicacioService aplicacioService;
+	@Autowired private PinbalServeiService pinbalServeiService;
 
 	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
@@ -433,6 +434,14 @@ public class BaseController implements MessageSourceAware {
 
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
+	}
+	
+	public void loadServeisPinbal(Model model, boolean nomesActius) {
+		if (nomesActius) {
+			model.addAttribute("pinbalServeiEnumOptions", pinbalServeiService.findActius());
+		} else {
+			model.addAttribute("pinbalServeiEnumOptions", pinbalServeiService.findAll());
+		}
 	}
 
 	@InitBinder

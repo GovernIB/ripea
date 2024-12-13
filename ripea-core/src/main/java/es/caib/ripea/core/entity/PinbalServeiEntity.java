@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
 
 import java.util.ArrayList;
@@ -9,13 +6,10 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.AllArgsConstructor;
@@ -23,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Entity
 @Table(name = "ipa_pinbal_servei")
@@ -34,10 +27,10 @@ import lombok.Setter;
 @Builder
 public class PinbalServeiEntity extends RipeaAuditable<Long> {
 
-	@Enumerated(EnumType.STRING)
 	@Column(name = "codi", length = 64, nullable = false)
-	private MetaDocumentPinbalServeiEnumDto codi;
-	
+	private String codi;
+	@Column(name = "nom", length = 256)
+	private String nom;
 	@Column(name = "doc_permes_dni", nullable = false)
 	private boolean pinbalServeiDocPermesDni;
 	@Column(name = "doc_permes_nif", nullable = false)
@@ -48,7 +41,8 @@ public class PinbalServeiEntity extends RipeaAuditable<Long> {
 	private boolean pinbalServeiDocPermesNie;
 	@Column(name = "doc_permes_pas", nullable = false)
 	private boolean pinbalServeiDocPermesPas;
-
+	@Column(name = "actiu", nullable = false)
+	private boolean actiu;
 
 	public List<PinbalServeiDocPermesEnumDto> getPinbalServeiDocsPermesos() {
 		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesosEnumDto = new ArrayList<>();
@@ -90,6 +84,5 @@ public class PinbalServeiEntity extends RipeaAuditable<Long> {
 		
 	}
 	
-	
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7356212275586432419L;
 }

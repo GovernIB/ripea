@@ -6,7 +6,6 @@
 <html>
 <head>
 	<title><spring:message code="seguiment.pinbal.list.titol"/></title>
-	
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -23,12 +22,8 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
-	
-	
 </head>
 <body>
-
 	<c:url value="seguimentPinbal/filtrar" var="formAction"/>
 	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="seguimentConsultaFiltreCommand">
 		<div class="row">
@@ -59,7 +54,9 @@
 			<div class="col-md-4">
 				<rip:inputSelect 
 					name="servei" 
-					optionEnum="MetaDocumentPinbalServeiEnumDto"
+					optionItems="${pinbalServeiEnumOptions}"
+					optionValueAttribute="codi" 
+					optionTextAttribute="codiNom"
 					emptyOption="true" 
 					placeholderKey="seguiment.list.filtre.camp.serveiSCSP"
 					inline="true" 
@@ -101,7 +98,6 @@
 		</div>
 	</form:form>
 
-
 	<table 
 		id="permisos" 
 		data-toggle="datatable" 
@@ -123,7 +119,7 @@
 					</script>
 				</th>
 				<th data-col-name="procedimentCodiNom"><spring:message code="seguiment.list.columna.procediment"/></th>
-				<th data-col-name="servei" data-renderer="enum(MetaDocumentPinbalServeiEnumDto)"><spring:message code="seguiment.list.columna.serveiSCSP"/></th>
+				<th data-col-name="servei"><spring:message code="seguiment.list.columna.serveiSCSP"/></th>
 				<th data-col-name="createdBy"><spring:message code="seguiment.list.columna.iniciatPer"/></th>
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="seguiment.list.columna.data"/></th>
 				<th data-col-name="estat" width="6%" data-template="#cellEstat"><spring:message code="seguiment.list.columna.estat"/>

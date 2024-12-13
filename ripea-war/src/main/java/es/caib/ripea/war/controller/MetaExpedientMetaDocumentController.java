@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -192,10 +191,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@Valid MetaDocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
@@ -203,9 +201,15 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			bindingResult.rejectValue("portafirmesDocumentTipus", "NotNull");
 		}
 		
-		if (command.isPinbalActiu() && (command.getPinbalFinalitat() == null || command.getPinbalFinalitat().isEmpty())) {
-			bindingResult.rejectValue("pinbalFinalitat", "NotNull");
+		if (command.isPinbalActiu()) {
+			if (command.getPinbalFinalitat() == null || command.getPinbalFinalitat().isEmpty()) {
+				bindingResult.rejectValue("pinbalFinalitat", "NotNull");
+			}
+			if (command.getPinbalServei() == null) {
+				bindingResult.rejectValue("pinbalServei", "NotNull");
+			}
 		}
+		
 		if (bindingResult.hasErrors()) {
 			
 			if (bindingResult.getAllErrors().size() == 1 && bindingResult.getAllErrors().get(0).getDefaultMessage() != null && bindingResult.getAllErrors().get(0).getDefaultMessage().contains("Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile'")) {
@@ -220,7 +224,18 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				emplenarModelForm(request, model);
 				return "metaExpedientMetaDocumentForm";
 			}
+		} else {
+			//Si no hi ha errors de validacio, preparam els possibles missatges a mostrar despres de guardar (sigui create o update)
+			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
+			if (command.getPinbalServei()!=null && !command.getPinbalServei().isActiu()) {
+				MissatgesHelper.warning(request, getMessage(request, "metaexpedient.serveiPinbal.inactiu"));
+			}
 		}
+		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
 		if (command.getId() != null) {
 			metaDocumentService.update(
@@ -233,9 +248,6 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					rolActual, 
 					organActual != null ? organActual.getId() : null);
 			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
-				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
-			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
@@ -249,10 +261,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					command.getPlantilla().getOriginalFilename(),
 					command.getPlantilla().getContentType(),
 					command.getPlantilla().getBytes(), rolActual, organActual != null ? organActual.getId() : null);
-			
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
-				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
-			}
+
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
@@ -308,9 +317,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 						root.getMessage(),
 						root);
 			}
-
 		}
-		
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/move/{posicio}", method = RequestMethod.GET)
@@ -326,15 +333,12 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				entitatActual.getId(),
 				metaDocumentId,
 				posicio);
-		
 
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:metaExpedientMetaDocument",
 				null);
 	}
-	
-	
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaExpedientId, @PathVariable Long metaDocumentId) {
@@ -537,12 +541,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				"isFirmaBiometrica",
 				Boolean.parseBoolean(
 						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
-		model.addAttribute(
-				"pinbalServeiEnumOptions",
-				EnumHelper.getOptionsForEnum(MetaDocumentPinbalServeiEnumDto.class, "meta.document.pinbal.servei.enum."));
 
+		loadServeisPinbal(model, false);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientMetaDocumentController.class);
-
 }

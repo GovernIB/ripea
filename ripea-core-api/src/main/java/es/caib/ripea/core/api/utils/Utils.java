@@ -65,6 +65,28 @@ public class Utils {
         return CollectionUtils.isEmpty(coll);
      }
 
+    /**
+     * <p>Comprova si un string té un valor valid.</p>
+     *
+     * <pre>
+     * Utils.hasValue(null)      = false
+     * Utils.hasValue("")        = false
+     * Utils.hasValue(" ")       = false
+     * Utils.hasValue("bob")     = true
+     * Utils.hasValue("  bob  ") = true
+     * </pre>
+     *
+     * @param st  the String to check, may be null
+     * @return <code>true</code> if the String is not empty and not null
+     */
+    public static boolean hasValue(String str) {
+    	if (str==null || "".equals(str.trim())) {
+    		return false;
+    	} else {
+    		return true;
+    	}
+    }
+    
     public static boolean isNotEmpty(final Collection<?> coll) {
        return CollectionUtils.isNotEmpty(coll);
     }

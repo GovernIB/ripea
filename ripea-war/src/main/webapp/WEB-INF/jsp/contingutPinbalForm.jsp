@@ -19,110 +19,123 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<rip:modalHead/>
-<script>
-const metaDocumentServeiScsp = [];
-const metaDocumentFinalitat = [];
-<c:forEach var="metaDocument" items="${metaDocuments}">
-metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei}";
-metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
-</c:forEach>
-$(document).ready(function() {
-
-	$('#metaDocumentId').on('change', function() {
-
-		let serveiNom = metaDocumentServeiScsp[$(this).val()];
-		showHideDatosEspecificos('#div' + serveiNom);
-
-		if ('${interessatCreat}'=='')
-			$('#finalitat').val(metaDocumentFinalitat[$(this).val()]);
+	<script>
+		const metaDocumentServeiScsp = [];
+		const metaDocumentFinalitat = [];
+		const metaDocumentActiu = [];
+		<c:forEach var="metaDocument" items="${metaDocuments}">
+		metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei.codi}";
+		metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
+		metaDocumentActiu[${metaDocument.id}] = "${metaDocument.pinbalServei.actiu}";
+		</c:forEach>
+		$(document).ready(function() {
 		
-		const metaDocumentId = $(this).val();
-		$.get("<c:url value="/contingut"/>" + "/${pinbalConsultaCommand.pareId}/pinbal/titulars/" + metaDocumentId)
-			.done(function(data) {
-				$('#interessatId option[value!=""]').remove();
-				let primerInt = '';
-				for (var i = 0; i < data.length; i++) {
-					$('#interessatId').append('<option value="' + data[i].id + '">' + data[i].identificador + '</option>');
-					if (primerInt=='') {
-						primerInt = data[i].id;
-					}
-				}
-				if ('${interessatCreat}'=='') {
-					$('#interessatId').val(primerInt).trigger('change');
+			$('#metaDocumentId').on('change', function() {
+
+				let serveiActiu = metaDocumentActiu[$(this).val()];
+		
+				if(serveiActiu!="true") {
+					$("#alertaServeiInactiu").show();
 				} else {
-					$('#interessatId').val('${interessatCreat}').trigger('change');
+					$("#alertaServeiInactiu").hide();
 				}
-			})
-			.fail(function() {
-				alert("<spring:message code="error.jquery.ajax"/>");
+				
+				let serveiNom = metaDocumentServeiScsp[$(this).val()];
+				showHideDatosEspecificos('#div' + serveiNom);
+		
+				if ('${interessatCreat}'=='')
+					$('#finalitat').val(metaDocumentFinalitat[$(this).val()]);
+				
+				const metaDocumentId = $(this).val();
+				$.get("<c:url value="/contingut"/>" + "/${pinbalConsultaCommand.pareId}/pinbal/titulars/" + metaDocumentId)
+					.done(function(data) {
+						$('#interessatId option[value!=""]').remove();
+						let primerInt = '';
+						for (var i = 0; i < data.length; i++) {
+							$('#interessatId').append('<option value="' + data[i].id + '">' + data[i].identificador + '</option>');
+							if (primerInt=='') {
+								primerInt = data[i].id;
+							}
+						}
+						if ('${interessatCreat}'=='') {
+							$('#interessatId').val(primerInt).trigger('change');
+						} else {
+							$('#interessatId').val('${interessatCreat}').trigger('change');
+						}
+					})
+					.fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});
 			});
-
-	});
-
-	$('#metaDocumentId').trigger('change');
-
-	function showHideDatosEspecificos(divToShow) {
-
-		if ($(divToShow).length) {
-			$('#bloc-datos-especificos').show();
-
-			var divsToShow = [];
-			var divsToHide = [];
-
-			$('#datos-especificos').children().each(function () {
-				let divId = "#" + this.id;
-				if (divToShow == divId) {
-					divsToShow.push(divId);
+		
+			$('#metaDocumentId').trigger('change');
+		
+			function showHideDatosEspecificos(divToShow) {
+		
+				if ($(divToShow).length) {
+					$('#bloc-datos-especificos').show();
+		
+					var divsToShow = [];
+					var divsToHide = [];
+		
+					$('#datos-especificos').children().each(function () {
+						let divId = "#" + this.id;
+						if (divToShow == divId) {
+							divsToShow.push(divId);
+						} else {
+							divsToHide.push(divId);
+						}
+					});
+		
+					divsToShow.forEach(function(divToShow) {
+						$(divToShow).find(":input").prop("disabled", false);
+						$(divToShow).show();
+					});
+		
+					divsToHide.forEach(function(divToHide) {
+						$(divToHide).find(":input").prop("disabled", true);
+						$(divToHide).hide();
+					});
+					
 				} else {
-					divsToHide.push(divId);
+					$('#bloc-datos-especificos').hide();
+					$('#bloc-datos-especificos').find(":input").prop("disabled", true);
 				}
-
+			}
+		
+			var urlNewInt = '<rip:modalUrl value="/expedient/${pinbalConsultaCommand.pareId}/interessat/new"/>';
+			$("#interessatId").parent().attr("class", "col-xs-6");
+			$("#interessatId").parent().parent().append("<div class='col-xs-2' style='padding-left: 0px;'>"+
+					"<a href='"+urlNewInt+"' onclick='guardarDadesFormActual()' id='addInteressatBtn' class='btn btn-default' data-toggle='modal' data-func-to-call-on-tancar='enableNotificar' data-modal-eval='true'>"+
+					"<span class='fa fa-plus'></span>&nbsp;Nou interessat</a></div>");
+		});
+		
+		function guardarDadesFormActual() {
+			var formData = $("#pinbalConsultaCommand").serialize();
+			$.ajax({
+				type: 'POST',
+				url: '<rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/guardaFormSessio"/>',
+				data: formData,
+				async: false,
+				success: function(response) {
+					console.log("Formulari PINBAL guardat en sessió: ", response);
+					return true;
+				},
+				error: function(xhr, status, error) {
+					console.error("No s'ha pogut redireccionar al formulari de interessat: ", error);
+					return true;
+				}
 			});
-
-			divsToShow.forEach(function(divToShow) {
-				$(divToShow).find(":input").prop("disabled", false);
-				$(divToShow).show();
-			});
-
-			divsToHide.forEach(function(divToHide) {
-				$(divToHide).find(":input").prop("disabled", true);
-				$(divToHide).hide();
-			});
-			
-		} else {
-			$('#bloc-datos-especificos').hide();
-			$('#bloc-datos-especificos').find(":input").prop("disabled", true);
 		}
-	}
-
-	var urlNewInt = '<rip:modalUrl value="/expedient/${pinbalConsultaCommand.pareId}/interessat/new"/>';
-	$("#interessatId").parent().attr("class", "col-xs-6");
-	$("#interessatId").parent().parent().append("<div class='col-xs-2' style='padding-left: 0px;'>"+
-			"<a href='"+urlNewInt+"' onclick='guardarDadesFormActual()' id='addInteressatBtn' class='btn btn-default' data-toggle='modal' data-func-to-call-on-tancar='enableNotificar' data-modal-eval='true'>"+
-			"<span class='fa fa-plus'></span>&nbsp;Nou interessat</a></div>");
-});
-
-function guardarDadesFormActual() {
-	var formData = $("#pinbalConsultaCommand").serialize();
-	$.ajax({
-		type: 'POST',
-		url: '<rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/guardaFormSessio"/>',
-		data: formData,
-		async: false,
-		success: function(response) {
-			console.log("Formulari PINBAL guardat en sessió: ", response);
-			return true;
-		},
-		error: function(xhr, status, error) {
-			console.error("No s'ha pogut redireccionar al formulari de interessat: ", error);
-			return true;
-		}
-	});
-}
-
-</script>
+	</script>
 </head>
 <body>
+	<div id="contingut-missatges">
+		<div id="alertaServeiInactiu" class="alert alert-warning">
+			<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
+			<spring:message code="metaexpedient.serveiPinbal.inactiu"/>
+		</div>
+	</div>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/new"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pinbalConsultaCommand">
 		<form:hidden path="entitatId"/>

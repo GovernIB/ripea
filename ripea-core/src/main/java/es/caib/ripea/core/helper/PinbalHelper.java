@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import java.util.Arrays;
@@ -63,7 +60,6 @@ import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
@@ -80,7 +76,6 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.PinbalServeiRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -92,16 +87,10 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class PinbalHelper {
 
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private IntegracioHelper integracioHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private PinbalServeiRepository pinbalServeiRepository;
-	@Resource
-	private OrganGestorHelper organGestorHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private IntegracioHelper integracioHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Resource private OrganGestorHelper organGestorHelper;
 
 	/** SVDDGPCIWS02 - Consulta de datos de identidad */
 	public String novaPeticioSvddgpciws02(
@@ -779,9 +768,8 @@ public class PinbalHelper {
 	private ScspTitular getTitularFromInteressat(
 			InteressatEntity interessat,
 			boolean ambNomSencer,
-			MetaDocumentPinbalServeiEnumDto pinbalServeiEnum) {
+			PinbalServeiEntity pinbalServei) {
 		
-		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(pinbalServeiEnum);
 		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = pinbalServei.getPinbalServeiDocsPermesos();
 		
 		ScspTitular titular = new ScspTitular();

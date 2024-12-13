@@ -86,12 +86,14 @@ import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.PinbalServeiRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
@@ -117,6 +119,7 @@ public class ConversioTipusHelper {
 	@Autowired private TascaHelper tascaHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	
 	public ConversioTipusHelper() {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
@@ -837,7 +840,12 @@ public class ConversioTipusHelper {
 	            	target.setCreatedBy(source.getCreatedBy().getNom());
 	            	target.setCreatedDate(source.getCreatedDate().toDate());
 	            	target.setError(HtmlUtils.htmlEscape(source.getError()));
-	            	
+	            	PinbalServeiEntity pse = pinbalServeiRepository.findByCodi(source.getServei());
+	            	if (pse!=null) {
+	            		target.setServei(pse.getCodi() + " - " + pse.getNom());
+	            	} else {
+	            		target.setServei(source.getServei());
+	            	}
 	            }
 	        })
 	        .byDefault()

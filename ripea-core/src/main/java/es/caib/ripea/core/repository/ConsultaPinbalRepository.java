@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.ConsultaPinbalEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.entity.ConsultaPinbalEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -44,7 +43,7 @@ public interface ConsultaPinbalRepository extends JpaRepository<ConsultaPinbalEn
 			@Param("esNullMetaExpedientId") boolean esNullMetaExpedientId,
 			@Param("metaExpedientId") Long metaExpedientId,
 			@Param("esNullServei") boolean esNullServei,
-			@Param("servei") MetaDocumentPinbalServeiEnumDto servei,
+			@Param("servei") String servei,
 			@Param("esNullCreatPer") boolean esNullCreatPer,
 			@Param("creatPer") UsuariEntity creatPer,
 			@Param("esNullDataInici") boolean esNullDataInici,

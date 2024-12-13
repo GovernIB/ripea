@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
 
 import javax.persistence.Column;
@@ -17,14 +14,12 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ConsultaPinbalEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Entity
 @Table(name = "ipa_consulta_pinbal")
@@ -40,9 +35,8 @@ public class ConsultaPinbalEntity extends RipeaAuditable<Long> {
 	@ForeignKey(name = "ipa_entitat_pinbal_fk")
 	protected EntitatEntity entitat;
 	
-	@Enumerated(EnumType.STRING)
 	@Column(name = "servei", length = 64, nullable = false)
-	private MetaDocumentPinbalServeiEnumDto servei;
+	private String servei;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "estat", length = 10, nullable = false)
@@ -53,7 +47,6 @@ public class ConsultaPinbalEntity extends RipeaAuditable<Long> {
 	
 	@Column(name = "error", length = 4000)
 	private String error;
-
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_id")
@@ -70,7 +63,5 @@ public class ConsultaPinbalEntity extends RipeaAuditable<Long> {
 	@ForeignKey(name = "ipa_document_pinbal_fk")
 	private DocumentEntity document;
 	
-
-
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -7640819122688201637L;
 }

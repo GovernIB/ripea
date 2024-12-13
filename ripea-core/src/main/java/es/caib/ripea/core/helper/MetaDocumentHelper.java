@@ -10,10 +10,12 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.PinbalServeiRepository;
 
 @Component
 public class MetaDocumentHelper {
@@ -30,6 +32,7 @@ public class MetaDocumentHelper {
 	@Resource private PluginHelper pluginHelper;
 	@Resource private EntityComprovarHelper entityComprovarHelper;
 	@Resource private MetaExpedientHelper metaExpedientHelper;
+	@Resource private PinbalServeiRepository pinbalServeiRepository;
 	
 	public MetaDocumentEntity update(
 			Long metaExpedientId,
@@ -40,6 +43,10 @@ public class MetaDocumentHelper {
 			String rolActual,
 			Long organId) {
 		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
+		PinbalServeiEntity pinbalServeiEntity = null;
+		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
+			pinbalServeiEntity = pinbalServeiRepository.findOne(metaDocument.getPinbalServei().getId());
+		}
 		//* = No s'actualitza
 		metaDocumentEntity.update(
 				metaDocumentEntity.getCodi(), //*
@@ -61,7 +68,7 @@ public class MetaDocumentHelper {
 				metaDocument.isBiometricaLectura(),
 				metaDocument.getPortafirmesFluxTipus(),
 				metaDocument.isPinbalActiu(),
-				metaDocument.getPinbalServei(),
+				pinbalServeiEntity,
 				metaDocument.getPinbalFinalitat(),
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		
@@ -99,9 +106,13 @@ public class MetaDocumentHelper {
 				false,
 				false, 
 				true, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId);
+		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		
+		PinbalServeiEntity pinbalServeiEntity = null;
+		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
+			pinbalServeiEntity = pinbalServeiRepository.findOne(metaDocument.getPinbalServei().getId());
+		}
 		
 		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
 				entitat,
@@ -127,7 +138,7 @@ public class MetaDocumentHelper {
 				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
 				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
 				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
-				pinbalServei(metaDocument.getPinbalServei()).
+				pinbalServei(pinbalServeiEntity).
 				build();
 		
 		entity.updatePerDefecte(metaDocument.isPerDefecte());

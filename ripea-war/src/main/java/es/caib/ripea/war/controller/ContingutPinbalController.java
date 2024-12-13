@@ -3,8 +3,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,18 +26,13 @@ import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
-import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
-import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.PinbalConsultaCommand;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
@@ -104,7 +97,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(command.getMetaDocumentId());
 	
-		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
+		if ("SVDDELSEXWS01".equals(metaDocument.getPinbalServei().getCodi())) {
 			if (StringUtils.isEmpty(command.getDataNaixement())) {
 				bindingResult.rejectValue("dataNaixement", "NotEmpty");
 			}
@@ -117,12 +110,11 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			if (command.getCodiNacionalitat().equals("724") && StringUtils.isEmpty(command.getNomPare()) && StringUtils.isEmpty(command.getNomMare())) {
 				bindingResult.rejectValue("nomPare", "NotEmpty");
 			}
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
+		} else if ("NIVRENTI".equals(metaDocument.getPinbalServei().getCodi())) {
 			if (command.getExercici() == null) {
 				bindingResult.rejectValue("exercici", "NotEmpty");
 			}
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPRESIDENCIALEGALDOCWS01) {
-			
+		} else if ("SVDDGPRESIDENCIALEGALDOCWS01".equals(metaDocument.getPinbalServei().getCodi())) {
 			if (command.getTipusPassaport() == null && Utils.isEmpty(command.getNumeroSoporte())) {
 				bindingResult.reject("contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment");
 			}
@@ -132,8 +124,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			if (command.getTipusPassaport() != null && Utils.isEmpty(command.getCodiNacionalitat())) {
 				bindingResult.rejectValue("codiNacionalitat", "NotEmpty");
 			}
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDRRCCNACIMIENTOWS01) {
-			
+		} else if ("SVDRRCCNACIMIENTOWS01".equals(metaDocument.getPinbalServei().getCodi())) {
 			if (Utils.isEmpty(command.getRegistreCivil())) {
 				bindingResult.rejectValue("registreCivil", "NotEmpty");
 			}
@@ -146,9 +137,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			if (command.getDataRegistre() == null) {
 				bindingResult.rejectValue("dataRegistre", "NotEmpty");
 			}
-
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDBECAWS01) {
-		
+		} else if ("SVDBECAWS01".equals(metaDocument.getPinbalServei().getCodi())) {
 			if (command.getCurs() == null) {
 				bindingResult.rejectValue("curs", "NotEmpty");
 			}

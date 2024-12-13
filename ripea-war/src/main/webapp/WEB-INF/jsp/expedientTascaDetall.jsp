@@ -31,6 +31,19 @@
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.createdBy"/></strong></td>
 				<td>${expedientTascaDto.createdBy.codi}</td>
+			</tr>
+			<tr>
+				<td><strong><spring:message code="expedient.tasca.form.camp.responsables"/></strong></td>
+				<td>
+					<c:choose>
+						<c:when test="${expedientTascaDto.responsables!=null && fn:length(expedientTascaDto.responsables) > 0}">
+							<c:forEach var="itm" items="${expedientTascaDto.responsables}" varStatus="status">
+								<c:out value="${itm.codi}"></c:out><br/>
+							</c:forEach>
+						</c:when>
+						<c:otherwise></c:otherwise>
+					</c:choose>					
+				</td>
 			</tr>			
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.responsableCodiActual"/></strong></td>
@@ -39,6 +52,19 @@
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.delegar.camp.delegat"/></strong></td>
 				<td>${expedientTascaDto.delegat.codi}</td>
+			</tr>
+			<tr>
+				<td><strong><spring:message code="expedient.tasca.form.camp.observadores"/></strong></td>
+				<td>
+					<c:choose>
+						<c:when test="${expedientTascaDto.observadors!=null && fn:length(expedientTascaDto.observadors) > 0}">
+							<c:forEach var="itm" items="${expedientTascaDto.observadors}" varStatus="status">
+								<c:out value="${itm.codi}"></c:out><br/>
+							</c:forEach>
+						</c:when>
+						<c:otherwise></c:otherwise>
+					</c:choose>
+				</td>
 			</tr>			
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.dataInici"/></strong></td>
@@ -67,32 +93,6 @@
 				<td>
 					<c:set var="nomKeyPrioritat">prioritat.enum.${expedientTascaDto.prioritat}</c:set>
 					<spring:message code="${nomKeyPrioritat}" />
-				</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="expedient.tasca.form.camp.responsables"/></strong></td>
-				<td>
-					<c:choose>
-						<c:when test="${expedientTascaDto.responsables!=null && fn:length(expedientTascaDto.responsables) > 0}">
-							<c:forEach var="itm" items="${expedientTascaDto.responsables}" varStatus="status">
-								<c:out value="${itm.codi}"></c:out><br/>
-							</c:forEach>
-						</c:when>
-						<c:otherwise></c:otherwise>
-					</c:choose>					
-				</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="expedient.tasca.form.camp.observadores"/></strong></td>
-				<td>
-					<c:choose>
-						<c:when test="${expedientTascaDto.observadors!=null && fn:length(expedientTascaDto.observadors) > 0}">
-							<c:forEach var="itm" items="${expedientTascaDto.observadors}" varStatus="status">
-								<c:out value="${itm.codi}"></c:out><br/>
-							</c:forEach>
-						</c:when>
-						<c:otherwise></c:otherwise>
-					</c:choose>
 				</td>
 			</tr>			
 		</tbody>

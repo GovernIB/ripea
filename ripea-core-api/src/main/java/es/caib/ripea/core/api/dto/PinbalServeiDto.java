@@ -6,16 +6,27 @@ import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 public class PinbalServeiDto {
 
     private Long id;
 	private List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos;
-    private MetaDocumentPinbalServeiEnumDto codi;
+    private String codi;
     private String nom;
-
+    private boolean actiu;
+    
+    public String getCodiNom() {
+    	return codi + " - " + nom;
+    }
+    
+    public String getNomAmbActiu() {
+    	if (actiu) {
+    		return getCodiNom();
+    	} else {
+    		return "(INACTIU) " + getCodiNom();
+    	}
+    }
     
     public String getDocPermesosString() {
     	String docsString = "";
@@ -28,5 +39,4 @@ public class PinbalServeiDto {
 		} 
     	return docsString;
 	}
-
 }

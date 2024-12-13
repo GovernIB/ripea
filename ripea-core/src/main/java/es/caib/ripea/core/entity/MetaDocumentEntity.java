@@ -22,7 +22,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -111,8 +110,12 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 
 	@Column(name = "pinbal_actiu", nullable = false)
 	private boolean pinbalActiu;
-	@Column(name = "pinbal_servei", length = 64)
-	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "pinbal_servei")
+	@ForeignKey(name = "PINBAL_SERVEI_FK")
+	private PinbalServeiEntity pinbalServei;
+	
 	@Column(name = "pinbal_finalitat", length = 512)
 	protected String pinbalFinalitat;
 	
@@ -192,9 +195,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public boolean isPinbalActiu() {
 		return pinbalActiu;
 	}
-	public MetaDocumentPinbalServeiEnumDto getPinbalServei() {
-		return pinbalServei;
-	}
 	public String getPinbalFinalitat() {
 		return pinbalFinalitat;
 	}
@@ -219,6 +219,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.ordre = ordre;
 	}
 	
+	public PinbalServeiEntity getPinbalServei() {
+		return pinbalServei;
+	}
+
 	public void setPinbalUtilitzarCifOrgan(
 			boolean pinbalUtilitzarCifOrgan) {
 		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
@@ -244,7 +248,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			boolean biometricaLectura,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			boolean pinbalActiu,
-			MetaDocumentPinbalServeiEnumDto pinbalServei,
+			PinbalServeiEntity pinbalServei,
 			String pinbalFinalitat,
 			boolean pinbalUtilitzarCifOrgan) {
 		update(codi, nom, descripcio);
@@ -390,7 +394,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.portafirmesFluxTipus = portafirmesFluxTipus;
 			return this;
 		}
-		public Builder pinbalServei(MetaDocumentPinbalServeiEnumDto pinbalServei) {
+		public Builder pinbalServei(PinbalServeiEntity pinbalServei) {
 			built.pinbalServei = pinbalServei;
 			return this;
 		}

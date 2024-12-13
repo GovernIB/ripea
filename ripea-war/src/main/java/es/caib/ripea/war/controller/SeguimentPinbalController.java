@@ -1,8 +1,4 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,27 +24,21 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
-
 @Controller
 @RequestMapping("/seguimentPinbal")
 public class SeguimentPinbalController extends BaseAdminController {
 	
 	public static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentPinbalController.session.filtre";
 	
-    @Autowired
-    private SeguimentService seguimentService;
-	@Autowired
-	private AplicacioService aplicacioService;
-
+    @Autowired private SeguimentService seguimentService;
+	@Autowired private AplicacioService aplicacioService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
-    	
     	EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-    	
     	SeguimentConsultaFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
-		
+		loadServeisPinbal(model, false);
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActius(
@@ -57,7 +47,6 @@ public class SeguimentPinbalController extends BaseAdminController {
 						RolHelper.getRolActual(request),
 						false,
 						null));
-    	
         return "seguimentPinbalList";
     }
     
@@ -83,7 +72,6 @@ public class SeguimentPinbalController extends BaseAdminController {
 		}
 		return "redirect:../seguimentPinbal";
 	}
-    
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
@@ -101,10 +89,6 @@ public class SeguimentPinbalController extends BaseAdminController {
 			
         return DatatablesHelper.getDatatableResponse(request, seguiment, "id");
     }
-    
-    
-    
-
 	
 	private SeguimentConsultaFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -121,9 +105,4 @@ public class SeguimentPinbalController extends BaseAdminController {
 		}
 		return filtreCommand;
 	}
-
-    
-
-	
-	
 }

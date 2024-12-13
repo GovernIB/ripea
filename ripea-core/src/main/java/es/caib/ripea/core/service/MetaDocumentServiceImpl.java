@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
@@ -13,7 +10,6 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,39 +58,22 @@ import es.caib.ripea.core.repository.PinbalServeiRepository;
 @Service
 public class MetaDocumentServiceImpl implements MetaDocumentService {
 
-	@Resource
-	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private DocumentRepository documentRepository;
-
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private MetaNodeHelper metaNodeHelper;
-	@Resource
-	private ContingutHelper contenidorHelper;
-	@Resource
-	private PaginacioHelper paginacioHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private MetaExpedientHelper metaExpedientHelper;
-	@Resource
-	private MetaDocumentHelper metaDocumentHelper;
-	@Resource
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private PinbalServeiRepository pinbalServeiRepository;
+	@Resource private MetaDocumentRepository metaDocumentRepository;
+	@Resource private EntitatRepository entitatRepository;
+	@Resource private MetaDadaRepository metaDadaRepository;
+	@Resource private DocumentRepository documentRepository;
+	@Resource private ConversioTipusHelper conversioTipusHelper;
+	@Resource private MetaNodeHelper metaNodeHelper;
+	@Resource private ContingutHelper contenidorHelper;
+	@Resource private PaginacioHelper paginacioHelper;
+	@Resource private PermisosHelper permisosHelper;
+	@Resource private PluginHelper pluginHelper;
+	@Resource private EntityComprovarHelper entityComprovarHelper;
+	@Resource private MetaExpedientHelper metaExpedientHelper;
+	@Resource private MetaDocumentHelper metaDocumentHelper;
+	@Resource private MetaExpedientRepository metaExpedientRepository;
+	@Resource private CacheHelper cacheHelper;
+	@Resource private PinbalServeiRepository pinbalServeiRepository;
 
 	@Transactional
 	@Override
@@ -116,10 +95,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				rolActual,
 				organId);
 
-
 		return metaDocumentDto;
 	}
-
 
 	@Transactional
 	@Override
@@ -138,6 +115,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				true,
 				false, false, false);
 
+		PinbalServeiEntity pinbalServeiEntity = null;
+		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
+			pinbalServeiEntity = pinbalServeiRepository.findOne(metaDocument.getPinbalServei().getId());
+		}
+		
 		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
 				entitat,
 				metaDocument.getCodi(),
@@ -162,7 +144,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				firmaPassarelaActiva(metaDocument.isFirmaPassarelaActiva()).
 				firmaPassarelaCustodiaTipus(metaDocument.getFirmaPassarelaCustodiaTipus()).
 				portafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus()).
-				pinbalServei(metaDocument.getPinbalServei()).
+				pinbalServei(pinbalServeiEntity).
 				build();
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
@@ -201,6 +183,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				entitat,
 				metaExpedient,
 				metaDocument.getId());
+		PinbalServeiEntity pinbalServeiEntity = null;
+		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
+			pinbalServeiEntity = pinbalServeiRepository.findOne(metaDocument.getPinbalServei().getId());
+		}
 		entity.update(
 				metaDocument.getCodi(),
 				metaDocument.getNom(),
@@ -221,7 +207,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isBiometricaLectura(),
 				metaDocument.getPortafirmesFluxTipus(),
 				metaDocument.isPinbalActiu(),
-				metaDocument.getPinbalServei(),
+				pinbalServeiEntity,
 				metaDocument.getPinbalFinalitat(),
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		if (plantillaContingut != null) {
@@ -258,18 +244,21 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut) {
-		logger.debug("Actualitzant meta-document existent (" +
-				"entitatId=" + entitatId + ", " +
-				"metaDocument=" + metaDocument + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		
+		logger.debug("Actualitzant meta-document existent ( entitatId=" + entitatId + ", metaDocument=" + metaDocument + ")");
+		
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				true,
 				false, false, false);
 
-		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
-				metaDocument.getId());
+		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(metaDocument.getId());
 		
+		PinbalServeiEntity pinbalServeiEntity = null;
+		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
+			pinbalServeiEntity = pinbalServeiRepository.findOne(metaDocument.getPinbalServei().getId());
+		}
 		entity.update(
 				metaDocument.getCodi(),
 				metaDocument.getNom(),
@@ -290,7 +279,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isBiometricaLectura(),
 				metaDocument.getPortafirmesFluxTipus(),
 				metaDocument.isPinbalActiu(),
-				metaDocument.getPinbalServei(),
+				pinbalServeiEntity,
 				metaDocument.getPinbalFinalitat(),
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		
@@ -485,18 +474,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		return resposta;
 	}	
 	
-	
 	@Transactional(readOnly = true)
 	@Override
-	public PinbalServeiDto findPinbalServei(
-			Long metaDocumentId) {
-
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				metaDocumentId);
-
-		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(metaDocument.getPinbalServei());
-		return conversioTipusHelper.convertir(pinbalServei, PinbalServeiDto.class);
-
+	public PinbalServeiDto findPinbalServei(Long metaDocumentId) {
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(metaDocumentId);
+		return conversioTipusHelper.convertir(metaDocument.getPinbalServei(), PinbalServeiDto.class);
 	}	
 
 	@Transactional(readOnly = true)
@@ -650,7 +632,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				"entitatId=" + entitatId + ", " +
 				"contingutId=" + contingutId + ", " +
 				"id=" + id +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,

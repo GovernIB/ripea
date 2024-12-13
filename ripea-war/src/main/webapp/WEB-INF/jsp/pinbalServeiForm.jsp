@@ -20,35 +20,16 @@
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
-	
-	
-<script>
-
-$(document).ready(function() {
-	
-
-  
-});
-
-</script>	
-
-<style>
-	textarea {
-	  resize: none;
-	}
-</style>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/pinbalServei"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pinbalServeiCommand" role="form" enctype="multipart/form-data">
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="pinbalServei.form.camp.codi" readonly="true"/>
-		<rip:inputTextarea name="nom" textKey="pinbalServei.form.camp.nom" disabled="true"/>
-		
+		<rip:inputTextarea name="nom" textKey="pinbalServei.form.camp.nom"/>
 		<rip:inputSelect name="pinbalServeiDocsPermesos" textKey="metadocument.form.camp.pinbal.servei.docs.permesos" multiple="true" optionEnum="PinbalServeiDocPermesEnumDto"/>
-
+		<rip:inputCheckbox name="actiu" textKey="pinbalServei.list.columna.actiu"></rip:inputCheckbox>
 		<div style="min-height: 150px;"></div>
-
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 				<c:choose>
