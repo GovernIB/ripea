@@ -1111,7 +1111,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
 					entitatActual.getId(),
 					expedientsMetaExpedient,
-					contingutOrigen.getExpedientId());
+					contingutOrigen.getExpedientId(),
+					RolHelper.getRolActual(request));
 			
 			model.addAttribute("carpetes", carpetes);
 		}

@@ -77,8 +77,8 @@ public class CarpetaServiceBean implements CarpetaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId) {
-		return delegate.findArbreCarpetesExpedient(entitatId, expedients, expedientId);
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId, String rolActual) {
+		return delegate.findArbreCarpetesExpedient(entitatId, expedients, expedientId, rolActual);
 	}
 
 	@Override

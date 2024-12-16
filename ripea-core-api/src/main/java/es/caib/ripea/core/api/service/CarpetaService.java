@@ -107,7 +107,7 @@ public interface CarpetaService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId);
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId, String rolActual);
 	
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportIndexCarpetes(Long entitatId, Set<Long> carpetaIds, String format) throws IOException;

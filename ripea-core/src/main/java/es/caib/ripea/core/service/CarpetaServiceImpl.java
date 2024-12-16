@@ -37,6 +37,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -182,14 +183,19 @@ public class CarpetaServiceImpl implements CarpetaService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedientsMetaExpedient, Long contingutId) {
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(
+			Long entitatId,
+			List<ExpedientDto> expedientsMetaExpedient,
+			Long contingutId,
+			String rolActual) {
+
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
 				false,
 				false,
 				false,
-				false, false, true, null);
+				false, false, true, rolActual);
 
 		List<ArbreDto<ExpedientCarpetaArbreDto>> arbreExpedients = new ArrayList<ArbreDto<ExpedientCarpetaArbreDto>>();
 		

@@ -42,6 +42,7 @@ import es.caib.ripea.war.command.ImportacioCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment d'importació de documents.
@@ -202,7 +203,8 @@ public class ContingutImportacioController extends BaseUserController {
 		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
 				entitatActual.getId(),
 				null,
-				contingutId);
+				contingutId,
+				RolHelper.getRolActual(request));
 		model.addAttribute("carpetes", carpetes);
 		model.addAttribute("jstreeJson", command.getEstructuraCarpetesJson());
 		model.addAttribute("selectedCarpeta", command.getDestiId());

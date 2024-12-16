@@ -1121,7 +1121,6 @@ public class ContingutHelper {
 		return (NodeEntity)contingut;
 	}
 
-
 	public ContingutEntity comprovarContingutDinsExpedientModificable(
 			Long entitatId,
 			Long contingutId,
@@ -1132,15 +1131,17 @@ public class ContingutHelper {
 			boolean checkPerMassiuAdmin,
 			boolean comprovarAgafatPerUsuariActual, 
 			String rolActual) {
+		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				false,
 				true, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				contingutId);
+		
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
 		contingut = HibernateHelper.deproxy(contingut);
+		
 		// Comprova el permís de modificació de l'expedient superior
 		ExpedientEntity expedient = getExpedientSuperior(
 				contingut,
@@ -1148,6 +1149,7 @@ public class ContingutHelper {
 				false,
 				true,
 				rolActual);
+		
 		if (expedient == null) {
 			throw new ValidationException(
 					contingutId,
@@ -1176,7 +1178,6 @@ public class ContingutHelper {
 			}
 		}
 
-
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
 			if (comprovarPermisWrite) {
@@ -1186,7 +1187,6 @@ public class ContingutHelper {
 						comprovarPermisWrite = false;
 				}
 			}
-			
 			
 			entityComprovarHelper.comprovarExpedient(
 					expedientEntity.getId(),
