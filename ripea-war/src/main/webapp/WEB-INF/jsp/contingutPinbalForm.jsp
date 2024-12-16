@@ -293,8 +293,8 @@
 			</div>
 		</div>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.enviar"/></button>
-			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="decorator.boto.consulta"/></button>
+			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="decorator.boto.cancela"/></a>
 		</div>
 	</form:form>
 </body>
