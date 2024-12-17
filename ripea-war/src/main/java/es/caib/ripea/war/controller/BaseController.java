@@ -12,11 +12,15 @@ import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.*;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.support.RequestContext;
@@ -444,6 +448,51 @@ public class BaseController implements MessageSourceAware {
 		}
 	}
 
+	//Converteix un objecte bindingResult, per retornar com una llista que es pugui
+	//passar a la funcio webutil.commons.js. showBindingErrors perque mostri els errors als camps
+	public List<ObjectError> bindingResultToJquery(HttpServletRequest request, BindingResult bindingResult) {
+		List<ObjectError> resultat = new ArrayList<ObjectError>();
+		for (ObjectError obj: bindingResult.getAllErrors()) {
+			String objectName = null;
+			String defaultMessage = null;
+			
+			if (obj instanceof FieldError) {
+				objectName = ((FieldError)obj).getField();				
+			} else {
+				//Validacions que no indiquen el nom del camp, pero ho podem deduir per els codis dels missates...
+				if (ArrayUtils.contains(obj.getCodes(), "classificacioSia")) {
+					objectName = "classificacioSia";
+				} else if (ArrayUtils.contains(obj.getCodes(), "CodiMetaExpedientNoRepetit")) {
+					objectName = "codi";
+				}
+			}
+			
+			if (obj.getCodes()!=null && obj.getCodes().length>0) {
+				for (String codi: obj.getCodes()) {
+					String aux = getMessage(request, codi);
+					if (aux!=null && !"".equals(aux.trim()) && !aux.startsWith("???")) {
+						defaultMessage = aux;
+						break;
+					}
+				}
+			}
+			
+			if (defaultMessage==null) {
+				//El default message podria ser un codi de traduccions o el literal final a mostrar.
+				String dm = getMessage(request, obj.getDefaultMessage());
+				if (dm!=null && !"".equals(dm.trim()) && !dm.startsWith("???")) {
+					defaultMessage = dm;
+				} else {
+					defaultMessage = obj.getDefaultMessage();
+				}
+			}
+			
+			ObjectError aux = new ObjectError(objectName, defaultMessage);
+			resultat.add(aux);
+		}
+		return resultat;
+	}
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(

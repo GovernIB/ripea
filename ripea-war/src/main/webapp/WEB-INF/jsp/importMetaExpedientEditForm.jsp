@@ -6,6 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%pageContext.setAttribute("idioma", org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());%>
 <spring:message code="metaexpedient.form.camp.updateProc.confirm" var="confirmUpdateProcediment"/>
+<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxerEditJson"/></c:set>
 
 <html>
 <head>
@@ -46,7 +47,28 @@
 
 			$('.importarSubmitBtn').click(function(e) {
 				if ($('#id').val()=='' || confirm("${confirmUpdateProcediment}")) {
-					$('#metaExpedientImportEditCommand').submit();
+					e.preventDefault();
+					hideBindingErrors($("#metaExpedientImportEditCommand"));
+					var formData = formToJson("metaExpedientImportEditCommand");
+					$.ajax({
+						type: 'POST',
+						url: '${formAction}',
+						contentType: 'application/json',
+						data: formData,
+						async: true,
+						success: function(data) {
+							if (data!=null && data.length>0) {
+								webutilRefreshMissatges(); //Refrescam els missatges generals a la modal
+								showBindingErrors(data, $("#metaExpedientImportEditCommand")); //Mostram missatges de error
+							} else {
+								parent.tancarModalImportacio(); //Refrescam els missatges al pare
+								$('button.close', $(window.frameElement).parent().parent().parent().parent()).trigger('click');
+							}
+						},
+						error: function (jqXHR, textStatus, errorThrown) {
+							alert(textStatus + ": "+errorThrown);
+						}
+					});
 				}
 			});				
 
@@ -134,19 +156,21 @@
 		
 		function calculateClassificacioId() {
 			let organGestorId = $('#organGestorId').val();
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/metaExpedient/calculateClassificacioId"/>/' + organGestorId,
-				success: function(id) {
-					$('#classificacioId').val(id);
-				}
-			});
+			if (organGestorId!=null) {
+				$.ajax({
+					type: 'GET',
+					url: '<c:url value="/metaExpedient/calculateClassificacioId"/>/' + organGestorId,
+					success: function(id) {
+						$('#classificacioId').val(id);
+					}
+				});
+			}
 		}
 	</script>
 	
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxerEdit"/></c:set>
+
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportEditCommand" role="form">
 
 		<form:hidden path="entitatId"/>

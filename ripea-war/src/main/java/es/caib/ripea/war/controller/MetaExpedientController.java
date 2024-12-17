@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
@@ -22,7 +19,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -99,14 +99,11 @@ public class MetaExpedientController extends BaseAdminController {
 	private static final String SESSION_ATTRIBUTE_FILTRE = "MetaExpedientController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_IMPORT_TEMPORAL = "MetaExpedientController.session.import.temporal";
 
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private Validator validator;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -477,29 +474,34 @@ public class MetaExpedientController extends BaseAdminController {
 		return "importMetaExpedientEditForm";
 	}
 	
-	@RequestMapping(value = "/importFitxerEdit", method = RequestMethod.POST)
-	public String importFitxerEditPost(
+	@RequestMapping(value = "/importFitxerEditJson", method = RequestMethod.POST)
+	@ResponseBody
+	public List<ObjectError> importFitxerEditPostJson(
 			HttpServletRequest request,
-			@Valid MetaExpedientImportEditCommand command,
+			@RequestBody String commandStr,
 			BindingResult bindingResult,
 			Model model) throws JsonParseException, IOException {
 		
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+		MetaExpedientImportEditCommand command = objectMapper.readValue(commandStr, MetaExpedientImportEditCommand.class);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		importEditValidation(request, command, bindingResult);
-		
-		MetaExpedientExportDto metaExpedientExport = (MetaExpedientExportDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
-		
+
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
-			model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
-			model.addAttribute("procedimentsActuals", metaExpedientService.findByEntitat(entitatActual.getId()));
-			return "importMetaExpedientEditForm";
+			return bindingResultToJquery(request, bindingResult);
 		}
 		
 		try {
+			
+			MetaExpedientExportDto metaExpedientExport = (MetaExpedientExportDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
+			String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+			
 			if (command.getMetaDocuments() != null) {
+				
+				List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
+				
 				for (MetaDocumentCommand metaDocumentCommand : command.getMetaDocuments()) {
 					for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
 						if (metaDocumentDto.getId().equals(metaDocumentCommand.getId())) {
@@ -508,7 +510,6 @@ public class MetaExpedientController extends BaseAdminController {
 						
 						if (metaDocumentDto.getPortafirmesFluxId() != null && !metaDocumentDto.getPortafirmesFluxId().isEmpty()) {
 							boolean exists = false;
-							List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 							if (plantilles != null) {
 								for (PortafirmesFluxRespostaDto portafirmesFlux : plantilles) {
 									if (portafirmesFlux.getFluxId().equals(metaDocumentDto.getPortafirmesFluxId())) {
@@ -555,7 +556,6 @@ public class MetaExpedientController extends BaseAdminController {
 			metaExpedientExport.setCodi(command.getCodi());
 			metaExpedientExport.setNom(command.getNom());
 			metaExpedientExport.setDescripcio(command.getDescripcio());
-			
 			metaExpedientExport.setTipusClassificacio(command.getTipusClassificacio());
 			if (command.getTipusClassificacio() == TipusClassificacioEnumDto.SIA) {
 				metaExpedientExport.setClassificacio(command.getClassificacioSia());
@@ -581,21 +581,21 @@ public class MetaExpedientController extends BaseAdminController {
 				messageSuccess = "metaexpedient.import.controller.update.ok";
 			}
 
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:metaExpedient",
-					messageSuccess,
-					new String[] {command.getNom() });
+			MissatgesHelper.success(request, getMessage(request, messageSuccess, new String[] {command.getNom() }));			
+			return null;
 			
 		} catch (Exception e) {
 			
 			logger.error("Error al importar procediment", e);
-			return getModalControllerReturnValueError(
+			MissatgesHelper.error(
 					request,
-					"redirect:metaExpedient",
-					"metaexpedient.import.controller.import.error",
-					new Object[] { command.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage() },
+					getMessage(
+							request,
+							"metaexpedient.import.controller.import.error",
+							new Object[] { command.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage() }),
 					e);
+			return null;
+			
 		} finally {
 			request.getSession().removeAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
 		}
@@ -704,20 +704,22 @@ public class MetaExpedientController extends BaseAdminController {
 			MetaExpedientImportEditCommand command,
 			BindingResult bindingResult) {
 		
+		validator.validate(command, bindingResult);
+		
 		if (command.getTipusClassificacio()!=null && 
 			command.getTipusClassificacio().equals(TipusClassificacioEnumDto.ID) &&
 			Utils.isEmpty(command.getClassificacioId())) {
-			bindingResult.reject("metaexpedient.import.form.validation.notId");
+			bindingResult.reject("classificacioId", "metaexpedient.import.form.validation.notId");
 		}
 		
 		if (command.getTipusClassificacio()!=null && 
 			command.getTipusClassificacio().equals(TipusClassificacioEnumDto.SIA) &&
 			Utils.isEmpty(command.getClassificacioSia())) {
-			bindingResult.reject("metaexpedient.import.form.validation.notSia");
+			bindingResult.reject("classificacioSia", "metaexpedient.import.form.validation.notSia");
 		}
 		
 		if (!command.isComu() && command.getOrganGestorId() == null) {
-			bindingResult.reject("metaexpedient.import.form.validation.organ.obligatori");
+			bindingResult.reject("organGestorId", "metaexpedient.import.form.validation.organ.obligatori");
 		}
 		
 		for (int i = 0; i < command.getMetaDocuments().size(); i++) {
@@ -745,7 +747,7 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 		}
 		if (!valid) {
-			bindingResult.reject("metaexpedient.import.form.validation.codisia.repetit");
+			bindingResult.reject("classificacioSia", "metaexpedient.import.form.validation.codisia.repetit");
 		}
 	}
 	

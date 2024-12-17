@@ -62,6 +62,10 @@
     function isRolAdminOrgan() {
         return ${isRolAdminOrgan};
     }
+    function tancarModalImportacio() {
+        $('#metaexpedients').DataTable().ajax.reload();
+    	webutilRefreshMissatges();
+	}
 	</script>
 </head>
 <body>

@@ -7,7 +7,6 @@
 
 <html>
 <head>
-
 	<title><spring:message code="metaexpedient.import.form.titol"/></title>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
@@ -21,14 +20,10 @@
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxer"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="fileCommand" role="form" enctype="multipart/form-data">
-
-	
 		<rip:inputFile name="file" textKey="metaexpedient.import.form.file" required="true"/>
-		
 		<div style="min-height: 20px;"></div>
-
 		<div id="modal-botons">
-			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-download"></span> <spring:message code="comu.boto.importar"/>...</button>
+			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-arrow-right"></span> <spring:message code="comu.boto.next"/>...</button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

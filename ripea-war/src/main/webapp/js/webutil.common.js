@@ -17,6 +17,62 @@ function remarcaElement(jQueryElem, color) {
 	jQueryElem[0].animate({ backgroundColor: color }, 500);
 }
 
+function hideBindingErrors(formulari) {
+	$('div.has-error', formulari).each(function() {
+		$(this).removeClass('has-error');
+		$(this).find('p').remove();
+	});
+}
+
+function showBindingErrors(errorsList, formulari) {
+	errorsList.forEach(function(err) {
+		var div = $("#"+err.objectName, formulari).parent();
+		if (div!=null) {
+			$(div).addClass("has-error");
+			$(div).append('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="codi.errors">'+err.defaultMessage+'</span></p>');
+		}
+	});
+}
+
+function formToJson(formId) {
+	var formData = new FormData(document.getElementById(formId));
+	var jsonData = {};
+
+	formData.forEach((value, key) => {
+		
+		//De vegades hi ha camps com el boolean que venen repetits:
+		// "comu": "true"
+		// "_comu": "on"
+		if (key.startsWith('_')) {
+			return;
+		}
+		
+		var keys = key.match(/[^[\]]+/g);
+		var lastKey = keys.pop();
+		if (lastKey.startsWith('.')) {
+			lastKey = lastKey.substring(1);
+		}
+		var deep = jsonData;
+	
+		keys.forEach((k, i) => {
+			if (!deep[k]) {
+				deep[k] = isNaN(keys[i + 1]) ? {} : [];
+			}
+			deep = deep[k];
+		});
+	
+		if (Array.isArray(deep[lastKey])) {
+			deep[lastKey].push(value);
+		} else if (deep[lastKey] !== undefined) {
+			deep[lastKey] = [deep[lastKey], value];
+		} else {
+			deep[lastKey] = value;
+		}
+	});
+
+	return JSON.stringify(jsonData);
+}
+
 function changedPrioritat() {
 	if ($('#prioritat').val()!='B_NORMAL') {
 		$('#prioritatMotiu').closest('.form-group').show();

@@ -8,6 +8,8 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
@@ -15,6 +17,7 @@ import lombok.Getter;
 
 @Getter
 @CodiMetaExpedientNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MetaExpedientImportEditCommand {
 
 	private Long id;
