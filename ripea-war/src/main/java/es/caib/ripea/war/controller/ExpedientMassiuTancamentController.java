@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -43,17 +44,13 @@ import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
-/**
- * Controlador per tancament massiu d'expedients
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Controller
 @RequestMapping("/massiu/tancament")
 public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganController {
@@ -63,44 +60,32 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	private static final String SESSION_ATTRIBUTE_SELECCIO_ADMIN = "ExpedientMassiuTancamentController.session.seleccio.admin";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_ORGAN = "ExpedientMassiuTancamentController.session.seleccio.organ";
 
-
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private DocumentService documentService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-		
-		model.addAttribute(
-				filtreCommand);
-		
+		model.addAttribute(filtreCommand);
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						getSessionAttributeSelecio(request)));
-
+		model.addAttribute("prioritatsExpedient",
+				EnumHelper.getOptionsForEnum(
+						PrioritatEnumDto.class,
+						"prioritat.enum.",
+						new Enum<?>[] {}));
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
-		/*boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		}*/
-		
+
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
@@ -120,7 +105,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE);
-
 		} else {
 			if (!bindingResult.hasErrors()) {
 				RequestSessionHelper.actualitzarObjecteSessio(
@@ -131,7 +115,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		}
 		return "redirect:/massiu/tancament";
 	}
-	
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody

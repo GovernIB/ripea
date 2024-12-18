@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.command;
 
 import java.util.Date;
@@ -11,6 +8,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 /**
@@ -34,7 +32,7 @@ public class ContingutMassiuFiltreCommand {
 	private Date dataFi;
 	private String identificador;
 	private Long expedientEstatId;
-	
+	private PrioritatEnumDto prioritat;
 	private boolean bloquejarTipusElement;
 	private boolean bloquejarMetaDada;
 	private boolean bloquejarMetaExpedient;

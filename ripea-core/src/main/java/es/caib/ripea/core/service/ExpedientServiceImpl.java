@@ -983,8 +983,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
-		
+			PaginacioParamsDto paginacioParams,
+			String rolActual) throws NotFoundException {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
@@ -1021,6 +1021,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getNom(),
 					dataInici,
 					dataFi,
+					filtre.getPrioritat(),
 					metaExpedientsPermesos,
 					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			return paginacioHelper.toPaginaDto(

@@ -101,19 +101,39 @@
 <form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
     <div class="row">
         <div class="col-md-4">
-            <rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true"/>
+            <rip:inputSelect
+            	name="metaExpedientId"
+            	optionItems="${metaExpedients}"
+            	optionValueAttribute="id"
+            	optionTextAttribute="codiSiaINom"
+            	optionMinimumResultsForSearch="3"
+            	emptyOption="true"
+            	placeholderKey="accio.massiva.list.filtre.tipusexpedient"
+            	inline="true"/>
         </div>
         <div class="col-md-4">
             <rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
         </div>
         <div class="col-md-2">
-            <rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+            <rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioDesde"/>
         </div>
         <div class="col-md-2">
-            <rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+            <rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioFins"/>
         </div>
     </div>
     <div class="row">
+
+		<div class="col-md-4">
+			<rip:inputSelect 
+				name="prioritat" 
+				optionItems="${prioritatsExpedient}"
+				emptyOption="true"
+				optionValueAttribute="value"
+				optionTextKeyAttribute="text"
+				placeholderKey="contingut.expedient.form.camp.prioritat"
+				templateResultFunction="showColorPriritats"
+				inline="true" />
+		</div>
 
         <div class="col-md-4 pull-right">
             <div class="pull-right">

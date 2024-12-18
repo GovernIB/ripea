@@ -449,8 +449,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 					expedient,
 					dataInici,
 					dataFi,
+					filtre.getNom(),
 					chosenEstatEnum,
 					chosenEstat,
+					filtre.getPrioritat(),
 					Utils.getNullIfEmpty(metaExpedientsPermesos),
 					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(

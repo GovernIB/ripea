@@ -6,6 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <rip:blocIconaContingutNoms/>
+
 <html>
 <head>
 	<title>${titolMassiu}</title>
@@ -25,164 +26,169 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<style>
+		table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+			background-color: #fcf8e3;
+			color: #666666;
+		}
+		table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
+			cursor: pointer;
+		}
+		table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+	    	color: #333;
+		}
+	</style>
+	<script type="text/javascript">
+	$(document).ready(function() {
+			
+			$('#metaExpedientId').on('change', function() {
 	
-<style>
-	table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-		background-color: #fcf8e3;
-		color: #666666;
-	}
-	table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
-		cursor: pointer;
-	}
-	table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
-    	color: #333;
-	}
-</style>
-<script>
+				debugger;
+				var tipus = $(this).val();
+				
+				if (tipus) {
+					$("#expedientId").data('urlParamAddicional', tipus);
+				} else {
+					$("#expedientId").data('urlParamAddicional', null);
+				}
 
-
-//################################################## document ready START ##############################################################
-$(document).ready(function() {
-
-		
-		$('#metaExpedientId').on('change', function() {
-
-			var tipus = $(this).val();
+				changeExpedientPlaceHolder();
+	
+				$('#expedientId option[value!=""]').remove();
+				$('#expedientId').select2('val', '', true);
+				
+				$('#metaDocumentId option[value!=""]').remove();
+				$('#metaDocumentId').select2('val', '', true);
+				if (tipus != undefined && tipus != "") {
+	
+					$.get("<c:url value="/massiu/metaDocuments/"/>" + tipus).done(function(data){
+						
+						for (var i = 0; i < data.length; i++) {
+							$('#metaDocumentId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+						}
+					}).fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});			
+				}
+			});
 			
-			if (tipus) {
-				$("#expedientId").data('urlParamAddicional', tipus);
-			} else {
-				$("#expedientId").data('urlParamAddicional', null);
-			}
+			$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
+				$.get(
+						"portafirmes/" + accio,
+						{ids: ids},
+						function(data) {
+							$("#seleccioCount").html(data);
+						}
+				);
+			});
+	
+			$('#taulaDades').one('draw.dt', function () {
+				$('#seleccioAll').on('click', function() {
+					$.get(
+							"portafirmes/select",
+							function(data) {
+								$("#seleccioCount").html(data);
+								$('#taulaDades').webutilDatatable('refresh');
+							}
+					);
+					return false;
+				});
+				$('#seleccioNone').on('click', function() {
+					$.get(
+							"portafirmes/deselect",
+							function(data) {
+								$("#seleccioCount").html(data);
+								$('#taulaDades').webutilDatatable('select-none');
+								$('#taulaDades').webutilDatatable('refresh');
+							}
+					);
+					return false;
+				});
+			});
+	
+			$('#taulaDades').on('draw.dt', function () {
+				var tipus = $('#metaDocumentId').val();
+				$('thead tr th:nth-child(1)', $('#taulaDades')).each(function () {
+					enableDisableSelection($(this), tipus);
+				});
+				$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function () {
+					enableDisableSelection($(this), tipus);
+				});
+				updateSelectionForTipusDocument(tipus);
+			});
+	
+			removeTransactionId();
+			changeExpedientPlaceHolder();
+	});//################################################## document ready END ##############################################################
 
-			$('#expedientId option[value!=""]').remove();
-			$('#expedientId').select2('val', '', true);
-
-			
-			$('#metaDocumentId option[value!=""]').remove();
-			$('#metaDocumentId').select2('val', '', true);
-			if (tipus != undefined && tipus != "") {
-
-				$.get("<c:url value="/massiu/metaDocuments/"/>" + tipus).done(function(data){
-					
-					for (var i = 0; i < data.length; i++) {
-						$('#metaDocumentId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-					}
-				}).fail(function() {
-					alert("<spring:message code="error.jquery.ajax"/>");
-				});			
-			}
-		});
-		
-		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
+	function changeExpedientPlaceHolder() {
+		var procSelector = document.getElementById("metaExpedientId");
+		var tipus = $("#metaExpedientId").val();
+		if (tipus) {
+			$('#select2-expedientId-container .select2-selection__placeholder').html('<spring:message code="accio.massiva.list.filtre.expsDelProc"/> '+procSelector.options[procSelector.selectedIndex].text);
+		} else {
+			$('#select2-expedientId-container .select2-selection__placeholder').html('<spring:message code="contingut.admin.filtre.expedient"/>');
+		}
+	}
+	
+	function enableDisableSelection($this, tipus) {
+	    if (tipus != undefined && tipus != "") {
+	    	$this.removeClass('selection-disabled');
+	    	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
+			$('.botons .btn-group button').removeAttr('disabled');
+	    } else {
+	    	$this.addClass('selection-disabled');
+	    	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
 			$.get(
-					"portafirmes/" + accio,
-					{ids: ids},
+					"portafirmes/deselect",
 					function(data) {
 						$("#seleccioCount").html(data);
+						$('#taulaDades').webutilDatatable('select-none');
+					}
+				);
+			$('.botons .btn-group button').attr('disabled','disabled');
+		}
+	}
+	
+	function updateSelectionForTipusDocument(currentTipus) {
+		var tipusInStorage = sessionStorage.getItem('Massiu_tipusDocument', currentTipus);
+	
+		if (tipusInStorage != null && tipusInStorage != currentTipus) {
+			$.get(
+					"portafirmes/deselect",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taulaDades').webutilDatatable('select-none');
+						$('#taulaDades').webutilDatatable('refresh');
 					}
 			);
-		});
-
-		$('#taulaDades').one('draw.dt', function () {
-			$('#seleccioAll').on('click', function() {
-				$.get(
-						"portafirmes/select",
-						function(data) {
-							$("#seleccioCount").html(data);
-							$('#taulaDades').webutilDatatable('refresh');
+		}
+	
+		var tipusInStorage = sessionStorage.setItem('Massiu_tipusDocument', currentTipus);
+	}
+	
+	function removeTransactionId(idModal) {
+		if (idModal) {
+			$('#' + idModal).on('hidden.bs.modal', function() {
+				var idTransaccio = localStorage.getItem('tmpTransaccioId');
+				if (idTransaccio) {
+					$.ajax({
+				    	type: 'GET',
+						url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
+						success: function() {
+							localStorage.removeItem('tmpTransaccioId');
+						},
+						error: function(err) {
+							console.log("Error tancant la transacció");
 						}
-				);
-				return false;
-			});
-			$('#seleccioNone').on('click', function() {
-				$.get(
-						"portafirmes/deselect",
-						function(data) {
-							$("#seleccioCount").html(data);
-							$('#taulaDades').webutilDatatable('select-none');
-							$('#taulaDades').webutilDatatable('refresh');
-						}
-				);
-				return false;
-			});
-		});
-
-		$('#taulaDades').on('draw.dt', function () {
-			var tipus = $('#metaDocumentId').val();
-			$('thead tr th:nth-child(1)', $('#taulaDades')).each(function () {
-				enableDisableSelection($(this), tipus);
-			});
-			$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function () {
-				enableDisableSelection($(this), tipus);
-			});
-			updateSelectionForTipusDocument(tipus);
-		});
-
-		removeTransactionId();
-});//################################################## document ready END ##############################################################
-
-
-
-
-function enableDisableSelection($this, tipus) {
-    if (tipus != undefined && tipus != "") {
-    	$this.removeClass('selection-disabled');
-    	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
-		$('.botons .btn-group button').removeAttr('disabled');
-    } else {
-    	$this.addClass('selection-disabled');
-    	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
-		$.get(
-				"portafirmes/deselect",
-				function(data) {
-					$("#seleccioCount").html(data);
-					$('#taulaDades').webutilDatatable('select-none');
+				    });
 				}
-			);
-		$('.botons .btn-group button').attr('disabled','disabled');
+			});
+		} else {
+			localStorage.removeItem('tmpTransaccioId');
+		}
 	}
-}
-
-function updateSelectionForTipusDocument(currentTipus) {
-	var tipusInStorage = sessionStorage.getItem('Massiu_tipusDocument', currentTipus);
-
-	if (tipusInStorage != null && tipusInStorage != currentTipus) {
-		$.get(
-				"portafirmes/deselect",
-				function(data) {
-					$("#seleccioCount").html(data);
-					$('#taulaDades').webutilDatatable('select-none');
-					$('#taulaDades').webutilDatatable('refresh');
-				}
-		);
-	}
-
-	var tipusInStorage = sessionStorage.setItem('Massiu_tipusDocument', currentTipus);
-}
-
-function removeTransactionId(idModal) {
-	if (idModal) {
-		$('#' + idModal).on('hidden.bs.modal', function() {
-			var idTransaccio = localStorage.getItem('tmpTransaccioId');
-			if (idTransaccio) {
-				$.ajax({
-			    	type: 'GET',
-					url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
-					success: function() {
-						localStorage.removeItem('tmpTransaccioId');
-					},
-					error: function(err) {
-						console.log("Error tancant la transacció");
-					}
-			    });
-			}
-		});
-	} else {
-		localStorage.removeItem('tmpTransaccioId');
-	}
-}
-</script>
+	</script>
 
 </head>
 <body>
@@ -221,7 +227,7 @@ function removeTransactionId(idModal) {
 					optionTextAttribute="nom" 
 					optionMinimumResultsForSearch="3"
 					emptyOption="true" 
-					placeholderKey="accio.massiva.list.filtre.tipusdocument"
+					placeholderKey="accio.massiva.list.filtre.tipusdocument.pf"
 					inline="true" />
 			</div>
 		</div>
@@ -230,10 +236,10 @@ function removeTransactionId(idModal) {
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.documentNom"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioDesde"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioFins"/>
 			</div>
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">

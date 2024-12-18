@@ -118,10 +118,10 @@
             <rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.columna.numero"/>
         </div>
         <div class="col-md-2">
-            <rip:inputDate name="dataInicial" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+            <rip:inputDate name="dataInicial" inline="true" placeholderKey="accio.massiva.list.filtre.dataAltaInici"/>
         </div>
         <div class="col-md-2">
-            <rip:inputDate name="dataFinal" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+            <rip:inputDate name="dataFinal" inline="true" placeholderKey="accio.massiva.list.filtre.dataAltaFi"/>
         </div>
 		<div class="col-md-3">
 			<div class="row">

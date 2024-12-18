@@ -1,33 +1,40 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.ExpedientMassiuCanviPrioritatCommand;
-import es.caib.ripea.war.helper.*;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
- * Controlador per canvi estat massiu del expedients
+ * Controlador per canvi de prioritat massiu del expedients
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -36,12 +43,13 @@ import java.util.*;
 @RequestMapping("/massiu/canviPrioritats")
 public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrganController {
 	
-	@Autowired private MetaExpedientService metaExpedientService;
-	@Autowired private ExpedientService expedientService;
-	@Autowired private ExecucioMassivaService execucioMassivaService;
-	@Autowired private AplicacioService aplicacioService;
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientMassiuCanviPrioritatController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientMassiuCanviPrioritatController.session.seleccio";
+	
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ExpedientEstatService expedientEstatService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -54,7 +62,11 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 		model.addAttribute(filtreCommand);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		model.addAttribute("metaExpedients", metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
-
+		model.addAttribute("prioritatsExpedient",
+				EnumHelper.getOptionsForEnum(
+						PrioritatEnumDto.class,
+						"prioritat.enum.",
+						new Enum<?>[] {}));
 		return "expedientMassiuCanviPrioritatList";
 	}
 
@@ -87,11 +99,12 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
-					 expedientService.findExpedientsPerTancamentMassiu(
+					expedientEstatService.findExpedientsPerCanviEstatMassiu(
 								entitatActual.getId(),
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request),
-								rolActual),
+								rolActual,
+								ResultEnumDto.PAGE).getPagina(),
 					 "id",
 					SESSION_ATTRIBUTE_SELECCIO);
 		} catch (Exception e) {
@@ -99,11 +112,10 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/canviar", method = RequestMethod.GET)
 	public String canviarPrioritatsGet(HttpServletRequest request, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = getSessionAttributeSelecio(request);
 
 		if (seleccio.isEmpty()) {
@@ -154,7 +166,6 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 		return modalUrlTancar();
 	}
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody
 	public int select(

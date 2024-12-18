@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.List;
@@ -22,15 +19,11 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.utils.Utils;
 
-
 @Controller
 @RequestMapping("/expedientajax") 
 public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private ExpedientService expedientService;
-
-	
+	@Autowired private ExpedientService expedientService;
 	
 	@RequestMapping(value = "/expedient/{procedimentId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -50,7 +43,6 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 		
 		return expedients;
 	}
-
 	
 	@RequestMapping(value = "/expedient", method = RequestMethod.GET)
 	@ResponseBody
@@ -69,7 +61,6 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 		
 		return expedients;
 	}
-
 	
 	@RequestMapping(value = "/expedient/item/{id}", method = RequestMethod.GET)
 	@ResponseBody
@@ -82,5 +73,4 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 				entitat.getId(),
 				id, null);
 	}
-
 }

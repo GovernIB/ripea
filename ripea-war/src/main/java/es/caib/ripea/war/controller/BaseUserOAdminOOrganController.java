@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,20 +19,17 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class BaseUserOAdminOOrganController extends BaseController {
 
 	@Autowired private EntitatService entitatService;
 	@Autowired private MetaDocumentService metaDocumentService;
 	@Autowired private DadesExternesService dadesExternesService;
 	
-	public EntitatDto getEntitatActualComprovantPermisos(
-			HttpServletRequest request) {
+	public EntitatDto getEntitatActualComprovantPermisos(HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request, entitatService);
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
-		
 		if (!entitat.isUsuariActualRead() && !entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari o administrador d'entitat o administrator de l'organ");
 		}

@@ -6,6 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <rip:blocIconaContingutNoms/>
+
 <html>
 <head>
 	<title><spring:message code="accio.massiva.titol.firmasimpleweb"/></title>
@@ -25,99 +26,98 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<style>
+		table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+			background-color: #fcf8e3;
+			color: #666666;
+		}
+		table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
+			cursor: pointer;
+		}
+		table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+	    	color: #333;
+		}
+	</style>
+	<script type="text/javascript">
+	$(document).ready(function() {
+			
+			$('#metaExpedientId').on('change', function() {
 	
-<style>
-	table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-		background-color: #fcf8e3;
-		color: #666666;
-	}
-	table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
-		cursor: pointer;
-	}
-	table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
-    	color: #333;
-	}
-</style>
-<script>
+				var tipus = $(this).val();
+				
+				if (tipus) {
+					$("#expedientId").data('urlParamAddicional', tipus);
+				} else {
+					$("#expedientId").data('urlParamAddicional', null);
+				}
 
-
-//################################################## document ready START ##############################################################
-$(document).ready(function() {
-
-		
-		$('#metaExpedientId').on('change', function() {
-
-			var tipus = $(this).val();
+				changeExpedientPlaceHolder();
+				
+				$('#expedientId option[value!=""]').remove();
+				$('#expedientId').select2('val', '', true);
+				
+				$('#metaDocumentId option[value!=""]').remove();
+				$('#metaDocumentId').select2('val', '', true);
+				if (tipus != undefined && tipus != "") {
+	
+					$.get("<c:url value="/massiu/firmasimpleweb/metaDocuments/"/>" + tipus).done(function(data){
+						
+						for (var i = 0; i < data.length; i++) {
+							$('#metaDocumentId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+						}
+					}).fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});			
+				}
+			});
 			
-			if (tipus) {
-				$("#expedientId").data('urlParamAddicional', tipus);
-			} else {
-				$("#expedientId").data('urlParamAddicional', null);
-			}
-
-			$('#expedientId option[value!=""]').remove();
-			$('#expedientId').select2('val', '', true);
-			
-			$('#metaDocumentId option[value!=""]').remove();
-			$('#metaDocumentId').select2('val', '', true);
-			if (tipus != undefined && tipus != "") {
-
-				$.get("<c:url value="/massiu/firmasimpleweb/metaDocuments/"/>" + tipus).done(function(data){
-					
-					for (var i = 0; i < data.length; i++) {
-						$('#metaDocumentId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-					}
-				}).fail(function() {
-					alert("<spring:message code="error.jquery.ajax"/>");
-				});			
-			}
-		});
-		
-		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
-			$.get(
-					"firmasimpleweb/" + accio,
-					{ids: ids},
-					function(data) {
-						$("#seleccioCount").html(data);
-					}
-			);
-		});
-
-		$('#taulaDades').one('draw.dt', function () {
-			$('#seleccioAll').on('click', function() {
+			$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 				$.get(
-						"firmasimpleweb/select",
+						"firmasimpleweb/" + accio,
+						{ids: ids},
 						function(data) {
 							$("#seleccioCount").html(data);
-							$('#taulaDades').webutilDatatable('refresh');
 						}
 				);
-				return false;
 			});
-			$('#seleccioNone').on('click', function() {
-				$.get(
-						"firmasimpleweb/deselect",
-						function(data) {
-							$("#seleccioCount").html(data);
-							$('#taulaDades').webutilDatatable('select-none');
-							$('#taulaDades').webutilDatatable('refresh');
-						}
-				);
-				return false;
+	
+			$('#taulaDades').one('draw.dt', function () {
+				$('#seleccioAll').on('click', function() {
+					$.get(
+							"firmasimpleweb/select",
+							function(data) {
+								$("#seleccioCount").html(data);
+								$('#taulaDades').webutilDatatable('refresh');
+							}
+					);
+					return false;
+				});
+				$('#seleccioNone').on('click', function() {
+					$.get(
+							"firmasimpleweb/deselect",
+							function(data) {
+								$("#seleccioCount").html(data);
+								$('#taulaDades').webutilDatatable('select-none');
+								$('#taulaDades').webutilDatatable('refresh');
+							}
+					);
+					return false;
+				});
 			});
-		});
 
+			changeExpedientPlaceHolder();
+	});//################################################## document ready END ##############################################################
 
-
-
-});//################################################## document ready END ##############################################################
-
-
-
-
-
-</script>
-
+	function changeExpedientPlaceHolder() {
+		var procSelector = document.getElementById("metaExpedientId");
+		var tipus = $("#metaExpedientId").val();
+		if (tipus) {
+			$('#select2-expedientId-container .select2-selection__placeholder').html('<spring:message code="accio.massiva.list.filtre.expsDelProc"/> '+procSelector.options[procSelector.selectedIndex].text);
+		} else {
+			$('#select2-expedientId-container .select2-selection__placeholder').html('<spring:message code="contingut.admin.filtre.expedient"/>');
+		}
+	}
+	</script>
 </head>
 <body>
 	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
@@ -164,10 +164,10 @@ $(document).ready(function() {
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.documentNom"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioDesde"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioFins"/>
 			</div>
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">

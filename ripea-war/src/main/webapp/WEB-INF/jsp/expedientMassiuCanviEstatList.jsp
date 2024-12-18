@@ -26,155 +26,169 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	
-<style>
-	table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-		background-color: #fcf8e3;
-		color: #666666;
-	}
-	table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
-		cursor: pointer;
-	}
-	table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
-	    color: #333;
-	}	
-</style>
-<script>
-
-
-//################################################## document ready START ##############################################################
-$(document).ready(function() {
-
+	<style>
+		table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+			background-color: #fcf8e3;
+			color: #666666;
+		}
+		table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
+			cursor: pointer;
+		}
+		table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+		    color: #333;
+		}	
+	</style>
 	
+	<script type="text/javascript">
 	
-	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
-		$.get(
-				"canviEstat/" + accio,
-				{ids: ids},
-				function(data) {
-					$("#seleccioCount").html(data);
-				}
-		);
-	});
-	
-	$('#taulaDades').one('draw.dt', function () {
+	$(document).ready(function() {
 		
-		$('#seleccioAll').on('click', function() {
+		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
-					"canviEstat/select",
+					"canviEstat/" + accio,
+					{ids: ids},
 					function(data) {
 						$("#seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('refresh');
 					}
 			);
-			return false;
 		});
-		$('#seleccioNone').on('click', function() {
+		
+		$('#taulaDades').one('draw.dt', function () {
+			
+			$('#seleccioAll').on('click', function() {
+				$.get(
+						"canviEstat/select",
+						function(data) {
+							$("#seleccioCount").html(data);
+							$('#taulaDades').webutilDatatable('refresh');
+						}
+				);
+				return false;
+			});
+			$('#seleccioNone').on('click', function() {
+				$.get(
+						"canviEstat/deselect",
+						function(data) {
+							$("#seleccioCount").html(data);
+							$('#taulaDades').webutilDatatable('select-none');
+							$('#taulaDades').webutilDatatable('refresh');
+						}
+				);
+				return false;
+			});
+		});
+		
+		$('#taulaDades').on('draw.dt', function () {
+	
+			var metaExpedientId = $('#metaExpedientId').val();
+			$('thead tr th:nth-child(1)', $('#taulaDades')).each(function() {
+				enableDisableSelection($(this), metaExpedientId);
+			});
+			$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function() {
+				enableDisableSelection($(this), metaExpedientId);
+			});
+	
+			$("span[class^='stateColor-']").each(function( index ) {
+				var fullClassNameString = this.className;
+				var colorString = fullClassNameString.substring(11);
+				if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
+					$(this).parent().css( "border", "dashed 1px #AAA" );
+					$(this).parent().css( "color", '#666666' );
+				} else if (colorString == 'TANCAT') {
+					$(this).parent().css( "background-color", "#777" );
+				} else {
+					$(this).parent().css( "background-color", colorString );
+					const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
+					$(this).parent().css( "color", textColor );
+					// $(this).parent().css( "fontSize", 'small' );
+					$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+				}
+			});
+	
+		});	
+	
+		$('#metaExpedientId').on('change', function() {
+			metaExpedientId = $(this).val();
+	
+			if (metaExpedientId) {
+				$("#expedientId").data('urlParamAddicional', metaExpedientId);
+			} else {
+				$("#expedientId").data('urlParamAddicional', null);
+				metaExpedientId = 0;
+			}
+
+			changeExpedientPlaceHolder();
+	
+			$('#expedientId option[value!=""]').remove();
+			$('#expedientId').select2('val', '', true);
+			
+			$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
+			.done(function(data) {
+				
+				$('#expedientEstatId').select2('val', '', true);
+				$('#expedientEstatId option[value!=""]').remove();
+	
+				let listSize = data.length > 1 ? data.length - 1 : data.length; // don't add last estat 'TANCAT'
+				for (var i = 0; i < listSize; i++) {
+					$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+				}
+			})
+			.fail(function() {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+			
+		});
+
+		changeExpedientPlaceHolder();
+	});//################################################## document ready END ##############################################################
+	
+	function enableDisableSelection($this, tipus) {
+	    if (tipus != undefined && tipus != "") {
+	    	$this.removeClass('selection-disabled');
+	    	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
+	    	$('.botons .btn-group button').removeAttr('disabled');
+	    } else {
+	    	$this.addClass('selection-disabled');
+	    	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
 			$.get(
-					"canviEstat/deselect",
+					"deselect",
 					function(data) {
 						$("#seleccioCount").html(data);
 						$('#taulaDades').webutilDatatable('select-none');
-						$('#taulaDades').webutilDatatable('refresh');
 					}
-			);
-			return false;
-		});
-	});
-
-	
-	$('#taulaDades').on('draw.dt', function () {
-
-		var metaExpedientId = $('#metaExpedientId').val();
-		$('thead tr th:nth-child(1)', $('#taulaDades')).each(function() {
-			enableDisableSelection($(this), metaExpedientId);
-		});
-		$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function() {
-			enableDisableSelection($(this), metaExpedientId);
-		});
-
-		$("span[class^='stateColor-']").each(function( index ) {
-			var fullClassNameString = this.className;
-			var colorString = fullClassNameString.substring(11);
-			if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
-				$(this).parent().css( "border", "dashed 1px #AAA" );
-				$(this).parent().css( "color", '#666666' );
-			} else if (colorString == 'TANCAT') {
-				$(this).parent().css( "background-color", "#777" );
-			} else {
-				$(this).parent().css( "background-color", colorString );
-				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
-				$(this).parent().css( "color", textColor );
-				// $(this).parent().css( "fontSize", 'small' );
-				$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
-			}
-		});
-
-	});	
-
-
-
-	$('#metaExpedientId').on('change', function() {
-		metaExpedientId = $(this).val();
-
-		if (metaExpedientId) {
-			$("#expedientId").data('urlParamAddicional', metaExpedientId);
-		} else {
-			$("#expedientId").data('urlParamAddicional', null);
-			metaExpedientId = 0;
+				);
+			$('.botons .btn-group button').attr('disabled','disabled');
 		}
-
-		$('#expedientId option[value!=""]').remove();
-		$('#expedientId').select2('val', '', true);
-		
-		$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
-		.done(function(data) {
-			
-			$('#expedientEstatId').select2('val', '', true);
-			$('#expedientEstatId option[value!=""]').remove();
-
-			let listSize = data.length > 1 ? data.length - 1 : data.length; // don't add last estat 'TANCAT'
-			for (var i = 0; i < listSize; i++) {
-				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-			}
-		})
-		.fail(function() {
-			alert("<spring:message code="error.jquery.ajax"/>");
-		});
-		
-	});
-
-});//################################################## document ready END ##############################################################
-
-	
-function enableDisableSelection($this, tipus) {
-    if (tipus != undefined && tipus != "") {
-    	$this.removeClass('selection-disabled');
-    	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
-    	$('.botons .btn-group button').removeAttr('disabled');
-    } else {
-    	$this.addClass('selection-disabled');
-    	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
-		$.get(
-				"deselect",
-				function(data) {
-					$("#seleccioCount").html(data);
-					$('#taulaDades').webutilDatatable('select-none');
-				}
-			);
-		$('.botons .btn-group button').attr('disabled','disabled');
 	}
-}
 
-
-
-</script>
+	function changeExpedientPlaceHolder() {
+		var procSelector = document.getElementById("metaExpedientId");
+		var tipus = $("#metaExpedientId").val();
+		if (tipus) {
+			$('#select2-expedientId-container .select2-selection__placeholder').html('<spring:message code="accio.massiva.list.filtre.expsDelProc"/> '+procSelector.options[procSelector.selectedIndex].text);
+			$('#select2-expedientEstatId-container .select2-selection__placeholder').html('<spring:message code="expedient.list.user.placeholder.estatProc"/> '+procSelector.options[procSelector.selectedIndex].text);
+		} else {
+			$('#select2-expedientId-container .select2-selection__placeholder').html('<spring:message code="contingut.admin.filtre.expedient"/>');
+			$('#select2-expedientEstatId-container .select2-selection__placeholder').html('<spring:message code="expedient.list.user.placeholder.estat"/>');
+		}
+	}
+	
+	</script>
 
 </head>
 <body>
 	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="codiSiaINom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true"/>
+				<rip:inputSelect
+					name="metaExpedientId"
+					optionItems="${metaExpedients}"
+					optionValueAttribute="id"
+					optionTextAttribute="codiSiaINom"
+					optionMinimumResultsForSearch="3"
+					emptyOption="true"
+					placeholderKey="accio.massiva.list.filtre.tipusexpedient"
+					inline="true"/>
 			</div>
 			<div class="col-md-4">					
 				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
@@ -191,10 +205,10 @@ function enableDisableSelection($this, tipus) {
 					urlParamAddicional="${contingutMassiuFiltreCommand.metaExpedientId}"/>	
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioDesde"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataCreacioFins"/>
 			</div>			
 		</div>
 		<div class="row">
@@ -209,6 +223,18 @@ function enableDisableSelection($this, tipus) {
 					placeholderKey="expedient.list.user.placeholder.estat" 
 					inline="true" />
 			</div>
+			
+			<div class="col-md-4">
+				<rip:inputSelect 
+					name="prioritat" 
+					optionItems="${prioritatsExpedient}"
+					emptyOption="true"
+					optionValueAttribute="value"
+					optionTextKeyAttribute="text"
+					placeholderKey="contingut.expedient.form.camp.prioritat"
+					templateResultFunction="showColorPriritats" 
+					inline="true" />
+			</div>			
 
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">

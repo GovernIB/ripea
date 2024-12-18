@@ -1,6 +1,7 @@
 package es.caib.ripea.core.repository.command;
 
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -15,20 +16,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
+@SuppressWarnings("serial")
 @Component
 public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
 
-    @Autowired
-    private ExpedientRepository expedientRepository;
-
+    @Autowired private ExpedientRepository expedientRepository;
 
     public Page<ExpedientEntity> findExpedientsRelacionatsByIdIn(final EntitatEntity entitat, final MetaNodeEntity metaNode, final String numero, final String nom, final ExpedientEstatEnumDto estatEnum, final ExpedientEstatEntity estat, final List<Long> ids, final Pageable pageable) {
         Map<String, Object> params = new HashMap<String, Object>() {{
@@ -58,7 +56,20 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         return getList(new ExpedientByEntitatAndMetaExpedientCommand(params), metaNodesPermesos, true);
     }
 
-    public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(final EntitatEntity entitat, final boolean nomesAgafats, final UsuariEntity usuariActual, final MetaNodeEntity metaExpedient, final ExpedientEntity expedient, final Date dataInici, final Date dataFi, final ExpedientEstatEnumDto estatEnum, final ExpedientEstatEntity estat, final List<? extends MetaNodeEntity> metaExpedientsPermesos, final Pageable pageable) {
+    public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(
+    		final EntitatEntity entitat,
+    		final boolean nomesAgafats,
+    		final UsuariEntity usuariActual,
+    		final MetaNodeEntity metaExpedient,
+    		final ExpedientEntity expedient,
+    		final Date dataInici,
+    		final Date dataFi,
+    		final String nom,
+    		final ExpedientEstatEnumDto estatEnum,
+    		final ExpedientEstatEntity estat,
+    		final PrioritatEnumDto prioritat,
+    		final List<? extends MetaNodeEntity> metaExpedientsPermesos,
+    		final Pageable pageable) {
         Map<String, Object> params = new HashMap<String, Object>() {{
             put("entitat", entitat);
             put("nomesAgafats", nomesAgafats);
@@ -67,8 +78,10 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             put("expedient", expedient);
             put("dataInici", dataInici);
             put("dataFi", dataFi);
+            put("nom", nom);
             put("estatEnum", estatEnum);
             put("estat", estat);
+            put("prioritat", prioritat);
             put("pageable", pageable);
         }};
         return getPage(new ExpedientByExpedientsPerCanviEstatMassiuCommand(params), metaExpedientsPermesos, true);
@@ -89,7 +102,17 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         return getList(new IdsByExpedientsPerCanviEstatMassiuCommand(params), metaExpedientsPermesos, true);
     }
 
-    public Page<ExpedientEntity> findExpedientsPerTancamentMassiu(final EntitatEntity entitat, final boolean nomesAgafats, final UsuariEntity usuariActual, final MetaNodeEntity metaExpedient, final String nom, final Date dataInici, final Date dataFi, final List<? extends MetaNodeEntity> metaExpedientsPermesos, final Pageable pageable) {
+    public Page<ExpedientEntity> findExpedientsPerTancamentMassiu(
+    		final EntitatEntity entitat,
+    		final boolean nomesAgafats,
+    		final UsuariEntity usuariActual,
+    		final MetaNodeEntity metaExpedient,
+    		final String nom,
+    		final Date dataInici,
+    		final Date dataFi,
+    		final PrioritatEnumDto prioritat,
+    		final List<? extends MetaNodeEntity> metaExpedientsPermesos,
+    		final Pageable pageable) {
         Map<String, Object> params = new HashMap<String, Object>() {{
             put("entitat", entitat);
             put("nomesAgafats", nomesAgafats);
@@ -99,6 +122,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             put("dataInici", dataInici);
             put("dataFi", dataFi);
             put("pageable", pageable);
+            put("prioritat", prioritat);
         }};
         return getPage(new ExpedientByExpedientsPerTancamentMassiuCommand(params), metaExpedientsPermesos, false);
     }
@@ -144,7 +168,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
     }
 
     public List<ExpedientEntity> findByEntitatAndMetaExpedientAndOrgans(final EntitatEntity entitat, final MetaNodeEntity metaNode, final List<String> organsCodisPermitted) {
-        Map<String, Object> params = new HashMap<String, Object>() {{
+		Map<String, Object> params = new HashMap<String, Object>() {{
             put("entitat", entitat);
             put("metaNode", metaNode);
         }};
@@ -266,8 +290,10 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final ExpedientEntity expedient;
         private final Date dataInici;
         private final Date dataFi;
+        private final String nom;
         private final ExpedientEstatEnumDto estatEnum;
         private final ExpedientEstatEntity estat;
+        private final PrioritatEnumDto prioritat;
         private final Pageable pageable;
 
         public ExpedientByExpedientsPerCanviEstatMassiuCommand(Map<String, Object> params) {
@@ -278,8 +304,10 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.expedient = (ExpedientEntity) params.get("expedient");
             this.dataInici = (Date) params.get("dataInici");
             this.dataFi = (Date) params.get("dataFi");
+            this.nom = (String) params.get("nom");
             this.estatEnum = (ExpedientEstatEnumDto) params.get("estatEnum");
             this.estat = (ExpedientEstatEntity) params.get("estat");
+            this.prioritat = (PrioritatEnumDto) params.get("prioritat");
             this.pageable = (Pageable) params.get("pageable");
         }
 
@@ -294,7 +322,9 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     dataInici == null, dataInici,
                     dataFi == null, dataFi,
                     estatEnum == null, estatEnum,
-                    estat == null, estat);
+                    !Utils.hasValue(nom), nom,
+                    estat == null, estat,
+                    prioritat == null, prioritat);
         }
         @Override
         public Page<ExpedientEntity> executePage(List<?> sublist) {
@@ -307,7 +337,9 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     dataInici == null, dataInici,
                     dataFi == null, dataFi,
                     estatEnum == null, estatEnum,
+                    !Utils.hasValue(nom), nom,
                     estat == null, estat,
+                    prioritat == null, prioritat,
                     pageable);
         }
 
@@ -329,6 +361,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final Date dataFi;
         private final ExpedientEstatEnumDto estatEnum;
         private final ExpedientEstatEntity estat;
+        private final PrioritatEnumDto prioritat;
 
         public IdsByExpedientsPerCanviEstatMassiuCommand(Map<String, Object> params) {
             this.entitat = (EntitatEntity) params.get("entitat");
@@ -340,6 +373,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.dataFi = (Date) params.get("dataFi");
             this.estatEnum = (ExpedientEstatEnumDto) params.get("estatEnum");
             this.estat = (ExpedientEstatEntity) params.get("estat");
+            this.prioritat = (PrioritatEnumDto) params.get("prioritat");
         }
 
         @Override
@@ -353,7 +387,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     dataInici == null, dataInici,
                     dataFi == null, dataFi,
                     estatEnum == null, estatEnum,
-                    estat == null, estat);
+                    estat == null, estat,
+                    prioritat == null, prioritat);
         }
         @Override
         public Page<Long> executePage(List<?> sublist) {
@@ -376,6 +411,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final String nom;
         private final Date dataInici;
         private final Date dataFi;
+        private final PrioritatEnumDto prioritat;
         private final Pageable pageable;
 
         public ExpedientByExpedientsPerTancamentMassiuCommand(Map<String, Object> params) {
@@ -387,6 +423,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.dataInici = (Date) params.get("dataInici");
             this.dataFi = (Date) params.get("dataFi");
             this.pageable = (Pageable) params.get("pageable");
+            this.prioritat = (PrioritatEnumDto) params.get("prioritat");
         }
 
         @Override
@@ -398,7 +435,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     metaExpedient == null, metaExpedient,
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
                     dataInici == null, dataInici,
-                    dataFi == null, dataFi);
+                    dataFi == null, dataFi,
+                    prioritat == null, prioritat);
         }
         @Override
         public Page<ExpedientEntity> executePage(List<?> sublist) {
@@ -410,6 +448,7 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
                     dataInici == null, dataInici,
                     dataFi == null, dataFi,
+                    prioritat == null, prioritat,
                     pageable);
         }
 

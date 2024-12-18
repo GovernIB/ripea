@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 import java.io.Serializable;
@@ -9,7 +6,6 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
-
 
 /**
  * Informació del filtre de continguts.
@@ -31,12 +27,11 @@ public class ContingutMassiuFiltreDto implements Serializable {
 	private Date dataFi;
 	private String identificador;
 	private Long expedientEstatId;
-	
+	private PrioritatEnumDto prioritat;
 	private boolean bloquejarTipusElement;
 	private boolean bloquejarMetaDada;
 	private boolean bloquejarMetaExpedient;
 	private boolean bloquejarMetaDocument;
-	
 	
 	public ContingutTipusEnumDto getTipusElement() {
 		return tipusElement;

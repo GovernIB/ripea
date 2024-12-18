@@ -4,6 +4,7 @@
 package es.caib.ripea.core.repository;
 
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -416,7 +417,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullExpedient = true or e = :expedient) " +
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaExpedient = true))) " +
+			"and (:esNullPrioritat = true or e.prioritat = :prioritatEnum) " +
 			"and (:esNullEstat = true or e.estatAdditional = :estat) ";
 
 	@Query(FIND_BY_CANVI_ESTAT_MASSIU)
@@ -435,8 +438,12 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataFi") Date dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,			
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") ExpedientEstatEntity estat,
+			@Param("esNullPrioritat") boolean esNullPrioritat,
+			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum,
 			Pageable pageable);
 
 	@Query(FIND_BY_CANVI_ESTAT_MASSIU)
@@ -455,8 +462,12 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataFi") Date dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEntity estat);
+			@Param("estat") ExpedientEstatEntity estat,
+			@Param("esNullPrioritat") boolean esNullPrioritat,
+			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum);
 
 	@Query(	"select " +
 			"    e.id " +
@@ -473,6 +484,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaExpedient = true))) " +
+			"and (:esNullPrioritat = true or e.prioritat = :prioritatEnum) " +
 			"and (:esNullEstat = true or e.estatAdditional = :estat) ")
 	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			@Param("entitat") EntitatEntity entitat,
@@ -490,8 +502,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEntity estat);
-
+			@Param("estat") ExpedientEstatEntity estat,
+			@Param("esNullPrioritat") boolean esNullPrioritat,
+			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum);
 
 	static final String FIND_BY_TANCAMENT_MASSIU = "select " +
 			"    e " +
@@ -507,6 +520,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
+			"and (:esNullPrioritat = true or e.prioritat = :prioritatEnum) " +
 			"and (select count(document) from DocumentEntity document where " + // no documents en process de firma
 			"	document.expedient = e " +
 			"	and (document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
@@ -545,6 +559,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
+			@Param("esNullPrioritat") boolean esNullPrioritat,
+			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum,			
 			Pageable pageable);
 
 	@Query(FIND_BY_TANCAMENT_MASSIU)
@@ -560,7 +576,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") Date dataFi,
+			@Param("esNullPrioritat") boolean esNullPrioritat,
+			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum);
 
 	@Query(	"select " +
 			"    e.id " +
