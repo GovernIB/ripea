@@ -111,7 +111,7 @@ $(document).ready(function() { });
 								<li class="divider"></li>
 							{{/if}}
 							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
-								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/contingut/${expedientId} ?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
+								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/contingut/${expedientId}?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
 							{{/if}}
 							{{if estat == 'PENDENT'}}
 								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>" data-toggle="ajax"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>

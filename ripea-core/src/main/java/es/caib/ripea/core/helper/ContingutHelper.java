@@ -794,8 +794,11 @@ public class ContingutHelper {
 		dto.setVersioCount(document.getVersioCount());
 		dto.setGesDocOriginalId(document.getGesDocOriginalId());
 		
-		if (params.isAmbVersions() && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == NO_ESBORRAT) {
-			setVersions(dto, document);
+		if (params.isAmbVersions() && 
+			pluginHelper.arxiuSuportaVersionsDocuments() && 
+			document.getEsborrat() == NO_ESBORRAT && 
+			Utils.hasValue(document.getArxiuUuid())) {
+				setVersions(dto, document);
 		}
 
 		dto.setCustodiaId(document.getCustodiaId());

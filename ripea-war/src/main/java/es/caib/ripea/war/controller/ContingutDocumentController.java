@@ -547,6 +547,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long documentId,
 			@RequestParam(value = "origin") String origin,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			@RequestParam(value = "expedientId", required = false) Long expedientId,
 			Model model)  {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -583,7 +584,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		String redirect = null;
 		if (origin.equals("docDetail")) {
-			redirect = "redirect:../../?tascaId=" + (tascaId == null ? "" : tascaId);
+			if (tascaId!=null) {
+				redirect = "redirect:../../../"+expedientId+"?tascaId="+tascaId;
+			} else {
+				redirect = "redirect:../../../"+expedientId;
+			}
 		} else if (origin.equals("seguiment")) {
 			redirect = "redirect:../../../../seguimentArxiuPendents/#documents";
 		}
@@ -1091,6 +1096,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		try {
 			
+			@SuppressWarnings("unchecked")
 			Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 			
 			if (docsIdx!=null && docsIdx.size()>1) {
