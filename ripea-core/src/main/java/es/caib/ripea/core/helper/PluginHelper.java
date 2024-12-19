@@ -1855,31 +1855,24 @@ public class PluginHelper {
 		return integracioAccioDto;
 	}
 
-	private String documentNomInArxiu(
-			String nomPerComprovar,
-			ContingutEntity pare) {
+	private String documentNomInArxiu(String nomPerComprovar, ContingutEntity pare) {
 
 		List<ContingutArxiu> continguts = null;
-		if (pare.getTipus() == ContingutTipusEnumDto.EXPEDIENT) {
-			continguts = arxiuExpedientConsultarPerUuid(
-					pare.getArxiuUuid()).getContinguts();
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(pare.getTipus()) || (ContingutTipusEnumDto.CARPETA.equals(pare.getTipus()) && isCarpetaLogica())) {
+			continguts = arxiuExpedientConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
 		} else {
-			continguts = arxiuCarpetaConsultarPerUuid(
-					pare.getArxiuUuid()).getContinguts();
+			continguts = arxiuCarpetaConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
 		}
 
-		nomPerComprovar = ArxiuConversioHelper.revisarContingutNom(
-				nomPerComprovar);
+		nomPerComprovar = ArxiuConversioHelper.revisarContingutNom(nomPerComprovar);
 		int ocurrences = 0;
 		if (continguts != null) {
 			List<String> noms = new ArrayList<String>();
 			for (ContingutArxiu contingut : continguts) {
-				noms.add(
-						contingut.getNom());
+				noms.add(contingut.getNom());
 			}
 			String newName = new String(nomPerComprovar);
-			while (noms.indexOf(
-					newName) >= 0) {
+			while (noms.indexOf(newName) >= 0) {
 				ocurrences++;
 				newName = nomPerComprovar + " (" + ocurrences + ")";
 			}
@@ -1888,9 +1881,7 @@ public class PluginHelper {
 		return nomPerComprovar;
 	}
 
-	public Document arxiuDocumentConsultar(
-			String arxiuUuid) {
-
+	public Document arxiuDocumentConsultar(String arxiuUuid) {
 		boolean throwException = false; // throwException = true;
 		if (throwException) {
 			throw new RuntimeException("Mock exception al consultar document arxiu");
@@ -1906,20 +1897,14 @@ public class PluginHelper {
 					arxiuUuid,
 					null,
 					true);
-
-			arxiuEnviamentOk(
-					integracioAccio);
-
+			arxiuEnviamentOk(integracioAccio);
 			return documentDetalls;
 		} catch (Exception ex) {
-			throw arxiuEnviamentError(
-					integracioAccio,
-					ex);
+			throw arxiuEnviamentError(integracioAccio, ex);
 		}
 	}
 
-	public void arxiuDocumentEsborrar(
-			String arxiuUuid) {
+	public void arxiuDocumentEsborrar(String arxiuUuid) {
 
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
@@ -1927,14 +1912,10 @@ public class PluginHelper {
 				arxiuPluginWrapper.getEndpoint(),
 				"Eliminació d'un document");
 		try {
-			getArxiuPlugin().getPlugin().documentEsborrar(
-					arxiuUuid);
-			arxiuEnviamentOk(
-					integracioAccio);
+			getArxiuPlugin().getPlugin().documentEsborrar(arxiuUuid);
+			arxiuEnviamentOk(integracioAccio);
 		} catch (Exception ex) {
-			throw arxiuEnviamentError(
-					integracioAccio,
-					ex);
+			throw arxiuEnviamentError(integracioAccio, ex);
 		}
 	}
 
@@ -5642,21 +5623,16 @@ public class PluginHelper {
 			ArxiuEstatEnumDto arxiuEstat) {
 
 		Document documentArxiu = new Document();
-
 		String documentNomInArxiu = documentEntity.getNom();
-		if (!DocumentTipusEnumDto.IMPORTAT.equals(
-				documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
-			documentNomInArxiu = documentNomInArxiu(
-					documentEntity.getNom(),
-					documentEntity.getPare());
+		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
+			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), documentEntity.getPare());
 		}
 		documentArxiu.setNom(documentNomInArxiu);
 		documentArxiu.setDescripcio(documentEntity.getDescripcio());
 		documentArxiu.setIdentificador(arxiuOperacio == ArxiuOperacioEnumDto.MODIFICACIO ? documentEntity.getArxiuUuid() : null);
 		documentArxiu.setEstat(DocumentEstat.valueOf(arxiuEstat.toString()));
 
-		if (!DocumentTipusEnumDto.FISIC.equals(
-				documentEntity.getDocumentTipus())) {
+		if (!DocumentTipusEnumDto.FISIC.equals(documentEntity.getDocumentTipus())) {
 			setContingutIFirmes(
 					documentArxiu,
 					fitxer,
