@@ -1,7 +1,5 @@
 package es.caib.ripea.core.api.dto;
 
-
-
 public enum NotificacioSeguimentEstatEnumDto {
 	PENDENT, 
 	ENVIADA, 
@@ -12,4 +10,3 @@ public enum NotificacioSeguimentEstatEnumDto {
 	REBUTJADA,
 	ENVIADA_SIR
 }
-

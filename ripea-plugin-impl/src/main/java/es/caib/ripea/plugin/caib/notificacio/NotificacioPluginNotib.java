@@ -29,6 +29,7 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioCanviClient;
+import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Registre;
 import es.caib.notib.client.domini.RespostaAltaV2;

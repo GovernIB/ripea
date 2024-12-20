@@ -249,9 +249,11 @@ public class IndexBatchHelper {
 							estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
 							break;
 						case ENVIADA:
+						case ENVIADA_AMB_ERRORS:
 							estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
 							break;
 						case FINALITZADA:
+						case FINALITZADA_AMB_ERRORS:
 							estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
 							break;
 						case PROCESSADA:
@@ -489,9 +491,11 @@ public class IndexBatchHelper {
 					case REGISTRADA:
 						estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
 					case ENVIADA:
+					case ENVIADA_AMB_ERRORS:
 						estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
 						break;
 					case FINALITZADA:
+					case FINALITZADA_AMB_ERRORS:
 						estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
 						break;
 					case PROCESSADA:

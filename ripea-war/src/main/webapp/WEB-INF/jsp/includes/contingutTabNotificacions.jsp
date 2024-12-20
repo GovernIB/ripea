@@ -216,6 +216,12 @@ $(document).ready(function() {
 						{{else}}
 							<span class="label label-info"><span class="fa fa-envelope-o"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA"/></span>
 						{{/if}}
+					{{else notificacioEstat == 'ENVIADA_AMB_ERRORS'}}
+						{{if error}}
+							<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA_AMB_ERRORS"/></span>
+						{{else}}
+							<span class="label label-info"><span class="fa fa-envelope-o"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA_AMB_ERRORS"/></span>
+						{{/if}}
 					{{else notificacioEstat == 'REGISTRADA'}}
 						{{if error}}
 							<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.REGISTRADA"/></span>
@@ -227,6 +233,12 @@ $(document).ready(function() {
 								<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA"/></span>
 							{{else}}
 								<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA"/></span>
+						{{/if}}
+					{{else notificacioEstat == 'FINALITZADA_AMB_ERRORS'}}
+						{{if error}}
+								<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA_AMB_ERRORS"/></span>
+							{{else}}
+								<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA_AMB_ERRORS"/></span>
 						{{/if}}
 					{{else notificacioEstat == 'PROCESSADA'}}
 						{{if error}}

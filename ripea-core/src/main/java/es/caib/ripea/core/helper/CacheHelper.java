@@ -683,7 +683,8 @@ public class CacheHelper {
 	
 	private boolean hasNotificacionsNoFinalitzades(DocumentEntity document) {
 		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
-				DocumentNotificacioEstatEnumDto.FINALITZADA, 
+				DocumentNotificacioEstatEnumDto.FINALITZADA,
+				DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS,
 				DocumentNotificacioEstatEnumDto.PROCESSADA));
 		List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
 		//Si la darrera notificació del document no està finalitzada

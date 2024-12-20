@@ -40,6 +40,10 @@
 			<c:set var="envelope" value="enviada fa fa-envelope-square" />
 		</c:when>
 		<c:when
+			test="${!contingut.errorDarreraNotificacio && (contingut.estatDarreraNotificacio == 'ENVIADA_AMB_ERRORS' or contingut.estatDarreraNotificacio == 'FINALITZADA_AMB_ERRORS')}">
+			<c:set var="envelope" value="error fa fa-envelope-square" />
+		</c:when>		
+		<c:when
 			test="${!contingut.errorDarreraNotificacio && (contingut.estatDarreraNotificacio == 'PROCESSADA' or contingut.estatDarreraNotificacio == 'FINALITZADA')}">
 			<c:set var="envelope" value="processada fa fa-envelope-square" />
 		</c:when>

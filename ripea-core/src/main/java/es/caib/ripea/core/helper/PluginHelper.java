@@ -4883,11 +4883,11 @@ public class PluginHelper {
 					respostaNotificioEstat.getDataFinalitzada());
 
 			DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
-			if (estatAnterior != estatDespres && (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA
-					&& estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
-				emailHelper.canviEstatNotificacio(
-						notificacio,
-						estatAnterior);
+			
+			if (estatAnterior != estatDespres &&
+				estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA &&
+				estatDespres  != DocumentNotificacioEstatEnumDto.PROCESSADA) {
+					emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
 			}
 
 			cacheHelper.evictErrorsValidacioPerNode(

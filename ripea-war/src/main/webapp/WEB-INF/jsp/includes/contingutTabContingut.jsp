@@ -1010,6 +1010,12 @@
 								if (val.error) {
 									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 								}
+							} else if (val.notificacioEstat == 'ENVIADA_AMB_ERRORS') {
+								content += "<span class='label label-info'><span class='fa fa-envelope-o'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA_AMB_ERRORS'/></span>";
+								if (val.error) {
+									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+								}								
 							} else if (val.notificacioEstat == 'REGISTRADA') {
 								content += "<span class='label label-success'><span class='fa fa-check'></span> ";
 								content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
@@ -1019,6 +1025,12 @@
 								if (val.error) {
 									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
 								}
+							} else if (val.notificacioEstat == 'FINALITZADA_AMB_ERRORS') {
+								content += "<span class='label label-success'><span class='fa fa-check'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA_AMB_ERRORS'/></span>";
+								if (val.error) {
+									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+								}								
 							} else if (val.notificacioEstat == 'PROCESSADA') {
 								content += "<span class='label label-success'><span class='fa fa-check'></span> ";
 								content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
