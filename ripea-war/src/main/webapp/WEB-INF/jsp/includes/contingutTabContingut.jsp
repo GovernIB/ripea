@@ -477,14 +477,7 @@
 			return false;
 		});
 		</c:if>
-
-		$(window).resize(resizeDropZone);
-
 	});//################################################## document ready END ##############################################################
-
-	const resizeDropZone = () => {
-		$('#drop-area').css('height', ($('div.panel-body').height() - 54) + 'px');
-	}
 
 	$(document).on('change', '.checkbox', function () {
 		selectCheckbox($(this));
@@ -682,8 +675,6 @@
 			var $dropMessage = $('#drop-message');
 			var $dragArea = $('#drag-area')
 			var dragCounter = 0;
-
-			resizeDropZone();
 
 			$('#drop-area').filedrop({
 				// paramname: 'file', // El nom del paràmetre que es passarà al servidor

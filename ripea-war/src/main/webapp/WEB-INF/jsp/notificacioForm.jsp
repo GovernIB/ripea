@@ -4,14 +4,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
 <%
 pageContext.setAttribute(
 		"interessatsTipusEnum",
 		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
 				 es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class,
 				"interessat.tipus.enum."));
-
 %>
 <c:choose>
 	<c:when test="${empty documentNotificacionsCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/> ${document.nom}</c:set></c:when>
@@ -279,17 +277,9 @@ function mostrarNotificacions(notificacions) {
 									</select> \
 								</div> \
 							</div> \
-						</div> \
-						<!----  NUM. DOCUMENT ----> \
-						<div class="col-md-6"> \
-							<div class="form-group"> \
-								<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.documentNum"><spring:message code="interessat.nifCifDni"/></label> \
-								<div class="col-xs-8"> \
-									<input disabled="true" id="enviaments[#num_notificacio#].titular.documentNum" name="enviaments[#num_notificacio#].titular.documentNum" class="form-control " type="text" value="' + (notificacio.titular.documentNum != null ? notificacio.titular.documentNum : "") +'"> \
-								</div> \
-							</div> \
-						</div> \
-						<!---- NOM / RAÓ SOCIAL ----> \
+						</div>' +
+						checkIfAdministracio(notificacio.titular, "titular") +
+						'<!---- NOM / RAÓ SOCIAL ----> \
 						<div class="col-md-6"> \
 							<div class="form-group"> ' +
 								getTipusInteressat(notificacio.titular) + 
@@ -314,7 +304,6 @@ function mostrarNotificacions(notificacions) {
 								</div> \
 							</div> \
 						</div>' +
-						checkIfAdministracio(notificacio.titular) +
 						checkIfPersonafisicaIncapacitat(notificacio) +
 				'</div> \
 			</div>' +
@@ -348,17 +337,9 @@ function setDestinatari(notificacio) {
 										</select> \
 									</div> \
 								</div> \
-							</div> \
-							<!----  NUM. DOCUMENT ----> \
-							<div class="col-md-6"> \
-								<div class="form-group"> \
-									<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].destinatari.documentNum"><spring:message code="interessat.nifCifDni"/></label> \
-									<div class="col-xs-8"> \
-										<input disabled="true" id="enviaments[#num_notificacio#].destinatari.documentNum" name="enviaments[#num_notificacio#].destinatari.documentNum" class="form-control " type="text" value="' + (notificacio.destinatari.documentNum != null ? notificacio.destinatari.documentNum : "") +'"> \
-									</div> \
-								</div> \
-							</div> \
-							<!---- NOM / RAÓ SOCIAL ----> \
+							</div>' +
+							checkIfAdministracio(notificacio.destinatari, "destinatari") +
+							'<!---- NOM / RAÓ SOCIAL ----> \
 							<div class="col-md-6"> \
 								<div class="form-group"> ' +
 									getTipusInteressat(notificacio.destinatari) + 
@@ -383,7 +364,6 @@ function setDestinatari(notificacio) {
 									</div> \
 								</div> \
 							</div>' +
-							checkIfAdministracio(notificacio.destinatari) +
 							checkIfPersonafisicaIncapacitat(notificacio) +
 					'</div> \
 				</div>';
@@ -527,42 +507,50 @@ function getTipusInteressat(interessat) {
 
 function checkIfPersonaFisica (interessat) {
 	if (interessat.tipus == "PERSONA_FISICA") {
-			return '<!---- PRIMER LLINATGE ----> \
-					<div class="col-md-6 llinatge1"> \
-						<div class="form-group"> \
-							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.llinatge1"><spring:message code="interessat.form.camp.llinatge1"/></label> \
-							<div class="col-xs-8"> \
-								<input disabled="true" id="enviaments[#num_notificacio#].titular.llinatge1" name="enviaments[#num_notificacio#].titular.llinatge1" class="form-control " type="text" value="' + (interessat.llinatge1 != null ? interessat.llinatge1 : "") +'"> \
-							</div> \
-						</div> \
+		return '<!---- PRIMER LLINATGE ----> \
+			<div class="col-md-6 llinatge1"> \
+				<div class="form-group"> \
+					<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.llinatge1"><spring:message code="interessat.form.camp.llinatge1"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].titular.llinatge1" name="enviaments[#num_notificacio#].titular.llinatge1" class="form-control " type="text" value="' + (interessat.llinatge1 != null ? interessat.llinatge1 : "") +'"> \
 					</div> \
-					<!---- SEGON LLINATGE ----> \
-					<div class="col-md-6 llinatge2"> \
-						<div class="form-group"> \
-							<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.llinatge2"><spring:message code="interessat.form.camp.llinatge2"/></label> \
-							<div class="col-xs-8"> \
-								<input disabled="true" id="enviaments[#num_notificacio#].titular.llinatge2" name="enviaments[#num_notificacio#].titular.llinatge2" class="form-control " type="text" value="' + (interessat.llinatge2 != null ? interessat.llinatge2 : "") +'"> \
-							</div> \
-						</div> \
-					</div>';
+				</div> \
+			</div> \
+			<!---- SEGON LLINATGE ----> \
+			<div class="col-md-6 llinatge2"> \
+				<div class="form-group"> \
+					<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.llinatge2"><spring:message code="interessat.form.camp.llinatge2"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].titular.llinatge2" name="enviaments[#num_notificacio#].titular.llinatge2" class="form-control " type="text" value="' + (interessat.llinatge2 != null ? interessat.llinatge2 : "") +'"> \
+					</div> \
+				</div> \
+			</div>';
 	} else {
 		return '';
 	}
 }
 
-function checkIfAdministracio(interessat) {
+function checkIfAdministracio(interessat, camp) {
 	if (interessat.tipus == "ADMINISTRACIO") {
 		return '<!---- CODI DIR3 ----> \
-				<div class="col-md-6"> \
-					<div class="form-group"> \
-						<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].titular.organCodi"><spring:message code="interessat.dir3codi"/></label> \
-						<div class="col-xs-8"> \
-							<input disabled="true" id="enviaments[#num_notificacio#].titular.organCodi" name="enviaments[#num_notificacio#].titular.organCodi" class="form-control " type="text" value="' + (interessat.organCodi != null ? interessat.organCodi : "") +'"> \
-						</div> \
+			<div class="col-md-6"> \
+				<div class="form-group"> \
+					<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].'+camp+'.organCodi"><spring:message code="interessat.dir3codi"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].'+camp+'.organCodi" name="enviaments[#num_notificacio#].'+camp+'.organCodi" class="form-control " type="text" value="' + (interessat.organCodi != null ? interessat.organCodi : "") +'"> \
 					</div> \
-				</div>';
+				</div> \
+			</div>';
 	} else {
-		return '';
+		return '<!----  NUM. DOCUMENT ----> \
+			<div class="col-md-6"> \
+				<div class="form-group"> \
+					<label class="control-label col-xs-4 " for="enviaments[#num_notificacio#].'+camp+'.documentNum"><spring:message code="interessat.nifCifDni"/></label> \
+					<div class="col-xs-8"> \
+						<input disabled="true" id="enviaments[#num_notificacio#].'+camp+'.documentNum" name="enviaments[#num_notificacio#].'+camp+'.documentNum" class="form-control " type="text" value="' + (interessat.documentNum != null ? interessat.documentNum : "") +'"> \
+					</div> \
+				</div> \
+			</div>';
 	}
 }
 
