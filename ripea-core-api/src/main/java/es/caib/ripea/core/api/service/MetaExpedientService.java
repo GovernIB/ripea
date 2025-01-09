@@ -354,6 +354,18 @@ public interface MetaExpedientService {
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientTascaValidacioDto> findValidacionsTasca(Long metaExpedientTascaId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public boolean createValidacioTasca(MetaExpedientTascaValidacioDto metaExpedientTascaValidacioDto);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public MetaExpedientTascaValidacioDto updateValidacioTasca(Long metaExpedientTascaValidacioId, String accio);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public int createValidacionsTasca(Long entitatId, Long tascaID, List<MetaExpedientTascaValidacioDto> validacions);
+	
 	/**
 	 * Consulta els permisos del meta-expedient.
 	 * 

@@ -10,11 +10,13 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
@@ -32,6 +34,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -48,6 +51,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.core.repository.PinbalServeiRepository;
 
 /**
@@ -74,6 +78,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Resource private MetaExpedientRepository metaExpedientRepository;
 	@Resource private CacheHelper cacheHelper;
 	@Resource private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 
 	@Transactional
 	@Override
@@ -360,6 +365,15 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocument);
 		if (docs != null && !docs.isEmpty()) {
 			throw new ExisteixenDocumentsException();
+		}
+		
+		//Eliminar les possibles validacions sobre el document
+		List<MetaExpedientTascaValidacioEntity> validacionsDoc = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
+				ItemValidacioTascaEnum.DOCUMENT,
+				id);
+		
+		if (validacionsDoc!=null && validacionsDoc.size()>0) {
+			metaExpedientTascaValidacioRepository.delete(validacionsDoc);
 		}
 		
 		metaDocumentRepository.delete(metaDocument);

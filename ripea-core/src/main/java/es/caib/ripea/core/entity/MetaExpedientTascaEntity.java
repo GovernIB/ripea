@@ -3,8 +3,10 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -49,9 +51,11 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Column(name = "PRIORITAT", length = 16)
 	@Enumerated(EnumType.STRING)
 	private PrioritatEnumDto prioritat;
+	
 	@ManyToOne
 	@JoinColumn(name = "estat_crear_tasca_id")
 	private ExpedientEstatEntity estatCrearTasca;
+	
 	@ManyToOne
 	@JoinColumn(name = "estat_finalitzar_tasca_id")
 	private ExpedientEstatEntity estatFinalitzarTasca;
@@ -60,6 +64,13 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = "ipa_metaexp_metaexptas_fk")
 	private MetaExpedientEntity metaExpedient;
+	
+	@OneToMany(
+			mappedBy = "metaExpedientTasca",
+			cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	private List<MetaExpedientTascaValidacioEntity> validacions = new ArrayList<MetaExpedientTascaValidacioEntity>();
 	
 	public void update(
 			String codi,

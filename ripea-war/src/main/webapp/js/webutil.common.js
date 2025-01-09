@@ -12,6 +12,30 @@ function webutilRefreshMissatges() {
 	$('#contingut-missatges').load(webutilContextPath() + "/nodeco/missatges");
 }
 
+function esNuloBlancoOIndefinido(variable) {
+	return variable === null || variable === '' || variable === undefined;
+}
+
+function listGenericDtoToSelect2(llistaElements, selectId) {
+	let select = document.getElementById(selectId);
+	
+	while (select.options.length > 0) {
+		select.remove(0);
+	}
+	
+	const opcionBlanco = document.createElement('option');
+	opcionBlanco.value = '';
+	opcionBlanco.text = '';
+	select.appendChild(opcionBlanco);
+	
+	llistaElements.forEach(elemento => {
+		const opcion = document.createElement('option');
+		opcion.value = elemento.id;
+		opcion.text = elemento.texte;
+		select.appendChild(opcion);
+	});
+}
+
 function remarcaElement(jQueryElem, color) {
 	if (typeof color === 'undefined') { color = '#d9edf7'; }
 	jQueryElem[0].animate({ backgroundColor: color }, 500);

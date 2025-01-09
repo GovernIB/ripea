@@ -511,15 +511,36 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				adminOrganId);
 	}
 
-//    @Override
-//    public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
-//        return delegate.getMetaExpedientsAmbOrganNoSincronitzat(entitatId);
-//    }
-
 	@Override
 	@RolesAllowed("tothom")
 	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis) {
 		return delegate.hasPermissionForAnyProcediment(entitatId, rolActual, permis);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientTascaValidacioDto> findValidacionsTasca(Long metaExpedientTascaId) {
+		return delegate.findValidacionsTasca(metaExpedientTascaId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean createValidacioTasca(MetaExpedientTascaValidacioDto metaExpedientTascaValidacioDto) {
+		return delegate.createValidacioTasca(metaExpedientTascaValidacioDto);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaExpedientTascaValidacioDto updateValidacioTasca(Long metaExpedientTascaValidacioId, String accio) {
+		return delegate.updateValidacioTasca(metaExpedientTascaValidacioId, accio);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public int createValidacionsTasca(
+			Long entitatId,
+			Long tascaID,
+			List<MetaExpedientTascaValidacioDto> validacions) {
+		return delegate.createValidacionsTasca(entitatId, tascaID, validacions);
+	}
 }

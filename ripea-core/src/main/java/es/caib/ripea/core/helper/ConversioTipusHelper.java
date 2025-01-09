@@ -42,10 +42,12 @@ import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -85,6 +87,7 @@ import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -92,6 +95,8 @@ import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.PinbalServeiRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
@@ -115,6 +120,8 @@ public class ConversioTipusHelper {
 
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private TascaHelper tascaHelper;
 	@Autowired private MessageHelper messageHelper;
@@ -156,6 +163,39 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+	      mapperFactory.classMap(MetaExpedientTascaValidacioEntity.class, MetaExpedientTascaValidacioDto.class) 
+	        .byDefault()
+	        .customize(new CustomMapper<MetaExpedientTascaValidacioEntity, MetaExpedientTascaValidacioDto>() {
+	        		@Override
+					public void mapAtoB(MetaExpedientTascaValidacioEntity source, MetaExpedientTascaValidacioDto dest, MappingContext context) {
+						if (ItemValidacioTascaEnum.DADA.equals(source.getItemValidacio())) {
+							dest.setItemNom(metaDadaRepository.findOne(source.getItemId()).getNom());
+						} else {
+							dest.setItemNom(metaDocumentRepository.findOne(source.getItemId()).getNom());
+						}
+					}
+				})
+	        .register();
+		
+		/*mapperFactory.getConverterFactory()..registerConverter(
+				new CustomConverter<MetaExpedientTascaValidacioEntity, MetaExpedientTascaValidacioDto>() {
+					public MetaExpedientTascaValidacioDto convert(MetaExpedientTascaValidacioEntity source, Type<? extends MetaExpedientTascaValidacioDto> destinationClass) {
+						MetaExpedientTascaValidacioDto target = new MetaExpedientTascaValidacioDto();
+						target.setId(source.getId());
+						target.setItemId(source.getItemId());
+						target.setActiva(source.isActiva());
+						target.setItemValidacio(source.getItemValidacio());
+						target.setMetaExpedientTasca(metaExpedientTasca);
+						if (ItemValidacioTascaEnum.DADA.equals(source.getItemValidacio())) {
+							
+						} else {
+							
+						}
+						return target;
+					}
+				});		
+		*/
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<PermisDto, PermisOrganGestorDto>() {
 					public PermisOrganGestorDto convert(PermisDto source, Type<? extends PermisOrganGestorDto> destinationClass) {
@@ -176,21 +216,7 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
-		
-		
-//		mapperFactory.getConverterFactory().registerConverter(
-//		new CustomConverter<GrupEntity, GrupDto>() {
-//			public GrupDto convert(GrupEntity source, Type<? extends GrupDto> destinationClass) {
-//				GrupDto target = new GrupDto();
-//				target.setId(source.getId());
-//				target.setRol(source.getRol());
-//				target.setDescripcio(source.getDescripcio());
-//
-//
-//				return target;
-//			}
-//		});
-		
+
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientTascaEntity, ExpedientTascaDto>() {
 					public ExpedientTascaDto convert(ExpedientTascaEntity source, Type<? extends ExpedientTascaDto> destinationClass) {
@@ -887,8 +913,6 @@ public class ConversioTipusHelper {
 	      	.exclude("tasques")
 	        .byDefault()
 	        .register();
-	      
-	      
 	}
 
 	private static InteressatEntity deproxyInteressatEntity(InteressatEntity source) {

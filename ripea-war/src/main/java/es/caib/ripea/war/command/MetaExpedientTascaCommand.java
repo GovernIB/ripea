@@ -7,8 +7,10 @@ import java.util.Date;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.core.api.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PrioritatEnumDto;
+import es.caib.ripea.core.api.dto.TipusValidacioTascaEnum;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientTascaNoRepetit;
 import lombok.Getter;
@@ -38,6 +40,12 @@ public class MetaExpedientTascaCommand {
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     private Long entitatId;
     private Long metaExpedientId;
+    
+    //Valors per defecte dels camps per crear nova validació.
+    //Un cop carregada la pantalla, hi ha funcions javascript per controlar la inserció
+    private ItemValidacioTascaEnum itemValidacio = ItemValidacioTascaEnum.DADA;
+    private TipusValidacioTascaEnum tipusValidacio;
+    private Long itemId;
 
     public static MetaExpedientTascaCommand asCommand(MetaExpedientTascaDto dto) {
         MetaExpedientTascaCommand command = ConversioTipusHelper.convertir(dto,

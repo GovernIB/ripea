@@ -9,9 +9,11 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -20,6 +22,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -32,6 +35,7 @@ import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 
 /**
@@ -42,29 +46,18 @@ import es.caib.ripea.core.repository.NodeRepository;
 @Service
 public class MetaDadaServiceImpl implements MetaDadaService {
 
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private NodeRepository nodeRepository;
-	@Resource
-	private DadaRepository dadaRepository;
-
-	@Resource
-	ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	PaginacioHelper paginacioHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private MetaNodeHelper metaNodeHelper;
-	@Resource
-	private MetaExpedientHelper metaExpedientHelper;
-	@Resource
-	private MetaDadaHelper metaDadaHelper;
+	@Resource private MetaDadaRepository metaDadaRepository;
+	@Resource private EntitatRepository entitatRepository;
+	@Resource private NodeRepository nodeRepository;
+	@Resource private DadaRepository dadaRepository;
+	@Resource ConversioTipusHelper conversioTipusHelper;
+	@Resource PaginacioHelper paginacioHelper;
+	@Resource private PermisosHelper permisosHelper;
+	@Resource private EntityComprovarHelper entityComprovarHelper;
+	@Resource private MetaNodeHelper metaNodeHelper;
+	@Resource private MetaExpedientHelper metaExpedientHelper;
+	@Resource private MetaDadaHelper metaDadaHelper;
+	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 
 	@Transactional
 	@Override
@@ -130,13 +123,21 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				entitat,
 				metaNodeId);
 		
-		
 		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
 				entitat,
 				metaNode,
 				id);
-		metaDadaRepository.delete(metaDada);
 		
+		//Eliminar les possibles validacions sobre la dada
+		List<MetaExpedientTascaValidacioEntity> validacionsDada = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
+				ItemValidacioTascaEnum.DADA,
+				id);
+		
+		if (validacionsDada!=null && validacionsDada.size()>0) {
+			metaExpedientTascaValidacioRepository.delete(validacionsDada);
+		}
+		
+		metaDadaRepository.delete(metaDada);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;

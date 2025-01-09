@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
@@ -40,6 +37,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -70,6 +68,7 @@ import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -102,6 +101,7 @@ import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
@@ -143,6 +143,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private HistoricExpedientRepository historicExpedientRepository;
 	@Autowired private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Resource private MetaDocumentHelper metaDocumentHelper;
@@ -1647,9 +1648,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
-
 		metaExpedientHelper.canviarRevisioAPendentEnviarEmail(entitatId, metaExpedient.getId(), organId);
-		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}
 	
@@ -1661,12 +1660,77 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
-
 		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientServiceImpl.class);
+
+	@Override
+	@Transactional(readOnly=true)
+	public List<MetaExpedientTascaValidacioDto> findValidacionsTasca(Long metaExpedientTascaId) {
+		List<MetaExpedientTascaValidacioEntity> aux = metaExpedientTascaValidacioRepository.findByMetaExpedientTascaId(metaExpedientTascaId);
+		return conversioTipusHelper.convertirList(aux, MetaExpedientTascaValidacioDto.class);
+	}
+
+	@Override
+	@Transactional
+	public boolean createValidacioTasca(MetaExpedientTascaValidacioDto metaExpedientTascaValidacioDto) {
+		
+		List<MetaExpedientTascaValidacioEntity> repetits = metaExpedientTascaValidacioRepository.findByItemValidacioAndTipusValidacioAndItemId(
+				metaExpedientTascaValidacioDto.getItemValidacio(),
+				metaExpedientTascaValidacioDto.getTipusValidacio(),
+				metaExpedientTascaValidacioDto.getItemId());
+		
+		if (repetits==null || repetits.size()==0) {
+			MetaExpedientTascaValidacioEntity novaValidacio = MetaExpedientTascaValidacioEntity.getBuilder(
+					metaExpedientTascaValidacioDto.getItemValidacio(),
+					metaExpedientTascaValidacioDto.getTipusValidacio(),
+					metaExpedientTascaValidacioDto.getItemId(),
+					metaExpedientTascaValidacioDto.isActiva()).build();
+			novaValidacio.setMetaExpedientTasca(metaExpedientTascaRepository.findOne(metaExpedientTascaValidacioDto.getMetaExpedientTasca().getId()));
+			metaExpedientTascaValidacioRepository.save(novaValidacio);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	@Transactional
+	public MetaExpedientTascaValidacioDto updateValidacioTasca(Long metaExpedientTascaValidacioId, String accio) {
+		MetaExpedientTascaValidacioEntity aux = metaExpedientTascaValidacioRepository.findOne(metaExpedientTascaValidacioId);
+		if("DESACTIVAR".equals(accio)) {
+			aux.setActiva(false);
+		} else if("ACTIVAR".equals(accio)) {
+			aux.setActiva(true);
+		} else if("ELIMINAR".equals(accio)) {
+			metaExpedientTascaValidacioRepository.delete(aux);
+		}
+		return conversioTipusHelper.convertir(aux, MetaExpedientTascaValidacioDto.class);
+	}
+
+	@Override
+	@Transactional
+	public int createValidacionsTasca(
+			Long entitatId,
+			Long tascaID,
+			List<MetaExpedientTascaValidacioDto> validacions) {
+		
+		int resultat = 0;
+		
+		for (MetaExpedientTascaValidacioDto validacioDto: validacions) {
+			if (validacioDto.getMetaExpedientTasca()==null) {
+				MetaExpedientTascaDto metaExpedientTasca = new MetaExpedientTascaDto();
+				validacioDto.setMetaExpedientTasca(metaExpedientTasca);
+			}
+			validacioDto.getMetaExpedientTasca().setId(tascaID);
+			if (createValidacioTasca(validacioDto)) {
+				resultat++;
+			}
+		}
+		
+		return resultat;
+	}
 
 }
