@@ -129,7 +129,8 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 					}
 					
 					document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
+					
+					ArxiuEstatEnumDto arxiuEstat =  documentViaFirma.isFirmaParcial() ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
 					contingutHelper.arxiuPropagarModificacio(
 							document,
 							firmes.get(0).getFitxer(),
