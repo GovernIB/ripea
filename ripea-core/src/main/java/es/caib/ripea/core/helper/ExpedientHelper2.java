@@ -1,7 +1,3 @@
-
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
@@ -24,6 +20,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -32,6 +29,7 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
@@ -39,46 +37,31 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
-/**
-For new transactions
- */
 @Component
 public class ExpedientHelper2 {
 
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private TascaHelper tascaHelper;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+ 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkIfExpedientCanBeClosed(Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
@@ -102,9 +85,17 @@ public class ExpedientHelper2 {
 		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, contingutHelper.getArxiuMaxReintentsDocuments()))) {
 			throw new ValidationException("No es pot tancar un expedient amb documents amb reintents pendents de guardar a l'arxiu");
 		}
-//		if (CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient))) {
-//			throw new ValidationException("No es pot tancar un expedient amb documents d'anotacions no moguts a la sèrie documental final");
-//		}
+
+		//Validar les tasques del expedient
+		List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
+		if (tasquesExpedient!=null) {
+			for (ExpedientTascaEntity tasca: tasquesExpedient) {
+				List<MetaExpedientTascaValidacioDto> validacions = tascaHelper.getValidacionsPendentsTasca(tasca.getId());
+				if (validacions!=null && validacions.size()>0) {
+					throw new ValidationException("No es pot tancar un expedient amb tasques que no superen les validacions definides al procediment");
+				}
+			}
+		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

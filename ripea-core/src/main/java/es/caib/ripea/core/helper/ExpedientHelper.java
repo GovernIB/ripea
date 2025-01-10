@@ -1,7 +1,3 @@
-
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import java.io.ByteArrayOutputStream;

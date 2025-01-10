@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ComunitatDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -35,7 +38,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
@@ -46,7 +48,6 @@ import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
@@ -59,7 +60,6 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -113,7 +113,7 @@ public class CacheHelper {
 	@Resource private OrganGestorRepository organGestorRepository;
 	@Resource private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private ConfigHelper configHelper;
-	@Autowired private TascaHelper tascaHelper;
+//	@Autowired private TascaHelper tascaHelper;
 
 	@Autowired
 	public void setPluginHelper(PluginHelper pluginHelper) {
@@ -288,7 +288,7 @@ public class CacheHelper {
 			}
 			
 			//Validar les tasques del expedient
-			List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
+			/*List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
 			if (tasquesExpedient!=null) {
 				for (ExpedientTascaEntity tasca: tasquesExpedient) {
 					if (!TascaEstatEnumDto.FINALITZADA.equals(tasca.getEstat()) &&
@@ -301,7 +301,7 @@ public class CacheHelper {
 						}
 					}
 				}
-			}
+			}*/
 		}
 		
 		if (!errors.isEmpty()) {

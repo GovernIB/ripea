@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.helper;
 
 import java.util.List;
@@ -35,9 +32,7 @@ public class ExpedientHelper {
 	private static final String SESSION_URL_VALIDACIO = "ExpedientHelper.isUrlValidacioDefinida";
 	private static final String SESSION_URLS_INSTRUCCIO = "ExpedientHelper.isUrlsInstruccioActiu";
 
-	@Autowired
-	private ExpedientService expedientService;
-
+	@Autowired private ExpedientService expedientService;
 	
 	public static void accesUsuariExpedients(
 			HttpServletRequest request,

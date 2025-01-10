@@ -1240,10 +1240,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			omplirModelTancarExpedient(
-					expedientId,
-					request,
-					model);
+			omplirModelTancarExpedient(expedientId,	request, model);
 			return "expedientTancarForm";
 		}
 		try {
@@ -1261,38 +1258,28 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			
 			logger.error("Error al tancar expedient amb id=" + command.getId(), ex);
 			
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(
-					ex,
-					ExpedientTancarSenseDocumentsDefinitiusException.class)) {
-				omplirModelTancarExpedient(
-						expedientId,
-						request,
-						model);
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExpedientTancarSenseDocumentsDefinitiusException.class)) {
+				omplirModelTancarExpedient(expedientId, request, model);
 				MissatgesHelper.error(
 						request, 
-						getMessage(
-								request, 
-								"expedient.controller.tancar.nodefinitius",
-								null),
+						getMessage(request, "expedient.controller.tancar.nodefinitius",	null),
 						ex);
 				return "expedientTancarForm";
-			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(
-					ex,
-					FirmaServidorException.class)) {
-				
+			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex,	FirmaServidorException.class)) {
 				FirmaServidorException fe = (FirmaServidorException) ExceptionHelper.findExceptionInstance(ex, FirmaServidorException.class, 3);
-				
 				return getModalControllerReturnValueError(
 						request,
 						"redirect:../../contingut/" + expedientId,
 						"expedient.controller.tancar.error",
 						new Object[] {fe.getDocumentNom()},
 						ex);
+			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex,	ValidationException.class)) {
+				omplirModelTancarExpedient(expedientId, request, model);
+				MissatgesHelper.error(request, ex.getCause().getMessage());
+				return "expedientTancarForm";
 			} else {
 				throw ex;
 			}
-			
-
 		}
 	}
 	

@@ -48,7 +48,6 @@
 			<c:if test="${error.documentsWithoutMetaDocument}"><c:set var="hiHaDocumentsSenseMetaNode" value="${true}"/></c:if>
 			<c:if test="${error.withNotificacionsNoFinalitzades}"><c:set var="hiHaNotificacionsNoFinalitzades" value="${true}"/></c:if>
 			<c:if test="${error.expedientWithoutInteressats}"><c:set var="expedientAmbInteressatObligatori" value="${true}"/></c:if>
-			<c:if test="${error.tasquesInvalides}"><c:set var="tasquesInvalides" value="${true}"/></c:if>
 		</c:forEach>
 		<c:if test="${hiHaMetaDades}">
 			<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.falten.metadades"/></h4>
@@ -88,12 +87,7 @@
 				<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.interessat"/></h4>
 			</div>
 		</c:if>
-		
-		<c:if test="${tasquesInvalides}">
-			<div class="${!hiHaMetaDades && !hiHaMetaDocuments ? 'altura' : ''}">
-				<h4><span class="fa fa-exclamation-triangle text-warning"></span>&nbsp;<spring:message code="contingut.errors.tasquesInvalides"/></h4>
-			</div>
-		</c:if>		
+
 	</c:if>
 	<div id="modal-botons" class="well">
 		<a href="<c:url value="/contingut/${contingut.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
