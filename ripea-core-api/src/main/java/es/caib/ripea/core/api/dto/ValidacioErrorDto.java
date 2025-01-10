@@ -20,6 +20,7 @@ public class ValidacioErrorDto implements Serializable {
 	private boolean documentsWithoutMetaDocument;
 	private boolean withNotificacionsNoFinalitzades;
 	private boolean expedientWithoutInteressats;
+	private boolean tasquesInvalides;
 	
 	public ValidacioErrorDto(
 			MetaDadaDto metaDada,
@@ -46,6 +47,9 @@ public class ValidacioErrorDto implements Serializable {
 				break;
 			case INTERESSATS:
 				this.expedientWithoutInteressats = true;
+				break;
+			case TASQUES:
+				this.tasquesInvalides = true;
 				break;
 		}
 	}
@@ -90,6 +94,13 @@ public class ValidacioErrorDto implements Serializable {
 	}
 	public boolean isExpedientWithoutInteressats() {
 		return expedientWithoutInteressats;
+	}
+	public boolean isTasquesInvalides() {
+		return tasquesInvalides;
+	}
+	public void setTasquesInvalides(
+			boolean tasquesInvalides) {
+		this.tasquesInvalides = tasquesInvalides;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

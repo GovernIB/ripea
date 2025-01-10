@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.core.helper;
 
 import java.io.Serializable;
@@ -14,9 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +27,6 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ComunitatDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -41,6 +35,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
@@ -51,6 +46,7 @@ import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
@@ -63,6 +59,7 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -85,7 +82,6 @@ import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
-
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
  * defineixen aquí per evitar la impossibilitat de fer funcionar
@@ -97,46 +93,27 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
 @Component
 public class CacheHelper {
 
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private DadaRepository dadaRepository;
-	@Resource
-	private DocumentRepository documentRepository;
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	private MetaDocumentRepository metaDocumentRepository;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private PermisosEntitatHelper permisosEntitatHelper;
-//	@Resource
+	@Resource private EntitatRepository entitatRepository;
+	@Resource private DadaRepository dadaRepository;
+	@Resource private DocumentRepository documentRepository;
+	@Resource private MetaDadaRepository metaDadaRepository;
+	@Resource private MetaDocumentRepository metaDocumentRepository;
+	@Resource private ConversioTipusHelper conversioTipusHelper;
+	@Resource private PermisosHelper permisosHelper;
+	@Resource private PermisosEntitatHelper permisosEntitatHelper;
 	private PluginHelper pluginHelper;
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Resource
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Resource
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Resource
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private AclSidRepository aclSidRepository;
-	@Resource
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private OrganGestorHelper organGestorHelper;
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Resource
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	@Autowired
-	private ConfigHelper configHelper;
+	@Resource private UsuariRepository usuariRepository;
+	@Resource private ExpedientTascaRepository expedientTascaRepository;
+	@Resource private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Resource private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private AclSidRepository aclSidRepository;
+	@Resource private ExpedientPeticioRepository expedientPeticioRepository;
+	@Resource private EntityComprovarHelper entityComprovarHelper;
+	@Resource private OrganGestorHelper organGestorHelper;
+	@Resource private OrganGestorRepository organGestorRepository;
+	@Resource private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private TascaHelper tascaHelper;
 
 	@Autowired
 	public void setPluginHelper(PluginHelper pluginHelper) {
@@ -252,10 +229,9 @@ public class CacheHelper {
 
 		}
 		if (node instanceof ExpedientEntity) {
+			
 			ExpedientEntity expedient = (ExpedientEntity)node;
-			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
-					expedient,
-					0);
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 			
 			// Valida documents específics del meta-node
 			List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndMultiplicitatIn(
@@ -264,6 +240,7 @@ public class CacheHelper {
 						MultiplicitatEnumDto.M_1,
 						MultiplicitatEnumDto.M_1_N
 					});
+			
 			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
 				boolean trobat = false;
 				for (DocumentEntity document: documents) {
@@ -279,6 +256,7 @@ public class CacheHelper {
 									metaDocument.getMultiplicitat(),
 									ErrorsValidacioTipusEnumDto.MULTIPLICITAT));
 			}
+			
 			for (DocumentEntity document : documents) {
 				if (document.getMetaNode() == null) {
 					errors.add(
@@ -300,6 +278,7 @@ public class CacheHelper {
 					break;
 				}
 			}
+			
 			boolean isObligarInteressatActiu = configHelper.getAsBoolean("es.caib.ripea.permetre.obligar.interessat");
 			MetaExpedientEntity procediment = expedient.getMetaExpedient();
 			if (isObligarInteressatActiu && procediment.isInteressatObligatori()
@@ -307,12 +286,29 @@ public class CacheHelper {
 							|| expedient.getInteressatsORepresentants().isEmpty())) {
 				errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.INTERESSATS));
 			}
+			
+			//Validar les tasques del expedient
+			List<ExpedientTascaEntity> tasquesExpedient = expedientTascaRepository.findByExpedient(expedient, null);
+			if (tasquesExpedient!=null) {
+				for (ExpedientTascaEntity tasca: tasquesExpedient) {
+					if (!TascaEstatEnumDto.FINALITZADA.equals(tasca.getEstat()) &&
+						!TascaEstatEnumDto.CANCELLADA.equals(tasca.getEstat())) {
+						errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.TASQUES));
+					} else {
+						List<MetaExpedientTascaValidacioDto> validacions = tascaHelper.getValidacionsPendentsTasca(tasca.getId());
+						if (validacions!=null && validacions.size()>0) {
+							errors.add(crearValidacioError(null, null, ErrorsValidacioTipusEnumDto.TASQUES));
+						}
+					}
+				}
+			}
 		}
+		
 		if (!errors.isEmpty()) {
 			// TODO: registrar a la base de dades
 			// Aquesta operació és necessària per a generar els historics de forma eficient
-			
 		}
+		
 		return errors;
 	}
 	@CacheEvict(value = "errorsValidacioNode", key = "#node.id")

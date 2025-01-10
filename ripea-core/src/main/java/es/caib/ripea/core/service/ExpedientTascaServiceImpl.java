@@ -16,10 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -32,16 +30,11 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -54,13 +47,8 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.TascaHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientTascaComentariRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -71,11 +59,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
-	@Autowired private MetaDadaRepository metaDadaRepository;
-	@Autowired private DadaRepository dadaRepository;
-	@Autowired private MetaDocumentRepository metaDocumentRepository;
-	@Autowired private DocumentRepository documentRepository;
-	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private ExpedientTascaComentariRepository expedientTascaComentariRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
@@ -746,87 +729,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Override
 	@Transactional(readOnly=true)
 	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
-		List<MetaExpedientTascaValidacioDto> resultat = new ArrayList<MetaExpedientTascaValidacioDto>();
-		
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
-		List<MetaExpedientTascaValidacioEntity> validacionsTasca = expedientTascaEntity.getMetaTasca().getValidacions();
-		
-		if (validacionsTasca!=null && validacionsTasca.size()>0) {
-			
-			List<DadaEntity> dadesExpedient = dadaRepository.findByNode(expedientTascaEntity.getExpedient());
-			List<DocumentEntity> documentsExpedient = documentRepository.findByExpedientAndEsborrat(expedientTascaEntity.getExpedient(), 0);
-			
-			for (MetaExpedientTascaValidacioEntity validacioTasca: validacionsTasca) {
-			
-				boolean validacioOk = false;
-				
-				if (ItemValidacioTascaEnum.DADA.equals(validacioTasca.getItemValidacio())) {
-					
-					//La mateixa funció s'utilitza per guardar els valors de la pipella de dades del expedient.					
-					MetaDadaEntity metaDadaProcediment = metaDadaRepository.findOne(validacioTasca.getItemId());
-					
-					if (metaDadaProcediment == null || !metaDadaProcediment.isActiva()) {
-						validacioOk = true; //Si la meta-dada no esta activa actualment al procediment, no es valida perque no es podrá aportar...
-					} else {
-						for (DadaEntity dadaExp: dadesExpedient) {
-							if (dadaExp.getMetaDada().getId().equals(validacioTasca.getItemId())) {
-								switch (validacioTasca.getTipusValidacio()) {
-								case AP:
-									if (Utils.hasValue(dadaExp.getValorComString())) {
-										validacioOk = true;
-									}
-									break;
-								default:
-									break;
-								}
-							}
-						}
-					}
-					
-				} else if (ItemValidacioTascaEnum.DOCUMENT.equals(validacioTasca.getItemValidacio())) {
-					
-					//Anam a cercar la dada del expedient, del tipus (metaDocumentId) igual al itemId de la validació
-					MetaDocumentEntity metaDocProcediment = metaDocumentRepository.findOne(validacioTasca.getItemId());
-					
-					if (metaDocProcediment==null || !metaDocProcediment.isActiu()) {
-						validacioOk = true; //Si el tipus de document no esta actiu acualment al procediment, no es valida perque no es podrá aportar...
-					} else {
-						for (DocumentEntity docExp: documentsExpedient) {
-							if (docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
-								switch (validacioTasca.getTipusValidacio()) {
-								case AP:
-									//S'ha trobat un document del tipus definit a la validació, no fa falta validar res més
-									validacioOk = true;
-									break;
-								case AP_FI:
-									if (docExp.isFirmat()) { validacioOk = true; }
-									break;
-								case AP_FI_NF:
-									DocumentNotificacioEstatEnumDto darreraNot_I = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
-									if (darreraNot_I!=null) { validacioOk = true; }
-									break;
-								case AP_FI_NI:
-									DocumentNotificacioEstatEnumDto darreraNot_F = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
-									if (DocumentNotificacioEstatEnumDto.FINALITZADA.equals(darreraNot_F) || 
-										DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(darreraNot_F)) { 
-											validacioOk = true;
-									}
-									break;
-								default:
-									break;
-								}
-							}
-						}
-					}
-				}
-				
-				if (!validacioOk) {
-					resultat.add(conversioTipusHelper.convertir(validacioTasca, MetaExpedientTascaValidacioDto.class));
-				}
-			}
-		}		
-		
-		return resultat;
+		return tascaHelper.getValidacionsPendentsTasca(expedientTascaId);
 	}
 	
 	private void log (ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
