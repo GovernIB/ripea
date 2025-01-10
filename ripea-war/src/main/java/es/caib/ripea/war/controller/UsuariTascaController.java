@@ -1,17 +1,12 @@
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.war.command.TascaCancelarDelegacioCommand;
-import es.caib.ripea.war.command.TascaDelegarCommand;
-import es.caib.ripea.war.command.UsuariTascaFiltreCommand;
-import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -25,10 +20,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.war.command.TascaCancelarDelegacioCommand;
+import es.caib.ripea.war.command.TascaDelegarCommand;
+import es.caib.ripea.war.command.UsuariTascaFiltreCommand;
+import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al llistat de tasques d'usuaris.
@@ -179,12 +183,21 @@ public class UsuariTascaController extends BaseUserController {
 			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
 			@RequestParam(value = "origenTasques", required = false) Boolean origenTasques,
 			Model model) {
+		
 		getEntitatActualComprovantPermisos(request);
-		ExpedientTascaDto expedientTascaDto = expedientTascaService.canviarTascaEstat(
-				expedientTascaId,
-				TascaEstatEnumDto.FINALITZADA,
-				null,
-				RolHelper.getRolActual(request));
+		
+		ExpedientTascaDto expedientTascaDto = null;
+		List<MetaExpedientTascaValidacioDto> validacionsPendents = expedientTascaService.getValidacionsPendentsTasca(expedientTascaId);
+		
+		if (validacionsPendents.size()>0) {
+			expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		} else {
+			expedientTascaDto = expedientTascaService.canviarTascaEstat(
+					expedientTascaId,
+					TascaEstatEnumDto.FINALITZADA,
+					null,
+					RolHelper.getRolActual(request));
+		}
 
 		String url = "redirect:/usuariTasca";
 		if (redirectATasca != null && redirectATasca) {
@@ -192,11 +205,29 @@ public class UsuariTascaController extends BaseUserController {
 		} else if (origenTasques == null || !origenTasques) {
 			url = "redirect:/contingut/" + expedientTascaDto.getExpedient().getId() + "#tasques";
 		}
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				url,
-				"expedient.tasca.controller.finalitzada.ok",
-				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
+		
+		if (validacionsPendents.size()>0) {
+			String message = getMessage(
+					request, 
+					"expedient.tasca.controller.finalitzada.ko",
+					new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
+			
+			for (MetaExpedientTascaValidacioDto validacio: validacionsPendents) {
+				String itemValidacio  = getMessage(request, "metaexpedient.tasca.validacio.tipus."+validacio.getItemValidacio());
+				String tipusValidacio = getMessage(request, "metaexpedient.tasca.validacio.enum."+validacio.getTipusValidacio());
+				message += "<br/>&nbsp;-&nbsp;"+itemValidacio+" <b>"+validacio.getItemNom()+"</b>: "+tipusValidacio;
+			}
+
+			return getAjaxControllerReturnValueErrorMessage(request, url, message, null);
+			
+		} else {
+
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					url,
+					"expedient.tasca.controller.finalitzada.ok",
+					new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
+		}
 	}
 	
 	@InitBinder

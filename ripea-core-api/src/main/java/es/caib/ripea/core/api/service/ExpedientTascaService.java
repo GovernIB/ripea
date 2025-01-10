@@ -9,6 +9,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
@@ -62,6 +63,8 @@ public interface ExpedientTascaService {
 			TascaEstatEnumDto tascaEstatEnumDto,
 			String motiu, 
 			String rolActual);
+	
+	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId);
 	
 	public ExpedientTascaDto updateResponsables(
 			Long expedientTascaId, 

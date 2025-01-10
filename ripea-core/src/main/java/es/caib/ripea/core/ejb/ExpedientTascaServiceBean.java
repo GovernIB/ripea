@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
@@ -191,5 +192,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	public ExpedientTascaDto reobrirTasca(Long expedientTascaId, List<String> responsablesCodi, String motiu,
 			String rolActual) {
 		return delegate.reobrirTasca(expedientTascaId, responsablesCodi, motiu, rolActual);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
+		return delegate.getValidacionsPendentsTasca(expedientTascaId);
 	}
 }

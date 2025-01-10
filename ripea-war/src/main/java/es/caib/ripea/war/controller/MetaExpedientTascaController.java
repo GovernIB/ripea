@@ -32,10 +32,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TipusValidacioTascaEnum;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -157,38 +154,23 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			Model model) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
-		paginacioParams.setPaginaNum(1);
-		paginacioParams.setPaginaTamany(-1);
-		paginacioParams.afegirOrdre("nom", OrdreDireccioDto.ASCENDENT);
-		
 		List<GenericDto> resultat = new ArrayList<GenericDto>();
 		
 		if (ItemValidacioTascaEnum.DADA.equals(tipus)) {
-		
-			List<MetaDadaDto> items = null;
-			PaginaDto<MetaDadaDto> aux = metaDadaService.findByMetaNodePaginat(entitatActual.getId(), metaExpedientId, paginacioParams);
-			
-			if (aux==null || aux.getContingut()==null) {
-				items = new ArrayList<MetaDadaDto>();
-			} else {
-				items = aux.getContingut();
+			List<MetaDadaDto> aux = metaDadaService.findActiveByMetaNode(entitatActual.getId(), metaExpedientId);
+			if (aux!=null) {
+				for (MetaDadaDto mD: aux) {
+					resultat.add(new GenericDto(mD.getId(), null, mD.getNom()));
+				}
 			}
-			
-			for (MetaDadaDto mD: items) {
-				resultat.add(new GenericDto(mD.getId(), null, mD.getNom()));
-			}
-			
 		} else {
-			
-			List<MetaDocumentDto> items = metaDocumentService.findByMetaExpedient(entitatActual.getId(), metaExpedientId);
-			
-			if (items==null) {
-				items = new ArrayList<MetaDocumentDto>();
-			}
-			
-			for (MetaDocumentDto mD: items) {
-				resultat.add(new GenericDto(mD.getId(), null, mD.getNom()));
+			List<MetaDocumentDto> items = metaDocumentService. findByMetaExpedient(entitatActual.getId(), metaExpedientId);
+			if (items!=null) {	
+				for (MetaDocumentDto mD: items) {
+					if (mD.isActiu()) {
+						resultat.add(new GenericDto(mD.getId(), null, mD.getNom()));
+					}
+				}
 			}
 		}
 		
@@ -353,17 +335,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		
 		model.addAttribute("expedientEstats", expedientEstats);
 		model.addAttribute("itemValidacioOptions", EnumHelper.getOptionsForEnum(ItemValidacioTascaEnum.class, "metaexpedient.tasca.validacio.tipus."));
-		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
-		paginacioParams.setPaginaNum(1);
-		paginacioParams.setPaginaTamany(-1);
-		PaginaDto<MetaDadaDto> aux = metaDadaService.findByMetaNodePaginat(entitatActual.getId(), metaExpedientId, paginacioParams);
-		List<MetaDadaDto> items = null;
-		if (aux==null || aux.getContingut()==null) {
-			items = new ArrayList<MetaDadaDto>();
-		} else {
-			items = aux.getContingut();
-		}
-		model.addAttribute("itemsOptions", items);
+		model.addAttribute("itemsOptions", metaDadaService.findActiveByMetaNode(entitatActual.getId(), metaExpedientId));
 		model.addAttribute("tipusValidacioOptions", EnumHelper.getOptionsForEnum(TipusValidacioTascaEnum.class, "metaexpedient.tasca.validacio.enum."));
 		
 		MetaExpedientTascaCommand command = null;

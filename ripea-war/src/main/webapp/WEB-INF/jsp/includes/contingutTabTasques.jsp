@@ -114,12 +114,12 @@ $(document).ready(function() { });
 								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/contingut/${expedientId}?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
 							{{/if}}
 							{{if estat == 'PENDENT'}}
-								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>" data-toggle="ajax"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
+								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar?redirectATasca=false"/>" data-toggle="ajax"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
 								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
 							{{/if}}
 							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
 								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
-								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
+								<li {{if !usuariActualResponsable && !usuariActualDelegat}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar?redirectATasca=false"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
 								<li class="divider"></li>
 								<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
 								{{if !delegada}}
