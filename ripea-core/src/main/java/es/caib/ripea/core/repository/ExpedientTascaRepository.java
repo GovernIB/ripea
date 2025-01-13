@@ -32,6 +32,7 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"left join tasca.observadors observador " +
 			"where " +
 			"	 (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
+			"and (tasca.expedient.esborrat = 0) " +
 			"and (:esNullExpedient = true or tasca.expedient = :expedient) " +
 			"and (:esNullDataInici = true or tasca.dataInici >= :dataInici) " +
 			"and (:esNullDataFi = true or tasca.dataInici <= :dataFi) " +
@@ -60,6 +61,7 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"where " +
 			"	 (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
 			"and (tasca.estat in (:estats)) " + 
+			"and (tasca.expedient.esborrat = 0) " +
 			"and (:esNullExpedient = true or tasca.expedient = :expedient) " +
 			"and (:esNullDataInici = true or tasca.dataInici >= :dataInici) " +
 			"and (:esNullDataFi = true or tasca.dataInici <= :dataFi) " +
