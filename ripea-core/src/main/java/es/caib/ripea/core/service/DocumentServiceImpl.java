@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
 
 import java.io.ByteArrayOutputStream;
@@ -131,68 +128,39 @@ import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
- * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private ConsultaPinbalRepository consultaPinbalRepository;	
-	@Autowired
-	private DocumentViaFirmaRepository documentViaFirmaRepository;
-	@Autowired
-	private DispositiuEnviamentRepository dispositiuEnviamentRepository;
-	@Resource
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
-	@Autowired
-	private DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
-	@Autowired
-	private DocumentFirmaAppletHelper firmaAppletHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private ViaFirmaHelper viaFirmaHelper;
-	@Autowired
-	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
-	@Autowired
-	private DocumentNotificacioHelper documentNotificacioHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private PinbalHelper pinbalHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private IntegracioHelper integracioHelper;
-	@Autowired
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private EntitatRepository entitatRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;	
+	@Autowired private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired private DispositiuEnviamentRepository dispositiuEnviamentRepository;
+	@Resource  private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
+	@Autowired private DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
+	@Autowired private DocumentFirmaAppletHelper firmaAppletHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ViaFirmaHelper viaFirmaHelper;
+	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private PinbalHelper pinbalHelper;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private IntegracioHelper integracioHelper;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private EntitatRepository entitatRepository;
 
 	@Transactional
 	@Override
@@ -2237,6 +2205,18 @@ public class DocumentServiceImpl implements DocumentService {
 				"portafirmesId=" + portafirmesId +")");
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
 		return pluginHelper.portafirmesRecuperarUrlEstatFluxFirmes(portafirmesId, idioma);
+	}
+
+	@Override
+	@Transactional
+	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException {
+		DocumentEntity documentEntity = documentRepository.findOne(documentId);
+		if (documentEntity!=null && Utils.hasValue(documentEntity.getArxiuUuid())) {
+			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(documentEntity, documentEntity.getArxiuUuid(), null, false);
+			pluginHelper.propagarMetadadesDocument(documentArxiu, documentEntity);
+			return conversioTipusHelper.convertir(documentEntity, DocumentDto.class);
+		}
+		return null;
 	}
 	
 }

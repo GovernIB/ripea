@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.*;
@@ -67,9 +64,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Controlador per a la gestió de contenidors i mètodes compartits entre
- * diferents tipus de contingut.
- * 
+ * Controlador per a la gestió de contenidors i mètodes compartits entre diferents tipus de contingut.
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -77,38 +72,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private ExpedientInteressatService interessatService;
-	@Autowired
-	private DocumentEnviamentService documentEnviamentService;	
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private MetaDadaService metaDadaService;
-	@Autowired
-	private AlertaService alertaService;
-	@Autowired
-	private BeanGeneratorHelper beanGeneratorHelper;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private URLInstruccioService urlInstruccioService;
-	@Autowired
-	private ExpedientTascaService expedientTascaService;
-	@Autowired
-	private CarpetaService carpetaService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private ExpedientInteressatService interessatService;
+	@Autowired private DocumentEnviamentService documentEnviamentService;	
+	@Autowired private ExpedientService expedientService;
+	@Autowired private MetaDadaService metaDadaService;
+	@Autowired private AlertaService alertaService;
+	@Autowired private BeanGeneratorHelper beanGeneratorHelper;
+	@Autowired private DocumentService documentService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private URLInstruccioService urlInstruccioService;
+	@Autowired private ExpedientTascaService expedientTascaService;
+	@Autowired private CarpetaService carpetaService;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
@@ -260,11 +239,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			} else {
 				throw e;
 			}
-			
-
 		}
-		
-		
 	}
 	
 	@RequestMapping(value = "/contingut/tag/{contingutId}", method = RequestMethod.GET)

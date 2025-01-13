@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -87,7 +84,6 @@ import java.util.Set;
 
 /**
  * Controlador per al manteniment de documents.
- * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -122,6 +118,15 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) throws ClassNotFoundException, IOException {
 		return get(request, pareId, null, tascaId, model);
+	}
+	
+	@RequestMapping(value = "/{contingutId}/document/getCsvInfo", method = RequestMethod.GET)
+	@ResponseBody
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) throws ClassNotFoundException, IOException {
+		return documentService.updateCsvInfo(contingutId).getNtiCsv();
 	}
 	
 	@RequestMapping(value = "/{pareId}/document/modificar/{documentId}", method = RequestMethod.GET)

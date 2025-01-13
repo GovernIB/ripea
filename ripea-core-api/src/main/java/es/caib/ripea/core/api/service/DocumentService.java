@@ -91,6 +91,13 @@ public interface DocumentService {
 			Long tascaId) throws NotFoundException;
 
 	/**
+	 * Actualitza i retorna la informació NTI de un document (codi CSV, etc)
+	 * https://github.com/GovernIB/ripea/issues/1451
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException;
+	
+	/**
 	 * Consulta les versions d'un document.
 	 * 
 	 * @param entitatId

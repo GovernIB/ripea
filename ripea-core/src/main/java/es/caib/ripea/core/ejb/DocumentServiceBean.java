@@ -610,27 +610,10 @@ public class DocumentServiceBean implements DocumentService {
 				entitatId);
 	}
 
-//	@Override
-//	@RolesAllowed("tothom")
-//	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(Long id, Long expedientId, String rolActual,
-//			Long tascaId) throws IOException {
-//		return delegate.descarregarAllDocumentsOfExpedientWithFolders(
-//				id, 
-//				expedientId, 
-//				rolActual, 
-//				tascaId);
-//	}
-
 	@Override
 	@RolesAllowed("tothom")
-	public List<DocumentDto> findByExpedient(
-			Long id, 
-			Long expedientId, 
-			String rolActual) {
-		return delegate.findByExpedient(
-				id, 
-				expedientId, 
-				rolActual);
+	public List<DocumentDto> findByExpedient(Long id, Long expedientId, String rolActual) {
+		return delegate.findByExpedient(id, expedientId, rolActual);
 	}
 
 	@Override
@@ -651,11 +634,13 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto descarregarFirmaSeparada(
-			Long entitatId,
-			Long id,
-			Long tascaId) {
+	public FitxerDto descarregarFirmaSeparada(Long entitatId, Long id, Long tascaId) {
 		return delegate.descarregarFirmaSeparada(entitatId, id, tascaId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException {
+		return delegate.updateCsvInfo(documentId);
+	}
 }

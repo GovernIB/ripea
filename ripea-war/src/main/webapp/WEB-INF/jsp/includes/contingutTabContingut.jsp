@@ -426,7 +426,7 @@
 			getDetallsSignants($('#detallSignants'), contingutId, false);
 		});
 
-		<c:if test="${contingut.document}">
+	<c:if test="${contingut.document}">
 
 		$('form#nodeDades').on('submit', function() {
 
@@ -476,7 +476,25 @@
 					});
 			return false;
 		});
+
+		<c:if test="${empty contingut.ntiCsv}">
+			$.ajax({
+				url: '<c:url value="/contingut/${contingut.id}/document/getCsvInfo"/>',
+				type: "GET",
+				success: function (data) {
+					if (data) {
+						$("#contenidorCsvNtiDoc").html(data);
+						$("#hrefCsvNtiDoc").attr("href", $("#hrefCsvNtiDoc").attr("href")+data);
+						$("#hrefCsvNtiDoc").show();
+					} else {
+						$("#contenidorCsvNtiDoc").html("");
+					}
+				}
+			});
 		</c:if>
+		
+	</c:if> //------------------------- if contingut IS document END ----------------------------------
+		
 	});//################################################## document ready END ##############################################################
 
 	$(document).on('change', '.checkbox', function () {
@@ -1431,28 +1449,47 @@
 							<td><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></td>
 						</c:otherwise>
 					</c:choose>
-				</tr>	
+				</tr>
 				<tr>
 					<td><strong><spring:message code="contingut.info.nti.estat.elab"/></strong></td>
 					<td><spring:message code="document.nti.estado.elaboracion.enum.${contingut.ntiEstadoElaboracion}"/></td>
-				</tr>				
+				</tr>
 				<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
 					<td><strong><spring:message code="contingut.info.nti.doc.origen.id"/></strong></td>
 					<td>${contingut.ntiIdDocumentoOrigen}</td>
 				</c:if>
-				<c:if test="${not empty contingut.ntiCsv}">		
-					<tr>
-						<td><strong><spring:message code="contingut.document.camp.firma.csv" /></strong></td>
-						<td>
-							${contingut.ntiCsv}
+				<tr>
+					<td><strong><spring:message code="contingut.document.camp.firma.csv" /></strong></td>
+					<td>
+						<c:if test="${not empty contingut.ntiCsv}">
+							<span id="contenidorCsvNtiDoc">${contingut.ntiCsv}</span>
 							<c:if test="${not empty concsvBaseUrl}">
-								<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
+								&nbsp;<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
+							</c:if>
+						</c:if>
+						<c:if test="${empty contingut.ntiCsv}">
+							<span id="contenidorCsvNtiDoc"><span class="fa fa-refresh fa-spin"></span></span>
+							<c:if test="${not empty concsvBaseUrl}">
+								&nbsp;<a style="display: none;" id="hrefCsvNtiDoc" href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
 							</c:if>							
-						</td>
-					</tr>	
-				</c:if>										
+						</c:if>
+					</td>
+				</tr>
+				<tr>
+					<td><strong><spring:message code="contingut.document.camp.firma.csv.regulacio"/></strong></td>
+					<td>${contingut.ntiCsvRegulacion}</td>
+				</tr>
+				<tr>
+					<td><strong><spring:message code="contingut.document.camp.firma.tipus"/></strong></td>
+					<td>
+						<c:if test="${not empty contingut.ntiTipoFirma}">
+							<spring:message code="document.nti.tipfir.enum.${contingut.ntiTipoFirma}"/>
+						</c:if>
+					</td>
+				</tr>
 			</tbody>
 		</table>
+		
 		<c:if test="${contingut.custodiat}">
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -1462,39 +1499,14 @@
 						<button id="mostraDetallSignants" class="btn btn-default pull-right"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.mostrar.info.signants"/></button>
 					</h3>
 				</div>
-				<table class="table table-bordered">
-					<tbody>
-						<tr>
-							<td><strong><spring:message code="contingut.document.camp.firma.tipus"/></strong></td>
-							<td>
-								<c:if test="${not empty contingut.ntiTipoFirma}">
-									<spring:message code="document.nti.tipfir.enum.${contingut.ntiTipoFirma}"/>
-								</c:if>
-							</td>
-						</tr>
-						<c:if test="${not empty contingut.ntiCsv}">
-						<tr>
-							<td><strong><spring:message code="contingut.document.camp.firma.csv"/></strong></td>
-							<td>
-								${contingut.ntiCsv}
-								<c:if test="${not empty concsvBaseUrl}">
-									<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
-								</c:if>		
-							</td>
-						</tr>
-						</c:if>
-						<tr>
-							<td><strong><spring:message code="contingut.document.camp.firma.csv.regulacio"/></strong></td>
-							<td>${contingut.ntiCsvRegulacion}</td>
-						</tr>
-					</tbody>
-					<tbody id="detallSignants">
-					</tbody>
-				</table>
+				<table class="table table-bordered"><tbody id="detallSignants"></tbody></table>
 			</div>
 		</c:if>
+		
 	</c:when>
+	
 	<%---------------------------- WHEN CONTINGUT IS EXPEDIENT OR CARPETA (SHOWS ARBRE / GRID OF CONTINGUTS) -------------------------%>
+	
 	<c:otherwise>
 
 		<div id="drop-area">
