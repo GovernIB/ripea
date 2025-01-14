@@ -152,6 +152,16 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					SessioHelper.desmarcarLlegit(request),
 					model, 
 					tascaId);
+			
+			//Si el contingut es una carpeta, llevam del path la propia carpeta, o surt dues vegades a la miga de pa
+			if (contingut instanceof CarpetaDto) {
+				if (contingut.getPath()!=null && contingut.getPath().size()>0) {
+					if (contingut.getPath().get(contingut.getPath().size()-1).getId().equals(contingutId)) {
+						contingut.getPath().remove(contingut.getPath().size()-1);
+					}
+				}
+			}
+			
 			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
 			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
 			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));

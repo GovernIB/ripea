@@ -302,7 +302,7 @@ public class ContingutHelper {
 			}
 		}
 		logMsg("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + params.getLevel() + "): "+ (System.currentTimeMillis() - t1) + " ms");
-
+		
 		return resposta;
 	}
 
@@ -469,17 +469,17 @@ public class ContingutHelper {
 		List<ContingutDto> fillsDtos = new ArrayList<>();
 		for (ContingutEntity fill: fills) {
 			if (fill.getEsborrat() == 0) {
-				fillsDtos.add(toContingutDto(fill, createParamsForFill(params, expedientCalculat, pathCalculatPerFills)));
+				fillsDtos.add(toContingutDto(fill, createParamsForFill(fill, params, expedientCalculat, pathCalculatPerFills)));
 			}
 		}
 		return fillsDtos;
 	}
 
-	private ToContingutParams createParamsForFill(ToContingutParams params, ExpedientDto expedientCalculat, List<ContingutDto> pathCalculatPerFills) {
-		return ToContingutParams.builder()
+	private ToContingutParams createParamsForFill(ContingutEntity fill, ToContingutParams params, ExpedientDto expedientCalculat, List<ContingutDto> pathCalculatPerFills) {
+		ToContingutParams aux = ToContingutParams.builder()
 				.ambPermisos(params.isAmbPermisos())
 				.ambFills(!params.isOnlyFirstDescendant())
-				.ambPath(params.isAmbPath())
+				.ambPath(!(fill instanceof DocumentEntity))
 				.rolActual(params.getRolActual())
 				.onlyForList(params.isOnlyForList())
 				.organActualId(params.getOrganActualId())
@@ -492,11 +492,9 @@ public class ContingutHelper {
 				.ambMapPerTipusDocument(params.isAmbMapPerTipusDocument())
 				.ambMapPerEstat(params.isAmbMapPerEstat())
 				.build();
+		
+		return aux;
 	}
-
-
-	// EXPEDIENT
-	// //////////////////////////////////////////////////////////////////////////////////////////
 
 	private ExpedientDto createExpedientDto(ExpedientEntity expedient, ToContingutParams params) {
 		long t1 = System.currentTimeMillis();
