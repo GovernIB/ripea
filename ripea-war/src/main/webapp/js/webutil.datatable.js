@@ -384,14 +384,15 @@
 				}
 			}
 			$taula.on('processing.dt', function(e, settings_, processing) {
-				if (!$('tbody .datatable-dades-carregant', $taula).length) {
-					$('tbody', $taula).append('<tr class="datatable-dades-carregant"><td colspan="8"><div><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></td></tr>');
-				}
 				if (processing) {
-					$('tbody .datatable-dades-carregant', $taula).show();
-				} else {
-					$('tbody .datatable-dades-carregant', $taula).hide();
+					//$('tbody .datatable-dades-carregant', $taula).show();
+					if (!$('tbody .datatable-dades-carregant', $taula).length) {
+						$('tbody', $taula).html('<tr class="datatable-dades-carregant"><td colspan="'+e.currentTarget.children[0].children[0].cells.length+'"><div><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></td></tr>');
+					}
 				}
+//				else {
+//					$('tbody .datatable-dades-carregant', $taula).hide();
+//				}
 			});
 			if (plugin.settings.dragEnabled) {
 				$taula.on('draw.dt', function () {
