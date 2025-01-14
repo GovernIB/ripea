@@ -33,23 +33,18 @@
 	}
 </style>
 <script type="text/javascript">
+
+	let refreshInterval;
+
 	$(document).ready(function() {
 		$('.collapsable').on('show.bs.collapse', function () {
-			var exm_id = $(this).data("exmid");
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/massiu/consultaContingut/' + exm_id + '"/>',
-				success: function(data) {
-					mostrarContinguts(data, exm_id);
-					mostraDetall(data);
-				},
-				error: function() {
-					console.log("error consultant continguts");
-				}
-			});
+			loadContinguts($(this).data("exmid"));
+		});
+		$('.collapsable').on('hidden.bs.collapse', function () {
+			unloadContinguts($(this).data("exmid"));
 		});
 		$("button[name=refrescar]").click(function() {
-			location.reload();
+			window.location.href = '<c:url value="/modal/massiu/consulta/${pagina}"/>';
 		});
 		$("button[name=nextPage]").click(function() {
 			window.location.href = '<c:url value="/modal/massiu/consulta/${pagina + sumador}"/>';
@@ -57,7 +52,64 @@
 		$("button[name=previousPage]").click(function() {
 			window.location.href = '<c:url value="/modal/massiu/consulta/${pagina - 1}"/>';
 		});
+		$("input[name=refrescarDeu]").click(function(event) {
+			if ($(this).prop('checked')) {
+				refreshInterval = setInterval(reloadPage, 10000);
+			} else {
+				clearInterval(refreshInterval);
+			}
+		});
+
+		<c:if test="${fn:length(idsDesplegats)>0}">
+			<c:forEach var="idMass" items="${idsDesplegats}">
+				loadContinguts(${idMass});
+			</c:forEach>
+		</c:if>
+
+		<c:if test="${isRefrescant}">
+			refreshInterval = setInterval(reloadPage, 10000);
+		</c:if>
 	});
+
+	function reloadPage() {
+		let isChecked = $("input[name=refrescarDeu]").prop('checked');
+		if (isChecked) {
+			window.location.href = '<c:url value="/modal/massiu/consulta/${pagina}"/>?isRefrescant=true';
+		} else {
+			window.location.href = '<c:url value="/modal/massiu/consulta/${pagina}"/>';
+		}
+	}
+	
+	function loadContinguts(exm_id) {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/massiu/consultaContingut/' + exm_id + '"/>',
+			success: function(data) {
+				mostrarContinguts(data, exm_id);
+				mostraDetall(data);
+				$("#collapse_"+exm_id).addClass("in");
+				$("#collapse_"+exm_id).attr("aria-expanded", "true");
+			},
+			error: function() {
+				console.log("error consultant continguts");
+			}
+		});
+	}
+
+	function unloadContinguts(exm_id) {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/massiu/unloadContingut/' + exm_id + '"/>',
+			success: function(data) {
+				$("#collapse_"+exm_id).removeClass("in");
+				$("#collapse_"+exm_id).attr("aria-expanded", "false");
+			},
+			error: function() {
+				console.log("error consultant continguts");
+			}
+		});
+	}
+	
 	function mostrarContinguts(continguts, exm_id) {
 
 		let elementTipus = continguts[0].elementTipus;
@@ -74,7 +126,6 @@
 		} else if (elementTipus == 'ANNEX') {
 			elementTipusTranslated = "<spring:message code='element.tipus.enum.ANNEX'/>"
 		} 
-
 		
 		$('#continguts_' + exm_id).empty();
 		var html_cont =
@@ -157,6 +208,10 @@
 </head>
 <body>
 
+<div style="padding: 0px 0px 15px 2px;">
+	<input type='checkbox' name='refrescarDeu' <c:if test="${isRefrescant}">checked='checked'</c:if> >&nbsp;<b>Refrescar cada 10s.</b>
+</div>
+
 <div class="panel panel-default">
     <div class="panel-heading" role="tab">
     	<div class="row">
@@ -232,10 +287,10 @@
   </div>
  </c:forEach>
 <div id="modal-botons" class="well">
-	<a href="<c:url value="/massiu/portafirmes"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+	<a href="<c:url value="/massiu/portafirmes"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tanca"/></a>
 	<button type="button" class="btn btn-primary" name="previousPage" value="previousPage"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.previous"/></button>
-		<button type="button" class="btn btn-primary" name="nextPage" value="nextPage"><spring:message code="comu.boto.next"/>&nbsp;<span class="fa fa-arrow-right"></span></button>
-	<button type="button" class="btn btn-primary" name="refrescar" value="refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.refrescar"/></button>
+	<button type="button" class="btn btn-primary" name="nextPage" value="nextPage"><spring:message code="comu.boto.next"/>&nbsp;<span class="fa fa-arrow-right"></span></button>
+	<button type="button" class="btn btn-primary" name="refrescar" value="refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.refresca"/></button>
 </div>
 </body>
 </html>

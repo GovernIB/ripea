@@ -1,21 +1,17 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.command.PortafirmesEnviarCommand;
-import es.caib.ripea.war.helper.*;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -29,20 +25,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de bústies.
- * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -51,6 +59,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ContingutMassiuController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutMassiuController.session.seleccio";
+	private static final String SESSION_COLLAPSE_SELECCIO = "ContingutMassiuController.session.collapse.seleccio";
 
 	@Autowired private DocumentService documentService;
 	@Autowired private ContingutService contingutService;
@@ -309,6 +318,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	public String getConsultaExecucions(
 			HttpServletRequest request,
 			@PathVariable int pagina,
+			@RequestParam(value="isRefrescant", required = false) String isRefrescant, 
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		pagina = (pagina < 0 ? 0 : pagina);
@@ -331,7 +341,12 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 			model.addAttribute("sumador", 1);
 		}
 		model.addAttribute("pagina",pagina);
+		model.addAttribute("isRefrescant",Utils.hasValue(isRefrescant));
 		model.addAttribute("execucionsMassives", execucionsMassives);
+		Object idsDesplegat = RequestSessionHelper.obtenirObjecteSessio(request, SESSION_COLLAPSE_SELECCIO);
+		if (idsDesplegat!=null) {
+			model.addAttribute("idsDesplegats", (List<Long>)idsDesplegat);
+		}
 		return "consultaExecucionsMassives";
 	}
 
@@ -340,9 +355,33 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	public List<ExecucioMassivaContingutDto> getConsultaContinguts(
 			HttpServletRequest request,
 			@PathVariable Long execucioMassivaId) {
-		if (RolHelper.isRolActualUsuari(request)) 
+		
+		if (RolHelper.isRolActualUsuari(request)) {
 			getEntitatActualComprovantPermisos(request);
+		}
+
+		Object idDesplegat = RequestSessionHelper.obtenirObjecteSessio(request, SESSION_COLLAPSE_SELECCIO);
+		List<Long> idsDesplegats = new ArrayList<Long>();
+		if (idDesplegat!=null) { idsDesplegats = (List<Long>)idDesplegat; }
+		if (!idsDesplegats.contains(execucioMassivaId)) { idsDesplegats.add(execucioMassivaId); }
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_COLLAPSE_SELECCIO, idsDesplegats);
+
 		return execucioMassivaService.findContingutPerExecucioMassiva(execucioMassivaId);
+	}
+	
+	@RequestMapping(value = "/unloadContingut/{execucioMassivaId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean unloadContingutContinguts(
+			HttpServletRequest request,
+			@PathVariable Long execucioMassivaId) {
+
+		Object idDesplegat = RequestSessionHelper.obtenirObjecteSessio(request, SESSION_COLLAPSE_SELECCIO);
+		List<Long> idsDesplegats = new ArrayList<Long>();
+		if (idDesplegat!=null) { idsDesplegats = (List<Long>)idDesplegat; }
+		if (idsDesplegats.contains(execucioMassivaId)) { idsDesplegats.remove(execucioMassivaId); }
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_COLLAPSE_SELECCIO, idsDesplegats);
+
+		return true;
 	}
 
 	@InitBinder
@@ -353,8 +392,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
-
-
 
 	private ContingutMassiuFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -370,5 +407,4 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		}
 		return filtreCommand;
 	}
-
 }
