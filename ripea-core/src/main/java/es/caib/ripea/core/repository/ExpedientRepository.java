@@ -521,6 +521,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
 			"and (:esNullPrioritat = true or e.prioritat = :prioritatEnum) " +
+			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaExpedient = true))) " +
+			"and (:esNullEstat = true or e.estatAdditional = :estat) " +			
 			"and (select count(document) from DocumentEntity document where " + // no documents en process de firma
 			"	document.expedient = e " +
 			"	and (document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
@@ -559,6 +561,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,	
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientEstatEntity estat,			
 			@Param("esNullPrioritat") boolean esNullPrioritat,
 			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum,			
 			Pageable pageable);
@@ -577,6 +583,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,	
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientEstatEntity estat,			
 			@Param("esNullPrioritat") boolean esNullPrioritat,
 			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum);
 

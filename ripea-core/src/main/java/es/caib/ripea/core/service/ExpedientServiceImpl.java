@@ -1003,6 +1003,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		
+		ExpedientEstatEnumDto chosenEstatEnum = null;
+		ExpedientEstatEntity chosenEstat = null;
+		Long estatId = filtre.getExpedientEstatId();
+		if (estatId != null) {
+			if (estatId.intValue() <= 0) { // if estat is 0 or less the given estat is enum
+				int estatIdInt = -estatId.intValue();
+				chosenEstatEnum = ExpedientEstatEnumDto.values()[estatIdInt];
+			} else { // given estat is estat from database
+				chosenEstat = expedientEstatRepository.findOne(estatId);
+			}
+		}
+		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 
 		if (!metaExpedientsPermesos.isEmpty()) {
@@ -1021,6 +1033,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getNom(),
 					dataInici,
 					dataFi,
+					chosenEstatEnum,
+					chosenEstat,
 					filtre.getPrioritat(),
 					metaExpedientsPermesos,
 					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));

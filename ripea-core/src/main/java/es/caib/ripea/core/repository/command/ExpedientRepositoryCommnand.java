@@ -110,6 +110,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
     		final String nom,
     		final Date dataInici,
     		final Date dataFi,
+    		final ExpedientEstatEnumDto estatEnum,
+    		final ExpedientEstatEntity estat,    		
     		final PrioritatEnumDto prioritat,
     		final List<? extends MetaNodeEntity> metaExpedientsPermesos,
     		final Pageable pageable) {
@@ -122,6 +124,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             put("dataInici", dataInici);
             put("dataFi", dataFi);
             put("pageable", pageable);
+            put("estatEnum", estatEnum);
+            put("estat", estat);
             put("prioritat", prioritat);
         }};
         return getPage(new ExpedientByExpedientsPerTancamentMassiuCommand(params), metaExpedientsPermesos, false);
@@ -411,6 +415,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final String nom;
         private final Date dataInici;
         private final Date dataFi;
+        private final ExpedientEstatEnumDto estatEnum;
+        private final ExpedientEstatEntity estat;
         private final PrioritatEnumDto prioritat;
         private final Pageable pageable;
 
@@ -423,6 +429,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.dataInici = (Date) params.get("dataInici");
             this.dataFi = (Date) params.get("dataFi");
             this.pageable = (Pageable) params.get("pageable");
+            this.estatEnum = (ExpedientEstatEnumDto) params.get("estatEnum");
+            this.estat = (ExpedientEstatEntity) params.get("estat");
             this.prioritat = (PrioritatEnumDto) params.get("prioritat");
         }
 
@@ -436,6 +444,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
                     dataInici == null, dataInici,
                     dataFi == null, dataFi,
+                    estatEnum == null, estatEnum,
+                    estat == null, estat,
                     prioritat == null, prioritat);
         }
         @Override
@@ -448,6 +458,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
                     dataInici == null, dataInici,
                     dataFi == null, dataFi,
+                    estatEnum == null, estatEnum,
+                    estat == null, estat,
                     prioritat == null, prioritat,
                     pageable);
         }

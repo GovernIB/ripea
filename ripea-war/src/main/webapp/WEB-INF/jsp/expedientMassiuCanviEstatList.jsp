@@ -40,9 +40,14 @@
 	</style>
 	
 	<script type="text/javascript">
+
+	var colorsEstats = {};
+	<c:forEach items="${expedientEstatsOptions}" var="estat">
+	colorsEstats['${estat.id}'] = '${estat.color}';
+	</c:forEach>
 	
 	$(document).ready(function() {
-		
+
 		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
 					"canviEstat/" + accio,
@@ -129,8 +134,10 @@
 				$('#expedientEstatId option[value!=""]').remove();
 	
 				let listSize = data.length > 1 ? data.length - 1 : data.length; // don't add last estat 'TANCAT'
+				colorsEstats = {}
 				for (var i = 0; i < listSize; i++) {
 					$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					colorsEstats[data[i].id] = data[i].color;
 				}
 			})
 			.fail(function() {
@@ -141,6 +148,15 @@
 
 		changeExpedientPlaceHolder();
 	});//################################################## document ready END ##############################################################
+
+	function showColor(element) {
+		const id = element.id;
+		const color = colorsEstats[id];
+		if (!color) {
+			return $('<span class="no-icon"></span><span>' + element.text + '</span>');
+		}
+		return $('<span class="color-icon" style="background-color: ' + color + '"></span><span>' + element.text + '</span>');
+	}
 	
 	function enableDisableSelection($this, tipus) {
 	    if (tipus != undefined && tipus != "") {
@@ -220,7 +236,8 @@
 					optionValueAttribute="id"
 					emptyOption="true" 
 					optionTextAttribute="nom"
-					placeholderKey="expedient.list.user.placeholder.estat" 
+					placeholderKey="expedient.list.user.placeholder.estat"
+					templateResultFunction="showColor"
 					inline="true" />
 			</div>
 			

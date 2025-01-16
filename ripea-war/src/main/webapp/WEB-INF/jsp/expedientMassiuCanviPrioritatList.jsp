@@ -35,10 +35,44 @@
             cursor: pointer;
         }
     </style>
-    <script>
+    
+    <script type="text/javascript">
+
+		var colorsEstats = {};
+		<c:forEach items="${expedientEstatsOptions}" var="estat">
+		colorsEstats['${estat.id}'] = '${estat.color}';
+		</c:forEach>
+    
         $(document).ready(function() {
 
+        	$('#metaExpedientId').on('change', function() {
+        		metaExpedientId = $(this).val();
 
+        		if (metaExpedientId) {
+        			$("#expedientId").data('urlParamAddicional', metaExpedientId);
+        		} else {
+        			$("#expedientId").data('urlParamAddicional', null);
+        			metaExpedientId = 0;
+        		}
+        		
+        		$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
+        		.done(function(data) {
+        			
+        			$('#expedientEstatId').select2('val', '', true);
+        			$('#expedientEstatId option[value!=""]').remove();
+
+        			let listSize = data.length > 1 ? data.length - 1 : data.length; // don't add last estat 'TANCAT'
+        			colorsEstats = {}
+        			for (var i = 0; i < listSize; i++) {
+        				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+        				colorsEstats[data[i].id] = data[i].color;
+        			}
+        		})
+        		.fail(function() {
+        			alert("<spring:message code="error.jquery.ajax"/>");
+        		});
+        	});
+        	
             $('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
                 $.get(
                     "canviPrioritats/" + accio,
@@ -92,8 +126,15 @@
 
         });
 
-
-
+      	function showColor(element) {
+      		const id = element.id;
+      		const color = colorsEstats[id];
+      		if (!color) {
+      			return $('<span class="no-icon"></span><span>' + element.text + '</span>');
+      		}
+      		return $('<span class="color-icon" style="background-color: ' + color + '"></span><span>' + element.text + '</span>');
+      	}
+                
     </script>
 
 </head>
@@ -122,6 +163,18 @@
         </div>
     </div>
     <div class="row">
+
+		<div class="col-md-4">
+			<rip:inputSelect 
+				name="expedientEstatId" 
+				optionItems="${expedientEstatsOptions}"
+				optionValueAttribute="id"
+				emptyOption="true" 
+				optionTextAttribute="nom"
+				placeholderKey="expedient.list.user.placeholder.estat"
+				templateResultFunction="showColor"
+				inline="true" />
+		</div>
 
 		<div class="col-md-4">
 			<rip:inputSelect 

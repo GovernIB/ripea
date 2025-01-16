@@ -35,64 +35,104 @@
 		cursor: pointer;
 	}
 </style>
-<script>
-$(document).ready(function() {
 
+<script type="text/javascript">
+
+	var colorsEstats = {};
+	<c:forEach items="${expedientEstatsOptions}" var="estat">
+	colorsEstats['${estat.id}'] = '${estat.color}';
+	</c:forEach>
 	
-	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
-		$.get(
-				"tancament/" + accio,
-				{ids: ids},
-				function(data) {
-					$("#seleccioCount").html(data);
-				}
-		);
-	});
-	
-	$('#taulaDades').on('draw.dt', function () {
-		$('#seleccioAll').on('click', function() {
+	$(document).ready(function() {
+		
+		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
-					"tancament/select",
+					"tancament/" + accio,
+					{ids: ids},
 					function(data) {
 						$("#seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('refresh');
 					}
 			);
-			return false;
 		});
-		$('#seleccioNone').on('click', function() {
-			$.get(
-					"tancament/deselect",
-					function(data) {
-						$("#seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('select-none');
-						$('#taulaDades').webutilDatatable('refresh');
-					}
-			);
-			return false;
-		});
-
-		$("span[class^='stateColor-']").each(function( index ) {
-			var fullClassNameString = this.className;
-			var colorString = fullClassNameString.substring(11);
-			if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
-				$(this).parent().css( "border", "dashed 1px #AAA" );
-				$(this).parent().css( "color", '#666666' );
-			} else if (colorString == 'TANCAT') {
-				$(this).parent().css( "background-color", "#777" );
+	
+		$('#metaExpedientId').on('change', function() {
+			metaExpedientId = $(this).val();
+	
+			if (metaExpedientId) {
+				$("#expedientId").data('urlParamAddicional', metaExpedientId);
 			} else {
-				$(this).parent().css( "background-color", colorString );
-				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
-				$(this).parent().css( "color", textColor );
-				// $(this).parent().css( "fontSize", 'small' );
-				$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+				$("#expedientId").data('urlParamAddicional', null);
+				metaExpedientId = 0;
 			}
+			
+			$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
+			.done(function(data) {
+
+				$('#expedientEstatId').select2('val', '', true);
+				$('#expedientEstatId option[value!=""]').remove();
+	
+				let listSize = data.length > 1 ? data.length - 1 : data.length; // don't add last estat 'TANCAT'
+				colorsEstats = {}
+				for (var i = 0; i < listSize; i++) {
+					$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+					colorsEstats[data[i].id] = data[i].color;
+				}
+			})
+			.fail(function() {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+		});
+		
+		$('#taulaDades').on('draw.dt', function () {
+			$('#seleccioAll').on('click', function() {
+				$.get(
+						"tancament/select",
+						function(data) {
+							$("#seleccioCount").html(data);
+							$('#taulaDades').webutilDatatable('refresh');
+						}
+				);
+				return false;
+			});
+			$('#seleccioNone').on('click', function() {
+				$.get(
+						"tancament/deselect",
+						function(data) {
+							$("#seleccioCount").html(data);
+							$('#taulaDades').webutilDatatable('select-none');
+							$('#taulaDades').webutilDatatable('refresh');
+						}
+				);
+				return false;
+			});
+	
+			$("span[class^='stateColor-']").each(function( index ) {
+				var fullClassNameString = this.className;
+				var colorString = fullClassNameString.substring(11);
+				if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
+					$(this).parent().css( "border", "dashed 1px #AAA" );
+					$(this).parent().css( "color", '#666666' );
+				} else if (colorString == 'TANCAT') {
+					$(this).parent().css( "background-color", "#777" );
+				} else {
+					$(this).parent().css( "background-color", colorString );
+					const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
+					$(this).parent().css( "color", textColor );
+					// $(this).parent().css( "fontSize", 'small' );
+					$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+				}
+			});
 		});
 	});
 
-});
-
-
+	function showColor(element) {
+		const id = element.id;
+		const color = colorsEstats[id];
+		if (!color) {
+			return $('<span class="no-icon"></span><span>' + element.text + '</span>');
+		}
+		return $('<span class="color-icon" style="background-color: ' + color + '"></span><span>' + element.text + '</span>');
+	}
 
 </script>
 
@@ -122,6 +162,18 @@ $(document).ready(function() {
 			</div>			
 		</div>
 		<div class="row">
+
+			<div class="col-md-4">
+				<rip:inputSelect 
+					name="expedientEstatId" 
+					optionItems="${expedientEstatsOptions}"
+					optionValueAttribute="id"
+					emptyOption="true" 
+					optionTextAttribute="nom"
+					placeholderKey="expedient.list.user.placeholder.estat" 
+					templateResultFunction="showColor"
+					inline="true" />
+			</div>
 
 			<div class="col-md-4">
 				<rip:inputSelect 

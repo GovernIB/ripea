@@ -31,12 +31,15 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
@@ -64,6 +67,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	@Autowired private ExpedientService expedientService;
 	@Autowired private ContingutService contingutService;
 	@Autowired private DocumentService documentService;
+	@Autowired private ExpedientEstatService expedientEstatService;
 	@Autowired private ExecucioMassivaService execucioMassivaService;
 	@Autowired private AplicacioService aplicacioService;
 
@@ -86,6 +90,12 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		Long metaExpedientId = filtreCommand != null ? filtreCommand.getMetaExpedientId() : null;
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		model.addAttribute("expedientEstatsOptions", expedientEstatsOptions);
+		
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
@@ -138,9 +148,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		} catch (Exception e) {
 			throw e;
 		}
-		
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
@@ -203,12 +211,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		return seleccio.size();
 	}
 	
-	
-	
-	
-	
-	
-	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/tancar", method = RequestMethod.GET)
 	public String tancarMassiuGet(
@@ -233,7 +235,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		
 		return "expedientMassiuTancamentForm";
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/tancar", method = RequestMethod.POST)

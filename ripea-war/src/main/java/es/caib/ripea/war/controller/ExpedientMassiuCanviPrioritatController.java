@@ -1,7 +1,9 @@
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -67,6 +71,11 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 						PrioritatEnumDto.class,
 						"prioritat.enum.",
 						new Enum<?>[] {}));
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		Long metaExpedientId = filtreCommand != null ? filtreCommand.getMetaExpedientId() : null;
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		model.addAttribute("expedientEstatsOptions", expedientEstatsOptions);		
 		return "expedientMassiuCanviPrioritatList";
 	}
 
