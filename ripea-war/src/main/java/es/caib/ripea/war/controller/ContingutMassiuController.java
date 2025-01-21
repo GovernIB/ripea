@@ -187,8 +187,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 				"redirect:/massiu/definitiu",
 				"document.controller.estat.canviat.ok");
 	}
-	
-
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
@@ -234,8 +232,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		return expedients;
 	}
 	
-	
-	
 	@RequestMapping(value = "/metaDocuments/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<MetaDocumentDto> findMetaDocuments(
@@ -249,9 +245,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		
 		return metaDocuments;
 	}	
-	
-	
-	
 
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody

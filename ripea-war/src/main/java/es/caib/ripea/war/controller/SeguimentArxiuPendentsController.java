@@ -166,8 +166,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		}
 		return filtreCommand;
 	}
-
-	
 	
 	@RequestMapping(value = "/filtrar/documents", method = RequestMethod.POST)
 	public String postDocuments(
@@ -236,9 +234,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		return filtreCommand;
 	}
 	
-	
-	
-	
 	@RequestMapping(value = "/filtrar/interessats", method = RequestMethod.POST)
 	public String postInteressats(
 			HttpServletRequest request,
@@ -305,11 +300,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		}
 		return filtreCommand;
 	}
-    
-
-
-	// Accions massives
-	// /////////////////////////////////////////////////////////////
 
 	@RequestMapping(value = "/expedients/select", method = RequestMethod.GET)
 	@ResponseBody
@@ -317,8 +307,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -349,6 +338,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		}
 		return seleccio.size();
 	}
+	
 	@RequestMapping(value = "/expedients/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselectExpedients(
@@ -380,10 +370,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	public int selectDocuments(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
-
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -414,6 +402,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		}
 		return seleccio.size();
 	}
+	
 	@RequestMapping(value = "/documents/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselectDocuments(
@@ -446,7 +435,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
-		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
@@ -480,6 +468,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		}
 		return seleccio.size();
 	}
+	
 	@RequestMapping(value = "/interessats/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselectInteressats(

@@ -2,15 +2,15 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ attribute name="contingut" required="true" rtexprvalue="true" type="java.lang.Object"%>
 
-<c:if test="${contingut.document && contingut.estat == 'REDACCIO'}">
-	<span class="icona-esborrany fa fa-bold" title="<spring:message code="contingut.info.estat.redaccio"/>"></span>
-</c:if> 
 <c:if test="${contingut.document && contingut.documentTipus == 'IMPORTAT'}">
 	<span class="importat fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span>
-</c:if> 
+</c:if>
 <c:if test="${contingut.node and not contingut.valid}">
 	&nbsp;<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.error.valid"/>"></span>
-</c:if> 
+</c:if>
+<c:if test="${contingut.document && contingut.estat == 'REDACCIO'}">
+	<span class="icona-esborrany fa fa-bold" title="<spring:message code="contingut.info.estat.redaccio"/>"></span>
+</c:if>   
 <c:if test="${contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'ADJUNT_FIRMAT')}">
 	<span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span>
 </c:if>

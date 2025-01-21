@@ -1859,6 +1859,7 @@ public class PluginHelper {
 
 		List<ContingutArxiu> continguts = null;
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(pare.getTipus()) || (ContingutTipusEnumDto.CARPETA.equals(pare.getTipus()) && isCarpetaLogica())) {
+			//Cerca dins tot l'expedient a Arxiu, si el pare es expedient, o estan activades les carpetes lògiques (carpetes nomes a RIPEA)
 			continguts = arxiuExpedientConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
 		} else {
 			continguts = arxiuCarpetaConsultarPerUuid(pare.getArxiuUuid()).getContinguts();

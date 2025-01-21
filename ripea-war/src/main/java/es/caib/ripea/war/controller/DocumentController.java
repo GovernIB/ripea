@@ -683,7 +683,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url");
 		DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
 		if (documentDto!=null && documentDto.getNtiCsv()!=null) {
-			return urlValidacio +"/view.xhtml?hash=" + documentDto.getNtiCsv();
+			return urlValidacio + documentDto.getNtiCsv();
 		}
 		return urlValidacio;
 	}

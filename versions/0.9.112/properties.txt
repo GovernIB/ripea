@@ -1,0 +1,7 @@
+Modificar property: es.caib.ripea.concsv.base.url
+
+Que hauria de tenir un valor similar a: https://intranet.caib.es/concsvfront
+
+Afegir al final de la propietat el literal "/view.xhtml?hash="
+
+Ja que ara, aquest texte es troba al codi, i per la APB no funciona.

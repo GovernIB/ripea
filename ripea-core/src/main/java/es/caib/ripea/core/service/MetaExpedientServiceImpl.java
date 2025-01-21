@@ -1677,10 +1677,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Transactional
 	public boolean createValidacioTasca(MetaExpedientTascaValidacioDto metaExpedientTascaValidacioDto) {
 		
-		List<MetaExpedientTascaValidacioEntity> repetits = metaExpedientTascaValidacioRepository.findByItemValidacioAndTipusValidacioAndItemId(
+		//No hi pot haver duplicats per el mateix:
+		//-ItemValidacio: Document o Metadada
+		//-TipusValidació: Aportat, Firmat, etc...
+		//-El mateix element (ItemId), que pot ser un ID de document o de metadada.
+		//-La mateixa tasca: MetaExpedientTasca.id
+		List<MetaExpedientTascaValidacioEntity> repetits = metaExpedientTascaValidacioRepository.findByItemValidacioAndTipusValidacioAndItemIdAndMetaExpedientTascaId(
 				metaExpedientTascaValidacioDto.getItemValidacio(),
 				metaExpedientTascaValidacioDto.getTipusValidacio(),
-				metaExpedientTascaValidacioDto.getItemId());
+				metaExpedientTascaValidacioDto.getItemId(),
+				metaExpedientTascaValidacioDto.getMetaExpedientTasca().getId());
 		
 		if (repetits==null || repetits.size()==0) {
 			MetaExpedientTascaValidacioEntity novaValidacio = MetaExpedientTascaValidacioEntity.getBuilder(

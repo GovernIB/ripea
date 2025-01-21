@@ -156,8 +156,22 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			//Si el contingut es una carpeta, llevam del path la propia carpeta, o surt dues vegades a la miga de pa
 			if (contingut instanceof CarpetaDto) {
 				if (contingut.getPath()!=null && contingut.getPath().size()>0) {
-					if (contingut.getPath().get(contingut.getPath().size()-1).getId().equals(contingutId)) {
-						contingut.getPath().remove(contingut.getPath().size()-1);
+					for (int p=contingut.getPath().size()-1; p>=0; p--) {
+						if (contingut.getPath().get(p).getId().equals(contingutId) ||
+							(contingut.getPath().get(p) instanceof DocumentDto)) {
+								contingut.getPath().remove(p);
+						}
+					}
+				}
+				//Si el contingut es un document, llevam del path el propi document, i altres documents o apareix a la miga de pa
+				//pero no es pot llevar el path com a tal, perque la funció "getPare" de ContingutDto, depen del path
+				//TODO: Millorar el tema del path, que no es faci al métode recursiu, sino despres.
+			} else if (contingut instanceof DocumentDto) {
+				if (contingut.getPath()!=null && contingut.getPath().size()>0) {
+					for (int p=contingut.getPath().size()-1; p>=0; p--) {
+						if (contingut.getPath().get(p) instanceof DocumentDto) {
+							contingut.getPath().remove(p);
+						}	
 					}
 				}
 			}

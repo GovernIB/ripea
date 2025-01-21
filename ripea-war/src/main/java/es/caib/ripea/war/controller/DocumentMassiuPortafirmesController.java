@@ -90,7 +90,6 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 					"metaDocuments",
 					 metaDocumentService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatActual.getId(), filtreCommand.getMetaExpedientId()));
 		}
-		
 
 		MissatgesHelper.info(
 				request,
@@ -154,9 +153,6 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		}
 		
 	}
-	
-	
-	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/crear", method = RequestMethod.GET)
@@ -273,8 +269,6 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 				"redirect:../../../massiu/portafirmes",
 				"accio.massiva.creat.ok");
 	}
-
-
 
 	@RequestMapping(value = "/expedients/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody

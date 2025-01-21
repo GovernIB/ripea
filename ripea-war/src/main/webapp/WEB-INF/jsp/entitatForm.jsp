@@ -5,11 +5,14 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
+<%pageContext.setAttribute("idioma", org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());%>
 <c:choose>
 	<c:when test="${empty entitatCommand.id}"><c:set var="titol"><spring:message code="entitat.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="entitat.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
+
 <html>
+
 <head>
 	<title>${titol}</title>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
@@ -21,23 +24,18 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
 	
-	
-<script>
-
-$(document).ready(function() {
-	
-  $('#logoImg').change(function(){
-	    var path = $(this).val();
-	    if (path) {
-	     	$('#logo').val(true);
-		} else {
-			$('#logo').val(false);
-		}
-  });
-  
-});
-
-</script>	
+	<script type="text/javascript">
+		$(document).ready(function() {
+		  $('#logoImg').change(function(){
+			    var path = $(this).val();
+			    if (path) {
+			     	$('#logo').val(true);
+				} else {
+					$('#logo').val(false);
+				}
+		  });
+		});
+	</script>	
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
@@ -47,10 +45,8 @@ $(document).ready(function() {
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>
-
 		<rip:inputFile name="logoImg" textKey="entitat.form.camp.logoImg" fileName="${entitatCommand.logo ? 'logo' : ''}" doNotShowErrors="1"/>
 		<form:hidden path="logo"/>
-		
 		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
 		<div id="modal-botons">

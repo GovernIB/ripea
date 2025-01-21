@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.111</version>
+		<version>0.9.112</version>
 	</parent>
 	<artifactId>ripea-war</artifactId>
 	<packaging>war</packaging>

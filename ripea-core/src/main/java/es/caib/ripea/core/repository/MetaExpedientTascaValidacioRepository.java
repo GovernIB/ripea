@@ -9,10 +9,11 @@ import es.caib.ripea.core.entity.MetaExpedientTascaValidacioEntity;
 
 public interface MetaExpedientTascaValidacioRepository extends JpaRepository<MetaExpedientTascaValidacioEntity, Long> {
 	public List<MetaExpedientTascaValidacioEntity> findByMetaExpedientTascaId(Long metaExpedientTascaId);
-	public List<MetaExpedientTascaValidacioEntity> findByItemValidacioAndTipusValidacioAndItemId(
+	public List<MetaExpedientTascaValidacioEntity> findByItemValidacioAndTipusValidacioAndItemIdAndMetaExpedientTascaId(
 			ItemValidacioTascaEnum itemValidacio,
 			TipusValidacioTascaEnum tipusValidacio,
-			Long itemId);
+			Long itemId,
+			Long metaExpedientTascaId);
 	public List<MetaExpedientTascaValidacioEntity> findByItemValidacioAndItemId(
 			ItemValidacioTascaEnum itemValidacio,
 			Long itemId);

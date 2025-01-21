@@ -35,6 +35,7 @@ import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -258,6 +259,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			int errors = 0;
 			int nodefinitius = 0;
 			int correctes = 0;
+			int validacio = 0;
 			Date dataInici = new Date();
 			List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 			
@@ -276,7 +278,9 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 				} catch (Exception e) {
 					logger.error("Error al tancament massiu de expedient amb id=" + expedientTancar.getId(), e);
 					throwable = ExceptionHelper.getRootCauseOrItself(e);
-					if (throwable.getClass() == ExpedientTancarSenseDocumentsDefinitiusException.class) {
+					if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class)) {
+						validacio++;
+					} else if (throwable.getClass() == ExpedientTancarSenseDocumentsDefinitiusException.class) {
 						nodefinitius++;
 					} else {
 						errors++;
@@ -285,7 +289,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					}
 				}
 				
-				
 				execucioMassivaElements.add(
 						new ExecucioMassivaContingutDto(
 								dataIniciElement,
@@ -293,7 +296,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 								expedientTancar.getId(),
 								throwable));
 			}
-			
 			
 			execucioMassivaService.saveExecucioMassiva(
 					entitatActual.getId(),
@@ -319,6 +321,9 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			} 
 			if (errors > 0) {
 				MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.errors", new Object[]{errors}), null);
+			}
+			if (validacio > 0) {
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.validacio", new Object[]{validacio}), null);
 			} 
 			return modalUrlTancar();
 			
