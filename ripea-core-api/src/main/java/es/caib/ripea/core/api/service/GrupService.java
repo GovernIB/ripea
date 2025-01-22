@@ -31,7 +31,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto create(
 			Long entitatId,
 			GrupDto grup) throws NotFoundException;
@@ -48,7 +48,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto update(
 			Long entitatId,
 			GrupDto grup) throws NotFoundException;
@@ -64,7 +64,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -78,7 +78,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto findById(
 			Long id) throws NotFoundException;
 	

@@ -31,14 +31,13 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/domini")
 public class DominiController extends BaseAdminController {
 
-	@Autowired
-	private DominiService dominiService;
+	@Autowired private DominiService dominiService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		return "dominiList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -46,7 +45,7 @@ public class DominiController extends BaseAdminController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
 				dominiService.findByEntitatPaginat(
@@ -68,7 +67,7 @@ public class DominiController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long dominiId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		DominiDto domini = null;
 		if (dominiId != null)
 			domini = dominiService.findById(
@@ -91,7 +90,7 @@ public class DominiController extends BaseAdminController {
 			@Valid DominiCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		if (bindingResult.hasErrors()) {
 			return "dominiForm";
 		}
@@ -120,7 +119,7 @@ public class DominiController extends BaseAdminController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long dominiId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		DominiDto dominiDto = dominiService.delete(
 				entitatActual.getId(),
 				dominiId);

@@ -6,88 +6,34 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <%
-	pageContext.setAttribute(
-	"sessionEntitats",
-	es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
-	pageContext.setAttribute(
-	"entitatActual",
-	es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
-	pageContext.setAttribute(
-	"isRevisioActiva",
-	es.caib.ripea.war.helper.MetaExpedientHelper.getRevisioActiva(request));
-	pageContext.setAttribute(
-	"sessionOrgansGestors",
-	es.caib.ripea.war.helper.EntitatHelper.findOrganGestorsAccessibles(request));
-	pageContext.setAttribute(
-	"organGestorActual",
-	es.caib.ripea.war.helper.EntitatHelper.getOrganGestorActual(request));
-	pageContext.setAttribute(
-  			"requestParameterCanviOrganGestor",
-  			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviOrganGestor());
-	pageContext.setAttribute(
-	"requestParameterCanviEntitat",
-	es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
-	pageContext.setAttribute(
-	"dadesUsuariActual",
-	es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
-	pageContext.setAttribute(
-	"rolActual",
-	es.caib.ripea.war.helper.RolHelper.getRolActual(request));
-	pageContext.setAttribute(
-	"rolsUsuariActual",
-	es.caib.ripea.war.helper.RolHelper.getRolsUsuariActual(request));
-	pageContext.setAttribute(
-	"isRolActualSuperusuari",
-	es.caib.ripea.war.helper.RolHelper.isRolActualSuperusuari(request));
-	pageContext.setAttribute(
-	"isRolActualAdministrador",
-	es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request),
-	PageContext.SESSION_SCOPE);
-	pageContext.setAttribute(
-  			"isRolActualAdministradorOrgan",
-  			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
-	pageContext.setAttribute(
-  			"isRolActualRevisor",
-  			es.caib.ripea.war.helper.RolHelper.isRolActualRevisor(request));
-	pageContext.setAttribute(
-	"isRolActualUsuari",
-	es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
-	pageContext.setAttribute(
-	"requestParameterCanviRol",
-	es.caib.ripea.war.helper.RolHelper.getRequestParameterCanviRol());
-	pageContext.setAttribute(
-	"teAccesExpedients",
-	es.caib.ripea.war.helper.ExpedientHelper.teAccesExpedients(request));
-	pageContext.setAttribute(
-	"countTasquesPendent",
-	es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
-	pageContext.setAttribute(
-	"countAnotacionsPendents",
-	es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
-	pageContext.setAttribute(
-	"teAccesEstadistiques",
-	es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
-	pageContext.setAttribute(
-	"avisos",
-	es.caib.ripea.war.helper.AvisHelper.getAvisos(request));
-	pageContext.setAttribute(
-	"isConvertirDefinitiuActiu",
-	es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
-	pageContext.setAttribute(
-	"isUrlValidacioDefinida",
-	es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
-	pageContext.setAttribute(
-	"organsNoSincronitzats",
-	es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
-	pageContext.setAttribute(
-	"isUrlsInstruccioActiu",
-	es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
-	pageContext.setAttribute(
-	"isCreacioFluxUsuariActiu",
-	es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
-	pageContext.setAttribute(
-	"isMostrarSeguimentEnviamentsUsuariActiu",
-	es.caib.ripea.war.helper.SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
+	pageContext.setAttribute("sessionEntitats", es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
+	pageContext.setAttribute("entitatActual", es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
+	pageContext.setAttribute("isRevisioActiva", es.caib.ripea.war.helper.MetaExpedientHelper.getRevisioActiva(request));
+	pageContext.setAttribute("sessionOrgansGestors", es.caib.ripea.war.helper.EntitatHelper.findOrganGestorsAccessibles(request));
+	pageContext.setAttribute("organGestorActual", es.caib.ripea.war.helper.EntitatHelper.getOrganGestorActual(request));
+	pageContext.setAttribute("requestParameterCanviOrganGestor", es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviOrganGestor());
+	pageContext.setAttribute("requestParameterCanviEntitat", es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
+	pageContext.setAttribute("dadesUsuariActual", es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
+	pageContext.setAttribute("rolActual", es.caib.ripea.war.helper.RolHelper.getRolActual(request));
+	pageContext.setAttribute("rolsUsuariActual", es.caib.ripea.war.helper.RolHelper.getRolsUsuariActual(request));
+	pageContext.setAttribute("isRolActualSuperusuari", es.caib.ripea.war.helper.RolHelper.isRolActualSuperusuari(request));
+	pageContext.setAttribute("isRolActualAdministrador", es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request), PageContext.SESSION_SCOPE);
+	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
+	pageContext.setAttribute("isRolActualDissenyadorOrgan", es.caib.ripea.war.helper.RolHelper.isRolActualDissenyadorOrgan(request));
+	pageContext.setAttribute("isRolActualRevisor", es.caib.ripea.war.helper.RolHelper.isRolActualRevisor(request));
+	pageContext.setAttribute("isRolActualUsuari", es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
+	pageContext.setAttribute("requestParameterCanviRol", es.caib.ripea.war.helper.RolHelper.getRequestParameterCanviRol());
+	pageContext.setAttribute("teAccesExpedients", es.caib.ripea.war.helper.ExpedientHelper.teAccesExpedients(request));
+	pageContext.setAttribute("countTasquesPendent", es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
+	pageContext.setAttribute("countAnotacionsPendents", es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+	pageContext.setAttribute("teAccesEstadistiques", es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
+	pageContext.setAttribute("avisos", es.caib.ripea.war.helper.AvisHelper.getAvisos(request));
+	pageContext.setAttribute("isConvertirDefinitiuActiu", es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
+	pageContext.setAttribute("isUrlValidacioDefinida", es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+	pageContext.setAttribute("organsNoSincronitzats", es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
+	pageContext.setAttribute("isUrlsInstruccioActiu", es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
+	pageContext.setAttribute("isCreacioFluxUsuariActiu", es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
+	pageContext.setAttribute("isMostrarSeguimentEnviamentsUsuariActiu", es.caib.ripea.war.helper.SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -233,7 +179,7 @@ body {
 						</c:choose>
 					</li>
 					<%------------------------ ORGANS ------------------------%>
-					<c:if test="${ isRolActualAdministradorOrgan }">
+					<c:if test="${isRolActualAdministradorOrgan or isRolActualDissenyadorOrgan}">
 						<li class="dropdown">
 							<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
 							<c:if test="${null != organGestorActual}">
@@ -299,15 +245,8 @@ body {
 				</ul>
 				<div class="clearfix"></div>
 			</div>
-				
-				
+
 			<div class="navbar-header">
-				<%--button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button--%>
 				<div class="navbar-collapse collapse">
 				<div class="navbar-brand" style="margin-top: -20px; padding: 0;">
 					<div id="govern-logo" class="pull-left">
@@ -450,7 +389,7 @@ body {
 					</c:when>
 					<c:when test="${isRolActualAdministradorOrgan}">
 						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>									
+						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
 						<%---- Annotacions pendents ----%>
 						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.expedientPeticions"/>
@@ -464,6 +403,11 @@ body {
 								<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 							</ul>
 						</div>
+					</c:when>
+					<c:when test="${isRolActualDissenyadorOrgan}">
+						<a href="<c:url value="/metaExpedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.metaexpedients"/></a>
+						<a href="<c:url value="/grup"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.grups"/></a>
+						<a href="<c:url value="/domini"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.domini"/></a>
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
 						<%---- Expedients ----%>
@@ -525,14 +469,13 @@ body {
 						</ul>
 					</div>
 				</c:if>
-				
 				<c:if test="${isRolActualRevisor}">
 					<%---- Revisió d'expedients ----%>
 					<a href="<c:url value="/metaExpedientRevisio"/>"class="btn btn-primary">
 							<spring:message code="decorator.menu.revisioProcediments"/>
 					</a>
 				</c:if>
-			</div>			
+			</div>
 		</div>
 	</div>
 

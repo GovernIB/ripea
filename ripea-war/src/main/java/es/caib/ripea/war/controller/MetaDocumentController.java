@@ -175,7 +175,7 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/{metaDocumentId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true, rolActual);
@@ -188,7 +188,7 @@ public class MetaDocumentController extends BaseAdminController {
 
 	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false, rolActual);

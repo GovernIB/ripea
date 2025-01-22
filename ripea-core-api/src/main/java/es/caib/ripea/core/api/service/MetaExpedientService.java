@@ -31,7 +31,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto create(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual, Long organId) throws NotFoundException;
@@ -53,7 +53,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient,
@@ -76,7 +76,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
@@ -95,7 +95,7 @@ public interface MetaExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws SQLException 
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto delete(
 			Long entitatId,
 			Long id, Long organId) throws NotFoundException;
@@ -143,7 +143,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
 			String codi) throws NotFoundException;
@@ -459,13 +459,13 @@ public interface MetaExpedientService {
 			Long organGestorId, 
 			String filtre);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(Long entitatId, Long metaExpedientId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long entitatId, Long metaExpedientCarpetaId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public ProcedimentDto findProcedimentByCodiSia(
 			Long entitatId,
 			String codiDir3, String codiSia);
@@ -523,7 +523,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException TODO
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto marcarPendentRevisio(
 			Long entitatId, 
 			Long id, Long organId);
@@ -541,46 +541,46 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException TODO
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto marcarProcesDisseny(
 			Long entitatId, 
 			Long id, 
 			Long organId);
 	
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public boolean publicarComentariPerMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			String text,
 			String rolActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public List<MetaExpedientComentariDto> findComentarisPerMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			String rolActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public String export(
 			Long entitatId,
 			Long id,
 			Long organActualId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public void createFromImport(
 			Long entitatId,
 			MetaExpedientExportDto metaExpedient,
 			String rolActual,
 			Long organId);
 	
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public void updateFromImport(
 			Long entitatId,
 			MetaExpedientExportDto metaExpedient,
 			String rolActual,
 			Long organId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public CrearReglaResponseDto reintentarCreacioReglaDistribucio(
 			Long entitatId,
 			Long metaExpedientId);
@@ -591,20 +591,20 @@ public interface MetaExpedientService {
 	 * @param entitatDto Entitat que es vol consultar
 	 * @return boolean indicant si existeix un procés en segon pla actualitzant els procediements de l'entitat indicada.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	boolean isUpdatingProcediments(EntitatDto entitatDto);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	ProgresActualitzacioDto getProgresActualitzacio(String codi);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	void actualitzaProcediments(EntitatDto entitat, Locale locale);
 	
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public ReglaDistribucioDto consultarReglaDistribucio(
 			Long metaExpedientId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public CrearReglaResponseDto canviarEstatReglaDistribucio(
 			Long metaExpedientId, 
 			boolean activa);

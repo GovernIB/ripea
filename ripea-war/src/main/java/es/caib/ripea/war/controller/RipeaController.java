@@ -39,6 +39,8 @@ public class RipeaController {
 		
 		if (RolHelper.isRolActualSuperusuari(request)) {
 			return "redirect:integracio";
+		} else if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+			return "redirect:metaExpedient";
 		} else {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if (entitat == null)

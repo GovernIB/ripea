@@ -42,16 +42,14 @@ public class GrupController extends BaseAdminController {
 	private static final String SESSION_ATTRIBUTE_FILTRE = "GrupController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "GrupController.session.seleccio";
 
-	@Autowired
-	private GrupService grupService;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private GrupService grupService;
+	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		
 		GrupFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
@@ -90,7 +88,7 @@ public class GrupController extends BaseAdminController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
         GrupFiltreCommand filtreCommand = getFiltreCommand(request);
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
 				request,
@@ -118,7 +116,7 @@ public class GrupController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long grupId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		GrupDto grup = null;
 		if (grupId != null)
 			grup = grupService.findById(
@@ -141,7 +139,7 @@ public class GrupController extends BaseAdminController {
 			@Valid GrupCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		
 		if (Utils.isNotEmpty(command.getCodi()) && grupService.checkIfAlreadyExistsWithCodi(entitatActual.getId(), command.getCodi(), command.getId())) {
 			bindingResult.rejectValue("codi", "GrupCodiRepetit");
@@ -178,7 +176,7 @@ public class GrupController extends BaseAdminController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long grupId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
 		try {
 			GrupDto grupDto = grupService.delete(
 					entitatActual.getId(),

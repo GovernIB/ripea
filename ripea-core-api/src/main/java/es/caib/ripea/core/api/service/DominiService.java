@@ -33,7 +33,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
 	public DominiDto create(
 			Long entitatId,
 			DominiDto domini) throws NotFoundException;
@@ -50,7 +50,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
 	public DominiDto update(
 			Long entitatId,
 			DominiDto tipusDocumental) throws NotFoundException;
@@ -66,7 +66,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
 	public DominiDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -82,7 +82,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
 	public DominiDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -96,7 +96,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
 	public PaginaDto<DominiDto> findByEntitatPaginat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
@@ -110,7 +110,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
 	public List<DominiDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
@@ -199,6 +199,6 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
 	public void evictDominiCache();
 }

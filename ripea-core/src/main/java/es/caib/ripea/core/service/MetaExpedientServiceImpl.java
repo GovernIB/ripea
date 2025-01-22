@@ -1038,7 +1038,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			String rolActual) {
 		// check permis administracio d'entitat
 		EntitatEntity entitat = null;
-		if (rolActual.equals("IPA_REVISIO")) {
+		if (rolActual.equals("IPA_REVISIO") || rolActual.equals("IPA_DISSENY")) {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		} else {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
@@ -1403,7 +1403,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				+ "nodeId=" + metaExpedientId + ")");
 		EntitatEntity entitat = null;
 		
-		if (rolActual.equals("IPA_REVISIO")) {
+		if (rolActual.equals("IPA_REVISIO") || rolActual.equals("IPA_DISSENY")) {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		} else {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, true);

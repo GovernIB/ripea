@@ -21,6 +21,7 @@ public class RolHelper {
 
 	private static final String ROLE_SUPER = "IPA_SUPER";
 	private static final String ROLE_ADMIN = "IPA_ADMIN";
+	private static final String ROLE_DISSENY = "IPA_DISSENY";
 	private static final String ROLE_ADMIN_ORGAN = "IPA_ORGAN_ADMIN";
 	private static final String ROLE_REVISOR = "IPA_REVISIO";
 	private static final String ROLE_USER = "tothom";
@@ -57,9 +58,7 @@ public class RolHelper {
 	}
 
 	public static String getRolActual(HttpServletRequest request) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
 			if (request.isUserInRole(ROLE_USER) && rolsDisponibles.contains(ROLE_USER)) {
@@ -72,11 +71,11 @@ public class RolHelper {
 				rolActual = ROLE_SUPER;
 			} else if (request.isUserInRole(ROLE_REVISOR) && rolsDisponibles.contains(ROLE_REVISOR)) {
 				rolActual = ROLE_REVISOR;
+			} else if (request.isUserInRole(ROLE_DISSENY) && rolsDisponibles.contains(ROLE_DISSENY)) {
+				rolActual = ROLE_DISSENY;				
 			}
 			if (rolActual != null) {
-				request.getSession().setAttribute(
-						SESSION_ATTRIBUTE_ROL_ACTUAL,
-						rolActual);
+				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, rolActual);
 			}
 		}
 		LOGGER.debug("Obtenint rol actual (rol=" + rolActual + ")");
@@ -85,6 +84,9 @@ public class RolHelper {
 
 	public static boolean isRolActualSuperusuari(HttpServletRequest request) {
 		return ROLE_SUPER.equals(getRolActual(request));
+	}
+	public static boolean isRolActualDissenyadorOrgan(HttpServletRequest request) {
+		return ROLE_DISSENY.equals(getRolActual(request));
 	}
 	public static boolean isRolActualAdministrador(HttpServletRequest request) {
 		return ROLE_ADMIN.equals(getRolActual(request));
@@ -114,14 +116,24 @@ public class RolHelper {
 			if (request.isUserInRole(ROLE_ADMIN_ORGAN) && isUsuariActualTeOrgans(request)) {
 				rols.add(ROLE_ADMIN_ORGAN);
 			}
+			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_DISSENY)) {
+				rols.add(ROLE_DISSENY);
+			}			
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_USER)) {
 				rols.add(ROLE_USER);
 			}
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_REVISOR) && MetaExpedientHelper.getRevisioActiva(request)) {
 				rols.add(ROLE_REVISOR);
 			}
-			
 		}
+		
+		//El rol dissenyador, no es compatible amb el rol Usuari
+		//"Es necessita disposar d'un nou perfil d'usuari per a dissenyar procediments, dominis o grups i que que no pugui accedir 
+		// als expedients dels procediments creats ni a altres seccions."
+		if (rols.contains(ROLE_DISSENY)) {
+			rols.remove(ROLE_USER);
+		}
+		
 		return rols;
 	}
 

@@ -28,7 +28,7 @@ public class AccesAdminEntitatInterceptor extends HandlerInterceptorAdapter {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		if (!RolHelper.isRolActualAdministrador(request)) {
+		if (!RolHelper.isRolActualAdministrador(request) && !RolHelper.isRolActualDissenyadorOrgan(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 			throw new SecurityException("Es necessari ser administrador d'entitat per accedir a aquesta página. " +
 					"L'usuari actual " + usuariActual.getCodi() + " no té cap rol requerit.", null);

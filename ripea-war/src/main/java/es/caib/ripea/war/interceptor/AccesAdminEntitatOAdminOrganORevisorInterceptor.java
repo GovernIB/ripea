@@ -28,7 +28,10 @@ public class AccesAdminEntitatOAdminOrganORevisorInterceptor extends HandlerInte
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		if (!RolHelper.isRolActualAdministrador(request) && !RolHelper.isRolActualAdministradorOrgan(request) && !RolHelper.isRolActualRevisor(request)) {
+		if (!RolHelper.isRolActualAdministrador(request) && 
+			!RolHelper.isRolActualAdministradorOrgan(request) &&
+			!RolHelper.isRolActualDissenyadorOrgan(request) &&
+			!RolHelper.isRolActualRevisor(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 			throw new SecurityException("Es necessari ser administrador d'entitat o administrador d'òrgan gestor o revisor de procediments per accedir a aquesta página. " +
 					"L'usuari actual " + usuariActual.getCodi() + " no té cap rol requerit.", null);

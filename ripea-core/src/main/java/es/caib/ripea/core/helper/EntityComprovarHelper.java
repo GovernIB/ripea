@@ -155,7 +155,6 @@ public class EntityComprovarHelper {
 		
 	}
 	
-	
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
 			boolean comprovarPermisUsuari,

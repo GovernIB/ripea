@@ -33,13 +33,13 @@ public class BaseAdminController extends BaseController {
 		return entitat;
 	}
 
-	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOrgan(HttpServletRequest request) {
+	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
 
-		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans()) {
+		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans() && !RolHelper.isRolActualDissenyadorOrgan(request)) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
 		}
 		return entitat;
@@ -51,7 +51,10 @@ public class BaseAdminController extends BaseController {
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
-		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans() && !RolHelper.isRolActualRevisor(request)) {
+		if (!entitat.isUsuariActualAdministration() &&
+			!entitat.isUsuariActualTeOrgans() &&
+			!RolHelper.isRolActualRevisor(request) && 
+			!RolHelper.isRolActualDissenyadorOrgan(request)) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
 		}
 		return entitat;
