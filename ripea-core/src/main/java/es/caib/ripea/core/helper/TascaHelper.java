@@ -53,71 +53,74 @@ public class TascaHelper {
 			List<DocumentEntity> documentsExpedient = documentRepository.findByExpedientAndEsborrat(expedientTascaEntity.getExpedient(), 0);
 			
 			for (MetaExpedientTascaValidacioEntity validacioTasca: validacionsTasca) {
+				
+				if (validacioTasca.isActiva()) {
 			
-				boolean validacioOk = false;
-				
-				if (ItemValidacioTascaEnum.DADA.equals(validacioTasca.getItemValidacio())) {
+					boolean validacioOk = false;
 					
-					//La mateixa funció s'utilitza per guardar els valors de la pipella de dades del expedient.					
-					MetaDadaEntity metaDadaProcediment = metaDadaRepository.findOne(validacioTasca.getItemId());
-					
-					if (metaDadaProcediment == null || !metaDadaProcediment.isActiva()) {
-						validacioOk = true; //Si la meta-dada no esta activa actualment al procediment, no es valida perque no es podrá aportar...
-					} else {
-						for (DadaEntity dadaExp: dadesExpedient) {
-							if (dadaExp.getMetaDada().getId().equals(validacioTasca.getItemId())) {
-								switch (validacioTasca.getTipusValidacio()) {
-								case AP:
-									if (Utils.hasValue(dadaExp.getValorComString())) {
-										validacioOk = true;
-									}
-									break;
-								default:
-									break;
-								}
-							}
-						}
-					}
-					
-				} else if (ItemValidacioTascaEnum.DOCUMENT.equals(validacioTasca.getItemValidacio())) {
-					
-					//Anam a cercar la dada del expedient, del tipus (metaDocumentId) igual al itemId de la validació
-					MetaDocumentEntity metaDocProcediment = metaDocumentRepository.findOne(validacioTasca.getItemId());
-					
-					if (metaDocProcediment==null || !metaDocProcediment.isActiu()) {
-						validacioOk = true; //Si el tipus de document no esta actiu acualment al procediment, no es valida perque no es podrá aportar...
-					} else {
-						for (DocumentEntity docExp: documentsExpedient) {
-							if (docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
-								switch (validacioTasca.getTipusValidacio()) {
-								case AP:
-									//S'ha trobat un document del tipus definit a la validació, no fa falta validar res més
-									validacioOk = true;
-									break;
-								case AP_FI:
-									if (docExp.isFirmat()) { validacioOk = true; }
-									break;
-								case AP_FI_NI:
-									DocumentNotificacioEstatEnumDto darreraNot_I = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
-									if (darreraNot_I!=null) { validacioOk = true; }
-									break;
-								case AP_FI_NF:
-									DocumentNotificacioEstatEnumDto darreraNot_F = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
-									if (DocumentNotificacioEstatEnumDto.FINALITZADA.equals(darreraNot_F) || 
-										DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(darreraNot_F)) { 
+					if (ItemValidacioTascaEnum.DADA.equals(validacioTasca.getItemValidacio())) {
+						
+						//La mateixa funció s'utilitza per guardar els valors de la pipella de dades del expedient.					
+						MetaDadaEntity metaDadaProcediment = metaDadaRepository.findOne(validacioTasca.getItemId());
+						
+						if (metaDadaProcediment == null || !metaDadaProcediment.isActiva()) {
+							validacioOk = true; //Si la meta-dada no esta activa actualment al procediment, no es valida perque no es podrá aportar...
+						} else {
+							for (DadaEntity dadaExp: dadesExpedient) {
+								if (dadaExp.getMetaDada().getId().equals(validacioTasca.getItemId())) {
+									switch (validacioTasca.getTipusValidacio()) {
+									case AP:
+										if (Utils.hasValue(dadaExp.getValorComString())) {
 											validacioOk = true;
+										}
+										break;
+									default:
+										break;
 									}
-									break;
-								default:
-									break;
+								}
+							}
+						}
+						
+					} else if (ItemValidacioTascaEnum.DOCUMENT.equals(validacioTasca.getItemValidacio())) {
+						
+						//Anam a cercar la dada del expedient, del tipus (metaDocumentId) igual al itemId de la validació
+						MetaDocumentEntity metaDocProcediment = metaDocumentRepository.findOne(validacioTasca.getItemId());
+						
+						if (metaDocProcediment==null || !metaDocProcediment.isActiu()) {
+							validacioOk = true; //Si el tipus de document no esta actiu acualment al procediment, no es valida perque no es podrá aportar...
+						} else {
+							for (DocumentEntity docExp: documentsExpedient) {
+								if (docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
+									switch (validacioTasca.getTipusValidacio()) {
+									case AP:
+										//S'ha trobat un document del tipus definit a la validació, no fa falta validar res més
+										validacioOk = true;
+										break;
+									case AP_FI:
+										if (docExp.isFirmat()) { validacioOk = true; }
+										break;
+									case AP_FI_NI:
+										DocumentNotificacioEstatEnumDto darreraNot_I = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
+										if (darreraNot_I!=null) { validacioOk = true; }
+										break;
+									case AP_FI_NF:
+										DocumentNotificacioEstatEnumDto darreraNot_F = documentNotificacioRepository.findLastEstatNotificacioByDocument(docExp);
+										if (DocumentNotificacioEstatEnumDto.FINALITZADA.equals(darreraNot_F) || 
+											DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(darreraNot_F)) { 
+												validacioOk = true;
+										}
+										break;
+									default:
+										break;
+									}
 								}
 							}
 						}
 					}
-				}
-				
-				if (!validacioOk) {
-					resultat.add(conversioTipusHelper.convertir(validacioTasca, MetaExpedientTascaValidacioDto.class));
+					
+					if (!validacioOk) {
+						resultat.add(conversioTipusHelper.convertir(validacioTasca, MetaExpedientTascaValidacioDto.class));
+					}
 				}
 			}
 		}		
