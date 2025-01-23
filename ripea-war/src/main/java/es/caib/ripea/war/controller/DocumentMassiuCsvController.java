@@ -126,7 +126,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		if (urlValidacio != null) {
 			for (Long documentId : seleccio) {
 				DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
-				enllacCsv += urlValidacio + "/view.xhtml?hash=" + documentDto.getNtiCsv();
+				enllacCsv += urlValidacio + documentDto.getNtiCsv();
 			}
 			MissatgesHelper.success(request, getMessage(request, "accio.massiva.csv.copiat.ok"));
 		} else {

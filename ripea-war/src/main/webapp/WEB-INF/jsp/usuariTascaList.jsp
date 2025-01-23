@@ -201,7 +201,7 @@
 				<th data-col-name="usuariActualObservador" data-visible="false"></th>
 				<th data-col-name="delegada" data-visible="false"></th>
 				<th data-col-name="usuariActualDelegat" data-visible="false"></th>
-				<th data-col-name="responsableActual.codi" data-orderable="false" width="12%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
+				<th data-col-name="responsableActual.codiAndNom" data-orderable="false" width="12%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
 				<th data-col-name="dataLimitString" width="8%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
 					<spring:message code="expedient.tasca.list.columna.dataLimit"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
@@ -272,7 +272,7 @@
 									 {{/if}}
 									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
 										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
-										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
+										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-toggle="ajax" data-refresh-missatges="true" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
 										<li class="divider"></li>
 										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
 										{{if !delegada}}

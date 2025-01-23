@@ -30,7 +30,7 @@
 			</tr>
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.createdBy"/></strong></td>
-				<td>${expedientTascaDto.createdBy.codi}</td>
+				<td>${expedientTascaDto.createdBy.codiAndNom}</td>
 			</tr>
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.responsables"/></strong></td>
@@ -38,7 +38,7 @@
 					<c:choose>
 						<c:when test="${expedientTascaDto.responsables!=null && fn:length(expedientTascaDto.responsables) > 0}">
 							<c:forEach var="itm" items="${expedientTascaDto.responsables}" varStatus="status">
-								<c:out value="${itm.codi}"></c:out><br/>
+								<c:out value="${itm.codiAndNom}"></c:out><br/>
 							</c:forEach>
 						</c:when>
 						<c:otherwise></c:otherwise>
@@ -47,11 +47,11 @@
 			</tr>			
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.responsableCodiActual"/></strong></td>
-				<td>${expedientTascaDto.responsableActual.codi}</td>
+				<td>${expedientTascaDto.responsableActual.codiAndNom}</td>
 			</tr>
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.delegar.camp.delegat"/></strong></td>
-				<td>${expedientTascaDto.delegat.codi}</td>
+				<td>${expedientTascaDto.delegat.codiAndNom}</td>
 			</tr>
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.observadores"/></strong></td>
@@ -59,7 +59,7 @@
 					<c:choose>
 						<c:when test="${expedientTascaDto.observadors!=null && fn:length(expedientTascaDto.observadors) > 0}">
 							<c:forEach var="itm" items="${expedientTascaDto.observadors}" varStatus="status">
-								<c:out value="${itm.codi}"></c:out><br/>
+								<c:out value="${itm.codiAndNom}"></c:out><br/>
 							</c:forEach>
 						</c:when>
 						<c:otherwise></c:otherwise>

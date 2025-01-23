@@ -1464,13 +1464,13 @@
 						<c:if test="${not empty contingut.ntiCsv}">
 							<span id="contenidorCsvNtiDoc">${contingut.ntiCsv}</span>
 							<c:if test="${not empty concsvBaseUrl}">
-								&nbsp;<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
+								&nbsp;<a href="${concsvBaseUrl}${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
 							</c:if>
 						</c:if>
 						<c:if test="${empty contingut.ntiCsv}">
 							<span id="contenidorCsvNtiDoc"><span class="fa fa-refresh fa-spin"></span></span>
 							<c:if test="${not empty concsvBaseUrl}">
-								&nbsp;<a style="display: none;" id="hrefCsvNtiDoc" href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
+								&nbsp;<a style="display: none;" id="hrefCsvNtiDoc" href="${concsvBaseUrl}${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
 							</c:if>							
 						</c:if>
 					</td>
