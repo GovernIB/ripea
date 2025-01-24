@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.core.api.dto;
 
@@ -10,7 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-@Getter @Setter
+@Getter
+@Setter
 public class UsuariTascaFiltreDto implements Serializable {
 
 	private TascaEstatEnumDto[] estats;
@@ -19,6 +20,11 @@ public class UsuariTascaFiltreDto implements Serializable {
 	private Date dataFi;
 	private Date dataLimitInici;
 	private Date dataLimitFi;
+
+	private String titol;
+	private Long metaExpedientId;
+	private Long metaExpedientTascaId;
+	private PrioritatEnumDto prioritat;
 
 	private static final long serialVersionUID = 1L;
 }
