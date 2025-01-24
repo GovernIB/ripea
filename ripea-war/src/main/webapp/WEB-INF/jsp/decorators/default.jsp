@@ -511,14 +511,7 @@ body {
 				</c:forEach>
 			</div>
 		</c:if>
-	
-		<p>entitatActual=${entitatActual}</p>
-		<p>sessionOrgansGestors=${sessionOrgansGestors}</p>
-		<p>organGestorActual=${organGestorActual}</p>
-		<p>rolActual=${rolActual}</p>
-		<p>rolsUsuariActual=${rolsUsuariActual}</p>
-		<p>hiHaOrgansGestors=${hiHaOrgansGestors}</p>	
-	
+
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2>

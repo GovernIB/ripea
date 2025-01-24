@@ -44,9 +44,6 @@ public class BaseController implements MessageSourceAware {
 	@Autowired private DadesExternesService dadesExternesService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PinbalServeiService pinbalServeiService;
-
-	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
-
 	MessageSource messageSource;
 
 	protected String modalUrlTancar() {

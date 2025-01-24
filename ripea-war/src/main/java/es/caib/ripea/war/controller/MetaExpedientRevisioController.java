@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.List;
@@ -49,11 +46,8 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "MetaExpedientRevisioController.session.filtre";
 
-	@Autowired
-	private MetaExpedientService metaExpedientRevisioService;
-	@Autowired
-	private AplicacioService aplicacioService;
-
+	@Autowired private MetaExpedientService metaExpedientRevisioService;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -61,8 +55,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN"));
 		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
 		return "metaExpedientRevisioList";
@@ -94,8 +87,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);

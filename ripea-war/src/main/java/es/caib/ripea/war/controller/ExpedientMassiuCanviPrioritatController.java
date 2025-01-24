@@ -60,12 +60,13 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 
 		model.addAttribute(filtreCommand);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
-		model.addAttribute("metaExpedients", metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+		model.addAttribute("metaExpedients", metaExpedientService.findActiusAmbEntitatPerModificacio(
+				entitatActual.getId(),
+				RolHelper.getRolActual(request)));
 		model.addAttribute("prioritatsExpedient",
 				EnumHelper.getOptionsForEnum(
 						PrioritatEnumDto.class,
@@ -100,11 +101,8 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
-
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
-
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
@@ -112,7 +110,7 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 								entitatActual.getId(),
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request),
-								rolActual,
+								RolHelper.getRolActual(request),
 								ResultEnumDto.PAGE).getPagina(),
 					 "id",
 					SESSION_ATTRIBUTE_SELECCIO);
@@ -180,19 +178,17 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 	public int select(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
-
 		Set<Long> seleccio = getSessionAttributeSelecio(request);
-
 		if (ids != null) {
             Collections.addAll(seleccio, ids);
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-			String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 			seleccio.addAll(
 					expedientService.findIdsExpedientsPerTancamentMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand),
+							RolHelper.getRolActual(request)));
 		}
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
 		return seleccio.size();

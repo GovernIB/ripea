@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
@@ -60,17 +57,11 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	public static final String SESSION_ATTRIBUTE_FILTRE = "MassiuAnnexProcesarController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "MassiuAnnexProcesarController.session.seleccio";
 
-	@Autowired
-	private ExpedientPeticioService expedientPeticioService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	
+	@Autowired private ExpedientPeticioService expedientPeticioService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -84,13 +75,12 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 						getSessionAttributeSelecio(request)));
 		model.addAttribute(
 				filtreCommand);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
 		List<MetaExpedientDto> metaExpedientsPermesos = expedientPeticioService.findMetaExpedientsPermesosPerAnotacions(
 				entitatActual.getId(),
 				organActualId,
-				rolActual);
+				RolHelper.getRolActual(request));
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientsPermesos);
@@ -128,13 +118,10 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
+	public DatatablesResponse datatable(HttpServletRequest request) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MassiuAnnexProcesarFiltreCommand massiuAnnexProcesarCommand = getFiltreCommand(request);
-
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
 		
 		try {
@@ -145,16 +132,14 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 								MassiuAnnexProcesarFiltreCommand.asDto(massiuAnnexProcesarCommand), 
 								DatatablesHelper.getPaginacioDtoFromRequest(request),
 								ResultEnumDto.PAGE, 
-								rolActual, 
+								RolHelper.getRolActual(request), 
 								organActualId).getPagina(),
 					 "id",
 					 getSessionAttributeSelecio(request));
 		} catch (Exception e) {
 			throw e;
 		}
-		
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
@@ -163,8 +148,6 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 		
-		
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -191,7 +174,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 								MassiuAnnexProcesarFiltreCommand.asDto(filtreCommand), 
 								null,
 								ResultEnumDto.IDS, 
-								rolActual, 
+								RolHelper.getRolActual(request), 
 								organActualId).getIds());
 		}
 		return seleccio.size();

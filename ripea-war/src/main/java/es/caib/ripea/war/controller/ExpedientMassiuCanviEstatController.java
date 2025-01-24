@@ -81,11 +81,10 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 						PrioritatEnumDto.class,
 						"prioritat.enum.",
 						new Enum<?>[] {}));
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
@@ -129,8 +128,6 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
@@ -138,7 +135,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual, 
+								RolHelper.getRolActual(request), 
 								ResultEnumDto.PAGE).getPagina(),
 					 "id",
 					 getSessionAttributeSelecio(request));
@@ -171,15 +168,12 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			
 			seleccio.addAll(
 					expedientEstatService.findExpedientsPerCanviEstatMassiu(
 							entitatActual.getId(),
 							ContingutMassiuFiltreCommand.asDto(filtreCommand), 
 							null,
-							rolActual,
+							RolHelper.getRolActual(request),
 							ResultEnumDto.IDS).getIds());
 		}
 		return seleccio.size();
@@ -326,8 +320,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 	
 	
 	private String getSessionAttributeSelecio(HttpServletRequest request) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		String sessionAttribute;
 		if (rolActual.equals("tothom")) {
 			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_USER;

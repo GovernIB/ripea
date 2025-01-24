@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -16,6 +13,7 @@ import es.caib.ripea.war.command.UsuariCommand;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,14 +41,10 @@ import java.util.regex.Pattern;
 @Controller
 @RequestMapping("/usuari")
 public class UsuariController  extends BaseAdminController {
-
 	
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private EntitatService entitatService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private EntitatService entitatService;
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
 	public String getConfiguracio(
@@ -178,7 +172,7 @@ public class UsuariController  extends BaseAdminController {
 
 		model.addAttribute("numElementsPagina", numElementsPagina);
 
-		String rolActual = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 
 		List<EntitatDto> entitatsAccessibles = EntitatHelper.findEntitatsAccessibles(request, entitatService);
 		model.addAttribute("entitats", entitatsAccessibles);
@@ -224,17 +218,13 @@ public class UsuariController  extends BaseAdminController {
 		if (entitatId == null) {
 			return new ArrayList<>();
 		}
-
-		String rolActual = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return metaExpedientService.findActius(
 				entitatId,
 				null,
-				rolActual,
+				RolHelper.getRolActual(request),
 				false,
 				null);
-
 	}
-
 	
 	/**
 	 * Només per Jboss

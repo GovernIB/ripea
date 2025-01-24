@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.math.BigDecimal;
@@ -62,24 +59,17 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/metaDocument")
 public class MetaDocumentMetaDadaController extends BaseAdminController {
 
-	@Autowired
-	private MetaDadaService metaDadaService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private MetaDadaService metaDadaService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private DocumentService documentService;
+	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(value = "/{metaDocumentId}/metaDada", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		model.addAttribute("metaDocument", metaDocumentService.findById(entitatActual.getId(), null, metaDocumentId));
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		model.addAttribute(
-				"esRevisor",
-				rolActual.equals("IPA_REVISIO"));
+		String rolActual = RolHelper.getRolActual(request);
+		model.addAttribute("esRevisor", rolActual.equals("IPA_REVISIO"));
 		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		if (metaDocument.getMetaExpedientId() != null) {
 			MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaDocument.getMetaExpedientId());
@@ -168,7 +158,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("existContingut",  documentService.countByMetaDocument(entitatActual.getId(), metaDocumentId) != 0);
@@ -205,7 +195,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId, @PathVariable Long metaDadaId) {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		MetaDadaDto metaDadaDto = metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true, rolActual, organActual != null ? organActual.getId() : null);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
@@ -230,7 +220,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaDocumentId,
 			@PathVariable Long metaDadaId) {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		MetaDadaDto metaDadaDto = metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false, rolActual, organActual != null ? organActual.getId() : null);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
@@ -253,7 +243,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 	public String delete(HttpServletRequest request, @PathVariable Long metaDocumentId, @PathVariable Long metaDadaId) {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		try {
-			String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);	
+			String rolActual = RolHelper.getRolActual(request);	
 			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 			MetaDadaDto metaDadaDto = metaDadaService.delete(entitatActual.getId(), metaDocumentId, metaDadaId, rolActual, organActual != null ? organActual.getId() : null);
 			

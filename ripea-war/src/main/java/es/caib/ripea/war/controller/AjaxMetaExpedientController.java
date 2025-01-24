@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.List;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per a les consultes ajax dels metaexpedients.
@@ -28,9 +26,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 @RequestMapping("/metaexpedientajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
 public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-
+	@Autowired private MetaExpedientService metaExpedientService;
 
 	@RequestMapping(value = "/metaexpedients/{text}/{organId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -47,7 +43,6 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 				entitat.getId(),
 				organId, 
 				text);
-
 		
 		return metaExpedientsPermisLectura;
 	}
@@ -58,17 +53,14 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
 		metaExpedientsPermisLectura = metaExpedientService.findActius(
 				entitat.getId(), 
 				text, 
-				rolActual, 
+				RolHelper.getRolActual(request), 
 				false, 
 				null);
-		
 		return metaExpedientsPermisLectura;
 	}
 	
@@ -78,8 +70,7 @@ public class AjaxMetaExpedientController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
 		if ("tothom".equals(rolActual)) {

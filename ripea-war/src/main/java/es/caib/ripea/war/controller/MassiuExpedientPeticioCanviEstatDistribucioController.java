@@ -238,17 +238,9 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 		
 		return "redirect:../expedientPeticioCanviEstatDistribucio";
 	}
-    
-    
-    
-    
-    
-    
-
 
     private String getSessionAttributeSelecio(HttpServletRequest request) {
-
-        String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+        String rolActual = RolHelper.getRolActual(request);
         String sessionAttribute;
         if (!rolActual.equals("IPA_ADMIN")) {
             throw new RuntimeException("No rol permitido");

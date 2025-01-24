@@ -88,8 +88,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 						PrioritatEnumDto.class,
 						"prioritat.enum.",
 						new Enum<?>[] {}));
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
 		Long metaExpedientId = filtreCommand != null ? filtreCommand.getMetaExpedientId() : null;
@@ -99,7 +97,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 
 		return "expedientMassiuTancamentList";
 	}
@@ -129,21 +127,18 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
+	public DatatablesResponse datatable(HttpServletRequest request) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
-		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
 					 expedientService.findExpedientsPerTancamentMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual),
+								DatatablesHelper.getPaginacioDtoFromRequest(request),
+								RolHelper.getRolActual(request)),
 					 "id",
 					 getSessionAttributeSelecio(request));
 		} catch (Exception e) {
@@ -175,13 +170,11 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			
 			seleccio.addAll(
 					expedientService.findIdsExpedientsPerTancamentMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand), 
+							RolHelper.getRolActual(request)));
 		}
 		return seleccio.size();
 	}
@@ -338,11 +331,8 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		}
 	}
 	
-	
-	
 	private String getSessionAttributeSelecio(HttpServletRequest request) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		String sessionAttribute;
 		if (rolActual.equals("tothom")) {
 			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_USER;
@@ -355,7 +345,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		}
 		return sessionAttribute;
 	}
-	
 	
 	private void omplirModelTancarExpedient(
 			HttpServletRequest request,

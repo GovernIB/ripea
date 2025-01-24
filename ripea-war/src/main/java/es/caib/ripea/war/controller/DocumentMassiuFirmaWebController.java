@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
@@ -64,18 +61,12 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuFirmaWebController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_DATA_INICI = "DocumentMassiuFirmaWebController.session.data.inici";
 
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private DocumentService documentService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private DocumentService documentService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -90,15 +81,10 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
 
-		model.addAttribute(
-				filtreCommand);
-		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
+		model.addAttribute(filtreCommand);		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 		
 		
 		if (filtreCommand.getMetaExpedientId() != null) {
@@ -148,9 +134,6 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
@@ -158,7 +141,7 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual,
+								RolHelper.getRolActual(request),
 								ResultEnumDto.PAGE).getPagina(),
 					 "id",
 					 SESSION_ATTRIBUTE_SELECCIO);
@@ -194,15 +177,12 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 			
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			
 			seleccio.addAll(
 					 contingutService.findDocumentsPerFirmaSimpleWebMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(filtreCommand),
 								null, 
-								rolActual,
+								RolHelper.getRolActual(request),
 								ResultEnumDto.IDS).getIds());
 		}
 		return seleccio.size();

@@ -51,14 +51,10 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/metaDocument")
 public class MetaDocumentController extends BaseAdminController {
 
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private TipusDocumentalService tipusDocumentalService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private TipusDocumentalService tipusDocumentalService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private PortafirmesFluxService portafirmesFluxService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAll(HttpServletRequest request, Model model) {
@@ -150,9 +146,12 @@ public class MetaDocumentController extends BaseAdminController {
 	public String delete(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		try {
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			MetaDocumentDto metaDocumentDto = metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId, rolActual, null);
+			MetaDocumentDto metaDocumentDto = metaDocumentService.delete(
+					entitatActual.getId(), 
+					null, 
+					metaDocumentId, 
+					RolHelper.getRolActual(request), 
+					null);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
@@ -176,9 +175,12 @@ public class MetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/{metaDocumentId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true, rolActual);
+		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(
+				entitatActual.getId(), 
+				null, 
+				metaDocumentId, 
+				true,
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
@@ -189,9 +191,12 @@ public class MetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false, rolActual);
+		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(
+				entitatActual.getId(), 
+				null, 
+				metaDocumentId, 
+				false, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",

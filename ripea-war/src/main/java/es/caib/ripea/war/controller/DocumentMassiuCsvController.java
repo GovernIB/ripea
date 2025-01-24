@@ -40,15 +40,15 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 	@Autowired private OrganGestorService organGestorService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String portafirmesGet(
-			HttpServletRequest request,
-			Model model) {
+	public String portafirmesGet(HttpServletRequest request, Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
 		filtreCommand.setBloquejarTipusElement(true);
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
+		
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -63,20 +63,18 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		model.addAttribute(
 				filtreCommand);
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
-		model.addAttribute(
-				"expedients",
-				expedients);
-
+			expedients = expedientService.findPerUserAndProcediment(
+					entitatActual.getId(),
+					filtreCommand.getMetaExpedientId(),
+					RolHelper.getRolActual(request));
+		
+		model.addAttribute("expedients", expedients);
 		return "documentMassiuCsvList";
 	}
 	
@@ -147,9 +145,6 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
@@ -157,7 +152,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual),
+								RolHelper.getRolActual(request)),
 					 "id",
 					 SESSION_ATTRIBUTE_SELECCIO);
 		} catch (Exception e) {
@@ -173,12 +168,9 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, rolActual);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, RolHelper.getRolActual(request));
 		return expedients;
 	}
 	
@@ -259,14 +251,11 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-			
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			
 			seleccio.addAll(
 					contingutService.findIdsDocumentsPerFirmaMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand),
+							RolHelper.getRolActual(request)));
 		}
 		return seleccio.size();
 	}

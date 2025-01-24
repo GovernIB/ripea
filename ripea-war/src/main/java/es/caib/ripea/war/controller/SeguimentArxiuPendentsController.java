@@ -130,16 +130,13 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		PaginaDto<SeguimentArxiuPendentsDto> docsPortafirmes = new PaginaDto<SeguimentArxiuPendentsDto>();
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandExpedients(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
         docsPortafirmes = seguimentService.findPendentsArxiu(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
-				rolActual,
+				RolHelper.getRolActual(request),
 				ResultEnumDto.PAGE,
 				ArxiuPendentTipusEnumDto.EXPEDIENT,
 				EntitatHelper.getOrganGestorActualId(request)).getPagina();
@@ -196,17 +193,13 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		PaginaDto<SeguimentArxiuPendentsDto> docs = new PaginaDto<SeguimentArxiuPendentsDto>();
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandDocuments(request);
-
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
         
 		docs = seguimentService.findPendentsArxiu(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
-				rolActual,
+				RolHelper.getRolActual(request),
 				ResultEnumDto.PAGE,
 				ArxiuPendentTipusEnumDto.DOCUMENT,
 				EntitatHelper.getOrganGestorActualId(request)).getPagina();
@@ -263,17 +256,13 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		PaginaDto<SeguimentArxiuPendentsDto> docsPortafirmes = new PaginaDto<SeguimentArxiuPendentsDto>();
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandInteressats(request);
-
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
         
         docsPortafirmes = seguimentService.findPendentsArxiu(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request), 
-				rolActual,
+				RolHelper.getRolActual(request),
 				ResultEnumDto.PAGE,
 				ArxiuPendentTipusEnumDto.INTERESSAT,
 				EntitatHelper.getOrganGestorActualId(request)).getPagina();
@@ -307,7 +296,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -331,7 +319,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 							entitatActual.getId(),
 							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand), 
 							null,
-							rolActual,
+							RolHelper.getRolActual(request),
 							ResultEnumDto.IDS,
 							ArxiuPendentTipusEnumDto.EXPEDIENT,
 							EntitatHelper.getOrganGestorActualId(request)).getIds());
@@ -370,8 +358,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	public int selectDocuments(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
-		
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -395,7 +381,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 							entitatActual.getId(),
 							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand), 
 							null,
-							rolActual,
+							RolHelper.getRolActual(request),
 							ResultEnumDto.IDS,
 							ArxiuPendentTipusEnumDto.DOCUMENT,
 							EntitatHelper.getOrganGestorActualId(request)).getIds());
@@ -434,9 +420,6 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	public int selectInteressats(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
-
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -461,7 +444,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 							entitatActual.getId(),
 							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand), 
 							null,
-							rolActual,
+							RolHelper.getRolActual(request),
 							ResultEnumDto.IDS,
 							ArxiuPendentTipusEnumDto.INTERESSAT,
 							EntitatHelper.getOrganGestorActualId(request)).getIds());

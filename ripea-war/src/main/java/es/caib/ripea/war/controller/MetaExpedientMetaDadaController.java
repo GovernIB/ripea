@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.math.BigDecimal;
@@ -64,16 +61,11 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/metaExpedient")
 public class MetaExpedientMetaDadaController extends BaseAdminController {
 
-	@Autowired
-	private MetaDadaService metaDadaService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private DominiService dominiService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private MetaDadaService metaDadaService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private DominiService dominiService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
@@ -81,9 +73,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		model.addAttribute(
 				"esRevisor",
 				rolActual.equals("IPA_REVISIO"));
@@ -119,8 +109,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		
 		if (!rolActual.equals("IPA_REVISIO")) {
 			comprovarAccesMetaExpedient(request, metaExpedientId);
@@ -216,7 +205,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
@@ -265,7 +254,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaDadaId) {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
@@ -292,7 +281,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaDadaId) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
@@ -320,7 +309,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaDadaId) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);

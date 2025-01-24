@@ -97,8 +97,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		long t0 = System.currentTimeMillis();
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -253,9 +252,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -278,7 +274,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					expedientService.findIdsAmbFiltre(
 							entitatActual.getId(),
 							ExpedientFiltreCommand.asDto(filtreCommand),
-							rolActual,
+							RolHelper.getRolActual(request),
 							EntitatHelper.getOrganGestorActualId(request)));
 		}
 		return seleccio.size();
@@ -560,7 +556,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		ExpedientCommand command = null;
@@ -571,7 +566,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			List<GrupDto> grups = metaExpedientService.findGrupsAmbMetaExpedient(
 					entitatActual.getId(),
 					command.getMetaNodeId(),
-					rolActual);
+					RolHelper.getRolActual(request));
 			model.addAttribute("grups", grups);
 			command.setGestioAmbGrupsActiva(expedient.getMetaExpedient().isGestioAmbGrupsActiva());
 		} else {
@@ -807,13 +802,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public List<GrupDto> grups(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaExpedientService.findGrupsAmbMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId, 
-				rolActual);
+				RolHelper.getRolActual(request));
 	}
 
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
@@ -832,12 +825,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public List<MetaExpedientDto> metaExpedients(
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		return metaExpedientService.findActius(
 				entitatActual.getId(), 
 				null, 
-				rolActual, 
+				RolHelper.getRolActual(request), 
 				false, 
 				null);
 	}
@@ -1472,8 +1463,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -1497,7 +1486,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					expedientService.findIdsAmbFiltre(
 							entitatActual.getId(),
 							ExpedientFiltreCommand.asDto(filtreCommand),
-							rolActual,
+							RolHelper.getRolActual(request),
 							EntitatHelper.getOrganGestorActualId(request)));
 		}
 		return seleccio.size();
@@ -2015,8 +2004,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 
 		model.addAttribute(
 				"expedientEstatEnumOptions",

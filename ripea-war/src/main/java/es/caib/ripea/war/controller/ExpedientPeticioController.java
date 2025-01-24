@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
@@ -102,22 +99,14 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private static final String SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES = "ExpedientPeticioController.session.tipusDocsDisponibles";
 	private static final String SESSION_ATTRIBUTE_INDEX = "ExpedientPeticioController.session.index";
 
-	@Autowired
-	private ExpedientPeticioService expedientPeticioService;
-	@Autowired
-	private EntitatService entitatService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;	
-	@Autowired
-	private ExpedientService expedientService;		
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private GrupService grupService;
+	@Autowired private ExpedientPeticioService expedientPeticioService;
+	@Autowired private EntitatService entitatService;
+	@Autowired private MetaExpedientService metaExpedientService;	
+	@Autowired private ExpedientService expedientService;		
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private GrupService grupService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -129,7 +118,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		long t2 = System.currentTimeMillis();
 
 		model.addAttribute(getFiltreCommand(request));
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
 		
@@ -193,14 +182,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientPeticioFiltreCommand expedientPeticioFiltreCommand = getFiltreCommand(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		DatatablesResponse dr = DatatablesHelper.getDatatableResponse(
 				request,
 				expedientPeticioService.findAmbFiltre(
 						entitatActual.getId(),
 						ExpedientPeticioFiltreCommand.asDto(expedientPeticioFiltreCommand),
 						DatatablesHelper.getPaginacioDtoFromRequest(request),
-						rolActual,
+						RolHelper.getRolActual(request),
 						EntitatHelper.getOrganGestorActualId(request)),
 				"id");
 		
@@ -623,15 +611,16 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		RegistreDto registre = expedientPeticioDto.getRegistre();
 		EntitatDto entitat = entitatService.findByUnitatArrel(registre.getEntitatCodi());
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-
 		List<RegistreInteressatDto> interessatsDistribucio = getSortedInteressatsDistribucio(registre.getInteressats());
 		List<InteressatDto> interessatsRipea = new ArrayList<>();
 		List<String> documentInteressatsOverwritten = new ArrayList<>();
 
 		ExpedientDto expedient = null;
 		if (!isCrearNew) {
-			expedient = expedientService.findById(entitat.getId(), expedientPeticioAcceptarCommand.getExpedientId(), rolActual);
+			expedient = expedientService.findById(
+					entitat.getId(),
+					expedientPeticioAcceptarCommand.getExpedientId(),
+					RolHelper.getRolActual(request));
 			interessatsRipea = getSortedInteressatRipea(expedient);
 			documentInteressatsOverwritten = getDocumentInteressatsOverwritten(interessatsRipea, interessatsDistribucio);
 		}
@@ -934,8 +923,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitatActual.getId(), rolActual);
+		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitatActual.getId(), RolHelper.getRolActual(request));
 		model.addAttribute("metaExpedients", metaExpedients);
 		
 		ExpedientPeticioModificarCommand command = new ExpedientPeticioModificarCommand();
@@ -1245,10 +1233,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		ExpedientDto expedient = null;
 		EntitatDto entitat = entitatService.findByUnitatArrel(registre.getEntitatCodi());
 		model.addAttribute("entitatId", entitat.getId());
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = RolHelper.getRolActual(request);
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitat.getId(), rolActual);
 		model.addAttribute("metaExpedients", metaExpedients);
 		List<ExpedientDto> expedients = null;
+		
 		// if exists metaExpedient with matching codi procediment
 		if (expedientPeticioDto.getMetaExpedientId() != null) {
 			boolean hasPermissions = false;
@@ -1281,11 +1270,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("accios", EnumHelper.getOptionsForEnum(ExpedientPeticioAccioEnumDto.class, "expedient.peticio.accio.enum."));
 		command.setId(expedientPeticioDto.getId());
 		command.setAssociarInteressats(true);
-//		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
 		command.setAny(Calendar.getInstance().get(Calendar.YEAR));
 		command.setGrupId(expedientPeticioDto.getGrupId());
 		model.addAttribute("expedientPeticioAcceptarCommand", command);
-		
 		model.addAttribute("rolActual", rolActual);
 	}
 
@@ -1302,54 +1289,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			}
 			command.setInteressats(associacionsInteressats);
 		}
-	}
-
-//	private InteressatAssociacioAccioEnum calculaAccioInteressat(RegistreInteressatDto interessat, Set<InteressatDto> interessatsRipea) {
-//		// Si s'està creant l'expedient, o l'expedient no té cap interessat associam els nous interessats
-//		if (interessatsRipea == null || interessatsRipea.isEmpty()) return InteressatAssociacioAccioEnum.ASSOCIAR;
-//		RegistreInteressatDto representant = interessat.getRepresentant();
-//
-//		String interessatDoc = interessat.getDocumentNumero();
-//		String representantDoc = representant != null ? representant.getDocumentNumero() : null;
-//		boolean interessatExists = false;
-//		boolean representantExists = false;
-//		InteressatDto interessatRipea = null;
-//
-//		// Obtenim l'interessat i representant ja existent a Ripea (si existeix)
-//		for (InteressatDto interessatDto: interessatsRipea) {
-//			if (interessatDoc.equalsIgnoreCase(interessatDto.getDocumentNum())) {
-//				interessatExists = true;
-//				interessatRipea = interessatDto;
-//			}
-//			if (representantDoc != null) {
-//				if (representantDoc.equalsIgnoreCase(interessatDto.getDocumentNum())) {
-//                    representantExists = true;
-//                } else if (interessatDto.getRepresentant() != null && representantDoc.equalsIgnoreCase(interessatDto.getRepresentant().getDocumentNum())) {
-//					representantExists = true;
-//				}
-//			}
-//			if (representantExists && interessatExists)
-//				break;
-//
-//		}
-//
-//		if (interessatExists) {
-//			if (sameRepresentant(interessatRipea.getRepresentant(), representantDoc)){
-//				return InteressatAssociacioAccioEnum.SOBREESCRIURE;
-//			} else {
-//				return InteressatAssociacioAccioEnum.SOBREESCRIURE_REPRESENTANT;
-//			}
-//		} else if (representantExists) {
-//			return InteressatAssociacioAccioEnum.ASSOCIAR_SOBREESCRIURE_REPRESENTANT;
-//		} else {
-//			return InteressatAssociacioAccioEnum.ASSOCIAR;
-//		}
-//	}
-
-	private boolean sameRepresentant(InteressatDto representant, String representantDoc) {
-		if (representant == null)
-			return representantDoc == null;
-		return representant.getDocumentNum().equals(representantDoc);
 	}
 
 	private boolean isIncorporacioJustificantActiva() {

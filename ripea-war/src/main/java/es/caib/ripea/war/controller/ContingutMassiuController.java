@@ -87,9 +87,8 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	}
 	
 	@RequestMapping(value = "/definitiu", method = RequestMethod.GET)
-	public String getDocumentsEsborranys(
-			HttpServletRequest request,
-			Model model) {
+	public String getDocumentsEsborranys(HttpServletRequest request, Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
@@ -115,14 +114,13 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
-		model.addAttribute(
-				"expedients",
-				expedients);
+			expedients = expedientService.findPerUserAndProcediment(
+					entitatActual.getId(),
+					filtreCommand.getMetaExpedientId(),
+					RolHelper.getRolActual(request));
+		
+		model.addAttribute("expedients", expedients);
 		return "contingutMassiuList";
 	}
 
@@ -196,9 +194,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
@@ -206,7 +201,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual),
+								RolHelper.getRolActual(request)),
 					 "id",
 					 SESSION_ATTRIBUTE_SELECCIO);
 		} catch (Exception e) {
@@ -222,13 +217,9 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, rolActual);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, RolHelper.getRolActual(request));
 		return expedients;
 	}
 	
@@ -269,14 +260,11 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-			
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			
 			seleccio.addAll(
 					contingutService.findIdsDocumentsPerFirmaMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand), 
+							RolHelper.getRolActual(request)));
 		}
 		return seleccio.size();
 	}

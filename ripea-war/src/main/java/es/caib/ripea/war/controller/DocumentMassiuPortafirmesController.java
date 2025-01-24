@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.*;
@@ -39,22 +36,14 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuPortafirmesController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private PortafirmesFluxService portafirmesFluxService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String portafirmesGet(
@@ -77,12 +66,9 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		model.addAttribute(
 				filtreCommand);
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request)));
 		
 		
 		if (filtreCommand.getMetaExpedientId() != null) {
@@ -135,9 +121,6 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
@@ -145,7 +128,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual),
+								RolHelper.getRolActual(request)),
 					 "id",
 					 SESSION_ATTRIBUTE_SELECCIO);
 		} catch (Exception e) {
@@ -257,7 +240,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		dto.setPortafirmesFluxId(command.getPortafirmesEnviarFluxId());
 		dto.setPortafirmesTransaccioId(transaccioId);
 		dto.setContingutIds(new ArrayList<Long>(seleccio));
-		dto.setRolActual((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL));
+		dto.setRolActual(RolHelper.getRolActual(request));
 		dto.setPortafirmesAvisFirmaParcial(command.isAvisFirmaParcial());
 		dto.setPortafirmesFirmaParcial(command.isFirmaParcial());
 		execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto);
@@ -277,12 +260,9 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, rolActual);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, RolHelper.getRolActual(request));
 		return expedients;
 	}
 	
@@ -365,14 +345,11 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-			
-			String rolActual = (String)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			
 			seleccio.addAll(
 					contingutService.findIdsDocumentsPerFirmaMassiu(
 							entitatActual.getId(),
-							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
+							ContingutMassiuFiltreCommand.asDto(filtreCommand),
+							RolHelper.getRolActual(request)));
 		}
 		return seleccio.size();
 	}
