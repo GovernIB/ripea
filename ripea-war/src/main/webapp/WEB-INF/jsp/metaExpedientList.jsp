@@ -204,6 +204,7 @@
 					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" width="1%">
 						<spring:message code="metaexpedient.list.columna.revisioEstat"/>
 						<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
+							<span class="label label-{{:revisioEstat}}">
 							{{if revisioEstat == 'DISSENY'}}
 								<spring:message code="meta.expedient.revisio.estat.enum.DISSENY"/>
 							{{else revisioEstat == 'PENDENT'}}
@@ -213,6 +214,7 @@
 							{{else revisioEstat == 'REBUTJAT'}}
 								<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
 							{{/if}}
+							</span>
 						</script>
 					</th>
 				</c:if>

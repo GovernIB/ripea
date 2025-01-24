@@ -1,21 +1,22 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.war.command;
 
 import java.util.Date;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
-
+@Setter
 @Getter
 @ToString
 public class UsuariTascaFiltreCommand {
-
 
 	private TascaEstatEnumDto[] estats;
 	private Long expedientId;
@@ -24,46 +25,21 @@ public class UsuariTascaFiltreCommand {
 	private Date dataLimitInici;
 	private Date dataLimitFi;
 	private String duracio;
-	
-	
+
+	private String titol;
+	private Long metaExpedientId;
+	private Long metaExpedientTascaId;
+	private PrioritatEnumDto prioritat;
+
 	public static UsuariTascaFiltreCommand asCommand(UsuariTascaFiltreDto dto) {
 		return ConversioTipusHelper.convertir(
-				dto,
-				UsuariTascaFiltreCommand.class);
-	}
-	
-	public static UsuariTascaFiltreDto asDto(UsuariTascaFiltreCommand command){
-		UsuariTascaFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
-				UsuariTascaFiltreDto.class);
-		return dto;
+			dto,
+			UsuariTascaFiltreCommand.class);
 	}
 
-	public void setEstats(TascaEstatEnumDto[] estats) {
-		this.estats = estats;
+	public static UsuariTascaFiltreDto asDto(UsuariTascaFiltreCommand command) {
+		return ConversioTipusHelper.convertir(
+			command,
+			UsuariTascaFiltreDto.class);
 	}
-
-	public void setExpedientId(Long expedientId) {
-		this.expedientId = expedientId;
-	}
-
-	public void setDataInici(Date dataInici) {
-		this.dataInici = dataInici;
-	}
-
-	public void setDataFi(Date dataFi) {
-		this.dataFi = dataFi;
-	}
-
-	public void setDataLimitInici(Date dataLimitInici) {
-		this.dataLimitInici = dataLimitInici;
-	}
-
-	public void setDataLimitFi(Date dataLimitFi) {
-		this.dataLimitFi = dataLimitFi;
-	}
-	
-	
-	
-
 }

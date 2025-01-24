@@ -506,6 +506,23 @@ table .dropdown {
     color: #666666;
 }*/
 
+.label-PENDENT {
+    background-color: #ffebae;
+    color: #666666;
+}
+.label-REVISAT {
+    background-color: #c3e8d1;
+    color: #666666;
+}
+.label-REBUTJAT {
+    background-color: #d99b9d;
+    color: #666666;
+}
+.label-DISSENY {
+    border: dashed 1px #AAA;
+    color: #666666;
+}
+
 span.no_color {
     width: 6px;
     border: dashed 1px #AAA;

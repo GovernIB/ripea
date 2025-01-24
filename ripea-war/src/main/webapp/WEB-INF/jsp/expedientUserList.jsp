@@ -439,7 +439,7 @@ function removeCookie(cname) {
 </script>
 </head>
 <body>
-	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
+	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well defaultFilterEnter" commandName="expedientFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero.expedient"/>
