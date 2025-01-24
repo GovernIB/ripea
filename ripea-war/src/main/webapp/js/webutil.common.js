@@ -934,6 +934,12 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		});
 	}
 	$(document).ready(function() {
+
+        if ($("form.defaultFilterEnter").length && $("form.defaultFilterEnter button[value='filtrar']").length){
+            var filterButton= $("form.defaultFilterEnter button[value='filtrar']").clone();
+            filterButton.addClass("hidden");
+            $("form.defaultFilterEnter").prepend(filterButton);
+        }
 		
 		$(this).webutilTogglesEval();
 	});

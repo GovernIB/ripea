@@ -81,7 +81,7 @@ $(document).ready(function() {
 <body>
 
 	<c:url value="seguimentNotificacions/filtrar" var="formAction"/>
-	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="seguimentNotificacionsFiltreCommand">
+	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" commandName="seguimentNotificacionsFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<rip:inputSelect name="enviamentTipus" optionEnum="NotificaEnviamentTipusEnumDto" emptyOption="true" placeholderKey="seguiment.list.filtre.camp.enviamentTipus" inline="true"/>
