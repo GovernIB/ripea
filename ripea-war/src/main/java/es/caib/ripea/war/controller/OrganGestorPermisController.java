@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.ArrayList;
@@ -42,14 +39,9 @@ public class OrganGestorPermisController extends BaseAdminController {
 
 	private final static String ORGANS_FILTRE = "organs_filtre";
 	
-	@Autowired
-	private AplicacioService aplicacioService;
-
-	@Autowired
-	private OrganGestorService organGestorService;
-	
-	@Autowired
-	private ExpedientPeticioService expedientPeticioService;
+	@Autowired private AplicacioService aplicacioService;
+ 	@Autowired private OrganGestorService organGestorService;
+	@Autowired private ExpedientPeticioService expedientPeticioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String permisos(
@@ -57,9 +49,7 @@ public class OrganGestorPermisController extends BaseAdminController {
 			@PathVariable Long organId,
 			OrganGestorFiltreCommand command,
 			Model model) {
-
 		RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, command);
-
 		model.addAttribute("organ", organGestorService.findItem(organId));
 		return "organGestorPermis";
 	}
@@ -134,8 +124,6 @@ public class OrganGestorPermisController extends BaseAdminController {
 				PermisOrganGestorCommand.asDto(command),
 				entitat.getId());
 		
-		
-		
 		if (command.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
 			organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), command.getPrincipalNom());
 		} else {
@@ -159,7 +147,6 @@ public class OrganGestorPermisController extends BaseAdminController {
 					"organgestor.controller.permis.modificat.ok",
 					new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 		}
-
 	}
 
 	@RequestMapping(value = "{permisId}/delete", method = RequestMethod.GET)

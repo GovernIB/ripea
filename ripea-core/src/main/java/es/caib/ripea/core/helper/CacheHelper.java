@@ -202,12 +202,11 @@ public class CacheHelper {
 	}
 	
 	@CacheEvict(value = "findOrganismesEntitatAmbPermis", key="{#entitatId, #usuariCodi}")
-	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
-	}
+	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {}
 	@CacheEvict(value = "findOrganismesEntitatAmbPermis", allEntries = true)
-	public void evictAllOrganismesEntitatAmbPermis() {
-	}
-	
+	public void evictAllOrganismesEntitatAmbPermis() {}
+	@CacheEvict(value = "findOrganismesEntitatAmbPermisDisseny", key="{#entitatId, #usuariCodi}")
+	public void evictOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {}
 
 	@Cacheable(value = "errorsValidacioNode", key = "#node.id")
 	public List<ValidacioErrorDto> findErrorsValidacioPerNode(

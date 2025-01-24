@@ -8,6 +8,7 @@
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="comment" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="disabled"><c:choose><c:when test="${not empty disabled}">${disabled}</c:when><c:otherwise>false</c:otherwise></c:choose></c:set>
@@ -24,7 +25,7 @@
 			</c:choose>
 		</label>
 		<div class="controls col-xs-${campInputSize}">
-			<div class="checkbox">
+			<div class="checkbox ${inputClass}">
 	  			<label>
 					<form:checkbox path="${campPath}" cssClass="span12" id="${campPath}" disabled="${disabled}"/>
 				</label>

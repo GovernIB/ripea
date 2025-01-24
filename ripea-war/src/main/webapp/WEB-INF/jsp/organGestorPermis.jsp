@@ -37,9 +37,6 @@
 			style="width:100%">
 		<thead>
 			<tr>
-<!-- 				<th data-col-name="organGestor.nom"> -->
-<%-- 					<spring:message code="organgestor.permis.columna.organ"/> --%>
-<!-- 				</th> -->
 				<th data-col-name="principalTipus">
 					<spring:message code="organgestor.permis.columna.tipus"/>
 				</th>
@@ -70,24 +67,30 @@
 						{{if delete}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="procedimentsComuns" data-template="#cellProcedimentsComunsTemplate" width="5%">
+				<th data-col-name="procedimentsComuns" data-template="#cellProcedimentsComunsTemplate">
 					<spring:message code="organgestor.permis.columna.procedimentsComuns"/>
 					<script id="cellProcedimentsComunsTemplate" type="text/x-jsrender">
  						{{if procedimentsComuns}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="administration" data-template="#cellPermisAdministrationTemplate" width="5%">
+				<th data-col-name="administration" data-template="#cellPermisAdministrationTemplate">
 					<spring:message code="organgestor.permis.columna.administracio"/>
 					<script id="cellPermisAdministrationTemplate" type="text/x-jsrender">
  						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="administrationComuns" data-template="#cellPermisAdministrationComunsTemplate" width="5%">
+				<th data-col-name="administrationComuns" data-template="#cellPermisAdministrationComunsTemplate">
 					<spring:message code="organgestor.permis.columna.administracio.comuns"/>
 					<script id="cellPermisAdministrationComunsTemplate" type="text/x-jsrender">
  						{{if administrationComuns}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="disseny" data-template="#cellPermisdissenyTemplate">
+					<spring:message code="organgestor.permis.columna.disseny"/>
+					<script id="cellPermisdissenyTemplate" type="text/x-jsrender">
+ 						{{if disseny}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
  						<div class="dropdown"> 

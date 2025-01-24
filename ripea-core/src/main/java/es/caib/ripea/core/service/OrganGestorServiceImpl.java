@@ -863,6 +863,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
 		cacheHelper.evictOrganismesEntitatAmbPermis(entitatId, usuariCodi);
+		cacheHelper.evictOrganismesEntitatAmbPermisDisseny(entitatId, usuariCodi);
 	}
 
 	@Transactional(readOnly = true)
@@ -917,9 +918,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		for (OrganGestorDto o: organs) {
 			List<PermisDto> permisosOrgan = permisosHelper.findPermisos(o.getId(), OrganGestorEntity.class);
 			for (PermisDto p: permisosOrgan) {
-				PermisOrganGestorDto permisOrgan = conversioTipusHelper.convertir(
-						p,
-						PermisOrganGestorDto.class);
+				PermisOrganGestorDto permisOrgan = conversioTipusHelper.convertir(p, PermisOrganGestorDto.class);
 				permisOrgan.setOrganGestor(o);
 				if (p.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
 					try {

@@ -52,9 +52,7 @@
 	});
 </script>
 <style>
-	.permisosInput {
-		margin-left: 45px
-	}
+	.permisosInput {margin-left: 45px}
 </style>
 </head>
 <body>
@@ -83,18 +81,47 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<rip:inputCheckbox name="selectAll" textKey="organgestor.permis.form.camp.all"/>
-		<div class="permisosInput">
-			<rip:inputCheckbox name="create" textKey="organgestor.permis.form.camp.creacio"/>
-			<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
-			<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
-			<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
-			<rip:inputCheckbox name="procedimentsComuns" textKey="organgestor.permis.form.camp.procedimentsComuns"/>
+		<div class="row">
+
+			<div class="col-xs-4"></div>
+
+			<div class="col-xs-4">
+			
+				<rip:inputCheckbox name="selectAll" textKey="organgestor.permis.form.camp.all"/>
+				
+				<div class="permisosInput">
+					<rip:inputCheckbox name="create" textKey="organgestor.permis.form.camp.creacio"/>
+					<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
+					<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
+					<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
+				</div>			
+			
+			</div>
+			
+			<div class="col-xs-4 pull-right">
+				<rip:inputCheckbox
+					name="procedimentsComuns" 
+					labelSize="10"
+					inputClass="pull-right"
+					textKey="organgestor.permis.form.camp.procedimentsComuns"/>
+				<rip:inputCheckbox 
+					name="administration"
+					labelSize="10"
+					inputClass="pull-right" 
+					textKey="organgestor.permis.form.camp.administracio"/>
+				<rip:inputCheckbox 
+					name="administrationComuns" 
+					labelSize="10"
+					inputClass="pull-right"
+					textKey="organgestor.permis.form.camp.administracio.comuns"/>
+				<rip:inputCheckbox 
+					name="disseny" 
+					labelSize="10"
+					inputClass="pull-right"
+					textKey="organgestor.permis.columna.disseny"/>
+			</div>
 		</div>
-		<rip:inputCheckbox name="administration" textKey="organgestor.permis.form.camp.administracio"/>
-		<div style="margin-left: 45px;">
-			<rip:inputCheckbox name="administrationComuns" textKey="organgestor.permis.form.camp.administracio.comuns"/>
-		</div>
+		
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 				<c:choose>

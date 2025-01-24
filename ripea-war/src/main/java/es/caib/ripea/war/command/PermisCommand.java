@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.command;
 
 import java.util.ArrayList;
@@ -18,11 +15,6 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.PermisMetaExpedient;
 import lombok.Getter;
 
-/**
- * Command per al manteniment de permisos.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter
 @PermisMetaExpedient
 public class PermisCommand {
@@ -42,7 +34,7 @@ public class PermisCommand {
 	private boolean selectAll;
 	private boolean procedimentsComuns;
 	private boolean administrationComuns;
-
+	private boolean disseny;
 	private Long organGestorId;
 
 	public static List<PermisCommand> toPermisCommands(
@@ -65,8 +57,7 @@ public class PermisCommand {
 		if (permisCommand.isCreate() &&
 			permisCommand.isDelete() &&
 			permisCommand.isRead() &&
-			permisCommand.isWrite() && 
-			permisCommand.isProcedimentsComuns())
+			permisCommand.isWrite())
 			permisCommand.setSelectAll(true);
 		return permisCommand;
 	}
@@ -135,4 +126,6 @@ public class PermisCommand {
 	public void setAdministrationComuns(boolean administrationComuns) {
 		this.administrationComuns = administrationComuns;
 	}
+
+	public void setDisseny(boolean disseny) { this.disseny = disseny; }	
 }
