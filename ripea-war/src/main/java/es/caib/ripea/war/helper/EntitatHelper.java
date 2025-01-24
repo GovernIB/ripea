@@ -8,6 +8,8 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -100,7 +102,6 @@ public class EntitatHelper {
 	
 	@SuppressWarnings("unchecked")
 	public static boolean isUsuariActualTeOrgans(HttpServletRequest request) {
-
 		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getAttribute(ORGANS_ACCESSIBLES);
 		if (organs != null && !organs.isEmpty()) {
 			return true;
@@ -117,9 +118,6 @@ public class EntitatHelper {
 		ExpedientHelper.resetAccesUsuariExpedients(request);
 	}
 
-	////
-	// ORGANS GESTORS
-	////
 	@SuppressWarnings("unchecked")
 	public static List<OrganGestorDto> findOrganGestorsAccessibles(HttpServletRequest request) {
 		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getAttribute(ORGANS_ACCESSIBLES);
@@ -127,6 +125,19 @@ public class EntitatHelper {
 			return organs;
 		} else {
 			return new ArrayList<OrganGestorDto>();
+		}
+	}
+	
+	public static void findOrganismesEntitatAmbPermisCache(HttpServletRequest request, OrganGestorService organGestorService) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		if (organGestorService != null && entitatActual != null) {
+			List<OrganGestorDto> organs = new ArrayList<OrganGestorDto>();
+			if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+				organs = organGestorService.findOrganismesEntitatAmbPermisDissenyCache(entitatActual.getId());
+			} else {
+				organs = organGestorService.findOrganismesEntitatAmbPermisCache(entitatActual.getId());
+			}
+			request.setAttribute(ORGANS_ACCESSIBLES, organs);
 		}
 	}
 	

@@ -5,6 +5,8 @@ package es.caib.ripea.war.helper;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +31,20 @@ public class RolHelper {
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
-	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService) {
+	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService, OrganGestorService organGestorService) {
+		
 		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
+		
 		if (canviRol != null && canviRol.length() > 0) {
+			
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
+			//Si el usuari actual era dissenyador de organ, hem de actualitzar el llistat de organs
+			//Ja que el nou usuari no ha de tenir el llistat de organs amb permis disseny, sino admin
+			if (isRolActualDissenyadorOrgan(request)) { //NO CRIDAR a cap funcio de isRolActual aqui, perque s'actualitza el rol en sessio!!!
+//			if (request.isUserInRole(ROLE_DISSENY)) {
+				EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+			}
+			
 			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 				aplicacioService.setRolUsuariActual(canviRol);
@@ -56,7 +68,7 @@ public class RolHelper {
 					rolActual);
 		}
 	}
-
+	
 	public static String getRolActual(HttpServletRequest request) {
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
@@ -74,12 +86,32 @@ public class RolHelper {
 			} else if (request.isUserInRole(ROLE_DISSENY) && rolsDisponibles.contains(ROLE_DISSENY)) {
 				rolActual = ROLE_DISSENY;				
 			}
-			if (rolActual != null) {
+			/**
+			 * Això de actualitzar a la sessió el rol del usuari cada cop que es consulta el rol no está bé.
+			 * Aquesta funció es molt utilitzada, i si consultes per un rol que no tens, entra per la segona condició del IF
+			 * lo cual provoca que se t'actualitzi el rol en sessió a ROLE_USER (el primer que troba)
+			 * Exemple: al canvi de rol s'actualitzen els organs gestors, això depen del rol (si ets admin o dissenyador de organ)
+			 * 			Això provoca una cridada a aquets mètode, y una persona que no tenia el rol de disseny, se li assignava user.
+			 */
+			/*if (rolActual != null) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, rolActual);
+			}*/
+		}
+		
+		String resultat = null;
+		if (rolActual!=null) {
+			resultat = rolActual;
+		} else {
+			if (rolsDisponibles!=null && rolsDisponibles.size()>0) {
+				resultat = rolsDisponibles.get(0);
+			} else {
+				resultat = ROLE_USER;
 			}
 		}
-		LOGGER.debug("Obtenint rol actual (rol=" + rolActual + ")");
-		return rolActual;
+		
+		LOGGER.debug("Obtenint rol actual (rol=" + resultat + ")");
+
+		return resultat;
 	}
 
 	public static boolean isRolActualSuperusuari(HttpServletRequest request) {

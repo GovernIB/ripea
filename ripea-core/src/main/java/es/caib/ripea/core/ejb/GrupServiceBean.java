@@ -2,7 +2,6 @@ package es.caib.ripea.core.ejb;
 
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
@@ -23,13 +22,9 @@ import es.caib.ripea.core.api.service.GrupService;
 @Interceptors(SpringBeanAutowiringInterceptor.class)
 public class GrupServiceBean implements GrupService {
 
-    @Autowired
-    private GrupService delegate;
-    
-    
+    @Autowired private GrupService delegate;
     
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto create(
 			Long entitatId, 
 			GrupDto tipusDocumental) throws NotFoundException {
@@ -39,7 +34,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto update(
 			Long entitatId, 
 			GrupDto tipusDocumental) throws NotFoundException {
@@ -49,7 +43,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto delete(
 			Long entitatId, 
 			Long id) throws NotFoundException {
@@ -59,7 +52,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto findById(
 			Long id) throws NotFoundException {
 		return delegate.findById(
@@ -67,7 +59,6 @@ public class GrupServiceBean implements GrupService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
 	public ResultDto<GrupDto> findByEntitat(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -86,7 +77,6 @@ public class GrupServiceBean implements GrupService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -101,7 +91,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public void relacionarAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId, 
@@ -117,7 +106,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public void desvincularAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId) {
@@ -128,14 +116,12 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public List<PermisDto> findPermisos(
 			Long id) {
 		return delegate.findPermisos(id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public void updatePermis(
 			Long id,
 			PermisDto permis) {
@@ -143,7 +129,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public void deletePermis(
 			Long id,
 			Long permisId) {
@@ -151,7 +136,6 @@ public class GrupServiceBean implements GrupService {
 	}
     
 	@Override
-	@RolesAllowed("tothom")
 	public boolean checkIfAlreadyExistsWithCodi(
 			Long entitatId,
 			String codi, 
@@ -163,7 +147,6 @@ public class GrupServiceBean implements GrupService {
 	}
     
 	@Override
-	@RolesAllowed("tothom")
 	public void marcarPerDefecte(
 			Long entitatId,
 			Long procedimentId,
@@ -175,7 +158,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -187,7 +169,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public void esborrarPerDefecte(
 			Long entitatId,
 			Long procedimentId,
@@ -199,7 +180,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public List<GrupDto> findGrups(
 			Long entitatId,
 			Long organGestorId,
@@ -211,13 +191,11 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public GrupDto findGrupById(Long grupId) {
 		return delegate.findGrupById(grupId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public GrupDto findGrupByExpedientPeticioAndProcedimentId(
 			Long expedientPeticioId,
 			Long procedimentId) {
@@ -227,7 +205,6 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
 			Long entitatId,
 			String rolActual,
@@ -239,9 +216,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
 	public boolean checkIfHasGrupPerDefecte(Long procedimentId) {
 		return delegate.checkIfHasGrupPerDefecte(procedimentId);
 	}
-
 }

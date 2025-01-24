@@ -155,8 +155,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
@@ -170,7 +169,7 @@ public class MetaExpedientController extends BaseAdminController {
 				filtreDto,
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
-				rolActual,
+				RolHelper.getRolActual(request),
 				hasPermisAdmComu(request));
 		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(request, metaExps, "id");
 		return dtr;

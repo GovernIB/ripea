@@ -131,7 +131,9 @@ body {
 		
 			<div class="nav navbar-nav navbar-right" style="width:100%;">
 				<ul class="list-inline pull-right" style="margin-bottom: 0px;">
+				
 					<%------------------------ ENTITATS ------------------------%>
+					
 					<c:if test="${not isRolActualSuperusuari and hiHaEntitats}">
 						<li class="dropdown">
 							<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
@@ -151,7 +153,9 @@ body {
 							</c:if>
 						</li>
 					</c:if>
+					
 					<%------------------------ ROLS ------------------------%>
+					
 					<li class="dropdown">
 						<c:choose>
 							<c:when test="${fn:length(rolsUsuariActual) > 1}">
@@ -178,38 +182,48 @@ body {
 							</c:otherwise>
 						</c:choose>
 					</li>
+					
 					<%------------------------ ORGANS ------------------------%>
+					
 					<c:if test="${isRolActualAdministradorOrgan or isRolActualDissenyadorOrgan}">
-						<li class="dropdown">
-							<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
-							<c:if test="${null != organGestorActual}">
-								<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-							</c:if>
-							<c:if test="${null == organGestorActual}">
-								<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-							</c:if>
-							<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
-							<c:if test="${hiHaMesOrgansGestors}">
-								<ul class="dropdown-menu">
+						<c:if test="${!hiHaOrgansGestors}">
+							<li class="dropdown">
+								<span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="decorator.menu.organgestor.cap"/>
+							</li>
+						</c:if>
+						<c:if test="${hiHaOrgansGestors}">
+							<li class="dropdown">
+								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
 								<c:if test="${null != organGestorActual}">
-									<c:url var="urlCanviOrganGestor" value="/index">
-										<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
-									</c:url>
-<%-- 									<li><a href="${urlCanviOrganGestor}"><spring:message code="decorator.menu.organgestor.tots"/></a></li> --%>
+									<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
 								</c:if>
-									<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
-										<c:if test="${og.id != organGestorActual.id}">
-											<c:url var="urlCanviOrganGestor" value="/index">
-												<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
-											</c:url>
-											<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
-										</c:if>
-									</c:forEach>
-								</ul>
-							</c:if>
-						</li>
+								<c:if test="${null == organGestorActual}">
+									<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
+								</c:if>
+								<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
+								<c:if test="${hiHaMesOrgansGestors}">
+									<ul class="dropdown-menu">
+									<c:if test="${null != organGestorActual}">
+										<c:url var="urlCanviOrganGestor" value="/index">
+											<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
+										</c:url>
+									</c:if>
+										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
+											<c:if test="${og.id != organGestorActual.id}">
+												<c:url var="urlCanviOrganGestor" value="/index">
+													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
+												</c:url>
+												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
+											</c:if>
+										</c:forEach>
+									</ul>
+								</c:if>
+							</li>
+						</c:if>
 					</c:if>
+					
 					<%------------------------ USER ------------------------%>
+					
 					<li class="dropdown">
 						<a href="#" data-toggle="dropdown">
 							<span class="fa fa-user"></span>
@@ -497,6 +511,13 @@ body {
 				</c:forEach>
 			</div>
 		</c:if>
+	
+		<p>entitatActual=${entitatActual}</p>
+		<p>sessionOrgansGestors=${sessionOrgansGestors}</p>
+		<p>organGestorActual=${organGestorActual}</p>
+		<p>rolActual=${rolActual}</p>
+		<p>rolsUsuariActual=${rolsUsuariActual}</p>
+		<p>hiHaOrgansGestors=${hiHaOrgansGestors}</p>	
 	
 		<div class="panel panel-default">
 			<div class="panel-heading">

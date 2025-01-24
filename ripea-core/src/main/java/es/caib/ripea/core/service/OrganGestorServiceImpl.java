@@ -783,8 +783,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
 	}
 	
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter, boolean directOrganPermisRequired) {
 		
 		List<OrganGestorEntity> filtrats = new ArrayList<OrganGestorEntity>();
@@ -845,7 +845,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				OrganGestorDto.class);
 	}
 	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(Long entitatId) {
@@ -853,14 +852,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return cacheHelper.findOrganismesEntitatAmbPermis(entitatId, auth.getName());
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDissenyCache(Long entitatId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return cacheHelper.findOrganismesEntitatAmbPermisDisseny(entitatId, auth.getName());
+	}
 	
 	@Transactional(readOnly = true)
 	@Override
 	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
 		cacheHelper.evictOrganismesEntitatAmbPermis(entitatId, usuariCodi);
 	}
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1244,5 +1247,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 	private String msg(String codi, Object... params) {
 		return messageHelper.getMessage(codi, params);
+	}
+
+	@Override
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolDisseny(
+			Long entitatId,
+			String filter,
+			boolean directOrganPermisRequired) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

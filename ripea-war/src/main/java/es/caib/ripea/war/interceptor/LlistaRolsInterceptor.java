@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.helper.ContingutEstaticHelper;
 import es.caib.ripea.war.helper.RolHelper;
 
@@ -20,8 +18,8 @@ import es.caib.ripea.war.helper.RolHelper;
  */
 public class LlistaRolsInterceptor extends HandlerInterceptorAdapter {
 
-    @Autowired
-    private AplicacioService aplicacioService;
+    @Autowired private AplicacioService aplicacioService;
+    @Autowired private OrganGestorService organGestorService;
 
 	@Override
 	public boolean preHandle(
@@ -29,7 +27,7 @@ public class LlistaRolsInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-			RolHelper.processarCanviRols(request, aplicacioService);
+			RolHelper.processarCanviRols(request, aplicacioService, organGestorService);
 			RolHelper.setRolActualFromDb(request, aplicacioService);
 		}
 		return true;

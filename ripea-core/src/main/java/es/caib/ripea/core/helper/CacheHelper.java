@@ -193,6 +193,14 @@ public class CacheHelper {
 				OrganGestorDto.class);
 	}
 	
+	@Cacheable(value = "findOrganismesEntitatAmbPermisDisseny", key="{#entitatId, #usuariCodi}")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		return conversioTipusHelper.convertirList(
+				organGestorHelper.findAmbEntitatPermis(entitat, ExtendedPermission.DISSENY),
+				OrganGestorDto.class);
+	}
+	
 	@CacheEvict(value = "findOrganismesEntitatAmbPermis", key="{#entitatId, #usuariCodi}")
 	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
 	}

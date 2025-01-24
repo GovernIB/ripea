@@ -295,5 +295,18 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.getOrganCodiFromMetaExpedientId(metaExpedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolDisseny(
+			Long entitatId,
+			String filter,
+			boolean directOrganPermisRequired) {
+		return delegate.findAccessiblesUsuariActualRolDisseny(entitatId, filter, directOrganPermisRequired);
+	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDissenyCache(Long entitatId) {
+		return delegate.findOrganismesEntitatAmbPermisDissenyCache(entitatId);
+	}
 }

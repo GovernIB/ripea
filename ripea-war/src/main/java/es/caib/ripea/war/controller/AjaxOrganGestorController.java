@@ -103,7 +103,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 			organGestorsList = organGestorService.findByEntitat(
 					entitatActual.getId(),
 					text);
-		} else if (RolHelper.isRolActualUsuari(request)) {
+		} else if (RolHelper.isRolActualUsuari(request) || RolHelper.isRolActualDissenyadorOrgan(request)) {
 			organGestorsList = organGestorService.findAccessiblesUsuariActualRolUsuari(
 					entitatActual.getId(),
 					text,

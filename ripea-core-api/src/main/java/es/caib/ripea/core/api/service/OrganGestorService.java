@@ -236,6 +236,12 @@ public interface OrganGestorService {
 			Long entitatId,
 			String filter, 
 			boolean directOrganPermisRequired);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolDisseny(
+			Long entitatId,
+			String filter, 
+			boolean directOrganPermisRequired);
 
 	@PreAuthorize("hasRole('tothom')")
 	public OrganGestorDto findItemByEntitatAndCodi(
@@ -266,23 +272,19 @@ public interface OrganGestorService {
     boolean hasPermisAdminComu(Long organId);
 	
 	@PreAuthorize("hasRole('tothom')")
-	public void evictOrganismesEntitatAmbPermis(
-			Long entitatId,
-			String usuariCodi);
+	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi);
 
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(
-			Long entitatId);
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(Long entitatId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDissenyCache(Long entitatId);
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public List<OrganGestorDto> findOrgansSuperiorByEntitat(
-			Long entitatId);
-
-
+	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId);
 
 	// For testing:
 	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper);
-
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
