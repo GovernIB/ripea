@@ -37,7 +37,7 @@ import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de meta-expedient revisions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -48,7 +48,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 
 	@Autowired private MetaExpedientService metaExpedientRevisioService;
 	@Autowired private AplicacioService aplicacioService;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		getEntitatActualComprovantPermisos(request);
@@ -92,7 +92,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 //		filtreCommand.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
-		
+
 		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
 		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
 //		if (rolActual.equals("IPA_ADMIN")) {
@@ -100,7 +100,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 //		} else {
 //			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT });
 //		}
-		
+
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
@@ -123,21 +123,21 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		
+
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientRevisioCommand command = MetaExpedientRevisioCommand.asCommand(metaExpedient);
 		command.setRevisioComentari(null);
 		model.addAttribute(command);
-		
+
 		if (RolHelper.isRolActualRevisor(request) && metaExpedientService.isRevisioActiva()) {
 			model.addAttribute("modificar", true);
 		}
-		
+
 
 		return "metaExpedientRevisioForm";
 	}
 
-	
+
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
@@ -147,7 +147,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 			Model model) throws JsonMappingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaExpedientDto dto = command.asDto();
-		
+
 		if (command.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REBUTJAT && (command.getRevisioComentari() == null || command.getRevisioComentari().isEmpty())) {
 			bindingResult.rejectValue("revisioComentari", "NotNull");
 		}
@@ -160,7 +160,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 				entitatActual.getId(),
 				dto,
 				RolHelper.getRolActual(request));
-		
+
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:metaExpedientRevisio",
@@ -181,21 +181,21 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
-		
+
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		model.addAttribute(
 				"usuariActual",
 				usuariActual);
-		
+
 		model.addAttribute(
 				"isRevisor",
 				true);
-		
+
 		return "metaExpedientComentaris";
-	}	
-	
-	
-	
+	}
+
+
+
 	@RequestMapping(value = "/{metaExpedientId}/comentaris/publicar", method = RequestMethod.POST)
 	@ResponseBody
 	public List<MetaExpedientComentariDto> publicarComentari(
@@ -204,13 +204,13 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 			@RequestParam String text,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+
 		if (text != null && !text.isEmpty()) {
 			metaExpedientService.publicarComentariPerMetaExpedient(entitatActual.getId(), metaExpedientId, text, RolHelper.getRolActual(request));
 		}
 
 		return metaExpedientService.findComentarisPerMetaExpedient(
-				entitatActual.getId(), 
+				entitatActual.getId(),
 				metaExpedientId,
 				RolHelper.getRolActual(request));
 	}
@@ -225,6 +225,9 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new MetaExpedientFiltreCommand();
+            if (RolHelper.isRolActualRevisor(request)) {
+                filtreCommand.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
+            }
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,
