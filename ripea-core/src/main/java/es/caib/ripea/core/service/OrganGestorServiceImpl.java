@@ -110,7 +110,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		logger.debug("Consulta del organ gestor (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 
-		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id);
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id, false);
 		OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
 		resposta.setPareId(organGestor.getPare() != null ? organGestor.getPare().getId() : null);
 		return resposta;
@@ -151,7 +151,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						organGestorDto + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
-		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, organGestorDto.getId());
+		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, organGestorDto.getId(), false);
 		
 		organGestorEntity.update(organGestorDto.isUtilitzarCifPinbal());
 
@@ -162,7 +162,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	public String delete(Long entitatId, Long id) {
 		logger.debug("Esborrant organ gestor (id=" + id + ")");
-		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id);
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id, false);
 		organGestorRepository.delete(organGestor);
 		return organGestor.getNom();
 	}

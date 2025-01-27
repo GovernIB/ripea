@@ -19,6 +19,7 @@
 	<rip:modalHead/>
 <script>
 	$(document).ready(function() {
+		
 		$("#modal-botons button[type='submit']").on('click', function() {
 			$("form#permisOrganGestorCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisOrganGestorCommand *:disabled").removeAttr('disabled');
@@ -26,13 +27,13 @@
 
 		$("#selectAll").on('change', function() {
 			if ($(this).prop("checked"))
-				$("div.permisosInput :checkbox").prop('checked', true);
+				$("#permisosExpMarc :checkbox").prop('checked', true);
 			else
-				$("div.permisosInput :checkbox").prop('checked', false);
+				$("#permisosExpMarc :checkbox").prop('checked', false);
 		});
-		$("div.permisosInput :checkbox").on('change', function() {
+		$("#permisosExpMarc :checkbox").on('change', function() {
 			var totsSeleccionats = true;
-			$("div.permisosInput :checkbox").each(function() {
+			$("#permisosExpMarc :checkbox").each(function() {
 				  if(!$(this).prop('checked'))
 					  totsSeleccionats = false;
 			});
@@ -41,15 +42,40 @@
 		$("#administration").change(() => {
 			if (!$("#administration").prop('checked')) {
 				$("#administrationComuns").prop("checked", false);
+				habilitarTotsPermisosBase();
+			} else {
+				marcarTotsPermisosBase();
 			}
 		});
 
 		$("#administrationComuns").change(() => {
 			if ($("#administrationComuns").prop("checked")) {
 				$("#administration").prop("checked", true);
+				marcarTotsPermisosBase();
 			}
 		});
+
+		if ($("#administration").prop('checked')) {
+			marcarTotsPermisosBase();
+		}
 	});
+
+	function marcarTotsPermisosBase() {
+		$("#permisosExpMarc :checkbox").each(function() {
+			  $(this).prop("checked", true);
+			  $(this).attr("disabled", "disabled");
+		});
+		$("#selectAll").prop('checked', true);
+		$("#selectAll").attr("disabled", "disabled");
+	}
+
+	function habilitarTotsPermisosBase() {
+		$("#permisosExpMarc :checkbox").each(function() {
+			  $(this).removeAttr("disabled");
+		});
+		$("#selectAll").removeAttr("disabled");
+	}
+	
 </script>
 <style>
 	.permisosInput {margin-left: 45px}
@@ -62,63 +88,111 @@
  	</c:if>	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisOrganGestorCommand">
 		<form:hidden path="id"/>
-		<rip:inputSelect name="organGestorId" textKey="organgestor.permis.form.camp.organ" 
-						 disabled="${not empty permisOrganGestorCommand.organGestorId}" emptyOption="true" emptyOptionTextKey="organgestor.permis.form.camp.organ.opcio.cap"
-						 optionItems="${ organsGestors }" optionValueAttribute="id" optionTextAttribute="nom"
-						 required="true" optionMinimumResultsForSearch="5"/>
+		<rip:inputSelect 
+			name="organGestorId" 
+			textKey="organgestor.permis.form.camp.organ" 
+			disabled="${not empty permisOrganGestorCommand.organGestorId}"
+			emptyOption="true"
+			emptyOptionTextKey="organgestor.permis.form.camp.organ.opcio.cap"
+			optionItems="${ organsGestors }"
+			optionValueAttribute="id"
+			optionTextAttribute="nom"
+			required="true"
+			labelSize="3"
+			optionMinimumResultsForSearch="5"/>
+			
 		<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
 			<form:hidden path="organGestorId"/>
-	 	</c:if>					 
-		<rip:inputSelect name="principalTipus" textKey="organgestor.permis.form.camp.tipus" disabled="${not empty permisOrganGestorCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
+	 	</c:if>
+	 			 
+		<rip:inputSelect 
+			name="principalTipus"
+			textKey="organgestor.permis.form.camp.tipus"
+			disabled="${not empty permisOrganGestorCommand.id}"
+			optionEnum="PrincipalTipusEnumDto"
+			labelSize="3"/>
 		
 		<c:choose>
 			<c:when test="${empty permisOrganGestorCommand.id}">
-				<rip:inputText name="principalNom" textKey="organgestor.permis.form.camp.principal" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
+				<rip:inputText 
+					name="principalNom"
+					textKey="organgestor.permis.form.camp.principal"
+					required="true"
+					placeholderKey="organgestor.permis.form.camp.principal"
+					labelSize="3"/>
 			</c:when>
 			<c:otherwise>
-				<rip:inputText name="principalCodiNom" textKey="organgestor.permis.form.camp.principal" disabled="true" required="true" placeholderKey="organgestor.permis.form.camp.principal"/>
+				<rip:inputText
+					name="principalCodiNom"
+					textKey="organgestor.permis.form.camp.principal"
+					disabled="true"
+					required="true"
+					placeholderKey="organgestor.permis.form.camp.principal"
+					labelSize="3"/>
 				<form:hidden path="principalNom"/>
 			</c:otherwise>
 		</c:choose>
 		
 		<div class="row">
 
-			<div class="col-xs-4"></div>
-
-			<div class="col-xs-4">
+			<label class="control-label col-xs-3">Permisos</label>
 			
-				<rip:inputCheckbox name="selectAll" textKey="organgestor.permis.form.camp.all"/>
+			<div class="col-xs-5">
+			
+				<rip:inputCheckbox name="selectAll"
+					textKey="organgestor.permis.form.camp.all"
+					labelSize="5"/>
 				
-				<div class="permisosInput">
-					<rip:inputCheckbox name="create" textKey="organgestor.permis.form.camp.creacio"/>
-					<rip:inputCheckbox name="read" textKey="organgestor.permis.form.camp.consulta"/>
-					<rip:inputCheckbox name="write" textKey="organgestor.permis.form.camp.modificacio"/>
-					<rip:inputCheckbox name="delete" textKey="organgestor.permis.form.camp.eliminacio"/>
+				<div id="permisosExpMarc" style="border: 1px solid lightgray;">
+					<rip:inputCheckbox name="read" 
+						textKey="organgestor.permis.form.camp.consulta"
+						faClassInfoIcon="fa-info-circle"
+						comment="organgestor.permis.form.info.a"/>
+					<rip:inputCheckbox name="create"
+						textKey="organgestor.permis.form.camp.creacio"
+						faClassInfoIcon="fa-info-circle"
+						comment="organgestor.permis.form.info.c"/>					
+					<rip:inputCheckbox name="write" 
+						textKey="organgestor.permis.form.camp.modificacio"
+						faClassInfoIcon="fa-info-circle"
+						comment="organgestor.permis.form.info.u"/>
+					<rip:inputCheckbox name="delete" 
+						textKey="organgestor.permis.form.camp.eliminacio"
+						faClassInfoIcon="fa-info-circle"
+						comment="organgestor.permis.form.info.d"/>
 				</div>			
 			
 			</div>
 			
-			<div class="col-xs-4 pull-right">
+			<div class="col-xs-4 pull-right" style="padding-top: 45px;">
 				<rip:inputCheckbox
 					name="procedimentsComuns" 
 					labelSize="10"
 					inputClass="pull-right"
-					textKey="organgestor.permis.form.camp.procedimentsComuns"/>
+					textKey="organgestor.permis.form.camp.procedimentsComuns"
+					faClassInfoIcon="fa-info-circle"
+					comment="organgestor.permis.form.info.comuns"/>
 				<rip:inputCheckbox 
 					name="administration"
 					labelSize="10"
 					inputClass="pull-right" 
-					textKey="organgestor.permis.form.camp.administracio"/>
+					textKey="organgestor.permis.form.camp.administracio"
+					faClassInfoIcon="fa-info-circle"
+					comment="organgestor.permis.form.info.adm"/>
 				<rip:inputCheckbox 
 					name="administrationComuns" 
 					labelSize="10"
 					inputClass="pull-right"
-					textKey="organgestor.permis.form.camp.administracio.comuns"/>
+					textKey="organgestor.permis.form.camp.administracio.comuns"
+					faClassInfoIcon="fa-info-circle"
+					comment="organgestor.permis.form.info.admCom"/>
 				<rip:inputCheckbox 
 					name="disseny" 
 					labelSize="10"
 					inputClass="pull-right"
-					textKey="organgestor.permis.columna.disseny"/>
+					textKey="organgestor.permis.columna.disseny"
+					faClassInfoIcon="fa-info-circle"
+					comment="organgestor.permis.form.info.diss"/>
 			</div>
 		</div>
 		

@@ -66,6 +66,7 @@ public class PermisOrganGestorCommand extends PermisCommand {
 		permisCommand.setDelete(dto.isDelete());
 		permisCommand.setProcedimentsComuns(dto.isProcedimentsComuns());
 		permisCommand.setAdministration(dto.isAdministration());
+		permisCommand.setDisseny(dto.isDisseny());
 		permisCommand.setSelectAll(false);
 		if (permisCommand.isCreate() && permisCommand.isDelete() && permisCommand.isRead() && permisCommand.isWrite())
 			permisCommand.setSelectAll(true);
