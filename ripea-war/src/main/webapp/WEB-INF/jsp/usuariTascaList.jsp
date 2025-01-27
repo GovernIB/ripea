@@ -308,8 +308,7 @@
         <th data-col-name="usuariActualObservador" data-visible="false"></th>
         <th data-col-name="delegada" data-visible="false"></th>
         <th data-col-name="usuariActualDelegat" data-visible="false"></th>
-        <th data-col-name="responsableActual.codi" data-orderable="false" width="12%"><spring:message
-                code="expedient.tasca.list.columna.responsable.actual"/></th>
+        <th data-col-name="responsableActual.codiAndNom" data-orderable="false" width="12%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
         <th data-col-name="dataLimitString" width="8%" data-orderable="false"
             data-template="#cellTascaDeadlineTemplate">
             <spring:message code="expedient.tasca.list.columna.dataLimit"/>
