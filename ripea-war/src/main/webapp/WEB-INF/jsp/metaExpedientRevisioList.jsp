@@ -31,25 +31,15 @@
 	.badge {
   	 	background-color: #333;
   	 }
-  	 
-	table.dataTable tr > td:nth-child(1), 
+
+	table.dataTable tr > td:nth-child(1),
 	table.dataTable tr > td:nth-child(2) {
-		word-wrap: break-word; 
+		word-wrap: break-word;
 		max-width: 1px;
-	}  	 
+	}
 	</style>
 	<script type="text/javascript">
-	$(function() {
-	    $("form input").keypress(function (e) {
-	        if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-	            $("#metaExpedientFiltreForm").submit()
-	            return false;
-	        } else {
-	            return true;
-	        }
-	    });
-	});
-	
+
 	$(document).ready(function(){
 		$('#revisioEstat').on('change', function() {
 			var estat = $(this).val();
@@ -66,14 +56,14 @@
 
 
 	<c:url value="metaExpedientRevisio/filtrar" var="formAction"/>
-	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="metaExpedientFiltreCommand">
+	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" commandName="metaExpedientFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="codi" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codi"/>
-			</div>		
+			</div>
 			<div class="col-md-4">
 				<rip:inputText name="classificacio" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codiSia"/>
-			</div>			
+			</div>
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
@@ -85,15 +75,15 @@
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
- 					name="organGestorId"  
+				<rip:inputSuggest
+ 					name="organGestorId"
  					inline="true"
  					urlConsultaInicial="${urlConsultaInicial}"
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
  					suggestText="codiINom" />
-			</div>	
+			</div>
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -104,24 +94,24 @@
 	</form:form>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
 
-	<table 
-		id="metaexpedients" 
-		data-toggle="datatable" 
-		data-url="<c:url value="/metaExpedientRevisio/datatable"/>" 
-		data-info-type="search" 
-		data-default-order="2" 
-		data-default-dir="asc" 
-		class="table table-striped table-bordered"
-		data-rowhref-template="#rowhrefTemplate" 
+	<table
+		id="metaexpedients"
+		data-toggle="datatable"
+		data-url="<c:url value="/metaExpedientRevisio/datatable"/>"
+		data-info-type="search"
+        data-default-order="10"
+        data-default-dir="desc"
+        class="table table-striped table-bordered"
+		data-rowhref-template="#rowhrefTemplate"
 		data-rowhref-toggle="modal"
 		data-save-state="true"
 		data-search-enabled="false">
 		<thead>
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
-				<th data-col-name="classificacio" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
+				<th data-col-name="classificacio" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>
-				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>								
+				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>
 				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.comu"/>
@@ -134,17 +124,18 @@
 					<script id="cellGrupTemplate" type="text/x-jsrender">
 						{{if gestioAmbGrupsActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>				
+				</th>
 				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				
+
 				<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" width="10%">
 					<spring:message code="metaexpedient.list.columna.revisioEstat"/>
 					<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
+						<span class="label label-{{:revisioEstat}}">
 						{{if revisioEstat == 'DISSENY'}}
 							<spring:message code="meta.expedient.revisio.estat.enum.DISSENY"/>
 						{{else revisioEstat == 'PENDENT'}}
@@ -154,18 +145,19 @@
 						{{else revisioEstat == 'REBUTJAT'}}
 							<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
 						{{/if}}
+						</span>
 					</script>
 				</th>
-				
+
 				<th data-col-name="lastModifiedBy.codiAndNom" width="10%"><spring:message code="metaexpedient.list.columna.modificat.per"/></th>
 				<th data-col-name="lastModifiedDate" data-converter="datetime" width="10%"><spring:message code="metaexpedient.list.columna.modificat.el"/></th>
-				
+
 				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellNumComentaris" width="1%">
 					<script id="cellNumComentaris" type="text/x-jsrender">
 							<a href="metaExpedientRevisio/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 					</script>
-				</th>					
-				
+				</th>
+
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
@@ -185,7 +177,7 @@
 								<li><a href="metaExpedient/{{:id}}/grup"><span class="badge">{{:grupsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.grups"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/permis"><span class="badge">{{:permisosCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.permisos"/></a></li>
 							</ul>
-						</div>					
+						</div>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
@@ -196,7 +188,7 @@
 							<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
 							<li><a href="metaExpedientRevisio/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.canviar.estat.revisio"/></a></li>
 							</ul>
-						</div>	
+						</div>
 					</script>
 				</th>
 			</tr>

@@ -89,19 +89,20 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		interessatLlinatges['${intFis.id}'] = "${intFis.llinatges}";
 	</c:if>
 	</c:forEach>
-	
+
 	const esRepresentant = <c:choose><c:when test="${esRepresentant}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 	const isPropertyNotEmpty = (obj, prop) => {
 		return obj.hasOwnProperty(prop) && obj[prop] !== null && obj[prop] !== undefined;
 	}
 
 	$(document).ready(function() {
-		
+
 		var munOrgan = '';
 		var edicio = <c:out value="${not empty interessatCommand.id}"/>;
 		var idEdicio = '${interessatCommand.id}';
 		var netejar = <c:out value="${empty interessatCommand.id and empty netejar}"/>;
 		var organsCarregats = <c:out value="${not empty unitatsOrganitzatives}"/>;
+        var idInteressat = '${interessatId}';
 		$body = $("body");
 		$(document).on({
 			ajaxStart: function() { $body.addClass("loading");    },
@@ -197,7 +198,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		});
 
 		$('input#documentNum').change((event) => {
-			
+
 			$('#id').val(edicio ? idEdicio : '');
 // 			$('#editar-warn').hide();
 			const documentNum = $(event.target).val();
@@ -208,7 +209,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 					type: 'GET',
 					url: "<c:url value="/expedient/${expedientId}/comprovarDoc/"/>" + documentNum,
 					success: function(data) {
-						if (data !== null && isPropertyNotEmpty(data, 'id')) {
+						if (data !== null && isPropertyNotEmpty(data, 'id') && idInteressat!=data.id) {
 							$('#id').val(data.id);
 							$('#editar-warn').show();
 							if (isPropertyNotEmpty(data, 'tipus')) {
@@ -235,7 +236,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 							if (isPropertyNotEmpty(data, 'observacions')) $('#observacions').val(data.observacions);
 							if (isPropertyNotEmpty(data, 'preferenciaIdioma')) $('#preferenciaIdioma').val(data.preferenciaIdioma);
 						} else {
-							//Maldament després canviin de nou el nif per un que no existeix, seguiran modificant el interessat existent i carregat anteriorment. 
+							//Maldament després canviin de nou el nif per un que no existeix, seguiran modificant el interessat existent i carregat anteriorment.
 						}
 					}
 				});
@@ -497,7 +498,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 				}
 				webutilModalAdjustHeight();
 			});
-			$('input[type=checkbox][name=entregaDeh').trigger('change');
+			$('input[type=checkbox][name=entregaDeh]').trigger('change');
 
 			$('input[type=checkbox][name=entregaDehObligat]').on('change', function() {
 				if($(this).prop("checked") == true){
@@ -514,7 +515,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 
 
 			});
-			$('input[type=checkbox][name=entregaDehObligat').trigger('change');
+			$('input[type=checkbox][name=entregaDehObligat]').trigger('change');
 		</c:if>
 
 	});
@@ -587,19 +588,19 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 	</c:choose>
 
 	<form:form id="interessatform" action="${formAction}" method="post" cssClass="form-horizontal" commandName="interessatCommand">
-	
+
 		<form:hidden path="entitatId" />
 		<form:hidden path="id" />
 		<form:hidden path="expedientId" />
 		<form:hidden path="formulariAnterior" />
 		<form:hidden path="interessatId" />
 		<input type="hidden" id="id" />
-		
+
 		<!-- Tipus d'interessat -->
 		<rip:inputSelect name="tipus" textKey="interessat.form.camp.tipus"
 			optionItems="${tipusEnumOptions}" optionTextKeyAttribute="text"
 			optionValueAttribute="value" labelSize="2" disabled="${!potModificar || not empty id}"/>
-			
+
 		<!-- Filtre de administració -->
 		<div class="row ">
 			<div id="organ-filtre" class="col-xs-10 collapse pull-right">
@@ -678,7 +679,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 			</div>
 		</c:if>
 		<form:hidden path="ambOficinaSir"/>
-		
+
 		<div class="row">
 			<!-- Tipus de document -->
 			<div class="col-xs-12">
@@ -702,8 +703,8 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 				<rip:inputText name="documentNum" textKey="interessat.form.camp.document.numero" required="true" labelSize="2" disabled="${!potModificar}" comment="${comentari_docnum}" />
 			</div>
 		</div>
-		
-		<!-- Nom --> 
+
+		<!-- Nom -->
 		<rip:inputText name="nom" textKey="interessat.form.camp.nom"
 			required="true" labelSize="2" disabled="${!potModificar}"/>
 
@@ -723,7 +724,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		<rip:inputText name="raoSocial"
 			textKey="interessat.form.camp.raoSocial" required="true"
 			labelSize="2" disabled="${!potModificar}"/>
-		
+
 		<div class="row">
 			<!-- País -->
 			<div class="col-xs-6">
@@ -741,7 +742,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 					optionMinimumResultsForSearch="6" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		
+
 		<div class="row">
 			<!-- Municipi -->
 			<div class="col-xs-6">
@@ -756,11 +757,11 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 					textKey="interessat.form.camp.codiPostal" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		
+
 		<!-- Adressa -->
 		<rip:inputTextarea name="adresa" textKey="interessat.form.camp.adresa"
 			labelSize="2" disabled="${!potModificar}"/>
-		
+
 		<div class="row">
 			<!-- Correu electrònic -->
 			<div class="col-xs-6">
@@ -771,20 +772,20 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 				<rip:inputText name="telefon" textKey="interessat.form.camp.telefon" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		
+
 		<!-- Observacions -->
 		<rip:inputTextarea name="observacions"
 			textKey="interessat.form.camp.observacions" labelSize="2" disabled="${!potModificar}"/>
-			
+
 		<!-- Idioma preferent -->
 		<div class="row">
 			<div class="col-xs-6">
-				<rip:inputSelect 
+				<rip:inputSelect
 					name="preferenciaIdioma"
 					textKey="interessat.form.camp.idioma"
-					optionItems="${idiomaEnumOptions}" 
+					optionItems="${idiomaEnumOptions}"
 					optionTextKeyAttribute="text"
-					optionValueAttribute="value" 
+					optionValueAttribute="value"
 					disabled="${!potModificar}"/>
 			</div>
 		</div>
@@ -796,7 +797,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 						textKey="interessat.form.camp.entregaDeh" labelSize="10" disabled="${!potModificar}"/>
 				</div>
 			</div>
-			
+
 			<!-- Obligat -->
 			<div class="row" class="hidden">
 				<div class="col-xs-6" style="float: right;"
@@ -815,7 +816,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 						<c:when test="${empty interessatCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
 						<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
 					</c:choose>
-				</button>			
+				</button>
 			</c:if>
 			<a href="<c:url value="/contingut/${expedientId}"/>" class="btn btn-default" data-modal-cancel="true">
 				<spring:message code="comu.boto.${potModificar ? 'cancelar' : 'tancar'}" />
