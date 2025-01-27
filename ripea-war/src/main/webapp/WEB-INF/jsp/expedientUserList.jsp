@@ -768,7 +768,7 @@ function removeCookie(cname) {
 										<li><a  href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
 										{{if !expedientAgafatPerUsuariActual}}
-											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:agafatPer.nom}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 										{{else}}
 											<li><a href="expedient/{{:id}}/retornar"  data-toggle="ajax" title="<spring:message code="comu.boto.retornar.info"/>"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.retornar"/></a></li>
 										{{/if}}

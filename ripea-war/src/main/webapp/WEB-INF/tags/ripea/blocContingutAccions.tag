@@ -119,7 +119,7 @@
 			</c:if>
 			<c:if test="${contingut.agafat}">
 				<c:if test="${not expedientAgafatPerUsuariActual}">
-					<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+					<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> ${expedient.agafatPer.nom}. <spring:message code="expedient.list.user.agafar.confirm.2"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 				</c:if>
 				<c:if test="${expedientAgafatPerUsuariActual}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/retornar"/>" title="<spring:message code="comu.boto.retornar.info"/>">
