@@ -149,34 +149,28 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-            UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(dadesUsuari.getCodi(), false, false);
-            if (usuari.isRebreEmailsCanviEstatRevisio()) {
-                addDestinatari(
-                        dadesUsuari.getCodi(),
-                        emailsNoAgrupats,
-                        emailsAgrupats,
-                        null,
-                        "Email canviEstatRevisioMetaExpedient. Permission: Rol IPA_REVISIO: " + ", user: " + dadesUsuari.getCodi());
-            }
+            addDestinatari(
+                dadesUsuari.getCodi(),
+                emailsNoAgrupats,
+                emailsAgrupats,
+                EventTipusEnumDto.CANVI_ESTAT_REVISIO,
+                "Email canviEstatRevisioMetaExpedient. Permission: Rol IPA_REVISIO: " + ", user: " + dadesUsuari.getCodi());
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 		for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
 			boolean granted = permisosHelper.isGrantedAll(
-					entitatId,
-					EntitatEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION },
-					dadesUsuari.getCodi());
+                entitatId,
+                EntitatEntity.class,
+                new Permission[] { ExtendedPermission.ADMINISTRATION },
+                dadesUsuari.getCodi());
 
-            UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(dadesUsuari.getCodi(), false, false);
-			if (granted && usuari.isRebreEmailsCanviEstatRevisio()) {
-				addDestinatari(
-						dadesUsuari.getCodi(),
-						emailsNoAgrupats,
-						emailsAgrupats,
-						null,
-						"Email canviEstatRevisioMetaExpedient. Permission: Administració de entitat: " + entitatId + ", user: " + dadesUsuari.getCodi());
-			}
+            addDestinatari(
+                dadesUsuari.getCodi(),
+                emailsNoAgrupats,
+                emailsAgrupats,
+                EventTipusEnumDto.CANVI_ESTAT_REVISIO,
+                "Email canviEstatRevisioMetaExpedient. Permission: Administració de entitat: " + entitatId + ", user: " + dadesUsuari.getCodi());
 		}
 		
 		String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
@@ -508,36 +502,35 @@ public class EmailHelper {
 			MetaExpedientEntity metaExpedientEntity, 
 			Long entitatId) {
 		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
-        if (organAdminCreador.isRebreEmailsCanviEstatRevisio()) {
-            List<String> emailsNoAgrupats = new ArrayList<>();
-            List<String> emailsAgrupats = new ArrayList<>();
 
-            addDestinatari(
-                    organAdminCreador.getCodi(),
-                    emailsNoAgrupats,
-                    emailsAgrupats,
-                    null,
-                    "Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
+        List<String> emailsNoAgrupats = new ArrayList<>();
+        List<String> emailsAgrupats = new ArrayList<>();
 
-            String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
-            String comentari = "";
-            if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
-                comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
-            }
-            String text =
-                    "Informació del procediment:\n" +
-                            "\tProcediment: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
-                            "Estat de revisió: " + metaExpedientEntity.getRevisioEstat() + "\n" +
-                            "Data de revisió: " + Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss") + "\n" +
-                            comentari;
+        addDestinatari(
+                organAdminCreador.getCodi(),
+                emailsNoAgrupats,
+                emailsAgrupats,
+                EventTipusEnumDto.CANVI_ESTAT_REVISIO,
+                "Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
 
-            sendOrSaveEmail(
-                    emailsNoAgrupats,
-                    emailsAgrupats,
-                    subject,
-                    text,
-                    EventTipusEnumDto.CANVI_ESTAT_REVISIO);
+        String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
+        String comentari = "";
+        if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
+            comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
         }
+        String text =
+                "Informació del procediment:\n" +
+                        "\tProcediment: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
+                        "Estat de revisió: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+                        "Data de revisió: " + Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss") + "\n" +
+                        comentari;
+
+        sendOrSaveEmail(
+                emailsNoAgrupats,
+                emailsAgrupats,
+                subject,
+                text,
+                EventTipusEnumDto.CANVI_ESTAT_REVISIO);
 	}
 
 	public void canviEstatDocumentPortafirmes(
@@ -1216,7 +1209,9 @@ public class EmailHelper {
 					addDestinatari = true;
 				} else if (event == EventTipusEnumDto.NOVA_ANOTACIO && usuari.isRebreAvisosNovesAnotacions()) {
 					addDestinatari = true;
-				}
+				} else if (event == EventTipusEnumDto.CANVI_ESTAT_REVISIO){
+                    addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
+                }
 			}
 		}
 		
