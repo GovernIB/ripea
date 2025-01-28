@@ -90,6 +90,9 @@
 		</div>
 		<div class="panel-body">
 			<rip:inputIosCheckbox name="rebreEmailsAgrupats" labelSize="10" textKey="usuari.form.camp.rebre.emails.agrupats" icon="fa-envelope-o"/>
+            <c:if test="${editEmailsCanviEstatRevisio}">
+                <rip:inputIosCheckbox name="rebreEmailsCanviEstatRevisio" labelSize="10" textKey="usuari.form.camp.rebre.emails.canvi.estat.revisio" icon="fa-envelope-o"/>
+            </c:if>
 			<rip:inputIosCheckbox name="rebreAvisosNovesAnotacions" labelSize="10" textKey="usuari.form.camp.rebre.avisos.noves.anotacions" icon="fa-bell-o"/>
 		</div>
 	</div>

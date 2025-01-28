@@ -174,6 +174,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.getIdioma(),
 				dto.isRebreEmailsAgrupats(),
 				dto.isRebreAvisosNovesAnotacions(),
+				dto.isRebreEmailsCanviEstatRevisio(),
 				dto.getNumElementsPagina(),
 				dto.isExpedientListDataDarrerEnviament(),
 				dto.isExpedientListAgafatPer(),

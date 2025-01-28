@@ -32,6 +32,7 @@ public class UsuariCommand implements Serializable {
 	private String[] rols;
 	private boolean rebreEmailsAgrupats;
 	private boolean rebreAvisosNovesAnotacions;
+	private boolean rebreEmailsCanviEstatRevisio;
 	private Long numElementsPagina;
 	private boolean expedientListDataDarrerEnviament;
 	private boolean expedientListAgafatPer;
@@ -63,9 +64,8 @@ public class UsuariCommand implements Serializable {
 	public void setEmailAlternatiu(String emailAlternatiu) {
 		this.emailAlternatiu = Utils.trim(emailAlternatiu);
 	}
-	
-	
-	public static UsuariCommand asCommand(UsuariDto dto) {
+
+    public static UsuariCommand asCommand(UsuariDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
 				UsuariCommand.class);
