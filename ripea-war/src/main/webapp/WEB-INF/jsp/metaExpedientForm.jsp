@@ -426,7 +426,7 @@ function calculateClassificacioId() {
 						<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu"/>
 					</c:when>
 					<c:otherwise>
-						<form:hidden path="comu"/>
+						<form:hidden path="comu" value="false"/>
 					</c:otherwise>
 				</c:choose>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>

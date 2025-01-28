@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.List;
@@ -28,18 +25,11 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/grupPermis")
 public class GrupPermisController extends BaseAdminController {
 
-	@Autowired
-	private GrupService grupService;
-
-
+	@Autowired private GrupService grupService;
 
 	@RequestMapping(value = "/{grupId}/permis", method = RequestMethod.GET)
-	public String permis(
-			@PathVariable Long grupId,
-			Model model) {
-		model.addAttribute(
-				"grup",
-				grupService.findById(grupId));
+	public String permis(@PathVariable Long grupId, Model model) {
+		model.addAttribute("grup", grupService.findById(grupId));
 		return "grupPermisList";
 	}
 
@@ -55,11 +45,10 @@ public class GrupPermisController extends BaseAdminController {
 	}
 
 	@RequestMapping(value = "/{grupId}/permis/new", method = RequestMethod.GET)
-	public String getNew(
-			@PathVariable Long grupId,
-			Model model) {
+	public String getNew(@PathVariable Long grupId, Model model) {
 		return get(grupId, null, model);
 	}
+	
 	@RequestMapping(value = "/{grupId}/permis/{permisId}", method = RequestMethod.GET)
 	public String get(
 			@PathVariable Long grupId,

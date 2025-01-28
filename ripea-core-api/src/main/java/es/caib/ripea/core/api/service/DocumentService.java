@@ -664,7 +664,7 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public Resum getSummarize(byte[] bytes, String contentType);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('tothom')")
 	public long countByMetaDocument(
 			Long entitatId,
 			Long metaDocumentId);

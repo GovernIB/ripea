@@ -396,7 +396,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_DISSENY"})
 	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
@@ -450,7 +450,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed("tothom")
 	public long countByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {

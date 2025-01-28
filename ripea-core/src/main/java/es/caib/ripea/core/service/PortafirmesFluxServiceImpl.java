@@ -131,21 +131,14 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
-		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false,
-				false, 
-				false);
 		
+		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
 		
 		List<PortafirmesFluxRespostaDto> plantillesFiltrades = new ArrayList<PortafirmesFluxRespostaDto>();
 		List<PortafirmesFluxRespostaDto> plantilles = pluginHelper.portafirmesRecuperarPlantillesDisponibles(aplicacioService.getUsuariActual(), filtrar);
-		
 		List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
 
 		for (PortafirmesFluxRespostaDto plantilla : plantilles) {

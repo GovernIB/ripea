@@ -477,7 +477,7 @@ public interface ExpedientService {
 			Long organActual);
 
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_DISSENY')")
 	PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
 			Long entitatId, 
 			Long metaExpedientId,
@@ -549,7 +549,7 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	@PreAuthorize("hasRole('tothom')")
 	public long countByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId);

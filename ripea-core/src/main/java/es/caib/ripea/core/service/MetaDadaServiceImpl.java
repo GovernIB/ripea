@@ -353,14 +353,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 		logger.debug("Consulta de les meta-dades de l'entitat (" +
 				"entitatId=" + entitatId + ", " +
 				"metaNodeId=" + metaNodeId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false, false, false);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
-				entitat,
-				metaNodeId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
 		return conversioTipusHelper.convertirList(
 				metaDadaRepository.findByMetaNodeAndActivaTrueOrderByOrdreAsc(metaNode),
 				MetaDadaDto.class);
@@ -368,9 +362,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Transactional(readOnly=true)
 	@Override
-	public List<MetaDadaDto> findByNode(
-			Long entitatId,
-			Long nodeId) {
+	public List<MetaDadaDto> findByNode(Long entitatId, Long nodeId) {
 		logger.debug("Consulta de les meta-dades disponibles al node ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + nodeId + ")");

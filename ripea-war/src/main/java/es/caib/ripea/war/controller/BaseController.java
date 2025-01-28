@@ -461,6 +461,8 @@ public class BaseController implements MessageSourceAware {
 					objectName = "classificacioSia";
 				} else if (ArrayUtils.contains(obj.getCodes(), "CodiMetaExpedientNoRepetit")) {
 					objectName = "codi";
+				} else if (ArrayUtils.contains(obj.getCodes(), "organGestorId")) {
+					objectName = "organGestorId";
 				}
 			}
 			

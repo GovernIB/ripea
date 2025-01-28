@@ -94,8 +94,8 @@ public class AjaxOrganGestorController extends BaseAdminController{
 		text = text.trim();
 
 		List<OrganGestorDto> organGestorsList = new ArrayList<OrganGestorDto>();
- 		if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			organGestorsList = organGestorService.findAccessiblesUsuariActualRolAdmin(
+ 		if (RolHelper.isRolAmbFiltreOrgan(request)) {
+			organGestorsList = organGestorService.findAccessiblesUsuariActualRolAdminOrDisseny(
 					entitatActual.getId(),
 					EntitatHelper.getOrganGestorActual(request).getId(),
 					text);
@@ -103,7 +103,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 			organGestorsList = organGestorService.findByEntitat(
 					entitatActual.getId(),
 					text);
-		} else if (RolHelper.isRolActualUsuari(request) || RolHelper.isRolActualDissenyadorOrgan(request)) {
+		} else if (RolHelper.isRolActualUsuari(request)) {
 			organGestorsList = organGestorService.findAccessiblesUsuariActualRolUsuari(
 					entitatActual.getId(),
 					text,

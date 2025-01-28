@@ -33,10 +33,8 @@ public class OrganGestorCacheHelper {
     @Cacheable(value = "codisOrgansFills", key="#codiEntitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisOrgansFills(String codiEntitat, String codiDir3Organ) {
         Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiEntitat);
-
         List<String> unitatsEntitat = new ArrayList<String>();
         unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3Organ));
-
         return unitatsEntitat;
     }
 

@@ -219,7 +219,8 @@ public class EntityComprovarHelper {
 		return entitat;
 	}
 	
-	public OrganGestorEntity comprovarOrganGestorAdmin(Long entitatId, Long id) {
+	//Funció que es crida desde MetaExpedientService i desde OrganGestorService, el primer ha de inclourer també permis de disseny
+	public OrganGestorEntity comprovarPermisOrganGestor(Long entitatId, Long id, boolean inclouDissenyador) {
 		OrganGestorEntity organGestor = organGestorRepository.findOne(id);
 		if (organGestor == null) {
 			throw new NotFoundException(id, OrganGestorEntity.class);
@@ -231,12 +232,17 @@ public class EntityComprovarHelper {
 		        new Permission[] { ExtendedPermission.ADMINISTRATION },
 		        auth);
 		if (!esAdministradorEntitat) {
-			boolean esAdministradorOrganGestor = organGestorHelper.isOrganGestorPermes(
-					organGestor,
-					ExtendedPermission.ADMINISTRATION);
+			boolean esAdministradorOrganGestor = organGestorHelper.isOrganGestorPermes(organGestor, ExtendedPermission.ADMINISTRATION);
 			if (!esAdministradorOrganGestor) {
-				throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(),
-				        "ADMINISTRATION");
+				
+				if (!inclouDissenyador) {
+					throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(), "ADMINISTRATION");
+				} else {
+					boolean esDissenyadorOrganGestor = organGestorHelper.isOrganGestorPermes(organGestor, ExtendedPermission.DISSENY);
+					if (!esDissenyadorOrganGestor) {
+						throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(), "DISSENY");
+					}
+				}
 			}	
 		}
 		return organGestor;
@@ -436,10 +442,12 @@ public class EntityComprovarHelper {
 		return metaExpedient;
 	}
 
-	public MetaExpedientEntity comprovarMetaExpedientAdmin(
+	public MetaExpedientEntity comprovarAccesMetaExpedient(
 			EntitatEntity entitat,
 			Long id, 
-			Long organId) {
+			Long organId,
+			boolean inclouDissenyador) {
+
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(entitat, id);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitat.getId(),
@@ -464,10 +472,8 @@ public class EntityComprovarHelper {
 				}
 			}
 		} else {
-			// si no es administrador d'entitat comprovar si es administrador del seu organ gestor
-			comprovarOrganGestorAdmin(
-					entitat.getId(),
-					metaExpedient.getOrganGestor().getId());
+			// si no es administrador d'entitat comprovar si es administrador o dissenyador del seu organ gestor
+			comprovarPermisOrganGestor(entitat.getId(), metaExpedient.getOrganGestor().getId(), inclouDissenyador);
 		}
 		return metaExpedient;
 	}
@@ -662,25 +668,21 @@ public class EntityComprovarHelper {
 		}
 	}
 	
-	
 	public boolean comprovarRolActualAdminEntitatOAdminOrganDelExpedient(ExpedientEntity expedient, String rolActual) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
 		if (rolActual.equals("IPA_ADMIN")) {
-			
 			return permisosHelper.isGrantedAll(
 					expedient.getEntitat().getId(),
 					EntitatEntity.class,
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					auth);
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			
-			return organGestorHelper.isOrganGestorPermes(
-					expedient.getOrganGestor(),
-					ExtendedPermission.ADMINISTRATION);
+			return organGestorHelper.isOrganGestorPermes(expedient.getOrganGestor(), ExtendedPermission.ADMINISTRATION);
+//		} else if (rolActual.equals("IPA_DISSENY")) {			
+//			return organGestorHelper.isOrganGestorPermes(expedient.getOrganGestor(), ExtendedPermission.DISSENY);
 		} else {
-			
 			return false;
 		}
 	}

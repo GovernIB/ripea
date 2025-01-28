@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -46,17 +43,12 @@ public class GrupController extends BaseAdminController {
 	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
-		
 		GrupFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
-
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
-		
 		return "grupList";
 	}
 	
@@ -96,7 +88,7 @@ public class GrupController extends BaseAdminController {
 						entitatActual.getId(),
 						null,
 						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null, 
+						RolHelper.isRolAmbFiltreOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null, 
 						filtreCommand.asDto(), 
 						ResultEnumDto.PAGE).getPagina(),
 				"id",
@@ -130,9 +122,16 @@ public class GrupController extends BaseAdminController {
 			command.setEntitatId(entitatActual.getId());
 		}
 		model.addAttribute(command);
-		model.addAttribute("esAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
+		addAttributesToModel(model, request);
 		return "grupForm";
 	}
+	
+	//Afegir els attributs al model que no son el command.
+	//Funcio que es cridarà desde el get de la pagina, com desde el post (save), en cas de error.
+	private void addAttributesToModel(Model model, HttpServletRequest request) {
+		model.addAttribute("esAdminOrgan", RolHelper.isRolAmbFiltreOrgan(request));
+	}
+	
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
@@ -144,11 +143,12 @@ public class GrupController extends BaseAdminController {
 		if (Utils.isNotEmpty(command.getCodi()) && grupService.checkIfAlreadyExistsWithCodi(entitatActual.getId(), command.getCodi(), command.getId())) {
 			bindingResult.rejectValue("codi", "GrupCodiRepetit");
 		}
-		if (command.getOrganGestorId() == null && RolHelper.isRolActualAdministradorOrgan(request)) {
+		if (command.getOrganGestorId() == null && RolHelper.isRolAmbFiltreOrgan(request)) {
 			bindingResult.rejectValue("organGestorId", "NotNull");
 		}
 		
 		if (bindingResult.hasErrors()) {
+			addAttributesToModel(model, request);
 			return "grupForm";
 		}
 		if (command.getId() != null) {

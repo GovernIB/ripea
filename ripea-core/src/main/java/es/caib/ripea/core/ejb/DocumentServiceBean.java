@@ -485,7 +485,7 @@ public class DocumentServiceBean implements DocumentService {
     }
 
     @Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+    @RolesAllowed("tothom")
 	public long countByMetaDocument(
 			Long entitatId,
 			Long metaDocumentId) {

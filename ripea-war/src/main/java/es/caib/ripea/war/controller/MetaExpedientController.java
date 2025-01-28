@@ -167,7 +167,7 @@ public class MetaExpedientController extends BaseAdminController {
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
 				filtreDto,
-				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
+				organActual == null ? false : RolHelper.isRolAmbFiltreOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
 				RolHelper.getRolActual(request),
 				hasPermisAdmComu(request));
@@ -181,16 +181,8 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long metaExpedientId,
-			Model model) {
-		
-		getMetaExpedient(
-				request,
-				metaExpedientId,
-				model);
-		
+	public String get(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
+		getMetaExpedient(request, metaExpedientId, model);		
 		return "metaExpedientForm";
 	}
 	
@@ -202,18 +194,17 @@ public class MetaExpedientController extends BaseAdminController {
 				metaExpedientId);
 	}
 	
-	public void getMetaExpedient(
-			HttpServletRequest request,
-			Long metaExpedientId,
-			Model model) {
+	public void getMetaExpedient(HttpServletRequest request, Long metaExpedientId, Model model) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 
 		MetaExpedientDto metaExpedient = null;
 		if (metaExpedientId != null)
 			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
+		
 		MetaExpedientCommand command = null;
 		boolean isRolActualAdminOrgan = RolHelper.isRolActualAdministradorOrgan(request);
+		
 		if (metaExpedient != null) {
 			command = MetaExpedientCommand.asCommand(metaExpedient);
 		} else {
@@ -225,10 +216,12 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 			command.setTipusClassificacio(TipusClassificacioEnumDto.SIA);
 		}
+		
 		command.setRolAdminOrgan(isRolActualAdminOrgan);
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
 		boolean isCarpetesDefecte = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte"));
+		
 		if (isCarpetesDefecte) {
 			List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = null;
 			if (metaExpedientId != null)
@@ -254,10 +247,7 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("metaExpedientDto", metaExpedient);
 		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 		
-		fillFormModel(
-				request,
-				metaExpedient,
-				model);
+		fillFormModel(request, metaExpedient, model);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -673,8 +663,8 @@ public class MetaExpedientController extends BaseAdminController {
 			try {
 				organGestorDto = organGestorService.findItemByEntitatAndCodi(entitatActual.getId(), metaExpedientExport.getOrganGestor().getCodi());
 				
-				if (RolHelper.isRolActualAdministradorOrgan(request)) {
-					List<OrganGestorDto> organs = organGestorService.findAccessiblesUsuariActualRolAdmin(entitatActual.getId(), organGestorDto.getId());
+				if (RolHelper.isRolAmbFiltreOrgan(request)) {
+					List<OrganGestorDto> organs = organGestorService.findAccessiblesUsuariActualRolAdminOrDisseny(entitatActual.getId(), organGestorDto.getId());
 					if (organs == null || organs.isEmpty()) {
 						throw new NotFoundException(organGestorDto.getId(), OrganGestorDto.class);
 					}
@@ -1232,8 +1222,8 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isRolAdmin", RolHelper.isRolActualAdministrador(request));
 
 		List<OrganGestorDto> organGestorsList = new ArrayList<>();
-		if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			organGestorsList = organGestorService.findAccessiblesUsuariActualRolAdmin(
+		if (RolHelper.isRolAmbFiltreOrgan(request)) {
+			organGestorsList = organGestorService.findAccessiblesUsuariActualRolAdminOrDisseny(
 					EntitatHelper.getEntitatActual(request).getId(),
 					EntitatHelper.getOrganGestorActual(request).getId());
 		} else if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualRevisor(request)){

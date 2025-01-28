@@ -421,7 +421,6 @@ body {
 					<c:when test="${isRolActualDissenyadorOrgan}">
 						<a href="<c:url value="/metaExpedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.metaexpedients"/></a>
 						<a href="<c:url value="/grup"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.grups"/></a>
-						<a href="<c:url value="/domini"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.domini"/></a>
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
 						<%---- Expedients ----%>

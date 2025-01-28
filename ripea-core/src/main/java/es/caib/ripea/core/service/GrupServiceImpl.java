@@ -658,27 +658,21 @@ public class GrupServiceImpl implements GrupService {
 
 	}
 	
-	
-	
-	
 	@Transactional(readOnly = true)
 	public boolean checkIfAlreadyExistsWithCodi(
 			Long entitatId,
 			String codi, 
 			Long grupId) {
-		
 		GrupEntity grup = grupRepository.findByEntitatIdAndCodi(entitatId, codi);
-		
 		return  grup!= null && !Objects.equals(grup.getId(), grupId);
 	}
-	
 	
 	@Transactional
 	@Override
 	public List<PermisDto> findPermisos(Long id) {
-
 		return permisosHelper.findPermisos(id, GrupEntity.class);
 	}
+	
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
@@ -694,10 +688,5 @@ public class GrupServiceImpl implements GrupService {
 		permisosHelper.deletePermis(id, GrupEntity.class, permisId);
 	}
 	
-	
-	
-	
 	private static final Logger logger = LoggerFactory.getLogger(GrupServiceImpl.class);
-	
-	
 }

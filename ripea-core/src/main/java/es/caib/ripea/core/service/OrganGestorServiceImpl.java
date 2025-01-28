@@ -110,7 +110,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		logger.debug("Consulta del organ gestor (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 
-		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id, false);
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, id, false);
 		OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
 		resposta.setPareId(organGestor.getPare() != null ? organGestor.getPare().getId() : null);
 		return resposta;
@@ -151,7 +151,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						organGestorDto + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
-		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, organGestorDto.getId(), false);
+		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, organGestorDto.getId(), false);
 		
 		organGestorEntity.update(organGestorDto.isUtilitzarCifPinbal());
 
@@ -162,7 +162,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	public String delete(Long entitatId, Long id) {
 		logger.debug("Esborrant organ gestor (id=" + id + ")");
-		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id, false);
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, id, false);
 		organGestorRepository.delete(organGestor);
 		return organGestor.getNom();
 	}
@@ -751,18 +751,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId) {
-		return findAccessiblesUsuariActualRolAdmin(entitatId, organGestorId, null);
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId) {
+		return findAccessiblesUsuariActualRolAdminOrDisseny(entitatId, organGestorId, null);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdmin(Long entitatId, Long organGestorId, String filter) {
+	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId, String filter) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!permisosHelper.isGrantedAny(
 				organGestorId,
 				OrganGestorEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.DISSENY },
 				auth)) {
 			return new ArrayList<OrganGestorDto>();
 		}

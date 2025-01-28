@@ -219,7 +219,7 @@ public class MetaExpedientHelper {
 			if (!permisosHelper.isGrantedAny(
 							organGestorId,
 							OrganGestorEntity.class,
-							new Permission[] { ExtendedPermission.ADMINISTRATION },
+							new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.DISSENY },
 							auth)) {
 				return procedimentIds;
 			}
@@ -542,7 +542,7 @@ public class MetaExpedientHelper {
 		
 		if (revisioActiva) {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, organId);
+			MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, false);
 
 			if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
 				metaExpedientEntity.updateRevisioEstat(
@@ -556,7 +556,7 @@ public class MetaExpedientHelper {
 	public void canviarRevisioADisseny(Long entitatId, Long metaExpedientId, Long organId) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, metaExpedientId, organId);
+		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarAccesMetaExpedient(entitat, metaExpedientId, organId, false);
 
 		if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.DISSENY);

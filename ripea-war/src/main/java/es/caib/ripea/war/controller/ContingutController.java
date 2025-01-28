@@ -96,6 +96,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			@RequestParam(value = "origenTasques", required = false) Boolean origenTasques,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		
 		String organCodi = organGestorService.getOrganCodiFromContingutId(contingutId);
 		SessioHelper.setOrganActual(request, organCodi);
 		organGestorService.actualitzarOrganCodi(organCodi);
@@ -106,9 +107,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	    		logger.info("contingutGet start (" + contingutId + ")");
 	    	
 			long t1 = System.currentTimeMillis();
-		
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+				throw new SecurityException("No te permisos per accedir a aquest contingut com a dissenyador d'organ.");
+			}
+
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);			
 			ContingutDto contingut = null;
+			
 			if (tascaId == null) {
 				contingutService.checkIfPermitted(contingutId, RolHelper.getRolActual(request), PermissionEnumDto.READ);
 				contingut = contingutService.findAmbIdUser(

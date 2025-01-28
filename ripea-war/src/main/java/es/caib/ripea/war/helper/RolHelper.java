@@ -129,11 +129,12 @@ public class RolHelper {
 	public static boolean isRolActualRevisor(HttpServletRequest request) {
 		return ROLE_REVISOR.equals(getRolActual(request));
 	}
-
 	public static boolean isRolActualUsuari(HttpServletRequest request) {
 		return ROLE_USER.equals(getRolActual(request));
 	}
-
+	public static boolean isRolAmbFiltreOrgan(HttpServletRequest request) {
+		return ROLE_ADMIN_ORGAN.equals(getRolActual(request)) || ROLE_DISSENY.equals(getRolActual(request));
+	}
 	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
 		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
 		List<String> rols = new ArrayList<String>();

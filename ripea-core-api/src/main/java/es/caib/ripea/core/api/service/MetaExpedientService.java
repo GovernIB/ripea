@@ -442,7 +442,7 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long organGestorId,
 			MetaExpedientFiltreDto filtre,
-			boolean isRolActualAdministradorOrgan,
+			boolean isRolFiltreoOrgan, //Admin organ o dissenyador de organ
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			boolean hasPermisAdmComu);

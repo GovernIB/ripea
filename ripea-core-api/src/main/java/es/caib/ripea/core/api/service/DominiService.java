@@ -33,7 +33,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public DominiDto create(
 			Long entitatId,
 			DominiDto domini) throws NotFoundException;
@@ -50,7 +50,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public DominiDto update(
 			Long entitatId,
 			DominiDto tipusDocumental) throws NotFoundException;
@@ -66,7 +66,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public DominiDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;

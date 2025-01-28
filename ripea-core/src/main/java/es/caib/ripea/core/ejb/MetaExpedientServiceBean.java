@@ -29,7 +29,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	MetaExpedientService delegate;
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto create(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual, Long organId) {
@@ -37,7 +37,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual,
@@ -46,7 +46,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto updateActiu(
 			Long entitatId,
 			Long id,
@@ -55,7 +55,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto delete(
 			Long entitatId,
 			Long metaExpedientId, Long organId) {
@@ -73,7 +73,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto findByEntitatCodi(
 			Long entitatId,
 			String codi) {
@@ -232,20 +232,18 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long entitatId,
 			Long organGestorId,
 			MetaExpedientFiltreDto filtre,
-			boolean isRolActualAdministradorOrgan,
+			boolean isRolFiltreoOrgan,
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			boolean hasPermisAdmComu) {
-
 	    return delegate.findByEntitatOrOrganGestor(
 	    		entitatId,
 	    		organGestorId,
 	    		filtre,
-	    		isRolActualAdministradorOrgan, 
+	    		isRolFiltreoOrgan, 
 	    		paginacioParams,
 				rolActual,
 				hasPermisAdmComu);
-
 	}
 	
 	@Override
@@ -282,20 +280,20 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public List<ArbreDto<MetaExpedientCarpetaDto>> findArbreCarpetesMetaExpedient(Long entitatId,
 			Long metaExpedientId) {
 		return delegate.findArbreCarpetesMetaExpedient(entitatId, metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientCarpetaDto deleteCarpetaMetaExpedient(Long entitatId, Long metaExpedientCarpetaId) {
 		return delegate.deleteCarpetaMetaExpedient(entitatId, metaExpedientCarpetaId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public ProcedimentDto findProcedimentByCodiSia(
 			Long entitatId,
 			String codiDir3, String codiSia) {
@@ -377,19 +375,19 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto marcarPendentRevisio(Long entitatId, Long id, Long organId) {
 		return delegate.marcarPendentRevisio(entitatId, id, organId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id, Long organId) {
 		return delegate.marcarProcesDisseny(entitatId, id, organId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public boolean publicarComentariPerMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -403,7 +401,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public List<MetaExpedientComentariDto> findComentarisPerMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -415,7 +413,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public String export(
 			Long entitatId,
 			Long id,
@@ -427,7 +425,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public void createFromImport(
 			Long entitatId,
 			MetaExpedientExportDto metaExpedient,
@@ -441,7 +439,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public void updateFromImport(
 			Long entitatId,
 			MetaExpedientExportDto metaExpedient,
@@ -455,7 +453,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public CrearReglaResponseDto reintentarCreacioReglaDistribucio(
 			Long entitatId,
 			Long metaExpedientId) {
@@ -465,32 +463,32 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
     @Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+    @RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
     public boolean isUpdatingProcediments(EntitatDto entitatDto) {
         return delegate.isUpdatingProcediments(entitatDto);
     }
 
     @Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
     public ProgresActualitzacioDto getProgresActualitzacio(String codi) {
         return delegate.getProgresActualitzacio(codi);
     }
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat, Locale locale) {
 		delegate.actualitzaProcediments(entitat, locale);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public ReglaDistribucioDto consultarReglaDistribucio(
 			Long metaExpedientId) {
 		return delegate.consultarReglaDistribucio(metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
 	public CrearReglaResponseDto canviarEstatReglaDistribucio(
 			Long metaExpedientId, 
 			boolean activa) {
