@@ -149,12 +149,15 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			addDestinatari(
-					dadesUsuari.getCodi(),
-					emailsNoAgrupats,
-					emailsAgrupats,
-					null,
-					"Email canviEstatRevisioMetaExpedient. Permission: Rol IPA_REVISIO: " + ", user: " + dadesUsuari.getCodi());
+            UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(dadesUsuari.getCodi(), false, false);
+            if (usuari.isRebreEmailsCanviEstatRevisio()) {
+                addDestinatari(
+                        dadesUsuari.getCodi(),
+                        emailsNoAgrupats,
+                        emailsAgrupats,
+                        null,
+                        "Email canviEstatRevisioMetaExpedient. Permission: Rol IPA_REVISIO: " + ", user: " + dadesUsuari.getCodi());
+            }
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -165,7 +168,8 @@ public class EmailHelper {
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
 
-			if (granted) {
+            UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(dadesUsuari.getCodi(), false, false);
+			if (granted && usuari.isRebreEmailsCanviEstatRevisio()) {
 				addDestinatari(
 						dadesUsuari.getCodi(),
 						emailsNoAgrupats,
@@ -504,35 +508,36 @@ public class EmailHelper {
 			MetaExpedientEntity metaExpedientEntity, 
 			Long entitatId) {
 		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
-		
-		List<String> emailsNoAgrupats = new ArrayList<>();
-		List<String> emailsAgrupats = new ArrayList<>();
-		
-		addDestinatari(
-				organAdminCreador.getCodi(),
-				emailsNoAgrupats,
-				emailsAgrupats,
-				null,
-				"Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
-		
-		String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
-		String comentari = "";
-		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
-			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
-		}
-		String text = 
-				"Informació del procediment:\n" +
-						"\tProcediment: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
-						"Estat de revisió: " + metaExpedientEntity.getRevisioEstat() + "\n" +
-						"Data de revisió: " + Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss") + "\n" +
-						comentari ;
+        if (organAdminCreador.isRebreEmailsCanviEstatRevisio()) {
+            List<String> emailsNoAgrupats = new ArrayList<>();
+            List<String> emailsAgrupats = new ArrayList<>();
 
-		sendOrSaveEmail(
-				emailsNoAgrupats,
-				emailsAgrupats,
-				subject,
-				text,
-				EventTipusEnumDto.CANVI_ESTAT_REVISIO);
+            addDestinatari(
+                    organAdminCreador.getCodi(),
+                    emailsNoAgrupats,
+                    emailsAgrupats,
+                    null,
+                    "Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
+
+            String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
+            String comentari = "";
+            if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
+                comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
+            }
+            String text =
+                    "Informació del procediment:\n" +
+                            "\tProcediment: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
+                            "Estat de revisió: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+                            "Data de revisió: " + Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss") + "\n" +
+                            comentari;
+
+            sendOrSaveEmail(
+                    emailsNoAgrupats,
+                    emailsAgrupats,
+                    subject,
+                    text,
+                    EventTipusEnumDto.CANVI_ESTAT_REVISIO);
+        }
 	}
 
 	public void canviEstatDocumentPortafirmes(

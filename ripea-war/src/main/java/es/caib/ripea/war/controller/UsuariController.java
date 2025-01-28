@@ -55,6 +55,9 @@ public class UsuariController  extends BaseAdminController {
 		model.addAttribute(usuariCommand);
 		emplenaModel(request, model, usuariCommand);
 
+        model.addAttribute("editEmailsCanviEstatRevisio",
+                RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualRevisor(request));
+
 		return "usuariForm";
 	}
 

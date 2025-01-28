@@ -79,6 +79,9 @@ public class UsuariEntity implements Serializable {
 	
 	@Column(name = "avisos_noves_anotacions")
 	private boolean rebreAvisosNovesAnotacions;
+
+	@Column(name = "emails_canvi_estat_revisio")
+	private boolean rebreEmailsCanviEstatRevisio = true;
 	
 	@Column(name = "exp_list_data_darrer_env")
 	private boolean expedientListDataDarrerEnviament = false;
@@ -126,6 +129,7 @@ public class UsuariEntity implements Serializable {
 			String idioma,
 			boolean rebreEmailsAgrupats,
 			boolean rebreAvisosNovesAnotacions, 
+			boolean rebreEmailsCanviEstatRevisio,
 			Long numElementsPagina,
 			boolean expedientListDataDarrerEnviament,
 			boolean expedientListAgafatPer,
@@ -141,6 +145,7 @@ public class UsuariEntity implements Serializable {
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
+		this.rebreEmailsCanviEstatRevisio = rebreEmailsCanviEstatRevisio;
 		this.expedientListDataDarrerEnviament = expedientListDataDarrerEnviament;
 		this.expedientListAgafatPer = expedientListAgafatPer;
 		this.expedientListInteressats = expedientListInteressats;
