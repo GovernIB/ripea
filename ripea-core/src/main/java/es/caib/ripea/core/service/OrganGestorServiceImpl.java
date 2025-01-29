@@ -63,6 +63,7 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
@@ -71,6 +72,7 @@ import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
 
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
@@ -285,7 +287,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Actualitzar procediments
 			progres.setFase(2);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.inici")).build());
-			metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), locale, progres);
+			metaExpedientHelper.actualitzarProcediments(
+					entitat,
+					metaExpedientRepository.findByEntitatOrderByNomAsc(entitat),
+					locale,
+					progres);
 			progres.setProgres(51);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
 

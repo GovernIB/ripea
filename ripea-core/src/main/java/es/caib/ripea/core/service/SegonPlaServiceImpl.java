@@ -1,7 +1,22 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
@@ -39,24 +54,8 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -67,53 +66,29 @@ import java.util.Map;
 @Slf4j
 public class SegonPlaServiceImpl implements SegonPlaService {
 
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Autowired
-	private JavaMailSender mailSender;
-	@Autowired
-	private TestHelper testHelper;
-	@Autowired
-	private EmailPendentEnviarRepository emailPendentEnviarRepository;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private ExpedientHelper2 expedientHelper2;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private ExpedientInteressatHelper expedientInteressatHelper;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private MetaExpedientComentariRepository metaExpedientComentariRepository;
-	@Autowired
-	private SchedulingConfig schedulingConfig;
-	
-	@Autowired
-	private DocumentRepository documentRepository;
-	
-	@Autowired
-	private ExpedientPeticioHelper0 expedientPeticioHelper0;
-
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Resource  private EntitatRepository entitatRepository;
+	@Resource  private CacheHelper cacheHelper;
+	@Autowired private JavaMailSender mailSender;
+	@Autowired private TestHelper testHelper;
+	@Autowired private EmailPendentEnviarRepository emailPendentEnviarRepository;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ExpedientHelper2 expedientHelper2;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private EmailHelper emailHelper;
+	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
+	@Autowired private SchedulingConfig schedulingConfig;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private ExpedientPeticioHelper0 expedientPeticioHelper0;
 
 	/*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -424,16 +399,22 @@ public class SegonPlaServiceImpl implements SegonPlaService {
     public void actualitzarProcediments() {
 
 		long t1 = System.currentTimeMillis();
+		
     	if (cacheHelper.mostrarLogsSegonPla())
     		logger.info("Execució tasca periòdica: Actualitzar procediments");
 
-		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)	// Tasca en segon pla no configurada
+		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)
 			return;
-		List<EntitatDto> entitats = conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
-		for(EntitatDto entitat: entitats) {
+		
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		for(EntitatEntity entitat: entitats) {
 			try {
 				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
-				metaExpedientHelper.actualitzarProcediments(entitat, new Locale("ca"), null);
+				metaExpedientHelper.actualitzarProcediments(
+						entitat,
+						metaExpedientRepository.findByEntitatOrderByNomAsc(entitat),
+						new Locale("ca"),
+						null);
 			} catch (Exception e) {
 				logger.error("Error al actualitzar procediments en segon pla", e);
 			}

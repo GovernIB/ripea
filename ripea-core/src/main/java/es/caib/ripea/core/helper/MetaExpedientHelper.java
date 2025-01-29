@@ -3,6 +3,34 @@
  */
 package es.caib.ripea.core.helper;
 
+import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 //import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
 
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
@@ -12,7 +40,6 @@ import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
 import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -53,33 +80,6 @@ import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
 
 /**
  * Utilitats comunes pels meta-expedients.
@@ -830,28 +830,28 @@ public class MetaExpedientHelper {
 	}
 
 	@Transactional
-	public void actualitzarProcediments(EntitatDto entitatDto, Locale locale, ProgresActualitzacioDto progresActualitzacioDto) {
+	public void actualitzarProcediments(
+			EntitatEntity entitat,
+			List<MetaExpedientEntity> metaExpedients,
+			Locale locale,
+			ProgresActualitzacioDto progresActualitzacioDto) {
+		
 		ProgresActualitzacioDto progres = null;
 		if (progresActualitzacioDto != null) {
 			progres = progresActualitzacioDto;
 		} else {
-			progres = progresActualitzacio.get(entitatDto.getCodi());
+			progres = progresActualitzacio.get(entitat.getCodi());
 			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
 				return;
 			}
 			// inicialitza el seguiment del prgrés d'actualització
 			progres = new ProgresActualitzacioDto();
-			progresActualitzacio.put(entitatDto.getCodi(), progres);
+			progresActualitzacio.put(entitat.getCodi(), progres);
 		}
-
 		
 		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
 		try {
-
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false, false);
-			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
-			
 			// remove procediments without codi sia
 			Iterator<MetaExpedientEntity> it = metaExpedients.iterator();
 			while (it.hasNext()) {
@@ -862,7 +862,6 @@ public class MetaExpedientHelper {
 			}
 
 			progres.setNumOperacions(metaExpedients.size());
-
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.inici")).infoText(msg("procediment.synchronize.info.inici", metaExpedients.size())).build());
 
 			Integer organsNoSincronitzats = 0;
@@ -918,7 +917,6 @@ public class MetaExpedientHelper {
 					continue;
 				}
 
-
 				String nom = procedimentGga.getNom();
 				String descripcio = procedimentGga.getResum();
 				OrganGestorEntity organGestor;
@@ -944,19 +942,15 @@ public class MetaExpedientHelper {
 				metaExpedientRepository.flush();
 				progres.addInfo(info, true);
 				modificats++;
-
 			}
 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.fi")).infoText(msg("procediment.synchronize.info.fi", modificats, fallat)).build());
-
 			progres.setProgres(100);
 			if (progresActualitzacioDto == null) {
 				progres.setFinished(true);
 			}
 
-//			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
-
-			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
+			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitat.getId());
 
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar procediemnts", e);

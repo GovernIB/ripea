@@ -476,8 +476,13 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_DISSENY", "IPA_ORGAN_ADMIN"})
-	public void actualitzaProcediments(EntitatDto entitat, Locale locale) {
-		delegate.actualitzaProcediments(entitat, locale);
+	public void actualitzaProcediments(
+			EntitatDto entitat,
+			OrganGestorDto organActual,
+			boolean isRolFiltreOrgan,
+			boolean hasPermisAdmComu,
+			Locale locale) {
+		delegate.actualitzaProcediments(entitat, organActual, isRolFiltreOrgan, hasPermisAdmComu, locale);
 	}
 
 	@Override
@@ -540,5 +545,15 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long tascaID,
 			List<MetaExpedientTascaValidacioDto> validacions) {
 		return delegate.createValidacionsTasca(entitatId, tascaID, validacions);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaExpedientDto getAndCheckOrganPermission(
+			Long entitatId,
+			Long id,
+			OrganGestorDto organActual,
+			boolean checkAdmin) {
+		return delegate.getAndCheckOrganPermission(entitatId, id, organActual, checkAdmin);
 	}
 }

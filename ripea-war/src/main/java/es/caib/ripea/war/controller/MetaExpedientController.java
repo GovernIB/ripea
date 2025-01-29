@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
@@ -162,7 +163,7 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
 		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
-		
+
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
@@ -354,9 +355,7 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long organGestorId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
 		OrganGestorDto organGestor = organGestorService.findById(entitatActual.getId(), organGestorId);
-		
 		return organGestor.getCodi() +  "_PRO_" + String.format("%030d", System.currentTimeMillis()) + "3F";
 	}
 	
@@ -685,7 +684,25 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isObligarInteressatActiu", isObligarInteressatActiu());
 		model.addAttribute(metaExpedientImportEditCommand);
 		model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
-		model.addAttribute("procedimentsActuals", metaExpedientService.findByEntitat(entitatActual.getId()));
+		
+		//Procediments possibles per actualitzar, depen del rol
+		
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
+		PaginacioParamsDto sensePaginacio = new PaginacioParamsDto();
+		sensePaginacio.setPaginaNum(0);
+		sensePaginacio.setPaginaTamany(Integer.MAX_VALUE);
+		
+		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
+				entitatActual.getId(),
+				organActual == null ? null : organActual.getId(),
+				new MetaExpedientFiltreDto(),
+				organActual == null ? false : RolHelper.isRolAmbFiltreOrgan(request),
+				sensePaginacio,
+				RolHelper.getRolActual(request),
+				hasPermisAdmComu(request));
+		
+		model.addAttribute("procedimentsActuals", metaExps.getContingut());
 	}
 	
 	private void importEditValidation(			
@@ -766,12 +783,7 @@ public class MetaExpedientController extends BaseAdminController {
 			return "importMetaExpedientRolsacForm";
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-
-		getMetaExpedient(
-				request,
-				null,
-				model);
-		
+		getMetaExpedient(request, null, model);
 		
 		String codiDir3;
 		if (RolHelper.isRolActualAdministradorOrgan(request)) {
@@ -814,7 +826,6 @@ public class MetaExpedientController extends BaseAdminController {
 				metaExpedientCommand.setOrganGestorId(procedimentDto.getOrganId());
 			}
 			
-			
 		} catch (Exception e) {
 			logger.error("Error al importar metaexpedient desde ROLSAC", e);
 			return getModalControllerReturnValueError(
@@ -828,10 +839,6 @@ public class MetaExpedientController extends BaseAdminController {
 		return "metaExpedientForm";
 	}
 	
-	
-
-	
-	
 	@RequestMapping(value = "/{metaExpedientId}/regla", method = RequestMethod.GET)
 	public String getRegla(
 			HttpServletRequest request,
@@ -840,7 +847,6 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-			
 			MetaExpedientDto metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
 			ReglaDistribucioDto regla = metaExpedientService.consultarReglaDistribucio(metaExpedientId);
 			model.addAttribute("regla", regla);
@@ -871,23 +877,13 @@ public class MetaExpedientController extends BaseAdminController {
 				request, 
 				"metaexpedient.controller.regla.crear.result",
 				new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
+		
 		if (crearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
-			
-			MissatgesHelper.success(
-					request, 
-					message);
-
+			MissatgesHelper.success(request, message);
 		} else if (crearReglaResponseDto.getStatus() == StatusEnumDto.WARNING) {
-			
-			MissatgesHelper.warning(
-					request, 
-					message);
-			
-
+			MissatgesHelper.warning(request, message);
 		} else {
-			MissatgesHelper.error(
-					request, 
-					message);
+			MissatgesHelper.error(request, message);
 		}
 		
 		MetaExpedientDto metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
@@ -955,7 +951,6 @@ public class MetaExpedientController extends BaseAdminController {
 				entitatActual.getId(),
 				metaExpedientCarpetaId);
 	}
-
 
 	private boolean hasPermisAdmComu(HttpServletRequest request) {
 		boolean hasPermisAdmComu = RolHelper.isRolActualAdministrador(request);
@@ -1258,7 +1253,13 @@ public class MetaExpedientController extends BaseAdminController {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		try {
-			metaExpedientService.actualitzaProcediments(entitat, new RequestContext(request).getLocale());
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+			metaExpedientService.actualitzaProcediments(
+					entitat,
+					organActual,
+					RolHelper.isRolAmbFiltreOrgan(request),
+					hasPermisAdmComu(request),
+					new RequestContext(request).getLocale());
 		} catch (Exception e) {
 			logger.error("Error inesperat al actualitzar els procediments", e);
 			model.addAttribute("errors", e.getMessage());
@@ -1287,5 +1288,4 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientController.class);
-
 }

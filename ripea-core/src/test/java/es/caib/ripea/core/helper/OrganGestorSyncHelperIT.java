@@ -1,15 +1,9 @@
 package es.caib.ripea.core.helper;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.test.AuthenticationTest;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,9 +19,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.test.AuthenticationTest;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/ripea/core/application-context-sync-test.xml"})
@@ -107,16 +109,12 @@ public class OrganGestorSyncHelperIT {
         ObjectMapper mapper = new ObjectMapper();
 
         Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.anyString(), Mockito.nullable(Date.class), Mockito.nullable(Date.class))).thenReturn((List<UnitatOrganitzativa>) mapper.readValue(UNITATS_JSON, new TypeReference<List<UnitatOrganitzativa>>(){}));
-        Mockito.doNothing().when(metaExpedientHelper).actualitzarProcediments(Mockito.any(EntitatDto.class), Mockito.any(Locale.class), null);
+//        Mockito.doNothing().when(metaExpedientHelper).actualitzarProcediments(Mockito.any(EntitatDto.class), Mockito.any(List.class), Mockito.any(Locale.class), null);
         Mockito.when(pluginHelper.dadesUsuariFindAmbCodi(Mockito.anyString())).thenReturn(null);
-
     }
 
     @After
-    public final void tearDown() {
-
-    }
-
+    public final void tearDown() {}
 
     @SuppressWarnings("unchecked")
     @Test

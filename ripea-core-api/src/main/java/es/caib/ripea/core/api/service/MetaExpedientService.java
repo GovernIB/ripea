@@ -132,6 +132,9 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id, Long organId);
 	
+	@PreAuthorize("hasRole('tothom')")	
+	public MetaExpedientDto getAndCheckOrganPermission(Long entitatId, Long id, OrganGestorDto organActual, boolean inclouRolDissenyador);
+	
 	/**
 	 * Consulta un meta-expedient donat el seu codi.
 	 * 
@@ -598,7 +601,7 @@ public interface MetaExpedientService {
 	ProgresActualitzacioDto getProgresActualitzacio(String codi);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
-	void actualitzaProcediments(EntitatDto entitat, Locale locale);
+	void actualitzaProcediments(EntitatDto entitat, OrganGestorDto organActual, boolean isRolFiltreOrgan, boolean hasPermisAdmComu, Locale locale);
 	
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN')")
 	public ReglaDistribucioDto consultarReglaDistribucio(

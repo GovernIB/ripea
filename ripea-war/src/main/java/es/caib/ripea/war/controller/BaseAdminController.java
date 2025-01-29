@@ -91,6 +91,18 @@ public class BaseAdminController extends BaseController {
 		MetaExpedientDto metaExpedient = null;
 		if (RolHelper.isRolActualRevisor(request)) {
 			metaExpedient = metaExpedientService.findById(entitat.getId(), metaExpedientId);
+		} else if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+			metaExpedient = metaExpedientService.getAndCheckOrganPermission(
+					entitat.getId(),
+					metaExpedientId,
+					EntitatHelper.getOrganGestorActual(request),
+					true);
+		} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+			metaExpedient = metaExpedientService.getAndCheckOrganPermission(
+					entitat.getId(),
+					metaExpedientId,
+					EntitatHelper.getOrganGestorActual(request),
+					false);
 		} else {
 			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 			metaExpedient = metaExpedientService.getAndCheckAdminPermission(
