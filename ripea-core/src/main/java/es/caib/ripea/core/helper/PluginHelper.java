@@ -4443,8 +4443,10 @@ public class PluginHelper {
 					missatge = "Error no especificado al validar la firma del fichero.";
 				} else if (missatge.indexOf("SignedDataNotProvided")>0) {
 					missatge = "SignedDataNotProvided: Se debe aportar el fichero original.";
-				}
-				return new SignatureInfoDto(true, true, missatge);
+				} else if (!RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")) {
+                    missatge = "Error al detectar firma de document.";
+                }
+                return new SignatureInfoDto(true, true, missatge);
 			}
 		} catch (Exception e) {
 			Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
@@ -4457,7 +4459,10 @@ public class PluginHelper {
 				logger.error(
 						"Error al detectar firma de document",
 						e);
-				return new SignatureInfoDto(false, true, e.getMessage());
+				return new SignatureInfoDto(false, true,
+                        RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")
+                        ? e.getMessage()
+                        : "Error al detectar firma de document.");
 			}
 		}
 	}
