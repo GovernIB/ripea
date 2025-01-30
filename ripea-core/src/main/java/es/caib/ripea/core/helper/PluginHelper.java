@@ -4453,6 +4453,7 @@ public class PluginHelper {
 			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
 					|| throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
 					|| throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")
+					|| throwable.getMessage().contains("El documento OOXML no está firmado.(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")
 					|| throwable.getMessage().contains("La firma proporcionada no contiene un nodo <ds:Signature>")) {
 				return new SignatureInfoDto(false, false, null);
 			} else {
