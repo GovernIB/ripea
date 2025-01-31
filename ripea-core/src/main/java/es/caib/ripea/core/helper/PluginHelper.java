@@ -1973,7 +1973,7 @@ public class PluginHelper {
 				"ambVersioImprimible",
 				new Boolean(ambVersioImprimible).toString());
 		long t0 = System.currentTimeMillis();
-		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin(document.getEntitat().getCodi());
 		try {
 			String arxiuUuidConsulta = (document != null && document instanceof DocumentEntity)
 					? document.getArxiuUuid()
@@ -6462,8 +6462,11 @@ public class PluginHelper {
 	}
 
 	public IArxiuPluginWrapper getArxiuPlugin() {
+        String entitatCodi = configHelper.getEntitatActualCodi();
+        return getArxiuPlugin(entitatCodi);
+    }
+    public IArxiuPluginWrapper getArxiuPlugin(String entitatCodi) {
 
-		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}

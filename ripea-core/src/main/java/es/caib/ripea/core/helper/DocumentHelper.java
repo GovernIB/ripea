@@ -11,23 +11,7 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.core.api.dto.DocumentOrigenEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ValidacioFirmaException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -1067,6 +1051,21 @@ public class DocumentHelper {
 		return fitxer;
 	}
 
+    @Transactional
+    public Document getFitxerById(Long adjuntId, EventTipusEnumDto eventTipus){
+        switch (eventTipus){
+            case ENVIAR_FICHERO:
+                DocumentEntity document = documentRepository.findOne(adjuntId);
+                return pluginHelper.arxiuDocumentConsultar(
+                        document,
+                        null,
+                        null,
+                        true,
+                        false);
+        }
+        return null;
+    }
+
 	public FitxerDto getFitxerAssociat(
 			DocumentEntity document,
 			String versio) {
@@ -1182,13 +1181,13 @@ public class DocumentHelper {
 	@SuppressWarnings("incomplete-switch")
 	public byte[] getContingutFromArxiuDocument(Document arxiuDocument) {
 		byte[] contingut = null;
-		boolean isArxiuCaib = isArxiuCaib();
 		DocumentContingut document = arxiuDocument.getContingut();
 		List<Firma> firmes = arxiuDocument.getFirmes();
 		
 		if (firmes == null || firmes.isEmpty()) {
 			contingut = document.getContingut();
 		} else {
+            boolean isArxiuCaib = isArxiuCaib();
 			for (Firma firma: firmes) {
 				if (firma.getTipus() != FirmaTipus.CSV) {
 					switch(firma.getTipus()) {

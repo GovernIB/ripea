@@ -10,10 +10,10 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import es.caib.plugins.arxiu.api.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.api.utils.Utils;
@@ -56,6 +57,11 @@ import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -90,7 +96,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private ExpedientPeticioHelper0 expedientPeticioHelper0;
 
-	/*
+    /*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
 	 */
 	@Override
@@ -248,72 +254,84 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			List<EmailPendentEnviarEntity> emailPendents) {
 		
 			
-		SimpleMailMessage missatge = new SimpleMailMessage();
-		missatge.setTo(emailDestinatari);
-		missatge.setFrom(emailPendents.get(0).getRemitent());
-		missatge.setSubject(emailHelper.getPrefixRipea() + " Emails agrupats");
-		
-		
-		// Agrupa per event tipus
-		Map<EventTipusEnumDto, List<EmailPendentEnviarEntity>> eventTipos = new HashMap<EventTipusEnumDto, List<EmailPendentEnviarEntity>>();
-		for (EmailPendentEnviarEntity contingutEmail : emailPendents) {
-			if (eventTipos.containsKey(contingutEmail.getEventTipusEnum())) {
-				eventTipos.get(contingutEmail.getEventTipusEnum()).add(contingutEmail);
-			} else {
-				List<EmailPendentEnviarEntity> lContingutEmails = new ArrayList<EmailPendentEnviarEntity>();
-				lContingutEmails.add(contingutEmail);
-				eventTipos.put(contingutEmail.getEventTipusEnum(), lContingutEmails);
-			}
-		}
-		
-		
-		String text = "";
+//		SimpleMailMessage missatge = new SimpleMailMessage();
+        MimeMessage message = mailSender.createMimeMessage();
 
-		for (Map.Entry<EventTipusEnumDto, List<EmailPendentEnviarEntity>> entry : eventTipos.entrySet()) {
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-			String header = "";
-			if (entry.getKey() == EventTipusEnumDto.AGAFAT_ALTRE_USUARI) {
-				header = "Elements de l'escriptori agafats per un altre usuari";
-			} else if (entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES) {
-				header = "Canvi d'estat de documents enviat a portafirmes";
-			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO) {
-				header = "Canvi d'estat de notificacions";
-			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_TASCA) {
-				header = "Canvi d'estat de tasques";
-			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
-				header = "Canvi d'estat de documents enviat a ViaFirma";
-			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
-				header = "Canvi d'estat de revisió de procediments";
-			} else if(entry.getKey() == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
-				header = "Nous comentaris en els procediments";
-			} else if (entry.getKey() == EventTipusEnumDto.NOVA_ANOTACIO) {
-				header = "Noves anotacions pendents";
-			} else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {
-				header = "Canvi de responsables de tasques";
-			} else if (entry.getKey() == EventTipusEnumDto.ALLIBERAT) {
-				header = "Elements de l'escriptori alliberats";
-			} else if (entry.getKey() == EventTipusEnumDto.MODIFICACIO_DATALIMIT_TASCA) {
-				header = "Modificació data límit de tasques";
-			} else if (entry.getKey() == EventTipusEnumDto.DELEGAT_TASCA) {
-				header = "Assignació delegat de tasques";
-			} else if (entry.getKey() == EventTipusEnumDto.CANCELAR_DELEGACIO_TASCA) {
-				header = "Cancel·lació delegat de tasques";
-			}
-			
-			text += header + "\n";
-			text += "--------------------------------------------------------------------------\n\n";
+            helper.setTo(emailDestinatari);
+            helper.setFrom(emailPendents.get(0).getRemitent());
+            helper.setSubject(emailHelper.getPrefixRipea() + " Emails agrupats");
 
-			for (EmailPendentEnviarEntity emailPendentEnviarEntity : entry.getValue()) {
-				text += emailPendentEnviarEntity.getText() + "\n\n";
-			}
-			text += "\n";
-		}
-		
 
-		missatge.setText(text);
-		
-		mailSender.send(missatge);
-		
+            // Agrupa per event tipus
+            Map<EventTipusEnumDto, List<EmailPendentEnviarEntity>> eventTipos = new HashMap<EventTipusEnumDto, List<EmailPendentEnviarEntity>>();
+            for (EmailPendentEnviarEntity contingutEmail : emailPendents) {
+                if (eventTipos.containsKey(contingutEmail.getEventTipusEnum())) {
+                    eventTipos.get(contingutEmail.getEventTipusEnum()).add(contingutEmail);
+                } else {
+                    List<EmailPendentEnviarEntity> lContingutEmails = new ArrayList<EmailPendentEnviarEntity>();
+                    lContingutEmails.add(contingutEmail);
+                    eventTipos.put(contingutEmail.getEventTipusEnum(), lContingutEmails);
+                }
+            }
+
+            String text = "";
+
+            for (Map.Entry<EventTipusEnumDto, List<EmailPendentEnviarEntity>> entry : eventTipos.entrySet()) {
+
+                String header = "";
+                if (entry.getKey() == EventTipusEnumDto.AGAFAT_ALTRE_USUARI) {
+                    header = "Elements de l'escriptori agafats per un altre usuari";
+                } else if (entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES) {
+                    header = "Canvi d'estat de documents enviat a portafirmes";
+                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO) {
+                    header = "Canvi d'estat de notificacions";
+                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_TASCA) {
+                    header = "Canvi d'estat de tasques";
+                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
+                    header = "Canvi d'estat de documents enviat a ViaFirma";
+                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
+                    header = "Canvi d'estat de revisió de procediments";
+                } else if(entry.getKey() == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
+                    header = "Nous comentaris en els procediments";
+                } else if (entry.getKey() == EventTipusEnumDto.NOVA_ANOTACIO) {
+                    header = "Noves anotacions pendents";
+                } else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {
+                    header = "Canvi de responsables de tasques";
+                } else if (entry.getKey() == EventTipusEnumDto.ALLIBERAT) {
+                    header = "Elements de l'escriptori alliberats";
+                } else if (entry.getKey() == EventTipusEnumDto.MODIFICACIO_DATALIMIT_TASCA) {
+                    header = "Modificació data límit de tasques";
+                } else if (entry.getKey() == EventTipusEnumDto.DELEGAT_TASCA) {
+                    header = "Assignació delegat de tasques";
+                } else if (entry.getKey() == EventTipusEnumDto.CANCELAR_DELEGACIO_TASCA) {
+                    header = "Cancel·lació delegat de tasques";
+                }
+
+                text += header + "\n";
+                text += "--------------------------------------------------------------------------\n\n";
+
+                for (EmailPendentEnviarEntity emailPendentEnviarEntity : entry.getValue()) {
+                    text += emailPendentEnviarEntity.getText() + "\n\n";
+
+                    if (emailPendentEnviarEntity.getAdjuntId() != null) {
+                        Document fitxer = documentHelper.getFitxerById(
+                                emailPendentEnviarEntity.getAdjuntId(), emailPendentEnviarEntity.getEventTipusEnum());
+                        if (fitxer != null) {
+                            helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut().getContingut()));
+                        }
+                    }
+                }
+                text += "\n";
+            }
+            helper.setText(text);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
 		
 		for (EmailPendentEnviarEntity emailPendent : emailPendents) {
 			emailPendentEnviarRepository.delete(emailPendent);
@@ -399,13 +417,13 @@ public class SegonPlaServiceImpl implements SegonPlaService {
     public void actualitzarProcediments() {
 
 		long t1 = System.currentTimeMillis();
-		
+
     	if (cacheHelper.mostrarLogsSegonPla())
     		logger.info("Execució tasca periòdica: Actualitzar procediments");
 
 		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)
 			return;
-		
+
 		List<EntitatEntity> entitats = entitatRepository.findAll();
 		for(EntitatEntity entitat: entitats) {
 			try {

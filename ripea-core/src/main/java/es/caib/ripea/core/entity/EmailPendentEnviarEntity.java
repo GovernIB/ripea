@@ -10,12 +10,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
+import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
-
+@Getter
 @Entity
 @Table(name="ipa_email_pendent_enviar")
 @EntityListeners(AuditingEntityListener.class)
@@ -29,39 +30,27 @@ public class EmailPendentEnviarEntity extends RipeaAuditable<Long> {
 	private String subject;
 	@Column(name = "text", length = 4000, nullable = false)
 	private String text;
-	
+    @Column(name = "adjunt_id")
+	private Long adjuntId;
+
 	@Column(name = "event_tipus_enum", length = 64, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private EventTipusEnumDto eventTipusEnum;
-	
-	
-	public String getRemitent() {
-	    return remitent;
-	}
-	public String getDestinatari() {
-	    return destinatari;
-	}
-	public String getSubject() {
-	    return subject;
-	}
-	public String getText() {
-	    return text;
-	}
-	public EventTipusEnumDto getEventTipusEnum() {
-	    return eventTipusEnum;
-	}
-	public static Builder getBuilder(
+
+    public static Builder getBuilder(
 			String remitent,
 			String destinatari,
 			String subject,
 			String text,
-			EventTipusEnumDto eventTipusEnum) {
+			EventTipusEnumDto eventTipusEnum,
+            Long adjuntId) {
 		return new Builder(
 				remitent,
 				destinatari,
 				subject,
 				text,
-				eventTipusEnum);
+				eventTipusEnum,
+                adjuntId);
 	}
 
 	public static class Builder {
@@ -73,13 +62,15 @@ public class EmailPendentEnviarEntity extends RipeaAuditable<Long> {
 				String destinatari,
 				String subject,
 				String text,
-				EventTipusEnumDto eventTipusEnum) {
+				EventTipusEnumDto eventTipusEnum,
+                Long adjuntId) {
 			built = new EmailPendentEnviarEntity();
 			built.remitent = remitent;
 			built.destinatari = destinatari;
 			built.subject = subject;
 			built.text = text;
 			built.eventTipusEnum = eventTipusEnum;
+			built.adjuntId = adjuntId;
 		}
 
 		public EmailPendentEnviarEntity build() {

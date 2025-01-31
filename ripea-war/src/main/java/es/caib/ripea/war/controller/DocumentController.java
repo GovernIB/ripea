@@ -1,6 +1,6 @@
 
 /**
- * 
+ *
  */
 package es.caib.ripea.war.controller;
 
@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.war.command.EnviarDocumentCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,7 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador per al manteniment de documents.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -86,40 +89,42 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private OrganGestorService organGestorService;
-	
+    @Autowired
+    private EmailHelper emailHelper;
+
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
-		
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId, 
+				documentId,
 				tascaId);
 		model.addAttribute("document", document);
-		model.addAttribute("annexos", 
+		model.addAttribute("annexos",
 				documentService.findAnnexosAmbExpedient(
-						entitatActual.getId(), 
+						entitatActual.getId(),
 						document));
-		
+
 		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
 		command.setMotiu(
 				getMessage(
-						request, 
+						request,
 						"contenidor.document.portafirmes.camp.motiu.default") +
 				" [" + document.getExpedientPare().getNom() + "]");
-		
+
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
-				document.getMetaDocument().getId());		
-		
+				document.getMetaDocument().getId());
+
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
 		setFluxPredefinit(
-				metaDocument, 
-				model, 
+				metaDocument,
+				model,
 				command);
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		model.addAttribute("isNouEnviament", true);
@@ -130,7 +135,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isCreacioFluxUsuariActiu", isCreacioFluxUsuariActiu());
 		return "portafirmesForm";
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.POST)
 	public String portafirmesUploadPost(
 			HttpServletRequest request,
@@ -142,19 +147,19 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId, 
+				documentId,
 				tascaId);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				document.getMetaDocument().getId());
-		
+
 		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && (command.getPortafirmesResponsables() == null || command.getPortafirmesResponsables().length == 0)) {
 			bindingResult.rejectValue("portafirmesResponsables", "NotNull");
 		}
-		
+
 		if (bindingResult.hasErrors()) {
 			setFluxPredefinit(
-					metaDocument, 
-					model, 
+					metaDocument,
+					model,
 					command);
 			emplenarModelPortafirmes(
 					request,
@@ -166,20 +171,20 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB)) {
 			transaccioId = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		}
-		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && 
+		if (command.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) &&
 				(metaDocument.getPortafirmesFluxId() == null || metaDocument.getPortafirmesFluxId().isEmpty()) &&
-				(transaccioId == null || transaccioId.isEmpty()) && 
+				(transaccioId == null || transaccioId.isEmpty()) &&
 				(command.getPortafirmesEnviarFluxId() == null || command.getPortafirmesEnviarFluxId().isEmpty())) {
 			emplenarModelPortafirmes(
 					request,
 					documentId,
 					model);
 			setFluxPredefinit(
-					metaDocument, 
-					model, 
+					metaDocument,
+					model,
 					command);
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
 							request,
 							"document.controller.portafirmes.flux.ko"),
@@ -196,18 +201,18 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					command.getPortafirmesSequenciaTipus(),
 					command.getPortafirmesFluxTipus(),
 					command.getAnnexos(),
-					transaccioId, 
-					RolHelper.getRolActual(request), 
+					transaccioId,
+					RolHelper.getRolActual(request),
 					tascaId,
 					command.isAvisFirmaParcial(),
 					command.isFirmaParcial());
-			
+
 			return this.getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + documentId,
 					"document.controller.portafirmes.upload.ok",
-					new Object[] {document.getNom()});	
-			
+					new Object[] {document.getNom()});
+
 		} catch (Exception ex) {
 			String missatge = ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)
 					? getMessage(request,"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes") : ex.getCause().getMessage();
@@ -235,9 +240,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc != null || doc.getGesDocFirmatId() != null) {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"firma.info.processat.ko"),
 					exc);
 			return "redirect:./info?readOnly=" + readOnly + "&tascaId=" + (tascaId == null ? "" : tascaId);
@@ -248,23 +253,23 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					"firma.info.processat.ok");
 		}
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/portafirmes/reintentarGuardarArxiu", method = RequestMethod.GET)
 	public String portafirmesReintentarGuardarArxiu(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
-		
+
 		model.addAttribute(
-				"tascaId", 
+				"tascaId",
 				tascaId);
-		
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
 				documentId,
-				RolHelper.getRolActual(request), 
+				RolHelper.getRolActual(request),
 				tascaId);
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc == null) {
@@ -289,8 +294,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					root);
 		}
 	}
-	
-	
+
+
 
 	@RequestMapping(value = "/{documentId}/portafirmes/cancel", method = RequestMethod.GET)
 	public String portafirmesCancel(
@@ -301,8 +306,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		documentService.portafirmesCancelar(
 				entitatActual.getId(),
-				documentId, 
-				RolHelper.getRolActual(request), 
+				documentId,
+				RolHelper.getRolActual(request),
 				tascaId);
 		return this.getModalControllerReturnValueSuccess(
 				request,
@@ -319,15 +324,15 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			Model model) {
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			
+
 			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
 					entitatActual.getId(),
-					documentId, 
+					documentId,
 					null);
 			model.addAttribute(
 					"portafirmes",
 					portafirmes);
-			
+
 			String urlFluxFirmes = null;
 			try {
 				urlFluxFirmes = documentService.recuperarUrlViewEstatFluxDeFirmes(Long.valueOf(portafirmes.getPortafirmesId()));
@@ -335,21 +340,21 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				logger.error("Error al recuperar urlFluxFirmes: " +  portafirmes.getPortafirmesId() + ", " + portafirmes.getId()+ ", " + documentId);
 			}
 			model.addAttribute(
-					"urlFluxFirmes", 
+					"urlFluxFirmes",
 					urlFluxFirmes);
 
 			model.addAttribute(
-					"document", 
+					"document",
 					documentService.findById(entitatActual.getId(), documentId, tascaId));
-			
+
 			model.addAttribute(
-					"tascaId", 
+					"tascaId",
 					tascaId);
-			
+
 			model.addAttribute(
-					"readOnly", 
+					"readOnly",
 					readOnly);
-			
+
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
@@ -359,7 +364,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			}
 		return "portafirmesInfo";
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/viafirma/info", method = RequestMethod.GET)
 	public String viaFirmaInfo(
 			HttpServletRequest request,
@@ -442,31 +447,31 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			@RequestParam(value = "massiu", required = false, defaultValue = "false") boolean massiu,
 			Model model) {
-		
+
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request,
 				"massiu",
 				massiu);
-		
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId, 
+				documentId,
 				null);
 		model.addAttribute("document", document);
 		FirmaSimpleWebCommand command = new FirmaSimpleWebCommand();
 		command.setMotiu(getMessage(
-						request, 
+						request,
 						"contenidor.document.portafirmes.camp.motiu.default") +
 				" [" + document.getExpedientPare().getNom() + "]");
 		model.addAttribute(command);
 		model.addAttribute("tascaId", tascaId);
 		return "firmaSimpleWebForm";
 	}
-	
-	
-	
-	
+
+
+
+
 	@RequestMapping(value = "/{documentId}/firmaSimpleWebStart", method = RequestMethod.POST)
 	public String firmaSimpleWebStart(
 			HttpServletRequest request,
@@ -478,7 +483,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 
 		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
-		
+
 		if (bindingResult.hasErrors()) {
 			emplenarModelFirmaClient(
 					request,
@@ -491,19 +496,19 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActualId,
 				documentId);
 		fitxerPerFirmar.setId(documentId);
-		
+
 		String urlReturnToRipea = aplicacioService.propertyBaseUrl() + "/document/" + documentId + "/firmaSimpleWebEnd?tascaId=" + (tascaId == null ? "" : tascaId);
-		
+
 		String urlRedirectToPortafib = documentService.firmaSimpleWebStart(
 				fitxerPerFirmar,
 				command.getMotiu(),
 				urlReturnToRipea);
-		
+
 		return "redirect:" + urlRedirectToPortafib;
 
 	}
 
-	
+
 	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd")
 	public String firmaSimpleWebEnd(
 			HttpServletRequest request,
@@ -511,40 +516,40 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@PathVariable Long documentId,
 			@RequestParam(value = "transactionID", required = true) String transactionID,
 			@RequestParam(value = "tascaId", required = false) Long tascaId) throws Exception {
-		
+
 		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
-		
+
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
-		
+
 		if (firmaResultat.getStatus() == StatusEnumDto.OK && firmaResultat.getSignatures().get(0).getStatus() == StatusEnumDto.OK) {
-			
+
 			documentService.processarFirmaClient(
 					entitatActualId,
 					documentId,
-					firmaResultat.getSignatures().get(0).getFitxerFirmatNom(), 
-					firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(), 
-					RolHelper.getRolActual(request), 
+					firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
+					firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
+					RolHelper.getRolActual(request),
 					tascaId);
-			
+
 			MissatgesHelper.success(
 					request,
 					getMessage(
-							request, 
+							request,
 							"document.controller.firma.passarela.final.ok"));
 
 		} else if (firmaResultat.getStatus() == StatusEnumDto.WARNING) {
 			MissatgesHelper.warning(
 					request,
 					firmaResultat.getMsg());
-			
+
 		} else if (firmaResultat.getStatus() == StatusEnumDto.ERROR) {
 			MissatgesHelper.error(
 					request,
 					firmaResultat.getMsg());
 		}
-		
-		
+
+
 		boolean massiu = (boolean) RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				"massiu");
@@ -556,7 +561,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		}
 
 	}
-	
+
 
 
 	@RequestMapping(value = "/{documentId}/viafirma/upload", method = RequestMethod.GET)
@@ -564,14 +569,14 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) {
-		
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId, 
+				documentId,
 				null);
 		model.addAttribute("document", document);
-		
+
 		ViaFirmaEnviarCommand command = new ViaFirmaEnviarCommand();
 		command.setTitol(document.getPare().getNom());
 		command.setDescripcio(recuperarMotiu(
@@ -587,7 +592,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isDispositiusEnabled", isViaFirmaDispositiusEnabled());
 		return "viaFirmaForm";
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/viafirma/cancel", method = RequestMethod.GET)
 	public String viaFirmaCancel(
 			HttpServletRequest request,
@@ -603,7 +608,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				"document.controller.viafirma.cancel.ok");
 	}
 
-	
+
 	@RequestMapping(value = "/{documentId}/viafirma/upload", method = RequestMethod.POST)
 	public String viaFirmaUploadPost(
 			HttpServletRequest request,
@@ -649,7 +654,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		List<ViaFirmaUsuariDto> viaFirmaUsuarisDto = documentService.viaFirmaUsuaris(usuariActual);
 		return viaFirmaUsuarisDto;
 	}
-	
+
 	@RequestMapping(value = "/viafirma/dispositius/{viaFirmaUsuari}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ViaFirmaDispositiuDto> getDispositiusViaFirma(
@@ -663,7 +668,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				usuariActual);
 		return dispositius;
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/enviament/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public List<DocumentEnviamentDto> enviamentDatatable(
@@ -673,9 +678,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return documentEnviamentService.findNotificacionsAmbDocument(
 						entitatActual.getId(),
-						documentId);		
+						documentId);
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/urlValidacio", method = RequestMethod.GET)
 	@ResponseBody
 	public String getUrlValidacio(HttpServletRequest request, @PathVariable Long documentId) {
@@ -687,7 +692,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		}
 		return urlValidacio;
 	}
-	
+
 	@RequestMapping(value = "/{documentId}/convertir", method = RequestMethod.GET)
 	public String convertir(
 			HttpServletRequest request,
@@ -696,15 +701,41 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		Long pareId = contingutService.getPareId(
 				documentId);
 		documentService.documentActualitzarEstat(
-				entitatActual.getId(), 
-				documentId, 
+				entitatActual.getId(),
+				documentId,
 				DocumentEstatEnumDto.DEFINITIU);
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + pareId,
 				"document.controller.estat.canviat.ok");
 	}
-	
+
+    @RequestMapping(value = "/{documentId}/enviar", method = RequestMethod.GET)
+    public String enviarGet(
+            HttpServletRequest request,
+            @PathVariable Long documentId,
+            Model model) {
+
+        EnviarDocumentCommand command = new EnviarDocumentCommand();
+        model.addAttribute(command);
+        return "enviarDocumentEmail";
+    }
+
+    @RequestMapping(value = "/{documentId}/enviar", method = RequestMethod.POST)
+    public String enviarPost(
+            HttpServletRequest request,
+            @PathVariable Long documentId,
+            @Validated({EnviarDocumentCommand.Create.class}) EnviarDocumentCommand command) {
+
+        emailHelper.enviarDocument(documentId, command.getResponsablesCodi());
+        MissatgesHelper.success(
+                request,
+                getMessage(
+                        request,
+                        "bustia.pendent.accio.enviarViaEmail.success"));
+        return modalUrlTancar();
+    }
+
 	private void setFluxPredefinit(
 			MetaDocumentDto metaDocument,
 			Model model,
@@ -723,7 +754,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		}
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 	}
-	
+
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -742,12 +773,12 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId, 
+				documentId,
 				null);
 		model.addAttribute("document", document);
-		model.addAttribute("annexos", 
+		model.addAttribute("annexos",
 				documentService.findAnnexosAmbExpedient(
-						entitatActual.getId(), 
+						entitatActual.getId(),
 						document));
 		model.addAttribute(
 				"interessats",
@@ -773,23 +804,23 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			DocumentDto document) {
 		return getMessage(request, "document.controller.viafirma.motiu") + document.getNom() + " [" + document.getMetaNode().getNom() + "]";
 	}
-	
+
 	private boolean isViaFirmaDispositiusEnabled() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled"));
 	}
-	
+
 	private boolean isHabilitarAvisFirmaParcialActiu() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
 	}
-	
+
 	private boolean isFirmaParcialHabilitada() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.firma.parcial"));
 	}
-	
+
 	private boolean isCreacioFluxUsuariActiu() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.portafirmes.fluxos.usuaris"));
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
-	
+
 }
