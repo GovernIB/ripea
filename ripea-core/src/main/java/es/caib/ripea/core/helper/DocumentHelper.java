@@ -46,6 +46,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -1520,6 +1522,22 @@ public class DocumentHelper {
 		return documentsDto;
 	}
 
+	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes) {
+		Pageable pageable = new PageRequest(0, 1);
+		List<DocumentEntity> l = null;
+		
+		if (contentTypes!=null && contentTypes.size()>0) {
+			l = documentRepository.findLastByUuid(contentTypes, pageable).getContent();
+		} else {
+			l = documentRepository.findLastByUuid(pageable).getContent();
+		}
+		
+		if (l!=null && l.size()>0) {
+			return l.get(0);
+		} else {
+			return null;
+		}
+	}
 	
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,

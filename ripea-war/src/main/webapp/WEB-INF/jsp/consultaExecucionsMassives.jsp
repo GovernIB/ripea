@@ -290,7 +290,7 @@
 	<a href="<c:url value="/massiu/portafirmes"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tanca"/></a>
 	<button type="button" class="btn btn-primary" name="previousPage" value="previousPage"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.previous"/></button>
 	<button type="button" class="btn btn-primary" name="nextPage" value="nextPage"><spring:message code="comu.boto.next"/>&nbsp;<span class="fa fa-arrow-right"></span></button>
-	<button type="button" class="btn btn-primary" name="refrescar" value="refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.refresca"/></button>
+	<button type="button" class="btn btn-warning" name="refrescar" value="refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.refresca"/></button>
 </div>
 </body>
 </html>

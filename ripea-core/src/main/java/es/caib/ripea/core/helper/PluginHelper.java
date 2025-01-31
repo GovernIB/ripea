@@ -1,6 +1,7 @@
 package es.caib.ripea.core.helper;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,6 +39,8 @@ import org.jopendocument.dom.text.TextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -2863,7 +2866,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
-
+	
 	public String portafirmesUpload(
 			DocumentEntity document,
 			String motiu,
@@ -3361,8 +3364,7 @@ public class PluginHelper {
 		}
 	}
 
-	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles(
-			String idioma) {
+	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles(String idioma) {
 
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -7133,7 +7135,8 @@ public class PluginHelper {
 					String.class,
 					Properties.class).newInstance(
 							ConfigDto.prefix + ".",
-							configHelper.getAllPropertiesEntitatOrGeneral(
+							configHelper.getGroupPropertiesEntitatOrGeneral(
+									IntegracioHelper.INTCODI_VIAFIRMA,
 									entitatCodi));
 			viaFirmaPlugins.put(entitatCodi,plugin);
 			return plugin;
@@ -7683,6 +7686,201 @@ public class PluginHelper {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(
-			PluginHelper.class);
+	/**
+	 * F U N C I O N S   D E   D I A G N O S T I C
+	 * Cridades a les funcions mes lleugeres de cada integració.
+	 */
+	
+	public String portafirmesDiagnostic() {
+		try {
+			PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+			//portafirmesPlugin.findDocumentTipus();
+			portafirmesPlugin.recuperarCarrecs();
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	
+	public String firmaSimpleDiagnostic() {
+		try {
+			FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
+			firmaWebPlugin.firmaSimpleWebEnd("prova");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	
+	public String firmaServidorDiagnostic() {
+		try {
+			FirmaServidorPlugin firmaServidorPlugin = getFirmaServidorPlugin();
+			byte[] fileContent = llegirBytesResourceCore("/samples/blank.pdf");
+			firmaServidorPlugin.firmar("prova.pdf", "test salut integracio RIPEA", fileContent, "ca", "application/pdf");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	
+	public String arxiuDiagnostic() {
+		try {
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(null);
+			if (doc!=null) {
+				String uuid = doc.getArxiuUuid();
+				getArxiuPlugin().getPlugin().documentDetalls(uuid, null, false);
+				return null;
+			} else {
+				return "No hi ha cap fitxer pujat a l'arxiu per poder consultar.";
+			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	
+	public String gestorDocumentalDiagnostic() {
+		try {
+			GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
+			String id = gestioDocumentalPlugin.create("DIAGNOSTIC", llegirResourceCore("/samples/blank.pdf"));
+			gestioDocumentalPlugin.delete(id, "DIAGNOSTIC");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}			
+	}
+	
+	public String dadesUsuariDiagnostic() {
+		try {
+			DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			dadesUsuariPlugin.findAmbCodi(auth.getName());
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String notibDiagnostic() {
+		try {
+			NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+			notificacioPlugin.consultarNotificacio("1234");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String viaFirmaDiagnostic() {
+		try {
+			ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin();
+			viaFirmaPlugin.getDeviceUser(
+					configHelper.getConfig("es.caib.ripea.plugin.viafirma.caib.callback.username"),
+					configHelper.getConfig("es.caib.ripea.plugin.viafirma.caib.callback.password"));
+//			ViaFirmaDocument resultat = viaFirmaPlugin.downloadDocument("user", "pass", "prova");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String digitalitzacioDiagnostic() {
+		try {
+			DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
+			String idioma = aplicacioService.getUsuariActual().getIdioma();
+			List<DigitalitzacioPerfil> resultat = digitalitzacioPlugin.recuperarPerfilsDisponibles(idioma);
+			if (resultat==null || resultat.size()==0) {
+				return "No s'ha pogut recuperar cap perfil de firma disponible per el idioma "+idioma;
+			} else {
+				return null;
+			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String validaFirmaDiagnostic() {
+		try {
+			IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin();
+			validaSignaturaPlugin.getPlugin().getSupportedSignatureRequestedInformation();
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String gesConDiagnostic() {
+		try {
+			ProcedimentPlugin procedimentPlugin = getProcedimentPlugin();
+			procedimentPlugin.getUnitatAdministrativa("0000");
+			return null;
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String conversioDocumentsDiagnostic() {
+		try {
+			List<String> extensions = new ArrayList<String>();
+			extensions.add("application/msword");
+			extensions.add("application/vnd.oasis.opendocument.text");
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions);
+			if (doc!=null) {
+	        	FitxerDto fitxerNoPdf = documentHelper.getFitxerAssociat(doc, null);
+	    			ConversioArxiu convertit = getConversioPlugin().convertirPdfIEstamparUrl(
+	    					new ConversioArxiu(fitxerNoPdf.getNom(), fitxerNoPdf.getContingut()), null);
+				if (convertit!=null && convertit.getArxiuContingut()!=null && convertit.getArxiuContingut().length>0) {
+					return null;
+				} else {
+					return "El document convertit no té contingut o no es PDF com s'esperava.";
+				}
+			} else {
+				return "No hi ha cap fitxer ODT o DOC pujat a l'arxiu per poder convertir.";
+			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
+	}
+	
+	public String dadesExternesDiagnostic() {
+		try {
+			DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
+			List<Provincia> provincies = dadesExternesPlugin.provinciaFindAll();
+			if (provincies!=null && provincies.size()>0) {
+				return null;
+			} else {
+				return "La consulta no ha retornat cap provincia.";
+			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}		
+	}
+	
+	//Els fitxers han de estar a la ruta src/main/resources/es/caib/ripea/core
+	private InputStream llegirResourceCore(String finalPath) {
+		ClassLoader classLoader = PluginHelper.class.getClassLoader();
+		return classLoader.getResourceAsStream("es/caib/ripea/core"+finalPath);
+	}
+	
+	private byte[] llegirBytesResourceCore(String finalPath) {
+		InputStream inputStream = null;
+		ByteArrayOutputStream bos = null;
+		try {
+			ClassLoader classLoader = PluginHelper.class.getClassLoader();
+			inputStream = classLoader.getResourceAsStream("es/caib/ripea/core"+finalPath);
+			bos = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                bos.write(buffer, 0, bytesRead);
+            }
+            return buffer;
+		} catch (Exception ex) {
+			return null;
+		} finally {
+			if (bos!=null) { try {bos.close();} catch (Exception ex) {} }
+			if (inputStream!=null) { try {inputStream.close();} catch (Exception ex) {} }
+		}
+	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 }

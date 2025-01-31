@@ -1,13 +1,10 @@
 package es.caib.ripea.core.api.utils;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-
-import es.caib.ripea.core.api.dto.FitxerDto;
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,10 +14,20 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.security.crypto.codec.Base64;
+
+import es.caib.ripea.core.api.dto.FitxerDto;
 
 public class Utils {
 	
@@ -483,6 +490,44 @@ public class Utils {
 				}
 			}
 		}
+		return resultat;
+	}
+	
+	public static Map<Integer, String> peticioRest(String endpoint, String user, String pass)  {
+		
+		Map<Integer, String> resultat = new HashMap<Integer, String>();
+		BufferedReader in = null;
+				
+		try {
+			
+			URL url = new URL(endpoint);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setRequestMethod("GET");
+	
+	        // Añadir la autenticación básica
+	        if (user!=null && pass!=null) {
+		        String auth = user + ":" + pass;
+		        byte[] encodedAuth = Base64.encode(auth.getBytes());
+		        String authHeaderValue = "Basic " + new String(encodedAuth);
+		        connection.setRequestProperty("Authorization", authHeaderValue);
+	        }
+	
+	        int responseCode = connection.getResponseCode();
+	        in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	        String inputLine;
+	        StringBuffer response = new StringBuffer();
+	        while ((inputLine = in.readLine()) != null) {
+	            response.append(inputLine);
+	        }
+	        
+	        resultat.put(responseCode, response.toString());
+	        
+		} catch (Exception ex) {
+			resultat.put(500, ex.getMessage());
+		} finally {
+			try { if (in!=null) { in.close(); } } catch (Exception ex) {}
+		}
+		
 		return resultat;
 	}
 }

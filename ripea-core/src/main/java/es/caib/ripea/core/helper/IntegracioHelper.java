@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
@@ -28,23 +25,13 @@ import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.UsuariEntity;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Mètodes per a la gestió d'integracions.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Slf4j
 @Component
 public class IntegracioHelper {
 	
-	@Resource
-	private UsuariHelper usuariHelper;
-	
-	@Resource
-	private CacheHelper cacheHelper;
-	
-	@Resource
-	private ConfigHelper configHelper;
+	@Resource private UsuariHelper usuariHelper;
+	@Resource private CacheHelper cacheHelper;
+	@Resource private ConfigHelper configHelper;
 
 	public static final int DEFAULT_MAX_ACCIONS = 20;
 

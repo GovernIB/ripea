@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.util.ArrayList;
@@ -19,22 +16,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.base.Strings;
 
+import es.caib.ripea.core.api.dto.GenericDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
 import es.caib.ripea.core.api.dto.IntegracioEnumDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.IntegracioFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
-/**
- * Controlador per a la consulta d'accions de les integracions.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Controller
 @RequestMapping("/integracio")
 public class IntegracioController extends BaseUserController {
@@ -42,8 +36,7 @@ public class IntegracioController extends BaseUserController {
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
 	private static final String INTEGRACIO_FILTRE = "integracio_filtre";
 
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -64,7 +57,6 @@ public class IntegracioController extends BaseUserController {
 				accio,
 				model);
 	}
-	
 
 	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
 	public String postAmbCodi(
@@ -87,7 +79,6 @@ public class IntegracioController extends BaseUserController {
 		
 		return codi != null ? "redirect:/integracio/{codi}" : "redirect:/integracio";
 	}
-
 	
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
@@ -113,25 +104,34 @@ public class IntegracioController extends BaseUserController {
 		return "integracioList";
 	}
 
-	/*@RequestMapping(value = "/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesPagina<IntegracioAccioDto> datatable(
-			HttpServletRequest request,
-			Model model) {
-		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_FILTRE);
-		List<IntegracioAccioDto> accions = null;
-		if (codi != null) {
-			accions = integracioService.findDarreresAccionsByIntegracio(
-					codi);
-		} else {
-			accions = new ArrayList<IntegracioAccioDto>();
+	@RequestMapping(value = "/diagnostic", method = RequestMethod.GET)
+	public String integracioDiagnostic(HttpServletRequest request, Model model) {
+		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
+		for (IntegracioDto integracio : integracions) {
+			for (IntegracioEnumDto integracioEnum : IntegracioEnumDto.values()) {
+				if (integracioEnum.name().equals(integracio.getCodi())) {
+					integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class, "integracio.list.pipella." + integracio.getCodi()).getText());
+				}
+			}
 		}
-		return PaginacioHelper.getPaginaPerDatatables(
-				request,
-				accions);
-	}*/
+		for (int i=integracions.size()-1; i>=0; i--) {
+			if (IntegracioEnumDto.CALLBACK.name().equals(integracions.get(i).getCodi())) {
+				integracions.remove(i);
+			}
+		}
+		model.addAttribute("integracions", integracions);		
+		return "integracioDiagnostic";
+	}
+
+	@RequestMapping(value = "/diagnostic/{codi}", method = RequestMethod.GET)
+	@ResponseBody
+	public GenericDto integracioDiagnosticAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
+		GenericDto resultat = aplicacioService.integracioDiagnostic(codi);
+		String missatge = getMessage(request, resultat.getCodi(), resultat.getArguments());
+		resultat.setCodi(Utils.abbreviate(missatge, 200));
+		return resultat;
+	}
+	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {

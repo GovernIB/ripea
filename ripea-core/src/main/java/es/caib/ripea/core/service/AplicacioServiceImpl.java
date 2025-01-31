@@ -1,10 +1,23 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
+import es.caib.ripea.core.api.dto.GenericDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
 import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
@@ -25,6 +38,7 @@ import es.caib.ripea.core.helper.ExcepcioLogHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PinbalHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
@@ -34,56 +48,25 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-/**
- * Implementació dels mètodes per a gestionar la versió de l'aplicació.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private IntegracioHelper integracioHelper;
-	@Resource
-	private ExcepcioLogHelper excepcioLogHelper;
-	@Resource
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Resource
-	private GrupRepository grupRepository;
-	@Resource
-	private RolHelper rolHelper;
-    @Autowired
-    private EntitatRepository entitatRepository;
+	@Resource private UsuariRepository usuariRepository;
+	@Resource private CacheHelper cacheHelper;
+	@Resource private PluginHelper pluginHelper;
+	@Resource private PinbalHelper pinbalHelper;	
+	@Resource private ConversioTipusHelper conversioTipusHelper;
+	@Resource private IntegracioHelper integracioHelper;
+	@Resource private ExcepcioLogHelper excepcioLogHelper;
+	@Resource private UsuariHelper usuariHelper;
+	@Resource private GrupRepository grupRepository;
+	@Resource private RolHelper rolHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+    @Autowired private EntitatRepository entitatRepository;
 
 	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
@@ -503,7 +486,6 @@ public class AplicacioServiceImpl implements AplicacioService {
         return configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi);
     }
     
-    
     @Override
     @Transactional(readOnly = true)
     public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
@@ -516,8 +498,117 @@ public class AplicacioServiceImpl implements AplicacioService {
     	 return configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(groupCode, entitatCodi, organCodi);
     }
 	
-	
+	@Override
+	@Transactional(readOnly = true)
+	public GenericDto integracioDiagnostic(String codi) {
+		if (codi!=null) {
+			if (codi.equals(IntegracioHelper.INTCODI_PFIRMA)) {
+				String resultatDiagnostic = pluginHelper.portafirmesDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.pf.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.pf.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_FIRMASIMPLE)) {
+				String resultatDiagnostic = pluginHelper.firmaSimpleDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.fs.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.fs.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_FIRMASERV)) {
+				String resultatDiagnostic = pluginHelper.firmaServidorDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.fserv.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.fserv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_CALLBACK)) {
+				return new GenericDto("integracio.diag.cb.info", "fa fa-info-circle blau", new Object[] {codi});
+			} else if (codi.equals(IntegracioHelper.INTCODI_ARXIU)) {
+				String resultatDiagnostic = pluginHelper.arxiuDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.ax.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.ax.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_GESDOC)) {
+				String resultatDiagnostic = pluginHelper.gestorDocumentalDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.gd.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.gd.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_PINBAL)) {
+				String resultatDiagnostic = pinbalHelper.pinbalDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.pin.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.pin.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_USUARIS)) {
+				String resultatDiagnostic = pluginHelper.dadesUsuariDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.us.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.us.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_CONVERT)) {
+				String resultatDiagnostic = pluginHelper.conversioDocumentsDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.conv.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.conv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_DADESEXT)) {
+				String resultatDiagnostic = pluginHelper.dadesExternesDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.de.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.de.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_NOTIFICACIO)) {
+				String resultatDiagnostic = pluginHelper.notibDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.notib.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.notib.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_VIAFIRMA)) {
+				String resultatDiagnostic = pluginHelper.viaFirmaDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.via.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.via.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_DIGITALITZACIO)) {
+				String resultatDiagnostic = pluginHelper.digitalitzacioDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.digi.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.digi.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_VALIDASIG)) {
+				String resultatDiagnostic = pluginHelper.validaFirmaDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.vf.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.vf.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_PROCEDIMENT)) {
+				String resultatDiagnostic = pluginHelper.gesConDiagnostic();
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.gc.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.gc.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else {
+				return new GenericDto("integracio.diag.no", "fa fa-question-circle taronja", new Object[] {codi});
+			}
+		} else {
+			return new GenericDto("integracio.diag.nf", "fa fa-question-circle taronja", new Object[] {codi});
+		}
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
-
 }

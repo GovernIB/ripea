@@ -3,8 +3,19 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.util.List;
+import java.util.Properties;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
+import es.caib.ripea.core.api.dto.GenericDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
 import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
@@ -12,14 +23,6 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Implementació de AplicacioService com a EJB que empra una clase
@@ -287,5 +290,10 @@ public class AplicacioServiceBean implements AplicacioService {
 	public boolean mostrarLogsCercadorAnotacio() {
 		return delegate.mostrarLogsCercadorAnotacio();
 	}
-	
+
+	@Override
+	@RolesAllowed({"IPA_SUPER"})
+	public GenericDto integracioDiagnostic(String codi) {
+		return delegate.integracioDiagnostic(codi);
+	}
 }

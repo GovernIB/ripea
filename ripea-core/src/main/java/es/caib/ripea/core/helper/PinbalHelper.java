@@ -666,6 +666,19 @@ public class PinbalHelper {
 		return sn;
 	}
 
+	public String pinbalDiagnostic() {
+		try {
+			Map<Integer, String> resultat = Utils.peticioRest(getPinbalBaseUrl()+"/interna/recobriment/test", getPinbalUser(), getPinbalPassword());
+			if (resultat!=null && resultat.get(200)!=null) {
+				return null;
+			} else {
+				return "La resposta del metode test no ha estat l'esperada: "+resultat.toString();
+			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	
 	public FitxerDto getJustificante(String idPeticion) throws PinbalException {
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta del justificant";

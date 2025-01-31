@@ -605,3 +605,8 @@ dd.no_color {
     left: -9px;
     top: 4px;
 }
+
+.vermell { color: #e99ca8; }
+.verd    { color: #9cc976; }
+.taronja { color: #ffcc63; }
+.blau    { color: #54daf5; }

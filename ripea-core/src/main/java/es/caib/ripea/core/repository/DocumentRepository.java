@@ -34,6 +34,13 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
  */
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
+	//DocumentEntity findTopByOrderByIdDesc
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null order by data desc")
+	Page<DocumentEntity> findLastByUuid(Pageable pageable);
+	
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null and d.fitxerContentType in (:fitxerContentTypes) order by data desc")
+	Page<DocumentEntity> findLastByUuid(@Param("fitxerContentTypes") List<String> fitxerContentTypes, Pageable pageable);
+	
 	List<DocumentEntity> findByExpedientAndEstatAndEsborrat(
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat,
