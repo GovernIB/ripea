@@ -612,14 +612,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (root instanceof ConnectException || (root.getMessage() != null && root.getMessage().contains("timed out"))) {
 				msg = getMessage(request,"error.arxiu.connectTimedOut");
 			} else {
-				msg = root.getMessage();
+				msg = RolHelper.isRolActualAdministrador(request)
+                        ? root.getMessage()
+                        : "";
 			}
 			return getAjaxControllerReturnValueError(
 					request,
 					redirect,
 					"document.controller.guardar.arxiu.error",
 					new Object[] {msg},
-					root);
+                    RolHelper.isRolActualAdministrador(request)
+                        ? root
+                        : null);
 		}
 	}
 

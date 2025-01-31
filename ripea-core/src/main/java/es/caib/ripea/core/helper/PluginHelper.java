@@ -4445,21 +4445,27 @@ public class PluginHelper {
 					missatge = "Error no especificado al validar la firma del fichero.";
 				} else if (missatge.indexOf("SignedDataNotProvided")>0) {
 					missatge = "SignedDataNotProvided: Se debe aportar el fichero original.";
-				}
-				return new SignatureInfoDto(true, true, missatge);
+				} else if (!RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")) {
+                    missatge = "Error al detectar firma de document.";
+                }
+                return new SignatureInfoDto(true, true, missatge);
 			}
 		} catch (Exception e) {
 			Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
 			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
 					|| throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")
 					|| throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")
+					|| throwable.getMessage().contains("El documento OOXML no está firmado.(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")
 					|| throwable.getMessage().contains("La firma proporcionada no contiene un nodo <ds:Signature>")) {
 				return new SignatureInfoDto(false, false, null);
 			} else {
 				logger.error(
 						"Error al detectar firma de document",
 						e);
-				return new SignatureInfoDto(false, true, e.getMessage());
+				return new SignatureInfoDto(false, true,
+                        RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")
+                        ? e.getMessage()
+                        : "Error al detectar firma de document.");
 			}
 		}
 	}
