@@ -752,6 +752,8 @@ public interface DocumentService {
 			Long expedientId, 
 			List<ArbreJsonDto> selectedElements, 
 			String rolActual, 
-			Long tascaId) throws IOException;	
+			Long tascaId) throws IOException;
 
+    @PreAuthorize("hasRole('tothom')")
+    public void enviarDocument(Long documentId, List<String> desinataris);
 }

@@ -89,8 +89,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private OrganGestorService organGestorService;
-    @Autowired
-    private EmailHelper emailHelper;
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -727,7 +725,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
             @PathVariable Long documentId,
             @Validated({EnviarDocumentCommand.Create.class}) EnviarDocumentCommand command) {
 
-        emailHelper.enviarDocument(documentId, command.getResponsablesCodi());
+        documentService.enviarDocument(documentId, command.getResponsablesCodi());
         MissatgesHelper.success(
                 request,
                 getMessage(

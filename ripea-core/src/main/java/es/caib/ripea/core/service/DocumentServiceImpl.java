@@ -13,6 +13,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,24 +97,7 @@ import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DateHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.DocumentNotificacioHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExceptionHelper;
-import es.caib.ripea.core.helper.IntegracioHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.OrganGestorHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PinbalHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.SynchronizationHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.ConsultaPinbalRepository;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
@@ -161,6 +145,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private EntitatRepository entitatRepository;
+    @Autowired private EmailHelper emailHelper;
 
 	@Transactional
 	@Override
@@ -485,7 +470,11 @@ public class DocumentServiceImpl implements DocumentService {
 		return toDocumentDto(document);
 	}
 
-
+    @Transactional
+    @Override
+    public void enviarDocument(Long documentId, List<String> desinataris){
+        emailHelper.enviarDocument(documentId, desinataris);
+    }
 	
 	
 	@Transactional

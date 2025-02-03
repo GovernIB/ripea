@@ -643,4 +643,10 @@ public class DocumentServiceBean implements DocumentService {
 	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException {
 		return delegate.updateCsvInfo(documentId);
 	}
+
+    @Override
+    @RolesAllowed("tothom")
+    public void enviarDocument(Long documentId, List<String> desinataris){
+        delegate.enviarDocument(documentId,desinataris);
+    }
 }
