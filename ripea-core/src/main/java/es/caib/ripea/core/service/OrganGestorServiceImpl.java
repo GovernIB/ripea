@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -102,16 +103,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAll() {
-		List<OrganGestorEntity> organs = organGestorRepository.findAll();
+		List<OrganGestorEntity> organs = organGestorRepository.findAll(new Sort(Sort.Direction.ASC, "nom"));
 		return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 	}
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		logger.debug("Consulta del organ gestor (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
-
 		OrganGestorEntity organGestor = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, id, false);
 		OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
 		resposta.setPareId(organGestor.getPare() != null ? organGestor.getPare().getId() : null);

@@ -186,9 +186,12 @@ public class ConfigHelper {
 
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral)  {
+    	return getConfig(keyGeneral, getEntitatActualCodi(), getOrganActualCodi());
+    }
+    
+    @Transactional(readOnly = true)
+    public String getConfig(String keyGeneral, String entitatCodi, String organCodi)  {
 
-    	String entitatCodi  = getEntitatActualCodi();
-        String organCodi = getOrganActualCodi();
 		String value = null;
 		ConfigEntity config = configRepository.findOne(keyGeneral);
 		if (config == null) {

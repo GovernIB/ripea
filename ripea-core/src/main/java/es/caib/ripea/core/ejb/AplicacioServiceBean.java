@@ -13,6 +13,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.DiagnosticFiltreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import es.caib.ripea.core.api.dto.GenericDto;
@@ -293,7 +294,7 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"IPA_SUPER"})
-	public GenericDto integracioDiagnostic(String codi) {
-		return delegate.integracioDiagnostic(codi);
+	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre) {
+		return delegate.integracioDiagnostic(codi, filtre);
 	}
 }

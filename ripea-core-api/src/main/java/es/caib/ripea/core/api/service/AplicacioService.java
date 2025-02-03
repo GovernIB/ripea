@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.DiagnosticFiltreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import es.caib.ripea.core.api.dto.GenericDto;
@@ -82,7 +83,7 @@ public interface AplicacioService {
 	public List<IntegracioDto> integracioFindAll();
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
-	public GenericDto integracioDiagnostic(String codi);
+	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre);
 	
 	/**
 	 * Obté la llista de les darreres accions realitzades a una integració.

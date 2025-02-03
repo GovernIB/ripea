@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.war.command.EnviarDocumentCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +52,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.command.EnviarDocumentCommand;
 import es.caib.ripea.war.command.FirmaSimpleWebCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.ViaFirmaEnviarCommand;

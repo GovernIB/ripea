@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.DiagnosticFiltreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import es.caib.ripea.core.api.dto.GenericDto;
@@ -500,24 +501,24 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public GenericDto integracioDiagnostic(String codi) {
+	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre) {
 		if (codi!=null) {
 			if (codi.equals(IntegracioHelper.INTCODI_PFIRMA)) {
-				String resultatDiagnostic = pluginHelper.portafirmesDiagnostic();
+				String resultatDiagnostic = pluginHelper.portafirmesDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.pf.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.pf.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_FIRMASIMPLE)) {
-				String resultatDiagnostic = pluginHelper.firmaSimpleDiagnostic();
+				String resultatDiagnostic = pluginHelper.firmaSimpleDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.fs.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.fs.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_FIRMASERV)) {
-				String resultatDiagnostic = pluginHelper.firmaServidorDiagnostic();
+				String resultatDiagnostic = pluginHelper.firmaServidorDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.fserv.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
@@ -526,77 +527,77 @@ public class AplicacioServiceImpl implements AplicacioService {
 			} else if (codi.equals(IntegracioHelper.INTCODI_CALLBACK)) {
 				return new GenericDto("integracio.diag.cb.info", "fa fa-info-circle blau", new Object[] {codi});
 			} else if (codi.equals(IntegracioHelper.INTCODI_ARXIU)) {
-				String resultatDiagnostic = pluginHelper.arxiuDiagnostic();
+				String resultatDiagnostic = pluginHelper.arxiuDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.ax.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.ax.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_GESDOC)) {
-				String resultatDiagnostic = pluginHelper.gestorDocumentalDiagnostic();
+				String resultatDiagnostic = pluginHelper.gestorDocumentalDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.gd.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.gd.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_PINBAL)) {
-				String resultatDiagnostic = pinbalHelper.pinbalDiagnostic();
+				String resultatDiagnostic = pinbalHelper.pinbalDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.pin.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.pin.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_USUARIS)) {
-				String resultatDiagnostic = pluginHelper.dadesUsuariDiagnostic();
+				String resultatDiagnostic = pluginHelper.dadesUsuariDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.us.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.us.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_CONVERT)) {
-				String resultatDiagnostic = pluginHelper.conversioDocumentsDiagnostic();
+				String resultatDiagnostic = pluginHelper.conversioDocumentsDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.conv.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.conv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_DADESEXT)) {
-				String resultatDiagnostic = pluginHelper.dadesExternesDiagnostic();
+				String resultatDiagnostic = pluginHelper.dadesExternesDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.de.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.de.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_NOTIFICACIO)) {
-				String resultatDiagnostic = pluginHelper.notibDiagnostic();
+				String resultatDiagnostic = pluginHelper.notibDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.notib.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.notib.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_VIAFIRMA)) {
-				String resultatDiagnostic = pluginHelper.viaFirmaDiagnostic();
+				String resultatDiagnostic = pluginHelper.viaFirmaDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.via.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.via.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_DIGITALITZACIO)) {
-				String resultatDiagnostic = pluginHelper.digitalitzacioDiagnostic();
+				String resultatDiagnostic = pluginHelper.digitalitzacioDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.digi.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.digi.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_VALIDASIG)) {
-				String resultatDiagnostic = pluginHelper.validaFirmaDiagnostic();
+				String resultatDiagnostic = pluginHelper.validaFirmaDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.vf.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.vf.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
 				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_PROCEDIMENT)) {
-				String resultatDiagnostic = pluginHelper.gesConDiagnostic();
+				String resultatDiagnostic = pluginHelper.gesConDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
 					return new GenericDto("integracio.diag.gc.ok", "fa fa-check verd", new Object[] {codi});
 				} else {

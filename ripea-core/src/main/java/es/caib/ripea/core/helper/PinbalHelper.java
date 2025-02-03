@@ -58,6 +58,7 @@ import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
+import es.caib.ripea.core.api.dto.DiagnosticFiltreDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
@@ -666,13 +667,16 @@ public class PinbalHelper {
 		return sn;
 	}
 
-	public String pinbalDiagnostic() {
+	public String pinbalDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
-			Map<Integer, String> resultat = Utils.peticioRest(getPinbalBaseUrl()+"/interna/recobriment/test", getPinbalUser(), getPinbalPassword());
+			Map<Integer, String> resultat = Utils.peticioRest(
+					getPinbalBaseUrl(filtre.getEntitatCodi(), filtre.getOrganCodi())+"/interna/recobriment/test",
+					getPinbalUser(filtre.getEntitatCodi(), filtre.getOrganCodi()),
+					getPinbalPassword(filtre.getEntitatCodi(), filtre.getOrganCodi()));
 			if (resultat!=null && resultat.get(200)!=null) {
 				return null;
 			} else {
-				return "La resposta del metode test no ha estat l'esperada: "+resultat.toString();
+				return "La resposta del mètode test no ha estat l'esperada: "+resultat.toString();
 			}
 		} catch (Exception ex) {
 			return ex.getMessage();
@@ -1170,6 +1174,9 @@ public class PinbalHelper {
 	private String getPinbalBaseUrl() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");
 	}
+	private String getPinbalBaseUrl(String entitatCodi, String organCodi) {
+		return configHelper.getConfig("es.caib.ripea.pinbal.base.url", entitatCodi, organCodi);
+	}
 	private String getPinbalEndpointName() {
 		String resultat = configHelper.getConfig("es.caib.ripea.pinbal.endpointName");
 		if (Utils.isEmpty(resultat)) {
@@ -1183,6 +1190,12 @@ public class PinbalHelper {
 	private String getPinbalPassword() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.password");
 	}
+	private String getPinbalUser(String entitatCodi, String organCodi) {
+		return configHelper.getConfig("es.caib.ripea.pinbal.user", entitatCodi, organCodi);
+	}
+	private String getPinbalPassword(String entitatCodi, String organCodi) {
+		return configHelper.getConfig("es.caib.ripea.pinbal.password", entitatCodi, organCodi);
+	}	
 	private boolean getPinbalBasicAuth() {
 		return configHelper.getAsBoolean("es.caib.ripea.pinbal.basic.auth");
 	}
