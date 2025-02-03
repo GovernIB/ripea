@@ -8,7 +8,7 @@
 
 
 <c:set var="expedientId" scope="request" value="${contingut.expedientId}" />
-<c:set var="expedient" scope="request" value="${contingut.expedientObject}" />
+<%--<c:set var="expedient" scope="request" value="${contingut.expedientObject}" />--%>
 
 <c:set var="expedientAgafatPerUsuariActual" scope="request">
 	<c:choose>

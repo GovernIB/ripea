@@ -995,7 +995,16 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		
 		if (tascaId == null) {
 			if (contingut instanceof CarpetaDto) {
-				contingut = contingut.getExpedientPare();
+                contingut = contingutService.findAmbIdUser(
+                        entitatActual.getId(),
+                        contingut.getExpedientPare().getId(),
+                        true,
+                        true,
+                        true,
+                        RolHelper.getRolActual(request),
+                        false,
+                        expedientHelper.isVistaTreetablePerTipusDocuments(request),
+                        expedientHelper.isVistaTreetablePerEstats(request));
 			}
 			if (contingut instanceof ExpedientDto) {
 				model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
@@ -1017,6 +1026,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 			}
 			if (contingut instanceof ExpedientDto || contingut instanceof DocumentDto) {
+                model.addAttribute("expedient", contingut.getExpedientObject());
 				model.addAttribute(
 						"metaDades",
 						metaDadaService.findByNode(
@@ -1028,9 +1038,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 								entitatActual.getId(),
 								contingut.getId(),
 								((NodeDto)contingut).getDades()));
-			} 
+			}
 
-			
+
 			model.addAttribute(
 					"registreTipusEnumOptions",
 					EnumHelper.getOptionsForEnum(
