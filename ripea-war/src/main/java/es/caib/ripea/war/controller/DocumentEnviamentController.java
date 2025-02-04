@@ -83,12 +83,22 @@ public class DocumentEnviamentController extends BaseUserController {
 		command.setDataCaducitat(sumarDiesNaturals(numDies));
 		command.setDocumentId(documentId);
 		model.addAttribute(command);
-		emplenarModelNotificacio(
-				request,
-				getEntitatActualComprovantPermisos(request),
-				documentId,
-				command,
-				model, null);
+        try {
+            EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+            emplenarModelNotificacio(
+                    request,
+                    entitatActual,
+                    documentId,
+                    command,
+                    model, null);
+        }catch (SecurityException e){
+            e.printStackTrace();
+            MissatgesHelper.error(
+                    request,
+                    getMessage(request,"entitat.list.consulta.ajax.error")+": "+e.getMessage(),
+                    e);
+        }
+
 		return "notificacioForm";
 	}
 
@@ -123,19 +133,19 @@ public class DocumentEnviamentController extends BaseUserController {
 		if (nifsErrorPostal) {
 			bindingResult.reject("notificacio.controller.reject.postal");
 		}
-		
-		if (bindingResult.hasErrors()) {
-			emplenarModelNotificacio(
-					request,
-					getEntitatActualComprovantPermisos(request),
-					documentId,
-					command,
-					model, null);
-			return "notificacioForm";
-		}
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		try {
+
+        try {
+            EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+            if (bindingResult.hasErrors()) {
+                emplenarModelNotificacio(
+                        request,
+                        entitatActual,
+                        documentId,
+                        command,
+                        model, null);
+                return "notificacioForm";
+            }
+
 			Map<String, String> errorsNotib = documentEnviamentService.notificacioCreate(
 					entitatActual.getId(),
 					documentId,

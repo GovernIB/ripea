@@ -26,10 +26,13 @@ public class BaseUserController extends BaseController {
 			HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request, entitatService);
 		if (entitat == null) {
-			throw new SecurityException("No te cap entitat assignada");
+			throw new SecurityException("No te cap entitat assignada. Contactau amb l'administrador");
+		}
+		if (entitat.getCodi() == null) {
+			throw new SecurityException("La entitat assignada no te codi. Contactau amb l'administrador");
 		}
 		if (!entitat.isUsuariActualRead()) {
-			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari");
+			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari. Contactau amb l'administrador");
 		}
 		return entitat;
 	}
