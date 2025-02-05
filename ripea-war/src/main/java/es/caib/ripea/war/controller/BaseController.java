@@ -397,9 +397,9 @@ public class BaseController implements MessageSourceAware {
 		} else {
 			model.addAttribute("entregaPostal", false);
 
-            if ( document.getExpedientPare().getOrganGestorId() == null ) {
+            if ( !entitatActual.isPermetreEnviamentPostal() ) {
                 model.addAttribute("entregaPostalMsg", "notificacio.form.entregapostal.err");
-            } else {
+            } else if (document.getExpedientPare().getOrganGestorId() != null){
                 model.addAttribute("entregaPostalMsg", "notificacio.form.entregapostal.err.desc");
             }
 		}
