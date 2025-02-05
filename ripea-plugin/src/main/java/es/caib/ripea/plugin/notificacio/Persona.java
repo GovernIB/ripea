@@ -1,5 +1,6 @@
 package es.caib.ripea.plugin.notificacio;
 
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +21,6 @@ public class Persona {
 	private String telefon;
 	private String email;
 	private InteressatTipusEnumDto interessatTipus;
+	private InteressatDocumentTipusEnumDto documentTipus;
 	private boolean incapacitat;
 }

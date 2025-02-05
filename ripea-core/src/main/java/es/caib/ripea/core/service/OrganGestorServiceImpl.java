@@ -1252,13 +1252,4 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private String msg(String codi, Object... params) {
 		return messageHelper.getMessage(codi, params);
 	}
-
-	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActualRolDisseny(
-			Long entitatId,
-			String filter,
-			boolean directOrganPermisRequired) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

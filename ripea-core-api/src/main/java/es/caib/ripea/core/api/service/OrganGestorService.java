@@ -236,12 +236,6 @@ public interface OrganGestorService {
 			Long entitatId,
 			String filter, 
 			boolean directOrganPermisRequired);
-	
-	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findAccessiblesUsuariActualRolDisseny(
-			Long entitatId,
-			String filter, 
-			boolean directOrganPermisRequired);
 
 	@PreAuthorize("hasRole('tothom')")
 	public OrganGestorDto findItemByEntitatAndCodi(
