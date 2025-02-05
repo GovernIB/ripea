@@ -4861,32 +4861,35 @@ public class PluginHelper {
 
 		try {
 
-			RespostaConsultaEstatEnviament resposta = notificacioPlugin.consultarEnviament(
-					documentEnviamentInteressatEntity.getEnviamentReferencia());
-
-			documentEnviamentInteressatEntity.updateEnviamentEstat(
-					resposta.getEstat(),
-					resposta.getEstatData(),
-					resposta.getEstatOrigen(),
-					documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
-					resposta.getCertificacioOrigen(),
-					resposta.isError(),
-					resposta.getErrorDescripcio());
-
-			documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
-					resposta.getRegistreData(),
-					resposta.getRegistreNumero(),
-					resposta.getRegistreNumeroFormatat());
-
-			guardarCertificacio(
-					documentEnviamentInteressatEntity,
-					resposta);
+			RespostaConsultaEstatEnviament resposta = null;
+			
+			if (documentEnviamentInteressatEntity.getEnviamentReferencia()!=null) {
+			
+				resposta = notificacioPlugin.consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
+	
+				documentEnviamentInteressatEntity.updateEnviamentEstat(
+						resposta.getEstat(),
+						resposta.getEstatData(),
+						resposta.getEstatOrigen(),
+						documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
+						resposta.getCertificacioOrigen(),
+						resposta.isError(),
+						resposta.getErrorDescripcio());
+	
+				documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
+						resposta.getRegistreData(),
+						resposta.getRegistreNumero(),
+						resposta.getRegistreNumeroFormatat());
+				
+				guardarCertificacio(documentEnviamentInteressatEntity, resposta);
+			}
 
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = notificacioPlugin.consultarNotificacio(
 					notificacio.getNotificacioIdentificador());
+			
 			notificacio.updateNotificacioEstat(
 					respostaNotificioEstat.getEstat(),
-					resposta.getEstatData(),
+					resposta!=null?resposta.getEstatData():Calendar.getInstance().getTime(),
 					respostaNotificioEstat.isError(),
 					respostaNotificioEstat.getErrorDescripcio(),
 					respostaNotificioEstat.getDataEnviada(),
@@ -5990,50 +5993,32 @@ public class PluginHelper {
 				extensioAmbPunt);
 	}
 
-	private Persona convertirAmbPersona(
-			InteressatEntity interessat) {
-
-		interessat = HibernateHelper.deproxy(
-				interessat);
+	private Persona convertirAmbPersona(InteressatEntity interessat) {
+		interessat = HibernateHelper.deproxy(interessat);
 		Persona persona = new Persona();
-		persona.setNif(
-				interessat.getDocumentNum());
+		persona.setNif(interessat.getDocumentNum());
+		persona.setDocumentTipus(interessat.getDocumentTipus());
 		if (interessat instanceof InteressatPersonaFisicaEntity) {
 			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity) interessat;
-			persona.setNom(
-					interessatPf.getNom());
-			persona.setLlinatge1(
-					interessatPf.getLlinatge1());
-			persona.setLlinatge2(
-					interessatPf.getLlinatge2());
-			persona.setInteressatTipus(
-					InteressatTipusEnumDto.PERSONA_FISICA);
+			persona.setNom(interessatPf.getNom());
+			persona.setLlinatge1(interessatPf.getLlinatge1());
+			persona.setLlinatge2(interessatPf.getLlinatge2());
+			persona.setInteressatTipus(InteressatTipusEnumDto.PERSONA_FISICA);
 		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
 			InteressatPersonaJuridicaEntity interessatPj = (InteressatPersonaJuridicaEntity) interessat;
-			persona.setRaoSocial(
-					interessatPj.getRaoSocial());
-			persona.setInteressatTipus(
-					InteressatTipusEnumDto.PERSONA_JURIDICA);
+			persona.setRaoSocial(interessatPj.getRaoSocial());
+			persona.setInteressatTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
 		} else if (interessat instanceof InteressatAdministracioEntity) {
 			InteressatAdministracioEntity interessatA = (InteressatAdministracioEntity) interessat;
-			persona.setInteressatTipus(
-					InteressatTipusEnumDto.ADMINISTRACIO);
-			UnitatOrganitzativaDto unitatOrganitzativaDto = unitatOrganitzativaHelper.findAmbCodi(
-					interessatA.getOrganCodi());
-			persona.setNif(
-					unitatOrganitzativaDto.getNifCif());
-			persona.setNom(
-					unitatOrganitzativaDto.getDenominacioCooficial());
-			persona.setCodiDir3(
-					unitatOrganitzativaDto.getCodi());
+			persona.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			UnitatOrganitzativaDto unitatOrganitzativaDto = unitatOrganitzativaHelper.findAmbCodi(interessatA.getOrganCodi());
+			persona.setNif(unitatOrganitzativaDto.getNifCif());
+			persona.setNom(unitatOrganitzativaDto.getDenominacioCooficial());
+			persona.setCodiDir3(unitatOrganitzativaDto.getCodi());
 		}
-		persona.setTelefon(
-				Utils.extractNumbers(
-						interessat.getTelefon()));
-		persona.setEmail(
-				interessat.getEmail());
-		persona.setIncapacitat(
-				interessat.getIncapacitat());
+		persona.setTelefon(Utils.extractNumbers(interessat.getTelefon()));
+		persona.setEmail(interessat.getEmail());
+		persona.setIncapacitat(interessat.getIncapacitat());
 		return persona;
 	}
 

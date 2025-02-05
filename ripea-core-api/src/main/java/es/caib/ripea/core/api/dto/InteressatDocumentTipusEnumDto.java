@@ -35,4 +35,8 @@ public enum InteressatDocumentTipusEnumDto {
         }
         throw new IllegalArgumentException("No matching type in InteressatDocumentTipusEnumDto for code " + label);
     }
+	
+	public static boolean isNotificableTelematic(InteressatDocumentTipusEnumDto tipusDoc) {
+		return tipusDoc.equals(NIF) || tipusDoc.equals(DOCUMENT_IDENTIFICATIU_ESTRANGERS);
+	}
 }

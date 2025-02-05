@@ -139,19 +139,12 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	@Column(name = "arxiu_reintents")
 	protected int arxiuReintents;
 
-	@OneToMany(
-			mappedBy = "interessat",
-			fetch = FetchType.LAZY,
-			orphanRemoval = true)
+	@OneToMany(mappedBy = "interessat", fetch = FetchType.LAZY, orphanRemoval = true)
 	private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
-	
 
-	@Transient
-	private String paisNom;
-	@Transient
-	private String provinciaNom;
-	@Transient
-	private String municipiNom;
+	@Transient private String paisNom;
+	@Transient private String provinciaNom;
+	@Transient private String municipiNom;
 
 	public Long getRepresentantId() {
 		Long representantId = null;
@@ -247,6 +240,19 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		if (dto.getEntregaDeh()!=null) { this.entregaDeh = dto.getEntregaDeh(); }
 		if (dto.getEntregaDehObligat()!=null) { this.entregaDehObligat = dto.getEntregaDehObligat(); }
 		if (dto.getIncapacitat()!=null) { this.incapacitat = dto.getIncapacitat(); }
+	}
+	
+	public boolean isNotificableTelematicament() {
+		if (this.getRepresentant()==null) {
+			if (this.getDocumentTipus()!=null && InteressatDocumentTipusEnumDto.isNotificableTelematic(this.getDocumentTipus())) {
+				return true;
+			}
+		} else {
+			if (this.getRepresentant().getDocumentTipus()!=null && InteressatDocumentTipusEnumDto.isNotificableTelematic(this.getRepresentant().getDocumentTipus())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static Builder getBuilder(

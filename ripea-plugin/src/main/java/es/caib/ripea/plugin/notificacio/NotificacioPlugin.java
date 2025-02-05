@@ -1,5 +1,7 @@
 package es.caib.ripea.plugin.notificacio;
 
+import java.util.List;
+
 import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 
@@ -17,8 +19,12 @@ public interface NotificacioPlugin extends RipeaEndpointPluginInfo {
 	 * @return la informació resultant de l'enviament de la notificació.
 	 * @throws SistemaExternException
 	 */
-	public RespostaEnviar enviar(
-			Notificacio notificacio) throws SistemaExternException;
+	public RespostaEnviar enviar(Notificacio notificacio) throws SistemaExternException;
+	
+	/**
+	 * Amplia x dies la data de caducitat dels enviaments.
+	 */
+	public RespostaAmpliarPlazo ampliarPlazo(List<String> identificadorsEnviaments, String motivo, int dies) throws SistemaExternException;
 
 	/**
 	 * Consulta l'estat d'una notificació.

@@ -83,13 +83,13 @@ $(document).ready(function() {
 		var noNif = false;
 		var administracioSir = false;
 		$(notificacions).each(function(index, notificacio) {
-			//if selected
 			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
 	    		notificacionsSeleccionades.push(notificacio);
 	    		var titular = notificacio.titular;
 	    		var destinatari = notificacio.destinatari;
 	    		if (titular.personaFisica) {
-		    		if ((destinatari == null && titular.documentTipus!='NIF' && titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (destinatari != null && destinatari.documentTipus!='NIF' && destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+		    		if ((destinatari == null && titular.documentTipus!='NIF' && titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS') ||
+				    	(destinatari != null && destinatari.documentTipus!='NIF' && destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
 		    			noNif = true;
 					}
 				}
@@ -124,12 +124,11 @@ $(document).ready(function() {
 		event.preventDefault();
 		
 		let continuar = true;
-		const notificacioSenseNifMsg = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm" />";
 		let enviamentsSenseNif = getNotificacionsSenseNif();
 
 		if (enviamentsSenseNif.length > 0) {
 			continuar = false;
-			let missatge = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm" />";
+			let missatge = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm.body" />";
 
 			missatge += "<ul>";
 			enviamentsSenseNif.forEach(function(notificacio, index) {
@@ -138,7 +137,7 @@ $(document).ready(function() {
 			missatge += "</ul>";
 
 			bootbox.confirm({
-				title: "Enviar?",
+				title: "<spring:message code="notificacio.form.notificacio.sense.nif.confirm.title" />",
 				size: "large",
 				message: missatge,
 				locale: 'ca',
@@ -239,7 +238,7 @@ function getNotificacionsSenseNif() {
 		if (notificacio.titular.personaFisica) {
 			//if selected
 			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
-	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS') || (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
 	    			notificacionsSenseNif.push(notificacio);
 				}
 			}

@@ -1,17 +1,14 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.service.*;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.war.command.DocumentNotificacionsCommand;
-import es.caib.ripea.war.command.InteressatCommand;
-import es.caib.ripea.war.command.NotificacioEnviamentCommand;
-import es.caib.ripea.war.helper.*;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +23,32 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.support.RequestContext;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DadesExternesService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.service.PinbalServeiService;
+import es.caib.ripea.war.command.DocumentNotificacionsCommand;
+import es.caib.ripea.war.command.InteressatCommand;
+import es.caib.ripea.war.command.NotificacioEnviamentCommand;
+import es.caib.ripea.war.helper.AjaxHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.ModalHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador base que implementa funcionalitats comunes.
@@ -43,7 +60,6 @@ public class BaseController implements MessageSourceAware {
 	@Autowired private ExpedientInteressatService expedientInteressatService;
 	@Autowired private ContingutService contingutService;
 	@Autowired private DadesExternesService dadesExternesService;
-	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PinbalServeiService pinbalServeiService;
 	@Autowired private OrganGestorService organGestorService;
 	MessageSource messageSource;

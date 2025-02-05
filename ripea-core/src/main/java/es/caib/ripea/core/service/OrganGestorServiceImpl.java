@@ -1257,15 +1257,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return messageHelper.getMessage(codi, params);
 	}
 
-	@Override
-	public List<OrganGestorDto> findAccessiblesUsuariActualRolDisseny(
-			Long entitatId,
-			String filter,
-			boolean directOrganPermisRequired) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
     @Override
     public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor) {
         OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);

@@ -29,7 +29,6 @@ import es.caib.notib.client.domini.EnviamentTipus;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioCanviClient;
-import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Registre;
 import es.caib.notib.client.domini.RespostaAltaV2;
@@ -38,10 +37,16 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.client.domini.ServeiTipus;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
+import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
+import es.caib.notib.client.domini.ampliarPlazo.Envios;
+import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.notificacio.AmpliacioPlazo;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
@@ -49,6 +54,7 @@ import es.caib.ripea.plugin.notificacio.Notificacio;
 import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
+import es.caib.ripea.plugin.notificacio.RespostaAmpliarPlazo;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
@@ -354,25 +360,21 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}
 
 	public void testCallbackNotificaCanvi(String identificador, String referenciaEnviament) {
-		
 		final String NOTIFICACIO_SERVICE_PATH = "/notificaCanvi";
 		NotificacioCanviClient notificacio;
 		String baseUrl;
 		baseUrl = "http://localhost:8080/ripea/rest/notib";
-		notificacio = new NotificacioCanviClient(
-				identificador, 
-				referenciaEnviament);
+		notificacio = new NotificacioCanviClient(identificador, referenciaEnviament);
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH;
 			ObjectMapper mapper  = new ObjectMapper();
 			String body = mapper.writeValueAsString(notificacio);
 			Client jerseyClient = Client.create();
 			jerseyClient.addFilter(new LoggingFilter(System.out));
-			ClientResponse response = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(ClientResponse.class, body);
-				
+			jerseyClient.
+				resource(urlAmbMetode).
+				type("application/json").
+				post(ClientResponse.class, body);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -458,25 +460,33 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			p.setRaoSocial(persona.getRaoSocial());
 			p.setTelefon(persona.getTelefon());
 			p.setEmail(persona.getEmail());
-			p.setInteressatTipus(toInteressatTipusEnumDto(persona.getInteressatTipus()));
+			p.setInteressatTipus(toInteressatTipusEnumDto(persona.getInteressatTipus(), persona.getDocumentTipus()));
 			p.setIncapacitat(persona.isIncapacitat());
 		}
 		return p;
 	}
 	
-	private InteressatTipus toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
+	private InteressatTipus toInteressatTipusEnumDto(
+			es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto,
+			InteressatDocumentTipusEnumDto documentTipusEnumDto) {
 		InteressatTipus interessatTipusEnumDtoWS = null;
 		if (interessatTipusEnumDto != null) {
 			switch (interessatTipusEnumDto) {
-			case PERSONA_FISICA:
-				interessatTipusEnumDtoWS = InteressatTipus.FISICA;
-				break;
-			case PERSONA_JURIDICA:
-				interessatTipusEnumDtoWS = InteressatTipus.JURIDICA;
-				break;
-			case ADMINISTRACIO:
-				interessatTipusEnumDtoWS = InteressatTipus.ADMINISTRACIO;
-				break;				
+				case PERSONA_FISICA:
+					if (InteressatDocumentTipusEnumDto.NIF.equals(documentTipusEnumDto) || 
+						InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS.equals(documentTipusEnumDto)) {
+						interessatTipusEnumDtoWS = InteressatTipus.FISICA;
+						break;
+					} else {
+						interessatTipusEnumDtoWS = InteressatTipus.FISICA_SENSE_NIF;
+						break;
+					}
+				case PERSONA_JURIDICA:
+					interessatTipusEnumDtoWS = InteressatTipus.JURIDICA;
+					break;
+				case ADMINISTRACIO:
+					interessatTipusEnumDtoWS = InteressatTipus.ADMINISTRACIO;
+					break;				
 			}
 		}
 		return interessatTipusEnumDtoWS;
@@ -512,4 +522,43 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioPluginNotib.class);
+
+	@Override
+	public RespostaAmpliarPlazo ampliarPlazo(List<String> identificadorsEnviaments, String motivo, int dies) throws SistemaExternException {
+		try {
+
+			// REQUEST
+			AmpliarPlazoOE ampliarPLazoRequest = new AmpliarPlazoOE();
+			Envios envios = new Envios(identificadorsEnviaments);
+			ampliarPLazoRequest.setEnvios(envios);
+			ampliarPLazoRequest.setMotivo(motivo);
+			ampliarPLazoRequest.setPlazo(dies);
+			
+			RespuestaAmpliarPlazoOE response = getNotificacioRestClient().ampliarPlazoOE(ampliarPLazoRequest);
+			
+			// RESPONSE
+			RespostaAmpliarPlazo resposta = new RespostaAmpliarPlazo();
+			List<AmpliacioPlazo> ampliacionsPlazo = new ArrayList<AmpliacioPlazo>();
+			if (response!=null) {
+				resposta.setError(response.isError());
+				resposta.setRespostaCodi(response.getCodigoRespuesta());
+				resposta.setErrorDescripcio(response.getErrorDescripcio());
+				if (response.getAmpliacionesPlazo()!=null && response.getAmpliacionesPlazo().getAmpliacionPlazo()!=null) {
+					for (AmpliacionPlazo ap: response.getAmpliacionesPlazo().getAmpliacionPlazo()) {
+						AmpliacioPlazo apRip = new AmpliacioPlazo();
+						apRip.setCodigo(ap.getCodigo());
+						apRip.setEstado(ap.getEstado());
+						apRip.setFechaCaducidad(ap.getFechaCaducidad());
+						apRip.setIdentificador(ap.getIdentificador());
+						apRip.setMensajeError(ap.getMensajeError());
+						ampliacionsPlazo.add(apRip);
+					}
+				}
+			}
+			resposta.setAmpliacionsPlazo(ampliacionsPlazo);
+			return resposta;
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'ha pogut ampliar el plaç dels enviaments.", ex);
+		}			
+	}
 }

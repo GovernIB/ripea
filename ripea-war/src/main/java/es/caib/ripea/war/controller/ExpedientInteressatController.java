@@ -28,7 +28,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
@@ -49,26 +51,15 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.ValidationHelper;
 
-/**
- * Controlador per als interessats dels expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Controller
 @RequestMapping("/expedient")
 public class ExpedientInteressatController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private ExpedientInteressatService expedientInteressatService;
-	@Autowired
-	private UnitatOrganitzativaService unitatOrganitzativaService;
-	@Autowired
-	private DadesExternesService dadesExternesService;
-	@Autowired
-	private ConfigService configService;
-
-	@Autowired(required = true)
-	private javax.validation.Validator validator;
+	@Autowired private ExpedientInteressatService expedientInteressatService;
+	@Autowired private UnitatOrganitzativaService unitatOrganitzativaService;
+	@Autowired private DadesExternesService dadesExternesService;
+	@Autowired private ConfigService configService;
+	@Autowired(required = true) private javax.validation.Validator validator;
 
 	@RequestMapping(value = "/{expedientId}/interessat/new", method = RequestMethod.GET)
 	public String get(
@@ -327,7 +318,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.modificat.ok";
 		}
-
+		
 		//Sigui el create o el update, s'ha executat correctament, ara en funció del atribut formulariAnterior
 		//hem de tancar modal o bé tornar al formulari original
 		if ("ContingutPinbalController.command".equals(interessatCommand.getFormulariAnterior())) {
@@ -356,7 +347,15 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
             model.addAttribute("interessatCreat", interessatCreat.getId());
             request.getSession().removeAttribute("DocumentEnviamentController.command");
             return retornar;
+            
         } else {
+        	
+        	//Només en cas de trobar-nos al formulari de interessat, retornarm aquest warning. La modal de notificació ja en té un parescut.
+    		if (interessatDto.getTipus()!=null && interessatDto.getTipus().equals(InteressatTipusEnumDto.PERSONA_FISICA) &&
+				interessatDto.getDocumentTipus()!=null && !InteressatDocumentTipusEnumDto.isNotificableTelematic(interessatDto.getDocumentTipus())) {
+				MissatgesHelper.warning(request, getMessage(request, "interessat.controller.creat.warn.notib", null));
+			}
+        	
 			if (interessatCreat!=null && !interessatCreat.isArxiuPropagat()) {
 				return getModalControllerReturnValueWarning(
 						request,
@@ -518,25 +517,18 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		
 		
 		String msgKey = "interessat.controller.representant.afegit.ok";
+		InteressatDto representant = null;
+		
 		if (interessatCommand.getId() == null) {
-			InteressatDto representant = expedientInteressatService.createRepresentant(
+			representant = expedientInteressatService.createRepresentant(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
 					representantDto,
 					true, 
 					RolHelper.getRolActual(request));	
-			
-			if (!representant.isArxiuPropagat()) {
-				return getModalControllerReturnValueWarning(
-						request,
-						"redirect:../../../contingut/" + expedientId,
-						"interessat.controller.creat.error.arxiu.representant",
-						new Object[] { interessatCommand.getDocumentNum() });
-			}
-			
 		} else {
-			expedientInteressatService.update(
+			representant = expedientInteressatService.update(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
@@ -544,11 +536,26 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.representant.modificat.ok";
 		}
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../contenidor/" + expedientId,
-				msgKey,
-				new Object[] { interessatCommand.getDocumentNum() });
+
+		//Mostrar un warning si el representant no podrà ser notificat telematicament.
+		if (representantDto.getTipus()!=null && representantDto.getTipus().equals(InteressatTipusEnumDto.PERSONA_FISICA) &&
+			representantDto.getDocumentTipus()!=null && !InteressatDocumentTipusEnumDto.isNotificableTelematic(representantDto.getDocumentTipus())) {
+				MissatgesHelper.warning(request, getMessage(request, "interessat.controller.creat.warn.notib", null));
+		}
+		
+		if (!representant.isArxiuPropagat()) {
+			return getModalControllerReturnValueWarning(
+					request,
+					"redirect:../../../contingut/" + expedientId,
+					"interessat.controller.creat.error.arxiu.representant",
+					new Object[] { interessatCommand.getDocumentNum() });
+		} else {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contenidor/" + expedientId,
+					msgKey,
+					new Object[] { interessatCommand.getDocumentNum() });
+		}
 	}
 
 	@RequestMapping(value = "/{expedientId}/interessat/{interessatId}/representant/{representantId}/delete", method = RequestMethod.GET)
