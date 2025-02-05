@@ -60,6 +60,8 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	@Column(name = "data_actualitzacio")
 	@Temporal(TemporalType.TIMESTAMP)
 	Date dataActualitzacio;
+    @Column(name = "perm_env_postal")
+    private boolean permetreEnviamentPostal = true;
 	
 	public void update(
 			String codi,

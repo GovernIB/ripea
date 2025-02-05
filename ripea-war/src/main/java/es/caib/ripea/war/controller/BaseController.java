@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.service.*;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.war.command.DocumentNotificacionsCommand;
 import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.NotificacioEnviamentCommand;
@@ -44,6 +45,7 @@ public class BaseController implements MessageSourceAware {
 	@Autowired private DadesExternesService dadesExternesService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PinbalServeiService pinbalServeiService;
+	@Autowired private OrganGestorService organGestorService;
 	MessageSource messageSource;
 
 	protected String modalUrlTancar() {
@@ -374,9 +376,19 @@ public class BaseController implements MessageSourceAware {
 				"expedientId",
 				document.getExpedientPare().getId());
 
-		boolean enviamentPostalProperty = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.notificacio.enviament.postal.actiu", true);
+        boolean isPermetreEnviamentPostal = entitatActual.isPermetreEnviamentPostal();
+        if ( document.getExpedientPare().getOrganGestorId() != null ) {
+            OrganGestorDto organGestor = organGestorService.findById(
+                    entitatActual.getId(),
+                    document.getExpedientPare().getOrganGestorId()
+            );
 
-		if (enviamentPostalProperty) {
+            isPermetreEnviamentPostal = isPermetreEnviamentPostal
+                    || organGestor.isPermetreEnviamentPostal()
+                    || organGestorService.isPermisAntecesor(document.getExpedientPare().getOrganGestorId(), false);
+        }
+
+		if (isPermetreEnviamentPostal) {
 			if (notificacioConcatenatEntregaPostal != null) {
 				model.addAttribute("entregaPostal", (boolean) notificacioConcatenatEntregaPostal);
 			} else {
@@ -384,6 +396,12 @@ public class BaseController implements MessageSourceAware {
 			}
 		} else {
 			model.addAttribute("entregaPostal", false);
+
+            if ( document.getExpedientPare().getOrganGestorId() == null ) {
+                model.addAttribute("entregaPostalMsg", "notificacio.form.entregapostal.err");
+            } else {
+                model.addAttribute("entregaPostalMsg", "notificacio.form.entregapostal.err.desc");
+            }
 		}
 
 		model.addAttribute(

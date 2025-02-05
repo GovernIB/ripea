@@ -315,4 +315,7 @@ public interface OrganGestorService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId);
+
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor);
 }

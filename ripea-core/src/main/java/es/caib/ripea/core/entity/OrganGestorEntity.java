@@ -54,6 +54,10 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     
     @Column(name = "utilitzar_cif_pinbal")
     private boolean utilitzarCifPinbal;
+    @Column(name = "perm_env_postal")
+    private boolean permetreEnviamentPostal;
+    @Column(name = "perm_env_postal_desc")
+    private boolean permetreEnviamentPostalDescendents;
 
     @Column(name = "estat", length = 1)
     @Enumerated(EnumType.STRING)
@@ -170,8 +174,13 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 
 	
 	public void update(
-			boolean utilitzarCifPinbal) {
+			boolean utilitzarCifPinbal,
+			boolean permetreEnviamentPostal,
+			boolean permetreEnviamentPostalDescendents
+    ) {
 		this.utilitzarCifPinbal = utilitzarCifPinbal;
+		this.permetreEnviamentPostal = permetreEnviamentPostal;
+		this.permetreEnviamentPostalDescendents = permetreEnviamentPostalDescendents;
 	}
 	
 	public void updateEstat(

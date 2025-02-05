@@ -38,6 +38,7 @@ public class EntitatDto extends AuditoriaDto {
 	private boolean logo;
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
+    private boolean permetreEnviamentPostal;
 	
 	public boolean isUsuariActualTeOrgans() {
 		return organsGestors != null && !organsGestors.isEmpty();
