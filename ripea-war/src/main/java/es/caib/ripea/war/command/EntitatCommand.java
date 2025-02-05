@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import es.caib.ripea.war.validation.DocumentIdentitat;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 @CodiEntitatNoRepetit(campId = "id", campCodi = "codi")
 public class EntitatCommand {
 
@@ -40,7 +43,8 @@ public class EntitatCommand {
 	private boolean logo;
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
-	
+	private boolean permetreEnviamentPostal;
+
 	
 	public String getCapsaleraColorLletra() {
 		return capsaleraColorLletra;

@@ -19,8 +19,28 @@
 	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
 	<rip:modalHead/>
-	
-	
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#permetreEnviamentPostal').change(function(){
+                var val = $('#permetreEnviamentPostal').is(":checked");
+                hideEnvPostalDesc(val)
+            });
+
+            hideEnvPostalDesc(${organGestorCommand.permetreEnviamentPostal});
+        });
+
+        var hideEnvPostalDesc = function (val){
+            if (val) {
+                $('.hideByPostal').show();
+                $('#permetreEnviamentPostalDescendents').show();
+            } else {
+                $('.hideByPostal').hide();
+                $('#permetreEnviamentPostalDescendents').hide();
+                $('#permetreEnviamentPostalDescendents').prop( "checked", false );
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -43,7 +63,8 @@
 				
 		<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2" readonly="true"/>
 		<rip:inputCheckbox name="utilitzarCifPinbal" textKey="organgestor.form.camp.utilitzar.cif.pinbal" labelSize="2" />
-				
+        <rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes" labelSize="2"/>
+        <rip:inputCheckbox name="permetreEnviamentPostalDescendents" textKey="notificacio.form.entregapostal.permes.desc" labelClass="hideByPostal" labelSize="2"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 				<c:choose>

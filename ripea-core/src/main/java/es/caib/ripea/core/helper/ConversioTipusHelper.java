@@ -733,6 +733,8 @@ public class ConversioTipusHelper {
 						target.setTipusTransicio(source.getTipusTransicio());
 						target.setCif(source.getCif());
 						target.setUtilitzarCifPinbal(source.isUtilitzarCifPinbal());
+						target.setPermetreEnviamentPostal(source.isPermetreEnviamentPostal());
+						target.setPermetreEnviamentPostalDescendents(source.isPermetreEnviamentPostalDescendents());
 						try {
 							if (target.getEstat()!=null)
 								target.setEstatMessage(messageHelper.getMessage("OrganEstatEnumDto."+target.getEstat()));

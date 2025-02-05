@@ -691,9 +691,7 @@ function updateCaducitatAmbDies(dies) {
 		
 		<!---  RETARD  ------->
 		<rip:inputNumber labelSize="2" name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
-		<c:if test="${entregaPostal}">
-			<rip:inputCheckbox labelSize="2" name="entregaPostal" textKey="notificacio.form.camp.entregaPostal"/>
-		</c:if>
+        <rip:inputCheckbox labelSize="2" name="entregaPostal" textKey="notificacio.form.camp.entregaPostal" disabled="${!entregaPostal}" comment="${entregaPostalMsg}"/>
 		<!--------------------------------------------------------  ENVIAMENTS  ------------------------------------------------------------>
 		<div class="container-fluid">
 			<div class="title">

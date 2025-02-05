@@ -154,7 +154,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, organGestorDto.getId(), false);
 		
-		organGestorEntity.update(organGestorDto.isUtilitzarCifPinbal());
+		organGestorEntity.update(
+                organGestorDto.isUtilitzarCifPinbal(),
+                organGestorDto.isPermetreEnviamentPostal(),
+                organGestorDto.isPermetreEnviamentPostalDescendents()
+        );
 
 		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
 	}
@@ -1252,4 +1256,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private String msg(String codi, Object... params) {
 		return messageHelper.getMessage(codi, params);
 	}
+
+    @Override
+    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor) {
+        OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);
+        List<OrganGestorEntity> organGestorEntityList = organGestorHelper.findPares(organGestor,incloureOrganGestor);
+        for (OrganGestorEntity organGestorEntity: organGestorEntityList) {
+            if (organGestorEntity.isPermetreEnviamentPostal() && organGestorEntity.isPermetreEnviamentPostalDescendents()){
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -300,4 +300,10 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDissenyCache(Long entitatId) {
 		return delegate.findOrganismesEntitatAmbPermisDissenyCache(entitatId);
 	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor) {
+		return delegate.isPermisAntecesor(organGestorId, incloureOrganGestor);
+	}
 }

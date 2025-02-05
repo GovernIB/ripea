@@ -5,6 +5,7 @@ package es.caib.ripea.war.command;
 
 import javax.validation.constraints.Size;
 
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -18,7 +19,7 @@ import lombok.Getter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter
+@Getter @Setter
 public class OrganGestorCommand {
 
     private Long id;
@@ -27,6 +28,8 @@ public class OrganGestorCommand {
     private Long pareId;
     private String cif;
     private boolean utilitzarCifPinbal;
+    private boolean permetreEnviamentPostal;
+    private boolean permetreEnviamentPostalDescendents;
 
 
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {

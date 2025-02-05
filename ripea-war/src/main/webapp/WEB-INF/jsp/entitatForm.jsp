@@ -49,6 +49,7 @@
 		<form:hidden path="logo"/>
 		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
+		<rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes"/>
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 				<c:choose>
