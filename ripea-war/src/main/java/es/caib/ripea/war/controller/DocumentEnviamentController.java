@@ -5,6 +5,7 @@ import java.net.ConnectException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -25,6 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,16 +35,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import es.caib.ripea.core.api.dto.AmpliarPlazoForm;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -219,6 +224,57 @@ public class DocumentEnviamentController extends BaseUserController {
 				"contingutNavigationId",
 				contingutNavigationId);
 		return "notificacioInfo";
+	}
+	
+	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/ampliar", method = RequestMethod.GET)
+	public String notificacioAmpliarGet(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			@PathVariable Long notificacioId,
+			@RequestParam(value = "contingutNavigationId", required = true) Long contingutNavigationId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		DocumentNotificacioDto documentNotificacioDto = documentEnviamentService.notificacioFindAmbIdAndDocument(
+				entitatActual.getId(),
+				documentId,
+				notificacioId);
+		AmpliarPlazoForm formData = new AmpliarPlazoForm();
+		formData.setId(documentNotificacioDto.getId());
+		List<DocumentEnviamentInteressatDto> myList = new ArrayList<>(documentNotificacioDto.getDocumentEnviamentInteressats());
+		formData.setDocumentEnviamentInteressats(myList);
+		model.addAttribute("documentNotificacioDto", formData);
+		model.addAttribute("contingutNavigationId", contingutNavigationId);
+		model.addAttribute("documentId", documentId);
+		model.addAttribute("notificacioId", notificacioId);
+		return "notificacioAmpliar";
+	}
+	
+	@RequestMapping(value = "/notificacio/{documentNotificacioId}/ampliar", method = RequestMethod.POST)
+	public String notificacioAmpliarPost(
+			HttpServletRequest request,
+			@PathVariable Long documentNotificacioId,
+			@ModelAttribute AmpliarPlazoForm documentNotificacioDto,
+			Model model) {
+		try {
+			List<RespostaAmpliarPlazo> resultat = documentEnviamentService.ampliarPlazoEnviament(documentNotificacioDto);
+			
+			String missatge = getMessage(request, "enviament.info.accio.ectualitzar.ampliarOk", new Object[] { resultat.size() });
+			
+			for (RespostaAmpliarPlazo resposta: resultat) {
+				missatge = missatge + "<br/> - <b>"+resposta.getDocumentNum() + "</b> " + resposta.getNomInteressat()+": "+resposta.getRespostaDescripcio();
+			}
+			
+			MissatgesHelper.info(request, missatge);
+//			return getModalControllerReturnValueSuccess(
+//					request,
+//					"notificacioAmpliar",
+//					"enviament.info.accio.ectualitzar.ampliarOk",
+//					new Object[] { resultat.size() });
+			return modalUrlTancar();
+		} catch (Exception ex) {
+			return getModalControllerReturnValueError(request, "notificacioAmpliar", "enviament.info.accio.ectualitzar.ampliarKo", ex);
+		}
 	}
 	
 	@RequestMapping(value = "/notificacio/actualitzarEstat/{identificador}")

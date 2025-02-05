@@ -1,4 +1,4 @@
-package es.caib.ripea.plugin.notificacio;
+package es.caib.ripea.core.api.dto;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 

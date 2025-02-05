@@ -189,6 +189,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		return incapacitat != null ? incapacitat : false;
 	}
 	public abstract String getIdentificador();
+	public abstract String getNomComplet();
 
 	public String getNom() {
 		if (this instanceof InteressatAdministracioEntity) {

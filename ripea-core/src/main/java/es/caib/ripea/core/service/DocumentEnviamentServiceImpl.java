@@ -1,8 +1,6 @@
-/**
- * 
- */
 package es.caib.ripea.core.service;
 
+import es.caib.ripea.core.api.dto.AmpliarPlazoForm;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
@@ -10,6 +8,7 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -25,6 +24,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentNotificacioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 /**
  * Implementació dels mètodes per a gestionar els enviaments
  * de documents.
@@ -48,26 +50,17 @@ import java.util.Map;
 @Service
 public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private DocumentPublicacioRepository documentPublicacioRepository;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private DocumentNotificacioHelper documentNotificacioHelper;
-	@Autowired
-	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private DocumentRepository documentRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+	@Autowired private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Resource  private PluginHelper pluginHelper;
 
 	@Transactional
 	@Override
@@ -92,16 +85,12 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		}
 
 		return errorsNotificant;
-		
 	}
 	
 	@Transactional
 	@Override
-	public boolean checkIfAnyInteressatIsAdministracio(
-			List<Long> interessatsIds) {
-		
+	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds) {
 		boolean isAnyAdministracio = false;
-
 		if (interessatsIds != null) {
 			for (Long id : interessatsIds) {
 				InteressatEntity inter = interessatRepository.findOne(id);
@@ -111,17 +100,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				}
 			}
 		}
-
 		return isAnyAdministracio;
 	}
 	
 	@Transactional
 	@Override
-	public boolean checkIfDocumentIsZip(
-			Long documentId) {
-		
+	public boolean checkIfDocumentIsZip(Long documentId) {
 		DocumentEntity doc = documentRepository.findOne(documentId);
-		
 		return doc.getFitxerContentType().equals("application/zip");
 	}
 	
@@ -541,4 +526,9 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentEnviamentServiceImpl.class);
+
+	@Override
+	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto) {
+		return pluginHelper.ampliarPlazoEnviament(documentNotificacioDto);
+	}
 }

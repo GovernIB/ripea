@@ -2,6 +2,7 @@ package es.caib.ripea.plugin.notificacio;
 
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
 

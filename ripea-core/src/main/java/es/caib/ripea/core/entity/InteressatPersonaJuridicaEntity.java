@@ -268,6 +268,11 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 		return InteressatTipusEnumDto.PERSONA_JURIDICA;
 	}
 
+	@Override
+	public String getNomComplet() {
+		return raoSocial;
+	}
+	
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

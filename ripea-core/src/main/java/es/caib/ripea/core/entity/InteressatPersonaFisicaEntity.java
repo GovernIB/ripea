@@ -316,6 +316,23 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 	}
 
 	@Override
+	public String getNomComplet() {
+		StringBuilder sb = new StringBuilder();
+		if (nom != null) {
+			sb.append(nom);
+		}
+		if (llinatge1 != null) {
+			sb.append(" ");
+			sb.append(llinatge1);
+			if (llinatge2 != null) {
+				sb.append(" ");
+				sb.append(llinatge2);
+			}
+		}
+		return sb.toString();
+	}
+	
+	@Override
 	public InteressatTipusEnumDto getTipus() {
 		return InteressatTipusEnumDto.PERSONA_FISICA;
 	}

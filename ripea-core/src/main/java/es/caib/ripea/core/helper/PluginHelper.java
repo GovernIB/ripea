@@ -68,6 +68,7 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
+import es.caib.ripea.core.api.dto.AmpliarPlazoForm;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
@@ -83,6 +84,7 @@ import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
@@ -116,6 +118,7 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxSignerDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.core.api.dto.Resum;
 import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
@@ -247,6 +250,7 @@ public class PluginHelper {
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -4621,6 +4625,60 @@ public class PluginHelper {
 		}
 	}
 
+	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto) {
+		
+		long t0 = System.currentTimeMillis();
+		List<RespostaAmpliarPlazo> resultat = new ArrayList<RespostaAmpliarPlazo>();
+		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+		String accioDescripcio = "Ampliar plaç de enviament notib";
+		
+		if (documentNotificacioDto!=null && documentNotificacioDto.getDocumentEnviamentInteressats()!=null) {
+			for (DocumentEnviamentInteressatDto dei: documentNotificacioDto.getDocumentEnviamentInteressats()) {
+				if (dei.getDiesAmpliacio()!=null && dei.getDiesAmpliacio()>0) {
+				
+					Map<String, String> accioParams = new HashMap<String, String>();
+					accioParams.put("referencia", dei.getEnviamentReferencia());
+					accioParams.put("motiu", dei.getMotiu());
+					accioParams.put("dies", dei.getDiesAmpliacio().toString());
+					
+					List<String> refs = new ArrayList<String>();
+					refs.add(dei.getEnviamentReferencia());
+					
+					try {
+
+						RespostaAmpliarPlazo aux = notificacioPlugin.ampliarPlazo(refs, dei.getMotiu(), dei.getDiesAmpliacio());
+						DocumentEnviamentInteressatEntity deiE = documentNotificacioHelper.findDocumentEnviamentInteressatById(dei.getId());
+						aux.setDocumentNum(deiE.getInteressat().getDocumentNum());
+						aux.setNomInteressat(deiE.getInteressat().getNomComplet());
+						resultat.add(aux);
+						integracioHelper.addAccioOk(
+								IntegracioHelper.INTCODI_NOTIFICACIO,
+								accioDescripcio,
+								notificacioPlugin.getEndpointURL(),
+								accioParams,
+								IntegracioAccioTipusEnumDto.ENVIAMENT,
+								System.currentTimeMillis() - t0);
+	
+					} catch (Exception ex) {
+						String errorDescripcio = "Error al accedir al plugin de notificacions";
+						integracioHelper.addAccioError(
+								IntegracioHelper.INTCODI_NOTIFICACIO,
+								accioDescripcio,
+								notificacioPlugin.getEndpointURL(),
+								accioParams,
+								IntegracioAccioTipusEnumDto.ENVIAMENT,
+								System.currentTimeMillis() - t0,
+								errorDescripcio,
+								ex);
+						throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
+					}
+				}
+			}
+		}
+		
+		return resultat;
+	}
+	
 	public RespostaEnviar notificacioEnviar(
 			DocumentNotificacioDto notificacioDto,
 			ExpedientEntity expedientEntity,

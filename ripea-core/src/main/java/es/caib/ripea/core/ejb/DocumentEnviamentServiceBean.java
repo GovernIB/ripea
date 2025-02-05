@@ -3,10 +3,12 @@
  */
 package es.caib.ripea.core.ejb;
 
+import es.caib.ripea.core.api.dto.AmpliarPlazoForm;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,4 +200,9 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 		return delegate.checkIfDocumentIsZip(documentId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto) {
+		return delegate.ampliarPlazoEnviament(documentNotificacioDto);
+	}
 }

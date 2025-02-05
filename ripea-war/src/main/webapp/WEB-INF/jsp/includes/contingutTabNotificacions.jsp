@@ -261,6 +261,7 @@ $(document).ready(function() {
 							<li><a href="<c:url value="/document/{{:documentId}}/notificacio/{{:id}}/info?contingutNavigationId=${contingut.id}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 							{{if notificacioEstat != 'PROCESSADA'}}
 								<li><a href="<c:url value="/document/notificacio/actualitzarEstat/{{:notificacioIdentificador}}?contingutNavigationId=${contingut.id}"/>"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.ectualitzar.estat"/></a></li>
+								<li><a href="<c:url value="/document/{{:documentId}}/notificacio/{{:id}}/ampliar?contingutNavigationId=${contingut.id}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-calendar-plus-o"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.ectualitzar.ampliar"/></a></li>
 							{{/if}}
 							{{if notificacioEstat != 'PENDENT'}}
 								<li><a href="<c:url value="/document/${contingut.id}/notificacio/{{:id}}/descarregarJustificantEnviamentNotib"/>"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="notificacio.info.camp.justificant.enviament.notib.boto"/></a></li>

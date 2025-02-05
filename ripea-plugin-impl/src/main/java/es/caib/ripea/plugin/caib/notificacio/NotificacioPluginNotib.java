@@ -1,5 +1,6 @@
 package es.caib.ripea.plugin.caib.notificacio;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -41,12 +42,13 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
+import es.caib.ripea.core.api.dto.AmpliacioPlazo;
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.notificacio.AmpliacioPlazo;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
@@ -54,7 +56,6 @@ import es.caib.ripea.plugin.notificacio.Notificacio;
 import es.caib.ripea.plugin.notificacio.NotificacioEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
-import es.caib.ripea.plugin.notificacio.RespostaAmpliarPlazo;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
@@ -540,9 +541,20 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			RespostaAmpliarPlazo resposta = new RespostaAmpliarPlazo();
 			List<AmpliacioPlazo> ampliacionsPlazo = new ArrayList<AmpliacioPlazo>();
 			if (response!=null) {
+				
 				resposta.setError(response.isError());
 				resposta.setRespostaCodi(response.getCodigoRespuesta());
 				resposta.setErrorDescripcio(response.getErrorDescripcio());
+				
+				String descripcions = "";
+				if (response.getDescripcions()!=null) {
+					for (String aux: response.getDescripcions()) {
+						if (Utils.hasValue(aux))
+							descripcions+=aux+", ";
+					}
+				}
+				
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				if (response.getAmpliacionesPlazo()!=null && response.getAmpliacionesPlazo().getAmpliacionPlazo()!=null) {
 					for (AmpliacionPlazo ap: response.getAmpliacionesPlazo().getAmpliacionPlazo()) {
 						AmpliacioPlazo apRip = new AmpliacioPlazo();
@@ -552,8 +564,17 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 						apRip.setIdentificador(ap.getIdentificador());
 						apRip.setMensajeError(ap.getMensajeError());
 						ampliacionsPlazo.add(apRip);
+						if (Utils.hasValue(ap.getMensajeError()))
+							descripcions+=ap.getMensajeError()+", ";
+						if (ap.getFechaCaducidad()!=null)
+							descripcions+="Caduca "+dateFormat.format(ap.getFechaCaducidad())+", ";
 					}
 				}
+				
+				if (descripcions!=null && descripcions.endsWith(", ")) {
+					descripcions = descripcions.substring(0, descripcions.length()-2);
+				}
+				resposta.setRespostaDescripcio(descripcions);
 			}
 			resposta.setAmpliacionsPlazo(ampliacionsPlazo);
 			return resposta;

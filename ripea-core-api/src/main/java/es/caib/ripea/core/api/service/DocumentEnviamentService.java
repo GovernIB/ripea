@@ -3,10 +3,12 @@
  */
 package es.caib.ripea.core.api.service;
 
+import es.caib.ripea.core.api.dto.AmpliarPlazoForm;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
+import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -99,6 +101,8 @@ public interface DocumentEnviamentService {
 			Long documentId,
 			Long notificacioId) throws NotFoundException;
 
+	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto);
+	
 	/**
 	 * Crea una publicació d'un document de l'expedient a un butlletí oficial.
 	 * 

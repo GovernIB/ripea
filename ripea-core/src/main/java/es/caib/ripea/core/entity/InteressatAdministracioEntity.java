@@ -104,6 +104,11 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	}
 
 	@Override
+	public String getNomComplet() {
+		return organCodi;
+	}
+	
+	@Override
 	public void update(InteressatDto dto) {
 
 		if (!(dto instanceof InteressatAdministracioDto))

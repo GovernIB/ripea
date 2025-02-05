@@ -146,6 +146,10 @@ public class DocumentNotificacioHelper {
 		return dto;
 	}
 		
+	public DocumentEnviamentInteressatEntity findDocumentEnviamentInteressatById(Long id) {
+		return documentEnviamentInteressatRepository.findOne(id);
+	}
+	
 	public DocumentNotificacioDto findAmbId(
 			Long entitatId,
 			ExpedientEntity expedient,

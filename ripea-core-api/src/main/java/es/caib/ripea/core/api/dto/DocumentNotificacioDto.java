@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 import java.util.ArrayList;
@@ -13,12 +10,6 @@ import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-
-/**
- * Informació d'una notificació d'un document a un ciutadà.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Setter @Getter
 public class DocumentNotificacioDto extends DocumentEnviamentDto {
 
@@ -32,19 +23,14 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	private ServeiTipusEnumDto serveiTipusEnum;
 	private boolean entregaPostal;
-
 	private List<Long> interessatsIds = new ArrayList<Long>();
 	private List<InteressatDto> interessats = new ArrayList<InteressatDto>();
-	
 	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();
-	
 	private Date registreData;
 	private String registreNumero;
 	private String registreNumeroFormatat;
-	
 	private boolean ambRegistres;
 	private OrganGestorDto emisor;
-	
 	private Date dataEnviada;
 	private Date dataFinalitzada;
 	

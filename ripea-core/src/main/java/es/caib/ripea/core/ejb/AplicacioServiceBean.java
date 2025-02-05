@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.ejb;
 
 import java.util.List;
