@@ -1781,7 +1781,7 @@ public class ContingutHelper {
 		} else {
 			exception = new RuntimeException("Expedient de aquest document no es guardat en arxiu");
 		}
-		carpeta.updateArxiuIntent();
+		carpeta.updateArxiuIntent(true);
 		return exception;
 	}
 	

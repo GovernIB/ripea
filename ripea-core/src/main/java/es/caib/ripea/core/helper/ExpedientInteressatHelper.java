@@ -640,7 +640,7 @@ public class ExpedientInteressatHelper {
 	public Exception guardarExpedientAndInteressatsArxiu(
 			Long expId) {
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
-		expedient.updateArxiuIntent();
+		expedient.updateArxiuIntent(true);
 		return arxiuPropagarInteressats(expedient, null);
 	}
 
@@ -681,9 +681,7 @@ public class ExpedientInteressatHelper {
 		if (interessat != null) {
 			interessat.updateArxiuIntent(arxiuPropagat);
 		} else {
-			for (InteressatEntity inter : expedient.getInteressatsORepresentants()) {
-				inter.updateArxiuIntent(arxiuPropagat);
-			}
+            expedient.updateArxiuIntent(arxiuPropagat);
 		}
 	}
 	

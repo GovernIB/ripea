@@ -1,0 +1,1 @@
+ALTER TABLE ipa_contingut ADD arxiu_propagat NUMBER(1,0) DEFAULT 1;

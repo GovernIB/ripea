@@ -103,6 +103,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	
 	@Column(name = "numero_registre")
 	protected String numeroRegistre;
+
+	@Column(name = "arxiu_propagat")
+	protected boolean arxiuPropagat;
 	
 	@Version
 	private long version = 0;
@@ -152,14 +155,16 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		if (arxiuUuid != null) {
 			this.arxiuUuid = arxiuUuid;
 		}
+        this.arxiuPropagat = true;
 		this.arxiuDataActualitzacio = new Date();
 	}
 	public void updateArxiuEsborrat() {
 		this.arxiuUuid = null;
 		this.arxiuDataActualitzacio = null;
 	}
-	
-	public void updateArxiuIntent() {
+
+	public void updateArxiuIntent(boolean arxiuPropagat) {
+        this.arxiuPropagat = arxiuPropagat;
 		this.arxiuIntentData = new Date();
 		this.arxiuReintents++;
 	}

@@ -648,7 +648,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"from " +
 			"    ExpedientEntity e " +
 			"where " +
-			"	 e.arxiuUuid = null " +
+			"	 (e.arxiuUuid = null or e.arxiuPropagat = false) " +
 			"and e.esborrat = 0 " +
 			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and e.entitat = :entitat " +

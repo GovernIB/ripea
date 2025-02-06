@@ -361,7 +361,7 @@ public class ExpedientHelper {
 
 		Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);
 		
-		expedient.updateArxiuIntent();
+		expedient.updateArxiuIntent(true);
 		
 		boolean throwExcepcion = false;//throwExcepcion = true;
 		if (throwExcepcion) {
@@ -1538,7 +1538,7 @@ public class ExpedientHelper {
 		
 		exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);
 		
-		expedient.updateArxiuIntent();
+		expedient.updateArxiuIntent(true);
 		
 		return exception;
 	}

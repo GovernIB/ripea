@@ -276,7 +276,7 @@ public class DocumentHelper {
  			}
 		}
 
-		entity.updateArxiuIntent();
+		entity.updateArxiuIntent(true);
 
 		if (returnDetail)		
 			dto = toDocumentDto(entity);
@@ -1435,7 +1435,7 @@ public class DocumentHelper {
 			exception = new RuntimeException("Expedient de aquest document no es guardat en arxiu");
 		}
 
-		documentEntity.updateArxiuIntent();
+		documentEntity.updateArxiuIntent(true);
 		return exception;
 	}
 
