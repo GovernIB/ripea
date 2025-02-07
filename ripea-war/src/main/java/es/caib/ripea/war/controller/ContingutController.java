@@ -1026,7 +1026,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 			}
 			if (contingut instanceof ExpedientDto || contingut instanceof DocumentDto) {
-                model.addAttribute("expedient", contingut.getExpedientObject());
 				model.addAttribute(
 						"metaDades",
 						metaDadaService.findByNode(
