@@ -76,7 +76,7 @@ $(document).ready(function() {
 <body>
 
 	<c:url value="grup/filtrar" var="formAction"/>
-	<form:form id="grupFiltreForm" action="${formAction}" method="post" cssClass="well" commandName="grupFiltreCommand">
+	<form:form id="grupFiltreForm" action="${formAction}" method="post" cssClass="well defaultFilterEnter" commandName="grupFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="codi" inline="true" placeholderKey="grup.list.filtre.camp.codi"/>
