@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import es.caib.ripea.core.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +47,6 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
-import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -68,8 +65,9 @@ public class EmailHelper {
     @Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
     @Autowired private DocumentHelper documentHelper;
+    @Autowired private DocumentRepository documentRepository;
 
-	public void contingutAgafatPerAltreUsusari(
+    public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
 			UsuariEntity usuariOriginal,
 			UsuariEntity usuariNou) {
@@ -1167,8 +1165,14 @@ public class EmailHelper {
                     "Email enviarDocument");
         }
 
+        UsuariEntity usuariEntity = usuariHelper.getUsuariAutenticat();
+        FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
+        DocumentEntity document= documentRepository.findOne(adjuntId);
+
         String subject = getPrefixRipea() + " Enviar document";
-        String text ="Ha rebut el següent document adjunt a partir de la funció 'Enviar document via email' de RIPEA.";
+        String text ="Ha rebut el document adjunt '"+fitxer.getNom()+"' a partir de la funció 'Enviar document via email' de RIPEA. \n" +
+                "Enviat per: " + usuariEntity.getNom() + "\n" +
+                "Expedient: " + document.getExpedient().getNom();
 
         sendOrSaveEmail(
                 destinatarisNoAgrupats,
