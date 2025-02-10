@@ -1,7 +1,5 @@
 package es.caib.ripea.plugin.caib.unitat;
 
-
-
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -11,8 +9,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.helper.RestClient;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

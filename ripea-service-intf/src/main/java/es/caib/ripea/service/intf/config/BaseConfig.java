@@ -20,6 +20,7 @@ public class BaseConfig {
 
 	public static final String ROLE_SUPER = "IPA_SUPER";
 	public static final String ROLE_ADMIN = "IPA_ADMIN";
+
 	public static final String ROLE_USER = "tothom";
 
 }

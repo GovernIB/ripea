@@ -46,7 +46,7 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 			boolean signarAnnexos,
 			String transaccioId) throws SistemaExternException {
 		//throw new SistemaExternException("Això no acaba d'anar be");
-		return new Long(System.currentTimeMillis()).toString();
+		return Long.valueOf(System.currentTimeMillis()).toString();
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 		PortafirmesDocumentTipus tipusDocument = new PortafirmesDocumentTipus();
 		for(int i = 0; i < 5; i++) {
 			tipusDocument = new PortafirmesDocumentTipus();
-			tipusDocument.setId(new Long(i));
+			tipusDocument.setId((long)i);
 			tipusDocument.setCodi("T" + i);
 			tipusDocument.setNom("Tipus " + i);
 			resposta.add(tipusDocument);				

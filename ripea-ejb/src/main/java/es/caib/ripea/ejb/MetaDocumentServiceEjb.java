@@ -1,0 +1,293 @@
+/**
+ * 
+ */
+package es.caib.ripea.ejb;
+
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import lombok.experimental.Delegate;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import java.util.List;
+
+/**
+ * Implementació de MetaDocumentService com a EJB que empra una clase
+ * delegada per accedir a la funcionalitat del servei.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Stateless
+public class MetaDocumentServiceEjb implements MetaDocumentService {
+
+	@Delegate
+	private MetaDocumentService delegateService;
+
+	protected void setDelegateService(MetaDocumentService delegateService) {
+		this.delegateService = delegateService;
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto create(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut, String rolActual, Long organId) {
+		return delegateService.create(
+				entitatId,
+				metaExpedientId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut, rolActual, organId);
+	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaDocumentDto create(Long entitatId, 
+			MetaDocumentDto metaDocument, String plantillaNom,
+			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
+		return delegateService.create(
+				entitatId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut);
+	}
+
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto update(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaDocumentDto metaDocument,
+			String plantillaNom,
+			String plantillaContentType,
+			byte[] plantillaContingut, String rolActual, Long organId) {
+		return delegateService.update(
+				entitatId,
+				metaExpedientId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut, rolActual, organId);
+	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public MetaDocumentDto update(Long entitatId, MetaDocumentDto metaDocument, String plantillaNom,
+			String plantillaContentType, byte[] plantillaContingut) throws NotFoundException {
+		return delegateService.update(
+				entitatId,
+				metaDocument,
+				plantillaNom,
+				plantillaContentType,
+				plantillaContingut);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto updateActiu(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id,
+			boolean actiu, String rolActual) {
+		return delegateService.updateActiu(
+				entitatId,
+				metaExpedientId,
+				id,
+				actiu, rolActual);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto delete(
+			Long entitatId,
+			Long metaExpedientId,
+			Long metaDocumentId, String rolActual, Long organId) {
+		return delegateService.delete(
+				entitatId,
+				metaExpedientId,
+				metaDocumentId, rolActual, organId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findById(
+			Long entitatId,
+			Long metaExpedientId,
+			Long id) {
+		return delegateService.findById(
+				entitatId,
+				metaExpedientId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findByCodi(
+			Long entitatId,
+			Long metaExpedientId,
+			String codi) {
+		return delegateService.findByCodi(
+				entitatId,
+				metaExpedientId,
+				codi);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegateService.findByMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
+			Long entitatId,
+			PaginacioParamsDto paginacioParams) {
+		return delegateService.findWithoutMetaExpedient(
+				entitatId,
+				paginacioParams);
+	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<MetaDocumentDto> findByEntitat(
+			Long entitatId) throws NotFoundException {
+		return delegateService.findByEntitat(entitatId);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "tothom"})
+	public FitxerDto getPlantilla(
+			Long entitatId,
+			Long contingutId,
+			Long id) {
+		return delegateService.getPlantilla(
+				entitatId,
+				contingutId,
+				id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findActiusPerCreacio(
+			Long entitatId,
+			Long contenidorId, 
+			Long metaExpedientId, boolean findAllMarkDisponiblesPerCreacio) {
+		return delegateService.findActiusPerCreacio(
+				entitatId,
+				contenidorId, 
+				metaExpedientId, findAllMarkDisponiblesPerCreacio);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findActiusPerModificacio(
+			Long entitatId,
+			Long documentId) throws NotFoundException {
+		return delegateService.findActiusPerModificacio(
+				entitatId,
+				documentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
+		return delegateService.portafirmesFindDocumentTipus();
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId) {
+		return delegateService.findByMetaExpedient(entitatId, metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "tothom"})
+	public MetaDocumentDto getDadesNti(Long entitatId, Long contingutId, Long id) throws NotFoundException {
+		return delegateService.getDadesNti(
+				entitatId, 
+				contingutId, 
+				id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findById(
+			Long metaDocumentId) {
+		return delegateService.findById(metaDocumentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findByTipusGeneric(
+			Long entitatId, 
+			MetaDocumentTipusGenericEnumDto tipusGeneric) {
+		return delegateService.findByTipusGeneric(
+				entitatId, 
+				tipusGeneric);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId) {
+		return delegateService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatId, metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void marcarPerDefecte(Long entitatId, Long metaExpedientId, Long metaDocumentId, boolean remove) throws NotFoundException {
+		delegateService.marcarPerDefecte(entitatId, metaExpedientId, metaDocumentId, remove);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
+			Long metaExpedientId) throws NotFoundException {
+		return delegateService.findByMetaExpedientAndPerDefecteTrue(
+				metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void moveTo(
+			Long entitatId,
+			Long metaDocumentId,
+			int posicio) throws NotFoundException {
+		delegateService.moveTo(
+				entitatId,
+				metaDocumentId,
+				posicio);
+		
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public PinbalServeiDto findPinbalServei(Long metaDocumentId) {
+		return delegateService.findPinbalServei(metaDocumentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaSimpleWebActiva(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegateService.findByMetaExpedientAndFirmaSimpleWebActiva(
+				entitatId,
+				metaExpedientId);
+	}
+
+}

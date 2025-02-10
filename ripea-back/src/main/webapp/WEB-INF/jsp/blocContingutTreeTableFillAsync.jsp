@@ -1,0 +1,2 @@
+<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
+<rip:blocContingutTreeTableFills contingut="${contingut}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}" contingutNavigationId="${contingut.id}"/>

@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import es.caib.ripea.service.intf.dto.AmpliacioPlazo;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +47,6 @@ import es.caib.notib.client.domini.ampliarPlazo.AmpliacionPlazo;
 import es.caib.notib.client.domini.ampliarPlazo.AmpliarPlazoOE;
 import es.caib.notib.client.domini.ampliarPlazo.Envios;
 import es.caib.notib.client.domini.ampliarPlazo.RespuestaAmpliarPlazoOE;
-import es.caib.ripea.core.api.dto.AmpliacioPlazo;
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.RespostaAmpliarPlazo;
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
@@ -450,7 +451,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		es.caib.notib.client.domini.PersonaV2 p = null;
 		if (persona != null) {
 			p = new es.caib.notib.client.domini.PersonaV2();
-			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
+			if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 				p.setDir3Codi(persona.getCodiDir3());
 			} else {
 				p.setNif(persona.getNif());
@@ -468,7 +469,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}
 	
 	private InteressatTipus toInteressatTipusEnumDto(
-			es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto,
+			InteressatTipusEnumDto interessatTipusEnumDto,
 			InteressatDocumentTipusEnumDto documentTipusEnumDto) {
 		InteressatTipus interessatTipusEnumDtoWS = null;
 		if (interessatTipusEnumDto != null) {

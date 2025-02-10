@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import es.caib.ripea.core.api.dto.Resum;
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.summarize.SummarizePlugin;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.log4j.Log4j;
 
 import java.util.Properties;

@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import javax.ws.rs.core.MediaType;
 
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +21,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import es.caib.ripea.core.api.dto.Resum;
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.summarize.SummarizePlugin;

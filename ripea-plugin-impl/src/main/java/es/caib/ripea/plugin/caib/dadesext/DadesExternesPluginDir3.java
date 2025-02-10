@@ -13,6 +13,7 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import es.caib.ripea.service.intf.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,6 @@ import es.caib.dir3caib.ws.api.catalogo.CatProvinciaTF;
 import es.caib.dir3caib.ws.api.catalogo.CatTipoVia;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWs;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWsService;
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;

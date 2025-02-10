@@ -11,7 +11,6 @@ import java.util.Properties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -22,6 +21,7 @@ import es.caib.ripea.plugin.dadesext.NivellAdministracio;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.plugin.dadesext.TipusVia;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Implementació del plugin de dades externes que consulta la
@@ -65,7 +65,7 @@ public class DadesExternesPluginCaib extends RipeaAbstractPluginProperties imple
 			for (DadesComunesPais paisJson: paisosJson) {
 				Long codiNumeric = 0L;
 				if (paisJson.getCodi_numeric() != null) {
-					codiNumeric = new Long(paisJson.getCodi_numeric());
+					codiNumeric = Long.valueOf(paisJson.getCodi_numeric());
 				}
 				Pais pais = new Pais(
 						codiNumeric,

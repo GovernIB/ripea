@@ -1,0 +1,23 @@
+<decorators defaultdir="/WEB-INF/jsp/decorators">
+	<excludes>
+		<pattern>/js*</pattern>
+		<pattern>/css*</pattern>
+		<pattern>/img*</pattern>
+		<pattern>/font*</pattern>
+		<pattern>/nodeco*</pattern>
+		<pattern>/ws*</pattern>
+		<pattern>/webdav*</pattern>
+		<pattern>/rest/notib*</pattern>
+		<pattern>*/tag*</pattern>
+	</excludes>
+	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
+		<pattern>/scanweb*</pattern>
+		<pattern>/error</pattern>
+	</decorator>
+	<decorator name="default" page="default.jsp">
+		<pattern>/*</pattern>
+	</decorator>
+	<decorator name="viewerPdfDecorator" page="viewerPdfDecorator.jsp">
+		<pattern>*/viewer.html*</pattern>
+	</decorator>
+</decorators>

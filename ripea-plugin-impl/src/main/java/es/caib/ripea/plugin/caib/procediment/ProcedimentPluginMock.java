@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.caib.unitat.UnitatsOrganitzativesPluginMock;
 import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
-
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
 
 public class ProcedimentPluginMock extends RipeaAbstractPluginProperties implements ProcedimentPlugin {
 

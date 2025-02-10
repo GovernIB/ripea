@@ -2,8 +2,6 @@ package es.caib.ripea.plugin.caib.procediment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-
 public class Procediment {
 	private String codigo;
 	private String codigoSIA;

@@ -8,7 +8,6 @@ import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWs;
 import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
 import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
 import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
@@ -24,6 +23,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesFluxSigner;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.ApiFirmaAsyncSimple;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleAnnex;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleDocumentTypeInformation;
@@ -138,7 +138,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			signatureRequest.setAdditionalInformation(null);
 			
 			signatureRequest.setFileToSign(toFirmaAsyncSimpleFile(document));
-			signatureRequest.setDocumentType(new Long(documentTipus));
+			signatureRequest.setDocumentType(Long.valueOf(documentTipus));
 			signatureRequest.setLanguageUI("ca");
 			signatureRequest.setLanguageDoc("ca");
 			signatureRequest.setProfileCode(getPerfil());
@@ -168,7 +168,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 				signatureRequest.setExpedientUrl(getUrlExpedient() + document.getExpedientUuid());
 			}
 			peticioDeFirmaId = getFirmaAsyncSimpleApi().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
-			return new Long(peticioDeFirmaId).toString();
+			return Long.valueOf(peticioDeFirmaId).toString();
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut pujar el document al portafirmes (" +
@@ -184,7 +184,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 	public PortafirmesDocument download(
 			String id) throws SistemaExternException {
 		try {
-			FirmaAsyncSimpleSignatureRequestInfo requestInfo = new FirmaAsyncSimpleSignatureRequestInfo(new Long(id).longValue(), "ca");
+			FirmaAsyncSimpleSignatureRequestInfo requestInfo = new FirmaAsyncSimpleSignatureRequestInfo(Long.valueOf(id).longValue(), "ca");
 			FirmaAsyncSimpleSignedFile fitxerDescarregat = getFirmaAsyncSimpleApi().getSignedFileOfSignatureRequest(requestInfo);
 			
 			PortafirmesDocument downloadedDocument = new PortafirmesDocument();
@@ -215,7 +215,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 	public void delete(
 			String id) throws SistemaExternException {
 		try {
-			FirmaAsyncSimpleSignatureRequestInfo requestInfo = new FirmaAsyncSimpleSignatureRequestInfo(new Long(id).longValue(), "ca");
+			FirmaAsyncSimpleSignatureRequestInfo requestInfo = new FirmaAsyncSimpleSignatureRequestInfo(Long.valueOf(id).longValue(), "ca");
 			getFirmaAsyncSimpleApi().deleteSignatureRequest(requestInfo);
 		} catch (Exception ex) {
 			throw new SistemaExternException(

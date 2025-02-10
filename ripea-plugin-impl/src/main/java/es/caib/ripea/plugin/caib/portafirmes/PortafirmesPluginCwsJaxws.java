@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.caib.cws.*;
@@ -16,6 +15,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.service.intf.utils.Utils;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -100,7 +100,7 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 			UploadResponse uploadResponse = cws.uploadDocument(
 					uploadRequest);
 			comprovarResult(uploadResponse.getResult());
-			return new Integer(uploadResponse.getDocument().getId()).toString();
+			return Integer.valueOf(uploadResponse.getDocument().getId()).toString();
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut pujar el document al portafirmes",
@@ -118,23 +118,23 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 			application.setPassword(getPassword());
 			downloadRequest.setApplication(application);
 			DownloadRequestDocument downloadRequestDocument = new DownloadRequestDocument();
-			downloadRequestDocument.setId(new Long(id).intValue());
+			downloadRequestDocument.setId(Long.valueOf(id).intValue());
 			downloadRequest.setDocument(downloadRequestDocument);
 			downloadRequest.setDownloadDocuments(
 					new JAXBElement<Boolean>(
 							new QName("download-documents"),
 							Boolean.class,
-							new Boolean(true)));
+							true));
 			downloadRequest.setAdditionalInfo(
 					new JAXBElement<Boolean>(
 							new QName("additional-info"),
 							Boolean.class,
-							new Boolean(true)));
+							true));
 			downloadRequest.setArchiveInfo(
 					new JAXBElement<Boolean>(
 							new QName("archive-info"),
 							Boolean.class,
-							new Boolean(true)));
+							true));
 			Cws cws = getCwsService();
 			BindingProvider bp = (BindingProvider)cws;
 			DownloadResponse downloadResponse = cws.downloadDocument(
@@ -171,7 +171,7 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 			application.setPassword(getPassword());
 			deleteRequest.setApplication(application);
 			DeleteRequestDocument deleteRequestDocument = new DeleteRequestDocument();
-			deleteRequestDocument.setId(new Long(id).intValue());
+			deleteRequestDocument.setId(Long.valueOf(id).intValue());
 			DeleteRequestDocuments deleteRequestDocuments = new DeleteRequestDocuments();
 			deleteRequestDocuments.getDocument().add(deleteRequestDocument);
 			deleteRequest.setDocuments(deleteRequestDocuments);
@@ -275,7 +275,7 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 		documentAttributes.setDescription(
 				limitarString(document.getDescripcio(), 250));
 		documentAttributes.setExtension(document.getArxiuExtensio());
-		documentAttributes.setType(new Integer(documentTipus).intValue());
+		documentAttributes.setType(Integer.valueOf(documentTipus).intValue());
 		documentAttributes.setSubject(motiu);
 		Sender sender = new Sender();
 		sender.setName(
@@ -305,12 +305,12 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 				new JAXBElement<Integer>(
 						new QName("type-sign"),
 						Integer.class,
-						new Integer(getSignaturaTipus())));
+						Integer.valueOf(getSignaturaTipus())));
 		documentAttributes.setIsFileSign(
 				new JAXBElement<Boolean>(
 						new QName("is-file-sign"),
 						Boolean.class,
-						new Boolean(document.isFirmat())));
+						document.isFirmat()));
 		uploadRequestDocument.setAttributes(documentAttributes);
 		Steps steps = new Steps();
 		steps.setSignMode(
@@ -324,7 +324,7 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 					new JAXBElement<Integer>(
 							new QName("minimal-signers"),
 							Integer.class,
-							new Integer(bloc.getMinSignataris())));
+							Integer.valueOf(bloc.getMinSignataris())));
 			Signers signers = new Signers();
 			for (String signatari: bloc.getDestinataris()) {
 				Signer signer = new Signer();
@@ -333,7 +333,7 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 						new JAXBElement<Boolean>(
 								new QName("check-cert"),
 								Boolean.class,
-								new Boolean(isCheckCert())));
+								isCheckCert()));
 				signers.getSigner().add(signer);
 			}
 			step.setSigners(signers);
@@ -351,12 +351,12 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 						new JAXBElement<Integer>(
 								new QName("type-sign"),
 								Integer.class,
-								new Integer(getSignaturaTipus())));
+								Integer.valueOf(getSignaturaTipus())));
 				anx.setIsFileSign(
 						new JAXBElement<Boolean>(
 								new QName("is-file-sign"),
 								Boolean.class,
-								new Boolean(annex.isFirmat())));
+								annex.isFirmat()));
 				Sender anxSender = new Sender();
 				anxSender.setName(
 						limitarString(remitent, 50));

@@ -3,6 +3,11 @@ package es.caib.ripea.plugin.caib.firmaweb;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaWebSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAddFileToSignRequest;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleCommonInfo;
@@ -16,12 +21,6 @@ import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactio
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStatus;
 import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaWebSimpleJersey;
 
-import es.caib.ripea.core.api.dto.FirmaResultatDto;
-import es.caib.ripea.core.api.dto.FirmaResultatDto.FirmaSignatureStatus;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.StatusEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 	public String firmaSimpleWebStart(
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
-			UsuariDto usuariActual, 
+			UsuariDto usuariActual,
 			String urlReturnToRipea) {
 		
 		if (getPropertyDebug())
@@ -256,7 +255,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			case FirmaSimpleStatus.STATUS_INITIALIZING: // = 0;
 
 				firmaResultat.addSignature(
-						new FirmaSignatureStatus(
+						new FirmaResultatDto.FirmaSignatureStatus(
 								signID,
 								StatusEnumDto.ERROR,
 								"Incoherent Status (STATUS_INITIALIZING)"));
@@ -264,7 +263,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			case FirmaSimpleStatus.STATUS_IN_PROGRESS: // = 1;
 
 				firmaResultat.addSignature( 
-						new FirmaSignatureStatus(
+						new FirmaResultatDto.FirmaSignatureStatus(
 								signID,
 								StatusEnumDto.ERROR,
 								"Incoherent Status (STATUS_IN_PROGRESS)"));
@@ -274,7 +273,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 
 				String errorMsg = "Error en la firma: " + fss.getErrorMessage() + " (STATUS_ERROR)";
 				firmaResultat.addSignature( 
-						new FirmaSignatureStatus(
+						new FirmaResultatDto.FirmaSignatureStatus(
 								signID,
 								StatusEnumDto.ERROR,
 								errorMsg));
@@ -284,7 +283,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 
 			case FirmaSimpleStatus.STATUS_CANCELLED: // = -2;
 				firmaResultat.addSignature( 
-						new FirmaSignatureStatus(
+						new FirmaResultatDto.FirmaSignatureStatus(
 								signID,
 								StatusEnumDto.WARNING,
 								"L'usuari ha cancel.lat la firma. (STATUS_CANCELLED)"));
@@ -301,7 +300,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 				final String outFile = signID + "_" + fsf.getNom();
 
 				firmaResultat.addSignature( 
-						new FirmaSignatureStatus(
+						new FirmaResultatDto.FirmaSignatureStatus(
 								signID,
 								StatusEnumDto.OK,
 								outFile,

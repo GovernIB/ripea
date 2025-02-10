@@ -1,8 +1,8 @@
 package es.caib.ripea.plugin.caib.summarize;
 
-import es.caib.ripea.core.api.dto.Resum;
-import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;

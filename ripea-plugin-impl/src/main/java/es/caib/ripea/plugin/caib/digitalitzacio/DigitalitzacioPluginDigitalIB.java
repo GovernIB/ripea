@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.fundaciobit.apisib.apimassivescanwebsimple.v1.ApiMassiveScanWebSimple;
 import org.fundaciobit.apisib.apimassivescanwebsimple.v1.beans.MassiveScanWebSimpleAvailableProfile;
 import org.fundaciobit.apisib.apimassivescanwebsimple.v1.beans.MassiveScanWebSimpleAvailableProfiles;
@@ -24,8 +26,6 @@ import org.fundaciobit.apisib.apimassivescanwebsimple.v1.beans.MassiveScanWebSim
 import org.fundaciobit.apisib.apimassivescanwebsimple.v1.jersey.ApiMassiveScanWebSimpleJersey;
 import org.slf4j.LoggerFactory;
 
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioEstat;

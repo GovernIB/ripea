@@ -4,29 +4,25 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.112</version>
+		<version>1.0.0</version>
 	</parent>
 	<artifactId>ripea-plugin-impl</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>es.caib.notib</groupId>
 			<artifactId>notib-client</artifactId>
-			<version>${notib.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
-			<version>${xdocreport.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>fr.opensagres.xdocreport.document.odt</artifactId>
-			<version>${xdocreport.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
-			<version>${xdocreport.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>xml-apis</artifactId>
@@ -45,7 +41,6 @@
 		<dependency>
 			<groupId>fr.opensagres.xdocreport</groupId>
 			<artifactId>fr.opensagres.xdocreport.converter.odt.odfdom</artifactId>
-			<version>${xdocreport.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>xml-apis</artifactId>
@@ -119,12 +114,10 @@
   		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
   		<dependency>
 			<groupId>es.caib.portafib</groupId>
 			<artifactId>portafib-ws-api</artifactId>
-			<version>${portafib.version}</version>
 		</dependency>
 		<!-- Flux firma -->
 		<dependency>
@@ -196,7 +189,6 @@
   		<dependency>
 			<groupId>es.caib.dir3caib</groupId>
 			<artifactId>dir3caib-ws-api</artifactId>
-			<version>${dir3caib.version}</version>
 		</dependency>
   		<dependency>
 			<groupId>es.caib</groupId>
@@ -218,7 +210,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
