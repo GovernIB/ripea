@@ -631,7 +631,7 @@ public class DocumentHelper {
 				fitxer = new FitxerDto();
 				fitxer.setContentType(documentEntity.getFitxerContentType());
 				fitxer.setNom(documentEntity.getFitxerNom());
-				if (isArxiuCaib()) {
+				if (isArxiuCaib(documentEntity.getEntitat()!=null?documentEntity.getEntitat().getCodi():null)) {
 					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 							documentEntity,
 							null,
@@ -1051,24 +1051,13 @@ public class DocumentHelper {
 		return fitxer;
 	}
 
-    @Transactional
-    public Document getFitxerById(Long adjuntId, EventTipusEnumDto eventTipus){
-        switch (eventTipus){
-            case ENVIAR_FICHERO:
-                DocumentEntity document = documentRepository.findOne(adjuntId);
-                return pluginHelper.arxiuDocumentConsultar(
-                        document,
-                        null,
-                        null,
-                        true,
-                        false);
-        }
-        return null;
+    public FitxerDto getFitxerAssociat(Long documentId, String versio) {
+    	DocumentEntity document = documentRepository.findOne(documentId);
+    	return getFitxerAssociat(document, versio);
     }
-
-	public FitxerDto getFitxerAssociat(
-			DocumentEntity document,
-			String versio) {
+    
+	public FitxerDto getFitxerAssociat(DocumentEntity document, String versio) {
+		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
@@ -1097,7 +1086,14 @@ public class DocumentHelper {
 						versio,
 						true,
 						false);
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+				fitxer.setContingut(
+						getContingutFromArxiuDocument(
+								arxiuDocument,
+								configHelper.getEntitatActualCodi()==null?
+										document.getEntitat()!=null?
+												document.getEntitat().getCodi()
+												:null
+										:configHelper.getEntitatActualCodi()));
 			}
 
 		} else {
@@ -1178,8 +1174,12 @@ public class DocumentHelper {
 		return documentsChosen;
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	public byte[] getContingutFromArxiuDocument(Document arxiuDocument) {
+		return getContingutFromArxiuDocument(arxiuDocument, null);
+	}
+	
+	@SuppressWarnings("incomplete-switch")
+	public byte[] getContingutFromArxiuDocument(Document arxiuDocument, String codiEntitat) {
 		byte[] contingut = null;
 		DocumentContingut document = arxiuDocument.getContingut();
 		List<Firma> firmes = arxiuDocument.getFirmes();
@@ -1187,7 +1187,7 @@ public class DocumentHelper {
 		if (firmes == null || firmes.isEmpty()) {
 			contingut = document.getContingut();
 		} else {
-            boolean isArxiuCaib = isArxiuCaib();
+            boolean isArxiuCaib = isArxiuCaib(codiEntitat);
 			for (Firma firma: firmes) {
 				if (firma.getTipus() != FirmaTipus.CSV) {
 					switch(firma.getTipus()) {
@@ -1649,8 +1649,12 @@ public class DocumentHelper {
 	public boolean isEnviarContingutExistentActiu(){
 		return configHelper.getAsBoolean("es.caib.ripea.document.enviar.contingut.existent");
 	}
-	public boolean isArxiuCaib() {
-		return pluginHelper.getArxiuPlugin().getPlugin() instanceof ArxiuPluginCaib;
+	public boolean isArxiuCaib(String codiEntitat) {
+		if (configHelper.getEntitatActualCodi()==null) {
+			return pluginHelper.getArxiuPlugin(codiEntitat).getPlugin() instanceof ArxiuPluginCaib;
+		} else {
+			return pluginHelper.getArxiuPlugin().getPlugin() instanceof ArxiuPluginCaib;
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);

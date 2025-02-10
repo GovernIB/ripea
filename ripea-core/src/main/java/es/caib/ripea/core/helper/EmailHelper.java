@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.repository.*;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.api.dto.EventTipusEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -40,11 +46,12 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.core.repository.ExpedientPeticioRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 @Component
 public class EmailHelper {
@@ -60,7 +67,6 @@ public class EmailHelper {
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
     @Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-    @Autowired private DocumentRepository documentRepository;
     @Autowired private DocumentHelper documentHelper;
 
 	public void contingutAgafatPerAltreUsusari(
@@ -1162,7 +1168,7 @@ public class EmailHelper {
         }
 
         String subject = getPrefixRipea() + " Enviar document";
-        String text ="Enviament de misatge amb document adjunt";
+        String text ="Ha rebut el següent document adjunt a partir de la funció 'Enviar document via email' de RIPEA.";
 
         sendOrSaveEmail(
                 destinatarisNoAgrupats,
@@ -1225,9 +1231,10 @@ public class EmailHelper {
                 helper.setText(text);
 
                 if (adjuntId != null) {
-                    Document fitxer = documentHelper.getFitxerById(adjuntId, eventTipus);
+//                    Document fitxer = documentHelper.getFitxerById(adjuntId, eventTipus);
+                	FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
                     if (fitxer != null) {
-                        helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut().getContingut()));
+                        helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
                     }
                 }
                 mailSender.send(message);
@@ -1263,11 +1270,11 @@ public class EmailHelper {
 		if (usuari != null) {
 			email = getEmail(usuari);
 			if (Utils.isNotEmpty(email)) {
-				if (event == null) {
+				if (event == null || EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
 					addDestinatari = true;
-				} else if (event == EventTipusEnumDto.NOVA_ANOTACIO && usuari.isRebreAvisosNovesAnotacions()) {
+				} else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event) && usuari.isRebreAvisosNovesAnotacions()) {
 					addDestinatari = true;
-				} else if (event == EventTipusEnumDto.CANVI_ESTAT_REVISIO){
+				} else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
                     addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
                 }
 			}

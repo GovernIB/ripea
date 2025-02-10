@@ -317,10 +317,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
                     text += emailPendentEnviarEntity.getText() + "\n\n";
 
                     if (emailPendentEnviarEntity.getAdjuntId() != null) {
-                        Document fitxer = documentHelper.getFitxerById(
-                                emailPendentEnviarEntity.getAdjuntId(), emailPendentEnviarEntity.getEventTipusEnum());
+//                        Document fitxer = documentHelper.getFitxerById(
+//                                emailPendentEnviarEntity.getAdjuntId(),
+//                                emailPendentEnviarEntity.getEventTipusEnum());
+                    	FitxerDto fitxer = documentHelper.getFitxerAssociat(emailPendentEnviarEntity.getAdjuntId(), null);
                         if (fitxer != null) {
-                            helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut().getContingut()));
+                            helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
                         }
                     }
                 }
