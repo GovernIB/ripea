@@ -114,6 +114,7 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute(command);
 		boolean isRolAdmin = RolHelper.isRolActualAdministrador(request);
 		model.addAttribute("isRolAdmin", isRolAdmin);
+		model.addAttribute("isRolDissenyadorOrgan", RolHelper.isRolActualDissenyadorOrgan(request));
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
 		
@@ -124,7 +125,7 @@ public class MetaExpedientController extends BaseAdminController {
 				MissatgesHelper.info(request, "<a href=\"metaExpedientRevisio\">" + getMessage(request, "metaexpedient.revisio.admin.pendent.revisar.alerta", new Object[] {count}) + "&nbsp;<i class=\"fa fa-external-link\"></i></a>");
 			}
 		}
-		
+
 		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
 		
 		return "metaExpedientList";
