@@ -6,7 +6,8 @@ package es.caib.ripea.back.interceptor;
 import es.caib.ripea.back.helper.AvisHelper;
 import es.caib.ripea.service.intf.service.AvisService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AvisosInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class AvisosInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	private AvisService avisService;

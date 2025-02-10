@@ -3,18 +3,17 @@ package es.caib.ripea.back.interceptor;
 import es.caib.ripea.back.helper.AnotacionsPendentsHelper;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class AnotacionsPendentsInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class AnotacionsPendentsInterceptor implements AsyncHandlerInterceptor {
 
-	
 	@Autowired
 	private ExpedientPeticioService expedientPeticioService;
-
-
 
 	@Override
 	public boolean preHandle(
@@ -26,5 +25,5 @@ public class AnotacionsPendentsInterceptor extends HandlerInterceptorAdapter {
 				expedientPeticioService);
 		return true;
 	}
-	
+
 }

@@ -1,8 +1,0 @@
-databaseChangeLog:
-- changeSet:
-    id: 1699878361884-1
-    author: limit
-    changes:
-    - sql:
-        sql:  
-          update ipa_interessat set document_tipus = 'NIF' where document_tipus = 'CIF';

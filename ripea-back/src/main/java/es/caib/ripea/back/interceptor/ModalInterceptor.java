@@ -4,7 +4,8 @@
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.ModalHelper;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ModalInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class ModalInterceptor implements AsyncHandlerInterceptor {
 
 	@Override
 	public boolean preHandle(
@@ -22,7 +24,6 @@ public class ModalInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		boolean resposta = ModalHelper.comprovarModalInterceptor(request, response);
-		// System.out.println(">>> MODAL: " + request.getRequestURI() + ", " + AjaxHelper.isAjax(request));
 		return resposta;
 	}
 

@@ -7,7 +7,8 @@ import es.caib.ripea.back.helper.SessioHelper;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class SessioInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class SessioInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	private AplicacioService aplicacioService;

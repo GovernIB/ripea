@@ -7,7 +7,8 @@ import es.caib.ripea.back.helper.ExpedientHelper;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,13 +18,14 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ExpedientsInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class ExpedientsInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private AplicacioService aplicacioService;
-	
+
 	@Override
 	public boolean preHandle(
 			HttpServletRequest request,

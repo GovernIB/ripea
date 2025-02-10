@@ -4,7 +4,7 @@
 package es.caib.ripea.back.config;
 
 import com.opensymphony.module.sitemesh.filter.PageFilter;
-import es.caib.distribucio.back.interceptor.*;
+import es.caib.ripea.back.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -23,9 +23,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 @DependsOn("ejbClientConfig")
-@SuppressWarnings("deprecation")
 public class WebMvcConfig implements WebMvcConfigurer {
 
+	@Autowired
+	private MetaExpedientInterceptor metaExpedientInterceptor;
 	@Autowired
 	private AplicacioInterceptor aplicacioInterceptor;
 	@Autowired
@@ -41,13 +42,32 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired
 	private AjaxInterceptor ajaxInterceptor;
 	@Autowired
-	private ElementsPendentsBustiaInterceptor elementsPendentsBustiaInterceptor;
+	private ExpedientsInterceptor expedientsInterceptor;
+	@Autowired
+	private TasquesPendentsInterceptor tasquesPendentsInterceptor;
+	@Autowired
+	private AnotacionsPendentsInterceptor anotacionsPendentsInterceptor;
+	@Autowired
+	private SeguimentEnviamentsUsuariInterceptor seguimentEnviamentsUsuariInterceptor;
 	@Autowired
 	private AvisosInterceptor avisosInterceptor;
 	@Autowired
+	private FluxFirmaInterceptor fluxFirmaInterceptor;
+
+	@Autowired
 	private AccesAdminInterceptor accesAdminInterceptor;
 	@Autowired
-	private AccesMetadadaInterceptor accesMetadadaInterceptor;
+	private AccesAdminEntitatInterceptor accesAdminEntitatInterceptor;
+	@Autowired
+	private AccesAdminEntitatOAdminOrganORevisorInterceptor accesAdminEntitatOAdminOrganORevisorInterceptor;
+	@Autowired
+	private AccesAdminEntitatORevisorInterceptor accesAdminEntitatORevisorInterceptor;
+	@Autowired
+	private AccesAdminEntitatOrUsuariInterceptor accesAdminEntitatOrUsuariInterceptor;
+	@Autowired
+	private AccesURLsInstruccioInterceptor accesURLsInstruccioInterceptor;
+	@Autowired
+	private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired
 	private AccesSuperInterceptor accesSuperInterceptor;
 
@@ -79,12 +99,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/**/selection/**",
 				"/**/rest/notib**",
 				"/**/rest/notib/**",
-				"/api/rest**",
-				"/api/rest/**",
+				"/**/rest/portafib**",
+				"/**/rest/portafib/**",
+				"/api/historic**",
+				"/api/historic/**",
 				"/api-docs/**",
 				"/**/api-docs/",
 				"/public/**"
 		};
+		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(sessioInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedPathPatterns);
@@ -92,68 +115,142 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(modalInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(nodecoInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(ajaxInterceptor).excludePathPatterns(excludedPathPatterns);
-		registry.addInterceptor(elementsPendentsBustiaInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(expedientsInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(tasquesPendentsInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(anotacionsPendentsInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(seguimentEnviamentsUsuariInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(avisosInterceptor).excludePathPatterns(excludedPathPatterns);
-		registry.addInterceptor(accesAdminInterceptor).addPathPatterns(new String[] {
-				"/bustiaAdminOrganigrama**",
-				"/bustiaAdminOrganigrama/**",
-				"/unitatOrganitzativa**",
-				"/unitatOrganitzativa/**",
-				"/regla**",
-				"/regla/**",
-				"/backoffice**",
-				"/backoffice/**",
-				"/permis**",
-				"/permis/**",
-				"/contingutAdmin**",
-				"/contingutAdmin/**",
-				"/registreAdmin**",
-				"/registreAdmin/**",
-				"/procediment/**",
-				"/procediment**",
-		});
-		registry.addInterceptor(accesMetadadaInterceptor).addPathPatterns(new String[] {
-				"/metaDada**",
-				"/metaDada/**",
-				"/domini**",
-				"/domini/**",
-		});
-		registry.addInterceptor(accesSuperInterceptor).addPathPatterns(new String[] {
-				"/entitat**",
-				"/entitat/**",
-				"/integracio**",
-				"/integracio/**",
-				"/excepcio**",
-				"/excepcio/**",
-				"/registreUser/metriquesView**",
-				"/registreUser/metriquesView/**",
-				"/registreUser/anotacionsPendentArxiu**",
-				"/registreUser/anotacionsPendentArxiu/**",
-				"/monitor**",
-				"/monitor/**",
-				"/config**",
-				"/config/**",
-				"/avis**",
-				"/avis/**",
-		}).excludePathPatterns(new String[] {
-				"/entitat/logo",
-				"/entitat/**/logo"
-		});
+		registry.addInterceptor(fluxFirmaInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(accesAdminEntitatOAdminOrganORevisorInterceptor).
+				addPathPatterns(
+						"/metaExpedient**",
+						"/metaExpedient/**",
+						"/grup**",
+						"/grup/**").
+				excludePathPatterns(
+						"/metaExpedient/findPerLectura/**",
+						"/metaExpedient/**/meta**",
+						"/metaExpedient/**/meta**/**",
+						"/metaExpedient/**/tasca**",
+						"/metaExpedient/**/tasca**/**",
+						"/metaExpedient/**/grup**",
+						"/metaExpedient/**/grup**/**",
+						"/metaExpedient/**/permis**",
+						"/metaExpedient/**/permis**/**",
+						"/metaExpedientRevisio**",
+						"/metaExpedientRevisio/**");
+		registry.addInterceptor(accesAdminEntitatInterceptor).
+				addPathPatterns(
+						"/domini**",
+						"/domini/**",
+						"/organgestor**",
+						"/organgestor/**",
+						"/permis**",
+						"/permis/**",
+						"/contingutAdmin**",
+						"/contingutAdmin/**",
+						"/seguimentTasques**",
+						"/seguimentTasques/**",
+						"/seguimentExpedientsPendents**",
+						"/seguimentExpedientsPendents/**",
+						"/urlInstruccio**",
+						"/urlInstruccio/**").
+				excludePathPatterns(
+						"/urlInstruccio/list**",
+						"/urlInstruccio/list/",
+						"/metaExpedientRevisio**",
+						"/metaExpedientRevisio/**");
+		registry.addInterceptor(accesAdminEntitatOrUsuariInterceptor).
+				addPathPatterns(
+						"/seguimentPortafirmes**",
+						"/seguimentPortafirmes/**",
+						"/seguimentNotificacions**",
+						"/seguimentNotificacions/**");
+		registry.addInterceptor(accesAdminEntitatORevisorInterceptor).
+				addPathPatterns(
+						"/metaExpedientRevisio**",
+						"/metaExpedientRevisio/**");
+		registry.addInterceptor(accesURLsInstruccioInterceptor).
+				addPathPatterns(
+						"/urlInstruccio**",
+						"/urlInstruccio/**");
+		registry.addInterceptor(accesFluxosFirmaUsuariInterceptor).
+				addPathPatterns(
+						"/fluxusuari**",
+						"/fluxusuari/**");
+		registry.addInterceptor(accesSuperInterceptor).
+				addPathPatterns(
+						"/entitat**",
+						"/entitat/**",
+						"/integracio**",
+						"/integracio/**",
+						"/excepcio**",
+						"/excepcio/**",
+						"/excepcio**",
+						"/excepcio/**",
+						"/avis**",
+						"/avis/**").
+				excludePathPatterns(
+						"/entitat/getEntitatLogo");
+
+
+
+
+		registry.addInterceptor(accesAdminInterceptor).
+				addPathPatterns(
+						"/bustiaAdminOrganigrama**",
+						"/bustiaAdminOrganigrama/**",
+						"/unitatOrganitzativa**",
+						"/unitatOrganitzativa/**",
+						"/regla**",
+						"/regla/**",
+						"/backoffice**",
+						"/backoffice/**",
+						"/permis**",
+						"/permis/**",
+						"/contingutAdmin**",
+						"/contingutAdmin/**",
+						"/registreAdmin**",
+						"/registreAdmin/**",
+						"/procediment/**",
+						"/procediment**");
+		registry.addInterceptor(accesSuperInterceptor).
+				addPathPatterns(
+						"/entitat**",
+						"/entitat/**",
+						"/integracio**",
+						"/integracio/**",
+						"/excepcio**",
+						"/excepcio/**",
+						"/registreUser/metriquesView**",
+						"/registreUser/metriquesView/**",
+						"/registreUser/anotacionsPendentArxiu**",
+						"/registreUser/anotacionsPendentArxiu/**",
+						"/monitor**",
+						"/monitor/**",
+						"/config**",
+						"/config/**",
+						"/avis**",
+						"/avis/**").
+				excludePathPatterns(
+						"/entitat/logo",
+						"/entitat/**/logo");
 	}
-	
+
 	/** Configura el firewall per permetre caràcters codificats com el % ja que aquests s'usen en la codificació
 	 * dels identificadors en els enllaços públics de descàrrega de documents.
 	 * 
 	 * @return
 	 */
 	@Bean
-    public HttpFirewall getHttpFirewall() {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
-        firewall.setAllowSemicolon(true);
-        firewall.setAllowUrlEncodedSlash(true);
-        firewall.setAllowBackSlash(true);
-        firewall.setAllowUrlEncodedPercent(true);
-        firewall.setAllowUrlEncodedPeriod(true);
-        return firewall;
-    }
+	public HttpFirewall getHttpFirewall() {
+		StrictHttpFirewall firewall = new StrictHttpFirewall();
+		firewall.setAllowSemicolon(true);
+		firewall.setAllowUrlEncodedSlash(true);
+		firewall.setAllowBackSlash(true);
+		firewall.setAllowUrlEncodedPercent(true);
+		firewall.setAllowUrlEncodedPeriod(true);
+		return firewall;
+	}
+
 }

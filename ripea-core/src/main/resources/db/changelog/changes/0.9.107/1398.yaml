@@ -1,7 +1,0 @@
-databaseChangeLog:
-- changeSet:
-    id: 1708087778804-1
-    author: limit
-    changes:
-    - sql:
-        sql:  update ipa_usuari set vista_actual = 'TREETABLE_PER_CARPETA';

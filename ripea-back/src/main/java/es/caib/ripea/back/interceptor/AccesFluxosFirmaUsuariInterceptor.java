@@ -4,6 +4,8 @@
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.FluxFirmaHelper;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +16,8 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AccesFluxosFirmaUsuariInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class AccesFluxosFirmaUsuariInterceptor implements AsyncHandlerInterceptor {
 
 	@Override
 	public boolean preHandle(

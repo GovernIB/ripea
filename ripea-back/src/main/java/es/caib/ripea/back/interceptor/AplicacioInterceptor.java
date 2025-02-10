@@ -4,7 +4,8 @@
 package es.caib.ripea.back.interceptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.ServletContext;
@@ -18,13 +19,13 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-
 /**
  * Interceptor per a les accions de context d'aplicació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AplicacioInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class AplicacioInterceptor implements AsyncHandlerInterceptor {
 
 	public static final String REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES = "manifestAtributes";
 

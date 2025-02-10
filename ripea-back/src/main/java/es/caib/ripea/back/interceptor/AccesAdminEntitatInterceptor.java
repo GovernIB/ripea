@@ -7,7 +7,8 @@ import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,11 +18,11 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class AccesAdminEntitatInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class AccesAdminEntitatInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-
 
 	@Override
 	public boolean preHandle(

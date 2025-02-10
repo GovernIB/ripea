@@ -7,7 +7,8 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,29 +19,29 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class LlistaEntitatsInterceptor implements AsyncHandlerInterceptor {
 
-    @Autowired private EntitatService entitatService;
-    @Autowired private OrganGestorService organGestorService;
-    @Autowired private AplicacioService aplicacioService;
-    
-    @Override
-    public boolean preHandle(
-    		HttpServletRequest request,
-    		HttpServletResponse response,
-    		Object handler) throws Exception {
-        if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-            EntitatHelper.processarCanviEntitats(request, entitatService, aplicacioService);
-            EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-            EntitatHelper.processarCanviOrganGestor(request, aplicacioService);
-            EntitatHelper.findEntitatsAccessibles(request, entitatService);
-        }
-        
-    	EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+	@Autowired private EntitatService entitatService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private AplicacioService aplicacioService;
+
+	@Override
+	public boolean preHandle(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Object handler) throws Exception {
+		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
+			EntitatHelper.processarCanviEntitats(request, entitatService, aplicacioService);
+			EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+			EntitatHelper.processarCanviOrganGestor(request, aplicacioService);
+			EntitatHelper.findEntitatsAccessibles(request, entitatService);
+		}
+		EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
 		if (entitatDto != null) {
 			entitatService.setConfigEntitat(entitatDto);
-		}		
-        
-        return true;
-    }
+		}
+		return true;
+	}
+
 }

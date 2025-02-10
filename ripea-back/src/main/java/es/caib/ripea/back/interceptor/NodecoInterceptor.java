@@ -4,7 +4,8 @@
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.NodecoHelper;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +16,8 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NodecoInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class NodecoInterceptor implements AsyncHandlerInterceptor {
 
 	@Override
 	public boolean preHandle(

@@ -3,14 +3,15 @@ package es.caib.ripea.back.interceptor;
 import es.caib.ripea.back.helper.SeguimentEnviamentsUsuariHelper;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class SeguimentEnviamentsUsuariInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class SeguimentEnviamentsUsuariInterceptor implements AsyncHandlerInterceptor {
 
-	
 	@Autowired
 	private AplicacioService aplicacioService;
 

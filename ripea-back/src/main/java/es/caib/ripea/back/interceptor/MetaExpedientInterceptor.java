@@ -6,13 +6,14 @@ package es.caib.ripea.back.interceptor;
 import es.caib.ripea.back.helper.MetaExpedientHelper;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-public class MetaExpedientInterceptor extends HandlerInterceptorAdapter {
+@Component
+public class MetaExpedientInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;

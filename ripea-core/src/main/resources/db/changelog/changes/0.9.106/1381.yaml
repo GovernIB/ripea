@@ -1,9 +1,0 @@
-databaseChangeLog:    
-- changeSet:
-    id: 1705668944465-1
-    author: limit
-    changes:
-    - sql:
-        sql: delete from ipa_config where key like '%escaneig%';
-             delete from ipa_config_group where description like '%escaneig%';
-        

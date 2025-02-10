@@ -57,7 +57,14 @@ import java.util.*;
 @ConditionalOnWarDeployment
 public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 
-	@Value("${es.caib.distribucio.security.mappableRoles:" + BaseConfig.ROLE_SUPER + "," + BaseConfig.ROLE_ADMIN + "," + BaseConfig.ROLE_ADMIN_LECTURA + "," + BaseConfig.ROLE_REGLA + "," + BaseConfig.ROLE_BUSTIA_WS + "}")
+	@Value("${es.caib.distribucio.security.mappableRoles:" +
+			BaseConfig.ROLE_SUPER + "," +
+			BaseConfig.ROLE_ADMIN + "," +
+			BaseConfig.ROLE_ORGAN_ADMIN + "," +
+			BaseConfig.ROLE_BSTWS + "," +
+			BaseConfig.ROLE_API_HIST + "," +
+			BaseConfig.ROLE_REVISIO + "," +
+			BaseConfig.ROLE_USER + "}")
 	private String mappableRoles;
 	@Value("${es.caib.distribucio.security.nameAttributeKey:preferred_username}")
 	private String nameAttributeKey;
