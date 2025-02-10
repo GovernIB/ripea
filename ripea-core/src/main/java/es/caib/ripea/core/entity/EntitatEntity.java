@@ -70,7 +70,8 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 			String cif,
 			String unitatArrel,
 			String capsaleraColorFons,
-			String capsaleraColorLletra) {
+			String capsaleraColorLletra,
+            boolean permetreEnviamentPostal) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
@@ -78,6 +79,7 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 		this.unitatArrel = unitatArrel;
 		this.capsaleraColorFons = capsaleraColorFons;
 		this.capsaleraColorLletra = capsaleraColorLletra;
+		this.permetreEnviamentPostal = permetreEnviamentPostal;
 	}
 	
 	public void updateLogoImgBytes(
