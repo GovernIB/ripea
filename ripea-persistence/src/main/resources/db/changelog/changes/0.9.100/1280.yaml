@@ -1,0 +1,285 @@
+databaseChangeLog:
+- changeSet:
+    id: 1682673428002-1
+    author: limit
+    changes:
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.firmasimpleasync.url
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Url de l'api firma simple async
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 1
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1         
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.firmasimpleasync.username
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Usuari de l'api firma simple async
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 2
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1 
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.firmasimpleasync.password
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Constrasenya de l'api firma simple async
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 3
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: PASSWORD
+          - column:
+              name: configurable
+              value: 1              
+          - column:
+              name: configurable_organ
+              value: 1                 
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.firmasimpleflux.url
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Url de l'api firma simple flux
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 4
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1         
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.firmasimpleflux.username
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Usuari de l'api firma simple flux
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 5
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1 
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.firmasimpleflux.password
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Constrasenya de l'api firma simple flux
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 6
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: PASSWORD
+          - column:
+              name: configurable
+              value: 1              
+          - column:
+              name: configurable_organ
+              value: 1    
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.usuarientitatws.url
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Url de UsuariEntitat webservice
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 7
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1         
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.usuarientitatws.username
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Usuari de UsuariEntitat webservice
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 8
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1 
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.portafirmes.usuarientitatws.password
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Constrasenya de UsuariEntitat webservice
+          - column:
+              name: group_code
+              value: PORTAFIRMES
+          - column:
+              name: position
+              value: 9
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: PASSWORD
+          - column:
+              name: configurable
+              value: 1              
+          - column:
+              name: configurable_organ
+              value: 1                     
+    - sql:
+        sql:  
+          delete from ipa_config where key like '%.plugin.portafirmes.portafib.base.url';
+          delete from ipa_config where key like '%.plugin.portafirmes.portafib.username';
+          delete from ipa_config where key like '%.plugin.portafirmes.portafib.password';   
+          update ipa_config set position = 10 where key = 'es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio';
+          update ipa_config set position = 11 where key = 'es.caib.ripea.plugin.portafirmes.carrer.mostrar.persona';
+          update ipa_config set position = 0 where key = 'es.caib.ripea.plugin.portafirmes.class';
+          
+                                  

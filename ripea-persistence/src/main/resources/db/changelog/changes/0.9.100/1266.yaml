@@ -1,0 +1,114 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1685347347557-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: nom_catala
+            type: varchar(256 ${varcharunit})
+        tableName: ipa_tipus_documental
+    - sql:
+        sql:  
+            update ipa_tipus_documental set nom_catala = 'Resolució' where codi = 'TD01';
+            update ipa_tipus_documental set nom_catala = 'Acord' where codi = 'TD02';
+            update ipa_tipus_documental set nom_catala = 'Contracte' where codi = 'TD03';
+            update ipa_tipus_documental set nom_catala = 'Conveni' where codi = 'TD04';
+            update ipa_tipus_documental set nom_catala = 'Declaració' where codi = 'TD05';
+            update ipa_tipus_documental set nom_catala = 'Comunicació' where codi = 'TD06';
+            update ipa_tipus_documental set nom_catala = 'Notificació' where codi = 'TD07';
+            update ipa_tipus_documental set nom_catala = 'Publicació' where codi = 'TD08';
+            update ipa_tipus_documental set nom_catala = 'Acusament de rebut' where codi = 'TD09';
+            update ipa_tipus_documental set nom_catala = 'Acta' where codi = 'TD10';
+            update ipa_tipus_documental set nom_catala = 'Certificat' where codi = 'TD11';
+            update ipa_tipus_documental set nom_catala = 'Diligència' where codi = 'TD12';
+            update ipa_tipus_documental set nom_catala = 'Informe' where codi = 'TD13';
+            update ipa_tipus_documental set nom_catala = 'Sol·licitud' where codi = 'TD14';
+            update ipa_tipus_documental set nom_catala = 'Denúncia' where codi = 'TD15';
+            update ipa_tipus_documental set nom_catala = 'Al·legació' where codi = 'TD16';
+            update ipa_tipus_documental set nom_catala = 'Recursos' where codi = 'TD17';
+            update ipa_tipus_documental set nom_catala = 'Comunicació ciutadà' where codi = 'TD18';
+            update ipa_tipus_documental set nom_catala = 'Factura' where codi = 'TD19';
+            update ipa_tipus_documental set nom_catala = 'Altres incautats' where codi = 'TD20';
+            update ipa_tipus_documental set nom_catala = 'Altres' where codi = 'TD99';
+            update ipa_config set description = 'Activar gestió de tipus documentals NTI' where key like '%habilitar.tipusdocument';
+            delete from ipa_config where key like '%.arxiu.metadocumental.addicional.actiu';    
+# It was decided to suspend for now funcionality of codi especific (email 2023.05.30 13:00). Probably there will be another issue in the future to add it.
+#    - addColumn:
+#        columns:
+#        - column:
+#            name: codi_especific
+#            type: varchar(64 ${varcharunit})
+#        tableName: ipa_tipus_documental
+#    - insert:
+#        tableName: ipa_config
+#        columns:
+#          - column:
+#              name: key
+#              value: es.caib.ripea.tipus.documentals.nti.codi.especific
+#          - column:
+#              name: value
+#              value: true
+#          - column:
+#              name: description
+#              value: Utilitzar codi específic dels tipus documentals NTI
+#          - column:
+#              name: group_code
+#              value: ALTRES
+#          - column:
+#              name: position
+#              value: 12
+#          - column:
+#              name: jboss_property
+#              value: 0
+#          - column:
+#              name: type_code
+#              value: BOOL
+#          - column:
+#              name: configurable
+#              value: 0
+#          - column:
+#              name: configurable_organ
+#              value: 0
+# not sure if should be connected by foreign key
+#    - addColumn:
+#        columns:        
+#        - column:
+#            name: nti_tipusdoc
+#            type: BIGINT
+#        tableName: ipa_metadocument        
+#    - addForeignKeyConstraint:
+#        baseColumnNames: nti_tipusdoc
+#        baseTableName: ipa_metadocument
+#        constraintName: ipa_tipdoc_metadoc_fk
+#        referencedColumnNames: id
+#        referencedTableName: ipa_tipus_documental  
+#UPDATE ipa_metadocument md
+#SET
+#    md.nti_tipusdoc = (
+#        SELECT
+#            td.id
+#        FROM
+#            ipa_tipus_documental td
+#        WHERE
+#            td.codi = md.nti_tipdoc
+#            AND td.entitat_id = (
+#                SELECT
+#                    ipa_metaexpedient.entitat_id
+#                FROM
+#                    ipa_metadocument
+#                    JOIN ipa_metaexpedient ON ipa_metadocument.id = ipa_metaexpedient.id
+#                WHERE
+#                    ipa_metadocument.id = md.id
+#            )
+#    );
+

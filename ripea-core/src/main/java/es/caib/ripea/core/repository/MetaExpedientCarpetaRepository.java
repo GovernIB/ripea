@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientCarpetaEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

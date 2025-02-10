@@ -14,9 +14,9 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.MetaDocumentEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

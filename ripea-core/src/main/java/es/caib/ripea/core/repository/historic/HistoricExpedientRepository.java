@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.HistoricExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.HistoricExpedientEntity;
+import es.caib.ripea.core.persistence.OrganGestorEntity;
 
 @Transactional
 public interface HistoricExpedientRepository extends HistoricRepository<HistoricExpedientEntity> {

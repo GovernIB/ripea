@@ -1,0 +1,69 @@
+databaseChangeLog:
+- changeSet:
+    id: init-grant-1
+    author: limit (generated)
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_alerta TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_carpeta TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_contingut TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_cont_log TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_cont_mov TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_dada TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_document TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_document_enviament TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_document_enviament_dis TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_document_enviament_doc TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_document_enviament_inter TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_domini TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_email_pendent_enviar TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_entitat TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_execucio_massiva TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_estat TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_interessat TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_organpare TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_peticio TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_rel TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_seguidor TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_expedient_tasca TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_exp_comment TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_grup TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_historic TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_hist_expedient TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_hist_exp_interessat TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_hist_exp_usuari TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_interessat TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_massiva_contingut TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metadada TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metadocument TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metaexpedient TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metaexpedient_carpeta TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metaexpedient_grup TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metaexp_organ TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metaexp_seq TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metaexp_tasca TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_metanode TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_node TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_organ_gestor TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_portafirmes_block TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_portafirmes_block_info TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_registre TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_registre_annex TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_registre_interessat TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_tipus_documental TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_usuari TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_usuari_viafirma_ripea TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_viafirma_usuari TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_acl_sid TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_acl_class TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_acl_object_identity TO www_ripea;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ipa_acl_entry TO www_ripea;
+
+GRANT SELECT ON ipa_hibernate_sequence TO www_ripea;
+GRANT SELECT ON ipa_acl_sid_seq TO www_ripea;
+GRANT SELECT ON ipa_acl_class_seq TO www_ripea;
+GRANT SELECT ON ipa_acl_oid_seq TO www_ripea;
+GRANT SELECT ON ipa_acl_entry_seq TO www_ripea;"

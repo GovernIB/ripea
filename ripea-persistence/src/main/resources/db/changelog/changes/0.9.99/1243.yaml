@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1679321539857-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.expedient.propagar.metadades
+              - column:
+                  name: value
+                  value: true
+              - column:
+                  name: description
+                  value: Permetre enviar les metadades marcades com 'Enviables arxiu' a l'arxiu
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 32
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1
+        - addColumn:
+            tableName: ipa_metadada
+            columns:
+              - column:
+                  name: enviable
+                  type: BOOLEAN
+                  defaultValue: ${booleanFalse}
+        - addColumn:
+            tableName: ipa_metadada
+            columns:
+              - column:
+                  name: metadada_arxiu
+                  type: varchar(255 ${varcharUnit})

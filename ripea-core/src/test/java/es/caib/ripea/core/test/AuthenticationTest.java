@@ -1,6 +1,6 @@
 package es.caib.ripea.core.test;
 
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import es.caib.ripea.core.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

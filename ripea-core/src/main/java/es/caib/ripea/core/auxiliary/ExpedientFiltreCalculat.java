@@ -5,12 +5,12 @@ import java.util.List;
 
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.GrupEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
+import es.caib.ripea.core.persistence.ExpedientEstatEntity;
+import es.caib.ripea.core.persistence.GrupEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.OrganGestorEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import lombok.Setter;
 
 @Setter

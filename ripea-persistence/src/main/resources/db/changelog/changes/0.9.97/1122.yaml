@@ -1,0 +1,12 @@
+databaseChangeLog:
+- changeSet:
+    id: 1629371481-2
+    author: limit
+    changes:
+    - sql: 
+        sql: "
+                INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (6, 'PLUGINS', 'DADES_EXT_PINBAL', 'Configuració del plugin de dades externes per consultes a PINBAL' );
+                
+                Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE, CONFIGURABLE) values ('es.caib.ripea.plugin.dadesextpinbal.class','es.caib.ripea.plugin.caib.dadesext.DadesExternesPluginCaib','Classe del plugin','DADES_EXT_PINBAL','1','0','DADESEXT_CLASS',null,null, 1);
+                Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE, CONFIGURABLE) values ('es.caib.ripea.plugin.dadesextcaib.service.url',null,'Url del plugin','DADES_EXT_PINBAL','2','1','TEXT',null,null, 1);        
+             "

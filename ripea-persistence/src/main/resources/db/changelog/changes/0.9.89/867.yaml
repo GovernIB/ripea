@@ -1,0 +1,18 @@
+databaseChangeLog:
+- changeSet:
+   id:  1638267492000-1  
+   author: limit
+   runOnChange: true
+   changes:
+   - modifyDataType:  
+      columnName:  FIRMA_TIPUS  
+      newDataType:  varchar2(30)  
+      tableName:  IPA_REGISTRE_ANNEX
+   - modifyDataType:  
+      columnName:  TIPUS_MIME  
+      newDataType:  varchar2(255)  
+      tableName:  IPA_REGISTRE_ANNEX
+   - modifyDataType:  
+      columnName:  NOM  
+      newDataType:  varchar2(255)  
+      tableName:  IPA_REGISTRE_ANNEX

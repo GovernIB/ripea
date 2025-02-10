@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.persistence.DadaEntity;
+import es.caib.ripea.core.persistence.MetaDadaEntity;
+import es.caib.ripea.core.persistence.NodeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

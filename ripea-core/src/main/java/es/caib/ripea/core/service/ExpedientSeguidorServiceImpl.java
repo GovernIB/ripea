@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.ExpedientSeguidorService;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.repository.UsuariRepository;

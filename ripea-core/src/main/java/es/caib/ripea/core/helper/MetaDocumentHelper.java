@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.PinbalServeiEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.MetaDocumentEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.PinbalServeiEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;

@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientCarpetaEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 import es.caib.ripea.core.repository.MetaExpedientCarpetaRepository;
 
 /**

@@ -22,7 +22,7 @@ import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
 import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

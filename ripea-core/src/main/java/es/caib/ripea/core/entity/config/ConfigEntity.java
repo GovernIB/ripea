@@ -1,6 +1,6 @@
-package es.caib.ripea.core.entity.config;
+package es.caib.ripea.core.persistence.config;
 
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,6 +1,6 @@
 package es.caib.ripea.core.repository.config;
 
-import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.persistence.config.ConfigEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

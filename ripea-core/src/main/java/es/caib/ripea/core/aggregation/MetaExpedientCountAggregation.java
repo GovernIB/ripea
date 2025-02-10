@@ -1,6 +1,6 @@
 package es.caib.ripea.core.aggregation;
 
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 import lombok.Data;
 
 @Data

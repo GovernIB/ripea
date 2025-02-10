@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1725277242660-1
+      author: limit
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: ZIP_CARPETES
+                  type: NUMBER(1)
+            tableName: IPA_EXECUCIO_MASSIVA
+        - addColumn:
+            columns:
+              - column:
+                  name: ZIP_IMPRIMIBLE
+                  type: NUMBER(1)
+            tableName: IPA_EXECUCIO_MASSIVA
+        - addColumn:
+            columns:
+              - column:
+                  name: ZIP_NOMFITXER
+                  type: varchar(16 ${varcharunit})
+            tableName: IPA_EXECUCIO_MASSIVA

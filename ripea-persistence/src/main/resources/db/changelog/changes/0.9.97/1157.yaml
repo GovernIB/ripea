@@ -1,0 +1,21 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1673273997173-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: pinbal_utilitzar_cif_organ
+            type: boolean
+            defaultValueBoolean:  false             
+        tableName: ipa_metadocument
+

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.HistoricAggregation;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.core.entity.HistoricInteressatEntity;
+import es.caib.ripea.core.persistence.HistoricInteressatEntity;
 
 @Transactional
 public interface HistoricInteressatRepository extends HistoricRepository<HistoricInteressatEntity> {

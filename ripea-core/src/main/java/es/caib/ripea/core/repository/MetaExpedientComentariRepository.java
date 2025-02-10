@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientComentariEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 
 
 public interface MetaExpedientComentariRepository extends JpaRepository<MetaExpedientComentariEntity, Long> {

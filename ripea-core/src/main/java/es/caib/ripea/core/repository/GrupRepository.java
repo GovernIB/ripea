@@ -1,7 +1,7 @@
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.GrupEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

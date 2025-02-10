@@ -1,7 +1,7 @@
 package es.caib.ripea.core.service;
 
 import es.caib.ripea.core.api.dto.config.ConfigDto;
-import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.persistence.config.ConfigEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.PluginHelper;

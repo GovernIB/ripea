@@ -10,10 +10,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.persistence.ContingutEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.MetaNodeEntity;
+import es.caib.ripea.core.persistence.NodeEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

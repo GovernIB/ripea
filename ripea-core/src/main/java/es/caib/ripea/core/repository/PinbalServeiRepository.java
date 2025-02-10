@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import es.caib.ripea.core.entity.PinbalServeiEntity;
+import es.caib.ripea.core.persistence.PinbalServeiEntity;
 
 public interface PinbalServeiRepository extends JpaRepository<PinbalServeiEntity, Long> {
 	

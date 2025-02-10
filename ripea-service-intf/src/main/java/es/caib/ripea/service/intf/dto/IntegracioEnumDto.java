@@ -1,0 +1,21 @@
+package es.caib.ripea.service.intf.dto;
+
+public enum IntegracioEnumDto {
+	REGISTRE,
+	USUARIS,
+	UNITATS,
+	CIUTADA,
+	PFIRMA,
+	ARXIU,
+	CONVERT,
+	CALLBACK,
+	DADESEXT,
+	SIGNATURA,
+	VALIDASIG,
+	NOTIFICACIO,
+	DISTRIBUCIO,
+	GESDOC,
+	FIRMASERV,
+	VIAFIRMA,
+	DIGITALITZACIO
+}

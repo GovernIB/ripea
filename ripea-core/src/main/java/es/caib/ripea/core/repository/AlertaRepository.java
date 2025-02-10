@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.AlertaEntity;
+import es.caib.ripea.core.persistence.AlertaEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

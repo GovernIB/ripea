@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.core.entity.HistoricUsuariEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.HistoricUsuariEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 
 @Transactional
 public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsuariEntity> {

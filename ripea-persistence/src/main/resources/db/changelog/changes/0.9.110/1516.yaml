@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1720693046608-1
+      author: limit
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: prioritat
+                  type: varchar(16 ${varcharunit})
+                  defaultValue: B_NORMAL
+            tableName: ipa_expedient
+        - addColumn:
+            columns:
+              - column:
+                  name: prioritat_motiu
+                  type: varchar(1024 ${varcharunit})
+            tableName: ipa_expedient

@@ -1,8 +1,8 @@
 package es.caib.ripea.plugin.summarize;
 
-import es.caib.ripea.core.api.dto.Resum;
 import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.service.intf.dto.Resum;
 
 public interface SummarizePlugin extends RipeaEndpointPluginInfo {
 

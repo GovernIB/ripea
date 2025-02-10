@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1728570783418-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_document_enviament
+            columns:
+              - column:
+                  name: pf_firma_parcial
+                  type: boolean
+                  valueBoolean: false
+        - addColumn:
+            tableName: ipa_execucio_massiva
+            columns:
+              - column:
+                  name: pfirmes_firma_parcial
+                  type: boolean
+                  valueBoolean: false
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.portafirmes.firma.parcial
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Mostrar opció per indicar si la firma de Portafib és parcial
+              - column:
+                  name: group_code
+                  value: PORTAFIRMES
+              - column:
+                  name: position
+                  value: 9
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1

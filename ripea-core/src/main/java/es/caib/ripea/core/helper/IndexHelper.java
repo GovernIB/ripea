@@ -46,12 +46,12 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.CarpetaEntity;
+import es.caib.ripea.core.persistence.ContingutEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 

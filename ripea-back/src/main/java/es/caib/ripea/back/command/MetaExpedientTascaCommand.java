@@ -1,0 +1,121 @@
+/**
+ * 
+ */
+package es.caib.ripea.back.command;
+
+import es.caib.ripea.back.helper.ConversioTipusHelper;
+import es.caib.ripea.back.validation.CodiMetaExpedientTascaNoRepetit;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusValidacioTascaEnum;
+import lombok.Getter;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.Date;
+
+/**
+ * Command per a les tasques del meta-expedient.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Getter
+@CodiMetaExpedientTascaNoRepetit(campId = "id", campCodi = "codi", campEntitatId = "entitatId", campMetaExpedientId = "metaExpedientId")
+public class MetaExpedientTascaCommand {
+
+    private Long id;
+    @NotEmpty
+    private String codi;
+    @NotEmpty
+    private String nom;
+    @NotEmpty
+    private String descripcio;
+    private String responsable;
+    private boolean activa;
+    private Date dataLimit;
+    private Long estatIdCrearTasca;
+    private Long estatIdFinalitzarTasca;
+	private Integer duracio = 10;
+	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
+    private Long entitatId;
+    private Long metaExpedientId;
+    
+    //Valors per defecte dels camps per crear nova validació.
+    //Un cop carregada la pantalla, hi ha funcions javascript per controlar la inserció
+    private ItemValidacioTascaEnum itemValidacio = ItemValidacioTascaEnum.DADA;
+    private TipusValidacioTascaEnum tipusValidacio;
+    private Long itemId;
+
+    public static MetaExpedientTascaCommand asCommand(MetaExpedientTascaDto dto) {
+        MetaExpedientTascaCommand command = ConversioTipusHelper.convertir(dto,
+                MetaExpedientTascaCommand.class);
+        return command;
+    }
+
+    public static MetaExpedientTascaDto asDto(MetaExpedientTascaCommand command) {
+        return ConversioTipusHelper.convertir(command, MetaExpedientTascaDto.class);
+    }
+
+    public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setCodi(String codi) {
+		this.codi = codi != null ? codi.trim() : null;
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom != null ? nom.trim() : null;
+	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio != null ? descripcio.trim() : null;
+	}
+
+	public void setResponsable(String responsable) {
+		this.responsable = responsable != null ? responsable.trim() : null;
+	}
+
+	public void setActiva(boolean activa) {
+		this.activa = activa;
+	}
+
+	public void setDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
+
+	public void setEstatIdCrearTasca(Long estatIdCrearTasca) {
+		this.estatIdCrearTasca = estatIdCrearTasca;
+	}
+
+	public void setEstatIdFinalitzarTasca(Long estatIdFinalitzarTasca) {
+		this.estatIdFinalitzarTasca = estatIdFinalitzarTasca;
+	}
+
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
+
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
+
+	public PrioritatEnumDto getPrioritat() {
+		return prioritat;
+	}
+
+	public void setPrioritat(PrioritatEnumDto prioritat) {
+		this.prioritat = prioritat;
+	}
+
+	public void setDuracio(Integer duracio) {
+		this.duracio = duracio;
+	}
+
+	public interface Create {
+    }
+
+    public interface Update {
+    }
+
+}

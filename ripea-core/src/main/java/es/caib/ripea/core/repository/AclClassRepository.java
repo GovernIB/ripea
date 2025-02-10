@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.AclClassEntity;
+import es.caib.ripea.core.persistence.AclClassEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

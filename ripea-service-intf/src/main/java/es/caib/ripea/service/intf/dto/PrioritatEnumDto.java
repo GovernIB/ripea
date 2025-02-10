@@ -1,0 +1,19 @@
+/**
+ * 
+ */
+package es.caib.ripea.service.intf.dto;
+
+
+/**
+ * Enumeració amb els possibles estats d'un expedient.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+public enum PrioritatEnumDto {
+	//CRITICA,
+	D_MOLT_ALTA,
+	C_ALTA,
+	B_NORMAL,
+	A_BAIXA,
+	//MOLT_BAIXA
+}

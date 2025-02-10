@@ -5,8 +5,8 @@ package es.caib.ripea.core.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.PortafirmesBlockEntity;
-import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
+import es.caib.ripea.core.persistence.PortafirmesBlockEntity;
+import es.caib.ripea.core.persistence.PortafirmesBlockInfoEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

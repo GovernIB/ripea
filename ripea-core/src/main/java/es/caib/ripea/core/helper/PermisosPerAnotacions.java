@@ -1,7 +1,7 @@
 package es.caib.ripea.core.helper;
 
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 import lombok.Setter;
 import org.apache.commons.collections4.ListUtils;
 

@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.HistoricEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.HistoricEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 
 @NoRepositoryBean
 public interface HistoricRepository<T extends HistoricEntity> extends JpaRepository<T, Long> {

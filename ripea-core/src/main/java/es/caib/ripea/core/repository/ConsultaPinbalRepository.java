@@ -12,9 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.api.dto.ConsultaPinbalEstatEnumDto;
-import es.caib.ripea.core.entity.ConsultaPinbalEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.ConsultaPinbalEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 
 
 public interface ConsultaPinbalRepository extends JpaRepository<ConsultaPinbalEntity, Long> {

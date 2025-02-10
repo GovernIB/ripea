@@ -2,7 +2,7 @@ package es.caib.ripea.core.aggregation;
 
 import java.util.Date;
 
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import lombok.Data;
 
 @Data

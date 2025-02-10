@@ -1,0 +1,329 @@
+package es.caib.ripea.service.service;
+
+import com.google.common.base.Strings;
+import es.caib.ripea.core.persistence.entity.EntitatEntity;
+import es.caib.ripea.core.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.core.persistence.entity.config.ConfigEntity;
+import es.caib.ripea.core.persistence.entity.config.ConfigGroupEntity;
+import es.caib.ripea.core.persistence.repository.EntitatRepository;
+import es.caib.ripea.core.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.core.persistence.repository.config.ConfigGroupRepository;
+import es.caib.ripea.core.persistence.repository.config.ConfigRepository;
+import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.config.ConfigDto;
+import es.caib.ripea.service.intf.dto.config.ConfigGroupDto;
+import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
+import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
+import es.caib.ripea.service.intf.service.ConfigService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+/**
+ * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
+ *
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Slf4j
+@Service
+public class ConfigServiceImpl implements ConfigService {
+
+    @Autowired
+    private ConfigGroupRepository configGroupRepository;
+    @Autowired
+    private ConfigRepository configRepository;
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private EntitatRepository entitatRepository;
+    @Autowired
+    private PluginHelper pluginHelper;
+    @Autowired
+    private ConfigHelper configHelper;
+    @Autowired
+    private OrganGestorRepository organGestorRepository;
+    @Autowired
+    private PaginacioHelper paginacioHelper;
+    @Autowired
+    private CacheHelper cacheHelper;
+
+    @Override
+    @Transactional
+    public ConfigDto updateProperty(ConfigDto property) {
+        log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
+        ConfigEntity configEntity = configRepository.getOne(property.getKey());
+        configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
+//        pluginHelper.reloadProperties(configEntity.getGroupCode());
+        pluginHelper.resetPlugins();
+       // cacheHelper.clearAllCaches();
+        
+        cacheHelper.evictMostrarLogsEmail();
+        cacheHelper.evictMostrarLogsPermisos();
+        cacheHelper.evictMostrarLogsGrups();
+        cacheHelper.evictMostrarLogsRendimentDescarregarAnotacio();
+        cacheHelper.evictMostrarLogsCercadorAnotacio();
+        cacheHelper.evictMostrarLogsRendiment();
+        cacheHelper.evictMostrarLogsCreacioContingut();
+        cacheHelper.evictMostrarLogsIntegracio();
+        cacheHelper.evictMostrarLogsSegonPla();
+
+        return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
+    }
+    
+    
+    @Override
+    @Transactional
+    public void createPropertyOrgan(OrganConfigDto property) {
+        log.info(String.format("Creant propietat organ: %s, key:  %s, value: %s ", property.getOrganGestorId(), property.getKey(), property.getValue()));
+        
+        String suffix = property.getKey().replace(ConfigDto.prefix, "");
+        
+        OrganGestorEntity organGestor = organGestorRepository.getOne(property.getOrganGestorId());
+		String keyOrgan = ConfigDto.prefix + "." + organGestor.getEntitat().getCodi() + "." + organGestor.getCodi() + suffix;
+        
+        ConfigEntity configEntity = configRepository.getOne(property.getKey());
+        
+        if (configRepository.getOne(keyOrgan) == null ) {
+            ConfigEntity nova = new ConfigEntity();
+            nova.crearConfigNova(keyOrgan, organGestor.getEntitat().getCodi(), organGestor.getCodi(), configEntity);
+            nova.setValue(property.getValue());
+            nova.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
+            configRepository.save(nova);
+
+            configHelper.resetPropietatsPerOrgan(organGestor.getEntitat().getCodi());
+        } else {
+        	throw new RuntimeException("La configuració per aquest òrgan ja esta creat");
+        }
+        
+        
+//        pluginHelper.reloadProperties(configEntity.getGroupCode());
+        pluginHelper.resetPlugins();
+    }
+    
+    @Override
+    @Transactional
+    public void modificarPropertyOrgan(OrganConfigDto property) {
+        log.info(String.format("Modificant propietat organ: %s, key:  %s, value: %s ", property.getOrganGestorId(), property.getKey(), property.getValue()));
+        
+        ConfigEntity confOrgan = configRepository.getOne(property.getKey());
+        if (confOrgan != null) {
+        	confOrgan.setValue(property.getValue());
+            confOrgan.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
+            configHelper.resetPropietatsPerOrgan(confOrgan.getEntitatCodi());
+        }
+
+//        pluginHelper.reloadProperties(confOrgan.getGroupCode());
+        pluginHelper.resetPlugins();
+    }
+    
+    @Override
+    @Transactional
+    public void deletePropertyOrgan(String key) {
+        log.info(String.format("Esborrant propietat organ:  %s, ", key));
+        
+        ConfigEntity confOrgan = configRepository.getOne(key);
+        if (confOrgan != null) {
+        	configRepository.delete(confOrgan);
+            configHelper.resetPropietatsPerOrgan(confOrgan.getEntitatCodi());
+        }
+        
+//        pluginHelper.reloadProperties(confOrgan.getGroupCode());
+        pluginHelper.resetPlugins();
+    }
+    
+    
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConfigGroupDto> findAll() {
+
+        log.info("Consulta totes les propietats");
+        List<ConfigGroupEntity> groups = configGroupRepository.findByParentCodeIsNull(Sort.by(Sort.Direction.ASC, "position"));
+        List<ConfigGroupDto> configGroupDtoList =  conversioTipusHelper.convertirList(groups, ConfigGroupDto.class);
+        for (ConfigGroupDto cGroup: configGroupDtoList) {
+            processPropertyValues(cGroup);
+        }
+        return configGroupDtoList;
+    }
+
+    @Override
+    public void resetPlugin(String pluginCode) {
+        pluginHelper.resetPlugins(pluginCode);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConfigDto findConfig(String key) {
+    	ConfigEntity config = configRepository.getOne(key);
+    	return conversioTipusHelper.convertir(config, ConfigDto.class);
+    }
+
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<OrganConfigDto> findConfigsOrgans(
+			String key,
+			PaginacioParamsDto paginacioParams) {
+
+
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("organGestorCodiNom", new String[] {"organCodi"});
+
+			String suffix = key.replace(ConfigDto.prefix, "");
+			
+			return paginacioHelper.toPaginaDto(
+					configRepository.findConfOrgansByKey(
+							ConfigDto.prefix,
+							suffix,
+							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
+					OrganConfigDto.class);
+		
+		
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public OrganConfigDto findConfigOrgan(
+			String key) {
+
+		return conversioTipusHelper.convertir(
+				configRepository.findByKey(key),
+				OrganConfigDto.class);
+		
+	}
+	
+
+    @Override
+    @Transactional
+    public List<String> syncFromJBossProperties() {
+        log.info("Sincronitzant les propietats amb JBoss");
+        Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
+        List<String> editedProperties = new ArrayList<>();
+        List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
+        Collections.sort(propertiesList);
+        for (String key : propertiesList) {
+            String value = properties.getProperty(key);
+            log.info(key + " : " + value);
+            ConfigEntity configEntity = configRepository.getOne(key);
+            if (configEntity != null) {
+                configEntity.update(value);
+//                pluginHelper.reloadProperties(configEntity.getGroupCode());
+                if (configEntity.getKey().endsWith(".class")){
+                    pluginHelper.resetPlugins();
+                }
+                editedProperties.add(configEntity.getKey());
+            }
+        }
+        return editedProperties;
+    }
+
+    
+    @Override
+    @Transactional
+    public void configurableEntitat(String key, boolean configurable) {
+        log.info(String.format("Actualització valor configurable entitat de propietat %s a %s ", key, configurable));
+        ConfigEntity configEntity = configRepository.getOne(key);
+        configEntity.updateConfigurableEntitat(configurable);
+        
+        List<EntitatEntity> entitats = entitatRepository.findAll();
+        if (configurable) {
+        	configHelper.crearConfigPerEntitats(configEntity, entitats);
+		} else {
+			configHelper.removeConfigPerEntitats(configEntity, entitats);
+		}
+        
+        pluginHelper.resetPlugins();
+
+    }
+    
+    
+    @Override
+    @Transactional
+    public void configurableOrgan(String key, boolean configurable) {
+        log.info(String.format("Actualització valor configurable organ de propietat %s a %s ", key, configurable));
+        ConfigEntity configEntity = configRepository.getOne(key);
+        configEntity.updateConfigurableOrgan(configurable);
+        
+        String suffix = key.replace(ConfigDto.prefix, "");
+        
+		if (!configurable) {
+			List<ConfigEntity> confs = configRepository.findConfOrgansByKey(
+					ConfigDto.prefix,
+					suffix);
+            Set<String> entitatsCodis = new HashSet<>();
+			for (ConfigEntity config : confs) {
+                if (config.getEntitatCodi() != null) {
+                    entitatsCodis.add(config.getEntitatCodi());
+                }
+				configRepository.delete(config);
+			}
+            for (String entitatCodi : entitatsCodis) {
+                configHelper.resetPropietatsPerOrgan(entitatCodi);
+            }
+		}
+        
+        pluginHelper.resetPlugins();
+    }
+    
+    @Override
+    @Transactional
+    public List<ConfigDto> findEntitatsConfigByKey(String key) {
+        if (Strings.isNullOrEmpty(key)) {
+            return new ArrayList<>();
+        }
+        String suffix = key.replace(ConfigDto.prefix, "");
+        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(ConfigDto.prefix, suffix), ConfigDto.class);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public String getConfigValue(String configKey) throws NotDefinedConfigException {
+    	return configHelper.getConfig(configKey);
+    }
+
+    public void processPropertyValues(ConfigGroupDto cGroup) {
+        for (ConfigDto config: cGroup.getConfigs()) {
+            if ("PASSWORD".equals(config.getTypeCode())){
+                config.setValue("*****");
+            } else if (config.isJbossProperty()) {
+                // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
+                config.setValue(ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey(), config.getValue()));
+            }
+        }
+
+        if (cGroup.getInnerConfigs() != null && !cGroup.getInnerConfigs().isEmpty()) {
+            for (ConfigGroupDto child : cGroup.getInnerConfigs()) {
+                processPropertyValues(child);
+            }
+        }
+    }
+    
+    @Override
+    @Transactional
+    public void crearPropietatsConfigPerEntitats() {
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
+        List<EntitatEntity> entitats = entitatRepository.findAll();
+        for (ConfigEntity config : configs) {
+        	configHelper.crearConfigPerEntitats(config, entitats);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void actualitzarPropietatsJBossBdd() {
+
+        List<ConfigEntity> configs = configRepository.findJBossConfigurables();
+        for(ConfigEntity config : configs) {
+            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            config.setValue(property);
+            configRepository.save(config);
+        }
+    }
+
+}

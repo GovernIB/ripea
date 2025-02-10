@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1662622106104-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.distribucio.regla.autenticacio.basic
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Client REST creació regles amb tipus autenticació BASIC
+              - column:
+                  name: group_code
+                  value: DISTRIBUCIO_REGLA
+              - column:
+                  name: position
+                  value: 5
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1

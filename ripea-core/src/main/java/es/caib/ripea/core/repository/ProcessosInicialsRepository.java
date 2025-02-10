@@ -1,6 +1,6 @@
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.ProcesosInicialsEntity;
+import es.caib.ripea.core.persistence.ProcesosInicialsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

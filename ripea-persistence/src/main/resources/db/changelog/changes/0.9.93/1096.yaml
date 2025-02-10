@@ -1,0 +1,71 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1655365368195-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: document_id
+            type: number(19)
+        tableName: ipa_registre_annex
+    - addForeignKeyConstraint:
+        baseColumnNames: document_id
+        baseTableName: ipa_registre_annex
+        constraintName: ipa_annex_document_fk
+        referencedColumnNames: id
+        referencedTableName: ipa_document
+    - sql:
+        sql:  "
+-- Comprovar si els elements són únics \n 
+SELECT
+   LISTAGG(ipa_document.id, ',') WITHIN GROUP (ORDER BY ipa_document.id) docs, LISTAGG(ipa_expedient.id, ',') WITHIN GROUP (ORDER BY ipa_document.id) exps
+FROM
+    ipa_document
+    INNER JOIN ipa_contingut ON ipa_document.id = ipa_contingut.id
+    INNER JOIN ipa_expedient ON ipa_contingut.expedient_id = ipa_expedient.id
+    INNER JOIN ipa_expedient_peticio ON ipa_expedient_peticio.expedient_id = ipa_expedient.id
+    INNER JOIN ipa_registre ON ipa_expedient_peticio.registre_id = ipa_registre.id
+    INNER JOIN ipa_registre_annex ON ipa_registre_annex.registre_id = ipa_registre.id
+WHERE
+    ipa_registre.id = ipa_registre_annex.registre_id
+    AND ipa_document.data_captura = ipa_registre_annex.nti_fecha_captura
+    AND ipa_contingut.nom LIKE ipa_registre_annex.titol || '%'
+    AND ipa_document.fitxer_nom = ipa_registre_annex.nom
+    AND ipa_contingut.esborrat = 0
+GROUP BY ipa_registre.id, ipa_document.data_captura, ipa_contingut.nom, ipa_document.fitxer_nom
+HAVING COUNT(*) > 1;
+
+-- relacionar annexos amb documents creats, només funcionarà si l'script anterior no retorna cap resultat \n 
+-- si l'script anterior retorna algun resultat y els documents trobats no son duplicats s'ha de eliminar-los \n 
+-- si l'script anterior retorna algun resultat y els documents trobats no son duplicats s'ha de pensar si existeix un altre paràmetre per diferenciar els documents entre si o relacionar documents trobats amb annexos manualment (UPDATE ipa_registre_annex SET document_id = DOCUMENT_ID where id = ANNEX_ID) \n 
+UPDATE ipa_registre_annex
+SET
+    document_id = (
+        SELECT
+            ipa_document.id
+        FROM
+            ipa_document
+            INNER JOIN ipa_contingut ON ipa_document.id = ipa_contingut.id
+            INNER JOIN ipa_expedient ON ipa_contingut.expedient_id = ipa_expedient.id
+            INNER JOIN ipa_expedient_peticio ON ipa_expedient_peticio.expedient_id = ipa_expedient.id
+            INNER JOIN ipa_registre ON ipa_expedient_peticio.registre_id = ipa_registre.id
+        WHERE
+            ipa_registre.id = ipa_registre_annex.registre_id
+            AND ipa_document.data_captura = ipa_registre_annex.nti_fecha_captura
+            AND ipa_contingut.nom LIKE ipa_registre_annex.titol || '%'
+            AND ipa_document.fitxer_nom = ipa_registre_annex.nom
+            AND ipa_contingut.esborrat = 0
+
+    ) where document_id is null; 
+        
+        
+"

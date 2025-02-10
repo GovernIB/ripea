@@ -27,7 +27,7 @@ import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.exception.FirmaServidorException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
 import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;

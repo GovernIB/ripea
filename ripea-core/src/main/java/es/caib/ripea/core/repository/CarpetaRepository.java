@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.persistence.CarpetaEntity;
+import es.caib.ripea.core.persistence.ContingutEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 

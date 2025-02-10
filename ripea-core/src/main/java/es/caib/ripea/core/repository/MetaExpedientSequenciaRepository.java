@@ -5,8 +5,8 @@ package es.caib.ripea.core.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.MetaExpedientSequenciaEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

@@ -4,9 +4,9 @@
 package es.caib.ripea.core.repository;
 
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.persistence.OrganGestorEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

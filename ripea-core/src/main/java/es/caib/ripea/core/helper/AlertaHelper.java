@@ -7,8 +7,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.entity.AlertaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.persistence.AlertaEntity;
+import es.caib.ripea.core.persistence.ContingutEntity;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 

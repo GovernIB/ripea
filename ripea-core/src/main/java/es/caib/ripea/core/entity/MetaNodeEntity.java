@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.ripea.core.entity;
+package es.caib.ripea.core.persistence;
 
 import java.util.HashSet;
 import java.util.Set;

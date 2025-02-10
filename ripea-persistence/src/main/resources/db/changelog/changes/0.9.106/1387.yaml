@@ -1,0 +1,105 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- property:
+    name: booleanFalse
+    value: 0
+    dbms: oracle
+- property:
+    name: booleanFalse
+    value: false
+    dbms: postgresql      
+- changeSet:
+    id: 1703236956442-1
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+            name: codi
+            type: varchar(64 ${varcharunit})
+        - column:
+            constraints:
+              nullable: false
+            name: doc_permes_dni
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: doc_permes_nif
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: doc_permes_cif
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: doc_permes_nie
+            type: boolean
+        - column:
+            constraints:
+              nullable: false
+            name: doc_permes_pas
+            type: boolean
+        - column:
+            name: createdby_codi
+            type: varchar(64)
+        - column:
+            name: createddate
+            type: timestamp
+        - column:
+            name: lastmodifiedby_codi
+            type: varchar(64)
+        - column:
+            name: lastmodifieddate
+            type: timestamp
+        tableName: ipa_pinbal_servei
+    - addPrimaryKey:
+        columnNames: id
+        constraintName: ipa_pinbal_servei_pk
+        tableName: ipa_pinbal_servei
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ipa_pinbal_servei
+        constraintName: ipa_usucre_pinbal_servei_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ipa_pinbal_servei
+        constraintName: ipa_usumod_pinbal_servei_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari
+    - sql:
+        dbms: oracle
+        sql: grant select, update, insert, delete on ipa_pinbal_servei to www_ripea;
+    - sql:
+        sql:  insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (1, 'SVDDGPCIWS02', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (2, 'SVDDGPVIWS02', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (3, 'SVDCCAACPASWS01', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (4, 'SVDSCDDWS01', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (5, 'SCDCPAJU', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (6, 'SVDSCTFNWS01', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (7, 'SVDCCAACPCWS01', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (8, 'Q2827003ATGSS001', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (9, 'SVDDELSEXWS01', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (10, 'SCDHPAJU', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (11, 'NIVRENTI', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (12, 'ECOT103', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+              insert into ipa_pinbal_servei (id, codi, doc_permes_dni, doc_permes_nif, doc_permes_cif, doc_permes_nie, doc_permes_pas) values (13, 'SVDDGPRESIDENCIALEGALDOCWS01', ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse}, ${booleanFalse});
+        

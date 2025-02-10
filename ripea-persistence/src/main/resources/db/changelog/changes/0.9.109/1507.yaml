@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - changeSet:
+      id: 0
+      author: admin
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: DURACIO
+                  type: number(19)
+              - column:
+                  name: PRIORITAT
+                  type: varchar(16 ${varcharunit})
+            tableName: ipa_expedient_tasca
+        - addColumn:
+            columns:
+              - column:
+                  name: DURACIO
+                  type: number(19)
+              - column:
+                  name: PRIORITAT
+                  type: varchar(16 ${varcharunit})
+            tableName: ipa_metaexp_tasca
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.duracio.tasca
+              - column:
+                  name: value
+                  value: 10
+              - column:
+                  name: description
+                  value: Duració per defecte de una tasca, sempre especificat en dies.
+              - column:
+                  name: group_code
+                  value: ALTRES
+              - column:
+                  name: position
+                  value: 16
+              - column:
+                  name: jboss_property
+                  value: ${booleanFalse}
+              - column:
+                  name: type_code
+                  value: INT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+              - column:
+                  name: configurable_organ
+                  value: ${booleanFalse}
+        - sql:
+            "UPDATE IPA_EXPEDIENT_TASCA SET DURACIO = CASE WHEN TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) < 0 THEN NULL ELSE TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) END WHERE DATA_LIMIT is not null;"

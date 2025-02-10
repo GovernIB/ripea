@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.ContingutMovimentEntity;
+import es.caib.ripea.core.persistence.ContingutMovimentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,0 +1,593 @@
+package es.caib.ripea.service.service;
+
+import es.caib.ripea.core.persistence.entity.GrupEntity;
+import es.caib.ripea.core.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.repository.EntitatRepository;
+import es.caib.ripea.core.persistence.repository.GrupRepository;
+import es.caib.ripea.core.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.core.persistence.repository.UsuariRepository;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+@Service
+public class AplicacioServiceImpl implements AplicacioService {
+
+	@Resource private UsuariRepository usuariRepository;
+	@Resource private CacheHelper cacheHelper;
+	@Resource private PluginHelper pluginHelper;
+	@Resource private PinbalHelper pinbalHelper;	
+	@Resource private ConversioTipusHelper conversioTipusHelper;
+	@Resource private IntegracioHelper integracioHelper;
+	@Resource private ExcepcioLogHelper excepcioLogHelper;
+	@Resource private UsuariHelper usuariHelper;
+	@Resource private GrupRepository grupRepository;
+	@Resource private RolHelper rolHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+    @Autowired private EntitatRepository entitatRepository;
+
+	@Override
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		ConfigHelper.setEntitat(entitat);
+	}
+	
+	@Override
+	public void actualitzarOrganCodi(String organCodi) {
+		ConfigHelper.setOrganCodi(organCodi);
+	}
+
+	@Override
+    @Transactional(readOnly = true)
+    public String getEntitatActualCodi() {
+        return configHelper.getEntitatActualCodi();
+    }
+	
+	
+	@Transactional
+	@Override
+	public void processarAutenticacioUsuari() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
+		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		if (usuari == null) {
+			logger.debug("Consultant plugin de dades d'usuari (" +
+					"usuariCodi=" + auth.getName() + ")");
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			if (dadesUsuari != null) {
+				usuari = usuariRepository.save(
+						UsuariEntity.getBuilder(
+								dadesUsuari.getCodi(),
+								dadesUsuari.getNom(),
+								dadesUsuari.getNif(),
+								dadesUsuari.getEmail(),
+								getIdiomaPerDefecte()).build());
+			} else {
+				throw new NotFoundException(
+						auth.getName(),
+						DadesUsuari.class);
+			}
+		} else {
+			logger.debug("Consultant plugin de dades d'usuari (" +
+					"usuariCodi=" + auth.getName() + ")");
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			if (dadesUsuari != null) {
+				usuari.update(
+						dadesUsuari.getNom(),
+						dadesUsuari.getNif(),
+						dadesUsuari.getEmail());
+			} else {
+				throw new NotFoundException(
+						auth.getName(),
+						DadesUsuari.class);
+			}
+		}
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto getUsuariActual() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("Obtenint usuari actual");
+		return toUsuariDtoAmbRols(
+				usuariRepository.getOne(auth.getName()));
+	}
+	
+	@Transactional
+	@Override
+	public void setRolUsuariActual(String rolActual) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("Actualitzant rol de usuari actual");
+
+		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		usuari.updateRolActual(rolActual);
+
+		cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
+	}
+	
+	@Transactional
+	@Override
+	public UsuariDto updateUsuariActual(UsuariDto dto) {
+		logger.debug("Actualitzant configuració de usuari actual");
+		UsuariEntity usuari = usuariRepository.getOne(dto.getCodi());
+		
+		usuari.update(
+				dto.getEmailAlternatiu(),
+				dto.getIdioma(),
+				dto.isRebreEmailsAgrupats(),
+				dto.isRebreAvisosNovesAnotacions(),
+				dto.isRebreEmailsCanviEstatRevisio(),
+				dto.getNumElementsPagina(),
+				dto.isExpedientListDataDarrerEnviament(),
+				dto.isExpedientListAgafatPer(),
+				dto.isExpedientListInteressats(),
+				dto.isExpedientListComentaris(),
+				dto.isExpedientListGrup(),
+				dto.getProcedimentId() != null ? metaExpedientRepository.getOne(dto.getProcedimentId()) : null,
+				dto.getVistaActual(), 
+				dto.isExpedientExpandit(),
+				dto.getEntitatPerDefecteId() != null ? entitatRepository.getOne(dto.getEntitatPerDefecteId()) : null,
+				dto.getVistaMoureActual());
+		
+		return toUsuariDtoAmbRols(usuari);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto findUsuariAmbCodi(String codi) {
+		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+		return conversioTipusHelper.convertir(
+				usuariRepository.getOne(codi),
+				UsuariDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<UsuariDto> findUsuariAmbText(String text) {
+		logger.debug("Consultant usuaris amb text (text=" + text + ")");
+		return conversioTipusHelper.convertirList(
+				usuariRepository.findByText(text),
+				UsuariDto.class);
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto findUsuariCarrecAmbCodiDades(String codi) {
+		logger.debug("Obtenint usuari/càrrec amb codi (codi=" + codi + ")");
+		UsuariDto usuariDto = null;
+		try {
+			usuariDto = conversioTipusHelper.convertir(
+					usuariHelper.getUsuariByCodiDades(codi, true, true),
+					UsuariDto.class);
+		} catch (NotFoundException ex) {
+			logger.error("No s'ha trobat cap usuari amb el codi " + codi + ". Procedim a cercar si és un càrrec.");
+			usuariDto = new UsuariDto();
+			PortafirmesCarrecDto carrec = pluginHelper.portafirmesRecuperarCarrec(codi);
+			
+			if (carrec != null) {
+				String nom = carrec.getCarrecName();
+			    if (!Utils.isBlank(carrec.getUsuariPersonaNom())) {
+			        nom += " - " + carrec.getUsuariPersonaNom();
+			    }
+				usuariDto.setCodi(carrec.getCarrecId());
+				usuariDto.setNom(nom);
+				usuariDto.setNif(carrec.getUsuariPersonaNif());
+			} else {
+				throw new NotFoundException(
+						codi,
+						DadesUsuari.class);
+			}
+		}
+		return usuariDto;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public UsuariDto findUsuariAmbCodiDades(String codi) {
+		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+		UsuariDto usuariDto = null;
+		usuariDto = conversioTipusHelper.convertir(
+				usuariHelper.getUsuariByCodiDades(codi, true, true),
+				UsuariDto.class);
+
+		return usuariDto;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<UsuariDto> findUsuariAmbTextDades(String text) {
+		logger.debug("Consultant usuaris amb text (text=" + text + ")");
+		return conversioTipusHelper.convertirList(
+				pluginHelper.findAmbFiltre(text),
+				UsuariDto.class);
+	}
+
+	@Override
+	public List<IntegracioDto> integracioFindAll() {
+		logger.debug("Consultant les integracions");
+		return integracioHelper.findAll();
+	}
+
+	@Override
+	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
+		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
+		return integracioHelper.findAccionsByIntegracioCodi(codi, null);
+	}
+
+	@Override
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params, IntegracioFiltreDto filtre) {
+
+		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
+		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(codi, filtre);
+		if (accions == null || accions.isEmpty()) {
+			return new PaginaDto<>();
+		}
+
+		List<List<IntegracioAccioDto>> pagines = paginacioHelper.getPages(accions, params.getPaginaTamany());
+		PaginaDto<IntegracioAccioDto> pagina = paginacioHelper.toPaginaDto(pagines.get(params.getPaginaNum()), null);
+		pagina.setContingut(pagines.get(params.getPaginaNum()));
+		return paginacioHelper.prepararPagina(pagina, pagines, accions);
+	}
+
+	@Override
+	public void excepcioSave(Throwable exception) {
+		try {
+			logger.debug("Emmagatzemant excepció (exception=" + exception + ")");
+			excepcioLogHelper.addExcepcio(exception);
+		} catch (Exception e) {
+			logger.error("Error al guardar excepció al monitor d'excepcions.", e);
+			logger.error("Excepció no guardada:", exception);
+		}
+	}
+
+	@Override
+	public ExcepcioLogDto excepcioFindOne(Long index) {
+		logger.debug("Consulta d'una excepció (index=" + index + ")");
+		return excepcioLogHelper.findAll().get(index.intValue());
+	}
+
+	@Override
+	public List<ExcepcioLogDto> excepcioFindAll() {
+		logger.debug("Consulta de les excepcions disponibles");
+		return excepcioLogHelper.findAll();
+	}
+
+	@Override
+	public List<String> permisosFindRolsDistinctAll() {
+		logger.debug("Consulta dels rols definits a les ACLs");
+		List<String> rolsAcls = cacheHelper.rolsDisponiblesEnAcls();
+		
+		
+		List<GrupEntity> grups = grupRepository.findAll();
+		List<String> grupRols = new ArrayList<>();
+		if (grups != null) {
+			for (GrupEntity grup : grups) {
+				grupRols.add(grup.getCodi());
+			}
+		}
+		rolsAcls.addAll(grupRols);
+		return rolsAcls;
+	}
+	@Override
+	public void evictRolsDisponiblesEnAcls() {
+		logger.debug("Evict rols disponibles en ACLs");
+		cacheHelper.evictRolsDisponiblesEnAcls();
+	}
+	
+	@Override
+	public void evictRolsPerUsuari(String usuariCodi) {
+		logger.debug("Evict rols per usuari");
+		cacheHelper.evictFindRolsAmbCodi(usuariCodi);
+	}
+
+	@Override
+	public void evictCountAnotacionsPendents(String usuariCodi) {
+		logger.debug("Evict count anotacions per usuari");
+		cacheHelper.evictCountAnotacionsPendents(usuariCodi);
+	}
+
+	@Override
+	public String propertyBaseUrl() {
+		logger.debug("Consulta de la propietat base URL");
+		return configHelper.getConfig("es.caib.ripea.base.url");
+	}
+
+	@Override
+	public String propertyPluginEscaneigIds() {
+		logger.debug("Consulta de la propietat amb les ids pels plugins d'escaneig de documents");
+		return configHelper.getConfig("es.caib.ripea.plugin.escaneig.ids");
+	}
+
+	@Override
+	public Properties propertiesFindByGroup(String codiGrup) {
+		logger.debug("Consulta del valor de les properties d'un grup (" +
+				"codi grup=" + codiGrup + ")");
+		return configHelper.getPropertiesByGroup(codiGrup);
+	}
+
+	@Override
+	public String propertyFindByNom(String nom) {
+		logger.debug("Consulta del valor del propertat amb nom");
+		return configHelper.getConfig(nom);
+	}
+	
+	@Override
+	public Boolean propertyBooleanFindByKey(String key) {
+		logger.debug("Consulta del valor del propietat boolea amb key");
+		return configHelper.getAsBoolean(key);
+	}
+	
+	@Override
+	@Deprecated
+	public boolean propertyBooleanFindByKey(String key, boolean defaultValueIfNull) {
+		logger.debug("Consulta del valor del propietat boolea amb key");
+		return configHelper.getAsBoolean(key);
+	}
+	
+	
+	@Override
+	public boolean mostrarLogsRendiment() {
+		return cacheHelper.mostrarLogsRendiment();
+	}
+	
+	@Override
+	public boolean mostrarLogsCercadorAnotacio() {
+		return cacheHelper.mostrarLogsCercadorAnotacio();
+	}
+	
+	@Override
+	public boolean getBooleanJbossProperty(
+			String key,
+			boolean defaultValueIfNull) {
+		String property = configHelper.getJBossProperty(key);
+		if (property != null) {
+			return Boolean.parseBoolean(property);
+		} else {
+			return defaultValueIfNull;
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		
+		Long procId = null;
+		if (usuari.getProcediment() != null) {
+			List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+					entitatId,
+					ExtendedPermission.READ,
+					true,
+					null, 
+					"IPA_ADMIN".equals(rolActual),
+					"IPA_ORGAN_ADMIN".equals(rolActual),
+					null, 
+					false); 
+			
+			for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
+				if (metaExpedientEntity.getId().equals(usuari.getProcediment().getId())) {
+					procId = metaExpedientEntity.getId();
+				}
+			}
+		}
+		
+		return procId;
+	}
+	
+	private UsuariDto toUsuariDtoAmbRols(
+			UsuariEntity usuari) {
+		UsuariDto dto = conversioTipusHelper.convertir(
+				usuari,
+				UsuariDto.class);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth.getAuthorities() != null) {
+			String[] rols = new String[auth.getAuthorities().size()];
+			int index = 0;
+			for (GrantedAuthority grantedAuthority: auth.getAuthorities()) {
+				rols[index++] = grantedAuthority.getAuthority();
+			}
+			dto.setRols(rols);
+		}
+		dto.setProcedimentId(usuari.getProcediment() != null ? usuari.getProcediment().getId() : null);
+		dto.setEntitatPerDefecteId(usuari.getEntitatPerDefecte() != null ? usuari.getEntitatPerDefecte().getId() : null);
+		return dto;
+	}
+	
+	@Override
+	public boolean doesCurrentUserHasRol(
+			String rolToCheck) {
+
+		return rolHelper.doesCurrentUserHasRol(rolToCheck);
+	}
+
+	private String getIdiomaPerDefecte() {
+		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
+	}
+	
+	
+	
+	
+	@Override
+	public List<String> findUsuarisCodisAmbRol(String rol) {
+		List<DadesUsuari> dadesUsuaris = pluginHelper.dadesUsuariFindAmbGrup(rol);
+		List<String> codisUsuaris = new ArrayList<>();
+		for (DadesUsuari dadesUsuari : dadesUsuaris) {
+			codisUsuaris.add(dadesUsuari.getCodi());
+		}
+		return codisUsuaris;
+	}
+	
+	
+    @Override
+    @Transactional
+	public String getValueForOrgan(
+			String entitatCodi,
+			String organCodi,
+			String keyGeneral) {
+		return configHelper.getValueForOrgan(
+				entitatCodi,
+				organCodi,
+				keyGeneral);
+	}
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi, String organCodi) {
+        return configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi) {
+        return configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
+        return configHelper.getGroupPropertiesEntitatOrGeneral(groupCode, entitatCodi);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesOrganOrEntitatOrGeneral(String groupCode, String entitatCodi, String organCodi) {
+    	 return configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(groupCode, entitatCodi, organCodi);
+    }
+	
+	@Override
+	@Transactional(readOnly = true)
+	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre) {
+		if (codi!=null) {
+			if (codi.equals(IntegracioHelper.INTCODI_PFIRMA)) {
+				String resultatDiagnostic = pluginHelper.portafirmesDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.pf.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.pf.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_FIRMASIMPLE)) {
+				String resultatDiagnostic = pluginHelper.firmaSimpleDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.fs.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.fs.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_FIRMASERV)) {
+				String resultatDiagnostic = pluginHelper.firmaServidorDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.fserv.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.fserv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_CALLBACK)) {
+				return new GenericDto("integracio.diag.cb.info", "fa fa-info-circle blau", new Object[] {codi});
+			} else if (codi.equals(IntegracioHelper.INTCODI_ARXIU)) {
+				String resultatDiagnostic = pluginHelper.arxiuDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.ax.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.ax.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_GESDOC)) {
+				String resultatDiagnostic = pluginHelper.gestorDocumentalDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.gd.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.gd.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_PINBAL)) {
+				String resultatDiagnostic = pinbalHelper.pinbalDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.pin.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.pin.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_USUARIS)) {
+				String resultatDiagnostic = pluginHelper.dadesUsuariDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.us.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.us.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_CONVERT)) {
+				String resultatDiagnostic = pluginHelper.conversioDocumentsDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.conv.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.conv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_DADESEXT)) {
+				String resultatDiagnostic = pluginHelper.dadesExternesDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.de.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.de.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_NOTIFICACIO)) {
+				String resultatDiagnostic = pluginHelper.notibDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.notib.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.notib.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_VIAFIRMA)) {
+				String resultatDiagnostic = pluginHelper.viaFirmaDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.via.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.via.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_DIGITALITZACIO)) {
+				String resultatDiagnostic = pluginHelper.digitalitzacioDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.digi.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.digi.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_VALIDASIG)) {
+				String resultatDiagnostic = pluginHelper.validaFirmaDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.vf.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.vf.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_PROCEDIMENT)) {
+				String resultatDiagnostic = pluginHelper.gesConDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.gc.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.gc.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic});
+				}
+			} else {
+				return new GenericDto("integracio.diag.no", "fa fa-question-circle taronja", new Object[] {codi});
+			}
+		} else {
+			return new GenericDto("integracio.diag.nf", "fa fa-question-circle taronja", new Object[] {codi});
+		}
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
+}

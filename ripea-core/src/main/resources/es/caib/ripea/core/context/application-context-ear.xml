@@ -26,7 +26,7 @@
 		<property name="jtaDataSource" ref="dataSource" />
 		<property name="packagesToScan">
 			<list>
-				<value>es.caib.ripea.core.entity</value>
+				<value>es.caib.ripea.core.persistence</value>
 			</list>
 		</property>
 		<property name="jpaDialect">

@@ -1,0 +1,663 @@
+databaseChangeLog:
+- changeSet:
+    id: init-index-2
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: metadada_id, node_id, ordre
+        constraintName: ipa_dada_mult_uk
+        tableName: ipa_dada
+- changeSet:
+    id: init-index-4
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: codi
+        constraintName: ipa_entitat_codi_uk
+        tableName: ipa_entitat
+- changeSet:
+    id: init-index-8
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: metaexpedient_id, anio, sequencia
+        constraintName: ipa_expedient_seq_uk
+        tableName: ipa_expedient
+- changeSet:
+    id: init-index-10
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: meta_node_id, codi
+        constraintName: ipa_metadada_metanode_codi_uk
+        tableName: ipa_metadada
+- changeSet:
+    id: init-index-12
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: meta_expedient_id, codi
+        constraintName: ipa_metadoc_metaexp_codi_uk
+        tableName: ipa_metadocument
+- changeSet:
+    id: init-index-14
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: entitat_id, codi
+        constraintName: ipa_metaexp_entitat_codi_uk
+        tableName: ipa_metaexpedient
+- changeSet:
+    id: init-index-16
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: anio, meta_expedient_id
+        constraintName: ipa_metaexp_seq_mult_uk
+        tableName: ipa_metaexp_seq
+- changeSet:
+    id: init-index-18
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: codi, meta_expedient_id
+        constraintName: ipa_metaexp_tasca_mult_uk
+        tableName: ipa_metaexp_tasca
+- changeSet:
+    id: init-index-22
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: codi, entitat_id
+        constraintName: ipa_organ_gestor_uk
+        tableName: ipa_organ_gestor
+- changeSet:
+    id: init-index-25
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: object_id_class
+        indexName: ipa_acl_class_oid_fk_i
+        tableName: ipa_acl_object_identity
+- changeSet:
+    id: init-index-26
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: acl_object_identity
+        indexName: ipa_acl_oid_entry_fk_i
+        tableName: ipa_acl_entry
+- changeSet:
+    id: init-index-27
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: parent_object
+        indexName: ipa_acl_parent_oid_fk_i
+        tableName: ipa_acl_object_identity
+- changeSet:
+    id: init-index-28
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: sid
+        indexName: ipa_acl_sid_entry_fk_i
+        tableName: ipa_acl_entry
+- changeSet:
+    id: init-index-29
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: owner_sid
+        indexName: ipa_acl_sid_oid_fk_i
+        tableName: ipa_acl_object_identity
+- changeSet:
+    id: init-index-30
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: agafat_per_codi
+        indexName: ipa_expedient_agafatper_fk_i
+        tableName: ipa_expedient
+- changeSet:
+    id: init-index-31
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: contingut_id
+        indexName: ipa_alerta_contingut_fk_i
+        tableName: ipa_alerta
+- changeSet:
+    id: init-index-32
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: contingut_id
+        indexName: ipa_cont_log_contingut_fk_i
+        tableName: ipa_cont_log
+- changeSet:
+    id: init-index-33
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: contingut_id
+        indexName: ipa_cont_mov_contingut_fk_i
+        tableName: ipa_cont_mov
+- changeSet:
+    id: init-index-34
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: contingut_id
+        indexName: ipa_mass_cont_contingut_fk_i
+        tableName: ipa_massiva_contingut
+- changeSet:
+    id: init-index-35
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: contmov_id
+        indexName: ipa_contingut_contmov_fk_i
+        tableName: ipa_contingut
+- changeSet:
+    id: init-index-36
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: contmov_id
+        indexName: ipa_cont_log_contmov_fk_i
+        tableName: ipa_cont_log
+- changeSet:
+    id: init-index-37
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: desti_id
+        indexName: ipa_cont_mov_desti_fk_i
+        tableName: ipa_cont_mov
+- changeSet:
+    id: init-index-38
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: document_id
+        indexName: ipa_doc_env_document_fk_i
+        tableName: ipa_document_enviament
+- changeSet:
+    id: init-index-39
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: entitat_id
+        indexName: ipa_contingut_entitat_fk_i
+        tableName: ipa_contingut
+- changeSet:
+    id: init-index-40
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: entitat_id
+        indexName: ipa_entitat_metanode_fk_i
+        tableName: ipa_metanode
+- changeSet:
+    id: init-index-41
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: execucio_massiva_id
+        indexName: ipa_mass_cont_exemass_fk_i
+        tableName: ipa_massiva_contingut
+- changeSet:
+    id: init-index-42
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: EXPEDIENT_ID
+        indexName: ipa_EXPEDIENT_contingut_fk_i
+        tableName: ipa_contingut
+- changeSet:
+    id: init-index-43
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: expedient_id
+        indexName: ipa_doc_env_expedient_fk_i
+        tableName: ipa_document_enviament
+- changeSet:
+    id: init-index-44
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: expedient_id
+        indexName: ipa_exp_int_expedient_fk_i
+        tableName: ipa_expedient_interessat
+- changeSet:
+    id: init-index-45
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: expedient_id
+        indexName: ipa_exp_seg_expedient_fk_i
+        tableName: ipa_expedient_seguidor
+- changeSet:
+    id: init-index-46
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: expedient_id
+        indexName: ipa_interessat_expedient_fk_i
+        tableName: ipa_interessat
+- changeSet:
+    id: init-index-47
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: interessat_id
+        indexName: ipa_exp_int_interessat_fk_i
+        tableName: ipa_expedient_interessat
+- changeSet:
+    id: init-index-48
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: metadada_id
+        indexName: ipa_dada_metadada_fk_i
+        tableName: ipa_dada
+- changeSet:
+    id: init-index-50
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: meta_expedient_id
+        indexName: ipa_metaexp_seq_metaexp_fk_i
+        tableName: ipa_metaexp_seq
+- changeSet:
+    id: init-index-52
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: metanode_id
+        indexName: ipa_node_metanode_fk_i
+        tableName: ipa_node
+- changeSet:
+    id: init-index-53
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: node_id
+        indexName: ipa_dada_node_fk_i
+        tableName: ipa_dada
+- changeSet:
+    id: 1620025951430-126
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: origen_id
+        indexName: ipa_cont_mov_origen_fk_i
+        tableName: ipa_cont_mov
+- changeSet:
+    id: init-index-54
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: pare_id
+        indexName: ipa_contingut_pare_fk_i
+        tableName: ipa_contingut
+- changeSet:
+    id: init-index-55
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: pare_id
+        indexName: ipa_cont_log_pare_fk_i
+        tableName: ipa_cont_log
+- changeSet:
+    id: init-index-56
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: pare_id
+        indexName: ipa_metaexp_pare_fk_i
+        tableName: ipa_metaexpedient
+- changeSet:
+    id: init-index-57
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: seguidor_codi
+        indexName: ipa_expedient_seg_fk_i
+        tableName: ipa_expedient_seguidor
+- changeSet:
+    id: init-index-58
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: remitent_codi
+        indexName: ipa_cont_mov_remitent_fk_i
+        tableName: ipa_cont_mov
+- changeSet:
+    id: init-index-59
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: representant_id
+        indexName: ipa_interessat_repres_fk_i
+        tableName: ipa_interessat
+- changeSet:
+    id: init-index-60
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_alerta_createdby_fk_i
+        tableName: ipa_alerta
+- changeSet:
+    id: init-index-61
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_contingut_createdby_fk_i
+        tableName: ipa_contingut
+- changeSet:
+    id: init-index-62
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_cont_log_createdby_fk_i
+        tableName: ipa_cont_log
+- changeSet:
+    id: init-index-63
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_cont_mov_createdby_fk_i
+        tableName: ipa_cont_mov
+- changeSet:
+    id: init-index-64
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_dada_createdby_fk_i
+        tableName: ipa_dada
+- changeSet:
+    id: init-index-65
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_doc_env_createdby_fk_i
+        tableName: ipa_document_enviament
+- changeSet:
+    id: init-index-66
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_entitat_createdby_fk_i
+        tableName: ipa_entitat
+- changeSet:
+    id: init-index-67
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_mass_cont_createdby_fk_i
+        tableName: ipa_massiva_contingut
+- changeSet:
+    id: init-index-68
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_exec_mass_createdby_fk_i
+        tableName: ipa_execucio_massiva
+- changeSet:
+    id: init-index-69
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_interessat_createdby_fk_i
+        tableName: ipa_interessat
+- changeSet:
+    id: init-index-71
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_metadada_createdby_fk_i
+        tableName: ipa_metadada
+- changeSet:
+    id: init-index-72
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_mexp_seq_createdby_fk_i
+        tableName: ipa_metaexp_seq
+- changeSet:
+    id: init-index-73
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: createdby_codi
+        indexName: ipa_metanode_createdby_fk_i
+        tableName: ipa_metanode
+- changeSet:
+    id: init-index-74
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_alerta_lastmodby_fk_i
+        tableName: ipa_alerta
+- changeSet:
+    id: init-index-75
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_contingut_lastmodby_fk_i
+        tableName: ipa_contingut
+- changeSet:
+    id: init-index-76
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_cont_log_lastmodby_fk_i
+        tableName: ipa_cont_log
+- changeSet:
+    id: init-index-77
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_cont_mov_lastmodby_fk_i
+        tableName: ipa_cont_mov
+- changeSet:
+    id: init-index-78
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_dada_lastmodby_fk_i
+        tableName: ipa_dada
+- changeSet:
+    id: init-index-79
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_doc_env_lastmodby_fk_i
+        tableName: ipa_document_enviament
+- changeSet:
+    id: init-index-80
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_entitat_lastmodby_fk_i
+        tableName: ipa_entitat
+- changeSet:
+    id: init-index-81
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_mass_cont_lastmodby_fk_i
+        tableName: ipa_massiva_contingut
+- changeSet:
+    id: init-index-82
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_exe_mass_lastmodby_fk_i
+        tableName: ipa_execucio_massiva
+- changeSet:
+    id: init-index-83
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_nteressat_lastmodby_fk_i
+        tableName: ipa_interessat
+- changeSet:
+    id: init-index-85
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_metadada_lastmodby_fk_i
+        tableName: ipa_metadada
+- changeSet:
+    id: init-index-86
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: lastmodifiedby_codi
+        indexName: ipa_metaexp_seq_lastmodby_fk_i
+        tableName: ipa_metaexp_seq

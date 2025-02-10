@@ -3,8 +3,8 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.ExpedientTascaComentariEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.persistence.ExpedientTascaComentariEntity;
+import es.caib.ripea.core.persistence.ExpedientTascaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

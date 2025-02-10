@@ -1,0 +1,29 @@
+/**
+ * 
+ */
+package es.caib.ripea.back.interceptor;
+
+import es.caib.ripea.back.helper.ModalHelper;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Interceptor per a redirigir les peticions a finestres modals.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+public class ModalInterceptor extends HandlerInterceptorAdapter {
+
+	@Override
+	public boolean preHandle(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Object handler) throws Exception {
+		boolean resposta = ModalHelper.comprovarModalInterceptor(request, response);
+		// System.out.println(">>> MODAL: " + request.getRequestURI() + ", " + AjaxHelper.isAjax(request));
+		return resposta;
+	}
+
+}

@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
+import es.caib.ripea.core.persistence.EmailPendentEnviarEntity;
 
 
 public interface EmailPendentEnviarRepository extends JpaRepository<EmailPendentEnviarEntity, Long> {

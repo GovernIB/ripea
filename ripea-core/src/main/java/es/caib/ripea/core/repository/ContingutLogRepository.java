@@ -12,9 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.aggregation.ContingutLogCountAggregation;
-import es.caib.ripea.core.entity.ContingutLogEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.ContingutLogEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base de

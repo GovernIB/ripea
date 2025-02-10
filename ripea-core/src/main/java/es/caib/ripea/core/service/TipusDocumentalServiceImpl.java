@@ -19,8 +19,8 @@ import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.TipusDocumentalEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.TipusDocumentalEntity;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 
 /**

@@ -1,0 +1,149 @@
+databaseChangeLog:
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1653978777186-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_metaexpedient
+            columns:
+              - column:
+                  name: organ_no_sinc
+                  type: boolean
+                  valueBoolean: false
+        - addColumn:
+            tableName: ipa_entitat
+            columns:
+              - column:
+                  name: data_sincronitzacio
+                  type: timestamp
+              - column:
+                  name: data_actualitzacio
+                  type: timestamp
+        - addColumn:
+            tableName: ipa_organ_gestor
+            columns:
+              - column:
+                  name: estat
+                  type: varchar(1 ${varcharUnit})
+                  defaultValue: 'V'
+              - column:
+                  name: tipus_transicio
+                  type: varchar(12 ${varcharUnit})
+        - addColumn:
+            tableName: ipa_avis
+            columns:
+              - column:
+                  name: avis_admin
+                  type: BOOLEAN
+                  defaultValue: ${booleanFalse}
+        - addColumn:
+            tableName: ipa_avis
+            columns:
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+        - createTable:
+            tableName: ipa_og_sinc_rel
+            columns:
+              - column:
+                  name: antic_og
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nou_og
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: antic_og
+            baseTableName: ipa_og_sinc_rel
+            constraintName: ipa_organ_antic_fk
+            referencedColumnNames: id
+            referencedTableName: ipa_organ_gestor
+        - addForeignKeyConstraint:
+            baseColumnNames: nou_og
+            baseTableName: ipa_og_sinc_rel
+            constraintName: ipa_organ_nou_fk
+            referencedColumnNames: id
+            referencedTableName: ipa_organ_gestor
+        - addUniqueConstraint:
+            tableName: ipa_og_sinc_rel
+            constraintName: ipa_uo_sinc_rel_mult_uk
+            columnNames: antic_og, nou_og
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.procediment.actualitzar.cron
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Cron per a la actualització de procediments
+              - column:
+                  name: group_code
+                  value: SCHEDULLED
+              - column:
+                  name: position
+                  value: 6
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: 0
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.organs.consulta.canvis
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Cron per a la consulta de canvis a l'organigrama
+              - column:
+                  name: group_code
+                  value: SCHEDULLED
+              - column:
+                  name: position
+                  value: 7
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: 0
+        - sql:
+            dbms: oracle
+            sql: grant select, update, insert, delete on ipa_og_sinc_rel to www_ripea;
+        - sql:
+            sql: update ipa_metaexp_seq set valor = 0 where valor is null;
+                 alter table ipa_metaexp_seq modify ( valor not null);        

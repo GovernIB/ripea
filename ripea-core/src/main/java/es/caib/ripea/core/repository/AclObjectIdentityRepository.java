@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.AclClassEntity;
-import es.caib.ripea.core.entity.AclObjectIdentityEntity;
-import es.caib.ripea.core.entity.AclSidEntity;
+import es.caib.ripea.core.persistence.AclClassEntity;
+import es.caib.ripea.core.persistence.AclObjectIdentityEntity;
+import es.caib.ripea.core.persistence.AclSidEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

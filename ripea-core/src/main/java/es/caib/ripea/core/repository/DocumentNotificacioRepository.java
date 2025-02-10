@@ -15,10 +15,10 @@ import org.springframework.data.repository.query.Param;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
+import es.caib.ripea.core.persistence.DocumentNotificacioEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

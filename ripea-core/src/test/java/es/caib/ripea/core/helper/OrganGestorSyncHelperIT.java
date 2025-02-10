@@ -26,7 +26,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.persistence.OrganGestorEntity;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.test.AuthenticationTest;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;

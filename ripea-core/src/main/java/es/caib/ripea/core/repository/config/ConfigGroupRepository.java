@@ -1,6 +1,6 @@
 package es.caib.ripea.core.repository.config;
 
-import es.caib.ripea.core.entity.config.ConfigGroupEntity;
+import es.caib.ripea.core.persistence.config.ConfigGroupEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 

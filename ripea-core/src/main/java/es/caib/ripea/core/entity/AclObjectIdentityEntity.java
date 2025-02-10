@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.ripea.core.entity;
+package es.caib.ripea.core.persistence;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

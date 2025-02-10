@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1685959676540-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.contingut.contreure.carpetes
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Contreure per defecte les carpetes
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 37
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1

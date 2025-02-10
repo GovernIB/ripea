@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.DocumentEnviamentEntity;
-import es.caib.ripea.core.entity.PortafirmesBlockEntity;
+import es.caib.ripea.core.persistence.DocumentEnviamentEntity;
+import es.caib.ripea.core.persistence.PortafirmesBlockEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

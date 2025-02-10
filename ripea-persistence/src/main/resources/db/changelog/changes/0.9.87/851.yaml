@@ -1,0 +1,77 @@
+databaseChangeLog:
+- changeSet:
+    id: 1631862307800-1
+    author: limit
+    runOnChange: true
+    changes:
+    - createTable:
+        tableName: IPA_EXPEDIENT_TASCA_RESP
+        columns:
+            - column:
+                name:  TASCA_ID
+                type:  BIGINT
+                constraints:
+                    nullable: false
+                    foreignKeyName: ipa_expedient_tasca_fk
+                    references: IPA_EXPEDIENT_TASCA(ID)
+            - column:
+                name:  RESPONSABLE_CODI
+                type:  varchar(64)
+                constraints:
+                    nullable: false
+                    foreignKeyName: ipa_expedient_tascaresp_fk
+                    references: IPA_USUARI(CODI)
+    - addPrimaryKey:
+        columnNames: TASCA_ID, RESPONSABLE_CODI
+        constraintName: ipa_expedient_tasca_resp_pk
+        tableName: IPA_EXPEDIENT_TASCA_RESP
+    - sql:
+        dbms: oracle
+        sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_EXPEDIENT_TASCA_RESP TO www_ripea;"
+
+#Mou responsable actual a la taula de responsables tasca
+- changeSet:
+    id: 1632905641063-2
+    author: limit
+    runOnChange: true
+    changes:
+    - sql: 
+        sql: "
+INSERT INTO IPA_EXPEDIENT_TASCA_RESP (
+		TASCA_ID, 
+		RESPONSABLE_CODI)
+SELECT ID, 
+	   RESPONSABLE_CODI
+FROM IPA_EXPEDIENT_TASCA;
+
+"
+
+#La columna de responsable antiga ara pertany al responsable que ha iniciat la tasca
+- changeSet:
+    id: 1632905896660-3
+    author: limit
+    runOnChange: true
+    changes:
+        - sql:
+              dbms: oracle
+              sql: "ALTER TABLE IPA_EXPEDIENT_TASCA MODIFY RESPONSABLE_CODI NULL;
+                    ALTER TABLE IPA_EXPEDIENT_TASCA RENAME COLUMN RESPONSABLE_CODI TO RESPONSABLE_ACTUAL_CODI;"
+        - sql:
+              dbms: postgresql
+              sql: "ALTER TABLE IPA_EXPEDIENT_TASCA ALTER COLUMN RESPONSABLE_CODI DROP NOT NULL;
+                    ALTER TABLE IPA_EXPEDIENT_TASCA RENAME COLUMN RESPONSABLE_CODI TO RESPONSABLE_ACTUAL_CODI;"                    
+                    
+
+
+#Tasques sense responsable actual (no iniciades)
+- changeSet:
+    id: 1632906026254-4
+    author: limit
+    runOnChange: true
+    changes:
+          - sql:
+                sql: "UPDATE IPA_EXPEDIENT_TASCA SET RESPONSABLE_ACTUAL_CODI = NULL WHERE ESTAT = 'PENDENT';"
+                dbms: oracle
+          - sql:
+                sql: "UPDATE IPA_EXPEDIENT_TASCA SET RESPONSABLE_ACTUAL_CODI = NULL WHERE ESTAT = 'PENDENT';"
+                dbms: postgresql                

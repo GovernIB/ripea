@@ -1,0 +1,29 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1695202086434-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: element_id
+            type: number(19)
+        - column:
+            name: element_nom
+            type: varchar(256 ${varcharunit})
+        - column:
+            name: element_tipus
+            type: varchar(16 ${varcharunit})
+        tableName: ipa_massiva_contingut
+    - sql:
+        sql:  update ipa_massiva_contingut set element_id = contingut_id;  
+              update ipa_massiva_contingut set element_tipus = 'DOCUMENT';  
+              update ipa_massiva_contingut set element_nom = (select nom from ipa_contingut where ipa_contingut.id = ipa_massiva_contingut.contingut_id);

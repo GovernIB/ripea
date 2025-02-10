@@ -1,4 +1,4 @@
-package es.caib.ripea.core.entity.config;
+package es.caib.ripea.core.persistence.config;
 
 import lombok.Getter;
 

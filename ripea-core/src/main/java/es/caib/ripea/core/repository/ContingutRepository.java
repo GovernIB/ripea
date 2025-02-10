@@ -4,11 +4,11 @@
 package es.caib.ripea.core.repository;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.ContingutEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
+import es.caib.ripea.core.persistence.MetaNodeEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

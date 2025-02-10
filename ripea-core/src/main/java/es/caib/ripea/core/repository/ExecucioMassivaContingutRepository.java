@@ -4,8 +4,8 @@
 package es.caib.ripea.core.repository;
 
 import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
-import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity;
+import es.caib.ripea.core.persistence.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.persistence.ExecucioMassivaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

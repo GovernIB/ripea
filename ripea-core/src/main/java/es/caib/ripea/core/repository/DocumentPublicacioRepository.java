@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentPublicacioEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
+import es.caib.ripea.core.persistence.DocumentPublicacioEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

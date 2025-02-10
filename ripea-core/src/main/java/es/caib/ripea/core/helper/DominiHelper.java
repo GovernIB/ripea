@@ -30,8 +30,8 @@ import es.caib.ripea.core.api.exception.CipherException;
 import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.entity.DominiEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.persistence.DominiEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
 import es.caib.ripea.core.repository.DominiRepository;
 
 /**

@@ -1,8 +1,8 @@
 package es.caib.ripea.plugin.procediment;
 
-import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
 
 /**
  * Plugin per a consultar la llista de procediments d'una font externa.

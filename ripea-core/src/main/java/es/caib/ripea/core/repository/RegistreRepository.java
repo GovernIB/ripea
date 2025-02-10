@@ -5,7 +5,7 @@ package es.caib.ripea.core.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.RegistreEntity;
+import es.caib.ripea.core.persistence.RegistreEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

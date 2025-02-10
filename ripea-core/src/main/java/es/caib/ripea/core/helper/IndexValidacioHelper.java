@@ -18,7 +18,7 @@ import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfReader;
 
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
 
 @Component
 public class IndexValidacioHelper {

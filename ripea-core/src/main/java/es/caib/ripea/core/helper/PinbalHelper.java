@@ -67,16 +67,16 @@ import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
-import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.PinbalServeiEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.ExpedientEntity;
+import es.caib.ripea.core.persistence.InteressatEntity;
+import es.caib.ripea.core.persistence.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.persistence.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.persistence.MetaDocumentEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.OrganGestorEntity;
+import es.caib.ripea.core.persistence.PinbalServeiEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 import lombok.extern.slf4j.Slf4j;
 
 /**

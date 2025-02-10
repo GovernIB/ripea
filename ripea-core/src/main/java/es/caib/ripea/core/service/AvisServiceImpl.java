@@ -7,7 +7,7 @@ import es.caib.ripea.core.api.dto.AvisDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.AvisService;
-import es.caib.ripea.core.entity.AvisEntity;
+import es.caib.ripea.core.persistence.AvisEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.AvisRepository;

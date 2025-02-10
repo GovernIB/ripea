@@ -2,10 +2,10 @@ package es.caib.ripea.plugin.firmaweb;
 
 import java.util.List;
 
-import es.caib.ripea.core.api.dto.FirmaResultatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 
 public interface FirmaWebPlugin extends RipeaEndpointPluginInfo {
 

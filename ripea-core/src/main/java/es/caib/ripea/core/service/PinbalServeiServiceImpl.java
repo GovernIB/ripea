@@ -10,7 +10,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDto;
 import es.caib.ripea.core.api.service.PinbalServeiService;
-import es.caib.ripea.core.entity.PinbalServeiEntity;
+import es.caib.ripea.core.persistence.PinbalServeiEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.PinbalServeiRepository;

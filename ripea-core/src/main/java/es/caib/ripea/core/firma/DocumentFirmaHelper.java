@@ -11,7 +11,7 @@ import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 

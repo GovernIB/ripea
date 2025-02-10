@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.persistence.ExpedientEstatEntity;
+import es.caib.ripea.core.persistence.MetaExpedientEntity;
 
 public interface ExpedientEstatRepository extends JpaRepository<ExpedientEstatEntity, Long> {
 

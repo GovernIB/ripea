@@ -6,9 +6,9 @@ package es.caib.ripea.plugin.notificacio;
 import java.util.Date;
 import java.util.List;
 
+import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import lombok.Data;
 
 /**

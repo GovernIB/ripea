@@ -1,0 +1,36 @@
+databaseChangeLog:
+- changeSet:
+    id: 1722515937801-1
+    author: limit
+    runOnChange: true
+    changes:
+    - createTable:
+        tableName: IPA_EXPEDIENT_TASCA_OBSE
+        columns:
+            - column:
+                name:  TASCA_ID
+                type:  BIGINT
+                constraints:
+                    nullable: false
+                    foreignKeyName: ipa_expedient_obse_tasca_fk
+                    references: IPA_EXPEDIENT_TASCA(ID)
+            - column:
+                name:  OBSERVADOR_CODI
+                type:  varchar(64 ${varcharunit})
+                constraints:
+                    nullable: false
+                    foreignKeyName: ipa_expedient_tascaobse_fk
+                    references: IPA_USUARI(CODI)
+    - addPrimaryKey:
+        columnNames: TASCA_ID, OBSERVADOR_CODI
+        constraintName: ipa_expedient_tasca_obse_pk
+        tableName: IPA_EXPEDIENT_TASCA_OBSE
+    - addColumn:
+        columns:
+          - column:
+              name: DELEGAT
+              type: varchar(64 ${varcharunit})
+        tableName: IPA_EXPEDIENT_TASCA
+    - sql:
+        dbms: oracle
+        sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON IPA_EXPEDIENT_TASCA_OBSE TO www_ripea;"

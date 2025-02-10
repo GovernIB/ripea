@@ -3,8 +3,8 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.AclEntryEntity;
-import es.caib.ripea.core.entity.AclObjectIdentityEntity;
+import es.caib.ripea.core.persistence.AclEntryEntity;
+import es.caib.ripea.core.persistence.AclObjectIdentityEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

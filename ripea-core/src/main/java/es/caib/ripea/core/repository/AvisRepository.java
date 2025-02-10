@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.entity.AvisEntity;
+import es.caib.ripea.core.persistence.AvisEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

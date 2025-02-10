@@ -1,4 +1,4 @@
-package es.caib.ripea.core.entity;
+package es.caib.ripea.core.persistence;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

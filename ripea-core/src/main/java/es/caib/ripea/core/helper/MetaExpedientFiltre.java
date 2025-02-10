@@ -1,8 +1,8 @@
 package es.caib.ripea.core.helper;
 
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.OrganGestorEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

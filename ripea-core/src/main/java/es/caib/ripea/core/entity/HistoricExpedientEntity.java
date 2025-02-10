@@ -1,4 +1,4 @@
-package es.caib.ripea.core.entity;
+package es.caib.ripea.core.persistence;
 
 import java.util.Date;
 

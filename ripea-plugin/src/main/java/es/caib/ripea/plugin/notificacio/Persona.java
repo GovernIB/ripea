@@ -1,7 +1,7 @@
 package es.caib.ripea.plugin.notificacio;
 
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import lombok.Getter;
 import lombok.Setter;
 

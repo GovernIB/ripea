@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import org.springframework.data.jpa.domain.AbstractAuditable;
 
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.persistence.UsuariEntity;
 
 /**
  * Classe basse de on extendre per a activar les auditories.

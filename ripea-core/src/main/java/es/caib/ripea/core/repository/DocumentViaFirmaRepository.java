@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.core.persistence.DocumentEntity;
+import es.caib.ripea.core.persistence.DocumentViaFirmaEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

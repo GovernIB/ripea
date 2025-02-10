@@ -1,8 +1,8 @@
 package es.caib.ripea.core.repository.command;
 
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.persistence.EntitatEntity;
+import es.caib.ripea.core.persistence.GrupEntity;
 import es.caib.ripea.core.repository.GrupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

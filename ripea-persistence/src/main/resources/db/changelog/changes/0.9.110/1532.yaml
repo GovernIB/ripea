@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1722515937801-1
+      author: limit
+      runOnChange: true
+      changes:
+        - modifyDataType:
+              columnName: organ_nom
+              newDataType: varchar(256 ${varcharUnit})
+              tableName: IPA_INTERESSAT

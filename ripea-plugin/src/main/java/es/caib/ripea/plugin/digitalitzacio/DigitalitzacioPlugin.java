@@ -2,9 +2,9 @@ package es.caib.ripea.plugin.digitalitzacio;
 
 import java.util.List;
 
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.plugin.RipeaEndpointPluginInfo;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 
 /**
  * Plugin per a la integració amb portafirmes.

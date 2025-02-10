@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.ExpedientCarpetaArbreEntity;
+import es.caib.ripea.core.persistence.ExpedientCarpetaArbreEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar la vista que representra les carpetes d'un expedient

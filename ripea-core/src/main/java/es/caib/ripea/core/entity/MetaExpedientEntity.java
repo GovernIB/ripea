@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.ripea.core.entity;
+package es.caib.ripea.core.persistence;
 
 import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
