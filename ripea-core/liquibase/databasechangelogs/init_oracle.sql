@@ -227,10 +227,10 @@ ALTER TABLE ipa_contingut ADD CONSTRAINT ipa_contingut_contmov_fk FOREIGN KEY (c
 ALTER TABLE ipa_cont_log ADD CONSTRAINT ipa_cont_log_cont_mov_fk FOREIGN KEY (contmov_id) REFERENCES ipa_cont_mov (id);
 
 -- Changeset db/changelog/initial_schema_constraint.yaml::init-constraint-15::limit (generated)
-ALTER TABLE ipa_document_enviament_doc ADD CONSTRAINT ipa_docenv_doc_docenv_fk FOREIGN KEY (document_enviament_id) REFERENCES ipa_document_enviament (id);
+ALTER TABLE ipa_document_enviament_doc ADD CONSTRAINT IPA_DOCENV_DOCENVDOC_FK FOREIGN KEY (document_enviament_id) REFERENCES ipa_document_enviament (id);
 
 -- Changeset db/changelog/initial_schema_constraint.yaml::init-constraint-16::limit (generated)
-ALTER TABLE ipa_document_enviament_doc ADD CONSTRAINT ipa_docenv_doct_document_fk FOREIGN KEY (document_id) REFERENCES ipa_document (id);
+ALTER TABLE ipa_document_enviament_doc ADD CONSTRAINT IPA_DOCUMENT_DOCENVDOC_FK FOREIGN KEY (document_id) REFERENCES ipa_document (id);
 
 -- Changeset db/changelog/initial_schema_constraint.yaml::init-constraint-17::limit (generated)
 ALTER TABLE ipa_document_enviament ADD CONSTRAINT ipa_doc_env_document_fk FOREIGN KEY (document_id) REFERENCES ipa_document (id);

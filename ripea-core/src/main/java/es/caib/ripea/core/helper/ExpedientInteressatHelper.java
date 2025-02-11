@@ -682,6 +682,14 @@ public class ExpedientInteressatHelper {
 			interessat.updateArxiuIntent(arxiuPropagat);
 		} else {
             expedient.updateArxiuIntent(arxiuPropagat);
+            //SI s'ha propagat correctament l'expedient, es que els interessats han quedat propagats també
+            if (arxiuPropagat) {
+            	if (expedient.getInteressatsORepresentants()!=null) {
+            		for (InteressatEntity interessatExp: expedient.getInteressatsORepresentants()) {
+            			interessatExp.updateArxiuIntent(arxiuPropagat);
+            		}
+            	}
+            }
 		}
 	}
 	
