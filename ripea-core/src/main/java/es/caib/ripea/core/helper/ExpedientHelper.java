@@ -1531,7 +1531,7 @@ public class ExpedientHelper {
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
 		
-		if (expedient.getArxiuUuid() != null) { // concurrency check
+		if (expedient.getArxiuUuid() != null && expedient.isArxiuPropagat()) { // concurrency check
 			throw new ArxiuJaGuardatException("L'expedient ja s'ha guardat en arxiu per otra persona o el process en segon pla");
 		}
 		concurrencyCheckExpedientJaTancat(expedient);
