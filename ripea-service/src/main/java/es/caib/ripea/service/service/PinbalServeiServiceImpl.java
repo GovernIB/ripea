@@ -1,7 +1,7 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.PinbalServeiEntity;
-import es.caib.ripea.core.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.intf.dto.PaginaDto;

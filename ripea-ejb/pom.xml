@@ -60,4 +60,24 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

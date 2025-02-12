@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.repository.*;
+import es.caib.ripea.persistence.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

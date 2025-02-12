@@ -3,10 +3,10 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.AlertaEntity;
-import es.caib.ripea.core.persistence.entity.ContingutEntity;
-import es.caib.ripea.core.persistence.repository.AlertaRepository;
-import es.caib.ripea.core.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.entity.AlertaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.repository.AlertaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

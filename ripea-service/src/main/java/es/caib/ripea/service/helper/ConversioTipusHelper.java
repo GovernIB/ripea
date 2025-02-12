@@ -4,12 +4,12 @@
 package es.caib.ripea.service.helper;
 
 import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
-import es.caib.ripea.core.persistence.aggregation.HistoricAggregation;
-import es.caib.ripea.core.persistence.aggregation.HistoricExpedientAggregation;
-import es.caib.ripea.core.persistence.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.entity.config.ConfigEntity;
-import es.caib.ripea.core.persistence.repository.*;
+import es.caib.ripea.persistence.aggregation.HistoricAggregation;
+import es.caib.ripea.persistence.aggregation.HistoricExpedientAggregation;
+import es.caib.ripea.persistence.aggregation.HistoricUsuariAggregation;
+import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
+import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;

@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.ContingutEntity;
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.ExpedientEntity;
-import es.caib.ripea.core.persistence.entity.URLInstruccioEntity;
-import es.caib.ripea.core.persistence.repository.URLInstruccioRepository;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.URLInstruccioEntity;
+import es.caib.ripea.persistence.repository.URLInstruccioRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;

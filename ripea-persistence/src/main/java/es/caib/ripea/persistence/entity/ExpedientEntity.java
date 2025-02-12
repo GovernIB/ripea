@@ -1,0 +1,521 @@
+/**
+ * 
+ */
+package es.caib.ripea.persistence.entity;
+
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.*;
+
+/**
+ * Classe del model de dades que representa un expedient.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Entity
+@Table(name = BaseConfig.DB_PREFIX + "expedient", uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"metaexpedient_id", "anio", "sequencia"})
+})
+@EntityListeners(AuditingEntityListener.class)
+public class ExpedientEntity extends NodeEntity {
+
+	@Column(name = "estat", nullable = false)
+	protected ExpedientEstatEnumDto estat;
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "metaexpedient_id")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_expedient_fk")
+	private MetaExpedientEntity metaExpedient;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "tancat_data")
+	protected Date tancatData;
+	@Column(name = "tancat_motiu", length = 1024)
+	protected String tancatMotiu;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "tancat_programat")
+	protected Date tancatProgramat;
+	@Column(name = "anio", nullable = false)
+	protected int any;
+	@Column(name = "sequencia", nullable = false)
+	protected long sequencia;
+	@Column(name = "codi", nullable = false)
+	protected String codi;
+	@Column(name = "numero", length = 64, nullable = false)
+	protected String numero;
+	@Column(name = "nti_version", length = 5, nullable = false)
+	protected String ntiVersion;
+	@Column(name = "nti_identif", length = 52, nullable = false)
+	protected String ntiIdentificador;
+	@Column(name = "nti_organo", length = 9, nullable = false)
+	protected String ntiOrgano;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "nti_fecha_ape", nullable = false)
+	protected Date ntiFechaApertura;
+	@Column(name = "nti_clasif_sia", length = 6, nullable = false)
+	protected String ntiClasificacionSia;
+	@Column(name = "sistra_bantel_num", length = 16)
+	protected String sistraBantelNum;
+	@Column(name = "sistra_publicat")
+	protected boolean sistraPublicat;
+	@Column(name = "sistra_unitat_adm", length = 9)
+	protected String sistraUnitatAdministrativa;
+	@Column(name = "sistra_clau", length = 100)
+	protected String sistraClau;
+	@Column(name = "registres_importats", length = 4000)
+	protected String registresImportats;
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "agafat_per_codi")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "agafatper_expedient_fk")
+	protected UsuariEntity agafatPer;
+	@OneToMany(
+			mappedBy = "expedient",
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	protected Set<InteressatEntity> interessats = new HashSet<InteressatEntity>();
+	@ManyToMany(
+			cascade = {
+					CascadeType.DETACH,
+					CascadeType.MERGE,
+					CascadeType.REFRESH,
+					CascadeType.PERSIST
+			},
+			fetch = FetchType.LAZY)
+	@JoinTable(
+			name = BaseConfig.DB_PREFIX + "expedient_rel",
+			joinColumns = {
+					@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
+			inverseJoinColumns = {
+					@JoinColumn(name = "expedient_rel_id", referencedColumnName = "id")})
+	@ForeignKey(
+			name = BaseConfig.DB_PREFIX + "exprel_exprel_fk",
+			inverseName = BaseConfig.DB_PREFIX + "expedient_exprel_fk")
+	protected List<ExpedientEntity> relacionatsAmb = new ArrayList<ExpedientEntity>();
+	@ManyToMany(
+			cascade = {
+					CascadeType.DETACH,
+					CascadeType.MERGE,
+					CascadeType.REFRESH,
+					CascadeType.PERSIST
+			},
+			fetch = FetchType.LAZY)
+	@JoinTable(
+			name = BaseConfig.DB_PREFIX + "expedient_rel",
+			joinColumns = {
+					@JoinColumn(name = "expedient_rel_id", referencedColumnName="id")},
+			inverseJoinColumns = {
+					@JoinColumn(name = "expedient_id", referencedColumnName="id")})
+	@ForeignKey(
+			name = BaseConfig.DB_PREFIX + "expedient_rel_rel_fk",
+			inverseName = BaseConfig.DB_PREFIX + "expedient_rel_exp_fk")
+	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
+	
+	@OneToMany(mappedBy = "expedient")
+	private List<ExpedientPeticioEntity> peticions = new ArrayList<ExpedientPeticioEntity>();
+	
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientTascaEntity> tasques = new ArrayList<ExpedientTascaEntity>();
+
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientComentariEntity> comentaris = new ArrayList<ExpedientComentariEntity>();
+
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "expedient_estat_id")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_expedient_fk")
+	private ExpedientEstatEntity estatAdditional;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = BaseConfig.DB_PREFIX + "expedient_seguidor",
+			joinColumns = {
+					@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
+			inverseJoinColumns = {
+					@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")})
+	@ForeignKey(
+			name = BaseConfig.DB_PREFIX + "expedient_expseguidor_fk",
+			inverseName = BaseConfig.DB_PREFIX + "persona_expseguidor_fk")
+	protected List<UsuariEntity> seguidors = new ArrayList<UsuariEntity>();
+	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "grup_id")
+	@ForeignKey(name = BaseConfig.DB_PREFIX + "grup_expedient_fk")
+	private GrupEntity grup;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "organ_gestor_id")
+    @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_gestor_exp_fk")
+    private OrganGestorEntity organGestor;
+
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
+	
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+	  name = BaseConfig.DB_PREFIX + "expedient_organpare",
+	  joinColumns = @JoinColumn(name = "expedient_id"), 
+	  inverseJoinColumns = @JoinColumn(name = "meta_expedient_organ_id"))
+	Set<MetaExpedientOrganGestorEntity> metaexpedientOrganGestorPares;
+
+	@Column(name = "prioritat")
+	@Enumerated(EnumType.STRING)
+	private PrioritatEnumDto prioritat;
+	
+	//En el despacho de los expedientes se guardará el orden riguroso de incoación en asuntos de homogénea naturaleza
+	//salvo que por el titular de la unidad administrativa se dé orden motivada en contrario, de la que quede constancia.
+	@Column(name = "prioritat_motiu")
+	private String prioritatMotiu;
+	
+
+	public GrupEntity getGrup() {
+		return grup;
+	}
+	public void setGrup(GrupEntity grup) {
+		this.grup = grup;
+	}
+	public List<ExpedientTascaEntity> getTasques() {
+		return tasques;
+	}
+	public void updateTasques(List<ExpedientTascaEntity> tasques) {
+		this.tasques = tasques;
+	}
+	public List<ExpedientPeticioEntity> getPeticions() {
+		return peticions;
+	}
+	public void addExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity) {
+		this.peticions.add(expedientPeticioEntity);
+	}
+	public ExpedientEstatEnumDto getEstat() {
+		return estat;
+	}
+	public Date getTancatData() {
+		return tancatData;
+	}
+	public String getTancatMotiu() {
+		return tancatMotiu;
+	}
+	public int getAny() {
+		return any;
+	}
+	public long getSequencia() {
+		return sequencia;
+	}
+	public String getCodi() {
+		return codi;
+	}
+	public ExpedientEstatEntity getEstatAdditional() {
+		return estatAdditional;
+	}
+	public String getNtiVersion() {
+		return ntiVersion;
+	}
+	public String getNtiIdentificador() {
+		return ntiIdentificador;
+	}
+	public String getNtiOrgano() {
+		return ntiOrgano;
+	}
+	public Date getNtiFechaApertura() {
+		return ntiFechaApertura;
+	}
+	public String getNtiClasificacionSia() {
+		return ntiClasificacionSia;
+	}
+	public String getSistraBantelNum() {
+		return sistraBantelNum;
+	}
+	public boolean isSistraPublicat() {
+		return sistraPublicat;
+	}
+	public String getSistraUnitatAdministrativa() {
+		return sistraUnitatAdministrativa;
+	}
+	public String getSistraClau() {
+		return sistraClau;
+	}
+	public UsuariEntity getAgafatPer() {
+		return agafatPer;
+	}
+	public Set<InteressatEntity> getInteressatsORepresentants() {
+		return interessats;
+	}
+	public List<ExpedientEntity> getRelacionatsAmb() {
+		return relacionatsAmb;
+	}
+	public List<ExpedientEntity> getRelacionatsPer() {
+		return relacionatsPer;
+	}
+	public List<UsuariEntity> getSeguidors() {
+		return seguidors;
+	}
+	public List<ExpedientComentariEntity> getComentaris() {
+		return comentaris;
+	}
+	public MetaExpedientEntity getMetaExpedient() {
+		return (MetaExpedientEntity)getMetaNode();
+	}
+	public OrganGestorEntity getOrganGestor() {
+		return organGestor;
+	}
+	public String getNumero() {
+		return numero;
+	}
+	public String getNomINumero() {
+		return this.nom + " (" + this.numero + ")";
+	}
+	public String getRegistresImportats() {
+		return registresImportats;
+	}
+	public PrioritatEnumDto getPrioritat() {
+		return this.prioritat;
+	}
+	public String getPrioritatMotiu() {
+		return prioritatMotiu;
+	}
+	public void setPrioritatMotiu(String prioritatMotiu) {
+		this.prioritatMotiu = prioritatMotiu;
+	}
+	
+	public void updateNom(
+			String nom) {
+		this.nom = nom;
+	}
+	
+	public void updateAny(
+			int any) {
+		this.any = any;
+	}
+	
+	public void updateOrganGestor(OrganGestorEntity organGestor) {
+		this.organGestor = organGestor;
+	}
+	public void updateAnySequenciaCodi(
+			int any,
+			long sequencia,
+			String codi) {
+		this.any = any;
+		this.sequencia = sequencia;
+		this.codi = codi;
+	}
+	public void updateNtiIdentificador(
+			String ntiIdentificador) {
+		this.ntiIdentificador = ntiIdentificador;
+	}
+	public void updateNti(
+			String ntiVersion,
+			String ntiIdentificador,
+			String ntiOrgano,
+			Date ntiFechaApertura,
+			String ntiClasificacionSia) {
+		this.ntiVersion = ntiVersion;
+		this.ntiIdentificador = ntiIdentificador;
+		this.ntiOrgano = ntiOrgano;
+		this.ntiFechaApertura = ntiFechaApertura;
+		this.ntiClasificacionSia = ntiClasificacionSia;
+	}
+	public void updateEstat(
+			ExpedientEstatEnumDto estat,
+			String tancatMotiu) {
+		this.estat = estat;
+		this.tancatMotiu = tancatMotiu;
+		if (ExpedientEstatEnumDto.TANCAT.equals(estat))
+			this.tancatData = new Date();
+	}
+	public void updateEstat(
+			ExpedientEstatEnumDto estat,
+			String tancatMotiu,
+			int diesRestants) {
+		Calendar dataTancament = Calendar.getInstance();
+		dataTancament.add(Calendar.DATE, diesRestants);
+		
+		this.estat = estat;
+		this.tancatMotiu = tancatMotiu;
+		if (ExpedientEstatEnumDto.TANCAT.equals(estat))
+			this.tancatProgramat = dataTancament.getTime();;
+	}
+	public void updateTancatData() {
+		this.tancatData = new Date();
+	}
+	public void updateEstatAdditional(
+			ExpedientEstatEntity estatAdditional) {
+		this.estatAdditional = estatAdditional;
+	}
+	
+	public void updateAgafatPer(
+			UsuariEntity usuari) {
+		this.agafatPer = usuari;
+	}
+
+	public void updateSistra(
+			boolean sistraPublicat,
+			String sistraUnitatAdministrativa,
+			String sistraClau) {
+		this.sistraPublicat = sistraPublicat;
+		this.sistraUnitatAdministrativa = sistraUnitatAdministrativa;
+		this.sistraClau = sistraClau;
+	}
+
+	public void addInteressat(InteressatEntity interessat) {
+		interessats.add(interessat);
+	}
+	public void deleteInteressat(InteressatEntity interessat) {
+		Iterator<InteressatEntity> it = interessats.iterator();
+		while (it.hasNext()) {
+			InteressatEntity ie = it.next();
+			if (ie.getDocumentNum()!=null && ie.getDocumentNum().equals(interessat.getDocumentNum()))
+				it.remove();
+		}
+	}
+
+	public void addSeguidor(UsuariEntity usuariEntity) {
+		seguidors.add(usuariEntity);
+	}
+
+	public void addRelacionat(ExpedientEntity relacionat) {
+		relacionatsAmb.add(relacionat);
+	}
+	public void removeRelacionat(ExpedientEntity relacionat) {
+		relacionatsAmb.remove(relacionat);
+	}
+	public List<ExpedientOrganPareEntity> getOrganGestorPares() {
+		return organGestorPares;
+	}
+	public void removeOrganGestorPares() {
+		this.organGestorPares.clear();
+	}
+	
+	public void updateNumero(String numero) {
+		this.numero = numero;
+	}
+	
+	public String getNumeroINom() {
+		return this.numero + " - " + this.nom;
+	}
+	
+	public void updateRegistresImportats(String numeroRegistre) {
+		if (registresImportats != null)
+			this.registresImportats += "," + numeroRegistre;
+		else
+			this.registresImportats = numeroRegistre;
+	}
+	
+	public void removeRegistresImportats() {
+		this.registresImportats = null;
+	}
+	
+	public void removeTancamentProgramat() {
+		this.tancatProgramat = null;
+	}
+	
+	public boolean isTancamentProgramat() {
+		return this.estat == ExpedientEstatEnumDto.TANCAT && this.tancatProgramat != null && this.tancatData == null;
+	}
+
+	public void updatePrioritat(PrioritatEnumDto prioritat, String prioritatMotiu) {
+		this.prioritat = prioritat;
+		this.prioritatMotiu = prioritatMotiu;
+	}
+	
+	public static Builder getBuilder(
+			String nom,
+			MetaExpedientEntity metaExpedient,
+			ContingutEntity pare,
+			EntitatEntity entitat,
+			String ntiVersion,
+			String ntiOrgano,
+			Date ntiFechaApertura,
+			String ntiClasificacionSia,
+			OrganGestorEntity organGestor,
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
+		return new Builder(
+				nom,
+				metaExpedient,
+				pare,
+				entitat,
+				ntiVersion,
+				ntiOrgano,
+				ntiFechaApertura,
+				ntiClasificacionSia,
+				organGestor,
+				prioritat,
+				prioritatMotiu);
+	}
+
+	public static class Builder {
+		ExpedientEntity built;
+		Builder(
+				String nom,
+				MetaExpedientEntity metaExpedient,
+				ContingutEntity pare,
+				EntitatEntity entitat,
+				String ntiVersion,
+				String ntiOrgano,
+				Date ntiFechaApertura,
+				String ntiClasificacionSia,
+				OrganGestorEntity organGestor,
+				PrioritatEnumDto prioritat,
+				String prioritatMotiu) {
+			built = new ExpedientEntity();
+			built.nom = nom;
+			built.metaNode = metaExpedient;
+			built.metaExpedient = metaExpedient;
+			built.pare = pare;
+			built.entitat = entitat;
+			built.ntiVersion = ntiVersion;
+			built.ntiIdentificador = new Long(System.currentTimeMillis()).toString();
+			built.ntiOrgano = ntiOrgano;
+			built.ntiFechaApertura = ntiFechaApertura;
+			built.ntiClasificacionSia = ntiClasificacionSia;
+			built.organGestor = organGestor;
+			built.estat = ExpedientEstatEnumDto.OBERT;
+			built.tipus = ContingutTipusEnumDto.EXPEDIENT;
+			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
+			built.prioritatMotiu = prioritatMotiu;
+		}
+		public Builder agafatPer(UsuariEntity agafatPer) {
+			built.agafatPer = agafatPer;
+			return this;
+		}
+		public Builder grup(GrupEntity grup) {
+			built.grup = grup;
+			return this;
+		}
+		public ExpedientEntity build() {
+			return built;
+		}
+		
+	}
+	
+	@Override
+	public String toString() {
+		return "ExpedientEntity: [" +
+				"node: " + super.toString() + ", " +
+				"id: " + this.getId() + ", " +
+				"codi: " + this.codi + ", " +
+				"tipus: " + this.tipus + ", " +
+				"prrioritat: " + this.prioritat + ", " +
+				"ntiVersion: " + this.ntiVersion + ", " +
+				"ntiIdentificador: " + this.ntiIdentificador + ", " +
+				"ntiOrgano: " + this.ntiOrgano + ", " +
+				"ntiFechaApertura: " + this.ntiFechaApertura + ", " +
+				"ntiClasificacionSia: " + this.ntiClasificacionSia + ", " +
+				"organGestor: " + this.organGestor + "]";
+	}
+
+	private static final long serialVersionUID = -2299453443943600172L;
+
+}

@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class UnidadRest extends UnidadTF{
+public class UnidadRest extends UnidadTF {
 
 	private String nifCif;
 	private String denominacionCooficial;
-
 
 }

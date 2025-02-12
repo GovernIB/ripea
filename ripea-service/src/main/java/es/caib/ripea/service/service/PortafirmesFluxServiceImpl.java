@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.FluxFirmaUsuariEntity;
-import es.caib.ripea.core.persistence.entity.UsuariEntity;
-import es.caib.ripea.core.persistence.repository.FluxFirmaUsuariRepository;
-import es.caib.ripea.core.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.*;

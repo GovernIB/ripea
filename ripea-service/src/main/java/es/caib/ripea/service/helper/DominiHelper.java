@@ -1,8 +1,8 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.DominiEntity;
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.repository.DominiRepository;
+import es.caib.ripea.persistence.entity.DominiEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.service.intf.dto.DominiDto;
 import es.caib.ripea.service.intf.exception.CipherException;
 import es.caib.ripea.service.intf.exception.DominiException;

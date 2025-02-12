@@ -1,12 +1,12 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.GrupEntity;
-import es.caib.ripea.core.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.core.persistence.entity.UsuariEntity;
-import es.caib.ripea.core.persistence.repository.EntitatRepository;
-import es.caib.ripea.core.persistence.repository.GrupRepository;
-import es.caib.ripea.core.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.core.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;

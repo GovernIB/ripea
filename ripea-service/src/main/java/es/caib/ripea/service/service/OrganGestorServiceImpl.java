@@ -1,9 +1,9 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.core.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.core.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.service.helper.*;

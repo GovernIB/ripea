@@ -3,13 +3,13 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.CarpetaEntity;
-import es.caib.ripea.core.persistence.entity.ContingutEntity;
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.ExpedientEntity;
-import es.caib.ripea.core.persistence.repository.CarpetaRepository;
-import es.caib.ripea.core.persistence.repository.ContingutRepository;
-import es.caib.ripea.core.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.repository.CarpetaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;

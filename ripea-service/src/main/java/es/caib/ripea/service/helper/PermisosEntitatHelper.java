@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.PermisDto;

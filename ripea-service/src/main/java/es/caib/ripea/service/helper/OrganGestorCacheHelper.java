@@ -1,6 +1,6 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.intf.dto.OrganismeDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

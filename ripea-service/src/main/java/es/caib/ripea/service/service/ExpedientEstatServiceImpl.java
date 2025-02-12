@@ -1,10 +1,10 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.persistence.repository.ExpedientRepository;
-import es.caib.ripea.core.persistence.repository.UsuariRepository;
-import es.caib.ripea.core.persistence.repository.command.ExpedientRepositoryCommnand;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.intf.dto.*;

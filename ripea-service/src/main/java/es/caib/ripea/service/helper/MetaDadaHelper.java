@@ -1,10 +1,10 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.DocumentRepository;
-import es.caib.ripea.core.persistence.repository.EntitatRepository;
-import es.caib.ripea.core.persistence.repository.MetaDadaRepository;
-import es.caib.ripea.core.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import org.slf4j.Logger;

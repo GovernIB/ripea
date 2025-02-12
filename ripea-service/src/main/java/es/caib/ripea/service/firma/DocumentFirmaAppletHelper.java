@@ -1,7 +1,7 @@
 package es.caib.ripea.service.firma;
 
 import com.sun.jersey.core.util.Base64;
-import es.caib.ripea.core.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;

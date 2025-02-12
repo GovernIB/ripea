@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.GrupEntity;
-import es.caib.ripea.core.persistence.repository.*;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;

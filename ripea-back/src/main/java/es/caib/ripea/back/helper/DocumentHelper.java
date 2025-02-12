@@ -29,7 +29,7 @@ import java.util.zip.ZipOutputStream;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Component
+@Component("backDocumentHelper")
 public class DocumentHelper {
 
 	public static final SecureRandom DEFAULT_NUMBER_GENERATOR = new SecureRandom();

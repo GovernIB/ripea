@@ -1,10 +1,10 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.persistence.repository.DocumentPublicacioRepository;
-import es.caib.ripea.core.persistence.repository.DocumentRepository;
-import es.caib.ripea.core.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;

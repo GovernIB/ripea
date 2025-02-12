@@ -1,8 +1,8 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.*;
-import es.caib.ripea.core.persistence.repository.command.ExpedientRepositoryCommnand;
+import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.SeguimentService;

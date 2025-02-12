@@ -1,6 +1,6 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Setter;
 import org.apache.commons.collections4.ListUtils;

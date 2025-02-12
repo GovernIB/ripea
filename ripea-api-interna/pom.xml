@@ -9,6 +9,7 @@
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>ripea-api-interna</artifactId>
+	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -41,4 +42,26 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.2</version>
+				<configuration>
+					<packagingExcludes>**/RipeaBackBootApp.class,WEB-INF/lib/*.jar</packagingExcludes>
+					<attachClasses>true</attachClasses>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

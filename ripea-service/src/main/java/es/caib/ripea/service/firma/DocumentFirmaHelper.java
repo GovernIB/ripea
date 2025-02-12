@@ -1,6 +1,6 @@
 package es.caib.ripea.service.firma;
 
-import es.caib.ripea.core.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;

@@ -1,6 +1,6 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.repository.ProcessosInicialsRepository;
+import es.caib.ripea.persistence.repository.ProcessosInicialsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;

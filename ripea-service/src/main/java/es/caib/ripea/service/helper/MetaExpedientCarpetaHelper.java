@@ -1,8 +1,8 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.core.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.core.persistence.repository.MetaExpedientCarpetaRepository;
+import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.repository.MetaExpedientCarpetaRepository;
 import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

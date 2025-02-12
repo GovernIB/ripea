@@ -3,10 +3,10 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.UsuariEntity;
-import es.caib.ripea.core.persistence.repository.EntitatRepository;
-import es.caib.ripea.core.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;

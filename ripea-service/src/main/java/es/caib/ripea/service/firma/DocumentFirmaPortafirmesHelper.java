@@ -1,13 +1,13 @@
 package es.caib.ripea.service.firma;
 
-import es.caib.ripea.core.persistence.entity.DocumentEntity;
-import es.caib.ripea.core.persistence.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.persistence.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.core.persistence.entity.PortafirmesBlockEntity;
-import es.caib.ripea.core.persistence.repository.DocumentPortafirmesRepository;
-import es.caib.ripea.core.persistence.repository.DocumentRepository;
-import es.caib.ripea.core.persistence.repository.DocumentViaFirmaRepository;
-import es.caib.ripea.core.persistence.repository.PortafirmesBlockRepository;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.PortafirmesBlockEntity;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.persistence.repository.PortafirmesBlockRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;

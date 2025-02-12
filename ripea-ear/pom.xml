@@ -17,18 +17,18 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>ripea-api-interna</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-ejb</artifactId>
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<!-- Dependències pels wars de tipus skinny
 		     (https://maven.apache.org/plugins/maven-war-plugin/examples/skinny-wars.html) -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-api-interna</artifactId>
-			<version>${project.version}</version>
-			<classifier>classes</classifier>
-		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-service-intf</artifactId>
@@ -46,45 +46,6 @@
 			<artifactId>reactive-streams</artifactId>
 		</dependency>
 	</dependencies>
-	<profiles>
-		<profile>
-			<id>jboss</id>
-			<activation>
-				<file>
-					<missing>../ripea-war/appserv_tomcat</missing>
-				</file>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<!-- Tornam a deixar els placeholders com a l'inici	-->
-					<plugin>
-						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>replacer</artifactId>
-						<version>1.5.3</version>
-						<executions>
-							<execution>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
-									<basedir>${basedir}/../ripea-core/src/main/java/es/caib/ripea/core/ejb/ws</basedir>
-									<includes>
-										<include>PortaFIBCallbackWsBean.java</include>
-										<include>MCGDWsBean.java</include>
-										<include>BackofficeWsServiceBean.java</include>
-									</includes>
-									<token>/${ripea.path}</token>
-									<value>/ripea</value>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 	<build>
 		<plugins>
 			<plugin>
@@ -118,17 +79,32 @@
 				<configuration>
 					<finalName>ripea</finalName>
 					<version>5</version>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+						</manifestEntries>
+					</archive>
 					<modules>
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>
-							<artifactId>ripea-core</artifactId>
+							<artifactId>ripea-ejb</artifactId>
 							<bundleFileName>ripea.jar</bundleFileName>
 						</ejbModule>
 						<webModule>
 							<groupId>${project.groupId}</groupId>
-							<artifactId>ripea-war</artifactId>
-							<contextRoot>/ripea</contextRoot>
-							<bundleFileName>ripea.war</bundleFileName>
+							<artifactId>ripea-back</artifactId>
+							<contextRoot>/ripeaback</contextRoot>
+							<bundleFileName>ripea-back.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>ripea-api-interna</artifactId>
+							<contextRoot>/ripeaapi/interna</contextRoot>
+							<bundleFileName>ripea-api-interna.war</bundleFileName>
 						</webModule>
 					</modules>
 					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>

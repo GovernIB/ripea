@@ -1,11 +1,11 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.GrupEntity;
-import es.caib.ripea.core.persistence.entity.ProcesosInicialsEntity;
-import es.caib.ripea.core.persistence.repository.EntitatRepository;
-import es.caib.ripea.core.persistence.repository.ExpedientRepository;
-import es.caib.ripea.core.persistence.repository.GrupRepository;
-import es.caib.ripea.core.persistence.repository.ProcessosInicialsRepository;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.ProcesosInicialsEntity;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.ProcessosInicialsRepository;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;

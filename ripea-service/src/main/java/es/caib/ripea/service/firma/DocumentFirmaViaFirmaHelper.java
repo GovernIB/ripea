@@ -1,8 +1,8 @@
 package es.caib.ripea.service.firma;
 
-import es.caib.ripea.core.persistence.entity.DocumentEntity;
-import es.caib.ripea.core.persistence.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.core.persistence.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;

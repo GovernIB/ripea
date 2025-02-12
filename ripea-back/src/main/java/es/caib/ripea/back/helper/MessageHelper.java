@@ -15,7 +15,7 @@ import java.util.Locale;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Component
+@Component("backMessageHelper")
 public class MessageHelper implements MessageSourceAware {
 
 	private MessageSource messageSource;

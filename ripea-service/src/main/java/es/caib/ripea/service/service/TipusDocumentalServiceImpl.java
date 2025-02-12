@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.TipusDocumentalEntity;
-import es.caib.ripea.core.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;

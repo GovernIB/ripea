@@ -1,6 +1,6 @@
 package es.caib.ripea.service.auxiliary;
 
-import es.caib.ripea.core.persistence.entity.*;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Setter;

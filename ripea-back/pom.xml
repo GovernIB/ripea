@@ -9,6 +9,7 @@
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>ripea-back</artifactId>
+	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -97,4 +98,57 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>ide</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-service</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-plugin-impl</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<mainClass>es.caib.distribucio.RipeaBackBootApp</mainClass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.2</version>
+				<configuration>
+					<packagingExcludes>**/RipeaBackBootApp.class,WEB-INF/lib/*.jar</packagingExcludes>
+					<attachClasses>true</attachClasses>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>${implementation.vendor}</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

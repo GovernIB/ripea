@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Component
+@Component("backExpedientHelper")
 public class ExpedientHelper {
 
 	private static final String REQUEST_PARAMETER_ACCES_EXPEDIENTS = "ExpedientHelper.teAccesExpedients";

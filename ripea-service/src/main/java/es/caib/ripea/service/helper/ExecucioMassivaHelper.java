@@ -1,8 +1,8 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.ContingutRepository;
-import es.caib.ripea.core.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;

@@ -3,8 +3,8 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

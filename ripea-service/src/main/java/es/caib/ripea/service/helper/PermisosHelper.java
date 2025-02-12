@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.AclClassRepository;
-import es.caib.ripea.core.persistence.repository.AclEntryRepository;
-import es.caib.ripea.core.persistence.repository.AclObjectIdentityRepository;
-import es.caib.ripea.core.persistence.repository.AclSidRepository;
+import es.caib.ripea.persistence.repository.AclClassRepository;
+import es.caib.ripea.persistence.repository.AclEntryRepository;
+import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
+import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;

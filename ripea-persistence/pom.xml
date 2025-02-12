@@ -52,4 +52,20 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>oracle</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>ojdbc10</artifactId>
+					<version>19.20.0.0</version>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

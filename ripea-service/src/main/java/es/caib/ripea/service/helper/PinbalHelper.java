@@ -42,7 +42,7 @@ import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
-import es.caib.ripea.core.persistence.entity.*;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.PinbalException;
 import es.caib.ripea.service.intf.utils.Utils;

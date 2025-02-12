@@ -1,7 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import com.itextpdf.text.pdf.*;
-import es.caib.ripea.core.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

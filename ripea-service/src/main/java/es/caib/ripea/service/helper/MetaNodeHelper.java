@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.MetaDadaEntity;
-import es.caib.ripea.core.persistence.entity.MetaNodeEntity;
-import es.caib.ripea.core.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaNodeAmbMetaDadesDto;

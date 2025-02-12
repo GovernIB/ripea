@@ -1,12 +1,12 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.aggregation.ContingutLogCountAggregation;
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.ContingutLogRepository;
-import es.caib.ripea.core.persistence.repository.ExpedientTascaRepository;
-import es.caib.ripea.core.persistence.repository.historic.HistoricExpedientRepository;
-import es.caib.ripea.core.persistence.repository.historic.HistoricInteressatRepository;
-import es.caib.ripea.core.persistence.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
+import es.caib.ripea.persistence.repository.ContingutLogRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;

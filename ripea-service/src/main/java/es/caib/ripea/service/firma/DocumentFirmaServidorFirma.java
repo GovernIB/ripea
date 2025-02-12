@@ -1,8 +1,8 @@
 package es.caib.ripea.service.firma;
 
 import com.itextpdf.text.pdf.PdfReader;
-import es.caib.ripea.core.persistence.entity.DocumentEntity;
-import es.caib.ripea.core.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;

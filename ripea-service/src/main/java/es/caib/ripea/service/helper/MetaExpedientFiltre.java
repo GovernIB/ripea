@@ -1,7 +1,7 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.EntitatEntity;
-import es.caib.ripea.core.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Builder;
 import lombok.Getter;

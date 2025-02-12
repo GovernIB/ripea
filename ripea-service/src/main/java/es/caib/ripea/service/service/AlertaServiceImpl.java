@@ -3,10 +3,10 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.AlertaEntity;
-import es.caib.ripea.core.persistence.entity.ContingutEntity;
-import es.caib.ripea.core.persistence.repository.AlertaRepository;
-import es.caib.ripea.core.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.entity.AlertaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.repository.AlertaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.service.helper.AlertaHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;

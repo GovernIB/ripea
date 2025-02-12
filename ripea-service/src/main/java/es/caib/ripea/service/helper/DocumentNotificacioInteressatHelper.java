@@ -1,8 +1,8 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.DocumentEnviamentInteressatRepository;
-import es.caib.ripea.core.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.service.intf.dto.*;

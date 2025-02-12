@@ -1,6 +1,6 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.core.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;

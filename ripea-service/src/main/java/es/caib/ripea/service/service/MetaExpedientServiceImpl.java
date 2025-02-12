@@ -1,11 +1,11 @@
 package es.caib.ripea.service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.persistence.entity.*;
-import es.caib.ripea.core.persistence.repository.*;
-import es.caib.ripea.core.persistence.repository.historic.HistoricExpedientRepository;
-import es.caib.ripea.core.persistence.repository.historic.HistoricInteressatRepository;
-import es.caib.ripea.core.persistence.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PaginacioHelper.ConverterParam;

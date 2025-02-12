@@ -3,8 +3,8 @@
  */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.core.persistence.entity.AvisEntity;
-import es.caib.ripea.core.persistence.repository.AvisRepository;
+import es.caib.ripea.persistence.entity.AvisEntity;
+import es.caib.ripea.persistence.repository.AvisRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.intf.dto.AvisDto;
