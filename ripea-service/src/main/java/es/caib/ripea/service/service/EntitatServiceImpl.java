@@ -85,7 +85,8 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getCif(),
 				entitat.getUnitatArrel(),
 				entitat.getCapsaleraColorFons(),
-				entitat.getCapsaleraColorLletra());
+				entitat.getCapsaleraColorLletra(),
+                entitat.isPermetreEnviamentPostal());
 
 	
 		if (Utils.isNotEmpty(entitat.getLogoImgBytes())) {

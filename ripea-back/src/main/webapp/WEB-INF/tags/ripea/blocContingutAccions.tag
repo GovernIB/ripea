@@ -327,12 +327,12 @@
 						<li><a href="<c:url value="/document/${contingut.id}/publicar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-clipboard"></span>&nbsp;<spring:message code="comu.boto.publicar"/>...</a></li>
 					</c:if>
 
-                    <%---- Enviar document ----%>
-                    <li><a href="<c:url value="/document/${contingut.id}/enviar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="bustia.pendent.accio.enviarViaEmail"/>...</a></li>
-					<c:set var="mostrarSeparador" value="${true}"/>
+                    <c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 			</c:if>
-			<c:if test="${potModificar}">
+            <%---- Enviar document ----%>
+            <li><a href="<c:url value="/document/${contingut.id}/enviar"/>" data-toggle="modal" data-datatable-id="taulaEnviaments"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="bustia.pendent.accio.enviarViaEmail"/>...</a></li>
+            <c:if test="${potModificar}">
 				<%---- Seguiment portafirmes ----%>
 				<c:if test="${contingut.estat == 'FIRMA_PENDENT' && contingut.documentTipus == 'DIGITAL'}">
 					<li><a href="<c:url value="/document/${contingut.id}/portafirmes/info?readOnly=false&tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>

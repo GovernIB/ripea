@@ -704,7 +704,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
                 request,
                 getMessage(
                         request,
-                        "bustia.pendent.accio.enviarViaEmail.success"));
+                        "bustia.pendent.accio.enviarViaEmail.success",
+                        new Object[]{command.getResponsablesCodi().size()}));
         return modalUrlTancar();
     }
 

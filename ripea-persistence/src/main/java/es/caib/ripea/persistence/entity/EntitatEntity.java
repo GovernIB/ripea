@@ -54,23 +54,25 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	Date dataActualitzacio;
     @Column(name = "perm_env_postal")
     private boolean permetreEnviamentPostal = true;
-	
-	public void update(
-			String codi,
-			String nom,
-			String descripcio,
-			String cif,
-			String unitatArrel,
-			String capsaleraColorFons,
-			String capsaleraColorLletra) {
-		this.codi = codi;
-		this.nom = nom;
-		this.descripcio = descripcio;
-		this.cif = cif;
-		this.unitatArrel = unitatArrel;
-		this.capsaleraColorFons = capsaleraColorFons;
-		this.capsaleraColorLletra = capsaleraColorLletra;
-	}
+
+    public void update(
+            String codi,
+            String nom,
+            String descripcio,
+            String cif,
+            String unitatArrel,
+            String capsaleraColorFons,
+            String capsaleraColorLletra,
+            boolean permetreEnviamentPostal) {
+        this.codi = codi;
+        this.nom = nom;
+        this.descripcio = descripcio;
+        this.cif = cif;
+        this.unitatArrel = unitatArrel;
+        this.capsaleraColorFons = capsaleraColorFons;
+        this.capsaleraColorLletra = capsaleraColorLletra;
+        this.permetreEnviamentPostal = permetreEnviamentPostal;
+    }
 	
 	public void updateLogoImgBytes(
 			byte[] logoImgBytes) {

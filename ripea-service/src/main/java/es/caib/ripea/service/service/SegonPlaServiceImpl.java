@@ -9,6 +9,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.service.SegonPlaService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -282,10 +283,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
                     text += emailPendentEnviarEntity.getText() + "\n\n";
 
                     if (emailPendentEnviarEntity.getAdjuntId() != null) {
-                        Document fitxer = documentHelper.getFitxerById(
-                                emailPendentEnviarEntity.getAdjuntId(), emailPendentEnviarEntity.getEventTipusEnum());
+//                        Document fitxer = documentHelper.getFitxerById(
+//                                emailPendentEnviarEntity.getAdjuntId(),
+//                                emailPendentEnviarEntity.getEventTipusEnum());
+                        FitxerDto fitxer = documentHelper.getFitxerAssociat(emailPendentEnviarEntity.getAdjuntId(), null);
                         if (fitxer != null) {
-                            helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut().getContingut()));
+                            helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
                         }
                     }
                 }

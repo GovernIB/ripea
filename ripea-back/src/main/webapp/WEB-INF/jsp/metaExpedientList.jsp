@@ -240,8 +240,8 @@
 				<th data-col-name="organNoSincronitzat" data-visible="false"></th>
 				<th data-col-name="organEstat" data-visible="false"></th>
 				<th data-col-name="organTipusTransicio" data-visible="false"></th>
-				
-				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
+
+                <c:if test="${(not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan) && not isRolDissenyadorOrgan}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 						<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>

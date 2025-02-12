@@ -54,7 +54,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
-		
+        if (RolHelper.isRolActualDissenyadorOrgan(request))
+            throw new SecurityException("No te permisos per accedir com a dissenyador d'organ.");
 		if (RolHelper.isRolActualAdministradorOrgan(request) && !Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ"))) {
 			throw new SecurityException("Per poder gestionar permisos la propietat \"es.caib.ripea.procediment.gestio.permis.administrador.organ\" ha de ser activada pel superusuari ", null);
 			

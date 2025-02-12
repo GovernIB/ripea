@@ -1138,8 +1138,14 @@ public class EmailHelper {
                     "Email enviarDocument");
         }
 
+        UsuariEntity usuariEntity = usuariHelper.getUsuariAutenticat();
+        FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
+        DocumentEntity document= documentRepository.findOne(adjuntId);
+
         String subject = getPrefixRipea() + " Enviar document";
-        String text ="Enviament de misatge amb document adjunt";
+        String text ="Ha rebut el document adjunt '"+fitxer.getNom()+"' a partir de la funció 'Enviar document via email' de RIPEA. \n" +
+                "Enviat per: " + usuariEntity.getNom() + "\n" +
+                "Expedient: " + document.getExpedient().getNom();
 
         sendOrSaveEmail(
                 destinatarisNoAgrupats,
@@ -1202,9 +1208,10 @@ public class EmailHelper {
                 helper.setText(text);
 
                 if (adjuntId != null) {
-                    Document fitxer = documentHelper.getFitxerById(adjuntId, eventTipus);
+//                    Document fitxer = documentHelper.getFitxerById(adjuntId, eventTipus);
+                    FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
                     if (fitxer != null) {
-                        helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut().getContingut()));
+                        helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
                     }
                 }
                 mailSender.send(message);
@@ -1240,11 +1247,11 @@ public class EmailHelper {
 		if (usuari != null) {
 			email = getEmail(usuari);
 			if (Utils.isNotEmpty(email)) {
-				if (event == null) {
-					addDestinatari = true;
-				} else if (event == EventTipusEnumDto.NOVA_ANOTACIO && usuari.isRebreAvisosNovesAnotacions()) {
-					addDestinatari = true;
-				} else if (event == EventTipusEnumDto.CANVI_ESTAT_REVISIO){
+                if (event == null || EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
+                    addDestinatari = true;
+                } else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event) && usuari.isRebreAvisosNovesAnotacions()) {
+                    addDestinatari = true;
+                } else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
                     addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
                 }
 			}

@@ -1819,43 +1819,36 @@ public class PluginHelper {
 		}
 
 		String accioDescripcio = "Consulta d'un document";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		if (document != null) {
-			accioParams.put(
-					"contingutId",
-					document.getId().toString());
-			accioParams.put(
-					"contingutNom",
-					document.getNom());
-		}
-		if (arxiuUuid != null) {
-			accioParams.put(
-					"arxiuUuid",
-					arxiuUuid);
-		}
-		accioParams.put(
-				"versio",
-				versio);
-		accioParams.put(
-				"ambContingut",
-				Boolean.valueOf(ambContingut).toString());
-		accioParams.put(
-				"ambVersioImprimible",
-				Boolean.valueOf(ambVersioImprimible).toString());
-		long t0 = System.currentTimeMillis();
-		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin(document.getEntitat().getCodi());
-		try {
-			String arxiuUuidConsulta = (document != null && document instanceof DocumentEntity)
-					? document.getArxiuUuid()
-					: arxiuUuid;
-			accioParams.put(
-					"arxiuUuidConsulta",
-					arxiuUuidConsulta);
-			Document documentDetalls = arxiuPluginWrapper.getPlugin().documentDetalls(
-					arxiuUuidConsulta,
-					versio,
-					ambContingut);
-			if (ambContingut && documentDetalls.getContingut() == null) {
+        long t0 = System.currentTimeMillis();
+        Map<String, String> accioParams = new HashMap<String, String>();
+        IArxiuPluginWrapper arxiuPluginWrapper = null;
+        String arxiuUuidConsulta = null;
+
+        if (document != null) {
+            accioParams.put("contingutId", document.getId().toString());
+            accioParams.put("contingutNom", document.getNom());
+            arxiuUuidConsulta  = document.getArxiuUuid();
+            String entitatCodi = configHelper.getEntitatActualCodi();
+            if (entitatCodi!=null) {
+                arxiuPluginWrapper = getArxiuPlugin(entitatCodi);
+            } else {
+                //Cas de enviament de email en segon pla, no disposam de entitat en sessió
+                arxiuPluginWrapper = getArxiuPlugin(document.getEntitat().getCodi());
+            }
+        } else {
+            arxiuPluginWrapper = getArxiuPlugin();
+            arxiuUuidConsulta  = arxiuUuid;
+        }
+
+        if (arxiuUuid != null) { accioParams.put("arxiuUuid", arxiuUuid); }
+        accioParams.put("versio", versio);
+        accioParams.put("ambContingut", new Boolean(ambContingut).toString());
+        accioParams.put("ambVersioImprimible", new Boolean(ambVersioImprimible).toString());
+        accioParams.put("arxiuUuidConsulta", arxiuUuidConsulta);
+
+        try {
+            Document documentDetalls = arxiuPluginWrapper.getPlugin().documentDetalls(arxiuUuidConsulta, versio, ambContingut);
+            if (ambContingut && documentDetalls.getContingut() == null) {
 				logger.error(
 						"El plugin no ha retornat el contingut del document ({})",
 						accioParams.toString());
