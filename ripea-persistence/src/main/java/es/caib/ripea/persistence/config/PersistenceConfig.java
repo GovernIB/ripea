@@ -36,7 +36,7 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @EnableJpaRepositories(
-		basePackages = { BaseConfig.BASE_PACKAGE + ".persist.repository" },
+		basePackages = { BaseConfig.BASE_PACKAGE + ".persistence.repository" },
 		entityManagerFactoryRef = "mainEntityManager",
 		transactionManagerRef = "mainTransactionManager"
 )
@@ -155,7 +155,7 @@ public class PersistenceConfig {
 	}
 
 	protected String getEntityPackages() {
-		return BaseConfig.BASE_PACKAGE + ".persist.entity";
+		return BaseConfig.BASE_PACKAGE + ".persistence.entity";
 	}
 
 	@Getter

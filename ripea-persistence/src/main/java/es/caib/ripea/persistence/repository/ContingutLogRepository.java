@@ -27,7 +27,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 
 
 	@Query( "select   " +
-			"    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
 			"	     i.documentNum, " +
 			"	     e.metaExpedient, " +
 			"        log.tipus, " +
@@ -37,7 +37,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "    ContingutLogEntity log, ExpedientEntity e JOIN e.interessats i " +
 	        "where " +
 	        "         log.contingutId = e.id " +
-			"     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
+			"     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
 	        "     and log.createdDate >= :createdDateIni " +
 	        "     and log.createdDate <= :createdDateEnd " +
 	        "group by" +
@@ -47,7 +47,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 			@Param("createdDateEnd") Date createdDateEnd);
 	
 	@Query( "select   " +
-			"    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
 			"	     i.documentNum, " +
 			"	     e.metaExpedient, " +
 			"        log.tipus, " +
@@ -57,7 +57,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "    ContingutLogEntity log, ExpedientEntity e JOIN e.interessats i " +
 	        "where " +
 	        "         log.contingutId = e.id " +
-			"     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
+			"     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
 	        "     and log.createdDate <= :createdDateEnd " +
 	        "group by" +
 	        "     e.metaExpedient, log.tipus, i.documentNum")
@@ -65,7 +65,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 			@Param("createdDateEnd") Date createdDateEnd);
 	
 	@Query( "select   " +
-			"    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
 			"	     log.createdBy, " +
 			"	     e.metaExpedient, " +
 			"        log.tipus, " +
@@ -75,7 +75,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "    ContingutLogEntity log, ExpedientEntity e " +
 	        "where " +
 	        "         log.contingutId = e.id " +
-			"     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
+			"     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
 	        "     and log.createdDate >= :createdDateIni " +
 	        "     and log.createdDate <= :createdDateEnd " +
 	        "group by" +
@@ -85,7 +85,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 			@Param("createdDateEnd") Date createdDateEnd);
 	
 	@Query( "select   " +
-			"    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
 			"	     log.createdBy, " +
 			"	     e.metaExpedient, " +
 			"        log.tipus, " +
@@ -95,7 +95,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "    ContingutLogEntity log, ExpedientEntity e " +
 	        "where " +
 	        "         log.contingutId = e.id " +
-			"     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
+			"     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
 	        "     and log.createdDate <= :createdDateEnd " +
 	        "group by" +
 	        "     e.metaExpedient, log.createdBy, log.tipus")
@@ -103,7 +103,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 			@Param("createdDateEnd") Date createdDateEnd);
 	
 	@Query( "select   " +
-            "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+            "    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
             "	     e.metaExpedient, " +
 			"	     e.metaExpedient, " +
             "        log.tipus, " +
@@ -113,7 +113,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "    ContingutLogEntity log, ExpedientEntity e " +
             "where " +
             "         log.contingutId = e.id " +
-            "     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
+            "     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
             "     and log.createdDate >= :createdDateIni " +
             "     and log.createdDate <= :createdDateEnd " +
             "group by" +
@@ -123,7 +123,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             @Param("createdDateEnd") Date createdDateEnd);
 	
 	@Query( "select   " +
-            "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+            "    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
             "	     e.metaExpedient, " +
 			"	     e.metaExpedient, " +
             "        log.tipus, " +
@@ -133,7 +133,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "    ContingutLogEntity log, ExpedientEntity e " +
             "where " +
             "         log.contingutId = e.id " +
-            "     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
+            "     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.EXPEDIENT " +
             "     and log.createdDate <= :createdDateEnd " +
             "group by" +
             "     e.metaExpedient, log.tipus")
@@ -142,7 +142,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	
 	
 	@Query( "select   " +
-            "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+            "    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
             "	     e.metaExpedient, " +
 			"	     e.metaExpedient, " +
             "        log.tipus, " +
@@ -152,7 +152,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "    ContingutLogEntity log, DocumentEntity d JOIN d.expedient e " +
             "where " +
             "         log.contingutId = d.id " +
-            "     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.DOCUMENT " +
+            "     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.DOCUMENT " +
             "     and log.createdDate >= :createdDateIni " +
             "     and log.createdDate <= :createdDateEnd " +
             "group by" +
@@ -163,7 +163,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	
 	
 	@Query( "select   " +
-            "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+            "    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
             "	     e.metaExpedient, " +
 			"	     e.metaExpedient, " +
             "        log.objecteLogTipus, " +
@@ -173,7 +173,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "    ContingutLogEntity log, DocumentEntity d JOIN d.expedient e " +
             "where " +
             "         log.contingutId = d.id " +
-            "     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.NOTIFICACIO " +
+            "     and log.objecteTipus = es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.NOTIFICACIO " +
             "     and log.createdDate >= :createdDateIni " +
             "     and log.createdDate <= :createdDateEnd " +
             "group by" +

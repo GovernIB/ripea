@@ -79,10 +79,10 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"    ContingutEntity c " +
 			"where " +
 			"    c.entitat = :entitat " +
-			"and (:tipusCarpeta = true or type(c) <> es.caib.ripea.core.entity.CarpetaEntity) " +
-			"and (:tipusDocument = true or type(c) <> es.caib.ripea.core.entity.DocumentEntity) " +
-			"and (:tipusExpedient = true or type(c) <> es.caib.ripea.core.entity.ExpedientEntity) " +
-			"and (:esNullMetaNode = true or ((type(c) = es.caib.ripea.core.entity.ExpedientEntity or type(c) = es.caib.ripea.core.entity.DocumentEntity) and c.metaNode = :metaNode)) " +
+			"and (:tipusCarpeta = true or type(c) <> es.caib.ripea.persistence.entity.CarpetaEntity) " +
+			"and (:tipusDocument = true or type(c) <> es.caib.ripea.persistence.entity.DocumentEntity) " +
+			"and (:tipusExpedient = true or type(c) <> es.caib.ripea.persistence.entity.ExpedientEntity) " +
+			"and (:esNullMetaNode = true or ((type(c) = es.caib.ripea.persistence.entity.ExpedientEntity or type(c) = es.caib.ripea.persistence.entity.DocumentEntity) and c.metaNode = :metaNode)) " +
 			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullCreador = true or lower(c.createdBy) like lower('%'||:creador||'%')) " +
 			"and (:esNullDataInici = true or c.createdDate >= :dataInici) " +
@@ -124,10 +124,10 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"    ContingutEntity c " +
 			"where " +
 			"    c.entitat = :entitat " +
-			"and (:tipusCarpeta = true or type(c) <> es.caib.ripea.core.entity.CarpetaEntity) " +
-			"and (:tipusDocument = true or type(c) <> es.caib.ripea.core.entity.DocumentEntity) " +
-			"and (:tipusExpedient = true or type(c) <> es.caib.ripea.core.entity.ExpedientEntity) " +
-			"and (:esNullMetaNode = true or ((type(c) = es.caib.ripea.core.entity.ExpedientEntity or type(c) = es.caib.ripea.core.entity.DocumentEntity) and c.metaNode = :metaNode)) " +
+			"and (:tipusCarpeta = true or type(c) <> es.caib.ripea.persistence.entity.CarpetaEntity) " +
+			"and (:tipusDocument = true or type(c) <> es.caib.ripea.persistence.entity.DocumentEntity) " +
+			"and (:tipusExpedient = true or type(c) <> es.caib.ripea.persistence.entity.ExpedientEntity) " +
+			"and (:esNullMetaNode = true or ((type(c) = es.caib.ripea.persistence.entity.ExpedientEntity or type(c) = es.caib.ripea.persistence.entity.DocumentEntity) and c.metaNode = :metaNode)) " +
 			"and (:esNullNom = true or lower(c.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullCreador = true or lower(c.createdBy) like lower('%'||:creador||'%')) " +
 			"and (:esNullDataInici = true or c.createdDate >= :dataInici) " +

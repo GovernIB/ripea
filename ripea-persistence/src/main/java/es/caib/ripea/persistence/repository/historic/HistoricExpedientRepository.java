@@ -16,7 +16,7 @@ import java.util.List;
 
 @Transactional
 public interface HistoricExpedientRepository extends HistoricRepository<HistoricExpedientEntity> {
-	static String commonConstructor = "    new es.caib.ripea.core.aggregation.HistoricExpedientAggregation( " +
+	static String commonConstructor = "    new es.caib.ripea.persistence.aggregation.HistoricExpedientAggregation( " +
 			"	     h.data, " +
 			"	     sum(h.numExpedientsCreats), " +
 			"        sum(h.numExpedientsCreatsTotal), " +

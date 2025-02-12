@@ -27,46 +27,16 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 
 	List<EntitatEntity> findByActiva(boolean activa);
 
-	@Query(	"from " +
-			"    EntitatEntity ent " +
-			"where " +
-			"    :esNullFiltre = true " +
-			" or lower(ent.codi) like lower('%'||:filtre||'%') " +
-			" or lower(ent.nom) like lower('%'||:filtre||'%') " +
-			" or lower(ent.cif) like lower('%'||:filtre||'%')) ")
-	Page<EntitatEntity> findByFiltrePaginat(
-			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre,
-			Pageable pageable);
-
-	@Query(	"from " +
-			"    EntitatEntity ent " +
-			"where " +
-			"    :esNullFiltre = true " +
-			" or lower(ent.codi) like lower('%'||:filtre||'%') " +
-			" or lower(ent.nom) like lower('%'||:filtre||'%') " +
-			" or lower(ent.cif) like lower('%'||:filtre||'%')) ")
-	List<EntitatEntity> findByFiltrePaginat(
-			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre,
-			Sort sort);
-
-	
-
 	Page<EntitatEntity> findBy(
 			Pageable pageable);
 
-
 	List<EntitatEntity> findBy(
 			Sort sort);
-	
-	  
+
 	@Query("select org.entitat " + 
 			"from " + 
 			"    OrganGestorEntity org " + 
 			" where org.id in (:ids)")
 	public List<EntitatEntity> findByOrgansIds(@Param("ids") List<Long> ids);
-  	
-	
-	
+
 }

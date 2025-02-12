@@ -132,7 +132,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    OrganGestorEntity og " +
 			" where " +
 			"    og.entitat = :entitat " + 
-			"and og.estat = es.caib.ripea.core.api.dto.OrganEstatEnumDto.V " +
+			"and og.estat = es.caib.ripea.service.intf.dto.OrganEstatEnumDto.V " +
 			"and og.id in (:ids)")
 	public List<String> findCodisByEntitatAndVigentIds(
 			@Param("entitat") EntitatEntity entitat,
@@ -164,6 +164,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    OrganGestorEntity og " +
 			"where " +
 			"    og.entitat = :entitat " +
-			"and og.estat != es.caib.ripea.core.api.dto.OrganEstatEnumDto.V ")
+			"and og.estat != es.caib.ripea.service.intf.dto.OrganEstatEnumDto.V ")
     List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
 }

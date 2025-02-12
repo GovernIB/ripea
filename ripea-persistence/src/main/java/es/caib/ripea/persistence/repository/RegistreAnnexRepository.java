@@ -120,7 +120,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 
 	@Query(	"select a.id " +
 			"from RegistreAnnexEntity a " +
-			"where a.annexArxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.ESBORRANY " +
+			"where a.annexArxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.ESBORRANY " +
 			"and a.document is not null " )
 	public List<Long> findIdsEsborranysAmbDocument();
 

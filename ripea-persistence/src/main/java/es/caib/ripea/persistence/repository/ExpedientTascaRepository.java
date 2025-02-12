@@ -105,7 +105,7 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		Pageable pageable);
 
 	@Query("select " +
-		"    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+		"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
 		"	     responsable, " +
 		"	     e.metaExpedient, " +
 		"        count(tasca) " +

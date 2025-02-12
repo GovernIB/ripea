@@ -27,7 +27,7 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			"     and (:isNullMetaExpedients = true or h.metaExpedient.id in (:metaExpedients))  ";
 	
 	static String commonConstructor =
-			"    new es.caib.ripea.core.aggregation.HistoricUsuariAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.HistoricUsuariAggregation( " +
 			"	     h.data, " +
 			"	     sum(h.numExpedientsCreats), " +
 			"        sum(h.numExpedientsCreatsTotal), " +

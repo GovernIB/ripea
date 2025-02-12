@@ -40,7 +40,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "    InteressatEntity inter "
 			+ "where "
 			+ "    inter.expedient = :expedient "
-			+ "and (type(inter) = es.caib.ripea.core.entity.InteressatPersonaFisicaEntity or type(inter) = es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity) "
+			+ "and (type(inter) = es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity or type(inter) = es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity) "
 			+ "order by "
 			+ "    inter.id asc")
 	List<InteressatEntity> findByExpedientPerNotificacions(
@@ -200,7 +200,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"	 i.arxiuPropagat = false " +
 			"and i.expedient.esborrat = 0 " +
 			"and i.expedient.entitat = :entitat " +
-			"and i.expedient.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
+			"and i.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (i.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or i.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true " +
@@ -236,7 +236,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"	 i.arxiuPropagat = false " +
 			"and i.expedient.esborrat = 0 " +
 			"and i.expedient.entitat = :entitat " +
-			"and i.expedient.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +			
+			"and i.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +			
 			"and (i.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or i.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true " +

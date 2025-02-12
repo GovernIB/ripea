@@ -82,9 +82,9 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:esNullDataInicial = true or ep.registre.data >= :dataInicial) " +
 			"and (:esNullDataFinal = true or ep.registre.data <= :dataFinal) " +
 			"and (:esNullEstat = true or " +
-			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
-			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
-			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " +
+			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
+			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
+			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " +
 			"and (:esNullAccio = true or ep.expedientPeticioAccioEnumDto = :accio) " +
 			"and (:esNullInteressat = true " +
 			"		or  ep.registre.id in (" +
@@ -226,10 +226,10 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:esNullDataInici = true or ep.dataAlta >= :dataInici) " +
 			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi) " +
 			"and (:esNullEstat = true or " +
-//			"							(:estat = 'CONSULTA_ERROR' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.CREAT) or " +
-			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
-			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
-			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " )
+//			"							(:estat = 'CONSULTA_ERROR' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.CREAT) or " +
+			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
+			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
+			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " )
 	Page<ExpedientPeticioEntity> findPendentsCanviEstatDistribucio(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullIdentificador") boolean esNullIdentificador,
@@ -254,10 +254,10 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:esNullDataInici = true or ep.dataAlta >= :dataInici) " +
 			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi) " +
 			"and (:esNullEstat = true or " +
-//			"							(:estat = 'CONSULTA_ERROR' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.CREAT) or " +
-			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
-			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
-			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " )
+//			"							(:estat = 'CONSULTA_ERROR' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.CREAT) or " +
+			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
+			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
+			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " )
 	List<Long> findIdsPendentsCanviEstatDistribucio(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullIdentificador") boolean esNullIdentificador,

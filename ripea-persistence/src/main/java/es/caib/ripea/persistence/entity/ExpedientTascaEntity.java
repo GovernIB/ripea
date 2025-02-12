@@ -77,7 +77,6 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	private TascaEstatEnumDto estat;
 	
 	@Column(name = "motiu_rebuig", length = 1024)
-	@Enumerated(EnumType.STRING)
 	private String motiuRebuig;
 
 	@Temporal(TemporalType.DATE)

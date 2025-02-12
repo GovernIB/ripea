@@ -13,7 +13,7 @@ import java.util.List;
 @Transactional
 public interface HistoricInteressatRepository extends HistoricRepository<HistoricInteressatEntity> {
 	@Query( "select " +
-			"    new es.caib.ripea.core.aggregation.HistoricAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.HistoricAggregation( " +
 			"	     h.data, " +
 			"	     sum(h.numExpedientsCreats), " +
 			"        sum(h.numExpedientsCreatsTotal), " +

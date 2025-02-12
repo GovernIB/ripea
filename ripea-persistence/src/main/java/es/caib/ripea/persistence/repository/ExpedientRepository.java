@@ -116,8 +116,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"		or e.id in (" + 
 			"			select dp.expedient.id " + 
 			"			from DocumentPortafirmesEntity dp " + 
-			"			where (dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
-			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
+			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
+			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
 			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))" +
@@ -249,8 +249,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"		or e.id in (" + 
 			"			select dp.expedient.id " + 
 			"			from DocumentPortafirmesEntity dp " + 
-			"			where (dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
-			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT)" + 
+			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
+			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT)" + 
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
 			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%')) " +
@@ -517,9 +517,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullEstat = true or e.estatAdditional = :estat) " +			
 			"and (select count(document) from DocumentEntity document where " + // no documents en process de firma
 			"	document.expedient = e " +
-			"	and (document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
-			"		or document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
-			"		or document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
+			"	and (document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
+			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
+			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
 			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
 			"and (select " +																										// all dades obligatoris created
 			"	     	count(metaDada) " +
@@ -598,9 +598,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
 			"and (select count(document) from DocumentEntity document where " + // no documents en process de firma
 			"	document.expedient = e " +
-			"	and (document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
-			"		or document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
-			"		or document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
+			"	and (document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
+			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
+			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
 			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
 			"and (select " +
 			"	     	count(metaDada) " +
@@ -642,7 +642,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where " +
 			"	 (e.arxiuUuid = null or e.arxiuPropagat = false) " +
 			"and e.esborrat = 0 " +
-			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
+			"and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
 			"and e.entitat = :entitat " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +
@@ -689,7 +689,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    ExpedientEntity e " +
 			"where " +
 			"	 e.arxiuUuid = null " +
-			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
+			"and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
 			"and e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +

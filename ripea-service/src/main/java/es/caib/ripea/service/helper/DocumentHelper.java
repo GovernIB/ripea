@@ -1033,7 +1033,7 @@ public class DocumentHelper {
 	}
 
     public FitxerDto getFitxerAssociat(Long documentId, String versio) {
-        DocumentEntity document = documentRepository.findOne(documentId);
+        DocumentEntity document = documentRepository.getOne(documentId);
         return getFitxerAssociat(document, versio);
     }
 

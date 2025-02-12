@@ -10,12 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -28,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Configuration
+@EnableAsync
 @EnableScheduling
 public class SchedulingConfig implements SchedulingConfigurer {
 
@@ -36,13 +40,13 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired
     private SegonPlaService segonPlaService;
     @Autowired
-    private TaskScheduler taskScheduler;
-    @Autowired
-	private ConfigHelper configHelper;
-    @Autowired
     private MonitorTasquesService monitorTasquesService;
+    @Autowired
+    private ConfigHelper configHelper;
 
-    private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
+    private Boolean[] primeraVez = {
+            Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE
+    };
 
     private static final long DEFAULT_INITIAL_DELAY_MS = 30000L;
     private ScheduledTaskRegistrar taskRegistrar;
@@ -61,6 +65,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final String codiActualitzacioDeProcediments = "actualitzacioDeProcediments";
     private final String codiConsultaDeCanvisAlOrganigrama = "consultaDeCanvisAlOrganigrama";
     private final String codiBuidarCachesDominis = "buidarCachesDominis";
+
+     @Bean
+     public TaskScheduler taskScheduler() {
+         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+         taskScheduler.setPoolSize(10);
+         taskScheduler.setThreadNamePrefix("ripea-scheduled-task-pool");
+         return taskScheduler;
+     }
 
     public void restartSchedulledTasks(String taskCodi) {
 
@@ -127,7 +139,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 
-    	taskRegistrar.setScheduler(taskScheduler);
+    	taskRegistrar.setScheduler(taskScheduler());
     	this.taskRegistrar = taskRegistrar;
 
         addTask(

@@ -1140,7 +1140,7 @@ public class EmailHelper {
 
         UsuariEntity usuariEntity = usuariHelper.getUsuariAutenticat();
         FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
-        DocumentEntity document= documentRepository.findOne(adjuntId);
+        DocumentEntity document= documentRepository.getOne(adjuntId);
 
         String subject = getPrefixRipea() + " Enviar document";
         String text ="Ha rebut el document adjunt '"+fitxer.getNom()+"' a partir de la funció 'Enviar document via email' de RIPEA. \n" +

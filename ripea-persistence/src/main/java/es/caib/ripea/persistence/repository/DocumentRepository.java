@@ -123,7 +123,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	
 	
 	@Query( "select   " +
-			"    new es.caib.ripea.core.aggregation.MetaExpedientCountAggregation( " +
+			"    new es.caib.ripea.persistence.aggregation.MetaExpedientCountAggregation( " +
 			"	     e.metaExpedient, " +
 			"        count(d) " +
 			"    ) " +
@@ -135,21 +135,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	        "     e.metaExpedient")
 	List<MetaExpedientCountAggregation> countByEstatGroupByMetaExpedient(
 			@Param("estat") DocumentEstatEnumDto estat);
-	
-	@Query(	" SELECT " +
-			"    new es.caib.ripea.core.aggregation.MetaExpedientCountAggregation( " +
-			"	     e.metaExpedient, " +
-			"        count(d) " +
-			"    ) " +
-			" FROM " +
-	        "    DocumentEntity d JOIN d.expedient e JOIN d.notificacions n " +
-			" WHERE " +
-			"     n.notificacioEstat IN :estat " +
-	        "group by" +
-	        "     e.metaExpedient")
-	List<MetaExpedientCountAggregation> countByNotificacioEstatInGroupByMetaExpedient(
-			@Param("estat") DocumentNotificacioEstatEnumDto[] estats);
-	
+
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -159,7 +145,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and c.expedient = :expedient "  + 
 			"and c.documentTipus != 2 " +
 			"and c.esborrat = 0 " +
-			"and c.id != :documentId) ")
+			"and c.id != :documentId ")
 	List<DocumentEntity> findByExpedientAndTipus(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("expedient") ExpedientEntity expedient,
@@ -224,8 +210,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"	 d.expedient = :expedient "  + 
 			"and d.esborrat = 0 " +
-			"and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.ESBORRANY " + 
-			"and d.documentFirmaTipus != es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto.SENSE_FIRMA ")
+			"and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.ESBORRANY " + 
+			"and d.documentFirmaTipus != es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto.SENSE_FIRMA ")
 	List<Long> findPendentsDeMarcarComADefinitius(
 			@Param("expedient") ExpedientEntity expedient);
 	
@@ -236,9 +222,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    c.expedient = :expedient " +
 			"and c.esborrat = 0 " +
-			"and (c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
-			"	or c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
-			"	or c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)")
+			"and (c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
+			"	or c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
+			"	or c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)")
 	List<DocumentEntity> findEnProccessDeFirma(
 			@Param("expedient") ExpedientEntity expedient);
 	
@@ -277,7 +263,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    c.expedient = :expedient "  + 
 			"and c.documentTipus = 0 " + //= DIGITAL
 			"and c.esborrat = 0 " +
-			"and c.estat = 0) ")
+			"and c.estat = 0 ")
 	Boolean hasFillsEsborranys(@Param("expedient") ExpedientEntity expedient);
 	
 	
@@ -300,7 +286,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    c.expedient = :expedient "  + 
 			"and (c.documentTipus = 0 or c.documentTipus = 3)" + //= DIGITAL || = IMPORTAT
 			"and c.esborrat = 0 " +
-			"and (c.estat = 3 or c.estat = 5)) ") //= CUSTODIAT || = DEFINITIU
+			"and (c.estat = 3 or c.estat = 5) ") //= CUSTODIAT || = DEFINITIU
 	Boolean hasAnyDocumentDefinitiu(@Param("expedient") ExpedientEntity expedient);
 	
 	List<DocumentEntity> findByEntitat(EntitatEntity entitat);
@@ -704,7 +690,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
 			"and d.entitat = :entitat " +
 			"and e.esborrat = 0 " +
-			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
+			"and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
@@ -743,7 +729,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
 			"and d.entitat = :entitat " +
 			"and e.esborrat = 0 " +
-			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
+			"and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
@@ -771,14 +757,14 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
     		"from DocumentEntity d " +
     		"join d.contingut c " +
             "where c.expedient = :expedient " +
-            "and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.DEFINITIU")
+            "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU")
     Boolean expedientHasDocumentsDefinitius(@Param("expedient") ExpedientEntity expedient);
     
     @Query("select case when count(c) > 0 then true else false end " + 
     		"from DocumentEntity d " +
     		"join d.contingut c " +
             "where c.pare = :carpeta " +
-            "and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.DEFINITIU")
+            "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU")
     Boolean carpetaHasDocumentsDefinitius(@Param("carpeta") CarpetaEntity carpeta);
 
 }
