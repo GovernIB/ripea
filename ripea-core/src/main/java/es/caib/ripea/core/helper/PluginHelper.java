@@ -7750,9 +7750,18 @@ public class PluginHelper {
 	public String firmaServidorDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			FirmaServidorPlugin firmaServidorPlugin = getFirmaServidorPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			byte[] fileContent = llegirBytesResourceCore("/samples/blank.pdf");
-			firmaServidorPlugin.firmar("prova.pdf", "test salut integracio RIPEA", fileContent, "ca", "application/pdf");
-			return null;
+//			byte[] fileContent = llegirBytesResourceCore("/samples/blank.pdf");
+			
+			List<String> extensions = new ArrayList<String>();
+			extensions.add("application/pdf");
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions);
+			if (doc!=null) {
+				FitxerDto fitxerAmbContingut = documentHelper.getFitxerAssociat(doc, null);
+				firmaServidorPlugin.firmar("prova.pdf", "test salut integracio RIPEA", fitxerAmbContingut.getContingut(), "ca", "application/pdf");
+				return null;
+			} else {
+				return "No hi ha cap fitxer PDF al sistema per provar.";
+			}
 		} catch (Exception ex) {
 			return ex.getMessage();
 		}

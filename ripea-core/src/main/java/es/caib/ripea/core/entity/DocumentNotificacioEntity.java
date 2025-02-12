@@ -190,7 +190,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			
 		}
 
-		public Builder annexos(List<DocumentEntity> annexos) {
+		public Builder annexos(List<DocumentEnviamentAnnexEntity> annexos) {
 			built.annexos = annexos;
 			return this;
 		}

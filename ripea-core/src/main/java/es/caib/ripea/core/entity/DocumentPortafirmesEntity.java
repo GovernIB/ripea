@@ -3,7 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -99,6 +101,16 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 
 	public void updateAdministrationId(String administrationId) {
 		this.administrationId = administrationId;
+	}
+	
+	public List<DocumentEntity> getAnnexosPortafibAsDocs() {
+		List<DocumentEntity> resultat = new ArrayList<DocumentEntity>();
+		if (this.getDocument()!=null && this.getDocument().getAnnexosEnviaments()!=null) {
+			for (DocumentEnviamentAnnexEntity deae: this.getDocument().getAnnexosEnviaments()) {
+				resultat.add(deae.getDocument());
+			}
+		}
+		return resultat;
 	}
 	
 	public static Builder getBuilder(

@@ -17,9 +17,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -83,32 +82,27 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> { //T
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "ipa_document_docenv_fk")
 	protected DocumentEntity document;
-	@ManyToMany(
-			cascade = CascadeType.ALL,
-			fetch = FetchType.LAZY)
-	@JoinTable(
-			name = "ipa_document_enviament_doc",
-			joinColumns = {
-					@JoinColumn(name = "document_enviament_id", referencedColumnName="id")},
-			inverseJoinColumns = {
-					@JoinColumn(name = "document_id")})
-	@ForeignKey(
-			name = "ipa_docenv_docenvdoc_fk",
-			inverseName = "ipa_document_docenvdoc_fk")
-	protected List<DocumentEntity> annexos = new ArrayList<DocumentEntity>();
-	
-	
-	
-
-	
+	@OneToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "documentEnviament",
+            orphanRemoval = true)
+	protected List<DocumentEnviamentAnnexEntity> annexos;
 	
 	@Version
 	private long version = 0;
 
-	public void addAnnex(DocumentEntity annex) {
-		annexos.add(annex);
+	public void updateAnnexos(List<DocumentEntity> annexxss) {
+		if (annexxss!=null) {
+			for (DocumentEntity document: annexxss) {
+				DocumentEnviamentAnnexEntity docEnvDocAnnex = new DocumentEnviamentAnnexEntity();
+				docEnvDocAnnex.nouAnnex(document, this);
+				if (this.annexos==null) this.annexos = new ArrayList<DocumentEnviamentAnnexEntity>();
+				annexos.add(docEnvDocAnnex);		
+			}
+		}
 	}
-
+	
 	public void updateEnviat(
 			Date enviatData) {
 		this.estat = DocumentEnviamentEstatEnumDto.ENVIAT;

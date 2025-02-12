@@ -159,9 +159,24 @@ public class DocumentEntity extends NodeEntity {
 	@ForeignKey(name = "ipa_expestat_document_fk")
 	private ExpedientEstatEntity expedientEstatAdditional;
 	
+	/**
+	 * Llista de enviaments del document a portafib.
+	 * Cada enviament por tenir annexos.
+	 */	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	@OrderBy("createdDate DESC")
 	protected Set<DocumentEnviamentEntity> enviaments;
+	
+	/**
+	 * Els annexos de un enviament a portafib, apunten a aquesta taula (son DocumentsEntity)
+	 */
+	@OneToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "document",
+            orphanRemoval = false) // No se eliminan los registros de ipa_document
+	protected List<DocumentEnviamentAnnexEntity> annexosEnviaments;
+	
 	@OneToMany(
 			mappedBy = "document",
 			fetch = FetchType.LAZY, targetEntity = DocumentEnviamentEntity.class)
