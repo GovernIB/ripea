@@ -63,7 +63,7 @@
 	<span class="parcial fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmaparcial"/>"></span>
 </c:if> 
 <c:if test="${contingut.document && contingut.estat != 'CUSTODIAT' && contingut.estat != 'REDACCIO' && contingut.errorEnviamentPortafirmes && contingut.gesDocFirmatId == null}">
-	<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
+	<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.errorEnviamentPortafirmes"/>"></span>
 </c:if> 
 <c:if test="${not contingut.carpeta && contingut.metaNode == null}">
 	<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
