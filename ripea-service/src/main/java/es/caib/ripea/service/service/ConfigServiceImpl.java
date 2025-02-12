@@ -203,14 +203,14 @@ public class ConfigServiceImpl implements ConfigService {
     @Transactional
     public List<String> syncFromJBossProperties() {
         log.info("Sincronitzant les propietats amb JBoss");
-        Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
+        Properties properties = configHelper.getEnvironmentPropertiesAll(null);
         List<String> editedProperties = new ArrayList<>();
         List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
         Collections.sort(propertiesList);
-        for (String key : propertiesList) {
+        for (String key: propertiesList) {
             String value = properties.getProperty(key);
             log.info(key + " : " + value);
-            ConfigEntity configEntity = configRepository.getOne(key);
+            ConfigEntity configEntity = configRepository.findById(key).orElse(null);
             if (configEntity != null) {
                 configEntity.update(value);
 //                pluginHelper.reloadProperties(configEntity.getGroupCode());
@@ -293,7 +293,7 @@ public class ConfigServiceImpl implements ConfigService {
                 config.setValue("*****");
             } else if (config.isJbossProperty()) {
                 // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
-                config.setValue(ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey(), config.getValue()));
+                config.setValue(configHelper.getEnvironmentProperty(config.getKey(), config.getValue()));
             }
         }
 
@@ -317,10 +317,9 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional
     public void actualitzarPropietatsJBossBdd() {
-
         List<ConfigEntity> configs = configRepository.findJBossConfigurables();
         for(ConfigEntity config : configs) {
-            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            String property = configHelper.getEnvironmentProperty(config.getKey(), null);
             config.setValue(property);
             configRepository.save(config);
         }

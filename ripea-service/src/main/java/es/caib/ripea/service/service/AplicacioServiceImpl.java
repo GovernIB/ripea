@@ -360,7 +360,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public boolean getBooleanJbossProperty(
 			String key,
 			boolean defaultValueIfNull) {
-		String property = configHelper.getJBossProperty(key);
+		String property = configHelper.getEnvironmentProperty(key, null);
 		if (property != null) {
 			return Boolean.parseBoolean(property);
 		} else {

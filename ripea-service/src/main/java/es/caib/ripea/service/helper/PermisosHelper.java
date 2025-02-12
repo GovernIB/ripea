@@ -26,7 +26,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.*;
 
@@ -38,27 +37,26 @@ import java.util.*;
 @Component
 public class PermisosHelper {
 
-	@Resource
+	@Autowired
 	private LookupStrategy lookupStrategy;
-	@Resource
+	@Autowired
 	private MutableAclService aclService;
-	@Resource
+	@Autowired
 	private AclSidRepository aclSidRepository;
-	@Resource
+	@Autowired
 	private AclEntryRepository aclEntryRepository;
-	@Resource
+	@Autowired
 	private AclClassRepository aclClassRepository;
-	@Resource
+	@Autowired
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
-	@Resource
+	@Autowired
 	private PluginHelper pluginHelper;
-
 	@Autowired
 	private MessageHelper messageHelper;
-
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -758,8 +756,7 @@ public class PermisosHelper {
 	}
 
 	private String getMapeigRol(String rol) {
-		String propertyMapeig =
-			(String) ConfigHelper.JBossPropertiesHelper.getProperties().get("es.caib.ripea.mapeig.rol." + rol);
+		String propertyMapeig = configHelper.getEnvironmentProperty("es.caib.ripea.mapeig.rol." + rol, null);
 		if (propertyMapeig != null)
 			return propertyMapeig;
 		else

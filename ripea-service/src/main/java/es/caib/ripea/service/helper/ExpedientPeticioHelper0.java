@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 @Component
 public class ExpedientPeticioHelper0 {
 
@@ -29,8 +27,9 @@ public class ExpedientPeticioHelper0 {
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
-	@Resource private OrganGestorHelper organGestorHelper;
-	@Resource private OrganGestorRepository organGestorRepository;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private DistribucioHelper distribucioHelper;
 
 	public void consultarIGuardarAnotacioPeticioPendent(
 			Long expedientPeticioId,
@@ -61,7 +60,7 @@ public class ExpedientPeticioHelper0 {
 					logger.info("anotacioGuardar consulta start (" + identificador + ", " + expedientPeticioId + ")");
 				
 				// obtain anotació from DISTRIBUCIO
-				AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioRestClient().consulta(anotacioRegistreId);
+				AnotacioRegistreEntrada registre = distribucioHelper.getBackofficeIntegracioRestClient().consulta(anotacioRegistreId);
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar consulta end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t2) + " ms");
@@ -88,7 +87,7 @@ public class ExpedientPeticioHelper0 {
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
 
 				try {
-					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
+					distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
 							"");
@@ -141,7 +140,7 @@ public class ExpedientPeticioHelper0 {
 									3600));
 
 					// change state of anotació in DISTRIBUCIO to BACK_ERROR
-					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
+					distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 							anotacioRegistreId,
 							Estat.ERROR,
 							StringUtils.abbreviate(

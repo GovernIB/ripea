@@ -30,7 +30,7 @@ public class I18nConfig {
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.setBasename("classpath:messages");
+		messageSource.setBasename("classpath:ripea-back-messages");
 		messageSource.setDefaultLocale(Locale.forLanguageTag("ca"));
 		messageSource.setDefaultEncoding(StandardCharsets.UTF_8.name());
 		messageSource.setFallbackToSystemLocale(false);

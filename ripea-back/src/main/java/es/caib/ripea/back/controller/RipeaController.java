@@ -90,7 +90,7 @@ public class RipeaController {
 	}
 	// /PER LLEVAR
 
-	@RequestMapping(value = "/error")
+	/*@RequestMapping(value = "/error")
 	public String error(
 			HttpServletRequest request,
 			Model model) {
@@ -98,7 +98,7 @@ public class RipeaController {
 				"errorObject",
 				new ErrorObject(request));
 		return "util/error";
-	}
+	}*/
 
 
 	public static class ErrorObject {

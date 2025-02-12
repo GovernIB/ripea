@@ -81,6 +81,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private EmailHelper emailHelper;
+	@Autowired private DistribucioHelper distribucioHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -306,7 +307,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 		try {
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
+			distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
 			expedientPeticioEntity.setEstatCanviatDistribucio(true);
 			// change state of expedient peticion to processat and notificat to DISTRIBUCIO
 			expedientPeticioHelper.canviEstatExpedientPeticioNewTransaction(

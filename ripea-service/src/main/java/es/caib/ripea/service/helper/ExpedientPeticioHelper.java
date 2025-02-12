@@ -46,6 +46,7 @@ public class ExpedientPeticioHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private PluginHelper pluginHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired private DistribucioHelper distribucioHelper;
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
@@ -356,7 +357,7 @@ public class ExpedientPeticioHelper {
 			}
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Canviant estat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
-			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, estat, observacions);
+			distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, estat, observacions);
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Estat canviat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
 			pendent.setEstatCanviatDistribucio(true);

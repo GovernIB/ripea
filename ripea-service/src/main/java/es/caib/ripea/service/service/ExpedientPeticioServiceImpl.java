@@ -79,6 +79,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private GrupRepository grupRepository;
+	@Autowired
+	private DistribucioHelper distribucioHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -428,7 +430,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 
 		try {
-			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId,
+			distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId,
 					Estat.REBUTJADA,
 					observacions);
 			expedientPeticioEntity.setEstatCanviatDistribucio(true);

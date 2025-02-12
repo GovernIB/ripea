@@ -56,6 +56,8 @@ public class ConversioTipusHelper {
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public ConversioTipusHelper() {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
@@ -748,7 +750,7 @@ public class ConversioTipusHelper {
 			            	target.setValue("*****");
 			            } else if (source.isJbossProperty()) {
 			                // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
-			            	target.setValue(ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(source.getKey(), source.getValue()));
+			            	target.setValue(configHelper.getEnvironmentProperty(source.getKey(), source.getValue()));
 			            } else {
 			            	target.setValue(source.getValue());
 			            }

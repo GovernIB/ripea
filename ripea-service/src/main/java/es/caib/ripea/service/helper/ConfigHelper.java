@@ -13,13 +13,14 @@ import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileInputStream;
 import java.util.*;
 
 @Slf4j
@@ -30,11 +31,13 @@ public class ConfigHelper {
     private ConfigRepository configRepository;
     @Autowired
     private ConfigGroupRepository configGroupRepository;
-
-    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();   
-    private static ThreadLocal<String> organCodi = new ThreadLocal<>();
     @Autowired
     private OrganGestorRepository organGestorRepository;
+    @Autowired
+    private Environment springEnvironment;
+
+    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
+    private static ThreadLocal<String> organCodi = new ThreadLocal<>();
 
     public static ThreadLocal<EntitatDto> getEntitat() {
 		return entitat;
@@ -173,7 +176,6 @@ public class ConfigHelper {
 
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral, String valorDefecte) {
-
         String valor = getConfig(keyGeneral);
         return !StringUtils.isEmpty(valor) ? valor : valorDefecte;
     }
@@ -185,19 +187,16 @@ public class ConfigHelper {
     
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral, String entitatCodi, String organCodi)  {
-
 		String value = null;
 		ConfigEntity config = configRepository.getOne(keyGeneral);
 		if (config == null) {
-            return getJBossProperty(keyGeneral);
+            return getEnvironmentProperty(keyGeneral, null);
         }
-
         Map<String, Map<String, String>> propietatsPerOrgan = propietatsPerEntitatOrgan.get(entitatCodi);
         if (propietatsPerOrgan == null) {
             inicialitzaPropietatsPerOrgan(entitatCodi);
             propietatsPerOrgan = propietatsPerEntitatOrgan.get(entitatCodi);
         }
-
         // Propietats per òrgan
         if (config.isConfigurableOrganActiu() && !StringUtils.isEmpty(organCodi) && propietatsPerOrgan.containsKey(keyGeneral)) {
             Map<String, String> propietatPerOrgans = propietatsPerOrgan.get(keyGeneral);
@@ -205,16 +204,6 @@ public class ConfigHelper {
                 return propietatPerOrgans.get(organCodi);
             }
         }
-//        if (config.isConfigurableOrganActiu() && !Strings.isNullOrEmpty(organCodi)) {
-//            // Propietat a nivell d'organ
-//            String keyOrgan = getKeyOrgan(entitatCodi, getOrganActualCodi(), keyGeneral);
-//			if (keyOrgan != null) {
-//	            ConfigEntity configOrganEntity = configRepository.findOne(keyOrgan);
-//	            if (configOrganEntity != null) {
-//	                value = getValue(configOrganEntity);
-//	            }
-//			}
-//        } else
         if (config.isConfigurableEntitatActiu() && !StringUtils.isEmpty(entitatCodi)) {
             // Propietat a nivell d'entitat
             String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
@@ -229,9 +218,7 @@ public class ConfigHelper {
         }
 		return value;
 	}
-    
-    
-	
+
 	public String getValueForOrgan(String entitatCodi, String organCodi, String keyGeneral) {
 
         Map<String, Map<String, String>> propietatsPerOrgan = propietatsPerEntitatOrgan.get(entitatCodi);
@@ -297,13 +284,6 @@ public class ConfigHelper {
     }
     public float getAsFloat(String key) {
         return Float.valueOf(getConfig(key));
-    }
-
-    public String getJBossProperty(String key) {
-        return JBossPropertiesHelper.getProperties().getProperty(key);
-    }
-    public String getJBossProperty(String key, String defaultValue) {
-        return JBossPropertiesHelper.getProperties().getProperty(key, defaultValue);
     }
 
     @Transactional(readOnly = true)
@@ -435,7 +415,7 @@ public class ConfigHelper {
         }
         return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + split[1]);
     }
-    
+
     public String getKeyOrgan(String entitatCodi, String organCodi, String key) {
     	if (Utils.isEmpty(organCodi)) {
 			return null;
@@ -454,10 +434,7 @@ public class ConfigHelper {
         return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + "." + organCodi + split[1]);
     }
 
-    
-    
-    public void crearConfigPerEntitats(ConfigEntity config,  List<EntitatEntity> entitats) {
-
+    public void crearConfigPerEntitats(ConfigEntity config, List<EntitatEntity> entitats) {
         for (EntitatEntity entitat : entitats) {
             String key = getKeyEntitat(entitat.getCodi(), config.getKey());
             if (configRepository.findByKey(key) == null ) {
@@ -469,8 +446,7 @@ public class ConfigHelper {
     }
     
     
-    public void removeConfigPerEntitats(ConfigEntity config,  List<EntitatEntity> entitats) {
-
+    public void removeConfigPerEntitats(ConfigEntity config, List<EntitatEntity> entitats) {
         for (EntitatEntity entitat : entitats) {
             String key = getKeyEntitat(entitat.getCodi(), config.getKey());
             ConfigEntity configEntitat = configRepository.findByKey(key);
@@ -480,12 +456,34 @@ public class ConfigHelper {
         }
     }
 
-    private String getValue(ConfigEntity configEntity) throws NotDefinedConfigException {
+    public String getEnvironmentProperty(String key, String defaultValue) {
+        String value = springEnvironment.getProperty(key);
+        return (value != null) ? value : defaultValue;
+    }
 
+    public Properties getEnvironmentPropertiesAll(String prefix) {
+        Properties properties = new Properties();
+        if (springEnvironment instanceof ConfigurableEnvironment) {
+            for (PropertySource<?> propertySource: ((ConfigurableEnvironment)springEnvironment).getPropertySources()) {
+                if (propertySource instanceof EnumerablePropertySource) {
+                    for (String key: ((EnumerablePropertySource<?>)propertySource).getPropertyNames()) {
+                        if (prefix != null) {
+                            if (key.startsWith(prefix)) properties.put(key, propertySource.getProperty(key));
+                        } else {
+                            properties.put(key, propertySource.getProperty(key));
+                        }
+                    }
+                }
+            }
+        }
+        return properties;
+    }
+
+    private String getValue(ConfigEntity configEntity) throws NotDefinedConfigException {
 		if (configEntity != null) {
 	        if (configEntity.isJbossProperty()) {
 	            // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat per defecte a la base de dades.
-	            return getJBossProperty(configEntity.getKey(), configEntity.getValue());
+	            return getEnvironmentProperty(configEntity.getKey(), configEntity.getValue());
 	        } else {
 	            return configEntity.getValue();
 	        }
@@ -495,7 +493,6 @@ public class ConfigHelper {
     }
     
     private String getConfigGeneralIfConfigEntitatNull(ConfigEntity configEntity) throws NotDefinedConfigException {
-    	
 		if (configEntity.getEntitatCodi() == null) {
 			return getValue(configEntity);
 		}
@@ -512,9 +509,7 @@ public class ConfigHelper {
 		return configRepository.getOne(generalKey);
     }
 
-
     public void crearConfigsEntitat(String codiEntitat) {
-
         List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
         ConfigDto dto = new ConfigDto();
         dto.setEntitatCodi(codiEntitat);
@@ -535,16 +530,8 @@ public class ConfigHelper {
     public void deleteConfigEntitat(String codiEntitat) {
         configRepository.deleteByEntitatCodi(codiEntitat);
     }
-    
 
-    /**
-     * 
-     * This class is used to take properties value from properties file
-     * Name of the class is incorrect, should be sth like FilePropertiesHelper
-     * In Tomcat we take properties manually from tomcat properties file specified in APPSERV_PROPS_PATH (ripea.properties)
-     * In Jboss properties are loaded to System automatically from jboss properties (jboss-service.xml)
-     *
-     */
+    /*
     @Slf4j
     public static class JBossPropertiesHelper extends Properties {
 
@@ -663,6 +650,8 @@ public class ConfigHelper {
             return properties;
         }
     }
-    
-	private static final Logger logger = LoggerFactory.getLogger(ConfigHelper.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(ConfigHelper.class);
+    */
+
 }
