@@ -3,6 +3,10 @@
  */
 package es.caib.ripea.plugin.usuari;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -10,6 +14,9 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DadesUsuari implements Serializable {
 
 	private String codi;
