@@ -602,11 +602,12 @@ public class PluginHelper {
 		return getArxiuPlugin().getPlugin().suportaVersionatDocument();
 	}
 
-	public void arxiuExpedientActualitzar(
-			ExpedientEntity expedient) {
-		organGestorHelper.actualitzarOrganCodi(
-				organGestorHelper.getOrganCodiFromContingutId(
-						expedient.getId()));
+	public void arxiuExpedientActualitzar(ExpedientEntity expedient) {
+		
+		//Si venim de un procés en segon pla, no tenim sessió hibernate. Aquest metode fa un deproxy.
+		String organCodiDir3 = organGestorHelper.getOrganCodiFromContingutId(expedient.getId());
+		organGestorHelper.actualitzarOrganCodi(organCodiDir3);
+
 		boolean throwExceptionExpedientArxiu = false;
 		if (throwExceptionExpedientArxiu) { // throwExceptionExpedientArxiu = true;
 			throw new RuntimeException("Mock excepcion al actualitzar expedient al arxiu");
@@ -614,31 +615,19 @@ public class PluginHelper {
 
 		String accioDescripcio = "Actualització de les dades d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				expedient.getId().toString());
-		accioParams.put(
-				"títol",
-				expedient.getNom());
+		accioParams.put("id", expedient.getId().toString());
+		accioParams.put("títol", expedient.getNom());
+		
 		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
-		accioParams.put(
-				"tipus",
-				metaExpedient.getNom());
-		accioParams.put(
-				"classificacio",
-				metaExpedient.getClassificacio());
-		accioParams.put(
-				"serieDocumental",
-				metaExpedient.getSerieDocumental());
-		String organCodiDir3 = expedient.getOrganGestor().getCodi();
-		accioParams.put(
-				"organ",
-				organCodiDir3);
-		accioParams.put(
-				"estat",
-				expedient.getEstat().name());
+		accioParams.put("tipus", metaExpedient.getNom());
+		accioParams.put("classificacio", metaExpedient.getClassificacio());
+		accioParams.put("serieDocumental", metaExpedient.getSerieDocumental());
+		accioParams.put("organ", organCodiDir3);
+		accioParams.put("estat", expedient.getEstat().name());
+		
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+
 		try {
 			String classificacio = metaExpedient.getClassificacio();
 			List<String> interessats = new ArrayList<String>();
@@ -7623,9 +7612,16 @@ public class PluginHelper {
 	public String firmaServidorDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			FirmaServidorPlugin firmaServidorPlugin = getFirmaServidorPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			byte[] fileContent = llegirBytesResourceCore("/samples/blank.pdf");
-			firmaServidorPlugin.firmar("prova.pdf", "test salut integracio RIPEA", fileContent, "ca", "application/pdf");
-			return null;
+			List<String> extensions = new ArrayList<String>();
+			extensions.add("application/pdf");
+			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(extensions);
+			if (doc!=null) {
+				FitxerDto fitxerAmbContingut = documentHelper.getFitxerAssociat(doc, null);
+				firmaServidorPlugin.firmar("prova.pdf", "test salut integracio RIPEA", fitxerAmbContingut.getContingut(), "ca", "application/pdf");
+				return null;
+			} else {
+				return "No hi ha cap fitxer PDF al sistema per provar.";
+			}
 		} catch (Exception ex) {
 			return ex.getMessage();
 		}

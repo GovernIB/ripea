@@ -29,34 +29,20 @@ import java.util.*;
 @Component
 public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private AlertaHelper alertaHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private PortafirmesBlockRepository portafirmesBlockRepository;
-	@Autowired
-	private DocumentViaFirmaRepository documentViaFirmaRepository;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-    @Autowired
-	private ConfigHelper configHelper;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private EmailHelper emailHelper;
+	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private AlertaHelper alertaHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private PortafirmesBlockRepository portafirmesBlockRepository;
+	@Autowired private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+    @Autowired private ConfigHelper configHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -135,72 +121,41 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				avisFirmaParcial,
 				firmaParcial).build();
 
+		List<DocumentEntity> annexos = new ArrayList<DocumentEntity>();
 		if (annexosIds != null) {
 			for (Long annexId : annexosIds) {
 				DocumentEntity annex = documentRepository.getOne(annexId);
-				documentPortafirmes.addAnnex(annex);
+				annexos.add(annex);
 			}
 		}
+		
 		// Si l'enviament produeix excepcions la retorna
-		SistemaExternException sex = portafirmesEnviar(
-				documentPortafirmes,
-				transaccioId);
+		SistemaExternException sex = portafirmesEnviar(documentPortafirmes, annexos, transaccioId);
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		if (sex != null) {
 			throw sex;
 		}
-		documentPortafirmesRepository.save(documentPortafirmes);
-		document.updateEstat(
-				DocumentEstatEnumDto.FIRMA_PENDENT);
-		logAll(document, documentPortafirmes, LogTipusEnumDto.PFIRMA_ENVIAMENT);
+
+		documentPortafirmes = documentPortafirmesRepository.save(documentPortafirmes);
 		
-//		String idioma = aplicacioService.getUsuariActual().getIdioma();
-//		List<PortafirmesBlockDto> portafirmesBlocks = pluginHelper.portafirmesRecuperarBlocksFirma(
-//				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
-//				transaccioId,
-//				portafirmesFluxTipus.equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB),
-//				documentPortafirmes.getPortafirmesId(),
-//				idioma);
-//
-//		if (portafirmesBlocks != null) {
-//			int i = 1;
-//			for (PortafirmesBlockDto portafirmesBlock : portafirmesBlocks) {
-//				PortafirmesBlockEntity portafirmesBlockEntity = PortafirmesBlockEntity.getBuilder(
-//						documentPortafirmes,
-//						i).build();
-//	
-//				portafirmesBlockRepository.save(portafirmesBlockEntity);
-//				for (PortafirmesBlockInfoDto portafirmesBlockInfo : portafirmesBlock.getSigners()) {
-//					PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = PortafirmesBlockInfoEntity.getBuilder(
-//							portafirmesBlockEntity, 
-//							portafirmesBlockInfo.getSignerNom(),
-//							portafirmesBlockInfo.getSignerCodi(),
-//							portafirmesBlockInfo.getSignerId(),
-//							false).build();
-//					portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
-//				}
-//				i++;
-//			}
-//		}
+		document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT);
+		
+		documentPortafirmes.updateAnnexos(annexos);
+		
+		logAll(document, documentPortafirmes, LogTipusEnumDto.PFIRMA_ENVIAMENT);
 	}
 	
-	public DocumentPortafirmesDto portafirmesInfo(
-			Long enviamentId) {
-
-		DocumentPortafirmesEntity enviament = documentPortafirmesRepository.getOne(
-				enviamentId);
-		return conversioTipusHelper.convertir(
-				enviament,
-				DocumentPortafirmesDto.class);
+	public DocumentPortafirmesDto portafirmesInfo(Long enviamentId) {
+		DocumentPortafirmesEntity enviament = documentPortafirmesRepository.getOne(enviamentId);
+		return conversioTipusHelper.convertir(enviament, DocumentPortafirmesDto.class);
 	}	
 	
-	
-	public DocumentPortafirmesDto portafirmesInfo(
-			Long entitatId,
-			DocumentEntity document) {
+	public DocumentPortafirmesDto portafirmesInfo(Long entitatId, DocumentEntity document) {
+		
 		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + document.getId() + ")");
+		
 		List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
@@ -247,6 +202,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		if (DocumentEnviamentEstatEnumDto.PENDENT.equals(documentPortafirmes.getEstat())) {
 			exception = portafirmesEnviar(
 					documentPortafirmes,
+					documentPortafirmes.getAnnexosPortafibAsDocs(),
 					null);
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			exception = portafirmesProcessar(documentPortafirmes);
@@ -254,12 +210,11 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		return exception;
 	}
-	
 
-	public SistemaExternException portafirmesEnviar(
-			DocumentPortafirmesEntity documentPortafirmes,
-			String transaccioId) {
+	public SistemaExternException portafirmesEnviar(DocumentPortafirmesEntity documentPortafirmes, List<DocumentEntity> annexos, String transaccioId) {
+		
 		DocumentEntity document = documentPortafirmes.getDocument();
+		
 		try {
 			String portafirmesId = pluginHelper.portafirmesUpload(
 					document,
@@ -270,11 +225,9 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					documentPortafirmes.getResponsables(),
 					documentPortafirmes.getSequenciaTipus(),
 					documentPortafirmes.getFluxId(),
-					documentPortafirmes.getAnnexos(),
+					annexos,
 					transaccioId);
-			documentPortafirmes.updateEnviat(
-					new Date(),
-					portafirmesId);
+			documentPortafirmes.updateEnviat(new Date(), portafirmesId);
 			return null;
 		} catch (SistemaExternException ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);

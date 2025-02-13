@@ -1,0 +1,1 @@
+DELETE FROM IPA_CONFIG WHERE KEY='es.caib.ripea.notificacio.enviament.postal.actiu';

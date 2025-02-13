@@ -3,13 +3,28 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.dto.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.util.Date;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa un enviament d'una versió
@@ -86,6 +101,16 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 
 	public void updateAdministrationId(String administrationId) {
 		this.administrationId = administrationId;
+	}
+	
+	public List<DocumentEntity> getAnnexosPortafibAsDocs() {
+		List<DocumentEntity> resultat = new ArrayList<DocumentEntity>();
+		if (this.getDocument()!=null && this.getDocument().getAnnexosEnviaments()!=null) {
+			for (DocumentEnviamentAnnexEntity deae: this.getDocument().getAnnexosEnviaments()) {
+				resultat.add(deae.getDocument());
+			}
+		}
+		return resultat;
 	}
 	
 	public static Builder getBuilder(

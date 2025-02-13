@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -65,30 +62,26 @@ public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> { //T
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "document_docenv_fk")
 	protected DocumentEntity document;
-	@ManyToMany(
-			cascade = CascadeType.ALL,
-			fetch = FetchType.LAZY)
-	@JoinTable(
-			name = BaseConfig.DB_PREFIX + "document_enviament_doc",
-			joinColumns = {
-					@JoinColumn(name = "document_enviament_id", referencedColumnName="id")},
-			inverseJoinColumns = {
-					@JoinColumn(name = "document_id")})
-	@ForeignKey(
-			name = BaseConfig.DB_PREFIX + "docenv_docenvdoc_fk",
-			inverseName = "BaseConfig.DB_PREFIX + \"document_docenvdoc_fk")
-	protected List<DocumentEntity> annexos = new ArrayList<DocumentEntity>();
-	
-	
-	
 
-	
+	@OneToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "documentEnviament",
+            orphanRemoval = true)
+	protected List<DocumentEnviamentAnnexEntity> annexos;
 	
 	@Version
 	private long version = 0;
 
-	public void addAnnex(DocumentEntity annex) {
-		annexos.add(annex);
+	public void updateAnnexos(List<DocumentEntity> annexxss) {
+		if (annexxss!=null) {
+			for (DocumentEntity document: annexxss) {
+				DocumentEnviamentAnnexEntity docEnvDocAnnex = new DocumentEnviamentAnnexEntity();
+				docEnvDocAnnex.nouAnnex(document, this);
+				if (this.annexos==null) this.annexos = new ArrayList<DocumentEnviamentAnnexEntity>();
+				annexos.add(docEnvDocAnnex);		
+			}
+		}
 	}
 
 	public void updateEnviat(

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -13,11 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.*;
 
-/**
- * Classe del model de dades que representa un document.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "document")
 @EntityListeners(AuditingEntityListener.class)
@@ -131,9 +123,24 @@ public class DocumentEntity extends NodeEntity {
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_document_fk")
 	private ExpedientEstatEntity expedientEstatAdditional;
 	
+	/**
+	 * Llista de enviaments del document a portafib.
+	 * Cada enviament por tenir annexos.
+	 */
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	@OrderBy("createdDate DESC")
-	protected Set<DocumentEnviamentEntity> enviaments;
+	private Set<DocumentEnviamentEntity> enviaments;
+	
+	/**
+	 * Els annexos de un enviament a portafib, apunten a aquesta taula (son DocumentsEntity)
+	 */
+	@OneToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "document",
+            orphanRemoval = false) // No se eliminan los registros de ipa_document
+	private List<DocumentEnviamentAnnexEntity> annexosEnviaments;	
+	
 	@OneToMany(
 			mappedBy = "document",
 			fetch = FetchType.LAZY, targetEntity = DocumentEnviamentEntity.class)
