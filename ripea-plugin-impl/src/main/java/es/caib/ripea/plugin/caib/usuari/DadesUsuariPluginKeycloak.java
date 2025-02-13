@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.usuari;
 
 import es.caib.ripea.plugin.SistemaExternException;
@@ -24,7 +21,7 @@ import java.util.stream.Collectors;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant el plugin de Keycloak. Les propietats necessàries són les següents a partir
- * de es.caib.distribucio.plugin.dades.usuari.pluginsib.userinformation.keycloak. :
+ * de es.caib.ripea.plugin.dades.usuari.pluginsib.userinformation.keycloak. :
  * 
  * - serverurl: Url del servidor de keycloak
  * - realm: Realm del keycloak.7

@@ -3,6 +3,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.MetaExpedientTascaCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -295,7 +296,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		} else {
 			tasca = new MetaExpedientTascaDto();
 			try {
-				String duracioTascaConf = configService.getConfigValue("es.caib.ripea.duracio.tasca");
+				String duracioTascaConf = configService.getConfigValue(PropertyConfig.TASCA_DURACIO_DEFAULT);
 				tasca.setDuracio(duracioTascaConf!=null?Integer.parseInt(duracioTascaConf):10);
 			} catch (Exception ex) {
 				tasca.setDuracio(10);
