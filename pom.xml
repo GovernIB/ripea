@@ -13,6 +13,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<spring-boot.version>2.7.18</spring-boot.version>
+		<liquibase.version>4.4.3</liquibase.version>
 		<implementation.vendor>Límit Tecnologies</implementation.vendor>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>

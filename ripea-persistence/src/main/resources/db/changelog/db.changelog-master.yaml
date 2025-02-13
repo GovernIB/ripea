@@ -1,18 +1,22 @@
 databaseChangeLog:
+- property:
+    name: app_prefix
+    value: ipa_
+- property:
+    name: blob
+    value: BLOB
+    dbms: oracle
+- property:
+    name: acl_pk_type
+    value: BIGINT
+    dbms: oracle
+- property:
+    name: blob
+    value: BYTEA
+    dbms: postgres
+- property:
+    name: acl_pk_type
+    value: BIGSERIAL
+    dbms: postgres
 - include:
-    file: db/changelog/initial_schema_table.yaml
-- include:
-    file: db/changelog/initial_schema_constraint.yaml
-- include:
-    file: db/changelog/initial_schema_index.yaml
-- include:
-    file: db/changelog/initial_schema_sequence.yaml
-- include:
-    file: db/changelog/initial_schema_trigger.yaml
-- include:
-    file: db/changelog/initial_schema_lob.yaml
-- include:
-    file: db/changelog/initial_schema_grant.yaml
-- includeAll:
-    path: db/changelog/changes
-    errorIfMissingOrEmpty: false
+    file: db/changelog/01-init_table.yaml

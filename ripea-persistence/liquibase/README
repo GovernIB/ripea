@@ -1,0 +1,24 @@
+- Generar changelog a partir de una base de datos existente
+---------------------------------------------------------
+1.- Crear un archivo de properties con el siguiente contenido:
+	url=jdbc:oracle:thin:@DB_HOST:1521:SID
+	username=USER
+	password=PASSWD
+	driver=oracle.jdbc.driver.OracleDriver
+	outputChangeLogFile=liquibase/liquibase-changelog.yaml
+2.- Ejecutar el siguiente comando: (donde DBTYPE puede tomar los valores: oracle):
+    $ mvn -pl ripea-persistence liquibase:generateChangeLog -P DBTYPE
+3.- La ejecución de este pedido generará el archivo con el changelog en liquibase/liquibase-changelog.yaml
+
+- Generar script de actualización
+------------------------------
+1.- Crear el archivo liquibase/databasechangelog.csv con el contenido de uno de los archivos de la carpeta liquibase/databasechangelogs.
+    Este archivo representa el punto de partida para generar el script de actualización.
+2.- Ejecutar el siguiente comando: (a on DBTYPE pot agafar els valors: oracle):
+    $ mvn -pl ripea-persistence liquibase:updateSQL
+3.- La ejecución de este pedido generará el script de actualización dentro de liquibase/script.sql
+4.- También actualizará el contenido del archivo liquibase/databasechangelog.csv que se podrá guardar dentro de liquibase/databasechangelogs para futuras actualizaciones.
+
+- Generar script de creación de la base de dades
+-----------------------------------------------
+Este script se puede crear siguiendo el mismo método que para generar el script de actualización pero eliminando el archivo liquibase/databasechangelog.csv.

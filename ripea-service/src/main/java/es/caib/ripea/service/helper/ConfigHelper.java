@@ -188,7 +188,7 @@ public class ConfigHelper {
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral, String entitatCodi, String organCodi)  {
 		String value = null;
-		ConfigEntity config = configRepository.getOne(keyGeneral);
+		ConfigEntity config = configRepository.findById(keyGeneral).orElse(null);
 		if (config == null) {
             return getEnvironmentProperty(keyGeneral, null);
         }

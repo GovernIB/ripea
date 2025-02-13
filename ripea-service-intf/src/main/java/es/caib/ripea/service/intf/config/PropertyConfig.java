@@ -10,7 +10,7 @@ package es.caib.ripea.service.intf.config;
  */
 public class PropertyConfig {
 
-	private static final String PROPERTY_PREFIX = "es.caib.distribucio.";
+	private static final String PROPERTY_PREFIX = "es.caib.ripea.";
 
 	public static final String APP_NAME = PROPERTY_PREFIX + "app.name";
 	public static final String APP_URL = PROPERTY_PREFIX + "app.url";
@@ -23,7 +23,7 @@ public class PropertyConfig {
 	public static final String PERSISTENCE_TRANSACTION_MANAGER_ENABLED = PROPERTY_PREFIX + "persist.transaction-manager.enabled";
 
 	// 1. Enviament d'execucions massives
-	public static final String EXECUTAR_EXECUCIONS_MASSIVES_RATE = "es.caib.ripea.segonpla.massives.periode.comprovacio";
+	public static final String EXECUTAR_EXECUCIONS_MASSIVES_RATE = PROPERTY_PREFIX + "segonpla.massives.periode.comprovacio";
 
 	// 2. Enviament de notificacions registrades a Notific@
 	public static final String PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE = "es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio";
