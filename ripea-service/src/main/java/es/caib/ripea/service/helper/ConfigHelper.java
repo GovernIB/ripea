@@ -506,7 +506,7 @@ public class ConfigHelper {
 
     private ConfigEntity findGeneralConfigForEntitatConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
 		String generalKey = configEntity.getKey().replace(configEntity.getEntitatCodi() + ".", "");
-		return configRepository.getOne(generalKey);
+		return configRepository.findById(generalKey).orElse(null);
     }
 
     public void crearConfigsEntitat(String codiEntitat) {

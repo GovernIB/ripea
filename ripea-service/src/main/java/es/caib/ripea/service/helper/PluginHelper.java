@@ -6304,7 +6304,7 @@ public class PluginHelper {
 			dadesUsuariPlugin = (DadesUsuariPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance(
-							"es.caib.ripea.",
+							"es.caib.ripea.plugin.dades.usuari.",
 							PropertiesHelper.getProperties());
 			return dadesUsuariPlugin;
 		} catch (Exception ex) {
