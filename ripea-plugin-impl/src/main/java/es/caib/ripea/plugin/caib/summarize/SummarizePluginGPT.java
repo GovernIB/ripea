@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import javax.ws.rs.core.MediaType;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.slf4j.Logger;
@@ -342,32 +343,31 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
     		return 	promptInicial;
     	}
     }
-    
+        
+    private String getUrl() {
+        return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_URL));
+    }
+    private String getModel() {
+        return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_MODEL));
+    }
+    private Integer geMaxTokens() {
+        return Integer.valueOf(getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_MAX_TOKENS), "8192"));
+    }
+    private String getApiKey() {
+        return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_APIKEY));
+    }
+    private Integer getTimeout() {
+        return Integer.valueOf(getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_TIMEOUT), "60000"));
+    }
+    private boolean isDebug() {
+        return getAsBoolean(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_DEBUG));
+    }
 	@Override
 	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.summarize.endpointName");
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.SUMMARIZE_PLUGIN_ENDPOINT));
 		if (Utils.isEmpty(endpoint)) {
 			endpoint = getUrl();
 		}
 		return endpoint;
-	}
-    
-    private String getUrl() {
-        return getProperty("plugin.summarize.url");
-    }
-    private String getModel() {
-        return getProperty("plugin.summarize.model");
-    }
-    private Integer geMaxTokens() {
-        return Integer.valueOf(getProperty("plugin.summarize.model.maxTokens", "8192"));
-    }
-    private String getApiKey() {
-        return getProperty("plugin.summarize.gpt.apiKey");
-    }
-    private Integer getTimeout() {
-        return Integer.valueOf(getProperty("plugin.summarize.service.timeout", "60000"));
-    }
-    private boolean isDebug() {
-        return getAsBoolean("plugin.summarize.debug");
-    }
+	}    
 }

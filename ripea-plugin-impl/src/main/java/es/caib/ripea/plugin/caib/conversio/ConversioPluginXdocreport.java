@@ -402,8 +402,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 			}
 		}
 	}
+	
 	@Override
-	public String getEndpointURL() {
-		return getProperty("plugin.conversio.endpointName"); 
-	}
+	public String getEndpointURL() { return null; }
 }

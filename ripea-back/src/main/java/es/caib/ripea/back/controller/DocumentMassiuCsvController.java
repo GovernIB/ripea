@@ -6,6 +6,7 @@ import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +121,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		}
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url");
+		String urlValidacio = aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL);
 		String enllacCsv = "";
 		
 		if (urlValidacio != null) {

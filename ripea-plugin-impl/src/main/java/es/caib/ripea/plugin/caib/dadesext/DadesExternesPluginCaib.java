@@ -21,6 +21,7 @@ import es.caib.ripea.plugin.dadesext.NivellAdministracio;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.plugin.dadesext.TipusVia;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.utils.Utils;
 
 /**
@@ -300,13 +301,20 @@ public class DadesExternesPluginCaib extends RipeaAbstractPluginProperties imple
 	}
 
 	private String getBaseUrl() {
-		String baseUrl = getProperty(
-				"plugin.dadesextcaib.service.url");
+		String baseUrl = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_PINBAL_URL));
 		if (baseUrl != null && baseUrl.length() > 0) {
 			return baseUrl;
 		} else {
 			return "https://proves.caib.es/dadescomunsfront";
 		}
+	}
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_PINBAL_ENDPOINT));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getBaseUrl();
+		}
+		return endpoint;
 	}
 
 	public static class DadesComunesPais {
@@ -340,12 +348,4 @@ public class DadesExternesPluginCaib extends RipeaAbstractPluginProperties imple
 		}
 	}
 
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.dadesextpinbal.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getBaseUrl();
-		}
-		return endpoint;
-	}
 }

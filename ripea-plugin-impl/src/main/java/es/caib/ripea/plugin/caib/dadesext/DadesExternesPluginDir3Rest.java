@@ -17,6 +17,7 @@ import es.caib.ripea.plugin.dadesext.NivellAdministracio;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.plugin.dadesext.TipusVia;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,16 +39,9 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
 	private final Properties properties;
-	private final String propertyKeyBase;
 
 	public DadesExternesPluginDir3Rest(Properties properties) {
 		this.properties = properties;
-		this.propertyKeyBase = "es.caib.ripea.";
-	}
-
-	public DadesExternesPluginDir3Rest(String propertyKeyBase, Properties properties) {
-		this.properties = properties;
-		this.propertyKeyBase = propertyKeyBase;
 	}
 
 	@Override
@@ -278,7 +272,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	
 	@Override
 	public String getEndpointURL() {
-		String endpoint = properties.getProperty("plugin.dadesext.endpointName");
+		String endpoint = properties.getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_ENDPOINT));
 		if (Utils.isEmpty(endpoint)) {
 			endpoint = getServiceUrl();
 		}
@@ -286,9 +280,9 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	}
 	
 	private String getServiceUrl() {
-		String url = properties.getProperty(propertyKeyBase + "plugin.dadesext.dir3.service.url");
+		String url = properties.getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_URL1));
 		if (url == null) {
-			url = properties.getProperty(propertyKeyBase + "plugin.dadesext.service.url");
+			url = properties.getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_URL2));
 		}
 		return url != null ? (!url.endsWith("/") ? url + "/" : url) : null;
 	}

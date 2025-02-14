@@ -3776,185 +3776,6 @@ public class PluginHelper {
 		}
 	}
 
-	// public RegistreAnotacioResposta registreEntradaConsultar(
-	// String identificador,
-	// String entitatCodi) {
-	// String accioDescripcio = "Consulta d'una anotació d'entrada";
-	// Map<String, String> accioParams = new HashMap<String, String>();
-	// accioParams.put("identificador", identificador);
-	// long t0 = System.currentTimeMillis();
-	// try {
-	// Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	// RegistreAnotacioResposta resposta = getRegistrePlugin().entradaConsultar(
-	// identificador,
-	// auth.getName(),
-	// entitatCodi);
-	// integracioHelper.addAccioOk(
-	// IntegracioHelper.INTCODI_REGISTRE,
-	// accioDescripcio,
-	// accioParams,
-	// IntegracioAccioTipusEnumDto.ENVIAMENT,
-	// System.currentTimeMillis() - t0);
-	// return resposta;
-	// } catch (Exception ex) {
-	// String errorDescripcio = "Error al accedir al plugin de registre";
-	// integracioHelper.addAccioError(
-	// IntegracioHelper.INTCODI_REGISTRE,
-	// accioDescripcio,
-	// accioParams,
-	// IntegracioAccioTipusEnumDto.ENVIAMENT,
-	// System.currentTimeMillis() - t0,
-	// errorDescripcio,
-	// ex);
-	// throw new SistemaExternException(
-	// IntegracioHelper.INTCODI_REGISTRE,
-	// errorDescripcio,
-	// ex);
-	// }
-	// }
-
-	/*
-	 * public CiutadaExpedientInformacio ciutadaExpedientCrear( ExpedientEntity
-	 * expedient, InteressatEntity destinatari) { MetaExpedientEntity metaExpedient
-	 * = expedient.getMetaExpedient(); String accioDescripcio =
-	 * "Creació d'un expedient a la zona personal del ciutadà"; Map<String, String>
-	 * accioParams = new HashMap<String, String>(); accioParams.put("expedientId",
-	 * expedient.getId().toString()); accioParams.put("expedientNumero",
-	 * expedient.getNumero()); accioParams.put("expedientTitol",
-	 * expedient.getNom()); accioParams.put("expedientTipusId",
-	 * expedient.getMetaNode().getId().toString());
-	 * accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-	 * accioParams.put("unitatAdministrativa",
-	 * metaExpedient.getUnitatAdministrativa()); String idioma =
-	 * getIdiomaPerPluginCiutada(destinatari.getPreferenciaIdioma());
-	 * accioParams.put("idioma", idioma); accioParams.put("destinatari",
-	 * destinatari.getIdentificador()); long t0 = System.currentTimeMillis(); try {
-	 * String descripcio = "[" + expedient.getNumero() + "] " + expedient.getNom();
-	 * String interessatMobil = null; if (destinatari.getTelefon() != null &&
-	 * isTelefonMobil(destinatari.getTelefon())) { interessatMobil =
-	 * destinatari.getTelefon(); } CiutadaExpedientInformacio expedientInfo =
-	 * getCiutadaPlugin().expedientCrear( expedient.getNtiIdentificador(),
-	 * metaExpedient.getUnitatAdministrativa(),
-	 * metaExpedient.getClassificacioDocumental(), idioma, descripcio,
-	 * toPluginCiutadaPersona(destinatari), null, expedient.getSistraBantelNum(),
-	 * destinatari.isNotificacioAutoritzat(), destinatari.getEmail(),
-	 * interessatMobil); integracioHelper.addAccioOk(
-	 * IntegracioHelper.INTCODI_CIUTADA, accioDescripcio, accioParams,
-	 * IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
-	 * return expedientInfo; } catch (Exception ex) { String errorDescripcio =
-	 * "Error al accedir al plugin de comunicació amb el ciutadà";
-	 * integracioHelper.addAccioError( IntegracioHelper.INTCODI_CIUTADA,
-	 * accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,
-	 * System.currentTimeMillis() - t0, errorDescripcio, ex); throw new
-	 * SistemaExternException( IntegracioHelper.INTCODI_CIUTADA, errorDescripcio,
-	 * ex); } }
-	 * 
-	 * public void ciutadaAvisCrear( ExpedientEntity expedient, String titol, String
-	 * text, String textMobil) { MetaExpedientEntity metaExpedient =
-	 * expedient.getMetaExpedient(); String accioDescripcio =
-	 * "Creació d'un avis a la zona personal del ciutadà"; Map<String, String>
-	 * accioParams = new HashMap<String, String>(); accioParams.put("expedientId",
-	 * expedient.getId().toString()); accioParams.put("expedientNumero",
-	 * expedient.getNumero()); accioParams.put("expedientTitol",
-	 * expedient.getNom()); accioParams.put("expedientTipusId",
-	 * expedient.getMetaNode().getId().toString());
-	 * accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-	 * accioParams.put("titol", titol); accioParams.put("text", text);
-	 * accioParams.put("textMobil", textMobil); long t0 =
-	 * System.currentTimeMillis(); try { getCiutadaPlugin().avisCrear(
-	 * expedient.getNtiIdentificador(), metaExpedient.getUnitatAdministrativa(),
-	 * titol, text, textMobil, null); integracioHelper.addAccioOk(
-	 * IntegracioHelper.INTCODI_CIUTADA, accioDescripcio, accioParams,
-	 * IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0); }
-	 * catch (Exception ex) { String errorDescripcio =
-	 * "Error al accedir al plugin de comunicació amb el ciutadà";
-	 * integracioHelper.addAccioError( IntegracioHelper.INTCODI_CIUTADA,
-	 * accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,
-	 * System.currentTimeMillis() - t0, errorDescripcio, ex); throw new
-	 * SistemaExternException( IntegracioHelper.INTCODI_CIUTADA, errorDescripcio,
-	 * ex); } }
-	 * 
-	 * public CiutadaNotificacioResultat ciutadaNotificacioEnviar( ExpedientEntity
-	 * expedient, InteressatEntity destinatari, String oficiTitol, String oficiText,
-	 * String avisTitol, String avisText, String avisTextMobil,
-	 * InteressatIdiomaEnumDto idioma, boolean confirmarRecepcio,
-	 * List<DocumentEntity> annexos) { MetaExpedientEntity metaExpedient =
-	 * expedient.getMetaExpedient(); String accioDescripcio =
-	 * "Enviament d'una notificació electrònica al ciutadà"; Map<String, String>
-	 * accioParams = new HashMap<String, String>(); accioParams.put("expedientId",
-	 * expedient.getId().toString()); accioParams.put("expedientNumero",
-	 * expedient.getNumero()); accioParams.put("expedientTitol",
-	 * expedient.getNom()); accioParams.put("expedientTipusId",
-	 * expedient.getMetaNode().getId().toString());
-	 * accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-	 * accioParams.put("unitatAdministrativa",
-	 * metaExpedient.getUnitatAdministrativa()); accioParams.put("llibreCodi",
-	 * metaExpedient.getNotificacioLlibreCodi()); accioParams.put("organCodi",
-	 * metaExpedient.getNotificacioOrganCodi()); accioParams.put("destinatari",
-	 * (destinatari != null) ? destinatari.getIdentificador() : "<null>");
-	 * accioParams.put("idioma", idioma.name()); accioParams.put("oficiTitol",
-	 * oficiTitol); accioParams.put("avisTitol", avisTitol);
-	 * accioParams.put("confirmarRecepcio", new
-	 * Boolean(confirmarRecepcio).toString()); if (annexos != null)
-	 * accioParams.put("annexos (núm.)", new Integer(annexos.size()).toString()); if
-	 * (annexos != null) { StringBuilder annexosIds = new StringBuilder();
-	 * StringBuilder annexosTitols = new StringBuilder(); boolean primer = true; for
-	 * (DocumentEntity annex: annexos) { if (!primer) { annexosIds.append(", ");
-	 * annexosTitols.append(", "); } annexosIds.append(annex.getId());
-	 * annexosTitols.append(annex.getNom()); primer = false; }
-	 * accioParams.put("annexosIds", annexosIds.toString());
-	 * accioParams.put("annexosTitols", annexosTitols.toString()); } long t0 =
-	 * System.currentTimeMillis(); try { List<CiutadaDocument> ciutadaAnnexos =
-	 * null; if (annexos != null) { ciutadaAnnexos = new
-	 * ArrayList<CiutadaDocument>(); for (DocumentEntity annex: annexos) { if
-	 * (DocumentTipusEnumDto.FISIC.equals(annex.getDocumentTipus())) { throw new
-	 * ValidationException( annex.getId(), DocumentEntity.class,
-	 * "No espoden emprar documents físics com annexos d'una notificació telemàtica"
-	 * ); } CiutadaDocument cdoc = new CiutadaDocument();
-	 * cdoc.setTitol(annex.getNom()); FitxerDto fitxer =
-	 * documentHelper.getFitxerAssociat(annex); cdoc.setArxiuNom(fitxer.getNom());
-	 * cdoc.setArxiuContingut(fitxer.getContingut()); ciutadaAnnexos.add(cdoc); } }
-	 * CiutadaNotificacioResultat resultat = getCiutadaPlugin().notificacioCrear(
-	 * expedient.getNtiIdentificador(), expedient.getSistraUnitatAdministrativa(),
-	 * metaExpedient.getNotificacioLlibreCodi(),
-	 * metaExpedient.getNotificacioOrganCodi(), toPluginCiutadaPersona(destinatari),
-	 * null, getIdiomaPerPluginCiutada(idioma), oficiTitol, oficiText, avisTitol,
-	 * avisText, avisTextMobil, confirmarRecepcio, ciutadaAnnexos);
-	 * integracioHelper.addAccioOk( IntegracioHelper.INTCODI_CIUTADA,
-	 * accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,
-	 * System.currentTimeMillis() - t0); return resultat; } catch (Exception ex) {
-	 * String errorDescripcio =
-	 * "Error al accedir al plugin de comunicació amb el ciutadà";
-	 * integracioHelper.addAccioError( IntegracioHelper.INTCODI_CIUTADA,
-	 * accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,
-	 * System.currentTimeMillis() - t0, errorDescripcio, ex); throw new
-	 * SistemaExternException( IntegracioHelper.INTCODI_CIUTADA, errorDescripcio,
-	 * ex); } }
-	 * 
-	 * public CiutadaNotificacioEstat ciutadaNotificacioComprovarEstat(
-	 * ExpedientEntity expedient, String registreNumero) { String accioDescripcio =
-	 * "Comprovació de l'estat de la notificació"; Map<String, String> accioParams =
-	 * new HashMap<String, String>(); accioParams.put("expedientId",
-	 * expedient.getId().toString()); accioParams.put("expedientNumero",
-	 * expedient.getNumero()); accioParams.put("expedientTitol",
-	 * expedient.getNom()); accioParams.put("expedientTipusId",
-	 * expedient.getMetaNode().getId().toString());
-	 * accioParams.put("expedientTipusNom", expedient.getMetaNode().getNom());
-	 * accioParams.put("registreNumero", registreNumero); long t0 =
-	 * System.currentTimeMillis(); try { CiutadaNotificacioEstat justificant =
-	 * getCiutadaPlugin().notificacioObtenirJustificantRecepcio( registreNumero);
-	 * integracioHelper.addAccioOk( IntegracioHelper.INTCODI_CIUTADA,
-	 * accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,
-	 * System.currentTimeMillis() - t0); return justificant; } catch (Exception ex)
-	 * { String errorDescripcio =
-	 * "Error al accedir al plugin de comunicació amb el ciutadà";
-	 * integracioHelper.addAccioError( IntegracioHelper.INTCODI_CIUTADA,
-	 * accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,
-	 * System.currentTimeMillis() - t0, errorDescripcio, ex); throw new
-	 * SistemaExternException( IntegracioHelper.INTCODI_CIUTADA, errorDescripcio,
-	 * ex); } }
-	 */
-
 	public List<Pais> dadesExternesPaisosFindAll() {
 
 		long t0 = System.currentTimeMillis();
@@ -6373,10 +6194,7 @@ public class PluginHelper {
 			plugin = arxiuPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
 			
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.arxiu.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.ARXIU_PLUGIN_CLASS);
 			
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				try {
@@ -6531,10 +6349,7 @@ public class PluginHelper {
 			plugin = conversioPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
 			
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.conversio.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.CONVERSIO_PLUGIN_CLASS);
 			
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				
@@ -6783,10 +6598,7 @@ public class PluginHelper {
 			plugin = validaSignaturaPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
 			
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.validatesignature.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.VALIDA_FIRMA_PLUGIN_CLASS);
 			
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				
@@ -7197,10 +7009,7 @@ public class PluginHelper {
 			if (plugin != null) {
 				return plugin;
 			}
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.summarize.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.SUMMARIZE_PLUGIN_CLASS);
 			if (Utils.isNotEmpty(
 					pluginClassOrgan)) {
 				try {
@@ -7400,8 +7209,7 @@ public class PluginHelper {
 	}
 
 	private String getPropertyPluginArxiu() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.arxiu.class");
+		return configHelper.getConfig(PropertyConfig.ARXIU_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginPortafirmes() {
@@ -7409,33 +7217,27 @@ public class PluginHelper {
 	}
 
 	private String getPropertyPluginDigitalitzacio() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.digitalitzacio.class");
+		return configHelper.getConfig(PropertyConfig.DIGITALITZACIO_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginConversio() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.conversio.class");
+		return configHelper.getConfig(PropertyConfig.CONVERSIO_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginDadesExternes() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.dadesext.class");
+		return configHelper.getConfig(PropertyConfig.DADESEXT_PLUGIN_DIR3_CLASS);
 	}
 
 	private String getPropertyPluginDadesExternesPinbal() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.dadesextpinbal.class");
+		return configHelper.getConfig(PropertyConfig.DADESEXT_PLUGIN_PINBAL_CLASS);
 	}
 
 	private String getPropertyPluginProcediment() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.procediment.class");
+		return configHelper.getConfig(PropertyConfig.ROLSAC_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginValidaSignatura() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.validatesignature.class");
+		return configHelper.getConfig(PropertyConfig.VALIDA_FIRMA_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginNotificacio() {
@@ -7455,13 +7257,11 @@ public class PluginHelper {
 	}
 
 	private String getPropertyPluginSummarize() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.summarize.class");
+		return configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginViaFirma() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.viafirma.class");
+		return configHelper.getConfig(PropertyConfig.VIAFIRMA_PLUGIN_CLASS);
 	}
 
 	private boolean getPropertyPluginRegistreSignarAnnexos() {

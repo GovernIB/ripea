@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import org.fundaciobit.genapp.common.utils.Utils;
 import org.slf4j.Logger;
@@ -141,15 +142,6 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 			
 		}
 		return dto;
-	}
-	
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.procediment.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getServiceUrl();
-		}
-		return endpoint;
 	}	
 
 	private Client getJerseyClient() {
@@ -197,24 +189,29 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 	}
 
 	private String getServiceUrl() {
-		return getProperty(
-				"plugin.procediment.rolsac.service.url");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_URL));
 	}
 	private String getServiceUsername() {
-		return getProperty(
-				"plugin.procediment.rolsac.service.username");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_USR));
 	}
 	private String getServicePassword() {
-		return getProperty(
-				"plugin.procediment.rolsac.service.password");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_PAS));
 	}
 	private Integer getServiceTimeout() {
-		String key = "plugin.procediment.rolsac.service.timeout";
+		String key = PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_TIMEOUT);
 		if (getProperty(key) != null) {
 			return getAsInt(key);
 		} else {
 			return null;
 		}
+	}
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_ENDPOINT));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcedimentPluginRolsac.class);

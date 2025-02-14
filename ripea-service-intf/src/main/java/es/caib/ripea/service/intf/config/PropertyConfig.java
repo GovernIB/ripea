@@ -102,6 +102,84 @@ public class PropertyConfig {
 	public static final String GESDOC_PLUGIN_FILESYSTEM_CLASS		= "es.caib.ripea.plugin.gesdoc.class";
 	public static final String GESDOC_PLUGIN_FILESYSTEM_PATH		= "es.caib.ripea.plugin.gesdoc.filesystem.base.dir";
 	
+	public static final String ARXIU_PLUGIN_CLASS			= "es.caib.ripea.plugin.arxiu.class";
+	public static final String ARXIU_PLUGIN_URL				= "es.caib.ripea.plugin.arxiu.caib.base.url";
+	public static final String ARXIU_PLUGIN_USUARI			= "es.caib.ripea.plugin.arxiu.caib.usuari";
+	public static final String ARXIU_PLUGIN_PASS			= "es.caib.ripea.plugin.arxiu.caib.contrasenya";
+	public static final String ARXIU_PLUGIN_APLICACIO_CODI	= "es.caib.ripea.plugin.arxiu.caib.aplicacio.codi";
+	public static final String ARXIU_PLUGIN_ENDPOINT_NAME	= "es.caib.ripea.arxiu.endpointName";
+	public static final String ARXIU_PLUGIN_VERSIO_IMPR_URL	= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.url";
+	public static final String ARXIU_PLUGIN_VERSIO_IMPR_USR	= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.usuari";
+	public static final String ARXIU_PLUGIN_VERSIO_IMPR_PAS	= "es.caib.ripea.plugin.arxiu.caib.conversio.imprimible.contrasenya";
+	public static final String ARXIU_PLUGIN_TIMEOUT_CONNECT	= "es.caib.ripea.plugin.arxiu.caib.timeout.connect";
+	public static final String ARXIU_PLUGIN_TIMEOUT_READ	= "es.caib.ripea.plugin.arxiu.caib.timeout.read";
+	
+	public static final String CONVERSIO_PLUGIN_CLASS		= "es.caib.ripea.plugin.conversio.class";
+	
+	public static final String DADESEXT_PLUGIN_DIR3_CLASS		= "es.caib.ripea.plugin.dadesext.class";
+	public static final String DADESEXT_PLUGIN_DIR3_URL1		= "es.caib.ripea.plugin.dadesext.dir3.service.url";
+	public static final String DADESEXT_PLUGIN_DIR3_URL2		= "es.caib.ripea.plugin.dadesext.service.url";
+	public static final String DADESEXT_PLUGIN_DIR3_ENDPOINT	= "es.caib.ripea.plugin.dadesext.endpointName";
+	
+	public static final String DADESEXT_PLUGIN_PINBAL_CLASS		= "es.caib.ripea.plugin.dadesextpinbal.class";
+	public static final String DADESEXT_PLUGIN_PINBAL_URL		= "es.caib.ripea.plugin.dadesextcaib.service.url";
+	public static final String DADESEXT_PLUGIN_PINBAL_ENDPOINT	= "es.caib.ripea.plugin.dadesextpinbal.endpointName";
+	
+	public static final String VALIDA_FIRMA_PLUGIN_CLASS		= "es.caib.ripea.plugin.validatesignature.class";
+	public static final String VALIDA_FIRMA_PLUGIN_URL			= "es.caib.ripea.plugins.validatesignature.afirmacxf.endpoint";
+	public static final String VALIDA_FIRMA_PLUGIN_USR			= "es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.username";
+	public static final String VALIDA_FIRMA_PLUGIN_PAS			= "es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.password";
+	public static final String VALIDA_FIRMA_PLUGIN_APP_ID		= "es.caib.ripea.plugins.validatesignature.afirmacxf.applicationID";
+	public static final String VALIDA_FIRMA_PLUGIN_IGNORE_CERTS	= "es.caib.ripea.plugins.validatesignature.afirmacxf.ignoreservercertificates";
+	public static final String VALIDA_FIRMA_PLUGIN_TRANSFORMERS	= "es.caib.ripea.plugins.validatesignature.afirmacxf.TransformersTemplatesPath";
+	public static final String VALIDA_FIRMA_PLUGIN_ENDPOINT		= "es.caib.ripea.plugins.validatesignature.endpointName";
+	
+	public static final String ROLSAC_PLUGIN_CLASS		= "es.caib.ripea.plugin.procediment.class";
+	public static final String ROLSAC_PLUGIN_URL		= "es.caib.ripea.plugin.procediment.rolsac.service.url";
+	public static final String ROLSAC_PLUGIN_USR		= "es.caib.ripea.plugin.procediment.rolsac.service.username";
+	public static final String ROLSAC_PLUGIN_PAS		= "es.caib.ripea.plugin.procediment.rolsac.service.password";
+	public static final String ROLSAC_PLUGIN_ENDPOINT	= "es.caib.ripea.plugin.procediment.endpointName";
+	public static final String ROLSAC_PLUGIN_TIMEOUT	= "es.caib.ripea.plugin.procediment.rolsac.service.timeout";
+	
+	public static final String SUMMARIZE_PLUGIN_CLASS		= "es.caib.ripea.plugin.summarize.class";
+	public static final String SUMMARIZE_PLUGIN_URL			= "es.caib.ripea.plugin.summarize.url";
+	public static final String SUMMARIZE_PLUGIN_MODEL		= "es.caib.ripea.plugin.summarize.model";
+	public static final String SUMMARIZE_PLUGIN_USR			= "es.caib.ripea.plugin.summarize.usuari";
+	public static final String SUMMARIZE_PLUGIN_PAS			= "es.caib.ripea.plugin.summarize.password";
+	public static final String SUMMARIZE_PLUGIN_ENDPOINT	= "es.caib.ripea.plugin.summarize.endpointName";
+	public static final String SUMMARIZE_PLUGIN_APIKEY		= "es.caib.ripea.plugin.summarize.gpt.apiKey";
+	public static final String SUMMARIZE_PLUGIN_TIMEOUT		= "es.caib.ripea.plugin.summarize.service.timeout";
+	public static final String SUMMARIZE_PLUGIN_DEBUG		= "es.caib.ripea.plugin.summarize.debug";
+	public static final String SUMMARIZE_PLUGIN_MAX_TOKENS	= "es.caib.ripea.plugin.summarize.model.maxTokens";
+	
+	public static final String CONCSV_BASE_URL				= "es.caib.ripea.concsv.base.url";	
+	
+	public static final String VIAFIRMA_PLUGIN_CLASS			= "es.caib.ripea.plugin.viafirma.class";
+	public static final String VIAFIRMA_PLUGIN_URL				= "es.caib.ripea.plugin.viafirma.caib.apiurl";
+	public static final String VIAFIRMA_PLUGIN_CONSUMER_KEY		= "es.caib.ripea.plugin.viafirma.caib.consumerkey";
+	public static final String VIAFIRMA_PLUGIN_CONSUMER_SECRET	= "es.caib.ripea.plugin.viafirma.caib.consumersecret";
+	public static final String VIAFIRMA_PLUGIN_AUTH_MODE		= "es.caib.ripea.plugin.viafirma.caib.authmode";
+	public static final String VIAFIRMA_PLUGIN_GROUP			= "es.caib.ripea.plugin.viafirma.caib.group.codi";
+	public static final String VIAFIRMA_PLUGIN_AUTH_TYPE		= "es.caib.ripea.plugin.viafirma.caib.authtype";
+	public static final String VIAFIRMA_PLUGIN_CALLBACK_URL		= "es.caib.ripea.plugin.viafirma.caib.callback.url";
+	public static final String VIAFIRMA_PLUGIN_CALLBACK_USR		= "es.caib.ripea.plugin.viafirma.caib.callback.username";
+	public static final String VIAFIRMA_PLUGIN_CALLBACK_PAS		= "es.caib.ripea.plugin.viafirma.caib.callback.password";
+	public static final String VIAFIRMA_PLUGIN_PROXY_HOST		= "es.caib.ripea.plugin.viafirma.caib.proxy.host";
+	public static final String VIAFIRMA_PLUGIN_PROXY_PORT		= "es.caib.ripea.plugin.viafirma.caib.proxy.port";
+	public static final String VIAFIRMA_PLUGIN_CAIB_APP_CODE	= "es.caib.ripea.plugin.viafirma.caib.app.codi";
+	public static final String VIAFIRMA_PLUGIN_ENDPOINT_NAME	= "es.caib.ripea.plugin.viafirma.endpointName";
+	
+	public static final String DISTRIBUCIO_PLUGIN_URL			= "es.caib.ripea.distribucio.backofficeIntegracio.ws.url";
+	public static final String DISTRIBUCIO_PLUGIN_USR			= "es.caib.ripea.distribucio.backofficeIntegracio.ws.username";
+	public static final String DISTRIBUCIO_PLUGIN_PAS			= "es.caib.ripea.distribucio.backofficeIntegracio.ws.password";
+	
+	public static final String DIGITALITZACIO_PLUGIN_CLASS		= "es.caib.ripea.plugin.digitalitzacio.class";
+	public static final String DIGITALITZACIO_PLUGIN_URL		= "es.caib.ripea.plugin.digitalitzacio.digitalib.base.url";
+	public static final String DIGITALITZACIO_PLUGIN_USR		= "es.caib.ripea.plugin.digitalitzacio.digitalib.username";
+	public static final String DIGITALITZACIO_PLUGIN_PAS		= "es.caib.ripea.plugin.digitalitzacio.digitalib.password";
+	public static final String DIGITALITZACIO_PLUGIN_PERFIL		= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
+	public static final String DIGITALITZACIO_PLUGIN_DEBUG		= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
+	public static final String DIGITALITZACIO_PLUGIN_ENDPOINT	= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
 	
 	public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO = "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";	
 	public static final String ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON = "es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron";	

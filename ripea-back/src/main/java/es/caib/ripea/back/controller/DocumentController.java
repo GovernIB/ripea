@@ -12,6 +12,7 @@ import es.caib.ripea.back.helper.ExceptionHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.service.intf.service.*;
@@ -657,7 +658,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	@ResponseBody
 	public String getUrlValidacio(HttpServletRequest request, @PathVariable Long documentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url");
+		String urlValidacio = aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL);
 		DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
 		if (documentDto!=null && documentDto.getNtiCsv()!=null) {
 			return urlValidacio + documentDto.getNtiCsv();

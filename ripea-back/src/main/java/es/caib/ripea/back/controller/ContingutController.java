@@ -4,6 +4,7 @@ import es.caib.ripea.back.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.registre.RegistreTipusEnum;
 import es.caib.ripea.service.intf.service.*;
@@ -168,7 +169,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
 			model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
 			model.addAttribute("isExpedientExpanditPerDefecte", aplicacioService.getUsuariActual().isExpedientExpandit());
-			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
+			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL));
 			model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
 			model.addAttribute("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic")));
 			model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
@@ -285,7 +286,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
 		model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.logiques")));
 		model.addAttribute("isExpedientExpanditPerDefecte", aplicacioService.getUsuariActual().isExpedientExpandit());
-		model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
+		model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL));
 		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));

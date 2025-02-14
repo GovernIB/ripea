@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -275,69 +276,55 @@ public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements
         return callbackAuthorization;
 	}
 	
+	private String getApiUrl() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_URL));
+	}
+	private String getConsumerKey() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_CONSUMER_KEY));
+	}
+	private String getConsumerSecret() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_CONSUMER_SECRET));
+	}
+	private String getAuthMode() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_AUTH_MODE));
+	}
+	private OAuthType getAuthenticationType() {
+		String authenticationType = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_AUTH_TYPE));
+		return OAuthType.valueOf(authenticationType);
+	}
+	private String getCallBackUrl() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_CALLBACK_URL));
+	}
+	private String getCallBackUsername() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_CALLBACK_USR));
+	}
+	private String getCallBackPassword() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_CALLBACK_PAS));
+	}
+	private String getGroupCodi() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_GROUP));
+	}
+	private String getProxyHost() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_PROXY_HOST));
+	}
+	private String getAppCodi() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_CAIB_APP_CODE));
+	}
+	private int getProxyPort() {
+		String proxyPort = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_PROXY_PORT));
+		if (proxyPort != null) {
+			return Integer.valueOf(proxyPort);
+		} else {
+			return 0;
+		}
+	}
 	@Override
 	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.viafirma.endpointName");
+		String endpoint = PropertyConfig.getPropertySuffix(PropertyConfig.VIAFIRMA_PLUGIN_ENDPOINT_NAME);
 		if (Utils.isEmpty(endpoint)) {
 			endpoint = getApiUrl();
 		}
 		return endpoint;
-	}
-	
-	private String getApiUrl() {
-		return getProperty(
-				"plugin.viafirma.caib.apiurl");
-	}
-	private String getConsumerKey() {
-		return getProperty(
-				"plugin.viafirma.caib.consumerkey");
-	}
-	private String getConsumerSecret() {
-		return getProperty(
-				"plugin.viafirma.caib.consumersecret");
-	}
-	private String getAuthMode() {
-		return getProperty(
-				"plugin.viafirma.caib.authmode");
-	}
-	private OAuthType getAuthenticationType() {
-		String authenticationType = getProperty(
-				"plugin.viafirma.caib.authtype");
-		return OAuthType.valueOf(authenticationType);
-	}
-	private String getCallBackUrl() {
-		return getProperty(
-				"plugin.viafirma.caib.callback.url");
-	}
-	private String getCallBackUsername() {
-		return getProperty(
-				"plugin.viafirma.caib.callback.username");
-	}
-	private String getCallBackPassword() {
-		return getProperty(
-				"plugin.viafirma.caib.callback.password");
-	}
-	private String getGroupCodi() {
-		return getProperty(
-				"plugin.viafirma.caib.group.codi");
-	}
-	private String getProxyHost() {
-		return getProperty(
-				"plugin.viafirma.caib.proxy.host");
-	}
-	private String getAppCodi() {
-		return getProperty(
-				"plugin.viafirma.caib.app.codi");
-	}
-	private int getProxyPort() {
-		String proxyPort = getProperty(
-				"plugin.viafirma.caib.proxy.port");
-		if (proxyPort != null) {
-			return Integer.valueOf(getProperty(
-				"plugin.viafirma.caib.proxy.port"));
-		} else {
-			return 0;
-		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ViaFirmaPluginImpl.class);

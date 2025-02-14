@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.fundaciobit.apisib.apimassivescanwebsimple.v1.ApiMassiveScanWebSimple;
@@ -44,12 +45,8 @@ public class DigitalitzacioPluginDigitalIB extends RipeaAbstractPluginProperties
 	public DigitalitzacioPluginDigitalIB() {
 		super();
 	}
-	public DigitalitzacioPluginDigitalIB(
-			String propertyKeyBase,
-			Properties properties) {
-		super(
-				propertyKeyBase,
-				properties);
+	public DigitalitzacioPluginDigitalIB(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
 	}
 
 	@Override
@@ -336,32 +333,30 @@ public class DigitalitzacioPluginDigitalIB extends RipeaAbstractPluginProperties
 				getPassword());
 		return api;
 	}
-
+	
+	private String getBaseUrl() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIGITALITZACIO_PLUGIN_URL));
+	}
+	private String getUsername() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIGITALITZACIO_PLUGIN_USR));
+	}
+	private String getPassword() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIGITALITZACIO_PLUGIN_PAS));
+	}
+	private String getPerfil() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIGITALITZACIO_PLUGIN_PERFIL));
+	}
+	private boolean isDebug() {
+		return getAsBoolean(PropertyConfig.getPropertySuffix(PropertyConfig.DIGITALITZACIO_PLUGIN_DEBUG));
+	}
 	@Override
 	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.digitalitzacio.endpointName");
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIGITALITZACIO_PLUGIN_ENDPOINT));
 		if (Utils.isEmpty(endpoint)) {
 			endpoint = getBaseUrl();
 		}
 		return endpoint;
 	}
 	
-	private String getBaseUrl() {
-		return getProperty("plugin.digitalitzacio.digitalib.base.url");
-	}
-	private String getUsername() {
-		return getProperty("plugin.digitalitzacio.digitalib.username");
-	}
-	private String getPassword() {
-		return getProperty("plugin.digitalitzacio.digitalib.password");
-	}
-	private String getPerfil() {
-		return getProperty("plugin.digitalitzacio.digitalib.perfil");
-	}
-
-	private boolean isDebug() {
-		return getAsBoolean("plugin.digitalitzacio.log");
-	}
-
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DigitalitzacioPluginDigitalIB.class);
 }
