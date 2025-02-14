@@ -43,6 +43,7 @@ import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.Solicitud
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
 import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.PinbalException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -1150,32 +1151,32 @@ public class PinbalHelper {
 	}
 	
 	private String getPinbalBaseUrl() {
-		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");
+		return configHelper.getConfig(PropertyConfig.PINBAL_BASE_URL);
 	}
 	private String getPinbalBaseUrl(String entitatCodi, String organCodi) {
-		return configHelper.getConfig("es.caib.ripea.pinbal.base.url", entitatCodi, organCodi);
+		return configHelper.getConfig(PropertyConfig.PINBAL_BASE_URL, entitatCodi, organCodi);
 	}
 	private String getPinbalEndpointName() {
-		String resultat = configHelper.getConfig("es.caib.ripea.pinbal.endpointName");
+		String resultat = configHelper.getConfig(PropertyConfig.PINBAL_ENDPOINT_DESC);
 		if (Utils.isEmpty(resultat)) {
-			resultat = configHelper.getConfig("es.caib.ripea.pinbal.base.url");
+			resultat = configHelper.getConfig(PropertyConfig.PINBAL_BASE_URL);
 		}
 		return resultat;
 	}
 	private String getPinbalUser() {
-		return configHelper.getConfig("es.caib.ripea.pinbal.user");
+		return configHelper.getConfig(PropertyConfig.PINBAL_USER);
 	}
 	private String getPinbalPassword() {
-		return configHelper.getConfig("es.caib.ripea.pinbal.password");
+		return configHelper.getConfig(PropertyConfig.PINBAL_PASS);
 	}
 	private String getPinbalUser(String entitatCodi, String organCodi) {
-		return configHelper.getConfig("es.caib.ripea.pinbal.user", entitatCodi, organCodi);
+		return configHelper.getConfig(PropertyConfig.PINBAL_USER, entitatCodi, organCodi);
 	}
 	private String getPinbalPassword(String entitatCodi, String organCodi) {
-		return configHelper.getConfig("es.caib.ripea.pinbal.password", entitatCodi, organCodi);
+		return configHelper.getConfig(PropertyConfig.PINBAL_PASS, entitatCodi, organCodi);
 	}	
 	private boolean getPinbalBasicAuth() {
-		return configHelper.getAsBoolean("es.caib.ripea.pinbal.basic.auth");
+		return configHelper.getAsBoolean(PropertyConfig.PINBAL_BASIC_AUTH);
 	}
 	private String getPinbalDefaultSia() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.codi.sia.peticions");

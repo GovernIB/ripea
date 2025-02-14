@@ -36,6 +36,7 @@ import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 import es.caib.ripea.plugin.viafirma.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -4652,7 +4653,7 @@ public class PluginHelper {
 			}
 			// ########## ENVIAMENT DEH ###############
 			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(
-					configHelper.getConfig("es.caib.ripea.notificacio.enviament.deh.activa"))) {
+					configHelper.getConfig(PropertyConfig.NOTIB_DEH_ACTIVA))) {
 				enviament.setEntregaDehActiva(true);
 				enviament.setEntregaDehObligat(interessat.getEntregaDehObligat());
 				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacio());
@@ -7400,13 +7401,11 @@ public class PluginHelper {
 	}
 
 	private String getPropertyPluginDadesUsuari() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.dades.usuari.class");
+		return configHelper.getConfig(PropertyConfig.USUARIS_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginUnitatsOrganitzatives() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.unitats.organitzatives.class");
+		return configHelper.getConfig(PropertyConfig.DIR3_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginArxiu() {

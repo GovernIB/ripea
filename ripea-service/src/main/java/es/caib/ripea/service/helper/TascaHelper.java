@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
@@ -121,7 +122,7 @@ public class TascaHelper {
 		try {
 
 			boolean shouldNotifyAboutDeadline = false;
-			int preavisDataLimitEnDies = configHelper.getAsInt("es.caib.ripea.tasca.preavisDataLimitEnDies", 3);
+			int preavisDataLimitEnDies = configHelper.getAsInt(PropertyConfig.TASCA_PREAVIS_DATA_LIMIT, 3);
 
 			if (expedientTascaEntity.getDataLimit() != null) {
 				if ((new Date()).after(new DateTime(expedientTascaEntity.getDataLimit()).minusDays(preavisDataLimitEnDies).toDate())) {

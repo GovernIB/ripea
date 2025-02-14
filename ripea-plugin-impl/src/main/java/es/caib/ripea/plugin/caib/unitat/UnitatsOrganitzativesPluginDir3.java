@@ -31,6 +31,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.apache.commons.io.IOUtils;
 
@@ -382,7 +383,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     }
 
     private String getServiceUrl() {
-
         String url = getProperty("plugin.unitats.organitzatives.dir3.service.url");
 		if (!url.endsWith("/")) {
 			url = url + "/";
@@ -403,20 +403,12 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     }
 
     private Integer getServiceTimeout() {
-
         String key = "plugin.unitats.organitzatives.dir3.service.timeout";
         return getProperty(key) != null ? getAsInt(key) : null;
     }
 
     private String getServiceCercaUrl() {
-
-        String serviceUrl = getProperty("plugin.unitats.organitzatives.dir3.consulta.rest.service.url");
-        if (serviceUrl == null) {
-            serviceUrl = PropertiesHelper.getProperties()
-                    .getProperty("es.caib.ripea.plugin.unitats.cerca.dir3.service.url");
-        }
-        return serviceUrl;
-
+    	return getProperty("plugin.unitats.cerca.dir3.service.url");
     }
 
     private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {

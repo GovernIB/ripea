@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.unitat;
 
 import java.util.List;
@@ -11,6 +8,7 @@ import org.junit.Test;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
@@ -27,22 +25,12 @@ public class UnitatsPluginDir3Test {
 
 	private UnitatsOrganitzativesPlugin plugin;
 
-
-
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.url",
-				ENDPOINT_ADDRESS);
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username",
-				USERNAME);
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password",
-				PASSWORD);
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.log.actiu",
-				"true");
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.DIR3_PLUGIN_URL, ENDPOINT_ADDRESS);
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.DIR3_PLUGIN_USER, USERNAME);
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.DIR3_PLUGIN_PASS, PASSWORD);
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.DIR3_PLUGIN_DEBUG, "true");
 		plugin = new UnitatsOrganitzativesPluginDir3();
 	}
 
@@ -53,5 +41,4 @@ public class UnitatsPluginDir3Test {
 			System.out.println(">>> [" + unitat.getCodi() + "] " + unitat.getDenominacio());
 		}
 	}
-
 }

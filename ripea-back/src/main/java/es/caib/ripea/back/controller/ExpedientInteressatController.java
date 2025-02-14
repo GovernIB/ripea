@@ -16,6 +16,7 @@ import es.caib.ripea.back.helper.ExceptionHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.helper.ValidationHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.ConfigService;
 import es.caib.ripea.service.intf.service.DadesExternesService;
@@ -706,7 +707,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		}
 		boolean dehActiu = false;
 		try {
-			dehActiu = Boolean.parseBoolean(configService.getConfigValue("es.caib.ripea.notificacio.enviament.deh.activa"));
+			dehActiu = Boolean.parseBoolean(configService.getConfigValue(PropertyConfig.NOTIB_DEH_ACTIVA));
 		} catch (Exception e) {}
 		model.addAttribute("dehActiu", dehActiu);
 	}
