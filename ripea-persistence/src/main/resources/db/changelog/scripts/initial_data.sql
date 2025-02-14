@@ -218,4 +218,3 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 ('0','GES_DOC','es.caib.ripea.plugin.gesdoc.class','es.caib.ripea.plugin.caib.gesdoc.GestioDocumentalPluginFilesystem','Nom de la classe per a gestionar l''emmagatzament de documents','1','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('1','GES_DOC','es.caib.ripea.plugin.gesdoc.filesystem.base.dir','d:/_LOT_RIPEAFILES/gesdoc','Directori del sistema de fitxers on emmagatzemar els documents','2','TEXT','0','1','0','1','0');
-----------------------------
