@@ -1,0 +1,4277 @@
+databaseChangeLog:
+- changeSet:
+    id: init-table-1
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}ALERTA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TEXT
+            type: VARCHAR(256 ${char})
+        - column:
+            name: ERROR
+            type: VARCHAR(2048 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: LLEGIDA
+            type: BOOLEAN
+        - column:
+            name: CONTINGUT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}ALERTA
+- changeSet:
+    id: init-table-2
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}AVIS_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ASSUMPTE
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: MISSATGE
+            type: VARCHAR(2048 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_INICI
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_FINAL
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIU
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: AVIS_NIVELL
+            type: VARCHAR(10 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            defaultValueBoolean: false
+            name: AVIS_ADMIN
+            type: BOOLEAN
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        tableName: ${app_prefix}AVIS
+- changeSet:
+    id: init-table-3
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CARPETA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: EXPEDIENT_RELACIONAT
+            type: NUMBER(19, 0)
+        tableName: ${app_prefix}CARPETA
+- changeSet:
+    id: init-table-4
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONFIG_PK
+            name: KEY
+            type: VARCHAR(256 ${char})
+        - column:
+            name: VALUE
+            type: VARCHAR(2048 ${char})
+        - column:
+            name: DESCRIPTION
+            type: VARCHAR(2048 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: GROUP_CODE
+            type: VARCHAR(128 ${char})
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: '0'
+            name: POSITION
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: JBOSS_PROPERTY
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: TEXT
+            name: TYPE_CODE
+            type: VARCHAR(128 ${char})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            defaultValueBoolean: false
+            name: CONFIGURABLE_ORGAN
+            type: BOOLEAN
+        - column:
+            name: ORGAN_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            defaultValueBoolean: false
+            name: CONFIGURABLE_ENTITAT_ACTIU
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: CONFIGURABLE_ORGAN_ACTIU
+            type: BOOLEAN
+        - column:
+            name: ENTITAT_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            defaultValueBoolean: false
+            name: CONFIGURABLE
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: CONFIGURABLE_ORG_DESCENDENTS
+            type: BOOLEAN
+        tableName: ${app_prefix}CONFIG
+- changeSet:
+    id: init-table-5
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONFIG_GROUP_PK
+            name: CODE
+            type: VARCHAR(128 ${char})
+        - column:
+            name: PARENT_CODE
+            type: VARCHAR(128 ${char})
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: '0'
+            name: POSITION
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPTION
+            type: VARCHAR(512 ${char})
+        tableName: ${app_prefix}CONFIG_GROUP
+- changeSet:
+    id: init-table-6
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONFIG_TYPE_PK
+            name: CODE
+            type: VARCHAR(128 ${char})
+        - column:
+            name: VALUE
+            type: VARCHAR(1024 ${char})
+        tableName: ${app_prefix}CONFIG_TYPE
+- changeSet:
+    id: init-table-7
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONSULTA_PINBAL_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: SERVEI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PINBAL_IDPETICION
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: VARCHAR(10 ${char})
+        - column:
+            name: ERROR
+            type: VARCHAR(4000 ${char})
+        - column:
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}CONSULTA_PINBAL
+- changeSet:
+    id: init-table-8
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONTINGUT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            name: PARE_ID
+            type: BIGINT
+        - column:
+            name: ESBORRAT
+            type: INTEGER
+        - column:
+            name: ESBORRAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: ARXIU_UUID
+            type: VARCHAR(36 ${char})
+        - column:
+            name: ARXIU_DATA_ACT
+            type: TIMESTAMP
+        - column:
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: CONTMOV_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            defaultValueNumeric: '0'
+            name: ORDRE
+            type: NUMBER(2, 0)
+        - column:
+            name: ARXIU_INTENT_DATA
+            type: TIMESTAMP
+        - column:
+            defaultValueNumeric: '0'
+            name: ARXIU_REINTENTS
+            type: INTEGER
+        - column:
+            name: NUMERO_REGISTRE
+            type: VARCHAR(80 ${char})
+        - column:
+            defaultValueBoolean: true
+            name: ARXIU_PROPAGAT
+            type: BOOLEAN
+        tableName: ${app_prefix}CONTINGUT
+- changeSet:
+    id: init-table-9
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONT_COMMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: TEXT
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CONTINGUT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}CONT_COMMENT
+- changeSet:
+    id: init-table-10
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONT_LOG_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CONTINGUT_ID
+            type: BIGINT
+        - column:
+            name: PARE_ID
+            type: BIGINT
+        - column:
+            name: CONTMOV_ID
+            type: BIGINT
+        - column:
+            name: OBJECTE_ID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: OBJECTE_LOG_TIPUS
+            type: INTEGER
+        - column:
+            name: OBJECTE_TIPUS
+            type: INTEGER
+        - column:
+            name: PARAM1
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PARAM2
+            type: VARCHAR(256 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}CONT_LOG
+- changeSet:
+    id: init-table-11
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}CONT_MOV_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CONTINGUT_ID
+            type: BIGINT
+        - column:
+            name: ORIGEN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: DESTI_ID
+            type: BIGINT
+        - column:
+            name: REMITENT_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: COMENTARI
+            type: VARCHAR(256 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}CONT_MOV
+- changeSet:
+    id: init-table-12
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DADA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: ORDRE
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: VALOR
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: METADADA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NODE_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${app_prefix}DADA
+- changeSet:
+    id: init-table-13
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOCUMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: UBICACIO
+            type: VARCHAR(255 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_CAPTURA
+            type: TIMESTAMP
+        - column:
+            name: CUSTODIA_DATA
+            type: TIMESTAMP
+        - column:
+            name: CUSTODIA_ID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: CUSTODIA_CSV
+            type: VARCHAR(256 ${char})
+        - column:
+            name: FITXER_NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: FITXER_CONTENT_TYPE
+            type: VARCHAR(256 ${char})
+        - column:
+            name: FITXER_CONTINGUT
+            type: ${blob}
+        - column:
+            name: VERSIO_DARRERA
+            type: VARCHAR(32 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: VERSIO_COUNT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_VERSION
+            type: VARCHAR(5 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_IDENTIF
+            type: VARCHAR(48 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_ORGANO
+            type: VARCHAR(9 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_ORIGEN
+            type: VARCHAR(2 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_ESTELA
+            type: VARCHAR(4 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_TIPDOC
+            type: VARCHAR(4 ${char})
+        - column:
+            name: NTI_IDORIG
+            type: VARCHAR(48 ${char})
+        - column:
+            name: NTI_TIPFIR
+            type: VARCHAR(4 ${char})
+        - column:
+            name: NTI_CSV
+            type: VARCHAR(256 ${char})
+        - column:
+            name: NTI_CSVREG
+            type: VARCHAR(512 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(512 ${char})
+        - column:
+            name: GES_DOC_FIRMAT_ID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: GES_DOC_ADJUNT_ID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: GES_DOC_ADJUNT_FIRMA_ID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: NOM_FITXER_FIRMAT
+            type: VARCHAR(512 ${char})
+        - column:
+            name: PINBAL_IDPETICION
+            type: VARCHAR(64 ${char})
+        - column:
+            defaultValueBoolean: true
+            name: VAL_OK
+            type: BOOLEAN
+        - column:
+            name: VAL_ERROR
+            type: VARCHAR(1000 ${char})
+        - column:
+            defaultValue: DEFINITIU
+            name: ANNEX_ESTAT
+            type: VARCHAR(16 ${char})
+        - column:
+            name: ARXIU_ESTAT
+            type: VARCHAR(16 ${char})
+        - column:
+            name: DOC_FIRMA_TIPUS
+            type: VARCHAR(16 ${char})
+        - column:
+            name: ARXIU_UUID_FIRMA
+            type: VARCHAR(36 ${char})
+        - column:
+            name: EXPEDIENT_ESTAT_ID
+            type: BIGINT
+        - column:
+            name: FITXER_TAMANY
+            type: INTEGER
+        - column:
+            name: UUID_DISTRIBUCIO
+            type: VARCHAR(36 ${char})
+        tableName: ${app_prefix}DOCUMENT
+- changeSet:
+    id: init-table-14
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOCUMENT_ENVIAMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: DTYPE
+            type: VARCHAR(32 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: VARCHAR(255 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ASSUMPTE
+            type: VARCHAR(256 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(256 ${char})
+        - column:
+            name: ENVIAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: PROCESSAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: CANCELAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: ERROR
+            type: BOOLEAN
+        - column:
+            name: ERROR_DESC
+            type: VARCHAR(2048 ${char})
+        - column:
+            name: INTENT_NUM
+            type: INTEGER
+        - column:
+            name: INTENT_DATA
+            type: TIMESTAMP
+        - column:
+            name: INTENT_PROXIM_DATA
+            type: TIMESTAMP
+        - column:
+            name: PUB_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: SERVEI_TIPUS
+            type: VARCHAR(10 ${char})
+        - column:
+            name: ENTREGA_POSTAL
+            type: BOOLEAN
+        - column:
+            name: NOT_TIPUS
+            type: INTEGER
+        - column:
+            name: NOT_RETARD
+            type: INTEGER
+        - column:
+            name: NOT_DATA_PROG
+            type: TIMESTAMP
+        - column:
+            name: NOT_DATA_CADUCITAT
+            type: TIMESTAMP
+        - column:
+            name: NOT_ENV_REF
+            type: VARCHAR(100 ${char})
+        - column:
+            name: NOT_ENV_DAT_ESTAT
+            type: VARCHAR(20 ${char})
+        - column:
+            name: NOT_ENV_DAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: NOT_ENV_DAT_ORIG
+            type: VARCHAR(20 ${char})
+        - column:
+            name: NOT_ENV_CERT_DATA
+            type: TIMESTAMP
+        - column:
+            name: NOT_ENV_CERT_ORIG
+            type: VARCHAR(20 ${char})
+        - column:
+            name: NOT_ENV_CERT_ARXIUID
+            type: VARCHAR(50 ${char})
+        - column:
+            name: NOT_ENV_REGISTRE_DATA
+            type: date
+        - column:
+            name: NOT_ENV_REGISTRE_NUMERO
+            type: BIGINT
+        - column:
+            name: NOT_ENV_REGISTRE_NUM_FORMATAT
+            type: VARCHAR(50 ${char})
+        - column:
+            name: NOT_ENV_ID
+            type: VARCHAR(100 ${char})
+        - column:
+            name: NOTIFICACIO_ESTAT
+            type: VARCHAR(255 ${char})
+        - column:
+            name: PF_PRIORITAT
+            type: INTEGER
+        - column:
+            name: PF_CAD_DATA
+            type: TIMESTAMP
+        - column:
+            name: PF_DOC_TIPUS
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PF_RESPONSABLES
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: PF_SEQ_TIPUS
+            type: INTEGER
+        - column:
+            name: PF_FLUX_ID
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PF_PORTAFIRMES_ID
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PF_CALLBACK_ESTAT
+            type: INTEGER
+        - column:
+            name: PF_FLUX_TIPUS
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PF_MOTIU_REBUIG
+            type: VARCHAR(512 ${char})
+        - column:
+            name: VF_CODI_USUARI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: VF_TITOL
+            type: VARCHAR(256 ${char})
+        - column:
+            name: VF_DESCRIPCIO
+            type: VARCHAR(256 ${char})
+        - column:
+            name: VF_CODI_DISPOSITIU
+            type: VARCHAR(64 ${char})
+        - column:
+            name: VF_MESSAGE_CODE
+            type: VARCHAR(64 ${char})
+        - column:
+            name: VF_CALLBACK_ESTAT
+            type: INTEGER
+        - column:
+            name: VF_CONTRASENYA_USUARI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: VF_LECTURA_OBLIGATORIA
+            type: BOOLEAN
+        - column:
+            name: VF_VIAFIRMA_DISPOSITIU
+            type: BIGINT
+        - column:
+            name: FIRMA_PARCIAL
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: NOT_EMISOR_ID
+            type: BIGINT
+        - column:
+            name: VF_VALIDATE_CODE_ENABLED
+            type: BOOLEAN
+        - column:
+            name: VF_VALIDATE_CODE
+            type: VARCHAR(100 ${char})
+        - column:
+            name: VF_SIGNANT_NIF
+            type: VARCHAR(17 ${char})
+        - column:
+            name: VF_SIGNANT_NOM
+            type: VARCHAR(90 ${char})
+        - column:
+            name: VF_OBSERVACIONS
+            type: VARCHAR(256 ${char})
+        - column:
+            name: VF_REBRE_CORREU
+            type: BOOLEAN
+        - column:
+            name: NOT_DATA_ENVIADA
+            type: TIMESTAMP
+        - column:
+            name: NOT_DATA_FINALITZADA
+            type: TIMESTAMP
+        - column:
+            name: PF_AVIS_FIRMA_PARCIAL
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: PF_FIRMA_PARCIAL
+            type: BOOLEAN
+        tableName: ${app_prefix}DOCUMENT_ENVIAMENT
+- changeSet:
+    id: init-table-15
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOCUMENT_ENV_DIS_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CODI_APLICACIO
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CODI_USUARI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(255 ${char})
+        - column:
+            name: LOCALE
+            type: VARCHAR(10 ${char})
+        - column:
+            name: ESTAT
+            type: VARCHAR(64 ${char})
+        - column:
+            name: TOKEN
+            type: VARCHAR(255 ${char})
+        - column:
+            name: IDENTIFICADOR
+            type: VARCHAR(64 ${char})
+        - column:
+            name: TIPUS
+            type: VARCHAR(64 ${char})
+        - column:
+            name: EMAIL_USUARI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: IDENTIFICADOR_NAC
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}DOCUMENT_ENVIAMENT_DIS
+- changeSet:
+    id: init-table-16
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOCUMENT_ENV_DOC_PK
+            name: DOCUMENT_ENVIAMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOCUMENT_ENV_DOC_PK
+            name: DOCUMENT_ID
+            type: BIGINT
+        tableName: ${app_prefix}DOCUMENT_ENVIAMENT_DOC
+- changeSet:
+    id: init-table-17
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOCUMENT_ENV_INTER_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ENVIAMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: INTERESSAT_ID
+            type: BIGINT
+        - column:
+            name: NOT_ENV_REF
+            type: VARCHAR(100 ${char})
+        - column:
+            name: NOT_ENV_DAT_ESTAT
+            type: VARCHAR(20 ${char})
+        - column:
+            name: NOT_ENV_DAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: NOT_ENV_DAT_ORIG
+            type: VARCHAR(20 ${char})
+        - column:
+            name: NOT_ENV_CERT_DATA
+            type: TIMESTAMP
+        - column:
+            name: NOT_ENV_CERT_ORIG
+            type: VARCHAR(20 ${char})
+        - column:
+            name: ERROR
+            type: BOOLEAN
+        - column:
+            name: ERROR_DESC
+            type: VARCHAR(2048 ${char})
+        - column:
+            name: NOT_ENV_REGISTRE_DATA
+            type: date
+        - column:
+            name: NOT_ENV_REGISTRE_NUMERO
+            type: BIGINT
+        - column:
+            name: NOT_ENV_REGISTRE_NUM_FORMATAT
+            type: VARCHAR(50 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}DOCUMENT_ENVIAMENT_INTER
+- changeSet:
+    id: init-table-18
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}DOMINI_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CONSULTA
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CADENA
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CONTRASENYA
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}DOMINI
+- changeSet:
+    id: init-table-19
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EMAIL_PENDENT_ENVIAR_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: REMITENT
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DESTINATARI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: SUBJECT
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TEXT
+            type: VARCHAR(4000 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: EVENT_TIPUS_ENUM
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: ADJUNT_ID
+            type: BIGINT
+        tableName: ${app_prefix}EMAIL_PENDENT_ENVIAR
+- changeSet:
+    id: init-table-20
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}ENTITAT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CIF
+            type: VARCHAR(9 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: UNITAT_ARREL
+            type: VARCHAR(9 ${char})
+        - column:
+            name: ACTIVA
+            type: BOOLEAN
+        - column:
+            name: LOGO_IMG
+            type: ${blob}
+        - column:
+            name: CAPSALERA_COLOR_FONS
+            type: VARCHAR(32 ${char})
+        - column:
+            name: CAPSALERA_COLOR_LLETRA
+            type: VARCHAR(32 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: DATA_SINCRONITZACIO
+            type: TIMESTAMP
+        - column:
+            name: DATA_ACTUALITZACIO
+            type: TIMESTAMP
+        - column:
+            defaultValueBoolean: true
+            name: PERM_ENV_POSTAL
+            type: BOOLEAN
+        tableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-table-21
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXECUCIO_MASSIVA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR(255 ${char})
+        - column:
+            name: DATA_INICI
+            type: TIMESTAMP
+        - column:
+            name: DATA_FI
+            type: TIMESTAMP
+        - column:
+            name: PFIRMES_MOTIU
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PFIRMES_PRIORI
+            type: VARCHAR(255 ${char})
+        - column:
+            name: PFIRMES_DATCAD
+            type: TIMESTAMP
+        - column:
+            name: ENVIAR_CORREU
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: PFIRMES_RESPONSABLES
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PFIRMES_SEQTIPUS
+            type: VARCHAR(16 ${char})
+        - column:
+            name: PFIRMES_FLUXID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PFIRMES_TRANSID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: ROL_ACTUAL
+            type: VARCHAR(32 ${char})
+        - column:
+            name: PFIRMES_AVIS_FIRMA_PARCIAL
+            type: BOOLEAN
+        - column:
+            name: DOCUMENT_NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: ZIP_CARPETES
+            type: BOOLEAN
+        - column:
+            name: ZIP_IMPRIMIBLE
+            type: BOOLEAN
+        - column:
+            name: ZIP_NOMFITXER
+            type: VARCHAR(16 ${char})
+        - column:
+            defaultValueBoolean: false
+            name: PFIRMES_FIRMA_PARCIAL
+            type: BOOLEAN
+        tableName: ${app_prefix}EXECUCIO_MASSIVA
+- changeSet:
+    id: init-table-22
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: TANCAT_DATA
+            type: TIMESTAMP
+        - column:
+            name: TANCAT_MOTIU
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ANIO
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: SEQUENCIA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_VERSION
+            type: VARCHAR(5 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_IDENTIF
+            type: VARCHAR(52 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_ORGANO
+            type: VARCHAR(9 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_FECHA_APE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_CLASIF_SIA
+            type: VARCHAR(46 ${char})
+        - column:
+            name: SISTRA_BANTEL_NUM
+            type: VARCHAR(16 ${char})
+        - column:
+            name: SISTRA_PUBLICAT
+            type: BOOLEAN
+        - column:
+            name: SISTRA_UNITAT_ADM
+            type: VARCHAR(9 ${char})
+        - column:
+            name: SISTRA_CLAU
+            type: VARCHAR(100 ${char})
+        - column:
+            name: AGAFAT_PER_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: EXPEDIENT_ESTAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENTS_FIRMATS
+            type: BOOLEAN
+        - column:
+            name: GRUP_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ORGAN_GESTOR_ID
+            type: BIGINT
+        - column:
+            name: NUMERO
+            type: VARCHAR(64 ${char})
+        - column:
+            name: TANCAT_PROGRAMAT
+            type: date
+        - column:
+            name: REGISTRES_IMPORTATS
+            type: VARCHAR(4000 ${char})
+        - column:
+            defaultValue: NORMAL
+            name: PRIORITAT
+            type: VARCHAR(16 ${char})
+        - column:
+            name: PRIORITAT_MOTIU
+            type: VARCHAR(1024 ${char})
+        tableName: ${app_prefix}EXPEDIENT
+- changeSet:
+    id: init-table-23
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_ESTAT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ORDRE
+            type: INTEGER
+        - column:
+            name: COLOR
+            type: VARCHAR(256 ${char})
+        - column:
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: INICIAL
+            type: BOOLEAN
+        - column:
+            name: RESPONSABLE_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}EXPEDIENT_ESTAT
+- changeSet:
+    id: init-table-24
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_FILTRE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: DATA_CREACIO_INICI
+            type: TIMESTAMP
+        - column:
+            name: DATA_CREACIO_FI
+            type: TIMESTAMP
+        - column:
+            name: NUMERO
+            type: VARCHAR(256 ${char})
+        - column:
+            name: ESTAT
+            type: VARCHAR(256 ${char})
+        - column:
+            name: DATA_TANCAT_INICI
+            type: TIMESTAMP
+        - column:
+            name: DATA_TANCAT_FI
+            type: TIMESTAMP
+        - column:
+            name: MEUS_EXPEDIENTS
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: FILTER_NAME
+            type: VARCHAR(256 ${char})
+        - column:
+            name: LAST_USED_DATE
+            type: TIMESTAMP
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}EXPEDIENT_FILTRE
+- changeSet:
+    id: init-table-25
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_INTERESSAT_PK
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_INTERESSAT_PK
+            name: INTERESSAT_ID
+            type: BIGINT
+        tableName: ${app_prefix}EXPEDIENT_INTERESSAT
+- changeSet:
+    id: init-table-26
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_ORGANPARE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: META_EXPEDIENT_ORGAN_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}EXPEDIENT_ORGANPARE
+- changeSet:
+    id: init-table-27
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_PETICIO_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: IDENTIFICADOR
+            type: VARCHAR(80 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CLAU_ACCES
+            type: VARCHAR(200 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_ALTA
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: VARCHAR(40 ${char})
+        - column:
+            name: EXP_PETICIO_ACCIO
+            type: VARCHAR(20 ${char})
+        - column:
+            name: REGISTRE_ID
+            type: BIGINT
+        - column:
+            name: CONSULTA_WS_ERROR
+            type: BOOLEAN
+        - column:
+            name: CONSULTA_WS_ERROR_DESC
+            type: VARCHAR(4000 ${char})
+        - column:
+            name: CONSULTA_WS_ERROR_DATE
+            type: TIMESTAMP
+        - column:
+            name: NOTIFICA_DIST_ERROR
+            type: VARCHAR(4000 ${char})
+        - column:
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            defaultValueBoolean: false
+            name: PENDENT_CANVI_ESTAT_DIS
+            type: BOOLEAN
+        - column:
+            defaultValueNumeric: '0'
+            name: REINTENTS_CANVI_ESTAT_DIS
+            type: NUMBER(10, 0)
+        - column:
+            name: DATA_ACTUALITZACIO
+            type: TIMESTAMP
+        - column:
+            name: USUARI_ACTUALITZACIO
+            type: VARCHAR(64 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(4000 ${char})
+        - column:
+            name: GRUP_ID
+            type: BIGINT
+        tableName: ${app_prefix}EXPEDIENT_PETICIO
+- changeSet:
+    id: init-table-28
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_REL_PK
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_REL_PK
+            name: EXPEDIENT_REL_ID
+            type: BIGINT
+        tableName: ${app_prefix}EXPEDIENT_REL
+- changeSet:
+    id: init-table-29
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_SEGUIDOR_PK
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_SEGUIDOR_PK
+            name: SEGUIDOR_CODI
+            type: VARCHAR(64 ${char})
+        tableName: ${app_prefix}EXPEDIENT_SEGUIDOR
+- changeSet:
+    id: init-table-30
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_TASCA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: METAEXP_TASCA_ID
+            type: BIGINT
+        - column:
+            name: RESPONSABLE_ACTUAL_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_INICI
+            type: TIMESTAMP
+        - column:
+            name: DATA_FI
+            type: TIMESTAMP
+        - column:
+            name: ESTAT
+            type: VARCHAR(20 ${char})
+        - column:
+            name: MOTIU_REBUIG
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: DATA_LIMIT
+            type: TIMESTAMP
+        - column:
+            name: COMENTARI
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: TITOL
+            type: VARCHAR(256 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: DURACIO
+            type: NUMBER(19, 0)
+        - column:
+            name: PRIORITAT
+            type: VARCHAR(16 ${char})
+        - column:
+            name: DELEGAT
+            type: VARCHAR(64 ${char})
+        tableName: ${app_prefix}EXPEDIENT_TASCA
+- changeSet:
+    id: init-table-31
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_TASCA_OBSE_PK
+            name: TASCA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_TASCA_OBSE_PK
+            name: OBSERVADOR_CODI
+            type: VARCHAR(64 ${char})
+        tableName: ${app_prefix}EXPEDIENT_TASCA_OBSE
+- changeSet:
+    id: init-table-32
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_TASCA_RESP_PK
+            name: TASCA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXPEDIENT_TASCA_RESP_PK
+            name: RESPONSABLE_CODI
+            type: VARCHAR(64 ${char})
+        tableName: ${app_prefix}EXPEDIENT_TASCA_RESP
+- changeSet:
+    id: init-table-33
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXP_COMMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: TEXT
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}EXP_COMMENT
+- changeSet:
+    id: init-table-34
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}EXP_TASCA_COMMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: EXP_TASCA_ID
+            type: BIGINT
+        - column:
+            name: TEXT
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}EXP_TASCA_COMMENT
+- changeSet:
+    id: init-table-35
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}FLUX_FIRMA_USUARI_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(80 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(256 ${char})
+        - column:
+            name: DESTINATARIS
+            type: VARCHAR(512 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: PORTAFIRMES_FLUXID
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}FLUX_FIRMA_USUARI
+- changeSet:
+    id: init-table-36
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}GRUP_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: ROL
+            type: VARCHAR(50 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPCIO
+            type: VARCHAR(512 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: codi
+            name: CODI
+            type: VARCHAR(50 ${char})
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        tableName: ${app_prefix}GRUP
+- changeSet:
+    id: init-table-37
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}HISTORIC_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_CREATS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_CREATS_ACUM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_OBERTS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_OBERTS_ACUM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_TANCATS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_TANCATS_ACUM
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${app_prefix}HISTORIC
+- changeSet:
+    id: init-table-38
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}HIST_EXPEDIENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_AMB_ALERTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_EXPED_ERRORS_VALID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DOCS_PENDENTS_SIGN
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DOCS_SIGN
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DOCS_PENDENTS_NOTIF
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DOCS_NOTIF
+            type: BIGINT
+        tableName: ${app_prefix}HIST_EXPEDIENT
+- changeSet:
+    id: init-table-39
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}HIST_EXP_INTERESSAT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: INTERESSAT_DOC_NUM
+            type: VARCHAR(17 ${char})
+        tableName: ${app_prefix}HIST_EXP_INTERESSAT
+- changeSet:
+    id: init-table-40
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}HIST_EXP_USUARI_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: N_TASQUES_TRAMITADES
+            type: BIGINT
+        tableName: ${app_prefix}HIST_EXP_USUARI
+- changeSet:
+    id: init-table-41
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}INTERESSAT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: DTYPE
+            type: VARCHAR(256 ${char})
+        - column:
+            name: NOM
+            type: VARCHAR(30 ${char})
+        - column:
+            name: LLINATGE1
+            type: VARCHAR(30 ${char})
+        - column:
+            name: LLINATGE2
+            type: VARCHAR(30 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_TIPUS
+            type: VARCHAR(40 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_NUM
+            type: VARCHAR(17 ${char})
+        - column:
+            name: PAIS
+            type: VARCHAR(4 ${char})
+        - column:
+            name: PROVINCIA
+            type: VARCHAR(2 ${char})
+        - column:
+            name: MUNICIPI
+            type: VARCHAR(5 ${char})
+        - column:
+            name: ADRESA
+            type: VARCHAR(160 ${char})
+        - column:
+            name: CODI_POSTAL
+            type: VARCHAR(5 ${char})
+        - column:
+            name: EMAIL
+            type: VARCHAR(160 ${char})
+        - column:
+            name: TELEFON
+            type: VARCHAR(20 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(160 ${char})
+        - column:
+            name: ORGAN_CODI
+            type: VARCHAR(9 ${char})
+        - column:
+            name: ORGAN_NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: RAO_SOCIAL
+            type: VARCHAR(80 ${char})
+        - column:
+            name: NOT_IDIOMA
+            type: VARCHAR(2 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOT_AUTORITZAT
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: ES_REPRESENTANT
+            type: BOOLEAN
+        - column:
+            name: REPRESENTANT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: ENTREGA_DEH
+            type: BOOLEAN
+        - column:
+            name: ENTREGA_DEH_OBLIGAT
+            type: BOOLEAN
+        - column:
+            name: INCAPACITAT
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            defaultValueBoolean: true
+            name: ARXIU_PROPAGAT
+            type: BOOLEAN
+        - column:
+            name: ARXIU_INTENT_DATA
+            type: TIMESTAMP
+        - column:
+            defaultValueNumeric: '0'
+            name: ARXIU_REINTENTS
+            type: INTEGER
+        - column:
+            defaultValueBoolean: false
+            name: AMB_OFICINA_SIR
+            type: BOOLEAN
+        tableName: ${app_prefix}INTERESSAT
+- changeSet:
+    id: init-table-42
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}MASSIVA_CONTINGUT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: EXECUCIO_MASSIVA_ID
+            type: BIGINT
+        - column:
+            name: CONTINGUT_ID
+            type: BIGINT
+        - column:
+            name: DATA_INICI
+            type: TIMESTAMP
+        - column:
+            name: DATA_FI
+            type: TIMESTAMP
+        - column:
+            name: ESTAT
+            type: VARCHAR(255 ${char})
+        - column:
+            name: ERROR
+            type: VARCHAR(2046 ${char})
+        - column:
+            name: ORDRE
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: ELEMENT_ID
+            type: BIGINT
+        - column:
+            name: ELEMENT_NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: ELEMENT_TIPUS
+            type: VARCHAR(16 ${char})
+        tableName: ${app_prefix}MASSIVA_CONTINGUT
+- changeSet:
+    id: init-table-43
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METADADA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: MULTIPLICITAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIVA
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: READ_ONLY
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: ORDRE
+            type: INTEGER
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: META_NODE_ID
+            type: BIGINT
+        - column:
+            name: VALOR
+            type: VARCHAR(255 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            defaultValueBoolean: false
+            name: NO_APLICA
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: ENVIABLE
+            type: BOOLEAN
+        - column:
+            name: METADADA_ARXIU
+            type: VARCHAR(255 ${char})
+        tableName: ${app_prefix}METADADA
+- changeSet:
+    id: init-table-44
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METADOCUMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: MULTIPLICITAT
+            type: INTEGER
+        - column:
+            name: FIRMA_PFIRMA
+            type: BOOLEAN
+        - column:
+            name: PORTAFIRMES_DOCTIP
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PORTAFIRMES_FLUXID
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PORTAFIRMES_RESPONS
+            type: VARCHAR(512 ${char})
+        - column:
+            name: PORTAFIRMES_SEQTIP
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PORTAFIRMES_CUSTIP
+            type: VARCHAR(64 ${char})
+        - column:
+            name: FIRMA_PASSARELA
+            type: BOOLEAN
+        - column:
+            name: PASSARELA_CUSTIP
+            type: VARCHAR(64 ${char})
+        - column:
+            name: PLANTILLA_NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PLANTILLA_CONTENT_TYPE
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PLANTILLA_CONTINGUT
+            type: ${blob}
+        - column:
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: GLOBAL_EXPEDIENT
+            type: BOOLEAN
+        - column:
+            name: GLOBAL_MULTIPLICITAT
+            type: VARCHAR(255 ${char})
+        - column:
+            name: GLOBAL_READONLY
+            type: BOOLEAN
+        - column:
+            name: NTI_ORIGEN
+            type: VARCHAR(2 ${char})
+        - column:
+            name: NTI_ESTELA
+            type: VARCHAR(4 ${char})
+        - column:
+            name: NTI_TIPDOC
+            type: VARCHAR(4 ${char})
+        - column:
+            name: FIRMA_BIOMETRICA
+            type: BOOLEAN
+        - column:
+            name: BIOMETRICA_LECTURA
+            type: BOOLEAN
+        - column:
+            name: META_DOCUMENT_TIPUS_GEN
+            type: VARCHAR(256 ${char})
+        - column:
+            name: PORTAFIRMES_FLUXTIP
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: PINBAL_ACTIU
+            type: BOOLEAN
+        - column:
+            name: PINBAL_SERVEI
+            type: BIGINT
+        - column:
+            defaultValueBoolean: false
+            name: PER_DEFECTE
+            type: BOOLEAN
+        - column:
+            name: PINBAL_FINALITAT
+            type: VARCHAR(512 ${char})
+        - column:
+            defaultValueBoolean: false
+            name: PINBAL_UTILITZAR_CIF_ORGAN
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: PINBAL_SERVEI_DOC_PERMES_DNI
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: PINBAL_SERVEI_DOC_PERMES_NIF
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: PINBAL_SERVEI_DOC_PERMES_CIF
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: PINBAL_SERVEI_DOC_PERMES_NIE
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: PINBAL_SERVEI_DOC_PERMES_PAS
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: '0'
+            name: ORDRE
+            type: INTEGER
+        tableName: ${app_prefix}METADOCUMENT
+- changeSet:
+    id: init-table-45
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXPEDIENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: PARE_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CLASIF_SIA
+            type: VARCHAR(46 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: SERIE_DOC
+            type: VARCHAR(30 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOT_ACTIVA
+            type: BOOLEAN
+        - column:
+            name: EXPRESSIO_NUMERO
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: PERMET_METADOCS_GENERALS
+            type: BOOLEAN
+        - column:
+            name: ORGAN_GESTOR_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: GESTIO_AMB_GRUPS_ACTIVA
+            type: BOOLEAN
+        - column:
+            name: REVISIO_ESTAT
+            type: VARCHAR(8 ${char})
+        - column:
+            name: REVISIO_COMENTARI
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: CREAR_REGLA_DIST_ESTAT
+            type: VARCHAR(10 ${char})
+        - column:
+            name: CREAR_REGLA_DIST_ERROR
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: ORGAN_NO_SINC
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: SIA
+            name: TIPUS_CLASSIFICACIO
+            type: VARCHAR(3 ${char})
+        - column:
+            name: GRUP_PER_DEFECTE
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: INTERESSAT_OBLIGATORI
+            type: BOOLEAN
+        tableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-table-46
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXPEDIENT_CARPETA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: PARE_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${app_prefix}METAEXPEDIENT_CARPETA
+- changeSet:
+    id: init-table-47
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXPEDIENT_GRUP_PK
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXPEDIENT_GRUP_PK
+            name: GRUP_ID
+            type: BIGINT
+        tableName: ${app_prefix}METAEXPEDIENT_GRUP
+- changeSet:
+    id: init-table-48
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXP_METADOC_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: MULTIPLICITAT
+            type: VARCHAR(255 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ORDRE
+            type: INTEGER
+        - column:
+            name: READONLY
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: METADOCUMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}METAEXPEDIENT_METADOCUMENT
+- changeSet:
+    id: init-table-49
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXP_COMMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: TEXT
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: EMAIL_ENVIAT
+            type: BOOLEAN
+        tableName: ${app_prefix}METAEXP_COMMENT
+- changeSet:
+    id: init-table-50
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXP_ORGAN_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ORGAN_GESTOR_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}METAEXP_ORGAN
+- changeSet:
+    id: init-table-51
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXP_SEQ_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: ANIO
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: VALOR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}METAEXP_SEQ
+- changeSet:
+    id: init-table-52
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXP_TASCA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${char})
+        - column:
+            name: RESPONSABLE
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIVA
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: META_EXPEDIENT_ID
+            type: BIGINT
+        - column:
+            name: DATA_LIMIT
+            type: TIMESTAMP
+        - column:
+            name: ESTAT_CREAR_TASCA_ID
+            type: BIGINT
+        - column:
+            name: ESTAT_FINALITZAR_TASCA_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: PRIORITAT
+            type: VARCHAR(16 ${char})
+        - column:
+            name: DURACIO
+            type: NUMBER(19, 0)
+        tableName: ${app_prefix}METAEXP_TASCA
+- changeSet:
+    id: init-table-53
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METAEXP_TASCA_VALIDACIO_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TASCA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ITEM_TIPUS
+            type: VARCHAR(8 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ITEM_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: VALIDACIO_TIPUS
+            type: VARCHAR(8 ${char})
+        - column:
+            defaultValueBoolean: true
+            name: ACTIVA
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}METAEXP_TASCA_VALIDACIO
+- changeSet:
+    id: init-table-54
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METANODE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(1024 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ACTIU
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${app_prefix}METANODE
+- changeSet:
+    id: init-table-55
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}METANODE_METADADA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: MULTIPLICITAT
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ORDRE
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: METADADA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: METANODE_ID
+            type: BIGINT
+        - column:
+            name: READONLY
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}METANODE_METADADA
+- changeSet:
+    id: init-table-56
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}NODE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: METANODE_ID
+            type: BIGINT
+        tableName: ${app_prefix}NODE
+- changeSet:
+    id: init-table-57
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: ANTIC_OG
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOU_OG
+            type: BIGINT
+        tableName: ${app_prefix}OG_SINC_REL
+- changeSet:
+    id: init-table-58
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}ORGAN_GESTOR_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(1000 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: PARE_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIU
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: GESTIO_DIRECT
+            type: BOOLEAN
+        - column:
+            name: CIF
+            type: VARCHAR(10 ${char})
+        - column:
+            defaultValue: V
+            name: ESTAT
+            type: VARCHAR(1 ${char})
+        - column:
+            name: TIPUS_TRANSICIO
+            type: VARCHAR(12 ${char})
+        - column:
+            name: NOM_ES
+            type: VARCHAR(1000 ${char})
+        - column:
+            defaultValueBoolean: false
+            name: UTILITZAR_CIF_PINBAL
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: PERM_ENV_POSTAL
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: PERM_ENV_POSTAL_DESC
+            type: BOOLEAN
+        tableName: ${app_prefix}ORGAN_GESTOR
+- changeSet:
+    id: init-table-59
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}PINBAL_SERVEI_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DOC_PERMES_DNI
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: DOC_PERMES_NIF
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: DOC_PERMES_CIF
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: DOC_PERMES_NIE
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: DOC_PERMES_PAS
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            defaultValueBoolean: true
+            name: ACTIU
+            type: BOOLEAN
+        - column:
+            name: NOM
+            type: VARCHAR(256 ${char})
+        tableName: ${app_prefix}PINBAL_SERVEI
+- changeSet:
+    id: init-table-60
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}PORTAFIRMES_BLOCK_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: BLK_ORDER
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ENVIAMENT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: ${app_prefix}PORTAFIRMES_BLOCK
+- changeSet:
+    id: init-table-61
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}PORTAFIRMES_BLOCK_INFO_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: PORTAFIRMES_BLOCK_ID
+            type: BIGINT
+        - column:
+            name: PORTAFIRMES_SIGNER_NOM
+            type: VARCHAR(50 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: PORTAFIRMES_SIGNER_CODI
+            type: VARCHAR(50 ${char})
+        - column:
+            name: PORTAFIRMES_SIGNER_ID
+            type: VARCHAR(9 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: SIGNED
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: SIGN_DATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}PORTAFIRMES_BLOCK_INFO
+- changeSet:
+    id: init-table-62
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}PROCESSOS_INICIALS_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: INIT
+            type: BOOLEAN
+        tableName: ${app_prefix}PROCESSOS_INICIALS
+- changeSet:
+    id: init-table-63
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}REGISTRE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: APLICACIO_CODI
+            type: VARCHAR(20 ${char})
+        - column:
+            name: APLICACIO_VERSIO
+            type: VARCHAR(15 ${char})
+        - column:
+            name: ASSUMPTE_CODI_CODI
+            type: VARCHAR(16 ${char})
+        - column:
+            name: ASSUMPTE_CODI_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            name: ASSUMPTE_TIPUS_CODI
+            type: VARCHAR(16 ${char})
+        - column:
+            name: ASSUMPTE_TIPUS_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP
+        - column:
+            name: DOC_FISICA_CODI
+            type: VARCHAR(1 ${char})
+        - column:
+            name: DOC_FISICA_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_CODI
+            type: VARCHAR(21 ${char})
+        - column:
+            name: ENTITAT_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            name: EXPEDIENT_NUMERO
+            type: VARCHAR(80 ${char})
+        - column:
+            name: EXPOSA
+            type: CLOB
+        - column:
+            name: EXTRACTE
+            type: VARCHAR(240 ${char})
+        - column:
+            name: PROCEDIMENT_CODI
+            type: VARCHAR(20 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: IDENTIFICADOR
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: IDIOMA_CODI
+            type: VARCHAR(2 ${char})
+        - column:
+            name: IDIOMA_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: LLIBRE_CODI
+            type: VARCHAR(4 ${char})
+        - column:
+            name: LLIBRE_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(50 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: OFICINA_CODI
+            type: VARCHAR(21 ${char})
+        - column:
+            name: OFICINA_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            name: ORIGEN_DATA
+            type: TIMESTAMP
+        - column:
+            name: ORIGEN_REGISTRE_NUM
+            type: VARCHAR(80 ${char})
+        - column:
+            name: REF_EXTERNA
+            type: VARCHAR(16 ${char})
+        - column:
+            name: SOLICITA
+            type: CLOB
+        - column:
+            name: TRANSPORT_NUM
+            type: VARCHAR(20 ${char})
+        - column:
+            name: TRANSPORT_TIPUS_CODI
+            type: VARCHAR(2 ${char})
+        - column:
+            name: TRANSPORT_TIPUS_DESC
+            type: VARCHAR(100 ${char})
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR(20 ${char})
+        - column:
+            name: USUARI_NOM
+            type: VARCHAR(80 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DESTI_CODI
+            type: VARCHAR(21 ${char})
+        - column:
+            name: DESTI_DESCRIPCIO
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: JUSTIFICANT_ARXIU_UUID
+            type: VARCHAR(256 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}REGISTRE
+- changeSet:
+    id: init-table-64
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}REGISTRE_ANNEX_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CONTINGUT
+            type: ${blob}
+        - column:
+            name: FIRMA_CONTINGUT
+            type: ${blob}
+        - column:
+            name: FIRMA_PERFIL
+            type: VARCHAR(20 ${char})
+        - column:
+            name: FIRMA_TAMANY
+            type: INTEGER
+        - column:
+            name: FIRMA_TIPUS
+            type: VARCHAR(10 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(80 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_FECHA_CAPTURA
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_ORIGEN
+            type: VARCHAR(20 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_TIPO_DOC
+            type: VARCHAR(20 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(50 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: SICRES_TIPO_DOC
+            type: VARCHAR(20 ${char})
+        - column:
+            name: SICRES_VALIDEZ_DOC
+            type: VARCHAR(30 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TAMANY
+            type: INTEGER
+        - column:
+            name: TIPUS_MIME
+            type: VARCHAR(255 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TITOL
+            type: VARCHAR(200 ${char})
+        - column:
+            name: UUID
+            type: VARCHAR(100 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: REGISTRE_ID
+            type: BIGINT
+        - column:
+            name: ESTAT
+            type: VARCHAR(20 ${char})
+        - column:
+            name: ERROR
+            type: VARCHAR(4000 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NTI_ESTADO_ELABORACIO
+            type: VARCHAR(50 ${char})
+        - column:
+            name: FIRMA_NOM
+            type: VARCHAR(80 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            defaultValueBoolean: true
+            name: VAL_OK
+            type: BOOLEAN
+        - column:
+            name: VAL_ERROR
+            type: VARCHAR(1000 ${char})
+        - column:
+            defaultValue: DEFINITIU
+            name: ANNEX_ESTAT
+            type: VARCHAR(16 ${char})
+        - column:
+            name: DOCUMENT_ID
+            type: BIGINT
+        tableName: ${app_prefix}REGISTRE_ANNEX
+- changeSet:
+    id: init-table-65
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}REGISTRE_INTERESSAT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: ADRESA
+            type: VARCHAR(160 ${char})
+        - column:
+            name: CANAL
+            type: VARCHAR(30 ${char})
+        - column:
+            name: CP
+            type: VARCHAR(5 ${char})
+        - column:
+            name: DOC_NUMERO
+            type: VARCHAR(17 ${char})
+        - column:
+            name: DOC_TIPUS
+            type: VARCHAR(15 ${char})
+        - column:
+            name: EMAIL
+            type: VARCHAR(160 ${char})
+        - column:
+            name: LLINATGE1
+            type: VARCHAR(30 ${char})
+        - column:
+            name: LLINATGE2
+            type: VARCHAR(30 ${char})
+        - column:
+            name: MUNICIPI_CODI
+            type: VARCHAR(100 ${char})
+        - column:
+            name: NOM
+            type: VARCHAR(30 ${char})
+        - column:
+            name: OBSERVACIONS
+            type: VARCHAR(160 ${char})
+        - column:
+            name: PAIS_CODI
+            type: VARCHAR(4 ${char})
+        - column:
+            name: PROVINCIA_CODI
+            type: VARCHAR(100 ${char})
+        - column:
+            name: RAO_SOCIAL
+            type: VARCHAR(80 ${char})
+        - column:
+            name: TELEFON
+            type: VARCHAR(20 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR(40 ${char})
+        - column:
+            name: REPRESENTANT_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_ID
+            type: BIGINT
+        - column:
+            name: PAIS
+            type: VARCHAR(200 ${char})
+        - column:
+            name: PROVINCIA
+            type: VARCHAR(200 ${char})
+        - column:
+            name: MUNICIPI
+            type: VARCHAR(200 ${char})
+        - column:
+            name: ORGAN_CODI
+            type: VARCHAR(9 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}REGISTRE_INTERESSAT
+- changeSet:
+    id: init-table-66
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}TIPUS_DOCUMENTAL_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: NOM_CATALA
+            type: VARCHAR(256 ${char})
+        tableName: ${app_prefix}TIPUS_DOCUMENTAL
+- changeSet:
+    id: init-table-67
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}URL_INSTRUCCIO_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        - column:
+            name: CODI
+            type: VARCHAR(255 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(255 ${char})
+        - column:
+            name: NOM
+            type: VARCHAR(255 ${char})
+        - column:
+            name: URL
+            type: VARCHAR(255 ${char})
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        tableName: ${app_prefix}URL_INSTRUCCIO
+- changeSet:
+    id: init-table-68
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}URL_INSTRUCCION_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR(80 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR(80 ${char})
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: URL
+            type: VARCHAR(256 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP
+        tableName: ${app_prefix}URL_INSTRUCCION
+- changeSet:
+    id: init-table-69
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}USUARI_PK
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            name: INICIALITZAT
+            type: BOOLEAN
+        - column:
+            name: NIF
+            type: VARCHAR(9 ${char})
+        - column:
+            name: NOM
+            type: VARCHAR(200 ${char})
+        - column:
+            name: EMAIL
+            type: VARCHAR(200 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: IDIOMA
+            type: VARCHAR(2 ${char})
+        - column:
+            name: EMAILS_AGRUPATS
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: ROL_ACTUAL
+            type: VARCHAR(64 ${char})
+        - column:
+            name: VISTA_ACTUAL
+            type: VARCHAR(64 ${char})
+        - column:
+            name: AVISOS_NOVES_ANOTACIONS
+            type: BOOLEAN
+        - column:
+            name: EMAIL_ALTERNATIU
+            type: VARCHAR(200 ${char})
+        - column:
+            defaultValueNumeric: '10'
+            name: NUM_ELEMENTS_PAGINA
+            type: NUMBER(19, 0)
+        - column:
+            defaultValueBoolean: true
+            name: EXPEDIENT_EXPANDIT
+            type: BOOLEAN
+        - column:
+            name: METAEXPEDIENT_ID
+            type: BIGINT
+        - column:
+            defaultValueBoolean: false
+            name: EXP_LIST_DATA_DARRER_ENV
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: true
+            name: EXP_LIST_AGAFAT_PER
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: true
+            name: EXP_LIST_INTERESSATS
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: true
+            name: EXP_LIST_COMENTARIS
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: EXP_LIST_GRUP
+            type: BOOLEAN
+        - column:
+            name: ENTITAT_DEFECTE_ID
+            type: BIGINT
+        - column:
+            defaultValue: LLISTA
+            name: VISTA_MOURE_ACTUAL
+            type: VARCHAR(16 ${char})
+        - column:
+            defaultValueBoolean: true
+            name: EMAILS_CANVI_ESTAT_REVISIO
+            type: BOOLEAN
+        tableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-table-70
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}USUARI_VIAFIRMA_RIPEA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: VIAFIRMA_USER_CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: RIPEA_USER_CODI
+            type: VARCHAR(64 ${char})
+        tableName: ${app_prefix}USUARI_VIAFIRMA_RIPEA
+- changeSet:
+    id: init-table-71
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}VIAFIRMA_USUARI_PK
+            name: CODI
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: CONTRASENYA
+            type: VARCHAR(64 ${char})
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPCIO
+            type: VARCHAR(64 ${char})
+        tableName: ${app_prefix}VIAFIRMA_USUARI
+- changeSet:
+    id: init-table-72
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}acl_sid_pk
+            name: id
+            type: ${acl_pk_type}
+        - column:
+            constraints:
+              nullable: false
+            name: principal
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: sid
+            type: VARCHAR(100)
+        tableName: ${app_prefix}acl_sid
+- changeSet:
+    id: init-table-73
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}acl_class_pk
+            name: id
+            type: ${acl_pk_type}
+        - column:
+            constraints:
+              nullable: false
+            name: class
+            type: VARCHAR(100)
+        tableName: ${app_prefix}acl_class
+- changeSet:
+    id: init-table-74
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}acl_object_identity_pk
+            name: id
+            type: ${acl_pk_type}
+        - column:
+            constraints:
+              nullable: false
+            name: object_id_class
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: object_id_identity
+            type: BIGINT
+        - column:
+            name: parent_object
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: owner_sid
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: entries_inheriting
+            type: BOOLEAN
+        tableName: ${app_prefix}acl_object_identity
+- changeSet:
+    id: init-table-75
+    author: limit
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ${app_prefix}acl_entry_pk
+            name: id
+            type: ${acl_pk_type}
+        - column:
+            constraints:
+              nullable: false
+            name: acl_object_identity
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ace_order
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: sid
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: mask
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: granting
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: audit_success
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: audit_failure
+            type: BOOLEAN
+        tableName: ${app_prefix}acl_entry

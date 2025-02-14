@@ -1,0 +1,89 @@
+databaseChangeLog:
+- changeSet:
+    id: init-grant-1
+    author: limit
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: |
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}alerta TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}AVIS TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}carpeta TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}CONFIG TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}CONFIG_GROUP TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}CONFIG_TYPE TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}CONSULTA_PINBAL TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}contingut TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}CONT_COMMENT TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}cont_log TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}cont_mov TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}dada TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}document TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}document_enviament TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}document_enviament_dis TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}document_enviament_doc TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}document_enviament_inter TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}domini TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}email_pendent_enviar TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}entitat TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}execucio_massiva TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_estat TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}EXPEDIENT_FILTRE TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_interessat TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_organpare TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_peticio TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_rel TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_seguidor TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}expedient_tasca TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}EXPEDIENT_TASCA_OBSE TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}EXPEDIENT_TASCA_RESP TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}exp_comment TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}EXP_TASCA_COMMENT TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}FLUX_FIRMA_USUARI TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}grup TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}historic TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}hist_expedient TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}hist_exp_interessat TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}hist_exp_usuari TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}interessat TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}massiva_contingut TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metadada TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metadocument TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metaexpedient TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metaexpedient_carpeta TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metaexpedient_grup TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}METAEXPEDIENT_METADOCUMENT TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}METAEXP_COMMENT TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metaexp_organ TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metaexp_seq TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metaexp_tasca TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}METAEXP_TASCA_VALIDACIO TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metanode TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}METANODE_METADADA TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}node TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}OG_SINC_REL TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}organ_gestor TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}PINBAL_SERVEI TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}portafirmes_block TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}portafirmes_block_info TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}PROCESSOS_INICIALS TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}registre TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}registre_annex TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}registre_interessat TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}tipus_documental TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}URL_INSTRUCCIO TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}URL_INSTRUCCION TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}usuari TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}usuari_viafirma_ripea TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}viafirma_usuari TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_sid TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_class TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_object_identity TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_entry TO ${app_user};
+          
+          GRANT SELECT ON ${app_prefix}acl_sid_seq TO ${app_user};
+          GRANT SELECT ON ${app_prefix}acl_class_seq TO ${app_user};
+          GRANT SELECT ON ${app_prefix}acl_oid_seq TO ${app_user};
+          GRANT SELECT ON ${app_prefix}acl_entry_seq TO ${app_user};
