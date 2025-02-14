@@ -4188,6 +4188,11 @@ databaseChangeLog:
               nullable: false
             name: class
             type: VARCHAR(100)
+        - column:
+            constraints:
+              nullable: false
+            name: class_id_type
+            type: VARCHAR(255 ${char})
         tableName: ${app_prefix}acl_class
 - changeSet:
     id: init-table-74

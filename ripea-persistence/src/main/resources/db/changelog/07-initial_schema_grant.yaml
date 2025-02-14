@@ -63,7 +63,7 @@ databaseChangeLog:
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}metanode TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}METANODE_METADADA TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}node TO ${app_user};
-          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}OG_SINC_REL TO ${app_user};
+          GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}LOG_SINC_REL TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}organ_gestor TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}PINBAL_SERVEI TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}portafirmes_block TO ${app_user};
@@ -82,7 +82,6 @@ databaseChangeLog:
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_class TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_object_identity TO ${app_user};
           GRANT SELECT, UPDATE, INSERT, DELETE ON ${app_prefix}acl_entry TO ${app_user};
-          
           GRANT SELECT ON ${app_prefix}acl_sid_seq TO ${app_user};
           GRANT SELECT ON ${app_prefix}acl_class_seq TO ${app_user};
           GRANT SELECT ON ${app_prefix}acl_oid_seq TO ${app_user};

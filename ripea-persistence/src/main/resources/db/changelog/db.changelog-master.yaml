@@ -10,25 +10,25 @@ databaseChangeLog:
     value: BLOB
     dbms: oracle
 - property:
-    name: blob
-    value: BYTEA
-    dbms: postgres
-- property:
     name: char
     value: CHAR
     dbms: oracle
-- property:
-    name: char
-    value: ''
-    dbms: postgres
 - property:
     name: acl_pk_type
     value: BIGINT
     dbms: oracle
 - property:
+    name: blob
+    value: BYTEA
+    dbms: postgresql
+- property:
+    name: char
+    value: ''
+    dbms: postgresql
+- property:
     name: acl_pk_type
     value: BIGSERIAL
-    dbms: postgres
+    dbms: postgresql
 - include:
     file: db/changelog/01-initial_schema_table.yaml
 - include:
@@ -43,6 +43,8 @@ databaseChangeLog:
     file: db/changelog/06-initial_schema_lob.yaml
 - include:
     file: db/changelog/07-initial_schema_grant.yaml
+- include:
+    file: db/changelog/08-initial_data.yaml
 - includeAll:
     path: db/changelog/changes
     errorIfMissingOrEmpty: false
