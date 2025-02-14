@@ -223,7 +223,6 @@
 				<groupId>org.keycloak</groupId>
 				<artifactId>keycloak-core</artifactId>
 				<version>22.0.4</version>
-				<scope>provided</scope>
 			</dependency>
 			<!-- Plugin for Jackson which can serialize cyclic object -->
 			<dependency>

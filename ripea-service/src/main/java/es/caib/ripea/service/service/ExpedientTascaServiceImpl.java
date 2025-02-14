@@ -641,7 +641,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
 
-		ExpedientTascaEntity tasca = expedientTascaRepository.getOne(expedientTascaId);
+		ExpedientTascaEntity tasca = expedientTascaRepository.findById(expedientTascaId).orElse(null);
 		if (tasca == null) {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
@@ -680,7 +680,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		logger.debug("Obtenint els comentaris per la tasca (" + "entitatId=" + entitatId + ", " + "tascaId=" + expedientTascaId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
 
-		ExpedientTascaEntity tasca = expedientTascaRepository.getOne(expedientTascaId);
+		ExpedientTascaEntity tasca = expedientTascaRepository.findById(expedientTascaId).orElse(null);
 		if (tasca == null) {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}

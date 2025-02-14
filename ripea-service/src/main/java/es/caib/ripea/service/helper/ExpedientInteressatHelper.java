@@ -80,7 +80,7 @@ public class ExpedientInteressatHelper {
 		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
 		InteressatEntity representantEntity = createDB(expedient, representant);
 
-		InteressatEntity interessat = interessatRepository.getOne(interessatId);
+		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		if (interessat == null) {
 			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
@@ -110,7 +110,7 @@ public class ExpedientInteressatHelper {
 		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, comprovarAgafat);
 		InteressatEntity representantEntity = createDB(expedient, representant);
 
-		InteressatEntity interessat = interessatRepository.getOne(interessatId);
+		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		if (interessat == null) {
 			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
@@ -303,7 +303,7 @@ public class ExpedientInteressatHelper {
 		InteressatEntity interessat = null;
 		Boolean associarRepresentant = false;
 		if (interessatId != null) {
-			interessat = interessatRepository.getOne(interessatId);
+			interessat = interessatRepository.findById(interessatId).orElse(null);
 			if (interessat == null) {
 				throw new NotFoundException(
 						interessatId,
@@ -407,7 +407,7 @@ public class ExpedientInteressatHelper {
 
 		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
 		InteressatEntity representantEntity = interessatRepository.getOne(representant.getId());
-		InteressatEntity interessat = interessatRepository.getOne(interessatId);
+		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		if (interessat == null) {
 			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
@@ -479,7 +479,7 @@ public class ExpedientInteressatHelper {
 				false,
 				false,
 				rolActual);
-		InteressatEntity interessat = interessatRepository.getOne(interessatId);
+		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		if (interessat != null) {
 			// Primer eliminam el representant
 			removeRepresentant(interessat);
@@ -544,7 +544,7 @@ public class ExpedientInteressatHelper {
 				false,
 				false,
 				rolActual);
-		InteressatEntity interessat = interessatRepository.getOne(interessatId);
+		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		// Si aquest representant s'està utilitzant com a interessat o com a representant d'un altre interessat, no es borra de BBDD
 		if (interessat != null) {
 			InteressatEntity representant = interessat.getRepresentant();

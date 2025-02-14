@@ -1,0 +1,36 @@
+databaseChangeLog:
+- changeSet:
+    id: init-sequence-1
+    author: limit
+    changes:
+    - createSequence:
+        sequenceName: ${app_prefix}hibernate_seq
+        startValue: 1
+- changeSet:
+    id: init-sequence-2
+    author: limit
+    changes:
+    - createSequence:
+        sequenceName: ${app_prefix}acl_sid_seq
+        startValue: 1
+- changeSet:
+    id: init-sequence-3
+    author: limit
+    changes:
+    - createSequence:
+        sequenceName: ${app_prefix}acl_class_seq
+        startValue: 1
+- changeSet:
+    id: init-sequence-4
+    author: limit
+    changes:
+    - createSequence:
+        sequenceName: ${app_prefix}acl_oid_seq
+        startValue: 1
+- changeSet:
+    id: init-sequence-5
+    author: limit
+    changes:
+    - createSequence:
+        sequenceName: ${app_prefix}acl_entry_seq
+        startValue: 1

@@ -62,8 +62,8 @@ public class AlertaServiceImpl implements AlertaService {
 	public AlertaDto update(
 			AlertaDto alerta) throws NotFoundException {
 		logger.debug("Actualitzant alerta existent (alerta=" + alerta + ")");
-		AlertaEntity entity = alertaRepository.getOne(
-				alerta.getId());
+		AlertaEntity entity = alertaRepository.findById(
+				alerta.getId()).orElse(null);
 		if (entity == null) {
 			throw new NotFoundException(alerta.getId(), AlertaEntity.class);
 		}
@@ -85,7 +85,7 @@ public class AlertaServiceImpl implements AlertaService {
 	public AlertaDto delete(
 			Long id) throws NotFoundException {
 		logger.debug("Esborrant alerta (id=" + id +  ")");
-		AlertaEntity entity = alertaRepository.getOne(id);
+		AlertaEntity entity = alertaRepository.findById(id).orElse(null);
 		if(entity == null ) throw new NotFoundException(id, AlertaEntity.class);
 		alertaRepository.delete(entity);
 		return conversioTipusHelper.convertir(

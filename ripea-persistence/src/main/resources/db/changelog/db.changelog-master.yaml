@@ -3,8 +3,15 @@ databaseChangeLog:
     name: app_prefix
     value: ipa_
 - property:
+    name: app_user
+    value: www_ripea
+- property:
     name: blob
     value: BLOB
+    dbms: oracle
+- property:
+    name: char
+    value: CHAR
     dbms: oracle
 - property:
     name: acl_pk_type
@@ -13,10 +20,31 @@ databaseChangeLog:
 - property:
     name: blob
     value: BYTEA
-    dbms: postgres
+    dbms: postgresql
+- property:
+    name: char
+    value: ''
+    dbms: postgresql
 - property:
     name: acl_pk_type
     value: BIGSERIAL
-    dbms: postgres
+    dbms: postgresql
 - include:
-    file: db/changelog/01-init_table.yaml
+    file: db/changelog/01-initial_schema_table.yaml
+- include:
+    file: db/changelog/02-initial_schema_constraint.yaml
+- include:
+    file: db/changelog/03-initial_schema_index.yaml
+- include:
+    file: db/changelog/04-initial_schema_sequence.yaml
+- include:
+    file: db/changelog/05-initial_schema_trigger.yaml
+- include:
+    file: db/changelog/06-initial_schema_lob.yaml
+- include:
+    file: db/changelog/07-initial_schema_grant.yaml
+- include:
+    file: db/changelog/08-initial_data.yaml
+- includeAll:
+    path: db/changelog/changes
+    errorIfMissingOrEmpty: false

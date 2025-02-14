@@ -69,7 +69,7 @@ public class DominiServiceImpl implements DominiService {
 				"entitatId=" + entitatId +
 				"dominiId=" + domini.getId() + ")");
 
-		DominiEntity entity = dominiRepository.getOne(domini.getId());
+		DominiEntity entity = dominiRepository.findById(domini.getId()).orElse(null);
 
 		if (entity == null || !entity.getId().equals(domini.getId())) {
 			throw new NotFoundException(

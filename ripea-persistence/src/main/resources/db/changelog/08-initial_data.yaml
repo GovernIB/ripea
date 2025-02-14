@@ -1,0 +1,15 @@
+databaseChangeLog:
+- changeSet:
+    id: init-data-1
+    author: limit
+    changes:
+    - sqlFile:
+        dbms: oracle
+        path: scripts/initial_data.sql
+        splitStatements: true
+        relativeToChangelogFile: true
+    - sqlFile:
+        dbms: postgresql
+        path: scripts/initial_data.sql
+        splitStatements: true
+        relativeToChangelogFile: true

@@ -89,7 +89,7 @@ public class ConfigServiceImpl implements ConfigService {
         
         ConfigEntity configEntity = configRepository.getOne(property.getKey());
         
-        if (configRepository.getOne(keyOrgan) == null ) {
+        if (configRepository.findById(keyOrgan) == null ) {
             ConfigEntity nova = new ConfigEntity();
             nova.crearConfigNova(keyOrgan, organGestor.getEntitat().getCodi(), organGestor.getCodi(), configEntity);
             nova.setValue(property.getValue());
@@ -111,7 +111,7 @@ public class ConfigServiceImpl implements ConfigService {
     public void modificarPropertyOrgan(OrganConfigDto property) {
         log.info(String.format("Modificant propietat organ: %s, key:  %s, value: %s ", property.getOrganGestorId(), property.getKey(), property.getValue()));
         
-        ConfigEntity confOrgan = configRepository.getOne(property.getKey());
+        ConfigEntity confOrgan = configRepository.findById(property.getKey()).orElse(null);
         if (confOrgan != null) {
         	confOrgan.setValue(property.getValue());
             confOrgan.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
@@ -127,7 +127,7 @@ public class ConfigServiceImpl implements ConfigService {
     public void deletePropertyOrgan(String key) {
         log.info(String.format("Esborrant propietat organ:  %s, ", key));
         
-        ConfigEntity confOrgan = configRepository.getOne(key);
+        ConfigEntity confOrgan = configRepository.findById(key).orElse(null);
         if (confOrgan != null) {
         	configRepository.delete(confOrgan);
             configHelper.resetPropietatsPerOrgan(confOrgan.getEntitatCodi());

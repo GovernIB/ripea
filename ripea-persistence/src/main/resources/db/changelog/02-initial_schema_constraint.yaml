@@ -1,0 +1,2256 @@
+databaseChangeLog:
+- changeSet:
+    id: init-constraint-1
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}expedient_peticio
+        constraintName: ${app_prefix}exp_pet_exp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-2
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}exp_comment
+        constraintName: ${app_prefix}exp_com_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-8
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: agafat_per_codi
+        baseTableName: ${app_prefix}expedient
+        constraintName: ${app_prefix}expedient_agafatper_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-9
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contingut_id
+        baseTableName: ${app_prefix}alerta
+        constraintName: ${app_prefix}alerta_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}contingut
+- changeSet:
+    id: init-constraint-10
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ${app_prefix}carpeta
+        constraintName: ${app_prefix}carpeta_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}contingut
+- changeSet:
+    id: init-constraint-11
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contingut_id
+        baseTableName: ${app_prefix}massiva_contingut
+        constraintName: ${app_prefix}massiva_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}contingut
+- changeSet:
+    id: init-constraint-12
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ${app_prefix}node
+        constraintName: ${app_prefix}node_contingut_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}contingut
+- changeSet:
+    id: init-constraint-13
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contmov_id
+        baseTableName: ${app_prefix}contingut
+        constraintName: ${app_prefix}contingut_contmov_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}cont_mov
+- changeSet:
+    id: init-constraint-14
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: contmov_id
+        baseTableName: ${app_prefix}cont_log
+        constraintName: ${app_prefix}cont_log_cont_mov_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}cont_mov
+- changeSet:
+    id: init-constraint-15
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_enviament_id
+        baseTableName: ${app_prefix}document_enviament_doc
+        constraintName: ${app_prefix}docenv_doc_docenv_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}document_enviament
+- changeSet:
+    id: init-constraint-16
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_id
+        baseTableName: ${app_prefix}document_enviament_doc
+        constraintName: ${app_prefix}docenv_doct_document_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}document
+- changeSet:
+    id: init-constraint-17
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_id
+        baseTableName: ${app_prefix}document_enviament
+        constraintName: ${app_prefix}doc_env_document_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}document
+- changeSet:
+    id: init-constraint-18
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: vf_viafirma_dispositiu
+        baseTableName: ${app_prefix}document_enviament
+        constraintName: ${app_prefix}doc_env_doc_env_dis_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}document_enviament_dis
+- changeSet:
+    id: init-constraint-19
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}contingut
+        constraintName: ${app_prefix}contingut_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-20
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}domini
+        constraintName: ${app_prefix}domini_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-21
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}grup
+        constraintName: ${app_prefix}grup_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-23
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}metanode
+        constraintName: ${app_prefix}metanode_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-24
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}organ_gestor
+        constraintName: ${app_prefix}organ_gestor_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-25
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}registre
+        constraintName: ${app_prefix}registre_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-26
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}tipus_documental
+        constraintName: ${app_prefix}tipus_docmntl_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-27
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: execucio_massiva_id
+        baseTableName: ${app_prefix}massiva_contingut
+        constraintName: ${app_prefix}mas_con_exe_mas_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}execucio_massiva
+- changeSet:
+    id: init-constraint-28
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}contingut
+        constraintName: ${app_prefix}contingut_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-29
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}document_enviament
+        constraintName: ${app_prefix}doc_env_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-30
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}expedient_interessat
+        constraintName: ${app_prefix}exp_int_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-31
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}expedient_rel
+        constraintName: ${app_prefix}exp_rel_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-32
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}expedient_seguidor
+        constraintName: ${app_prefix}exp_seg_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-33
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}interessat
+        constraintName: ${app_prefix}interessat_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-34
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_estat_id
+        baseTableName: ${app_prefix}expedient
+        constraintName: ${app_prefix}expedient_exp_estat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient_estat
+- changeSet:
+    id: init-constraint-35
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}expedient_organpare
+        constraintName: ${app_prefix}exp_orgpare_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-36
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_organ_id
+        baseTableName: ${app_prefix}expedient_organpare
+        constraintName: ${app_prefix}exp_orgpare_mexp_org_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexp_organ
+- changeSet:
+    id: init-constraint-37
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}expedient_organpare
+        constraintName: ${app_prefix}exp_orgpare_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-38
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}expedient_organpare
+        constraintName: ${app_prefix}exp_orgpare_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-39
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_rel_id
+        baseTableName: ${app_prefix}expedient_rel
+        constraintName: ${app_prefix}exp_rel_exprel_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-40
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}exp_comment
+        constraintName: ${app_prefix}exp_com_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-41
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: expedient_id
+        baseTableName: ${app_prefix}expedient_tasca
+        constraintName: ${app_prefix}exp_tasca_expedient_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-42
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: grup_id
+        baseTableName: ${app_prefix}expedient
+        constraintName: ${app_prefix}expedient_grup_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}grup
+- changeSet:
+    id: init-constraint-43
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: grup_id
+        baseTableName: ${app_prefix}metaexpedient_grup
+        constraintName: ${app_prefix}mexp_grup_grup_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}grup
+- changeSet:
+    id: init-constraint-44
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: entitat_id
+        baseTableName: ${app_prefix}historic
+        constraintName: ${app_prefix}historic_entitat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-45
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ${app_prefix}historic
+        constraintName: ${app_prefix}historic_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-46
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_id
+        baseTableName: ${app_prefix}historic
+        constraintName: ${app_prefix}historic_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}organ_gestor
+- changeSet:
+    id: init-constraint-47
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: usuari_codi
+        baseTableName: ${app_prefix}hist_exp_usuari
+        constraintName: ${app_prefix}hist_exp_usu_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-48
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: interessat_id
+        baseTableName: ${app_prefix}expedient_interessat
+        constraintName: ${app_prefix}exp_int_interessat_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}interessat
+- changeSet:
+    id: init-constraint-49
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metadada_id
+        baseTableName: ${app_prefix}dada
+        constraintName: ${app_prefix}dada_metadada_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metadada
+- changeSet:
+    id: init-constraint-51
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexp_tasca_id
+        baseTableName: ${app_prefix}expedient_tasca
+        constraintName: ${app_prefix}exp_tasca_mext_tasca_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexp_tasca
+- changeSet:
+    id: init-constraint-52
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ${app_prefix}expedient_estat
+        constraintName: ${app_prefix}exp_est_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-53
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ${app_prefix}expedient
+        constraintName: ${app_prefix}expedient_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-54
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ${app_prefix}metadocument
+        constraintName: ${app_prefix}metadoc_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-56
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metaexpedient_id
+        baseTableName: ${app_prefix}metaexpedient_grup
+        constraintName: ${app_prefix}metaexp_metaexpgrup_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-57
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ${app_prefix}metaexp_organ
+        constraintName: ${app_prefix}mexp_org_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-58
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ${app_prefix}metaexp_seq
+        constraintName: ${app_prefix}metaexp_seq_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-59
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_expedient_id
+        baseTableName: ${app_prefix}metaexp_tasca
+        constraintName: ${app_prefix}metaexp_tasca_metaexp_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-60
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: estat_crear_tasca_id
+        baseTableName: ${app_prefix}metaexp_tasca
+        constraintName: ${app_prefix}mexp_tasca_exp_est_cre_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient_estat
+- changeSet:
+    id: init-constraint-61
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: estat_finalitzar_tasca_id
+        baseTableName: ${app_prefix}metaexp_tasca
+        constraintName: ${app_prefix}mexp_tasca_exp_est_fi_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}expedient_estat
+- changeSet:
+    id: init-constraint-63
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: meta_node_id
+        baseTableName: ${app_prefix}metadada
+        constraintName: ${app_prefix}metadada_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metanode
+- changeSet:
+    id: init-constraint-64
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ${app_prefix}metadocument
+        constraintName: ${app_prefix}metadoc_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metanode
+- changeSet:
+    id: init-constraint-65
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ${app_prefix}metaexpedient
+        constraintName: ${app_prefix}metaexp_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metanode
+- changeSet:
+    id: init-constraint-66
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: metanode_id
+        baseTableName: ${app_prefix}node
+        constraintName: ${app_prefix}node_metanode_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metanode
+- changeSet:
+    id: init-constraint-67
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: node_id
+        baseTableName: ${app_prefix}dada
+        constraintName: ${app_prefix}dada_node_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}node
+- changeSet:
+    id: init-constraint-68
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ${app_prefix}document
+        constraintName: ${app_prefix}document_node_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}node
+- changeSet:
+    id: init-constraint-69
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: id
+        baseTableName: ${app_prefix}expedient
+        constraintName: ${app_prefix}expedient_node_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}node
+- changeSet:
+    id: init-constraint-70
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_gestor_id
+        baseTableName: ${app_prefix}expedient
+        constraintName: ${app_prefix}expedient_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}organ_gestor
+- changeSet:
+    id: init-constraint-71
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_gestor_id
+        baseTableName: ${app_prefix}metaexpedient
+        constraintName: ${app_prefix}metaexp_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}organ_gestor
+- changeSet:
+    id: init-constraint-72
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: organ_gestor_id
+        baseTableName: ${app_prefix}metaexp_organ
+        constraintName: ${app_prefix}metaexp_organ_org_ges_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}organ_gestor
+- changeSet:
+    id: init-constraint-73
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: pare_id
+        baseTableName: ${app_prefix}contingut
+        constraintName: ${app_prefix}contingut_pare_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}contingut
+- changeSet:
+    id: init-constraint-74
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: pare_id
+        baseTableName: ${app_prefix}cont_log
+        constraintName: ${app_prefix}cont_log_pare_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}cont_log
+- changeSet:
+    id: init-constraint-75
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: pare_id
+        baseTableName: ${app_prefix}metaexpedient
+        constraintName: ${app_prefix}metaexpedient_pare_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-76
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: seguidor_codi
+        baseTableName: ${app_prefix}expedient_seguidor
+        constraintName: ${app_prefix}exp_seg_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-77
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: registre_id
+        baseTableName: ${app_prefix}registre_annex
+        constraintName: ${app_prefix}reg_annex_registre_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}registre
+- changeSet:
+    id: init-constraint-78
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: registre_id
+        baseTableName: ${app_prefix}registre_interessat
+        constraintName: ${app_prefix}reg_int_registre_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}registre
+- changeSet:
+    id: init-constraint-79
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: registre_id
+        baseTableName: ${app_prefix}expedient_peticio
+        constraintName: ${app_prefix}exp_pet_registre_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}registre
+- changeSet:
+    id: init-constraint-80
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: remitent_codi
+        baseTableName: ${app_prefix}cont_mov
+        constraintName: ${app_prefix}cont_mov_remitent_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-81
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: representant_id
+        baseTableName: ${app_prefix}interessat
+        constraintName: ${app_prefix}interessat_repres_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}interessat
+- changeSet:
+    id: init-constraint-82
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ripea_user_codi
+        baseTableName: ${app_prefix}usuari_viafirma_ripea
+        constraintName: ${app_prefix}usu_viaf_rip_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-83
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: document_enviament_id
+        baseTableName: ${app_prefix}portafirmes_block
+        constraintName: ${app_prefix}port_block_doc_env_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}document_enviament
+- changeSet:
+    id: init-constraint-84
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: portafirmes_block_id
+        baseTableName: ${app_prefix}portafirmes_block_info
+        constraintName: ${app_prefix}port_blo_info_pot_blo_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}portafirmes_block
+- changeSet:
+    id: init-constraint-85
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: RESPONSABLE_ACTUAL_CODI
+        baseTableName: ${app_prefix}expedient_tasca
+        constraintName: ${app_prefix}exp_tasca_usuari_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-86
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}alerta
+        constraintName: ${app_prefix}alerta_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-87
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}contingut
+        constraintName: ${app_prefix}contingut_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-88
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}cont_log
+        constraintName: ${app_prefix}cont_log_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-89
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}cont_mov
+        constraintName: ${app_prefix}cont_mov_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-90
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}dada
+        constraintName: ${app_prefix}dada_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-91
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}document_enviament
+        constraintName: ${app_prefix}doc_env_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-92
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}entitat
+        constraintName: ${app_prefix}entitat_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-93
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}massiva_contingut
+        constraintName: ${app_prefix}mass_cont_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-94
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}execucio_massiva
+        constraintName: ${app_prefix}exe_mass_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-95
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}exp_comment
+        constraintName: ${app_prefix}exp_com_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-96
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}interessat
+        constraintName: ${app_prefix}interessat_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-98
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}metadada
+        constraintName: ${app_prefix}metadada_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-99
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}metaexp_seq
+        constraintName: ${app_prefix}metaexp_seq_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-100
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}metaexp_tasca
+        constraintName: ${app_prefix}mexp_tasca_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-101
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: createdby_codi
+        baseTableName: ${app_prefix}metanode
+        constraintName: ${app_prefix}metanode_createdby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-102
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}alerta
+        constraintName: ${app_prefix}alerta_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-103
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}contingut
+        constraintName: ${app_prefix}contingut_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-104
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}cont_log
+        constraintName: ${app_prefix}cont_log_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-105
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}cont_mov
+        constraintName: ${app_prefix}cont_mov_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-106
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}dada
+        constraintName: ${app_prefix}dada_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-107
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}document_enviament
+        constraintName: ${app_prefix}doc_env_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-108
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}entitat
+        constraintName: ${app_prefix}entitat_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-109
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}massiva_contingut
+        constraintName: ${app_prefix}mass_cont_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-110
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}execucio_massiva
+        constraintName: ${app_prefix}exe_mass_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-111
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}interessat
+        constraintName: ${app_prefix}interessat_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-113
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}metadada
+        constraintName: ${app_prefix}metadada_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-114
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}metaexp_seq
+        constraintName: ${app_prefix}metaexp_seq_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-115
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}metaexp_tasca
+        constraintName: ${app_prefix}mexp_tasca_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-116
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: lastmodifiedby_codi
+        baseTableName: ${app_prefix}metanode
+        constraintName: ${app_prefix}metanode_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}usuari
+- changeSet:
+    id: init-constraint-117
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: viafirma_user_codi
+        baseTableName: ${app_prefix}usuari_viafirma_ripea
+        constraintName: ${app_prefix}usu_viaf_rip_lastmodby_fk
+        referencedColumnNames: codi
+        referencedTableName: ${app_prefix}viafirma_usuari
+- changeSet:
+    id: init-constraint-118
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: parent_object
+        baseTableName: ${app_prefix}acl_object_identity
+        constraintName: ${app_prefix}acl_oid_parent_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}acl_object_identity
+- changeSet:
+    id: init-constraint-119
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: object_id_class
+        baseTableName: ${app_prefix}acl_object_identity
+        constraintName: ${app_prefix}acl_oid_class_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}acl_class
+- changeSet:
+    id: init-constraint-120
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: owner_sid
+        baseTableName: ${app_prefix}acl_object_identity
+        constraintName: ${app_prefix}acl_oid_owner_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}acl_sid
+- changeSet:
+    id: init-constraint-121
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: acl_object_identity
+        baseTableName: ${app_prefix}acl_entry
+        constraintName: ${app_prefix}acl_entry_object_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}acl_object_identity
+- changeSet:
+    id: init-constraint-122
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: sid
+        baseTableName: ${app_prefix}acl_entry
+        constraintName: ${app_prefix}acl_entry_acl_fk
+        referencedColumnNames: id
+        referencedTableName: ${app_prefix}acl_sid
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+- changeSet:
+    id: init-constraint-184
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PARE_ID
+        baseTableName: ${app_prefix}ORGAN_GESTOR
+        constraintName: ${app_prefix}ORGAN_GESTOR_PARE_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ORGAN_GESTOR
+- changeSet:
+    id: init-constraint-185
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}ORGAN_GESTOR
+        constraintName: ${app_prefix}ORGAN_GESTOR_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-186
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}ORGAN_GESTOR
+        constraintName: ${app_prefix}ORGAN_GESTOR_LASTMODDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-187
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PARENT_CODE
+        baseTableName: ${app_prefix}CONFIG_GROUP
+        constraintName: ${app_prefix}CONFIG_GROUP_PARENT_FK
+        referencedColumnNames: CODE
+        referencedTableName: ${app_prefix}CONFIG_GROUP
+- changeSet:
+    id: init-constraint-188
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ID
+        baseTableName: ${app_prefix}HIST_EXP_INTERESSAT
+        constraintName: ${app_prefix}HIST_HISTORIC_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}HISTORIC
+- changeSet:
+    id: init-constraint-189
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: ${app_prefix}EXECUCIO_MASSIVA
+        constraintName: ${app_prefix}EXECUCIO_MASSENT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-constraint-190
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}METAEXP_ORGAN
+        constraintName: ${app_prefix}METAEXP_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-191
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}METAEXP_ORGAN
+        constraintName: ${app_prefix}METAEXP_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-192
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: INTERESSAT_ID
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT_INTER
+        constraintName: ${app_prefix}DOC_ENV_INT_INTERESSAT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}INTERESSAT
+- changeSet:
+    id: init-constraint-193
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: DOCUMENT_ENVIAMENT_ID
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT_INTER
+        constraintName: ${app_prefix}DOC_ENV_INT_DOC_ENV_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}DOCUMENT_ENVIAMENT
+- changeSet:
+    id: init-constraint-194
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT_INTER
+        constraintName: ${app_prefix}DOC_ENV_INT_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-195
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT_INTER
+        constraintName: ${app_prefix}DOC_ENV_INT_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-196
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}REGISTRE_ANNEX
+        constraintName: ${app_prefix}REG_ANNEX_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-197
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}REGISTRE_ANNEX
+        constraintName: ${app_prefix}REG_ANNEX_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-198
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}EMAIL_PENDENT_ENVIAR
+        constraintName: ${app_prefix}EMAIL_PENDENV_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-199
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}EMAIL_PENDENT_ENVIAR
+        constraintName: ${app_prefix}EMAIL_PENDENV_LASTMOD_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-200
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ID
+        baseTableName: ${app_prefix}HIST_EXP_USUARI
+        constraintName: ${app_prefix}HIST_EXP_USU_HIST_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}HISTORIC
+- changeSet:
+    id: init-constraint-201
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}AVIS
+        constraintName: ${app_prefix}AVIS_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-202
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}AVIS
+        constraintName: ${app_prefix}AVIS_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-203
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}GRUP
+        constraintName: ${app_prefix}GRUP_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-204
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}GRUP
+        constraintName: ${app_prefix}GRUP_LASTMOD_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-205
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT_DIS
+        constraintName: ${app_prefix}DOC_ENV_DIS_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-206
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT_DIS
+        constraintName: ${app_prefix}DOC_ENV_DIS_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-207
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_ESTAT
+        constraintName: ${app_prefix}EXP_EST_CREATEDBY_CODI
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-208
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_ESTAT
+        constraintName: ${app_prefix}EXP_EST_LASTMODBY_CODI
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-209
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_TASCA
+        constraintName: ${app_prefix}EXP_TASCA_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-210
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_TASCA
+        constraintName: ${app_prefix}EXP_TASCA_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-211
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}CONFIG
+        constraintName: ${app_prefix}CONFIG_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-212
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}HISTORIC
+        constraintName: ${app_prefix}HISTORIC_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-213
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}HISTORIC
+        constraintName: ${app_prefix}HISTORIC_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-214
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}PORTAFIRMES_BLOCK
+        constraintName: ${app_prefix}PORT_BLOCK_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-215
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}PORTAFIRMES_BLOCK
+        constraintName: ${app_prefix}PORT_BLOCK_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-216
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}PORTAFIRMES_BLOCK_INFO
+        constraintName: ${app_prefix}PORT_BLO_INFO_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-217
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}PORTAFIRMES_BLOCK_INFO
+        constraintName: ${app_prefix}PORT_BLO_INFO_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-218
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}REGISTRE
+        constraintName: ${app_prefix}REGISTRE_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-219
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}REGISTRE
+        constraintName: ${app_prefix}REGISTRE_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-220
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}DOMINI
+        constraintName: ${app_prefix}DOMINI_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-221
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}DOMINI
+        constraintName: ${app_prefix}DOMINI_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-222
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}METAEXPEDIENT_CARPETA
+        constraintName: ${app_prefix}METAEXPCARP_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-223
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}METAEXPEDIENT_CARPETA
+        constraintName: ${app_prefix}METAEXPCARP_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-224
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}TIPUS_DOCUMENTAL
+        constraintName: ${app_prefix}TIP_DOCMNTL_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-225
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}TIPUS_DOCUMENTAL
+        constraintName: ${app_prefix}TIP_DOCMNTL_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-226
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ID
+        baseTableName: ${app_prefix}HIST_EXPEDIENT
+        constraintName: ${app_prefix}HIST_EXP_HISTORIC_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}HISTORIC
+- changeSet:
+    id: init-constraint-227
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}REGISTRE_INTERESSAT
+        constraintName: ${app_prefix}REG_INT_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-228
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}REGISTRE_INTERESSAT
+        constraintName: ${app_prefix}REG_INT_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-229
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_PETICIO
+        constraintName: ${app_prefix}EXP_PET_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-230
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_PETICIO
+        constraintName: ${app_prefix}EXP_PET_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-231
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}FLUX_FIRMA_USUARI
+        constraintName: ${app_prefix}FLXFRM_USU_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-232
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}FLUX_FIRMA_USUARI
+        constraintName: ${app_prefix}FLXFRM_USU_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-233
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}URL_INSTRUCCIO
+        constraintName: ${app_prefix}URL_INST_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-234
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}URL_INSTRUCCIO
+        constraintName: ${app_prefix}URL_INST_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-235
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUP_CODE
+        baseTableName: ${app_prefix}CONFIG
+        constraintName: ${app_prefix}CONFIG_GROUP_FK
+        referencedColumnNames: CODE
+        referencedTableName: ${app_prefix}CONFIG_GROUP
+- changeSet:
+    id: init-constraint-244
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: DOCUMENT_ID
+        baseTableName: ${app_prefix}REGISTRE_ANNEX
+        constraintName: ${app_prefix}REG_ANNEX_DOC_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}DOCUMENT
+- changeSet:
+    id: init-constraint-246
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: EXPEDIENT_RELACIONAT
+        baseTableName: ${app_prefix}CARPETA
+        constraintName: ${app_prefix}CARPETA_EXPREL_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}EXPEDIENT
+- changeSet:
+    id: init-constraint-253
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CONTINGUT_ID
+        baseTableName: ${app_prefix}CONT_COMMENT
+        constraintName: ${app_prefix}CONT_COM_CONTINGUT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}CONTINGUT
+- changeSet:
+    id: init-constraint-254
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}CONT_COMMENT
+        constraintName: ${app_prefix}CONT_COM_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-255
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}CONT_COMMENT
+        constraintName: ${app_prefix}CONT_COM_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-270
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: DOCUMENT_ID
+        baseTableName: ${app_prefix}CONSULTA_PINBAL
+        constraintName: ${app_prefix}DOCUMENT_PINBAL_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}DOCUMENT
+- changeSet:
+    id: init-constraint-279
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: ${app_prefix}METAEXPEDIENT
+        constraintName: ${app_prefix}ENTITAT_METAEXP_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-constraint-280
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: ${app_prefix}CONSULTA_PINBAL
+        constraintName: ${app_prefix}ENTITAT_PINBAL_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-constraint-281
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_DEFECTE_ID
+        baseTableName: ${app_prefix}USUARI
+        constraintName: ${app_prefix}ENTITAT_USUARI_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-constraint-289
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TASCA_ID
+        baseTableName: ${app_prefix}EXPEDIENT_TASCA_OBSE
+        constraintName: ${app_prefix}EXP_OBSE_TASCA_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}EXPEDIENT_TASCA
+- changeSet:
+    id: init-constraint-291
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: EXPEDIENT_ID
+        baseTableName: ${app_prefix}CONSULTA_PINBAL
+        constraintName: ${app_prefix}EXPEDIENT_PINBAL_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}EXPEDIENT
+- changeSet:
+    id: init-constraint-292
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: OBSERVADOR_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_TASCA_OBSE
+        constraintName: ${app_prefix}EXP_TASCA_OBSE_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-293
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: RESPONSABLE_CODI
+        baseTableName: ${app_prefix}EXPEDIENT_TASCA_RESP
+        constraintName: ${app_prefix}EXPEDIENT_TASCARESP_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-294
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TASCA_ID
+        baseTableName: ${app_prefix}EXPEDIENT_TASCA_RESP
+        constraintName: ${app_prefix}EXPEDIENT_TASCA_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}EXPEDIENT_TASCA
+- changeSet:
+    id: init-constraint-295
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: EXPEDIENT_ESTAT_ID
+        baseTableName: ${app_prefix}DOCUMENT
+        constraintName: ${app_prefix}EXPESTAT_DOCUMENT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}EXPEDIENT_ESTAT
+- changeSet:
+    id: init-constraint-296
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: EXP_TASCA_ID
+        baseTableName: ${app_prefix}EXP_TASCA_COMMENT
+        constraintName: ${app_prefix}EXPTASCA_TASCACOMMENT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}EXPEDIENT_TASCA
+- changeSet:
+    id: init-constraint-308
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: METAEXPEDIENT_ID
+        baseTableName: ${app_prefix}EXPEDIENT_PETICIO
+        constraintName: ${app_prefix}EXP_PET_METAEXP_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-317
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: ${app_prefix}FLUX_FIRMA_USUARI
+        constraintName: ${app_prefix}FLUX_FIRMA_USUARI_ENT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-constraint-318
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USUARI_CODI
+        baseTableName: ${app_prefix}FLUX_FIRMA_USUARI
+        constraintName: ${app_prefix}FLUX_FIRMA_USUARI_USU_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-320
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GRUP_ID
+        baseTableName: ${app_prefix}EXPEDIENT_PETICIO
+        constraintName: ${app_prefix}EXP_PET_GRUP_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}GRUP
+- changeSet:
+    id: init-constraint-321
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GRUP_PER_DEFECTE
+        baseTableName: ${app_prefix}METAEXPEDIENT
+        constraintName: ${app_prefix}GRUP_METAEXP_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}GRUP
+- changeSet:
+    id: init-constraint-329
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: REPRESENTANT_ID
+        baseTableName: ${app_prefix}REGISTRE_INTERESSAT
+        constraintName: ${app_prefix}INTERESSAT_REPRESENTANT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}REGISTRE_INTERESSAT
+- changeSet:
+    id: init-constraint-341
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: METAEXPEDIENT_ID
+        baseTableName: ${app_prefix}METAEXPEDIENT_METADOCUMENT
+        constraintName: ${app_prefix}METAEXP_METADOC_METAEXP_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-342
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: META_EXPEDIENT_ID
+        baseTableName: ${app_prefix}METAEXPEDIENT_CARPETA
+        constraintName: ${app_prefix}METAEXP_METAEXPCARP_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-343
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: META_EXPEDIENT_ID
+        baseTableName: ${app_prefix}METAEXP_COMMENT
+        constraintName: ${app_prefix}METAEXP_METAEXPCOMMENT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-348
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: METAEXPEDIENT_ID
+        baseTableName: ${app_prefix}CONSULTA_PINBAL
+        constraintName: ${app_prefix}METAEXP_PINBAL_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-353
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TASCA_ID
+        baseTableName: ${app_prefix}METAEXP_TASCA_VALIDACIO
+        constraintName: ${app_prefix}METAEXP_TASCA_VALIDACIO_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXP_TASCA
+- changeSet:
+    id: init-constraint-354
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: METAEXPEDIENT_ID
+        baseTableName: ${app_prefix}USUARI
+        constraintName: ${app_prefix}METAEXP_USUARI_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-359
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}METAEXPEDIENT_METADOCUMENT
+        constraintName: ${app_prefix}MEXP_MDOC_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-360
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}METAEXPEDIENT_METADOCUMENT
+        constraintName: ${app_prefix}MEXP_MDOC_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-366
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}METANODE_METADADA
+        constraintName: ${app_prefix}MNODE_MDADA_CREATEDBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-367
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}METANODE_METADADA
+        constraintName: ${app_prefix}MNODE_MDADA_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-368
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: METADADA_ID
+        baseTableName: ${app_prefix}METANODE_METADADA
+        constraintName: ${app_prefix}MNODE_MDADA_METADADA_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METADADA
+- changeSet:
+    id: init-constraint-369
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: METANODE_ID
+        baseTableName: ${app_prefix}METANODE_METADADA
+        constraintName: ${app_prefix}MNODE_MDADA_METANODE_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}METANODE
+- changeSet:
+    id: init-constraint-372
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ANTIC_OG
+        baseTableName: ${app_prefix}OG_SINC_REL
+        constraintName: ${app_prefix}ORGAN_ANTIC_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ORGAN_GESTOR
+- changeSet:
+    id: init-constraint-373
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOT_EMISOR_ID
+        baseTableName: ${app_prefix}DOCUMENT_ENVIAMENT
+        constraintName: ${app_prefix}ORGAN_DOCENV_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ORGAN_GESTOR
+- changeSet:
+    id: init-constraint-375
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_ID
+        baseTableName: ${app_prefix}GRUP
+        constraintName: ${app_prefix}GRUP_ORGAN_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ORGAN_GESTOR
+- changeSet:
+    id: init-constraint-376
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOU_OG
+        baseTableName: ${app_prefix}OG_SINC_REL
+        constraintName: ${app_prefix}ORGAN_NOU_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ORGAN_GESTOR
+- changeSet:
+    id: init-constraint-383
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: ${app_prefix}URL_INSTRUCCION
+        constraintName: ${app_prefix}URL_INSTRUCCION_ENT_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}ENTITAT
+- changeSet:
+    id: init-constraint-384
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USUARI_ACTUALITZACIO
+        baseTableName: ${app_prefix}EXPEDIENT_PETICIO
+        constraintName: ${app_prefix}EXP_PET_USUACT_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-385
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}METAEXP_COMMENT
+        constraintName: ${app_prefix}USUCRE_METAEXPCOMMENT_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-386
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}CONSULTA_PINBAL
+        constraintName: ${app_prefix}USUCRE_PINBAL_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-387
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}PINBAL_SERVEI
+        constraintName: ${app_prefix}USUCRE_PINBAL_SERVEI_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-388
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: ${app_prefix}EXP_TASCA_COMMENT
+        constraintName: ${app_prefix}USUCRE_TASCACOMMENT_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-389
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}METAEXP_COMMENT
+        constraintName: ${app_prefix}USUMOD_METAEXPCOMMENT_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-390
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}CONSULTA_PINBAL
+        constraintName: ${app_prefix}USUMOD_PINBAL_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-391
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}PINBAL_SERVEI
+        constraintName: ${app_prefix}USUMOD_PINBAL_SERVEI_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-392
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: ${app_prefix}EXP_TASCA_COMMENT
+        constraintName: ${app_prefix}TASCACOMMENT_LASTMODBY_FK
+        referencedColumnNames: CODI
+        referencedTableName: ${app_prefix}USUARI
+- changeSet:
+    id: init-constraint-395
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TYPE_CODE
+        baseTableName: ${app_prefix}CONFIG
+        constraintName: ${app_prefix}CONFIG_TYPE_FK
+        referencedColumnNames: CODE
+        referencedTableName: ${app_prefix}CONFIG_TYPE
+- changeSet:
+    id: init-constraint-396
+    author: limit
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PINBAL_SERVEI
+        baseTableName: ${app_prefix}METADOCUMENT
+        constraintName: ${app_prefix}METADOC_PINBAL_FK
+        referencedColumnNames: ID
+        referencedTableName: ${app_prefix}PINBAL_SERVEI
+
+# unique constraint
+- changeSet:
+    id: init-constraint-unique-1
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: metadada_id, node_id, ordre
+        constraintName: ${app_prefix}dada_mult_uk
+        tableName: ${app_prefix}dada
+- changeSet:
+    id: init-constraint-unique-2
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: codi
+        constraintName: ${app_prefix}entitat_codi_uk
+        tableName: ${app_prefix}entitat
+- changeSet:
+    id: init-constraint-unique-3
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: metaexpedient_id, anio, sequencia
+        constraintName: ${app_prefix}expedient_seq_uk
+        tableName: ${app_prefix}expedient
+- changeSet:
+    id: init-constraint-unique-4
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: meta_node_id, codi
+        constraintName: ${app_prefix}metadada_metanode_codi_uk
+        tableName: ${app_prefix}metadada
+- changeSet:
+    id: init-constraint-unique-5
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: meta_expedient_id, codi
+        constraintName: ${app_prefix}metadoc_metaexp_codi_uk
+        tableName: ${app_prefix}metadocument
+- changeSet:
+    id: init-constraint-unique-6
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: entitat_id, codi
+        constraintName: ${app_prefix}metaexp_entitat_codi_uk
+        tableName: ${app_prefix}metaexpedient
+- changeSet:
+    id: init-constraint-unique-7
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: anio, meta_expedient_id
+        constraintName: ${app_prefix}metaexp_seq_mult_uk
+        tableName: ${app_prefix}metaexp_seq
+- changeSet:
+    id: init-constraint-unique-8
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: codi, meta_expedient_id
+        constraintName: ${app_prefix}metaexp_tasca_mult_uk
+        tableName: ${app_prefix}metaexp_tasca
+- changeSet:
+    id: init-constraint-unique-9
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: codi, entitat_id
+        constraintName: ${app_prefix}organ_gestor_uk
+        tableName: ${app_prefix}organ_gestor
+- changeSet:
+    id: init-constraint-unique-10
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: sid, principal
+        constraintName: ${app_prefix}acl_sid_uk
+        tableName: ${app_prefix}acl_sid
+- changeSet:
+    id: init-constraint-unique-11
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: class
+        constraintName: ${app_prefix}acl_class_uk
+        tableName: ${app_prefix}acl_class
+- changeSet:
+    id: init-constraint-unique-12
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: object_id_class, object_id_identity
+        constraintName: ${app_prefix}acl_oid_uk
+        tableName: ${app_prefix}acl_object_identity
+- changeSet:
+    id: init-constraint-unique-13
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: acl_object_identity, ace_order
+        constraintName: ${app_prefix}acl_entry_uk
+        tableName: ${app_prefix}acl_entry
+- changeSet:
+    id: init-constraint-unique-14
+    author: limit
+    changes:
+    - addUniqueConstraint:
+        columnNames: CLASIF_SIA
+        constraintName: ${app_prefix}METAEXPEDIENT_CLASIF_UK
+        tableName: ${app_prefix}METAEXPEDIENT
+- changeSet:
+    id: init-constraint-unique-15
+    author: limit
+    changes:
+      - addUniqueConstraint:
+          columnNames: ANTIC_OG, NOU_OG
+          constraintName: ${app_prefix}UO_SINC_REL_MULT_UK
+          tableName: ${app_prefix}OG_SINC_REL
