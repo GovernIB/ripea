@@ -40,7 +40,7 @@ public class MetaDocumentHelper {
 		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByMetaExpedientIdAndCodi(metaExpedientId, metaDocument.getCodi());
 		PinbalServeiEntity pinbalServeiEntity = null;
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
-			pinbalServeiEntity = pinbalServeiRepository.getOne(metaDocument.getPinbalServei().getId());
+			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
 		}
 		//* = No s'actualitza
 		metaDocumentEntity.update(
@@ -106,7 +106,7 @@ public class MetaDocumentHelper {
 		
 		PinbalServeiEntity pinbalServeiEntity = null;
 		if (metaDocument.getPinbalServei()!=null && metaDocument.getPinbalServei().getId()!=null) {
-			pinbalServeiEntity = pinbalServeiRepository.getOne(metaDocument.getPinbalServei().getId());
+			pinbalServeiEntity = pinbalServeiRepository.findById(metaDocument.getPinbalServei().getId()).orElse(null);
 		}
 		
 		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(

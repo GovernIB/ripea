@@ -82,7 +82,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				true,
 				false, false, false);
 		
-		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.getOne(tipusDocumental.getId());
+		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.findById(tipusDocumental.getId()).orElse(null);
 
 		if (tipusDocumentalEntity == null || !tipusDocumentalEntity.getId().equals(tipusDocumental.getId())) {
 			throw new NotFoundException(

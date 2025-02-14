@@ -1498,11 +1498,11 @@ public class ContingutHelper {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			agafatPer = usuariRepository.getOne(auth.getName());
+			agafatPer = usuariRepository.findById(auth.getName()).orElse(null);
 		}
 		GrupEntity grupEntity = null;
 		if (grupId != null) {
-			grupEntity = grupRepository.getOne(grupId);
+			grupEntity = grupRepository.findById(grupId).orElse(null);
 		}
 		ExpedientEntity expedientCrear = ExpedientEntity.getBuilder(
 				nom.trim(),
@@ -2172,7 +2172,7 @@ public class ContingutHelper {
 			String rolActual, 
 			PermissionEnumDto permission) {
 		
-		ContingutEntity contingut = contingutRepository.getOne(contingutId);
+		ContingutEntity contingut = contingutRepository.findById(contingutId).orElse(null);
 		if (contingut == null) {
 			throw new NotFoundException(contingutId, ContingutEntity.class);
 		}

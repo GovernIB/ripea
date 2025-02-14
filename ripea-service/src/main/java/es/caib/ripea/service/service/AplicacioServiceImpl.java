@@ -69,7 +69,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void processarAutenticacioUsuari() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
-		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
@@ -157,7 +157,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
 		return conversioTipusHelper.convertir(
-				usuariRepository.getOne(codi),
+				usuariRepository.findById(codi),
 				UsuariDto.class);
 	}
 

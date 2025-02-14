@@ -185,7 +185,7 @@ public class ContingutLogHelper {
 		}
 		if (log.getObjecteId() != null) {
 			String objecteNom = null;
-			ContingutEntity c = contingutRepository.getOne(Long.valueOf(log.getObjecteId()));
+			ContingutEntity c = contingutRepository.findById(Long.valueOf(log.getObjecteId())).orElse(null);
 			objecteNom = c != null ? c.getNom() : "";
 			detalls.setObjecteNom(objecteNom);
 		}
