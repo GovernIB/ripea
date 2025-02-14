@@ -822,7 +822,7 @@ public class ExpedientHelper {
 			documentDto.setNom(uniqueNameInPare);
 			
 			//	Recuperar tipus document per defecte
-			MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.getOne(metaDocumentId) : null;
+			MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findById(metaDocumentId).orElse(null) : null;
 			
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
 					expedientEntity,
@@ -1030,7 +1030,7 @@ public class ExpedientHelper {
 				DocumentEntity.class);
 //		Recuperar tipus document per defecte
 //		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
-		MetaDocumentEntity metaDocument = justificantIdMetaDoc != null ? metaDocumentRepository.getOne(justificantIdMetaDoc) : null;
+		MetaDocumentEntity metaDocument = justificantIdMetaDoc != null ? metaDocumentRepository.findById(justificantIdMetaDoc).orElse(null) : null;
 		
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),

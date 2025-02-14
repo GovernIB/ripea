@@ -48,7 +48,7 @@ public class ExecucioMassivaHelper{
 		
 		Throwable exc = null;
 		String resultat = null;
-		ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.getOne(execucioMassivaContingutId);
+		ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findById(execucioMassivaContingutId).orElse(null);
 		
 		if (emc == null)
 			throw new NotFoundException(execucioMassivaContingutId, ExecucioMassivaContingutEntity.class);

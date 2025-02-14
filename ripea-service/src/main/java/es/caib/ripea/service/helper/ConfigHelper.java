@@ -207,7 +207,7 @@ public class ConfigHelper {
         if (config.isConfigurableEntitatActiu() && !StringUtils.isEmpty(entitatCodi)) {
             // Propietat a nivell d'entitat
             String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
-            ConfigEntity configEntitatEntity = configRepository.getOne(keyEntitat);
+            ConfigEntity configEntitatEntity = configRepository.findById(keyEntitat).orElse(null);
             if (configEntitatEntity != null) {
                 value = getValue(configEntitatEntity);
             }
@@ -241,7 +241,7 @@ public class ConfigHelper {
     @Transactional(readOnly = true)
     public Properties getPropertiesByGroup(String codeGroup) {
         Properties properties = new Properties();
-        ConfigGroupEntity configGroup = configGroupRepository.getOne(codeGroup);
+        ConfigGroupEntity configGroup = configGroupRepository.findById(codeGroup).orElse(null);
         fillGroupProperties(configGroup, properties);
         return properties;
     }
@@ -371,10 +371,10 @@ public class ConfigHelper {
     public String getValueEntitatOrGeneral(String entitatCodi, String keyGeneral) {
 
         String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
-        ConfigEntity configEntitat = configRepository.getOne(keyEntitat);
+        ConfigEntity configEntitat = configRepository.findById(keyEntitat).orElse(null);
         String value = getValue(configEntitat);
         if (StringUtils.isEmpty(value)) {
-        	ConfigEntity configGeneral = configRepository.getOne(keyGeneral);
+        	ConfigEntity configGeneral = configRepository.findById(keyGeneral).orElse(null);
         	value = getValue(configGeneral);
         }
 		return value;
@@ -390,10 +390,10 @@ public class ConfigHelper {
         String value = getValueForOrgan(entitatCodi, organCodi, keyGeneral);
 	    if (StringUtils.isEmpty(value)) {
 	        String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
-	        ConfigEntity configEntitat = configRepository.getOne(keyEntitat);
+	        ConfigEntity configEntitat = configRepository.findById(keyEntitat).orElse(null);
 	        value = getValue(configEntitat);
 	        if (StringUtils.isEmpty(value)) {
-	        	ConfigEntity configGeneral = configRepository.getOne(keyGeneral);
+	        	ConfigEntity configGeneral = configRepository.findById(keyGeneral).orElse(null);
 	        	value = getValue(configGeneral);
 	        }
         }

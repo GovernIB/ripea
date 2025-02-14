@@ -115,7 +115,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Override
 	@Transactional(readOnly = true)
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
-		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.getOne(execMassivaId);
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
 		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
 			FitxerDto resultat = new FitxerDto();
 			String directoriDesti = configHelper.getConfig("es.caib.ripea.app.data.dir") + execucioMassiva.getDocumentNom();
@@ -235,7 +235,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException {
-		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.getOne(exm_id);
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(exm_id).orElse(null);
 		if (execucioMassiva == null)
 			throw new NotFoundException(exm_id, ExecucioMassivaEntity.class);
 		

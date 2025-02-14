@@ -85,14 +85,11 @@ public class AvisServiceImpl implements AvisService {
 				"id=" + id + ", " +
 				"activa=" + activa + ")");
 		AvisEntity avisEntity = avisRepository.getOne(id);
-		
 		avisEntity.updateActiva(activa);
 		return conversioTipusHelper.convertir(
 				avisEntity,
 				AvisDto.class);
 	}
-	
-	
 
 	@Transactional
 	@Override

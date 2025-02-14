@@ -46,7 +46,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	 */
 	public ArxiuFirmaDto removeFirmesInvalidesAndFirmaServidor(Long documentId, String motiu, List<Long> documentsClonar) {
 
-		DocumentEntity document = documentRepository.getOne(documentId);
+		DocumentEntity document = documentRepository.findById(documentId).orElse(null);
 				
 		if (document != null) {
 			

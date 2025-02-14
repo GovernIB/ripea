@@ -546,7 +546,7 @@ public class HistoricServiceImpl implements HistoricService {
 			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = getDadesOrgansGestors(entitatId, rolActual, filtre);
 			List<OrganGestorDto> organsGestors = new ArrayList<>();
 			for (Long organId : filtre.getOrganGestorsIds()) {
-				OrganGestorEntity organGestorEntity = organGestorRepository.getOne(organId);
+				OrganGestorEntity organGestorEntity = organGestorRepository.findById(organId).orElse(null);
 				if (organGestorEntity == null) {
 					throw new NotFoundException(organId, OrganGestorEntity.class);
 				}

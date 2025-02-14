@@ -820,7 +820,7 @@ public class DocumentHelper {
 		try {
 			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 			
-			DocumentEntity documentEntity = documentRepository.getOne(documentId);
+			DocumentEntity documentEntity = documentRepository.findById(documentId).orElse(null);
 			
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 					documentEntity,

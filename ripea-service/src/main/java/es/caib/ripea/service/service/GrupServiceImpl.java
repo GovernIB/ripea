@@ -564,7 +564,7 @@ public class GrupServiceImpl implements GrupService {
 			Long grupId) {
 		
 		return conversioTipusHelper.convertir(
-				grupRepository.getOne(grupId),
+				grupRepository.findById(grupId),
 				GrupDto.class);
 	}
 	

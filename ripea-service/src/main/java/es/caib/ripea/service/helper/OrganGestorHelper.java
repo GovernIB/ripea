@@ -532,7 +532,7 @@ public class OrganGestorHelper {
 
 		String organCodi = null;
 		if (contingutId != null) {
-			ContingutEntity contingut = contingutRepository.getOne(contingutId);
+			ContingutEntity contingut = contingutRepository.findById(contingutId).orElse(null);
 			if (contingut != null) {
 				ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 				organCodi =  deproxied.getExpedientPare().getOrganGestor().getCodi();

@@ -405,7 +405,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Override
 	public RegistreDto findRegistreById(Long registreId) {
 		return conversioTipusHelper.convertir(
-				registreRepository.getOne(registreId),
+				registreRepository.findById(registreId),
 				RegistreDto.class);
 	}
 	
