@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AmpliacioPlazo;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
@@ -437,15 +438,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 					ex);
 		}
 	}
-
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.notificacio.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getUrl();
-		}
-		return endpoint;
-	}
 	
 	private es.caib.notib.client.domini.PersonaV2 toPersonaNotib(Persona persona) {
 		es.caib.notib.client.domini.PersonaV2 p = null;
@@ -506,21 +498,24 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}
 
 	private String getUrl() {
-		return getProperty(
-				"plugin.notificacio.url");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.NOTIB_PLUGIN_URL));
 	}
 	private String getUsername() {
-		return getProperty(
-				"plugin.notificacio.username");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.NOTIB_PLUGIN_USER));
 	}
 	private String getPassword() {
-		return getProperty(
-				"plugin.notificacio.password");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.NOTIB_PLUGIN_PASS));
 	}
-	
 	private boolean isDebug() {
-		return getAsBoolean(
-				"plugin.notificacio.debug");
+		return getAsBoolean(PropertyConfig.getPropertySuffix(PropertyConfig.NOTIB_PLUGIN_DEBUG));
+	}
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.NOTIB_PLUGIN_ENDPOINT));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getUrl();
+		}
+		return endpoint;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioPluginNotib.class);

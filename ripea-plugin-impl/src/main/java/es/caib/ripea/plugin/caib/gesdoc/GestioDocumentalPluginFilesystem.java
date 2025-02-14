@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 
 /**
  * Implementació del plugin de gestió documental que
@@ -122,8 +123,7 @@ public class GestioDocumentalPluginFilesystem extends RipeaAbstractPluginPropert
 	}
 
 	private String getBaseDir(String agrupacio) {
-		String baseDir = getProperty(
-				"plugin.gesdoc.filesystem.base.dir");
+		String baseDir = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.GESDOC_PLUGIN_FILESYSTEM_PATH));
 		if (baseDir != null) {
 			if (baseDir.endsWith("/")) {
 				return baseDir + agrupacio;

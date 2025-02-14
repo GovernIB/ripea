@@ -33,7 +33,6 @@ public class PropertyConfig {
 	public static final String ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON = "es.caib.ripea.segonpla.email.enviament.agrupat.cron";
 	public static final String TASCA_DURACIO_DEFAULT = "es.caib.ripea.duracio.tasca";
 	public static final String TASCA_PREAVIS_DATA_LIMIT = "es.caib.ripea.tasca.preavisDataLimitEnDies";
-	public static final String NOTIB_DEH_ACTIVA = "es.caib.ripea.notificacio.enviament.deh.activa";
 	public static final String BUIDAR_CACHES_DOMINIS_RATE = "es.caib.ripea.dominis.cache.execucio";
 	
 	public static final String USUARIS_PLUGIN_CLASS 			= "es.caib.ripea.plugin.dades.usuari.class";
@@ -47,12 +46,61 @@ public class PropertyConfig {
 	
 	public static final String DIR3_PLUGIN_CLASS 		= "es.caib.ripea.plugin.unitats.organitzatives.class";
 	public static final String DIR3_PLUGIN_URL 			= "es.caib.ripea.plugin.unitats.organitzatives.dir3.service.url";
+	public static final String DIR3_PLUGIN_ENDPOINT		= "es.caib.ripea.plugin.unitats.organitzatives.endpointName";
 	public static final String DIR3_PLUGIN_USER 		= "es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username";
 	public static final String DIR3_PLUGIN_PASS 		= "es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password";
 	public static final String DIR3_PLUGIN_DEBUG 		= "es.caib.ripea.plugin.unitats.organitzatives.dir3.service.log.actiu";
 	public static final String DIR3_PLUGIN_CERCA_URL	= "es.caib.ripea.plugin.unitats.cerca.dir3.service.url";
 	public static final String DIR3_PLUGIN_TIMEOUT 		= "es.caib.ripea.plugin.unitats.organitzatives.dir3.service.timeout";
 	
+	public static final String NOTIB_PLUGIN_CLASS 		= "es.caib.ripea.plugin.notificacio.class";
+	public static final String NOTIB_PLUGIN_URL 		= "es.caib.ripea.plugin.notificacio.url";
+	public static final String NOTIB_PLUGIN_USER 		= "es.caib.ripea.plugin.notificacio.username";
+	public static final String NOTIB_PLUGIN_PASS 		= "es.caib.ripea.plugin.notificacio.password";
+	public static final String NOTIB_PLUGIN_ENDPOINT 	= "es.caib.ripea.plugin.notificacio.endpointName";
+	public static final String NOTIB_PLUGIN_DEH_ACTIVA	= "es.caib.ripea.notificacio.enviament.deh.activa";
+	public static final String NOTIB_PLUGIN_RETARD 		= "es.caib.ripea.notificacio.retard.num.dies";
+	public static final String NOTIB_PLUGIN_CADUCA 		= "es.caib.ripea.notificacio.caducitat.num.dies";
+	public static final String NOTIB_PLUGIN_ENTITAT 	= "es.caib.ripea.notificacio.forsar.entitat";
+	public static final String NOTIB_PLUGIN_DEBUG 		= "es.caib.ripea.plugin.notificacio.debug";
+	
+	public static final String FIRMA_SERV_PLUGIN_CLASS			= "es.caib.ripea.plugin.firmaservidor.class";
+	public static final String FIRMA_SERV_PLUGIN_URL			= "es.caib.ripea.plugin.firmaservidor.portafib.endpoint";
+	public static final String FIRMA_SERV_PLUGIN_USER			= "es.caib.ripea.plugin.firmaservidor.portafib.auth.username";
+	public static final String FIRMA_SERV_PLUGIN_PASS			= "es.caib.ripea.plugin.firmaservidor.portafib.auth.password";
+	public static final String FIRMA_SERV_PLUGIN_SIGNER_EMAIL	= "es.caib.ripea.plugin.firmaservidor.portafib.signerEmail";
+	public static final String FIRMA_SERV_PLUGIN_PERFIL			= "es.caib.ripea.plugin.firmaservidor.portafib.perfil";
+	public static final String FIRMA_SERV_PLUGIN_LOCATION		= "es.caib.ripea.plugin.firmaservidor.portafib.location";
+	public static final String FIRMA_SERV_PLUGIN_FIRMA_USERNAME	= "es.caib.ripea.plugin.firmaservidor.portafib.username";
+	
+	public static final String PORTAFIB_PLUGIN_CLASS			= "es.caib.ripea.plugin.portafirmes.class";
+	public static final String PORTAFIB_PLUGIN_ENDPOINTNAME		= "es.caib.ripea.plugin.portafirmes.endpointName";
+	public static final String PORTAFIB_PLUGIN_URL				= "es.caib.ripea.plugin.portafirmes.firmasimpleasync.url";
+	public static final String PORTAFIB_PLUGIN_USER				= "es.caib.ripea.plugin.portafirmes.firmasimpleasync.username";
+	public static final String PORTAFIB_PLUGIN_PASS				= "es.caib.ripea.plugin.portafirmes.firmasimpleasync.password";
+	public static final String PORTAFIB_PLUGIN_DEBUG			= "es.caib.ripea.plugin.portafirmes.portafib.log.actiu";
+	public static final String PORTAFIB_PLUGIN_PERFIL			= "es.caib.ripea.plugin.portafirmes.portafib.perfil";
+	public static final String PORTAFIB_PLUGIN_PERSONA_CARREC	= "es.caib.ripea.plugin.portafirmes.carrer.mostrar.persona";
+	public static final String PORTAFIB_PLUGIN_ENVIAR_URL_EXP	= "es.caib.ripea.plugin.portafirmes.portafib.enviar.url.expedient";
+	
+	public static final String PORTAFIB_PLUGIN_FLUX_URL			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.url";
+	public static final String PORTAFIB_PLUGIN_FLUX_USR			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.username";
+	public static final String PORTAFIB_PLUGIN_FLUX_PAS			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.password";
+	
+	public static final String PORTAFIB_PLUGIN_USUARISPF_URL	= "es.caib.ripea.plugin.portafirmes.usuarientitatws.url";
+	public static final String PORTAFIB_PLUGIN_USUARISPF_USR	= "es.caib.ripea.plugin.portafirmes.usuarientitatws.username";
+	public static final String PORTAFIB_PLUGIN_USUARISPF_PAS	= "es.caib.ripea.plugin.portafirmes.usuarientitatws.password";
+	
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_CLASS		= "es.caib.ripea.plugin.firmasimpleweb.class";
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_URL			= "es.caib.ripea.plugin.firmasimpleweb.endpoint";
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_USER		= "es.caib.ripea.plugin.firmasimpleweb.username";
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_PASS		= "es.caib.ripea.plugin.firmasimpleweb.password";
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_ENDPOINT	= "es.caib.ripea.plugin.firmasimpleweb.endpointName";
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_LOCATION	= "es.caib.ripea.plugin.firmasimpleweb.location";
+	public static final String PORTAFIB_PLUGIN_FIRMAWEB_DEBUG		= "es.caib.ripea.plugin.firmasimpleweb.debug";
+	
+	public static final String GESDOC_PLUGIN_FILESYSTEM_CLASS		= "es.caib.ripea.plugin.gesdoc.class";
+	public static final String GESDOC_PLUGIN_FILESYSTEM_PATH		= "es.caib.ripea.plugin.gesdoc.filesystem.base.dir";
 	
 	
 	public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO = "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";	
@@ -62,4 +110,11 @@ public class PropertyConfig {
 	public static final String ACTUALITZAR_PROCEDIMENTS = "es.caib.ripea.procediment.actualitzar.cron";
 	public static final String CONSULTA_CANVIS_ORGANIGRAMA = "es.caib.ripea.organs.consulta.canvis";
 	public static final String TANCAMENT_LOGIC_CRON = "es.caib.ripea.expedient.tancament.logic.cron";
+	
+	public static String getPropertySuffix(String propertyValue) {
+		if (propertyValue.startsWith(PROPERTY_PREFIX)) {
+            return propertyValue.substring(PROPERTY_PREFIX.length());
+        }
+		return propertyValue;
+	}
 }

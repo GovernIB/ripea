@@ -4653,7 +4653,7 @@ public class PluginHelper {
 			}
 			// ########## ENVIAMENT DEH ###############
 			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(
-					configHelper.getConfig(PropertyConfig.NOTIB_DEH_ACTIVA))) {
+					configHelper.getConfig(PropertyConfig.NOTIB_PLUGIN_DEH_ACTIVA))) {
 				enviament.setEntregaDehActiva(true);
 				enviament.setEntregaDehObligat(interessat.getEntregaDehObligat());
 				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacio());
@@ -6450,10 +6450,7 @@ public class PluginHelper {
 			plugin = portafirmesPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
 			
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.portafirmes.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.PORTAFIB_PLUGIN_CLASS);
 			if (StringUtils.isNotEmpty(
 					pluginClassOrgan)) {
 				try {
@@ -6860,7 +6857,7 @@ public class PluginHelper {
 			plugin = notificacioPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
 			
-			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.notificacio.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.NOTIB_PLUGIN_CLASS);
 			
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				
@@ -6937,10 +6934,7 @@ public class PluginHelper {
 			if (plugin != null) {
 				return plugin;
 			}
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.firmaservidor.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.FIRMA_SERV_PLUGIN_CLASS);
 			if (StringUtils.isNotEmpty(
 					pluginClassOrgan)) {
 				try {
@@ -7132,10 +7126,7 @@ public class PluginHelper {
 			if (plugin != null) {
 				return plugin;
 			}
-			String pluginClassOrgan = configHelper.getValueForOrgan(
-					entitatCodi,
-					organCodi,
-					"es.caib.ripea.plugin.firmasimpleweb.class");
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_CLASS);
 			if (Utils.isNotEmpty(
 					pluginClassOrgan)) {
 				try {
@@ -7414,8 +7405,7 @@ public class PluginHelper {
 	}
 
 	private String getPropertyPluginPortafirmes() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.portafirmes.class");
+		return configHelper.getConfig(PropertyConfig.PORTAFIB_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginDigitalitzacio() {
@@ -7449,23 +7439,19 @@ public class PluginHelper {
 	}
 
 	private String getPropertyPluginNotificacio() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.notificacio.class");
+		return configHelper.getConfig(PropertyConfig.NOTIB_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginGestioDocumental() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.gesdoc.class");
+		return configHelper.getConfig(PropertyConfig.GESDOC_PLUGIN_FILESYSTEM_CLASS);
 	}
 
 	private String getPropertyPluginFirmaServidor() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.firmaservidor.class");
+		return configHelper.getConfig(PropertyConfig.FIRMA_SERV_PLUGIN_CLASS);
 	}
 
 	private String getPropertyPluginFirmaWeb() {
-		return configHelper.getConfig(
-				"es.caib.ripea.plugin.firmasimpleweb.class");
+		return configHelper.getConfig(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_CLASS);
 	}
 
 	private String getPropertyPluginSummarize() {
@@ -7494,18 +7480,15 @@ public class PluginHelper {
 	}
 
 	private Integer getPropertyNotificacioRetardNumDies() {
-		return configHelper.getAsInt(
-				"es.caib.ripea.notificacio.retard.num.dies");
+		return configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_RETARD);
 	}
 
 	private Integer getPropertyNotificacioCaducitatNumDies() {
-		return configHelper.getAsInt(
-				"es.caib.ripea.notificacio.caducitat.num.dies");
+		return configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA);
 	}
 
 	private String getPropertyNotificacioForsarEntitat() {
-		return configHelper.getConfig(
-				"es.caib.ripea.notificacio.forsar.entitat");
+		return configHelper.getConfig(PropertyConfig.NOTIB_PLUGIN_ENTITAT);
 	}
 
 	private boolean getPropertyGuardarCertificacioExpedient() {

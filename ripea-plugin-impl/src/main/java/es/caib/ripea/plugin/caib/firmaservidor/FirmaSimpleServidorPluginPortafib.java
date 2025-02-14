@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleCommonInfo;
@@ -41,15 +42,6 @@ public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProper
 	@Override
 	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, String idioma, String contentType) throws SistemaExternException {
 		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).contentType(contentType).contingut(contingut).build());
-	}
-
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.firmaservidor.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getPropertyEndpoint();
-		}
-		return endpoint;
 	}
 	
 	public SignaturaResposta signar(SignaturaConsulta consulta) {
@@ -150,32 +142,41 @@ public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProper
 	}
 
 	private String getPropertyEndpoint() {
-		return getProperty("plugin.firmaservidor.portafib.endpoint");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_URL));
 	}
 
 	private String getPropertyUsername() {
-		return getProperty("plugin.firmaservidor.portafib.auth.username");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_USER));
 	}
 
 	private String getPropertyPassword() {
-		return getProperty("plugin.firmaservidor.portafib.auth.password");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_PASS));
 	}
 
 	private String getPropertyPerfil() {
-		return getProperty("plugin.firmaservidor.portafib.perfil");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_PERFIL));
 	}
 
 	private String getPropertyLocation() {
-		return getProperty("plugin.firmaservidor.portafib.location", "Palma");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_LOCATION), "Palma");
 	}
 
 	private String getPropertySignerEmail() {
-		return getProperty("plugin.firmaservidor.portafib.signerEmail", "suport@caib.es");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_SIGNER_EMAIL), "suport@caib.es");
 	}
 
 	private String getPropertyUsuariFirma() {
-		return getProperty("plugin.firmaservidor.portafib.username");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.FIRMA_SERV_PLUGIN_FIRMA_USERNAME));
 	}
-
+	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_ENDPOINTNAME));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getPropertyEndpoint();
+		}
+		return endpoint;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);
 }

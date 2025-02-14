@@ -707,7 +707,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		}
 		boolean dehActiu = false;
 		try {
-			dehActiu = Boolean.parseBoolean(configService.getConfigValue(PropertyConfig.NOTIB_DEH_ACTIVA));
+			dehActiu = Boolean.parseBoolean(configService.getConfigValue(PropertyConfig.NOTIB_PLUGIN_DEH_ACTIVA));
 		} catch (Exception e) {}
 		model.addAttribute("dehActiu", dehActiu);
 	}

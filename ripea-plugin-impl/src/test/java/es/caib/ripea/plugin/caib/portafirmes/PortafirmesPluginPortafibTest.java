@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.portafirmes;
 
 import static org.junit.Assert.assertTrue;
@@ -18,13 +15,9 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.plugin.PropertiesHelper;
 
-/**
- * Classe de proves pel portafirmes Portafib.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class PortafirmesPluginPortafibTest {
 
 	private static final String BASE_URL = "https://proves.caib.es/portafib";
@@ -33,25 +26,14 @@ public class PortafirmesPluginPortafibTest {
 	private static final String DESTINATARI = "43110511R";
 
 	private PortafirmesPlugin plugin;
-
 	private PortafirmesDocument uploadDocument;
-
-
 
 	@Before
 	public void setUp() throws Exception {
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.portafirmes.portafib.base.url",
-				BASE_URL);
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.portafirmes.portafib.username",
-				USERNAME);
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.portafirmes.portafib.password",
-				PASSWORD);
-		PropertiesHelper.getProperties().setProperty(
-				"es.caib.ripea.plugin.portafirmes.portafib.log.actiu",
-				"true");
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.PORTAFIB_PLUGIN_URL, BASE_URL);
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.PORTAFIB_PLUGIN_USER, USERNAME);
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.PORTAFIB_PLUGIN_PASS, PASSWORD);
+		PropertiesHelper.getProperties().setProperty(PropertyConfig.PORTAFIB_PLUGIN_DEBUG, "true");
 		plugin = new PortafirmesPluginPortafib();
 		uploadDocument = new PortafirmesDocument();
 		uploadDocument.setTitol("(RIP) Document per firmar");

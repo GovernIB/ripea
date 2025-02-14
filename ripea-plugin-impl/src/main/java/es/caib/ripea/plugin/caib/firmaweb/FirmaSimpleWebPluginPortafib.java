@@ -3,6 +3,7 @@ package es.caib.ripea.plugin.caib.firmaweb;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
@@ -218,16 +219,6 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 		}
 
 		return firmaResultat;
-
-	}
-
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.firmasimpleweb.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getPropertyEndpoint();
-		}
-		return endpoint;
 	}
 	
 	private FirmaResultatDto processStatusFileOfSign(
@@ -320,26 +311,34 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 					getPropertyPassword());
 		}
 		return api;
-		
 	}
+	
 	private String getPropertyEndpoint() {
-		return getProperty("plugin.firmasimpleweb.endpoint");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_URL));
 	}
 
 	private String getPropertyUsername() {
-		return getProperty("plugin.firmasimpleweb.username");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_USER));
 	}
 
 	private String getPropertyPassword() {
-		return getProperty("plugin.firmasimpleweb.password");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_PASS));
 	}
 	
 	private String getPropertyLocation() {
-		return getProperty("plugin.firmasimpleweb.location");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_LOCATION));
 	}
 	
 	private boolean getPropertyDebug() {
-		return getAsBoolean("plugin.firmasimpleweb.debug");
+		return getAsBoolean(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_DEBUG));
 	}
-
+	
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.PORTAFIB_PLUGIN_FIRMAWEB_ENDPOINT));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getPropertyEndpoint();
+		}
+		return endpoint;
+	}
 }

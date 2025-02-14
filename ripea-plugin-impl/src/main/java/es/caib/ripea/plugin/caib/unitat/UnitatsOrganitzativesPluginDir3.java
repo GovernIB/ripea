@@ -209,7 +209,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
         return unitats;
     }
 
-
     // Mètodes SOAP per sincronització
     // //////////////////////////////////////////////////////////////////////////////////////
 
@@ -253,15 +252,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
                     ex);
         }
     }
-    
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.unitats.organitzatives.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getServiceUrl();
-		}
-		return endpoint;
-	}
 
     private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
 
@@ -383,36 +373,42 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     }
 
     private String getServiceUrl() {
-        String url = getProperty("plugin.unitats.organitzatives.dir3.service.url");
+        String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_URL));
 		if (!url.endsWith("/")) {
 			url = url + "/";
 		}
         return url;
     }
-
     private String getServiceUsername() {
-        return getProperty("plugin.unitats.organitzatives.dir3.service.username");
+        return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_USER));
     }
 
     private String getServicePassword() {
-        return getProperty("plugin.unitats.organitzatives.dir3.service.password");
+    	return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_PASS));
     }
 
     private boolean isLogMissatgesActiu() {
-        return getAsBoolean("plugin.unitats.organitzatives.dir3.service.log.actiu");
+    	return getAsBoolean(PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_DEBUG));
     }
 
     private Integer getServiceTimeout() {
-        String key = "plugin.unitats.organitzatives.dir3.service.timeout";
+        String key = PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_TIMEOUT);
         return getProperty(key) != null ? getAsInt(key) : null;
     }
 
     private String getServiceCercaUrl() {
-    	return getProperty("plugin.unitats.cerca.dir3.service.url");
+    	return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_CERCA_URL));
     }
-
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DIR3_PLUGIN_ENDPOINT));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}
+    
     private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {
-
         organigrama.put(unitat.getCodi(), unitat);
         if (unitat.getFills() == null) {
             return;
