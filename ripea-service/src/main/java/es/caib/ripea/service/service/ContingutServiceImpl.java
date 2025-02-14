@@ -1067,7 +1067,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false, false, false);
 		MetaNodeEntity metaNode = null;
 		if (filtre.getMetaNodeId() != null) {
-			metaNode = metaNodeRepository.getOne(filtre.getMetaNodeId());
+			metaNode = metaNodeRepository.findById(filtre.getMetaNodeId()).orElse(null);
 			if (metaNode == null) {
 				throw new NotFoundException(
 						filtre.getMetaNodeId(),
@@ -1109,7 +1109,7 @@ public class ContingutServiceImpl implements ContingutService {
 		
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
-			expedient = expedientRepository.getOne(filtre.getExpedientId());
+			expedient = expedientRepository.findById(filtre.getExpedientId()).orElse(null);
 			if (expedient == null) {
 				throw new NotFoundException(
 						filtre.getExpedientId(),

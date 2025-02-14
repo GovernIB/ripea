@@ -137,7 +137,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Override
 	@Transactional(readOnly = true)
 	public OrganGestorDto findItem(Long id) {
-		OrganGestorEntity organGestor = organGestorRepository.getOne(id);
+		OrganGestorEntity organGestor = organGestorRepository.findById(id).orElse(null);
 		if (organGestor == null) {
 			throw new NotFoundException(id, OrganGestorEntity.class);
 		}

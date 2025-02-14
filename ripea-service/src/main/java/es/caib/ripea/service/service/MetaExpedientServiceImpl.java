@@ -1604,7 +1604,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 
-		MetaExpedientTascaEntity entity = metaExpedientTascaRepository.getOne(id);
+		MetaExpedientTascaEntity entity = metaExpedientTascaRepository.findById(id).orElse(null);
 		if (entity == null || !entity.getMetaExpedient().getId().equals(metaExpedientId)) {
 			throw new NotFoundException(id, MetaExpedientTascaEntity.class);
 		}

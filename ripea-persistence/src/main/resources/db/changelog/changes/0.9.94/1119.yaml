@@ -1,8 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 1659009409606-1
-      author: limit
-      changes:
-        - dropNotNullConstraint:
-            tableName: ipa_hist_exp_interessat
-            columnName: interessat_doc_num

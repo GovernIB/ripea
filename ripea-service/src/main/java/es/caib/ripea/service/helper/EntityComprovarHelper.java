@@ -127,7 +127,7 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisUsuariOrAdmin, 
 			boolean comprovarPermisUsuariOrAdminOrOrgan, 
 			boolean comprovarPermisAdminOrOrgan) throws NotFoundException {
-		EntitatEntity entitat = entitatRepository.getOne(entitatId);
+		EntitatEntity entitat = entitatRepository.findById(entitatId).orElse(null);
 		if (entitat == null) {
 			throw new NotFoundException(entitatId, EntitatEntity.class);
 		}
@@ -186,7 +186,7 @@ public class EntityComprovarHelper {
 	
 	//Funció que es crida desde MetaExpedientService i desde OrganGestorService, el primer ha de inclourer també permis de disseny
 	public OrganGestorEntity comprovarPermisOrganGestor(Long entitatId, Long id, boolean inclouDissenyador) {
-		OrganGestorEntity organGestor = organGestorRepository.getOne(id);
+		OrganGestorEntity organGestor = organGestorRepository.findById(id).orElse(null);
 		if (organGestor == null) {
 			throw new NotFoundException(id, OrganGestorEntity.class);
 		}
@@ -302,7 +302,7 @@ public class EntityComprovarHelper {
 	
 
 	public MetaNodeEntity comprovarMetaNode(EntitatEntity entitat, Long id) {
-		MetaNodeEntity metaNode = metaNodeRepository.getOne(id);
+		MetaNodeEntity metaNode = metaNodeRepository.findById(id).orElse(null);
 		if (metaNode == null) {
 			throw new NotFoundException(id, MetaNodeEntity.class);
 		}
@@ -318,7 +318,7 @@ public class EntityComprovarHelper {
 
 
 	public MetaExpedientEntity comprovarMetaExpedient(EntitatEntity entitat, Long metaExpedientId) {
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
 		if (metaExpedient == null) {
 			throw new NotFoundException(metaExpedientId, MetaExpedientEntity.class);
 		}
@@ -342,7 +342,7 @@ public class EntityComprovarHelper {
 	
 	
 	public MetaExpedientEntity comprovarMetaExpedient(Long metaExpedientId) {
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
 		if (metaExpedient == null) {
 			throw new NotFoundException(metaExpedientId, MetaExpedientEntity.class);
 		}
@@ -452,7 +452,7 @@ public class EntityComprovarHelper {
 	}
 
 	public MetaDocumentEntity comprovarMetaDocument(Long metaDocumentId) {
-		MetaDocumentEntity metaDocument = metaDocumentRepository.getOne(metaDocumentId);
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findById(metaDocumentId).orElse(null);
 		if (metaDocument == null) {
 			throw new NotFoundException(metaDocumentId, MetaDocumentEntity.class);
 		}
@@ -480,7 +480,7 @@ public class EntityComprovarHelper {
 					"entitatId=" + entitat.getId() + ", " +
 					"metaExpedientId=" + (metaExpedient != null ? metaExpedient.getId() : "") + ", " +
 					"metaDocumentId=" + id + ")");
-		MetaDocumentEntity metaDocument = metaDocumentRepository.getOne(id);
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findById(id).orElse(null);
 		if (metaDocument == null) {
 			throw new NotFoundException(id, MetaDocumentEntity.class);
 		}
@@ -548,7 +548,7 @@ public class EntityComprovarHelper {
 	}
 
 	public MetaDadaEntity comprovarMetaDada(EntitatEntity entitat, MetaNodeEntity metaNode, Long id) {
-		MetaDadaEntity metaDada = metaDadaRepository.getOne(id);
+		MetaDadaEntity metaDada = metaDadaRepository.findById(id).orElse(null);
 		if (metaDada == null) {
 			throw new NotFoundException(id, MetaDadaEntity.class);
 		}
@@ -565,7 +565,7 @@ public class EntityComprovarHelper {
 	
 	
 	public ContingutEntity comprovarContingut(Long id) {
-		ContingutEntity contingut = contingutRepository.getOne(id);
+		ContingutEntity contingut = contingutRepository.findById(id).orElse(null);
 		if (contingut == null) {
 			throw new NotFoundException(id, ContingutEntity.class);
 		}
@@ -576,7 +576,7 @@ public class EntityComprovarHelper {
 	public NodeEntity comprovarNode(
 			EntitatEntity entitat,
 			Long nodeId) {
-		NodeEntity node = nodeRepository.getOne(nodeId);
+		NodeEntity node = nodeRepository.findById(nodeId).orElse(null);
 		if (node == null) {
 			throw new NotFoundException(nodeId, NodeEntity.class);
 		}
@@ -585,7 +585,7 @@ public class EntityComprovarHelper {
 	}
 
 	public CarpetaEntity comprovarCarpeta(EntitatEntity entitat, Long id) {
-		CarpetaEntity carpeta = carpetaRepository.getOne(id);
+		CarpetaEntity carpeta = carpetaRepository.findById(id).orElse(null);
 		if (carpeta == null) {
 			throw new NotFoundException(id, CarpetaEntity.class);
 		}
@@ -774,7 +774,7 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisDelete,
 			String rolActual) {
 
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		ExpedientEntity expedient = expedientRepository.findById(expedientId).orElse(null);
 		if (expedient == null) {
 			throw new NotFoundException(expedientId, ExpedientEntity.class);
 		}
@@ -842,7 +842,7 @@ public class EntityComprovarHelper {
 			Long expedientId,
 			ExpedientEstatEnumDto estat) {
 		EntitatEntity entitat = comprovarEntitat(entitatId, false, false, false, true, false);
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		ExpedientEntity expedient = expedientRepository.findById(expedientId).orElse(null);
 		if (expedient == null) {
 			throw new NotFoundException(expedientId, ExpedientEntity.class);
 		}
@@ -879,7 +879,7 @@ public class EntityComprovarHelper {
 	public DocumentEntity comprovarDocument(EntitatEntity entitat, ExpedientEntity expedient, Long documentId,
 	                                        boolean comprovarPermisRead, boolean comprovarPermisWrite,
 	                                        boolean comprovarPermisCreate, boolean comprovarPermisDelete) {
-		DocumentEntity document = documentRepository.getOne(documentId);
+		DocumentEntity document = documentRepository.findById(documentId).orElse(null);
 		if (document == null) {
 			throw new NotFoundException(documentId, DocumentEntity.class);
 		}
@@ -927,7 +927,7 @@ public class EntityComprovarHelper {
 	}
 
 	public DadaEntity comprovarDada(NodeEntity node, Long dadaId) {
-		DadaEntity dada = dadaRepository.getOne(dadaId);
+		DadaEntity dada = dadaRepository.findById(dadaId).orElse(null);
 		if (dada == null) {
 			throw new NotFoundException(dadaId, DadaEntity.class);
 		}
@@ -951,7 +951,7 @@ public class EntityComprovarHelper {
 	 */
 
 	public InteressatEntity comprovarInteressat(ExpedientEntity expedient, Long interessatId) {
-		InteressatEntity interessat = interessatRepository.getOne(interessatId);
+		InteressatEntity interessat = interessatRepository.findById(interessatId).orElse(null);
 		if (interessat == null) {
 			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
@@ -971,7 +971,7 @@ public class EntityComprovarHelper {
 
 	public DocumentNotificacioEntity comprovarNotificacio(ExpedientEntity expedient, DocumentEntity document,
 	                                                      Long notificacioId) {
-		DocumentNotificacioEntity notificacio = documentNotificacioRepository.getOne(notificacioId);
+		DocumentNotificacioEntity notificacio = documentNotificacioRepository.findById(notificacioId).orElse(null);
 		if (notificacio == null) {
 			throw new NotFoundException(notificacioId, DocumentNotificacioEntity.class);
 		}
@@ -992,7 +992,7 @@ public class EntityComprovarHelper {
 
 	public DocumentPublicacioEntity comprovarPublicacio(ExpedientEntity expedient, DocumentEntity document,
 	                                                    Long publicacioId) {
-		DocumentPublicacioEntity publicacio = documentPublicacioRepository.getOne(publicacioId);
+		DocumentPublicacioEntity publicacio = documentPublicacioRepository.findById(publicacioId).orElse(null);
 		if (publicacio == null) {
 			throw new NotFoundException(publicacioId, DocumentNotificacioEntity.class);
 		}
@@ -1076,7 +1076,7 @@ public class EntityComprovarHelper {
 		boolean grantedOrgan = false;
 
 		if (organGestorId != null) {
-			OrganGestorEntity organGestorEntity = organGestorRepository.getOne(organGestorId);
+			OrganGestorEntity organGestorEntity = organGestorRepository.findById(organGestorId).orElse(null);
 			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
 			permisosHelper.filterGrantedAny(
 					organsGestors,
@@ -1147,7 +1147,7 @@ public class EntityComprovarHelper {
 			logger.info("isGrantedPermisProcediemntsComuns( procedimentId=" + procedimentId + ")");
 		
 		boolean grantedOrganProcedimentsComuns = false;
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(procedimentId);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(procedimentId).orElse(null);
 		if (metaExpedient.isComu()) {
 			List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
 					OrganGestorEntity.class,
@@ -1166,12 +1166,12 @@ public class EntityComprovarHelper {
 			Permission permission) {
 		
 		
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(procedimentId);
-		OrganGestorEntity organ = organGestorRepository.getOne(organId);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(procedimentId).orElse(null);
 		
 		boolean grantedOrganProcedimentsComuns = false;
 		
 		if (metaExpedient.isComu()) {
+			OrganGestorEntity organ = organGestorRepository.findById(organId).orElse(null);
 			List<Long> organParesIds = organGestorHelper.findParesIds(organ.getId(), true);
 			permisosHelper.filterGrantedAll(
 					organParesIds,
@@ -1275,7 +1275,7 @@ public class EntityComprovarHelper {
 					}
 
 					if (grupId != null) {
-						GrupEntity grup = grupRepository.getOne(grupId);
+						GrupEntity grup = grupRepository.findById(grupId).orElse(null);
 						if (grup != null) {
 							
 							boolean grantedGrup = permisosHelper.isGrantedAll(

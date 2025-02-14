@@ -41,10 +41,10 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 		this.autenticacioBasic = autenticacioBasic;
 	}
 
-	
+
 	public List<UnidadRest> obtenerArbolUnidades(String codigo, String fechaActualizacion, String fechaSincronizacion) {
 		try {
-			
+
 			MultivaluedMap<String, String> params = new MultivaluedMapImpl();
 			params.add("codigo", codigo); 
 			if (Utils.isNotEmpty(fechaActualizacion)) {
@@ -65,12 +65,12 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 					queryParams(params).
 					type("application/json").
 					get(String.class);
-			
+
 			log.info("obtenerArbolUnidades REST response: " + json);
 			return getMapper().readValue(json, new TypeReference<List<UnidadRest>>(){});
 		} catch (Exception ex) { 
 			if (ex instanceof UniformInterfaceException) { 
-				if (((UniformInterfaceException) ex).getResponse().getStatusInfo().getStatusCode() == 204) { //com.sun.jersey.api.client.UniformInterfaceException: GET returned a response status of 204 No Content
+				if (((UniformInterfaceException) ex).getResponse().getClientResponseStatus().getStatusCode() == 204) { //com.sun.jersey.api.client.UniformInterfaceException: GET returned a response status of 204 No Content
 					return null;
 				}
 			}

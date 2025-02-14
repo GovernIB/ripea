@@ -83,7 +83,7 @@ public class UsuariHelper {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null)
 			return null;
-		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
@@ -118,7 +118,7 @@ public class UsuariHelper {
 
 	public UsuariEntity getUsuariByCodi(String codi) {
 		
-		UsuariEntity usuari = usuariRepository.getOne(codi);
+		UsuariEntity usuari = usuariRepository.findById(codi).orElse(null);
 		if (usuari == null) {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + codi + ")");
@@ -165,7 +165,7 @@ public class UsuariHelper {
 			}
 		}
 		
-		UsuariEntity usuari = usuariRepository.getOne(usuariCodi);
+		UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
 		
 		if (usuari == null && checkAlsoByNif)
 			usuari = usuariRepository.findByNif(usuariCodi);

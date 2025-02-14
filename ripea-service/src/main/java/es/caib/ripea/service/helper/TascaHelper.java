@@ -50,7 +50,7 @@ public class TascaHelper {
 					if (ItemValidacioTascaEnum.DADA.equals(validacioTasca.getItemValidacio())) {
 						
 						//La mateixa funció s'utilitza per guardar els valors de la pipella de dades del expedient.					
-						MetaDadaEntity metaDadaProcediment = metaDadaRepository.getOne(validacioTasca.getItemId());
+						MetaDadaEntity metaDadaProcediment = metaDadaRepository.findById(validacioTasca.getItemId()).orElse(null);
 						
 						if (metaDadaProcediment == null || !metaDadaProcediment.isActiva()) {
 							validacioOk = true; //Si la meta-dada no esta activa actualment al procediment, no es valida perque no es podrá aportar...
@@ -73,7 +73,7 @@ public class TascaHelper {
 					} else if (ItemValidacioTascaEnum.DOCUMENT.equals(validacioTasca.getItemValidacio())) {
 						
 						//Anam a cercar la dada del expedient, del tipus (metaDocumentId) igual al itemId de la validació
-						MetaDocumentEntity metaDocProcediment = metaDocumentRepository.getOne(validacioTasca.getItemId());
+						MetaDocumentEntity metaDocProcediment = metaDocumentRepository.findById(validacioTasca.getItemId()).orElse(null);
 						
 						if (metaDocProcediment==null || !metaDocProcediment.isActiu()) {
 							validacioOk = true; //Si el tipus de document no esta actiu acualment al procediment, no es valida perque no es podrá aportar...
@@ -140,7 +140,7 @@ public class TascaHelper {
 
 	public ExpedientTascaEntity comprovarTasca(Long expedientTascaId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		ExpedientTascaEntity tasca = expedientTascaRepository.getOne(expedientTascaId);
+		ExpedientTascaEntity tasca = expedientTascaRepository.findById(expedientTascaId).orElse(null);
 		
 		if (tasca == null)
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);

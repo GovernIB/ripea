@@ -1,0 +1,47 @@
+databaseChangeLog:
+- changeSet:
+    id: lob-1
+    author: limit
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}document MOVE LOB(fitxer_contingut) STORE AS ${app_prefix}document_fitxcont_lob(TABLESPACE ripea_lob INDEX ${app_prefix}document_fitxcont_lob_i);
+- changeSet:
+    id: lob-2
+    author: limit
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}entitat MOVE LOB(logo_img) STORE AS ${app_prefix}entitat_logo_lob(TABLESPACE ripea_lob INDEX ${app_prefix}entitat_logo_lob_i);
+- changeSet:
+    id: lob-3
+    author: limit
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}metadocument MOVE LOB(plantilla_contingut) STORE AS ${app_prefix}metadoc_plancont_lob(TABLESPACE ripea_lob INDEX ${app_prefix}metadoc_plancont_lob_i);
+- changeSet:
+    id: lob-4
+    author: limit
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}registre MOVE LOB(exposa) STORE AS ${app_prefix}registre_exposa_lob(TABLESPACE ripea_lob INDEX ${app_prefix}registre_exposa_lob_i);
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}registre MOVE LOB(solicita) STORE AS ${app_prefix}registre_solicita_lob(TABLESPACE ripea_lob INDEX ${app_prefix}registre_solicita_lob_i);
+- changeSet:
+    id: lob-5
+    author: limit
+    context: caib
+    changes:
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}registre_annex MOVE LOB(contingut) STORE AS ${app_prefix}reg_annx_cont_lob(TABLESPACE ripea_lob INDEX ${app_prefix}reg_annx_cont_lob_i);
+    - sql:
+        dbms: oracle
+        sql: ALTER TABLE ${app_prefix}registre_annex MOVE LOB(firma_contingut) STORE AS ${app_prefix}reg_annx_firmacont_lob(TABLESPACE ripea_lob INDEX ${app_prefix}reg_annx_firmacont_lob_i);

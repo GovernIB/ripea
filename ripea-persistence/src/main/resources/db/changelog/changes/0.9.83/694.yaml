@@ -1,7 +1,0 @@
-databaseChangeLog:
-- changeSet:
-    id: 1620634795427-1
-    author: limit
-    changes:
-    - sql:
-        sql:  update ipa_metaexpedient set revisio_estat = 'REVISAT' where revisio_estat is null;
