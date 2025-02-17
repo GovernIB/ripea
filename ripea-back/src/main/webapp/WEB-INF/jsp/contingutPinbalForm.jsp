@@ -137,7 +137,7 @@
 		</div>
 	</div>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/new"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pinbalConsultaCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="pinbalConsultaCommand">
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
 		<rip:inputSelect name="metaDocumentId" textKey="contingut.pinbal.form.camp.metanode" required="true" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom"/>

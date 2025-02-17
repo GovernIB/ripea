@@ -171,7 +171,7 @@
 </head>
 <body>
 
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportEditCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientImportEditCommand" role="form">
 
 		<form:hidden path="entitatId"/>
 		

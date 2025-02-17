@@ -18,7 +18,7 @@
     <rip:modalHead/>
 </head>
 <body>
-<form:form action="" method="post" cssClass="form-horizontal" commandName="enviarDocumentCommand">
+<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="enviarDocumentCommand">
 
     <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
     <c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>

@@ -20,7 +20,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/grup/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="grupCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="grupCommand">
 		<form:hidden path="id"/>
 		<!--  form:hidden path="entitatId"/-->
 		<rip:inputText name="codi" textKey="grup.form.camp.codi" required="true"/>

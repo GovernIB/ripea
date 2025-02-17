@@ -359,7 +359,7 @@ function calculateClassificacioId() {
 
 	<div id="loading" style="display: none;"><div style="text-align: center; padding-bottom: 100px; color: #666666; margin-top: 100px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientCommand">
 		<c:if test="${isCarpetaDefecte || (metaExpedientCommand.revisioEstat!=null && isRevisioActiva)}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>

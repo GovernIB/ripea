@@ -46,7 +46,7 @@
 </head>
 <body>
 
-	<form:form action="" method="post" cssClass="well" commandName="diagnosticFiltreDto">
+	<form:form action="" method="post" cssClass="well" modelAttribute="diagnosticFiltreDto">
 		<div class="row">
 	        <div class="col-xs-6">
 				<rip:inputSelect

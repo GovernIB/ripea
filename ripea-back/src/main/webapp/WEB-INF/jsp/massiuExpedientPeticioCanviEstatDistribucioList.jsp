@@ -112,7 +112,7 @@
 
 </head>
 <body>
-<form:form action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
+<form:form action="" method="post" cssClass="well" modelAttribute="expedientPeticioFiltreCommand">
     <div class="row">
         <div class="col-md-4">
             <rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.columna.numero"/>

@@ -224,7 +224,7 @@ function closeViewer() {
 	</c:choose>
 		
 	</c:set>
-	<form:form id="annexForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="registreAnnexCommand">
+	<form:form id="annexForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="registreAnnexCommand">
 
 		<c:choose>
 			<c:when test="${!empty registreAnnexCommand}">

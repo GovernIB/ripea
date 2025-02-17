@@ -114,7 +114,7 @@ function changedCallback(e, data) {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${descarregaCommand.pareId}/descarregarSelectedDocuments"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="descarregaCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="descarregaCommand">
 		<br/>
 		<rip:arbreMultiple  name="estructuraCarpetesJson" isArbreSeleccionable="${true}" isFullesSeleccionable="${true}" id="arbreCarpetes" 
 			atributId="id" atributNom="nom" arbre="${carpetes}" fulles="${documents}" fullesIcona="fa fa-file-text-o" fullesAtributId="id" 

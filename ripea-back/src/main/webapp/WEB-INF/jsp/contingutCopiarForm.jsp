@@ -14,7 +14,7 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<form:form action="" class="form-horizontal" commandName="contingutMoureCopiarEnviarCommand">
+	<form:form action="" class="form-horizontal" modelAttribute="contingutMoureCopiarEnviarCommand">
 		<form:hidden path="origenId"/>
 		<rip:inputFixed textKey="contingut.copiar.camp.origen">
 			<rip:blocIconaContingut contingut="${contingutOrigen}"/>

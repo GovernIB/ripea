@@ -45,7 +45,7 @@
 <body>
 
 	<c:set var="formAction"><rip:modalUrl value="/organgestor"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organGestorCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="organGestorCommand" role="form">
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="organgestor.form.camp.codi" labelSize="2" readonly="true"/>
 		<rip:inputText name="nom" textKey="organgestor.form.camp.nom" labelSize="2" readonly="true"/>

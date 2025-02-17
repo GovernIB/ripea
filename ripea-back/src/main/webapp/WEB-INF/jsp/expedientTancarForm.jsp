@@ -32,7 +32,7 @@
 			<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>
 		</div>
 	</div>
-	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientTancarCommand">
+	<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="expedientTancarCommand">
 		<form:hidden path="id"/>
 		<c:if test="${!empty esborranys}">
 			<div class="alert well-sm alert-info">

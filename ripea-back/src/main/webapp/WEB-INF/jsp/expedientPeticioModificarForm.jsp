@@ -105,7 +105,7 @@ function refrescarGrup(firstTime) {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/expedientPeticio/canviarProcediment"/></c:set>
-	<form:form id="expedientPeticioModificarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioModificarCommand">
+	<form:form id="expedientPeticioModificarForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientPeticioModificarCommand">
 		<form:hidden path="id" />
 
 		<rip:inputText name="numero" textKey="expedient.peticio.list.columna.numero" readonly = "true"/>

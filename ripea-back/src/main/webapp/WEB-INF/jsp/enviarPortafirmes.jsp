@@ -495,7 +495,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/massiu/portafirmes/crear"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="portafirmesEnviarCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="portafirmesEnviarCommand" role="form">
 		<rip:inputDate name="dataInici" textKey="accio.massiva.general.data.inici" required="false"/>
 		<rip:inputCheckbox name="enviarCorreu" textKey="accio.massiva.general.enviar.correu"/>
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>

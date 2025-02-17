@@ -18,7 +18,7 @@
 		<rip:modalUrl value="/expedientPeticio/rebutjar" />
 	</c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal"
-		commandName="expedientPeticioRebutjarCommand">
+		modelAttribute="expedientPeticioRebutjarCommand">
 		<form:hidden path="id" />
 
 

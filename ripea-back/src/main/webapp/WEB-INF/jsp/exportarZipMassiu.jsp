@@ -16,7 +16,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/expedient/exportarZipMassiu"/></c:set>
-	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientExportarZipOptions">
+	<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="expedientExportarZipOptions">
 		
 		<rip:inputHidden name="numExps"/>		
 		<rip:inputCheckbox

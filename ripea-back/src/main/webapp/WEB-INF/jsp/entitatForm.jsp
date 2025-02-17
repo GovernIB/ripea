@@ -39,7 +39,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="entitatCommand" role="form" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="entitatCommand" role="form" enctype="multipart/form-data">
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="entitat.form.camp.codi" required="true" readonly="${!empty entitatCommand.id}"/>
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>

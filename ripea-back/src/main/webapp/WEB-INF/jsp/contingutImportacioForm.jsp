@@ -159,7 +159,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${importacioCommand.pareId}/importacio/new"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="importacioCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="importacioCommand">
 		<br/>
 		<rip:inputRadio name="tipusImportacio" textKey="contingut.importacio.form.camp.tipus" botons="true" optionItems="${tipusImportacioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<div class="tipus-registre">

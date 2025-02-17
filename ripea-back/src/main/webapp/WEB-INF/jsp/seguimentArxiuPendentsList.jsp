@@ -175,7 +175,7 @@ $(document).ready(function() {
 		<!------------------------------ TABPANEL EXPEDIENTS ------------------------------------->
 		<div class="tab-pane active in" id="expedients">
 			<c:url value="/seguimentArxiuPendents/filtrar/expedients" var="formAction"/>
-			<form:form id="seguimentFiltreExpedientsForm" action="${ formAction }" method="post" cssClass="well" commandName="commandExpedients">
+			<form:form id="seguimentFiltreExpedientsForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="commandExpedients">
 				<div class="row">
 					<div class="col-md-4">
 						<rip:inputText name="elementNom" inline="true" placeholderKey="seguiment.list.filtre.camp.expedientNom"/>
@@ -246,7 +246,7 @@ $(document).ready(function() {
 		<!------------------------------ TABPANEL DOCUMENTS ------------------------------------->
 		<div class="tab-pane" id="documents">
 			<c:url value="/seguimentArxiuPendents/filtrar/documents" var="formAction"/>
-			<form:form id="seguimentFiltreDocumentsForm" action="${ formAction }" method="post" cssClass="well" commandName="commandDocuments">
+			<form:form id="seguimentFiltreDocumentsForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="commandDocuments">
 				<div class="row">
 					<div class="col-md-4">
 						<rip:inputText name="elementNom2" inline="true" placeholderKey="seguiment.list.filtre.camp.documentNom"/>
@@ -346,7 +346,7 @@ $(document).ready(function() {
 		<!------------------------------ TABPANEL INTERESSATS ------------------------------------->
 		<div class="tab-pane" id="interessats">
 			<c:url value="/seguimentArxiuPendents/filtrar/interessats" var="formAction"/>
-			<form:form id="seguimentFiltreInteressatsForm" action="${ formAction }" method="post" cssClass="well" commandName="commandInteressats">
+			<form:form id="seguimentFiltreInteressatsForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="commandInteressats">
 				<div class="row">
 					<div class="col-md-4">
 						<rip:inputText name="elementNom3" inline="true" placeholderKey="seguiment.list.filtre.camp.interessatNom"/>

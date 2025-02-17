@@ -161,7 +161,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 
 </head>
 <body>
-	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
+	<form:form action="" method="post" cssClass="well" modelAttribute="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputSelect name="tipusElement"  optionEnum="ContingutTipusEnumDto" placeholderKey="accio.massiva.list.filtre.tipuselement" emptyOption="true" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarTipusElement}" netejar="${not contingutMassiuFiltreCommand.bloquejarTipusElement}"/>

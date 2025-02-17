@@ -116,7 +116,7 @@ function showGrup(element) {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedientId}/grup/relacionar/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="relacionarGrupCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="relacionarGrupCommand">
 
 
 		<rip:inputSelect 

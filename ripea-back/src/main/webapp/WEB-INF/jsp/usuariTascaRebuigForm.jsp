@@ -13,7 +13,7 @@
 </head>
 <body>
     <c:set var="formAction"><rip:modalUrl value="/usuariTasca/rebutjar"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="usuariTascaRebuigCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="usuariTascaRebuigCommand">
 		<form:hidden path="id"/>
 
 		<rip:inputTextarea name="motiu" textKey="expedient.tasca.rebutjar.form.camp.motiu" required="true"/>

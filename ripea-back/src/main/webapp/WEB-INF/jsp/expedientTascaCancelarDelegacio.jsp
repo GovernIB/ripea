@@ -18,7 +18,7 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<form:form action="" method="post" cssClass="form-horizontal" commandName="tascaCancelarDelegacioCommand">
+	<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="tascaCancelarDelegacioCommand">
 		
 		<rip:inputTextarea name="comentari" textKey="expedient.tasca.delegar.camp.comentari"/>
 		

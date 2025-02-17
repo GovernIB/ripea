@@ -22,7 +22,7 @@
 
 	<c:set var="formAction"><rip:modalUrl value="/massiu/canviEstat/canviarEstat"/></c:set>
 
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientMassiuCanviEstatCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientMassiuCanviEstatCommand">
 		<rip:inputSelect name="expedientEstatId" textKey="expedient.massiu.estat.form.camp"  optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
 		<div class="row" style="margin-bottom: 60px;"></div>
 		<div id="modal-botons" class="well">

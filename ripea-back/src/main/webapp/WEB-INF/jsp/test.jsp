@@ -30,7 +30,7 @@
 <body>
 
 
-	<form:form action="${formAction}" method="post"  commandName="testCommand" role="form" >
+	<form:form action="${formAction}" method="post"  modelAttribute="testCommand" role="form" >
 
 		
 

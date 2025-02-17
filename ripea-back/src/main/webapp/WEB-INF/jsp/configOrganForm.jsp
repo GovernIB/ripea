@@ -26,7 +26,7 @@
 	<c:when test="${organConfigCommand.crear}"><c:set var="formAction"><rip:modalUrl value="/config/organ/new"/></c:set></c:when>
 	<c:otherwise><c:set var="formAction"><rip:modalUrl value="/config/organ/update"/></c:set></c:otherwise>
 </c:choose>
-<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organConfigCommand">
+<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="organConfigCommand">
 
 	<form:hidden path="key"/>
 	<form:hidden path="jbossProperty"/>

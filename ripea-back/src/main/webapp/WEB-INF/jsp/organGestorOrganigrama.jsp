@@ -134,7 +134,7 @@
 
 	<!------------------------- FILTER ------------------------>
 	<c:url value="organGestorOrganigrama/filtrar" var="formAction"/>
-	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="organGestorFiltreCommand">
+	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="organGestorFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<rip:inputText name="codi" inline="true" placeholderKey="organgestor.list.filtre.camp.codi"/>
@@ -191,7 +191,7 @@
 
 
 					<c:set var="formAction"><rip:modalUrl value="/organgestor?redirectAOrganigrama=true"/></c:set>
-					<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organGestorCommand" role="form">
+					<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="organGestorCommand" role="form">
 					
 						<form:hidden path="id"/>
 						<rip:inputText name="codi" id="codi1" textKey="organgestor.form.camp.codi" labelSize="2" readonly="true"/>

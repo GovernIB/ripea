@@ -11,7 +11,7 @@
 <%
 pageContext.setAttribute(
 		"metadocumentSeqtipEnumOptions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
 		es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
 		"metadocument.seqtip.enum."));
 %>
@@ -688,7 +688,7 @@ function isDniNie(value) {
 
 	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/portafirmes/upload?tascaId=${tascaId}"/></c:set>
 
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal content" commandName="portafirmesEnviarCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal content" modelAttribute="portafirmesEnviarCommand" role="form">
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<%--<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/> --%>

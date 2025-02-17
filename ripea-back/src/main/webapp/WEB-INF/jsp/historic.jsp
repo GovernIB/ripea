@@ -995,7 +995,7 @@
 <c:url value="/organgestorajax/organgestor" var="urlConsultaOrgansLlistat"/>
 <c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaMetaExpedientsInicial"/>
 <c:url value="/metaexpedientajax/metaexpedients/estadistiques" var="urlConsultaMetaExpedientsLlistat"/>
-	<form:form action="" method="post" cssClass="well" commandName="historicFiltreCommand">
+	<form:form action="" method="post" cssClass="well" modelAttribute="historicFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="historic.filtre.data.inici"/>

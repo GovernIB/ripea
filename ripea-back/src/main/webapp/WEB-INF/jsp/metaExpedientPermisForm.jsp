@@ -47,7 +47,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/permis"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="permisCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect name="principalTipus" textKey="metaexpedient.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="PrincipalTipusEnumDto"/>
 		<c:choose>

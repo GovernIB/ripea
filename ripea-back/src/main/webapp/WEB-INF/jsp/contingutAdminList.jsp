@@ -7,7 +7,7 @@
 <%
 pageContext.setAttribute(
 		"contingutAdminOpcionsEsborratEnumOptions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
 				es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum.class,
 				"contingut.admin.opcions.esborrat.enum."));
 %>
@@ -116,7 +116,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<form:form action="" method="post" cssClass="well" commandName="contingutFiltreCommand">
+	<form:form action="" method="post" cssClass="well" modelAttribute="contingutFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>

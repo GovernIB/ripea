@@ -20,7 +20,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaDocument/${metaDocument.id}/metaDada/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaNodeMetaDadaCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaNodeMetaDadaCommand">
 		<form:hidden path="id"/>
 		<c:choose>
 			<c:when test="${empty metaNodeMetaDadaCommand.id}">

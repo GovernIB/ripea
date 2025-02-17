@@ -120,7 +120,7 @@
 	</script>
 </head>
 <body>
-	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
+	<form:form action="" method="post" cssClass="well" modelAttribute="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputSelect 

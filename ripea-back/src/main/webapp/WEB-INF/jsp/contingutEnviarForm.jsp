@@ -14,7 +14,7 @@
 	<script src="<c:url value="/js/jstree.min.js"/>"></script>
 </head>
 <body>
-	<form:form action="" class="form-horizontal" commandName="contingutMoureCopiarEnviarCommand">
+	<form:form action="" class="form-horizontal" modelAttribute="contingutMoureCopiarEnviarCommand">
 		<form:hidden path="origenId"/>
 		<rip:inputFixed textKey="contingut.enviar.camp.origen">
 			<rip:blocIconaContingut contingut="${contingutOrigen}"/>

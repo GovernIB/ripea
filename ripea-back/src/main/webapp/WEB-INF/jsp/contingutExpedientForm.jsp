@@ -15,7 +15,7 @@
 	<c:when test="${empty expedientCommand.id}"><c:set var="formAction"><rip:modalUrl value="/expedient/new"/></c:set></c:when>
 	<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientCommand.id}/update"/></c:set></c:otherwise>
 </c:choose>
-<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
+<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientCommand">
 	<form:hidden path="id"/>
 	<form:hidden path="entitatId"/>
 	<form:hidden path="pareId"/>

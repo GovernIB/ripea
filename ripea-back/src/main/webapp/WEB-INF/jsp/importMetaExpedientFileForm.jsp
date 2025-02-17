@@ -19,7 +19,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxer"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="fileCommand" role="form" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="fileCommand" role="form" enctype="multipart/form-data">
 		<rip:inputFile name="file" textKey="metaexpedient.import.form.file" required="true"/>
 		<div style="min-height: 20px;"></div>
 		<div id="modal-botons">

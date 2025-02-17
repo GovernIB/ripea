@@ -20,7 +20,7 @@
 
 <c:set var="formAction"><rip:modalUrl value="/expedientTasca/canviarPrioritat"/></c:set>
 
-<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientTascaDto">
+<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientTascaDto">
     <form:hidden path="id"/>
     <rip:inputText name="metaExpedientTasca.nom" textKey="expedient.tasca.form.camp.metaExpedientTasca" disabled="true"/>
     <rip:inputText name="titol" textKey="expedient.tasca.list.columna.titol" readonly="true"/>    

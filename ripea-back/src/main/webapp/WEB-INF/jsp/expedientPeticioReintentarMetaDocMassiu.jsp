@@ -40,7 +40,7 @@ $(document).ready(function(){
 	<c:set var="formAction">
 		<rip:modalUrl value="/massiu/procesarAnnexosPendents/adjuntarExpedient" />
 	</c:set>
-	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="registreAnnexCommand">
+	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="registreAnnexCommand">
 		<div class="well"> 
 			<form:hidden path="id" />
 			<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>

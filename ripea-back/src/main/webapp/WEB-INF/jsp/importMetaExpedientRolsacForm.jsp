@@ -20,7 +20,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importRolsac"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportRolsacCommand" role="form" >
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientImportRolsacCommand" role="form" >
 		
 		<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true"/>
 		

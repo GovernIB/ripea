@@ -131,7 +131,7 @@ function enableDisableSelection($this, tipus) {
 	</div>
 
 
-	<form:form action="" method="post" cssClass="well" commandName="massiuAnnexProcesarFiltreCommand">
+	<form:form action="" method="post" cssClass="well" modelAttribute="massiuAnnexProcesarFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.column.nom.annex"/>

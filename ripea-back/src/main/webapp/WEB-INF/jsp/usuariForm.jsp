@@ -68,7 +68,7 @@
 <body>
 
 <c:set var="formAction"><rip:modalUrl value="/usuari/configuracio"/></c:set>
-<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="usuariCommand" role="form">
+<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="usuariCommand" role="form">
 	<div class="panel panel-primary">
 		<div class="panel-heading">
 			<h3 class="panel-title">Dades de l'usuari</h3>

@@ -86,7 +86,7 @@
 	<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
 		<c:set var="formAction"><rip:modalUrl value="/organgestor/${ permisOrganGestorCommand.organGestorId }/permis"/></c:set>
  	</c:if>	
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisOrganGestorCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="permisOrganGestorCommand">
 		<form:hidden path="id"/>
 		<rip:inputSelect 
 			name="organGestorId" 

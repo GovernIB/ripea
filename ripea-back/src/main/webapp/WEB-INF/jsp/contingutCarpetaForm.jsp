@@ -18,7 +18,7 @@
 		<c:when test="${empty carpetaCommand.id}"><c:set var="formAction"><rip:modalUrl value="/contingut/${carpetaCommand.pareId}/carpeta/new"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/contingut/${carpetaCommand.pareId}/carpeta/update"/></c:set></c:otherwise>
 	</c:choose>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="carpetaCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="carpetaCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>

@@ -56,7 +56,7 @@
 
 
 	<c:url value="metaExpedientRevisio/filtrar" var="formAction"/>
-	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" commandName="metaExpedientFiltreCommand">
+	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" modelAttribute="metaExpedientFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="codi" inline="true" placeholderKey="metaexpedient.list.filtre.camp.codi"/>

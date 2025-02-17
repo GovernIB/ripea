@@ -187,7 +187,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/viafirma/upload"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="viaFirmaEnviarCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="viaFirmaEnviarCommand" role="form">
 		<div class="title">
 			<label><spring:message code="contenidor.document.biometrica.dades"/></label>
 			<hr>

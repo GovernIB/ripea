@@ -18,7 +18,7 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<form:form action="" method="post" cssClass="form-horizontal" commandName="tascaReobrirCommand">
+	<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="tascaReobrirCommand">
 		
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>

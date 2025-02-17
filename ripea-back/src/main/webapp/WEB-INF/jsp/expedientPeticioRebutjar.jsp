@@ -13,7 +13,7 @@
 </head>
 <body>
     <c:set var="formAction"><rip:modalUrl value="/expedientPeticio/rebutjar"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioRebutjarCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientPeticioRebutjarCommand">
 		<form:hidden path="id"/>
 
 		<rip:inputTextarea name="observacions" textKey="expedient.peticio.rebutjar.form.camp.motiu" required="true"/>

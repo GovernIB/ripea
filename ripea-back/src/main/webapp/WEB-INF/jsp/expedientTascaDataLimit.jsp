@@ -87,7 +87,7 @@
 
 <body>
 
-	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientTascaDto">
+	<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="expedientTascaDto">
 		
 		<form:hidden path="id"/>
 		<form:hidden path="titol"/>

@@ -200,7 +200,7 @@ function closeViewer() {
 	<c:set var="formAction">
 		<rip:modalUrl value="/expedientPeticio/${expedientPeticioId}/reintentar" />
 	</c:set>
-	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="registreAnnexCommand">
+	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="registreAnnexCommand">
 	
 		<div class="well">
 			<form:hidden path="id" />
