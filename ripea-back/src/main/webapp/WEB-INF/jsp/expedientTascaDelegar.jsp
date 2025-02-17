@@ -18,7 +18,7 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<form:form action="" method="post" cssClass="form-horizontal" commandName="tascaDelegarCommand">
+	<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="tascaDelegarCommand">
 		
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>

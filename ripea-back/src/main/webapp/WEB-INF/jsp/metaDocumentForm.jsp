@@ -14,17 +14,17 @@
 		org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage());
 pageContext.setAttribute(
 		"multiplicitatEnumOptions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
 		es.caib.ripea.core.api.dto.MultiplicitatEnumDto.class,
 		"multiplicitat.enum."));
 pageContext.setAttribute(
 		"metadocumentSequenciatipEnumOptions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
 		es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
 		"metadocument.seqtip.enum."));
 pageContext.setAttribute(
 		"metadocumentFluxtipEnumOptions",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
 		es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
 		"metadocument.fluxtip.enum."));
 %>
@@ -285,7 +285,7 @@ function removeLoading() {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaDocument"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaDocumentCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaDocumentCommand" enctype="multipart/form-data">
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dades"/></a></li>
 			<li role="presentation"><a href="#dades-nti" aria-controls="dades-nti" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dadesnti"/></a></li>

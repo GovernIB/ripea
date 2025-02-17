@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<form:form id="exportIntForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="interessatExportCommand" role="form">
+<form:form id="exportIntForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="interessatExportCommand" role="form">
 
     <form:hidden path="expedientId" />
 

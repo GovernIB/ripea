@@ -578,7 +578,7 @@ function removeLoading() {
 		<div class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span>&nbsp; <spring:message code="contingut.document.form.arxiu.definitiu.avis"/></div>
 	</c:if>
 	
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="documentCommand" enctype="multipart/form-data">
 		<div id="info-plantilla-si" class="alert well-sm alert-info hidden">
 			<span class="fa fa-info-circle"></span>
 			<spring:message code="contingut.document.form.info.plantilla.si"/>

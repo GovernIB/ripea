@@ -27,7 +27,7 @@
 <body>
 
 	<c:url value="seguimentExpedientsPendents/filtrar" var="formAction"/>
-	<form:form id="expedientPeticioFiltreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" commandName="expedientPeticioFiltreCommand">
+	<form:form id="expedientPeticioFiltreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" modelAttribute="expedientPeticioFiltreCommand">
 
 		<div class="row">
 			<div class="col-md-4">

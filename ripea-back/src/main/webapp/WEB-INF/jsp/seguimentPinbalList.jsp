@@ -25,7 +25,7 @@
 </head>
 <body>
 	<c:url value="seguimentPinbal/filtrar" var="formAction"/>
-	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="seguimentConsultaFiltreCommand">
+	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="seguimentConsultaFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>

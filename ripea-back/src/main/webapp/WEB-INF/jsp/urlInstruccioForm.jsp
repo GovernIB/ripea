@@ -26,7 +26,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/urlInstruccio"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="URLInstruccioCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="URLInstruccioCommand" role="form">
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="url.instruccio.form.camp.codi" required="true"/>
 		<rip:inputText name="nom" textKey="url.instruccio.form.camp.nom" required="true"/>

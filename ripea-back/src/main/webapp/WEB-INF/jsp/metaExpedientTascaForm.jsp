@@ -148,7 +148,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/tasca/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientTascaCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientTascaCommand">
 		
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>

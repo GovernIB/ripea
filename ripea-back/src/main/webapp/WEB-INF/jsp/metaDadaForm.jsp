@@ -209,7 +209,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<form:form action="." method="post" cssClass="form-horizontal" commandName="metaDadaCommand">
+	<form:form action="." method="post" cssClass="form-horizontal" modelAttribute="metaDadaCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="metaNodeId"/>

@@ -16,7 +16,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/massiu/canviPrioritats/canviar"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientMassiuCanviPrioritatCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientMassiuCanviPrioritatCommand">
 		<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
 		<div class="h200" />
 		<div id="modal-botons" class="well">

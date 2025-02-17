@@ -18,7 +18,7 @@
     <rip:modalHead/>
 </head>
 <body>
-<form:form action="" method="post" cssClass="form-horizontal" commandName="enviarDocumentCommand">
+<form:form action="" method="post" cssClass="form-horizontal" modelAttribute="enviarDocumentCommand">
 
 	<rip:inputText name="email" textKey="contingut.interessat.info.email"/>
 

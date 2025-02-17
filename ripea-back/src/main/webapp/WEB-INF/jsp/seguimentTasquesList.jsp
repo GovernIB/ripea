@@ -30,7 +30,7 @@
 <body>
 
 	<c:url value="seguimentTasques/filtrar" var="formAction"/>
-	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="seguimentFiltreCommand">
+	<form:form id="seguimentFiltreForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="seguimentFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="expedientNom" inline="true" placeholderKey="seguiment.list.filtre.camp.expedientNom"/>

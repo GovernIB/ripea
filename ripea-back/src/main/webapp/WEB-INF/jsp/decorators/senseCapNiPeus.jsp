@@ -5,7 +5,7 @@
 <%
 	pageContext.setAttribute(
 			"dadesUsuariActual",
-			es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
+			es.caib.ripea.back.helper.SessioHelper.getUsuariActual(request));
 %>
 <!DOCTYPE html>
 <html lang="en">

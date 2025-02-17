@@ -1,4 +1,4 @@
-<%@ page import="es.caib.ripea.war.helper.EnumHelper"%>
+<%@ page import="es.caib.ripea.back.helper.EnumHelper"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -118,7 +118,7 @@
 <body>
 
 	<c:set var="formAction"><rip:modalUrl value="/expedientTasca/${expedientId}/tasca"/></c:set>
-	<form:form id="tascaform" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientTascaCommand">
+	<form:form id="tascaform" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientTascaCommand">
 
 		<rip:inputSelect 
 			name="metaExpedientTascaId" 

@@ -42,9 +42,6 @@ public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain oauth2LoginSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests().
-			requestMatchers(publicRequestMatchers()).permitAll().
-			anyRequest().authenticated();
 		http.oauth2Login().
 			userInfoEndpoint().userService(oauth2UserService());
 		http.logout().
@@ -54,6 +51,9 @@ public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 			//addLogoutHandler(oauth2LogoutHandler()).
 			//logoutUrl(LOGOUT_URL).
 			logoutSuccessUrl("/");
+		http.authorizeRequests().
+				requestMatchers(publicRequestMatchers()).permitAll().
+				anyRequest().authenticated();
 		http.headers().frameOptions().sameOrigin();
 		http.csrf().disable();
 		http.cors();

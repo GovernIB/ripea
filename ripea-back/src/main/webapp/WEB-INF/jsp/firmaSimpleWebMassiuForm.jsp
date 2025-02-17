@@ -28,7 +28,7 @@ $(document).ready(function() {
 
 	<c:set var="formAction"><rip:modalUrl value="/massiu/firmasimpleweb/firmaSimpleWebStart"/></c:set>
 
-	<form:form id="passarela-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="firmaSimpleWebCommand" role="form" enctype="multipart/form-data">
+	<form:form id="passarela-form" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="firmaSimpleWebCommand" role="form" enctype="multipart/form-data">
 		<rip:inputTextarea name="motiu" textKey="firmasimpleweb.form.camp.motiu" required="true"/>
 
 		<div id="modal-botons" class="well">

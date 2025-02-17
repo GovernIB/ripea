@@ -20,7 +20,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/tipusDocumental/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="tipusDocumentalCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="tipusDocumentalCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<rip:inputText name="codi" textKey="tipusdocumental.form.camp.codi" required="true"/>

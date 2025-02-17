@@ -41,7 +41,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<form:form action="" class="form-horizontal" commandName="contingutMoureCopiarEnviarCommand">
+	<form:form action="" class="form-horizontal" modelAttribute="contingutMoureCopiarEnviarCommand">
 		<form:hidden path="origenIds"/>
 		<form:hidden path="origenId"/>
 		<rip:inputFixed textKey="contingut.moure.camp.origen">

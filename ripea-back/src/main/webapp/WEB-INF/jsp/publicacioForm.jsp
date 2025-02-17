@@ -26,7 +26,7 @@
 		<c:when test="${empty documentPublicacioCommand.id}"><c:set var="formAction"><rip:modalUrl value="/document/${documentPublicacioCommand.documentId}/publicar"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/document/${documentPublicacioCommand.documentId}/publicacio/${documentPublicacioCommand.id}"/></c:set></c:otherwise>
 	</c:choose>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentPublicacioCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="documentPublicacioCommand" role="form">
 		<rip:inputHidden name="id"/>
 		<rip:inputHidden name="documentId"/>
 		<rip:inputSelect name="tipus" textKey="publicacio.form.camp.tipus" optionItems="${publicacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>

@@ -318,7 +318,7 @@ function refrescarGrups() {
 	<c:set var="formAction">
 		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/getFirstAnnex" />
 	</c:set>
-	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
+	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientPeticioAcceptarCommand">
 		<form:hidden path="id" />
 
 		<rip:inputRadio name="accio" textKey="expedient.peticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>

@@ -20,7 +20,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/domini/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="dominiCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="dominiCommand">
 		<form:hidden path="id"/>
 		<!--  form:hidden path="entitatId"/-->
 		<rip:inputText name="codi" textKey="domini.form.camp.codi" required="true"/>

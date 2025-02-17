@@ -18,7 +18,7 @@
 		action="${formAction}"
 		method="post"
 		cssClass="form-horizontal"
-		commandName="documentNotificacioDto"
+		modelAttribute="documentNotificacioDto"
 		role="form"
 		enctype="multipart/form-data">
 		

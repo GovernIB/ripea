@@ -24,7 +24,7 @@
 
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document/modificarTipus/${documentCommand.id}"/></c:set>
 	
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="documentCommand" enctype="multipart/form-data">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>

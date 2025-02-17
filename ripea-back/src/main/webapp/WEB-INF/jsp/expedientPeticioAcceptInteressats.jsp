@@ -99,7 +99,7 @@
 	</c:if>
 
 	<c:set var="formAction"><rip:modalUrl value="/expedientPeticio/acceptarAmbInteressats/${expedientPeticioId}" /></c:set>
-	<form:form id="interessatsForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
+	<form:form id="interessatsForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientPeticioAcceptarCommand">
 		<c:choose>
 			<c:when test="${!empty interessatsDistribucio}">
 				<table id="interessats-distribucio" class="table table-bordered table-striped">

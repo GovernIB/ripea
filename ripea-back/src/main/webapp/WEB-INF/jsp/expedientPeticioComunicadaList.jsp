@@ -103,7 +103,7 @@ table.dataTable td {
 <body>
 
 
-	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
+	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" modelAttribute="expedientPeticioFiltreCommand">
 
 		<div class="row">
 			<div class="col-md-4">

@@ -23,7 +23,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaDocumentCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaDocumentCommand" enctype="multipart/form-data">
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dades"/></a></li>
 		</ul>

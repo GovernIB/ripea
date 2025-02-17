@@ -174,7 +174,7 @@
 <body>
 
 <c:url value="usuariTasca/filtrar" var="formAction"/>
-<form:form id="filtreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" commandName="usuariTascaFiltreCommand">
+<form:form id="filtreForm" action="${ formAction }" method="post" cssClass="well defaultFilterEnter" modelAttribute="usuariTascaFiltreCommand">
     <div class="row">
         <div class="col-md-3">
             <rip:inputSelect

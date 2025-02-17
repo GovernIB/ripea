@@ -32,7 +32,7 @@
 	</div>
 
 	<c:url value="organgestor/filtrar" var="formAction"/>
-	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="organGestorFiltreCommand">
+	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" modelAttribute="organGestorFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<rip:inputText name="codi" inline="true" placeholderKey="organgestor.list.filtre.camp.codi"/>

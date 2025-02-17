@@ -23,7 +23,7 @@
 
 	<c:set var="formAction"><rip:modalUrl value="/massiu/tancament/tancar"/></c:set>
 
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientMassiuTancamentCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientMassiuTancamentCommand">
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<c:if test="${hasEsborranys}">
 			<div class="alert well-sm alert-info">

@@ -23,7 +23,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/pinbalServei"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pinbalServeiCommand" role="form" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="pinbalServeiCommand" role="form" enctype="multipart/form-data">
 		<form:hidden path="id"/>
 		<rip:inputText name="codi" textKey="pinbalServei.form.camp.codi" readonly="true"/>
 		<rip:inputTextarea name="nom" textKey="pinbalServei.form.camp.nom"/>

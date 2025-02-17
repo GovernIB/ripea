@@ -7,7 +7,7 @@
 <%
 pageContext.setAttribute(
 		"interessatsTipusEnum",
-		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
+		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
 				 es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class,
 				"interessat.tipus.enum."));
 %>
@@ -637,7 +637,7 @@ function updateCaducitatAmbDies(dies) {
 		<c:when test="${empty documentNotificacionsCommand.id}"><c:set var="formAction"><rip:modalUrl value="/document/${documentNotificacionsCommand.documentId}/notificar"/></c:set></c:when>
 		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/notificacio/${documentNotificacionsCommand.id}"/></c:set></c:otherwise>
 	</c:choose>
-	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacionsCommand" role="form">
+	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="documentNotificacionsCommand" role="form">
 		<rip:inputHidden name="id"/>
 		<rip:inputHidden name="documentId"/>
 		<rip:inputHidden name="expedientPareId"/>

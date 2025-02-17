@@ -26,7 +26,7 @@
 <body>
 
 <c:url value="organgestor/filtrar" var="formAction"/>
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="integracioFiltreCommand">
+	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="integracioFiltreCommand">
 		<div class="row">
 		
 			<div class="col-md-2">

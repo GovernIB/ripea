@@ -25,7 +25,7 @@
         <c:forEach items="${ group.configs }" var="config" varStatus="status_group">
             <c:set var = "configKey" value = "${fn:replace(config.key,'.','-')}"/>
 
-            <form:form method="post" cssClass="config-form form-update-config form-horizontal" action="config/update" commandName="config_${configKey}">
+            <form:form method="post" cssClass="config-form form-update-config form-horizontal" action="config/update" modelAttribute="config_${configKey}">
                 <form:hidden path="key"/>
                 <div class="form-group">
                     <label for="config_${config.key}" class="col-sm-3 control-label" style="word-wrap: break-word;">${ config.description }</label>

@@ -83,7 +83,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${documentConcatenatCommand.pareId}/notificar"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentConcatenatCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="documentConcatenatCommand" enctype="multipart/form-data">
 		<div id="info-plantilla-si" class="alert well-sm alert-info hidden">
 			<span class="fa fa-info-circle"></span>
 			<spring:message code="contingut.document.form.info.plantilla.si"/>

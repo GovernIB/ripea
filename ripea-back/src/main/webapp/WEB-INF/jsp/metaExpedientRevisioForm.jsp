@@ -36,7 +36,7 @@
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedientRevisio"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientRevisioCommand" role="form" >
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientRevisioCommand" role="form" >
 	
 		<form:hidden path="id"/>
 		<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${!modificar}"/>

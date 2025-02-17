@@ -21,7 +21,7 @@
 </head>
 <body>
 
-<form:form id="importIntForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="interessatImportCommand" role="form" enctype="multipart/form-data">
+<form:form id="importIntForm" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="interessatImportCommand" role="form" enctype="multipart/form-data">
     
     <form:hidden path="expedientId" />
     <form:hidden path="accio" />

@@ -7,7 +7,7 @@
 <%
 pageContext.setAttribute(
 			"isRolActualAdministrador",
-			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request));
+			es.caib.ripea.back.helper.RolHelper.isRolActualAdministrador(request));
 %>
 
 <script type="text/javascript">
@@ -78,7 +78,7 @@ function hexToRgb(hex) {
 
 <%--
 <c:if test="${not simplifiedView}">
-<form:form id="filtre" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
+<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="expedientFiltreCommand">
 	<div class="row">
 		<div class="col-md-2">
 			<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.columna.numero"/>

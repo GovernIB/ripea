@@ -37,7 +37,7 @@
 
 	<c:set var="formAction"><rip:modalUrl value="/expedient/canviarEstat"/></c:set>
 
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="expedientCommand">
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
