@@ -48,7 +48,7 @@
 				<rip:inputSelect  name="estat"  optionEnum="IntegracioAccioEstatEnumDto" emptyOption="true" placeholderKey="integracio.list.estat" inline="true"/>
 			</div>
 			
-			<div class="col-md-2 pull-right">
+			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<a href="<c:url value="/integracio/diagnostic"/>" class="btn btn-success" data-toggle="modal" data-refresh-pagina="false">
 						<span class="fa fa-th-list"></span>&nbsp;<spring:message code="integracio.boto.diag"/>
