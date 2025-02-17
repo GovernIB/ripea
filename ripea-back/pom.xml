@@ -129,7 +129,7 @@
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
 						<configuration>
-							<mainClass>es.caib.ripea.RipeaBackBootApp</mainClass>
+							<mainClass>es.caib.ripea.RipeaBackApp</mainClass>
 						</configuration>
 					</plugin>
 					<plugin>

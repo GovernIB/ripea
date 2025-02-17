@@ -49,8 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 				@ComponentScan.Filter(
 						type = FilterType.REGEX,
 						pattern = {
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.logic\\..*",
-								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.persist\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.service\\..*",
+								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.persistence\\..*",
 								"es\\.caib\\." + BaseConfig.APP_NAME + "\\.ejb\\..*" })
 		})
 @PropertySource(
