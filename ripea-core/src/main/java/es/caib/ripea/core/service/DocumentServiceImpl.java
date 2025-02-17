@@ -13,6 +13,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,44 +30,6 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.portafib.ws.api.v1.WsValidationException;
-import es.caib.ripea.core.api.dto.ArbreJsonDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ConsultaPinbalEstatEnumDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
-import es.caib.ripea.core.api.dto.FirmaResultatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PinbalConsultaDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
-import es.caib.ripea.core.api.dto.Resum;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
-import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
-import es.caib.ripea.core.api.dto.ViaFirmaRespostaDto;
-import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -146,6 +109,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private EntitatRepository entitatRepository;
     @Autowired private EmailHelper emailHelper;
+    @Autowired private ContingutLogHelper contingutLogHelper;
 
 	@Transactional
 	@Override
@@ -472,8 +436,16 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional
     @Override
-    public void enviarDocument(Long documentId, List<String> desinataris){
-        emailHelper.enviarDocument(documentId, desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
+        emailHelper.enviarDocument(documentId, emails, desinataris);
+        DocumentEntity document= documentRepository.findOne(documentId);
+        contingutLogHelper.log(
+                document,
+                LogTipusEnumDto.ENVIAR_MAIL,
+                null,
+                null,
+                false,
+                false);
     }
 	
 	
