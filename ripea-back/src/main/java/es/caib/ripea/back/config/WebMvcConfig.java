@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.back.config;
 
-import com.opensymphony.module.sitemesh.filter.PageFilter;
+import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
 import es.caib.ripea.back.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -55,8 +55,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	private FluxFirmaInterceptor fluxFirmaInterceptor;
 
 	@Autowired
-	private AccesAdminInterceptor accesAdminInterceptor;
-	@Autowired
 	private AccesAdminEntitatInterceptor accesAdminEntitatInterceptor;
 	@Autowired
 	private AccesAdminEntitatOAdminOrganORevisorInterceptor accesAdminEntitatOAdminOrganORevisorInterceptor;
@@ -72,9 +70,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	private AccesSuperInterceptor accesSuperInterceptor;
 
 	@Bean
-	public FilterRegistrationBean<PageFilter> sitemeshFilter() {
-		FilterRegistrationBean<PageFilter> registrationBean = new FilterRegistrationBean<>();
-		registrationBean.setFilter(new PageFilter());
+	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {
+		FilterRegistrationBean<SiteMeshFilter> registrationBean = new FilterRegistrationBean<>();
+		registrationBean.setFilter(new SiteMeshFilter());
 		registrationBean.addUrlPatterns("/*");
 		registrationBean.setOrder(2);
 		return registrationBean;
@@ -129,6 +127,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 						"/grup/**").
 				excludePathPatterns(
 						"/metaExpedient/findPerLectura/**",
+						"/metaExpedient/metaDadaPermisLectura/domini",
 						"/metaExpedient/**/meta**",
 						"/metaExpedient/**/meta**/**",
 						"/metaExpedient/**/tasca**",
@@ -186,58 +185,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 						"/integracio/**",
 						"/excepcio**",
 						"/excepcio/**",
-						"/excepcio**",
-						"/excepcio/**",
-						"/avis**",
-						"/avis/**").
-				excludePathPatterns(
-						"/entitat/getEntitatLogo");
-
-
-
-
-		registry.addInterceptor(accesAdminInterceptor).
-				addPathPatterns(
-						"/bustiaAdminOrganigrama**",
-						"/bustiaAdminOrganigrama/**",
-						"/unitatOrganitzativa**",
-						"/unitatOrganitzativa/**",
-						"/regla**",
-						"/regla/**",
-						"/backoffice**",
-						"/backoffice/**",
-						"/permis**",
-						"/permis/**",
-						"/contingutAdmin**",
-						"/contingutAdmin/**",
-						"/registreAdmin**",
-						"/registreAdmin/**",
-						"/procediment/**",
-						"/procediment**");
-		registry.addInterceptor(accesSuperInterceptor).
-				addPathPatterns(
-						"/entitat**",
-						"/entitat/**",
-						"/integracio**",
-						"/integracio/**",
-						"/excepcio**",
-						"/excepcio/**",
-						"/registreUser/metriquesView**",
-						"/registreUser/metriquesView/**",
-						"/registreUser/anotacionsPendentArxiu**",
-						"/registreUser/anotacionsPendentArxiu/**",
-						"/monitor**",
-						"/monitor/**",
 						"/config**",
 						"/config/**",
 						"/avis**",
 						"/avis/**").
 				excludePathPatterns(
-						"/entitat/logo",
-						"/entitat/**/logo");
+						"/entitat/getEntitatLogo");
 	}
 
-	/** Configura el firewall per permetre caràcters codificats com el % ja que aquests s'usen en la codificació
+	/**
+	 * Configura el firewall per permetre caràcters codificats com el % ja que aquests s'usen en la codificació
 	 * dels identificadors en els enllaços públics de descàrrega de documents.
 	 * 
 	 * @return

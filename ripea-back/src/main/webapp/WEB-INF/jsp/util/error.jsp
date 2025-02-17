@@ -2,13 +2,16 @@
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:set var="errorTitol"><spring:message code="error.titol.http"/> ${errorObject.statusCode}</c:set>
+<c:set var="errorTitol"><spring:message code="error.titol.http"/> ${errorObject.status}</c:set>
 <c:choose>
-	<c:when test="${errorObject.throwable.class.canonicalName == 'es.caib.ripea.core.api.exception.NotFoundException'}">
+	<c:when test="${errorObject.notFound}">
 		<c:set var="errorTitol"><spring:message code="error.titol.not.found"/></c:set>
 	</c:when>
-	<c:when test="${errorObject.throwable.class.canonicalName == 'es.caib.ripea.core.api.exception.SistemaExternException'}">
+	<c:when test="${errorObject.sistemaExtern}">
 		<c:set var="errorTitol"><spring:message code="error.titol.sistema.ext"/></c:set>
+	</c:when>
+	<c:when test="${errorObject.accessDenied}">
+		<c:set var="errorTitol"><spring:message code="error.titol.access.denied"/></c:set>
 	</c:when>
 </c:choose>
 <html>
