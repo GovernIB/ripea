@@ -1,10 +1,6 @@
 package es.caib.ripea.core.helper;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -1152,8 +1148,8 @@ public class EmailHelper {
 
 	}
 
-    public void enviarDocument(Long adjuntId, List<String> desinataris) {
-        List<String> destinatarisNoAgrupats = new ArrayList<>();
+    public void enviarDocument(Long adjuntId, List<String> emails, List<String> desinataris) {
+        List<String> destinatarisNoAgrupats = new ArrayList<>(emails);
         List<String> destinatarisAgrupats = new ArrayList<>();
 
         for (String desinatariCodi:desinataris) {
@@ -1235,7 +1231,6 @@ public class EmailHelper {
                 helper.setText(text);
 
                 if (adjuntId != null) {
-//                    Document fitxer = documentHelper.getFitxerById(adjuntId, eventTipus);
                 	FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
                     if (fitxer != null) {
                         helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
@@ -1274,12 +1269,14 @@ public class EmailHelper {
 		if (usuari != null) {
 			email = getEmail(usuari);
 			if (Utils.isNotEmpty(email)) {
-				if (event == null || EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
+				if (event == null) {
 					addDestinatari = true;
-				} else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event) && usuari.isRebreAvisosNovesAnotacions()) {
-					addDestinatari = true;
+				} else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event)) {
+					addDestinatari = usuari.isRebreAvisosNovesAnotacions();
 				} else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
-                    addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
+					addDestinatari = usuari.isRebreAvisosNovesAnotacions();
+				} else if (EventTipusEnumDto.ENVIAR_FICHERO.equals(event)){
+                    addDestinatari = true;
                 }
 			}
 		}

@@ -84,5 +84,8 @@ public enum LogTipusEnumDto {
 	
 	//Delegació tasques
 	DELEGAR_TASCA,
-	CANCELAR_DELEGACIO_TASCA
+	CANCELAR_DELEGACIO_TASCA,
+
+    //Enviar per mail
+    ENVIAR_MAIL
 }

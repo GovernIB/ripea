@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -722,15 +723,17 @@ public class DocumentController extends BaseUserOAdminOOrganController {
     public String enviarPost(
             HttpServletRequest request,
             @PathVariable Long documentId,
-            @Validated({EnviarDocumentCommand.Create.class}) EnviarDocumentCommand command) {
+            @Validated EnviarDocumentCommand command) {
 
-        documentService.enviarDocument(documentId, command.getResponsablesCodi());
+        List<String> emails = new ArrayList<>(Arrays.asList(command.getEmail().split(",")));
+        emails.removeAll(Arrays.asList("", null));
+        documentService.enviarDocument(documentId, emails, command.getResponsablesCodi());
         MissatgesHelper.success(
                 request,
                 getMessage(
                         request,
                         "bustia.pendent.accio.enviarViaEmail.success",
-                        new Object[]{command.getResponsablesCodi().size()}));
+                        new Object[]{command.getResponsablesCodi().size()+emails.size()}));
         return modalUrlTancar();
     }
 

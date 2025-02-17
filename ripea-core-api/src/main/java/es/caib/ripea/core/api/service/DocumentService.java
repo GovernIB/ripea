@@ -755,5 +755,5 @@ public interface DocumentService {
 			Long tascaId) throws IOException;
 
     @PreAuthorize("hasRole('tothom')")
-    public void enviarDocument(Long documentId, List<String> desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris);
 }

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,12 +16,13 @@ import java.util.List;
 @Setter
 public class EnviarDocumentCommand {
 
-	@NotEmpty
+	private String email;
 	private List<String> responsablesCodi;
 
-
-	public interface Create {}
-	public interface Update {}
-
-
+    public List<String> getResponsablesCodi() {
+        if (responsablesCodi == null) {
+            responsablesCodi = new ArrayList<>();
+        }
+        return responsablesCodi;
+    }
 }

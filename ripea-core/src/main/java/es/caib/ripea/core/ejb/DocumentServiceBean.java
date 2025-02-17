@@ -646,7 +646,7 @@ public class DocumentServiceBean implements DocumentService {
 
     @Override
     @RolesAllowed("tothom")
-    public void enviarDocument(Long documentId, List<String> desinataris){
-        delegate.enviarDocument(documentId,desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
+        delegate.enviarDocument(documentId, emails, desinataris);
     }
 }
