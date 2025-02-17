@@ -439,15 +439,16 @@ public class DocumentServiceImpl implements DocumentService {
     public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
         emailHelper.enviarDocument(documentId, emails, desinataris);
         DocumentEntity document= documentRepository.findOne(documentId);
-        contingutLogHelper.log(
-                document,
-                LogTipusEnumDto.ENVIAR_MAIL,
-                null,
-                null,
-                false,
-                false);
+        if (document!=null) {
+	        contingutLogHelper.log(
+	                document,
+	                LogTipusEnumDto.ENVIAR_MAIL,
+	                emails.toString(),
+	                desinataris.toString(),
+	                false,
+	                false);
+        }
     }
-	
 	
 	@Transactional
 	@Override

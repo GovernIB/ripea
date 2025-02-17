@@ -1,11 +1,14 @@
 package es.caib.ripea.core.helper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import es.caib.ripea.core.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,11 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.core.repository.ExpedientPeticioRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -138,14 +146,8 @@ public class EmailHelper {
 		}
 	}
 
-
-
-	public void canviEstatRevisioMetaExpedient(
-			MetaExpedientEntity metaExpedientEntity,
-			Long entitatId) {
+	public void canviEstatRevisioMetaExpedient(MetaExpedientEntity metaExpedientEntity, Long entitatId) {
 		logger.debug("Enviant correu electrònic per a canvi d'estat de revisio");
-
-
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
@@ -160,12 +162,6 @@ public class EmailHelper {
 
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 		for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
-			boolean granted = permisosHelper.isGrantedAll(
-                entitatId,
-                EntitatEntity.class,
-                new Permission[] { ExtendedPermission.ADMINISTRATION },
-                dadesUsuari.getCodi());
-
             addDestinatari(
                 dadesUsuari.getCodi(),
                 emailsNoAgrupats,
@@ -193,8 +189,6 @@ public class EmailHelper {
 				text,
 				EventTipusEnumDto.CANVI_ESTAT_REVISIO);
 	}
-
-
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void comentariMetaExpedient(
@@ -1269,14 +1263,12 @@ public class EmailHelper {
 		if (usuari != null) {
 			email = getEmail(usuari);
 			if (Utils.isNotEmpty(email)) {
-				if (event == null) {
-					addDestinatari = true;
-				} else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event)) {
-					addDestinatari = usuari.isRebreAvisosNovesAnotacions();
-				} else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
-					addDestinatari = usuari.isRebreAvisosNovesAnotacions();
-				} else if (EventTipusEnumDto.ENVIAR_FICHERO.equals(event)){
+                if (event == null || EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
                     addDestinatari = true;
+                } else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event)) {
+                    addDestinatari = usuari.isRebreAvisosNovesAnotacions();
+                } else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
+                    addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
                 }
 			}
 		}

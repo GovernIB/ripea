@@ -108,7 +108,7 @@
 			optionValueAttribute="id"
 			optionTextAttribute="nom"
 			required="true"
-			labelSize="3"
+			labelSize="2"
 			optionMinimumResultsForSearch="5"/>
 			
 		<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
@@ -120,7 +120,7 @@
 			textKey="organgestor.permis.form.camp.tipus"
 			disabled="${not empty permisOrganGestorCommand.id}"
 			optionEnum="PrincipalTipusEnumDto"
-			labelSize="3"/>
+			labelSize="2"/>
 		
 		<c:choose>
 			<c:when test="${empty permisOrganGestorCommand.id}">
@@ -129,7 +129,7 @@
 					textKey="organgestor.permis.form.camp.principal"
 					required="true"
 					placeholderKey="organgestor.permis.form.camp.principal"
-					labelSize="3"/>
+					labelSize="2"/>
 			</c:when>
 			<c:otherwise>
 				<rip:inputText
@@ -138,14 +138,14 @@
 					disabled="true"
 					required="true"
 					placeholderKey="organgestor.permis.form.camp.principal"
-					labelSize="3"/>
+					labelSize="2"/>
 				<form:hidden path="principalNom"/>
 			</c:otherwise>
 		</c:choose>
 		
-		<div class="row">
+		<div class="row" style="margin-right: 10px; margin-left: 10px; padding-bottom:10px;">
 
-			<label class="control-label col-xs-3">Permisos</label>
+			<label class="control-label col-xs-2">Permisos</label>
 			
 			<fieldset class="col-xs-5 scheduler-border">
                 <legend class="scheduler-border">Gestió d'expedients</legend>
@@ -178,7 +178,7 @@
 			
 			</fieldset>
 
-            <fieldset class="col-xs-4 pull-right scheduler-border">
+            <fieldset class="col-xs-5 pull-right scheduler-border" style="border-left: none;">
                 <legend class="scheduler-border">Administració i disseny</legend>
 
 				<rip:inputCheckbox
@@ -209,7 +209,8 @@
 					textKey="organgestor.permis.columna.disseny"
 					faClassInfoIcon="fa-info-circle"
 					comment="organgestor.permis.form.info.diss"/>
-			</div>
+				<div class="form-group" style="height: 32px;"></div>
+			</fieldset>
 		</div>
 		
 		<div id="modal-botons">

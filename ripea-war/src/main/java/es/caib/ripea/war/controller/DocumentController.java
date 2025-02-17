@@ -727,7 +727,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 
         List<String> emails = new ArrayList<>(Arrays.asList(command.getEmail().split(",")));
         emails.removeAll(Arrays.asList("", null));
-        documentService.enviarDocument(documentId, emails, command.getResponsablesCodi());
+        if (emails.size()>0 || command.getResponsablesCodi().size()>0) {
+        	documentService.enviarDocument(documentId, emails, command.getResponsablesCodi());
+        }
         MissatgesHelper.success(
                 request,
                 getMessage(
