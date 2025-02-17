@@ -1315,25 +1315,32 @@ public class PluginHelper {
 							documentArxiu,
 							contingutPare.getArxiuUuid());
 				} catch (Exception ex) {
-					if (ex.getMessage().contains(
-							"Duplicate child name not allowed")
-							|| ex.getMessage().contains(
-									"Petición mal formada")) {
+					if (ex.getMessage().contains("Duplicate child name not allowed")) {
+						try {
+							//#1631 Reintentam amb un altre nom, tot i que en principi, ha passat per el mètode documentNomInArxiu
+							documentArxiu.setNom(documentArxiu.getNom()+"_"+System.currentTimeMillis());
+							documentArxiuCreatOModificat = arxiuPluginWrapper.getPlugin().documentCrear(
+									documentArxiu,
+									contingutPare.getArxiuUuid());
+						} catch (Exception ex2) {
+							throw ex2;
+						}
+					} else if (ex.getMessage().contains("Petición mal formada")) {
 						logger.error(
-								"Error al crear o modificar el documento en el arxiu. Document a desar a l'arxiu ja existeix.");
+								"Error al crear o modificar el documento en el arxiu. Petición mal formada.");
 						logger.error(
 								"\t>>> Id pare=" + contingutPare.getArxiuUuid());
 						logger.error(
 								"\t>>> Nom pare=" + contingutPare.getNom());
 						logger.error(
 								"\t>>> Nom=" + documentArxiu.getNom());
+						throw ex;
+					} else {
+						throw ex;
 					}
-					throw ex;
 				}
-				document.updateArxiu(
-						documentArxiuCreatOModificat.getIdentificador());
-				document.updateArxiuEstat(
-						arxiuEstat);
+				document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
+				document.updateArxiuEstat(arxiuEstat);
 
 			} else {
 				// =============== MODIFICAR DOCUMENT EN ARXIU ===================
@@ -1345,29 +1352,35 @@ public class PluginHelper {
 						firmes,
 						ArxiuOperacioEnumDto.MODIFICACIO,
 						arxiuEstat);
-
-				documentArxiuCreatOModificat = arxiuPluginWrapper.getPlugin().documentModificar(
-						documentArxiu);
-				document.updateArxiu(
-						null);
-				document.updateArxiuEstat(
-						arxiuEstat);
-
+				try {
+					documentArxiuCreatOModificat = arxiuPluginWrapper.getPlugin().documentModificar(documentArxiu);
+				} catch (Exception ex) {
+					if (ex.getMessage().contains("Duplicate child name not allowed")) {
+						try {
+							//#1631 Reintentam amb un altre nom, tot i que en principi, ha passat per el mètode documentNomInArxiu...
+							documentArxiu.setNom(documentArxiu.getNom()+"_"+System.currentTimeMillis());
+							documentArxiuCreatOModificat = arxiuPluginWrapper.getPlugin().documentModificar(documentArxiu);
+						} catch (Exception ex2) {
+							throw ex2;
+						}
+					} else {
+						throw ex;
+					}
+				}
+				document.updateArxiu(null);
+				document.updateArxiuEstat(arxiuEstat);
 			}
+			
 			Document documentDetalls = arxiuPluginWrapper.getPlugin().documentDetalls(
 					documentArxiuCreatOModificat.getIdentificador(),
 					null,
 					false);
-			propagarMetadadesDocument(
-					documentDetalls,
-					document);
-
-			arxiuEnviamentOk(
-					integracioAccio);
+			
+			propagarMetadadesDocument(documentDetalls, document);
+			arxiuEnviamentOk(integracioAccio);
+			
 		} catch (Exception ex) {
-			throw arxiuEnviamentError(
-					integracioAccio,
-					ex);
+			throw arxiuEnviamentError(integracioAccio, ex);
 		}
 	}
 

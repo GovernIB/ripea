@@ -97,8 +97,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		long t0 = System.currentTimeMillis();
 
-		String rolActual = RolHelper.getRolActual(request);
+		if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+			throw new SecurityException("No te permisos per accedir a aquest contingut com a dissenyador d'organ.");
+		}
 		
+		String rolActual = RolHelper.getRolActual(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
@@ -106,13 +109,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			logger.info("ExpedientController.get start ( entitatId=" + entitatActual.getId() + " rolActual=" + rolActual + " filtreOrganId=" + filtreCommand.getOrganGestorId() + ")");
 		
 		long t2 = System.currentTimeMillis();
-		model.addAttribute(
-				"rolActual",
-				rolActual);
+		model.addAttribute("rolActual", rolActual);
 		
-		model.addAttribute(
-				"usuariActual",
-				aplicacioService.getUsuariActual());
+		model.addAttribute("usuariActual", aplicacioService.getUsuariActual());
 
 		model.addAttribute(
 				"hasCreatePermissionForAnyProcediment",
@@ -120,45 +119,33 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						rolActual,
 						PermissionEnumDto.CREATE));
-		model.addAttribute(
-				filtreCommand);
-		model.addAttribute(
-				"seleccio",
-				RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						SESSION_ATTRIBUTE_SELECCIO));
+		model.addAttribute(filtreCommand);
+		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
+		
 		if (aplicacioService.mostrarLogsRendiment())
 			logger.info("findActiusAmbEntitatPerCreacio time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		long t3 = System.currentTimeMillis();
+		
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		Long metaExpedientId = (Long)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_METAEXP_ID);
+		Long metaExpedientId = (Long)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_METAEXP_ID);
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
 		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), metaExpedientId));
 		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
-		model.addAttribute(
-				"expedientEstatsOptions",
-				expedientEstatsOptions);
+		model.addAttribute("expedientEstatsOptions", expedientEstatsOptions);
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
-		
 		model.addAttribute("isDominisEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis"));
 		model.addAttribute("nomCookieFirmaPendent", COOKIE_FIRMA_PENDENT);
 		model.addAttribute("firmaPendent", firmaPendent);
-		
 		model.addAttribute("nomCookieExpsSeguits", COOKIE_EXPS_SEGUITS);
 		model.addAttribute("expedientsSeguits", expedientsSeguits);
-		
 		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
 		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
-		
 		model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
 		model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
-		
 		model.addAttribute("grups", grupService.findGrupsPermesosProcedimentsGestioActiva(entitatActual.getId(), rolActual, RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null));
 		
 		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
@@ -556,6 +543,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+
+		if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+			throw new SecurityException("No te permisos per accedir a aquest contingut com a dissenyador d'organ.");
+		}
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		ExpedientCommand command = null;

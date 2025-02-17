@@ -3,18 +3,19 @@
  */
 package es.caib.ripea.war.helper;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.support.RequestContextUtils;
+
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.support.RequestContextUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -43,8 +44,10 @@ public class SessioHelper {
         SessioHelper.propietatsInicialitzades = false;
     }
 
-	public static void processarAutenticacio(HttpServletRequest request, HttpServletResponse response, AplicacioService aplicacioService, EntitatService entitatService) {
+	public static String processarAutenticacio(HttpServletRequest request, HttpServletResponse response, AplicacioService aplicacioService, EntitatService entitatService) {
 
+		String resultat = null;
+		
 		if (request.getUserPrincipal() != null && !request.getServletPath().startsWith("/error")) {
 			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA);
 			UsuariDto usuariActual = null;
@@ -56,6 +59,9 @@ public class SessioHelper {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuariActual);
 				// Forçam el refresc de l'entitat actual i dels permisos d'administració d'òrgan
 				entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+				if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+					resultat = "/ripea/metaExpedient";
+				}
 			}
 			if (usuariActual == null) {
 				usuariActual = aplicacioService.getUsuariActual();
@@ -72,6 +78,7 @@ public class SessioHelper {
                 habilitarDominis = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis");
 				propietatsInicialitzades = true;
 			}
+			
 			String idioma_usuari = usuariActual.getIdioma();
 			LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
 			request.getSession().setAttribute("SessionHelper.capsaleraLogo", capLogo);
@@ -83,8 +90,9 @@ public class SessioHelper {
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			aplicacioService.actualitzarEntiatThreadLocal(entitatActual);
 			localeResolver.setLocale(request, response, StringUtils.parseLocaleString(idioma_usuari));
-//			localeResolver.setLocale(request, response, StringUtils.parseLocaleString((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI)));
 		}
+		
+		return resultat;
 	}
 
 	public static boolean isAutenticacioProcessada(HttpServletRequest request) {
