@@ -1,24 +1,18 @@
 package es.caib.ripea.service.service;
 
-import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.portafib.ws.api.v1.WsValidationException;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
-import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
-import es.caib.ripea.service.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
-import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.helper.PaginacioHelper.Converter;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.*;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.DocumentService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipOutputStream;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +23,111 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.zip.ZipOutputStream;
+import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.portafib.ws.api.v1.WsValidationException;
+import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DispositiuEnviamentEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
+import es.caib.ripea.persistence.repository.ConsultaPinbalRepository;
+import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
+import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
+import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.service.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
+import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.DateHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DocumentNotificacioHelper;
+import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExceptionHelper;
+import es.caib.ripea.service.helper.IntegracioHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PaginacioHelper.Converter;
+import es.caib.ripea.service.helper.PinbalHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.SynchronizationHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.helper.ViaFirmaHelper;
+import es.caib.ripea.service.intf.dto.ArbreJsonDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesBlockDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaRespostaDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.service.intf.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -71,6 +165,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private EntitatRepository entitatRepository;
     @Autowired private EmailHelper emailHelper;
+    @Autowired private ContingutLogHelper contingutLogHelper;
 
 	@Transactional
 	@Override
@@ -397,10 +492,19 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional
     @Override
-    public void enviarDocument(Long documentId, List<String> desinataris){
-        emailHelper.enviarDocument(documentId, desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
+        emailHelper.enviarDocument(documentId, emails, desinataris);
+        DocumentEntity document= documentRepository.findById(documentId).orElse(null);
+        if (document!=null) {
+	        contingutLogHelper.log(
+	                document,
+	                LogTipusEnumDto.ENVIAR_MAIL,
+	                emails.toString(),
+	                desinataris.toString(),
+	                false,
+	                false);
+        }
     }
-	
 	
 	@Transactional
 	@Override

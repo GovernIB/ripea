@@ -20,8 +20,11 @@
 <body>
 <form:form action="" method="post" cssClass="form-horizontal" commandName="enviarDocumentCommand">
 
+	<rip:inputText name="email" textKey="contingut.interessat.info.email"/>
+
     <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
     <c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+    
     <rip:inputSuggest
             name="responsablesCodi"
             urlConsultaInicial="${urlConsultaInicial}"

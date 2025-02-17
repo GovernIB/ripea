@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.SessioHelper;
@@ -13,26 +10,25 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Interceptor per a les accions de context de sessió.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class SessioInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
-	private AplicacioService aplicacioService;
-    @Autowired
-    private EntitatService entitatService;
+	@Autowired private AplicacioService aplicacioService;
+    @Autowired private EntitatService entitatService;
 
 	@Override
 	public boolean preHandle(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		SessioHelper.processarAutenticacio(request, response, aplicacioService, entitatService);
-		return true;
+		
+		String redireccio = SessioHelper.processarAutenticacio(request, response, aplicacioService, entitatService);
+		
+		if (redireccio==null) {
+			return true;
+		} else {
+			response.sendRedirect(redireccio);
+			return false;
+		}
 	}
-
 }

@@ -38,17 +38,12 @@ public class UsuariTascaController extends BaseUserController {
 
     private static final String SESSION_ATTRIBUTE_FILTRE = "UsuariTascaController.session.filtre";
 
-    @Autowired
-    private ExpedientTascaService expedientTascaService;
-    @Autowired
-    private ExpedientService expedientService;
-    @Autowired
-    private MetaExpedientService metaExpedientService;
+    @Autowired private ExpedientTascaService expedientTascaService;
+    @Autowired private ExpedientService expedientService;
+    @Autowired private MetaExpedientService metaExpedientService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String get(
-            HttpServletRequest request,
-            Model model) {
+    public String get(HttpServletRequest request, Model model) {
 
         UsuariTascaFiltreCommand command = getFiltreCommand(request);
         model.addAttribute(command);
@@ -56,6 +51,10 @@ public class UsuariTascaController extends BaseUserController {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         String rolActual = RolHelper.getRolActual(request);
 
+		if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+			throw new SecurityException("No te permisos per accedir a aquest contingut com a dissenyador d'organ.");
+		}
+        
         List<MetaExpedientDto> metaExpedientDtoList = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual);
         model.addAttribute("metaExpedients", metaExpedientDtoList);
 

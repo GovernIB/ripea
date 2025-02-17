@@ -25,11 +25,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/**
- * Controlador per al manteniment de regles.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Controller
 @RequestMapping("/usuari")
 public class UsuariController  extends BaseAdminController {
@@ -39,17 +34,12 @@ public class UsuariController  extends BaseAdminController {
 	@Autowired private EntitatService entitatService;
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
-	public String getConfiguracio(
-			HttpServletRequest request,
-			Model model) {
+	public String getConfiguracio(HttpServletRequest request, Model model) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		UsuariCommand usuariCommand = UsuariCommand.asCommand(usuari);
 		model.addAttribute(usuariCommand);
 		emplenaModel(request, model, usuariCommand);
-
-        model.addAttribute("editEmailsCanviEstatRevisio",
-                RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualRevisor(request));
-
+        model.addAttribute("editEmailsCanviEstatRevisio", RolHelper.hasRolAdministrador(request) || RolHelper.hasRolRevisor(request));
 		return "usuariForm";
 	}
 

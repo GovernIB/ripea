@@ -44,4 +44,23 @@ public class BaseWebSecurityConfig {
 		};
 	}
 
+	protected RequestMatcher[] superRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher("/entitat*"),
+				new AntPathRequestMatcher("/config*"),
+		};
+	}
+	
+	protected RequestMatcher[] adminRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher("/permis*"),
+				new AntPathRequestMatcher("/tipusDocumental*"),
+		};
+	}
+	
+	protected RequestMatcher[] procedimentRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher("/metaExpedient*"),
+		};
+	}
 }

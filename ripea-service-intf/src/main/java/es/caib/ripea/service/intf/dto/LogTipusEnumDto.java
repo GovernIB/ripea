@@ -1,14 +1,5 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
-
-/**
- * Enumeració amb els possibles tipus d'accions de log.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public enum LogTipusEnumDto {
 	CREACIO,
 	CONSULTA,
@@ -23,32 +14,23 @@ public enum LogTipusEnumDto {
 	RETORNAR,
 	COPIA,
 	MOVIMENT,
-	
-	REENVIAMENT, // 12
+	REENVIAMENT,
 	PROCESSAMENT,
 	TANCAMENT,
 	REOBERTURA,
 	ACUMULACIO,
 	DISGREGACIO,
 	PER_DEFECTE,
-	
-	// NOTIFICACIONS
-	NOTIFICACIO_ENVIADA, // 19
-//	NOTIFICACIO_ENTREGADA,
+	NOTIFICACIO_ENVIADA,
 	NOTIFICACIO_REBUTJADA,
-	NOTIFICACIO_CERTIFICADA, // notificacio feta
-//	NOTIFICACIO_REINTENT,
-	
-	// Portafirmes
-	PFIRMA_ENVIAMENT,  // 22
+	NOTIFICACIO_CERTIFICADA,
+	PFIRMA_ENVIAMENT,
 	PFIRMA_CANCELACIO,
 	PFIRMA_CALLBACK,
 	PFIRMA_FIRMA,
 	PFIRMA_REBUIG,
 	PFIRMA_REINTENT,
-
-	// Via firma
-	VFIRMA_ENVIAMENT, // 28
+	VFIRMA_ENVIAMENT,
 	VFIRMA_CANCELACIO,
 	VFIRMA_CALLBACK,
 	VFIRMA_FIRMA,
@@ -57,32 +39,19 @@ public enum LogTipusEnumDto {
 	VFIRMA_WAITING_CHECK,
 	VFIRMA_EXPIRED,
 	VFIRMA_REINTENT,
-	
-	// Firma servidor
-	SFIRMA_FIRMA,  // 37
-
-	// Firma Applet - navegador (pasarela)
-	FIRMA_CLIENT, //this
-	
+	SFIRMA_FIRMA,
+	FIRMA_CLIENT,
 	ARXIU_CSV,
-	ARXIU_CUSTODIAT, //this
+	ARXIU_CUSTODIAT,
 	CUSTODIA_CANCELACIO,
-
-	// Log una vegada s'ha validat la firma
-	DOC_FIRMAT, // 42
-
+	DOC_FIRMAT,
 	CANVI_ESTAT,
 	CANVI_PRIORITAT,
 	CANVI_RESPONSABLES,
-	
-	// Tancament logic expedient
 	TANCAMENT_LOGIC,
-	
 	ESCANEIG,
-	
 	CANVI_DATALIMIT_TASCA,
-	
-	//Delegació tasques
 	DELEGAR_TASCA,
-	CANCELAR_DELEGACIO_TASCA
+	CANCELAR_DELEGACIO_TASCA,
+	ENVIAR_MAIL
 }

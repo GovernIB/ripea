@@ -1,12 +1,14 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +21,38 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.util.*;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.RegistreEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Component
 public class EmailHelper {
@@ -137,12 +168,6 @@ public class EmailHelper {
 
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 		for (DadesUsuari dadesUsuari : dadesUsuarisAdmin) {
-			boolean granted = permisosHelper.isGrantedAll(
-                entitatId,
-                EntitatEntity.class,
-                new Permission[] { ExtendedPermission.ADMINISTRATION },
-                dadesUsuari.getCodi());
-
             addDestinatari(
                 dadesUsuari.getCodi(),
                 emailsNoAgrupats,
@@ -276,7 +301,7 @@ public class EmailHelper {
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("novaAnotacioPendent start (id=" + expedientPeticioId + ")");
 
-		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.getOne(expedientPeticioId);
+		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
@@ -1125,8 +1150,8 @@ public class EmailHelper {
 
 	}
 
-    public void enviarDocument(Long adjuntId, List<String> desinataris) {
-        List<String> destinatarisNoAgrupats = new ArrayList<>();
+    public void enviarDocument(Long adjuntId, List<String> emails, List<String> desinataris) {
+    	List<String> destinatarisNoAgrupats = new ArrayList<>(emails);
         List<String> destinatarisAgrupats = new ArrayList<>();
 
         for (String desinatariCodi:desinataris) {
@@ -1140,7 +1165,7 @@ public class EmailHelper {
 
         UsuariEntity usuariEntity = usuariHelper.getUsuariAutenticat();
         FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
-        DocumentEntity document= documentRepository.getOne(adjuntId);
+        DocumentEntity document= documentRepository.findById(adjuntId).orElse(null);
 
         String subject = getPrefixRipea() + " Enviar document";
         String text ="Ha rebut el document adjunt '"+fitxer.getNom()+"' a partir de la funció 'Enviar document via email' de RIPEA. \n" +
@@ -1208,7 +1233,6 @@ public class EmailHelper {
                 helper.setText(text);
 
                 if (adjuntId != null) {
-//                    Document fitxer = documentHelper.getFitxerById(adjuntId, eventTipus);
                     FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
                     if (fitxer != null) {
                         helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
@@ -1249,8 +1273,8 @@ public class EmailHelper {
 			if (Utils.isNotEmpty(email)) {
                 if (event == null || EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
                     addDestinatari = true;
-                } else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event) && usuari.isRebreAvisosNovesAnotacions()) {
-                    addDestinatari = true;
+                } else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event)) {
+                    addDestinatari = usuari.isRebreAvisosNovesAnotacions();
                 } else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
                     addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
                 }

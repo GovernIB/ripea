@@ -20,6 +20,7 @@ public class BaseConfig {
 
 	public static final String ROLE_SUPER = "IPA_SUPER";
 	public static final String ROLE_ADMIN = "IPA_ADMIN";
+	public static final String ROLE_DISSENY = "IPA_DISSENY";
 	public static final String ROLE_ORGAN_ADMIN = "IPA_ORGAN_ADMIN";
 	public static final String ROLE_BSTWS = "IPA_BSTWS";
 	public static final String ROLE_API_HIST = "IPA_API_HIST";

@@ -60,6 +60,7 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 	@Value("${es.caib.distribucio.security.mappableRoles:" +
 			BaseConfig.ROLE_SUPER + "," +
 			BaseConfig.ROLE_ADMIN + "," +
+			BaseConfig.ROLE_DISSENY + "," +
 			BaseConfig.ROLE_ORGAN_ADMIN + "," +
 			BaseConfig.ROLE_BSTWS + "," +
 			BaseConfig.ROLE_API_HIST + "," +
@@ -82,6 +83,9 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 				permitAll(false));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll().
+				requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER).
+				requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN).
+				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).
 				anyRequest().authenticated();
 		http.headers().frameOptions().sameOrigin();
 		http.csrf().disable();

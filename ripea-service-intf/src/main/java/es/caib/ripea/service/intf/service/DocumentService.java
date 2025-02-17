@@ -717,12 +717,10 @@ public interface DocumentService {
 	public FirmaResultatDto firmaSimpleWebEnd(String transactionID);
 
 	@PreAuthorize("hasRole('tothom')")
-	public Long getAndSaveFitxerTamanyFromArxiu(
-			Long documentId);
+	public Long getAndSaveFitxerTamanyFromArxiu(Long documentId);
 
 	@PreAuthorize("hasRole('tothom')")
-	public void notificacioActualitzarEstat(
-			String identificador);
+	public void notificacioActualitzarEstat(String identificador);
 
 	@PreAuthorize("hasRole('tothom')")
 	public void notificacioActualitzarEstat(Long id);
@@ -733,18 +731,8 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public String firmaSimpleWebStartMassiu(Set<Long> ids, String motiu, String urlReturnToRipea, Long entitatId);
 
-//	@PreAuthorize("hasRole('tothom')")
-//	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
-//			Long id, 
-//			Long expedientId, 
-//			String rolActual,
-//			Long tascaId) throws IOException;
-
 	@PreAuthorize("hasRole('tothom')")
-	public List<DocumentDto> findByExpedient(
-			Long id, 
-			Long expedientId, 
-			String rolActual);
+	public List<DocumentDto> findByExpedient(Long id, Long expedientId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
@@ -755,5 +743,5 @@ public interface DocumentService {
 			Long tascaId) throws IOException;
 
     @PreAuthorize("hasRole('tothom')")
-    public void enviarDocument(Long documentId, List<String> desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris);
 }

@@ -620,7 +620,7 @@ public class DocumentServiceEjb implements DocumentService {
 
     @Override
     @RolesAllowed("tothom")
-    public void enviarDocument(Long documentId, List<String> desinataris){
-        delegateService.enviarDocument(documentId,desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
+        delegateService.enviarDocument(documentId, emails, desinataris);
     }
 }

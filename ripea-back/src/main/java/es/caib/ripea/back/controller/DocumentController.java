@@ -1,8 +1,32 @@
-
-/**
- *
- */
 package es.caib.ripea.back.controller;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.command.EnviarDocumentCommand;
 import es.caib.ripea.back.command.FirmaSimpleWebCommand;
@@ -13,36 +37,29 @@ import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
-import es.caib.ripea.service.intf.service.*;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.ExpedientInteressatService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-/**
- * Controlador per al manteniment de documents.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Slf4j
 @Controller
 @RequestMapping("/document")
@@ -50,20 +67,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private DocumentEnviamentService documentEnviamentService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private ExpedientInteressatService expedientInteressatService;
-	@Autowired
-	private OrganGestorService organGestorService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private DocumentService documentService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private DocumentEnviamentService documentEnviamentService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private ExpedientInteressatService expedientInteressatService;
+	@Autowired private OrganGestorService organGestorService;
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -698,15 +708,19 @@ public class DocumentController extends BaseUserOAdminOOrganController {
     public String enviarPost(
             HttpServletRequest request,
             @PathVariable Long documentId,
-            @Validated({EnviarDocumentCommand.Create.class}) EnviarDocumentCommand command) {
+            @Validated EnviarDocumentCommand command) {
 
-        documentService.enviarDocument(documentId, command.getResponsablesCodi());
+        List<String> emails = new ArrayList<>(Arrays.asList(command.getEmail().split(",")));
+        emails.removeAll(Arrays.asList("", null));
+        if (emails.size()>0 || command.getResponsablesCodi().size()>0) {
+        	documentService.enviarDocument(documentId, emails, command.getResponsablesCodi());
+        }
         MissatgesHelper.success(
                 request,
                 getMessage(
                         request,
                         "bustia.pendent.accio.enviarViaEmail.success",
-                        new Object[]{command.getResponsablesCodi().size()}));
+                        new Object[]{command.getResponsablesCodi().size()+emails.size()}));
         return modalUrlTancar();
     }
 

@@ -17,69 +17,80 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
-<script>
-	$(document).ready(function() {
-		
-		$("#modal-botons button[type='submit']").on('click', function() {
-			$("form#permisOrganGestorCommand *:disabled").attr('readonly', 'readonly');
-			$("form#permisOrganGestorCommand *:disabled").removeAttr('disabled');
-		});
-
-		$("#selectAll").on('change', function() {
-			if ($(this).prop("checked"))
-				$("#permisosExpMarc :checkbox").prop('checked', true);
-			else
-				$("#permisosExpMarc :checkbox").prop('checked', false);
-		});
-		$("#permisosExpMarc :checkbox").on('change', function() {
-			var totsSeleccionats = true;
-			$("#permisosExpMarc :checkbox").each(function() {
-				  if(!$(this).prop('checked'))
-					  totsSeleccionats = false;
-			});
-			$("#selectAll").prop('checked', totsSeleccionats);
-		});
-		$("#administration").change(() => {
-			if (!$("#administration").prop('checked')) {
-				$("#administrationComuns").prop("checked", false);
-				habilitarTotsPermisosBase();
-			} else {
-				marcarTotsPermisosBase();
-			}
-		});
-
-		$("#administrationComuns").change(() => {
-			if ($("#administrationComuns").prop("checked")) {
-				$("#administration").prop("checked", true);
-				marcarTotsPermisosBase();
-			}
-		});
-
-		if ($("#administration").prop('checked')) {
-			marcarTotsPermisosBase();
-		}
-	});
-
-	function marcarTotsPermisosBase() {
-		$("#permisosExpMarc :checkbox").each(function() {
-			  $(this).prop("checked", true);
-			  $(this).attr("disabled", "disabled");
-		});
-		$("#selectAll").prop('checked', true);
-		$("#selectAll").attr("disabled", "disabled");
-	}
-
-	function habilitarTotsPermisosBase() {
-		$("#permisosExpMarc :checkbox").each(function() {
-			  $(this).removeAttr("disabled");
-		});
-		$("#selectAll").removeAttr("disabled");
-	}
 	
-</script>
-<style>
-	.permisosInput {margin-left: 45px}
-</style>
+	<script>
+		$(document).ready(function() {
+			
+			$("#modal-botons button[type='submit']").on('click', function() {
+				$("form#permisOrganGestorCommand *:disabled").attr('readonly', 'readonly');
+				$("form#permisOrganGestorCommand *:disabled").removeAttr('disabled');
+			});
+	
+			$("#selectAll").on('change', function() {
+				if ($(this).prop("checked"))
+					$("#permisosExpMarc :checkbox").prop('checked', true);
+				else
+					$("#permisosExpMarc :checkbox").prop('checked', false);
+			});
+			$("#permisosExpMarc :checkbox").on('change', function() {
+				var totsSeleccionats = true;
+				$("#permisosExpMarc :checkbox").each(function() {
+					  if(!$(this).prop('checked'))
+						  totsSeleccionats = false;
+				});
+				$("#selectAll").prop('checked', totsSeleccionats);
+			});
+			$("#administration").change(() => {
+				if (!$("#administration").prop('checked')) {
+					$("#administrationComuns").prop("checked", false);
+					habilitarTotsPermisosBase();
+				} else {
+					marcarTotsPermisosBase();
+				}
+			});
+	
+			$("#administrationComuns").change(() => {
+				if ($("#administrationComuns").prop("checked")) {
+					$("#administration").prop("checked", true);
+					marcarTotsPermisosBase();
+				}
+			});
+	
+			if ($("#administration").prop('checked')) {
+				marcarTotsPermisosBase();
+			}
+		});
+	
+		function marcarTotsPermisosBase() {
+			$("#permisosExpMarc :checkbox").each(function() {
+				  $(this).prop("checked", true);
+				  $(this).attr("disabled", "disabled");
+			});
+			$("#selectAll").prop('checked', true);
+			$("#selectAll").attr("disabled", "disabled");
+		}
+	
+		function habilitarTotsPermisosBase() {
+			$("#permisosExpMarc :checkbox").each(function() {
+				  $(this).removeAttr("disabled");
+			});
+			$("#selectAll").removeAttr("disabled");
+		}
+		
+	</script>
+	<style>
+		.permisosInput {margin-left: 45px}
+	    fieldset.scheduler-border {
+	        border: 1px solid lightgray;
+	    }
+	
+	    legend.scheduler-border {
+	        font-size: small;
+	        width: auto;
+	        padding: 0 10px;
+	        border-bottom: none;
+	    }
+	</style>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/organgestor/permis"/></c:set>
@@ -98,7 +109,7 @@
 			optionValueAttribute="id"
 			optionTextAttribute="nom"
 			required="true"
-			labelSize="3"
+			labelSize="2"
 			optionMinimumResultsForSearch="5"/>
 			
 		<c:if test="${not empty permisOrganGestorCommand.organGestorId}">
@@ -110,7 +121,7 @@
 			textKey="organgestor.permis.form.camp.tipus"
 			disabled="${not empty permisOrganGestorCommand.id}"
 			optionEnum="PrincipalTipusEnumDto"
-			labelSize="3"/>
+			labelSize="2"/>
 		
 		<c:choose>
 			<c:when test="${empty permisOrganGestorCommand.id}">
@@ -119,7 +130,7 @@
 					textKey="organgestor.permis.form.camp.principal"
 					required="true"
 					placeholderKey="organgestor.permis.form.camp.principal"
-					labelSize="3"/>
+					labelSize="2"/>
 			</c:when>
 			<c:otherwise>
 				<rip:inputText
@@ -128,43 +139,49 @@
 					disabled="true"
 					required="true"
 					placeholderKey="organgestor.permis.form.camp.principal"
-					labelSize="3"/>
+					labelSize="2"/>
 				<form:hidden path="principalNom"/>
 			</c:otherwise>
 		</c:choose>
 		
-		<div class="row">
+		<div class="row" style="margin-right: 10px; margin-left: 10px; padding-bottom:10px;">
 
-			<label class="control-label col-xs-3">Permisos</label>
+			<label class="control-label col-xs-2">Permisos</label>
 			
-			<div class="col-xs-5">
-			
+			<fieldset class="col-xs-5 scheduler-border">
+                <legend class="scheduler-border">Gestió d'expedients</legend>
 				<rip:inputCheckbox name="selectAll"
 					textKey="organgestor.permis.form.camp.all"
 					labelSize="5"/>
 				
-				<div id="permisosExpMarc" style="border: 1px solid lightgray;">
+				<div id="permisosExpMarc">
 					<rip:inputCheckbox name="read" 
 						textKey="organgestor.permis.form.camp.consulta"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.a"/>
+						comment="organgestor.permis.form.info.a"
+                        labelSize="6"/>
 					<rip:inputCheckbox name="create"
 						textKey="organgestor.permis.form.camp.creacio"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.c"/>					
+						comment="organgestor.permis.form.info.c"
+                        labelSize="6"/>
 					<rip:inputCheckbox name="write" 
 						textKey="organgestor.permis.form.camp.modificacio"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.u"/>
+						comment="organgestor.permis.form.info.u"
+                        labelSize="6"/>
 					<rip:inputCheckbox name="delete" 
 						textKey="organgestor.permis.form.camp.eliminacio"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.d"/>
+						comment="organgestor.permis.form.info.d"
+                        labelSize="6"/>
 				</div>			
 			
-			</div>
-			
-			<div class="col-xs-4 pull-right" style="padding-top: 45px;">
+			</fieldset>
+
+            <fieldset class="col-xs-5 pull-right scheduler-border" style="border-left: none;">
+                <legend class="scheduler-border">Administració i disseny</legend>
+
 				<rip:inputCheckbox
 					name="procedimentsComuns" 
 					labelSize="10"
@@ -193,7 +210,8 @@
 					textKey="organgestor.permis.columna.disseny"
 					faClassInfoIcon="fa-info-circle"
 					comment="organgestor.permis.form.info.diss"/>
-			</div>
+				<div class="form-group" style="height: 32px;"></div>
+			</fieldset>
 		</div>
 		
 		<div id="modal-botons">

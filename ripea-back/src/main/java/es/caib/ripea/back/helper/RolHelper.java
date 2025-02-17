@@ -134,6 +134,26 @@ public class RolHelper {
 	public static boolean isRolAmbFiltreOrgan(HttpServletRequest request) {
 		return ROLE_ADMIN_ORGAN.equals(getRolActual(request)) || ROLE_DISSENY.equals(getRolActual(request));
 	}
+	
+	public static boolean hasRolSuperusuari(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_ADMIN);
+	}
+	public static boolean hasRolDissenyadorOrgan(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_DISSENY);
+	}
+	public static boolean hasRolAdministrador(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_ADMIN);
+	}
+	public static boolean hasRolAdministradorOrgan(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_ADMIN_ORGAN);
+	}
+	public static boolean hasRolRevisor(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_REVISOR);
+	}
+	public static boolean hasRolUsuari(HttpServletRequest request) {
+		return getRolsUsuariActual(request).contains(ROLE_USER);
+	}
+	
 	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
 		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
 		List<String> rols = new ArrayList<String>();
