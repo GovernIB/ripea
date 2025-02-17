@@ -79,6 +79,16 @@
 </script>
 <style>
 	.permisosInput {margin-left: 45px}
+    fieldset.scheduler-border {
+        border: 1px solid lightgray;
+    }
+
+    legend.scheduler-border {
+        font-size: small;
+        width: auto;
+        padding: 0 10px;
+        border-bottom: none;
+    }
 </style>
 </head>
 <body>
@@ -137,34 +147,40 @@
 
 			<label class="control-label col-xs-3">Permisos</label>
 			
-			<div class="col-xs-5">
-			
+			<fieldset class="col-xs-5 scheduler-border">
+                <legend class="scheduler-border">Gestió d'expedients</legend>
 				<rip:inputCheckbox name="selectAll"
 					textKey="organgestor.permis.form.camp.all"
 					labelSize="5"/>
 				
-				<div id="permisosExpMarc" style="border: 1px solid lightgray;">
+				<div id="permisosExpMarc">
 					<rip:inputCheckbox name="read" 
 						textKey="organgestor.permis.form.camp.consulta"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.a"/>
+						comment="organgestor.permis.form.info.a"
+                        labelSize="6"/>
 					<rip:inputCheckbox name="create"
 						textKey="organgestor.permis.form.camp.creacio"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.c"/>					
+						comment="organgestor.permis.form.info.c"
+                        labelSize="6"/>
 					<rip:inputCheckbox name="write" 
 						textKey="organgestor.permis.form.camp.modificacio"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.u"/>
+						comment="organgestor.permis.form.info.u"
+                        labelSize="6"/>
 					<rip:inputCheckbox name="delete" 
 						textKey="organgestor.permis.form.camp.eliminacio"
 						faClassInfoIcon="fa-info-circle"
-						comment="organgestor.permis.form.info.d"/>
+						comment="organgestor.permis.form.info.d"
+                        labelSize="6"/>
 				</div>			
 			
-			</div>
-			
-			<div class="col-xs-4 pull-right" style="padding-top: 45px;">
+			</fieldset>
+
+            <fieldset class="col-xs-4 pull-right scheduler-border">
+                <legend class="scheduler-border">Administració i disseny</legend>
+
 				<rip:inputCheckbox
 					name="procedimentsComuns" 
 					labelSize="10"
