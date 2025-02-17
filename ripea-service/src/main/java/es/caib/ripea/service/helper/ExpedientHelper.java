@@ -1,20 +1,23 @@
 package es.caib.ripea.service.helper;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-import es.caib.distribucio.rest.client.integracio.domini.*;
-import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
-import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
-import es.caib.plugins.arxiu.api.*;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
-import es.caib.ripea.service.intf.exception.InteressatTipusDocumentException;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipOutputStream;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +27,94 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
-import java.math.BigDecimal;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.zip.ZipOutputStream;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+
+import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
+import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
+import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
+import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.ContingutTipus;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DadaEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.AlertaRepository;
+import es.caib.ripea.persistence.repository.CarpetaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
+import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
+import es.caib.ripea.service.intf.exception.InteressatTipusDocumentException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 /**
  * Mètodes comuns per a la gestió d'expedients.
@@ -486,11 +572,6 @@ public class ExpedientHelper {
 	}
 
 	private InteressatEntity updateInteressat(Long expedientId, PermissionEnumDto permission, String rolActual, InteressatDto interessatOverwritten) {
-//		InteressatEntity createdInteressat = expedientInteressatHelper.update(
-//				expedientId,
-//				interessatOverwritten,
-//				permission,
-//				rolActual);
 		InteressatEntity createdInteressat = expedientInteressatHelper.updateInteressatRepresentantEntity(
 				expedientId,
 				null,
@@ -499,16 +580,9 @@ public class ExpedientHelper {
 				false,
 				false);
 		return createdInteressat;
-
 	}
 
 	private void updateRepresentant(Long expedientId, Long interessatId, PermissionEnumDto permission, String rolActual, InteressatDto representantOverwritten) {
-//		expedientInteressatHelper.updateRepresentant(
-//				expedientId,
-//				interessatId,
-//				representantOverwritten,
-//				permission,
-//				rolActual);
 		expedientInteressatHelper.updateInteressatRepresentantEntity(
 				expedientId,
 				interessatId,
@@ -517,78 +591,6 @@ public class ExpedientHelper {
 				false,
 				false);
 	}
-
-
-//	private void updateInteressat(ExpedientEntity expedient, Long entitatId, InteressatDto interessat, String rolActual) {
-//		InteressatEntity interessatEntity = interessatRepository.findByExpedientAndDocumentNum(expedient, interessat.getDocumentNum());
-//		if (!sameTipusInteressat(interessat, interessatEntity)) {
-//			throw new InteressatTipusDocumentException(
-//					interessat.getDocumentNum(),
-//					getTipusInteressat(interessatEntity).name(),
-//					interessat.getTipus().name(),
-//					expedient.getId());
-//		}
-//		expedientInteressatHelper.update(entitatId, expedient.getId(), null, interessat, rolActual, false, false);
-//	}
-//
-//	private void crearInteressatIRepresentant(Long expedientId, Long entitatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio, Map<String, InteressatDto> interessatsOvewritten) {
-//		InteressatDto createdInteressat = createInteressat(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
-//		if (interessatDistribucio.getRepresentant() != null) {
-//			createRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten, createdInteressat);
-//		}
-//	}
-
-//	private void createRepresentant(Long expedientId, Long entitatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio, Map<String, InteressatDto> interessatsOvewritten, InteressatDto createdInteressat) {
-//		expedientInteressatHelper.createRepresentant(
-//				expedientId,
-//				createdInteressat.getId(),
-//				interessatsOvewritten.containsKey(interessatDistribucio.getRepresentant().getDocumentNumero()) ?
-//						interessatsOvewritten.get(interessatDistribucio.getRepresentant().getDocumentNumero()) :
-//						toInteressatDto(interessatDistribucio.getRepresentant(), null),
-//				false,
-//				permission,
-//				rolActual,
-//				false);
-//	}
-//
-//	private InteressatDto createInteressat(Long expedientId, Long entitatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio, Map<String, InteressatDto> interessatsOvewritten) {
-//		InteressatDto createdInteressat = expedientInteressatHelper.create(
-//				expedientId,
-//				interessatsOvewritten.containsKey(interessatDistribucio.getDocumentNumero()) ?
-//						interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) :
-//						toInteressatDto(interessatDistribucio, null),
-//				false,
-//				permission,
-//				rolActual,
-//				false);
-//		return createdInteressat;
-//	}
-
-//	private InteressatEntity getInteressatOvewritten(Long expedientId, String interessatNumDocument, String representantNumDocument) {
-//		if (interessatNumDocument != null) {
-//			InteressatEntity interessat = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, interessatNumDocument);
-//			if (interessat != null) {
-//				return interessat;
-//			}
-//		}
-//		if (representantNumDocument != null) {
-//			InteressatEntity representant = interessatRepository.findByExpedientIdAndRepresentantDocumentNum(expedientId, representantNumDocument);
-//			if (representant != null) {
-//				return representant;
-//			}
-//		}
-//		return null;
-//	}
-
-//	private Map<String, InteressatEntity> convertInteressatListToMap(Set<InteressatEntity> interessatsORepresenantsRipea) {
-//		Map<String, InteressatEntity> result = new HashMap<>();
-//		if (interessatsORepresenantsRipea != null) {
-//			for (InteressatEntity interessat : interessatsORepresenantsRipea) {
-//				result.put(interessat.getDocumentNum(), interessat);
-//			}
-//		}
-//		return result;
-//	}
 
 	public Map<String, InteressatDto> getInteressatsOverwritten(ExpedientEntity expedientEntity, List<RegistreInteressatEntity> interessatsDistribucio) {
 
@@ -601,8 +603,7 @@ public class ExpedientHelper {
 
 		Set<RegistreInteressatEntity> interessatsOrRepresentantsDistribucio = getInteressatOrRepresentantsDistribucio(interessatsDistribucio);
 
-		boolean sobreescriureTipus = configHelper.getAsBoolean("es.caib.ripea.interessats.permet.canvi.tipus");
-
+		boolean sobreescriureTipus = configHelper.getAsBoolean(PropertyConfig.CANVI_TIPUS_INTERESSAT_ANOTACIONS);
 
 		for (InteressatEntity interessatRipea : interessatsORepresenantsRipea) {
 			for (RegistreInteressatEntity interessatDistribucio : interessatsOrRepresentantsDistribucio) {
@@ -962,7 +963,6 @@ public class ExpedientHelper {
 		return moveAnnexArxiu(registreAnnexId);
 	}
 	
-	
 	/**
 	 * Creates document from registre annex
 	 * @param expedientId 
@@ -990,16 +990,15 @@ public class ExpedientHelper {
 				null, 
 				true, 
 				false);
-		//registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
+
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
 				"Creant justificant de expedient peticio (" + "expedientId=" +
 						expedientId + ", " + "arxiuUuid=" + arxiuUuid +
 						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
-		// ############################## CREATE CARPETA IN DB AND IN ARXIU
-		// ##########################################
-		boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
+		// CREATE CARPETA IN DB AND IN ARXIU
+		boolean isCarpetaActive = configHelper.getAsBoolean(PropertyConfig.CARPETES_CREACIO_ACTIVA);
 		if (isCarpetaActive) {
 			// create carpeta ind db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaForDocFromAnnex(
@@ -1011,11 +1010,8 @@ public class ExpedientHelper {
 			carpetaEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 		}
 
-		// ############################## CREATE DOCUMENT IN DB
-		// ####################################
-		DocumentDto documentDto = toDocumentDto(
-				documentDetalls, 
-				expedientPeticioEntity.getIdentificador());
+		// CREATE DOCUMENT IN DB
+		DocumentDto documentDto = toDocumentDto(documentDetalls, expedientPeticioEntity.getIdentificador());
 		// comprovar si el justificant s'ha importat anteriorment
 		List<DocumentDto> documents = documentHelper.findByArxiuUuid(arxiuUuid);
 		if (documents != null && !documents.isEmpty()) {

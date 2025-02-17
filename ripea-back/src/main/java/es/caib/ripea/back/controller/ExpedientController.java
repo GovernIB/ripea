@@ -8,6 +8,7 @@ import es.caib.ripea.back.command.ExpedientFiltreCommand;
 import es.caib.ripea.back.command.ExpedientTancarCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.*;
 import es.caib.ripea.service.intf.service.*;
@@ -109,8 +110,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientEstatsOptions", expedientEstatsOptions);
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
-		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
-		model.addAttribute("isDominisEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis"));
+		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
+		model.addAttribute("isDominisEnabled", aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS));
 		model.addAttribute("nomCookieFirmaPendent", COOKIE_FIRMA_PENDENT);
 		model.addAttribute("firmaPendent", firmaPendent);
 		model.addAttribute("nomCookieExpsSeguits", COOKIE_EXPS_SEGUITS);

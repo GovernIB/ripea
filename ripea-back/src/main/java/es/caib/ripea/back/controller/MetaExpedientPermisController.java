@@ -6,6 +6,7 @@ import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
@@ -46,20 +47,15 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		if (!rolActual.equals("IPA_REVISIO")) {
 			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
-		model.addAttribute(
-				"esRevisor",
-				rolActual.equals("IPA_REVISIO"));
-		model.addAttribute(
-				"metaExpedient",
-				metaExpedientService.findById(
-						entitatActual.getId(),
-						metaExpedientId));
+		model.addAttribute("esRevisor", rolActual.equals("IPA_REVISIO"));
+		model.addAttribute("metaExpedient", metaExpedientService.findById(entitatActual.getId(), metaExpedientId));
+		
         if (RolHelper.isRolActualDissenyadorOrgan(request))
             throw new SecurityException("No te permisos per accedir com a dissenyador d'organ.");
-		if (RolHelper.isRolActualAdministradorOrgan(request) && !Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ"))) {
-			throw new SecurityException("Per poder gestionar permisos la propietat \"es.caib.ripea.procediment.gestio.permis.administrador.organ\" ha de ser activada pel superusuari ", null);
-			
+		if (RolHelper.isRolActualAdministradorOrgan(request) && !Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ADMIN_ORGAN_GESTIO_PERMISOS))) {
+			throw new SecurityException("Per poder gestionar permisos la propietat "+PropertyConfig.ADMIN_ORGAN_GESTIO_PERMISOS+" ha de ser activada pel superusuari ", null);
 		}
+		
 		if (metaExpedient != null // es tracta d'una modificació
 				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
 				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {

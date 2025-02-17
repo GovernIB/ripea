@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import es.caib.ripea.back.command.*;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
@@ -69,7 +70,7 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isRolAdmin", isRolAdmin);
         model.addAttribute("isRolDissenyadorOrgan", RolHelper.isRolActualDissenyadorOrgan(request));
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
-		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
+		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ADMIN_ORGAN_GESTIO_PERMISOS)));
 		
 		if (isRolAdmin) {
 			boolean revisioActiva = metaExpedientService.isRevisioActiva();
@@ -175,7 +176,7 @@ public class MetaExpedientController extends BaseAdminController {
 		command.setRolAdminOrgan(isRolActualAdminOrgan);
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
-		boolean isCarpetesDefecte = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte"));
+		boolean isCarpetesDefecte = Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE));
 		
 		if (isCarpetesDefecte) {
 			List<ArbreDto<MetaExpedientCarpetaDto>> carpetes = null;
@@ -198,7 +199,7 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		
 		model.addAttribute("isRolActualAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
-		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
+		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false));
 		model.addAttribute("metaExpedientDto", metaExpedient);
 		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 		
@@ -1166,7 +1167,7 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isRolAdminOrgan", isRolAdminOrgan);
 		model.addAttribute("hasPermisAdmComu", hasPermisAdmComu);
 		model.addAttribute("hasOrganGestor", hasOrganGestor);
-		model.addAttribute("isCarpetaDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte")));
+		model.addAttribute("isCarpetaDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE)));
 		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
 		model.addAttribute("isRolAdmin", RolHelper.isRolActualAdministrador(request));
 

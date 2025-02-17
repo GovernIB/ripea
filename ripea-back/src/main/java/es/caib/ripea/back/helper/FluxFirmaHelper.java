@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.back.helper;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class FluxFirmaHelper {
 	public static void setCreacioFluxUsuariActiu(
 			HttpServletRequest request,
 			AplicacioService aplicacioService) {
-		boolean isCreacioFluxUsuariActiu = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.portafirmes.fluxos.usuaris"));
+		boolean isCreacioFluxUsuariActiu = Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMETRE_USUARIS_CREAR_FLUX_PORTAFIB));
 		request.getSession().setAttribute(
 				SESSION_CREACIO_FLUX_USUARI,
 				isCreacioFluxUsuariActiu);

@@ -13,6 +13,7 @@ import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import lombok.extern.slf4j.Slf4j;
@@ -636,7 +637,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	}
 
 	private boolean isIncorporacioJustificantActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.incorporar.justificant");
+		return configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT);
 	}
 	
 	@Transactional
@@ -904,7 +905,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Override
 	public Long getPeriodeActualitzacioContadorAnotacionsPendents() {
-		return Long.valueOf(configHelper.getConfig("es.caib.ripea.periode.actualitzacio.contador.anotacions.pendents", "150"));
+		return Long.valueOf(configHelper.getConfig(PropertyConfig.PERIODE_ACTUALITZACIO_ANOTACIO_PENDENT, "150"));
 	}
 
 }

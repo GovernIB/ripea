@@ -17,6 +17,7 @@ import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
@@ -2218,11 +2219,11 @@ public class ContingutHelper {
 	}
 
 	public boolean isCarpetaLogica() {
-		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
+		return configHelper.getAsBoolean(PropertyConfig.CARPETES_LOGIQUES_ACTIVES);
 	}
 
 	public boolean isOrdenacioPermesa() {
-		return configHelper.getAsBoolean("es.caib.ripea.ordenacio.contingut.habilitada");
+		return configHelper.getAsBoolean(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU);
 	}
 
 	private boolean isPermesEsborrarFinals() {
@@ -2230,7 +2231,7 @@ public class ContingutHelper {
 	}
 	
 	public boolean isConversioDefinitiuActiu() {
-		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu");
+		return configHelper.getAsBoolean(PropertyConfig.CONVERSIO_DEFINITIU);
 	}
 	
 	private boolean isCertificacioAmbFirma(byte[] certificacioContingut) {
@@ -2424,7 +2425,7 @@ public class ContingutHelper {
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
 	}
 	private boolean getPropertyGuardarCertificacioExpedient() {
-		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
+		return configHelper.getAsBoolean(PropertyConfig.GUARDAR_CERTIFICACIO_EXPEDIENT);
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 

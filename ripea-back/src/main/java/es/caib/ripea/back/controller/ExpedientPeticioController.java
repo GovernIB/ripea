@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.back.command.*;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.service.*;
@@ -1236,7 +1237,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	}
 
 	private boolean isIncorporacioJustificantActiva() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.incorporar.justificant"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.INCORPORAR_JUSTIFICANT));
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioController.class);

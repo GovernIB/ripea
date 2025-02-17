@@ -32,6 +32,7 @@ import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.utils.Utils;
 
 /**
@@ -259,18 +260,16 @@ public class ConversioPluginOpenOffice extends RipeaAbstractPluginProperties imp
 	}
 
 	private String getOpenOfficeHost() {
-		return getProperty(
-				"plugin.conversio.ooffice.host");
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.CONVERSIO_PLUGIN_OOFICE_HOST));
 	}
 	
 	private int getOpenOfficePort() {
-		return getAsInt(
-				"plugin.conversio.ooffice.port");
+		return getAsInt(PropertyConfig.getPropertySuffix(PropertyConfig.CONVERSIO_PLUGIN_OOFICE_PORT));
 	}
 	
 	@Override
 	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.conversio.endpointName");
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.CONVERSIO_PLUGIN_ENDPOINT_NAME));
 		if (Utils.isEmpty(endpoint)) {
 			endpoint = getOpenOfficeHost();
 		}

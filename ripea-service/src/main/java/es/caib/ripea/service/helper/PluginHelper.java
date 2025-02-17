@@ -1,48 +1,23 @@
 package es.caib.ripea.service.helper;
 
-import com.google.common.base.Strings;
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.tool.xml.Experimental;
-import es.caib.distribucio.rest.client.integracio.domini.Annex;
-import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
-import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
-import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
-import es.caib.plugins.arxiu.api.*;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.plugin.PropertiesHelper;
-import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
-import es.caib.ripea.plugin.SistemaExternNoTrobatException;
-import es.caib.ripea.plugin.conversio.ConversioArxiu;
-import es.caib.ripea.plugin.conversio.ConversioPlugin;
-import es.caib.ripea.plugin.dadesext.*;
-import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
-import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
-import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
-import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
-import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
-import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
-import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.ripea.plugin.notificacio.*;
-import es.caib.ripea.plugin.portafirmes.*;
-import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
-import es.caib.ripea.plugin.summarize.SummarizePlugin;
-import es.caib.ripea.plugin.unitat.NodeDir3;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
-import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
-import es.caib.ripea.plugin.viafirma.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.dto.config.ConfigDto;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +27,13 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.fundaciobit.plugins.certificate.InformacioCertificat;
-import org.fundaciobit.plugins.validatesignature.api.*;
+import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
+import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
+import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
+import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.jdom.Element;
 import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.text.TextDocument;
@@ -63,11 +44,166 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.*;
+import com.google.common.base.Strings;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.tool.xml.Experimental;
+
+import es.caib.distribucio.rest.client.integracio.domini.Annex;
+import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentExtensio;
+import es.caib.plugins.arxiu.api.DocumentFormat;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.DocumentTipusAddicional;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.api.ExpedientEstat;
+import es.caib.plugins.arxiu.api.ExpedientMetadades;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DispositiuEnviamentEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
+import es.caib.ripea.plugin.SistemaExternNoTrobatException;
+import es.caib.ripea.plugin.conversio.ConversioArxiu;
+import es.caib.ripea.plugin.conversio.ConversioPlugin;
+import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
+import es.caib.ripea.plugin.dadesext.DadesExternesPlugin;
+import es.caib.ripea.plugin.dadesext.Municipi;
+import es.caib.ripea.plugin.dadesext.Pais;
+import es.caib.ripea.plugin.dadesext.Provincia;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
+import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
+import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
+import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
+import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
+import es.caib.ripea.plugin.notificacio.Enviament;
+import es.caib.ripea.plugin.notificacio.EnviamentTipus;
+import es.caib.ripea.plugin.notificacio.Notificacio;
+import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
+import es.caib.ripea.plugin.notificacio.Persona;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.ripea.plugin.notificacio.RespostaEnviar;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
+import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxReviser;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxSigner;
+import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
+import es.caib.ripea.plugin.summarize.SummarizePlugin;
+import es.caib.ripea.plugin.unitat.NodeDir3;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
+import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
+import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
+import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
+import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
+import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuOperacioEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioEstatDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.ImportacioDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
+import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxEstatDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxReviserDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxSignerDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
+import es.caib.ripea.service.intf.dto.TipusViaDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.config.ConfigDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -4056,10 +4192,6 @@ public class PluginHelper {
 		}
 	}
 
-	public boolean isRegistreSignarAnnexos() {
-		return this.getPropertyPluginRegistreSignarAnnexos();
-	}
-
 	public SignatureInfoDto detectSignedAttachedUsingPdfReader(
 			byte[] documentContingut,
 			String contentType) {
@@ -7279,19 +7411,12 @@ public class PluginHelper {
 		return configHelper.getConfig(PropertyConfig.VIAFIRMA_PLUGIN_CLASS);
 	}
 
-	private boolean getPropertyPluginRegistreSignarAnnexos() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.plugin.signatura.signarAnnexos");
-	}
-
 	public boolean getPropertyArxiuMetadadesAddicionalsActiu() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.arxiu.metadades.addicionals.actiu");
+		return configHelper.getAsBoolean(PropertyConfig.ARXIU_PLUGIN_METADADES_ADICIONALS);
 	}
 
 	public boolean getPropertyArxiuFirmaDetallsActiu() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.arxiu.firma.detalls.actiu");
+		return configHelper.getAsBoolean(PropertyConfig.ARXIU_PLUGIN_FIRMA_DETALLS);
 	}
 
 	private Integer getPropertyNotificacioRetardNumDies() {
@@ -7307,8 +7432,7 @@ public class PluginHelper {
 	}
 
 	private boolean getPropertyGuardarCertificacioExpedient() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.notificacio.guardar.certificacio.expedient");
+		return configHelper.getAsBoolean(PropertyConfig.GUARDAR_CERTIFICACIO_EXPEDIENT);
 	}
 
 	private boolean getPropertyViaFirmaDispositius() {
@@ -7317,8 +7441,7 @@ public class PluginHelper {
 	}
 
 	public boolean getPropertyPropagarConversioDefinitiuActiu() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.conversio.definitiu.propagar.arxiu");
+		return configHelper.getAsBoolean(PropertyConfig.CONVERSIO_DEFINITIU_PROPAGAR_ARXIU);
 	}
 
 	private boolean isComprovacioNomsDesactivada() {
@@ -7332,8 +7455,7 @@ public class PluginHelper {
 	}
 
 	public boolean isCarpetaLogica() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.carpetes.logiques");
+		return configHelper.getAsBoolean(PropertyConfig.CARPETES_LOGIQUES_ACTIVES);
 	}
 
 	public boolean isPropagarNumeroExpedientActiu() {

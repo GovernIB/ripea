@@ -806,7 +806,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	}
 
 	private boolean isCreacioFluxUsuariActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.portafirmes.fluxos.usuaris"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMETRE_USUARIS_CREAR_FLUX_PORTAFIB));
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);

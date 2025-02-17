@@ -7,6 +7,7 @@ import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
@@ -488,7 +489,7 @@ public class MetaExpedientHelper {
 
 	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId, Long organId) {
 
-		boolean revisioActiva = configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
+		boolean revisioActiva = configHelper.getAsBoolean(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA);
 		
 		if (revisioActiva) {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
@@ -516,10 +517,9 @@ public class MetaExpedientHelper {
 	}
 	
 	public boolean isRevisioActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.metaexpedients.revisio.activa");
+		return configHelper.getAsBoolean(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA);
 	}
-	
-
+ 
 	public List<ArbreDto<MetaExpedientCarpetaDto>> obtenirPareArbreCarpetesPerMetaExpedient(
 			MetaExpedientEntity metaExpedient,
 			List<ArbreDto<MetaExpedientCarpetaDto>> carpetes) {

@@ -9,6 +9,7 @@ import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
@@ -1616,10 +1617,10 @@ public class DocumentHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
 	}
 	public boolean isPropagarConversioDefinitiuActiu() {
-		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+		return configHelper.getAsBoolean(PropertyConfig.CONVERSIO_DEFINITIU_PROPAGAR_ARXIU);
 	}
 	public boolean isConversioDefinitiuActiu() {
-		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu");
+		return configHelper.getAsBoolean(PropertyConfig.CONVERSIO_DEFINITIU);
 	}
 	public boolean isPropagarModificacioDefinitiusActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");

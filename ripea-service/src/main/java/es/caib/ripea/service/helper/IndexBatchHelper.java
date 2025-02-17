@@ -1,32 +1,60 @@
 package es.caib.ripea.service.helper;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.pdf.*;
-import es.caib.ripea.persistence.repository.ContingutRepository;
-import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.ContingutService;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.NoSuchFileException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.poi.common.usermodel.HyperlinkType;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Hyperlink;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.NoSuchFileException;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.List;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfAction;
+import com.itextpdf.text.pdf.PdfAnnotation;
+import com.itextpdf.text.pdf.PdfBorderArray;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPCellEvent;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.ContingutService;
 
 /**
  * Mètodes per generar un índex d'un expedient relacionat en una transacció separada
@@ -596,7 +624,7 @@ public class IndexBatchHelper {
 	}
 	
 	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
-		return configHelper.getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
+		return configHelper.getAsBoolean(PropertyConfig.INDEX_CAMPS_ADDICIONALS);
 	}
 
 	private String getCsvUrl() throws NoSuchFileException, IOException {

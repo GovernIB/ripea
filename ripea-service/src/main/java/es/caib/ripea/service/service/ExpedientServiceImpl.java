@@ -9,6 +9,7 @@ import es.caib.ripea.service.auxiliary.ExpedientFiltreCalculat;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PaginacioHelper.ConverterParam;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -2097,15 +2098,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	private boolean isIncorporacioDuplicadaPermesa() {
-		return configHelper.getAsBoolean("es.caib.ripea.incorporacio.anotacions.duplicada");
+		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
 	}
 	
 	private boolean isProgaparRelacioActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.propagar.relacio.expedients");
+		return configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
 	}
 	
 	private boolean isIncorporacioJustificantActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.incorporar.justificant");
+		return configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT);
 	}
 	
 	private boolean isImportacioRelacionatsActiva() {

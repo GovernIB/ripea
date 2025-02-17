@@ -10,6 +10,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -761,15 +762,15 @@ public class IndexHelper {
 	}
 	
 	private String getLogo() throws NoSuchFileException, IOException {
-		return configHelper.getConfig("es.caib.ripea.index.logo");
+		return configHelper.getConfig(PropertyConfig.INDEX_LOGO);
 	}
 	
 	private boolean indexExpedientsRelacionats() throws NoSuchFileException, IOException {
-		return configHelper.getAsBoolean("es.caib.ripea.index.expedients.relacionats");
+		return configHelper.getAsBoolean(PropertyConfig.INDEX_EXPEDIENTS_RELACIONATS);
 	}
 	
 	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
-		return configHelper.getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
+		return configHelper.getAsBoolean(PropertyConfig.INDEX_CAMPS_ADDICIONALS);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(IndexHelper.class);

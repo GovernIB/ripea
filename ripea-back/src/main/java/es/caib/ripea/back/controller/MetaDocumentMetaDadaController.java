@@ -4,6 +4,7 @@ import es.caib.ripea.back.command.MetaDadaCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
@@ -126,7 +127,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			}
 		}
 		List<HtmlOption> tipus = EnumHelper.getOptionsForEnum(MetaDadaTipusEnumDto.class, "meta.dada.tipus.enum.");
-		if (!aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis")) {
+		if (!aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS)) {
 			tipus.remove(new HtmlOption("DOMINI", null));
 		}
 		model.addAttribute("tipus", tipus);

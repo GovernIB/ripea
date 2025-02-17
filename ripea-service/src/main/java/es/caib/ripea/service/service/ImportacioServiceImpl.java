@@ -10,6 +10,7 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -334,7 +335,6 @@ public class ImportacioServiceImpl implements ImportacioService {
 	        }
 	        corrected.add(document);
 	    }
-
 	    return corrected;
 	}
 	
@@ -353,8 +353,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 	}
 	
 	private boolean isIncorporacioDuplicadaPermesa() {
-		return configHelper.getAsBoolean("es.caib.ripea.incorporacio.anotacions.duplicada");
+		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
 	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ImportacioServiceImpl.class);
-
 }

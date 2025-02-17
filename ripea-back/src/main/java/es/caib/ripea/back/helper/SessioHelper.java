@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
@@ -63,12 +64,12 @@ public class SessioHelper {
 				entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
 			}
 			if (!propietatsInicialitzades) {
-                capLogo = aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.logo");
-                capColorFons = aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.fons");
-                capColorLletra = aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.lletra");
-                habilitarTipusDocument = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.tipusdocument", false);
-                habilitarDocumentsGenerals = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false);
-                habilitarDominis = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis");
+                capLogo = aplicacioService.propertyFindByNom(PropertyConfig.ENTITAT_LOGO);
+                capColorFons = aplicacioService.propertyFindByNom(PropertyConfig.CAPSALERA_FONS);
+                capColorLletra = aplicacioService.propertyFindByNom(PropertyConfig.CAPSALERA_LLETRA);
+                habilitarTipusDocument = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOCUMENT_ACTIUS, false);
+                habilitarDocumentsGenerals = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false);
+                habilitarDominis = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS);
 				propietatsInicialitzades = true;
 			}
 			String idioma_usuari = usuariActual.getIdioma();

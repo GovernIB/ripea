@@ -147,23 +147,23 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				}
 			}
 			
-			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
-			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
-			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
-			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
-			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
+			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_ACTIVA)));
+			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_CREACIO_ACTIVA)));
+			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_ANOTACIONS_ACTIVES)));
+			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
+			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
 			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa")));
 			model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 			model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
-			model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
+			model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
 			model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
 			model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
 			model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
-			model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
+			model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU, false));
 			model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
 			model.addAttribute("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.importacio.expedient.relacionat.activa")));
 			model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.esborrar.finals", true));
-			model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.logiques")));
+			model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
 			model.addAttribute("isGenerarUrlsInstruccioActiu", isGenerarUrlsInstruccioActiu());
 			model.addAttribute("isNotificacioMultipleGenerarDocumentVisible", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.document.generat.visible")));
 			model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
@@ -276,20 +276,20 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		}
 		
 		model.addAttribute("contingut", contingut);
-		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
-		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
-		model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
+		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
+		model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_CREACIO_ACTIVA)));
 		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
 		model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.esborrar.finals", true));
-		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
-		model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
-		model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.logiques")));
+		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU, false));
+		model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_ANOTACIONS_ACTIVES)));
+		model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
 		model.addAttribute("isExpedientExpanditPerDefecte", aplicacioService.getUsuariActual().isExpedientExpandit());
 		model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL));
 		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
-		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
+		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
 		
 		//model.addAttribute("paddingCurrentFill", 60 * contingut.getPath().size());
 		

@@ -9,6 +9,7 @@ import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PaginacioHelper.ConverterParam;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
@@ -1612,7 +1613,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	}
 
 	private boolean isCarpetesDefectaActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.carpetes.defecte");
+		return configHelper.getAsBoolean(PropertyConfig.CARPETES_PER_DEFECTE);
 	}
 
 	@Transactional

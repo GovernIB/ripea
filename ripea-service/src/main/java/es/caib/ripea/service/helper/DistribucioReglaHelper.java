@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import com.sun.jersey.api.client.ClientResponse;
 import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
@@ -100,56 +101,37 @@ public class DistribucioReglaHelper  {
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-
 	}
 	
-	
-	
-	public ReglaDistribucioDto consultarRegla(
-			String sia)  {
-		
+	public ReglaDistribucioDto consultarRegla(String sia)  {
 		try {
-			// Creació del client
 			ReglesRestClient client = new ReglesRestClient(
 					getServiceUrl(),
 					getServiceUsername(),
 					getServicePassword(),
 					isAutenticacioBasic());
-
 			ReglaDistribucioDto regla = client.consultarRegla(sia);
-
 			return regla;
-
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-
 	}
-	
-	
-
 
 	private String getServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.distribucio.regla.ws.url");
+		return PropertiesHelper.getProperties().getProperty(PropertyConfig.DISTRIBUCIO_REGLA_PLUGIN_URL);
 	}
 	private String getServiceUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.distribucio.regla.ws.username");
+		return PropertiesHelper.getProperties().getProperty(PropertyConfig.DISTRIBUCIO_REGLA_PLUGIN_USR);
 	}
 	private String getServicePassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.distribucio.regla.ws.password");
+		return PropertiesHelper.getProperties().getProperty(PropertyConfig.DISTRIBUCIO_REGLA_PLUGIN_PAS);
 	}
-	
 	private String getCodiBackoffice() {
-		return configHelper.getConfig("es.caib.ripea.distribucio.regla.ws.codi.backoffice");
+		return configHelper.getConfig(PropertyConfig.DISTRIBUCIO_REGLA_PLUGIN_CODI_BACK);
 	}
-	
 	private boolean isAutenticacioBasic() {
-		return configHelper.getAsBoolean("es.caib.ripea.distribucio.regla.autenticacio.basic");
+		return configHelper.getAsBoolean(PropertyConfig.DISTRIBUCIO_REGLA_PLUGIN_AUTH_BASIC);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DistribucioReglaHelper.class);
-
 }

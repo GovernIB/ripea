@@ -1,5 +1,6 @@
 package es.caib.ripea.back.helper;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,13 +13,8 @@ public class SeguimentEnviamentsUsuariHelper {
 		return (Boolean)request.getSession().getAttribute(SESSION_MOSTRAR_SEGUIMENT_ENVIAMENTS_USUARI);
 	}
 	
-	public static void setMostrarSeguimentEnviamentsUsuari(
-			HttpServletRequest request,
-			AplicacioService aplicacioService) {
-		boolean isConversioDefinitiuActiva = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.seguiment.enviaments.usuari"));
-		request.getSession().setAttribute(
-				SESSION_MOSTRAR_SEGUIMENT_ENVIAMENTS_USUARI,
-				isConversioDefinitiuActiva);
+	public static void setMostrarSeguimentEnviamentsUsuari(HttpServletRequest request, AplicacioService aplicacioService) {
+		boolean isConversioDefinitiuActiva = Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.SEGUIMENT_ENVIAMENTS_USUARI));
+		request.getSession().setAttribute(SESSION_MOSTRAR_SEGUIMENT_ENVIAMENTS_USUARI, isConversioDefinitiuActiva);
 	}
-	
 }

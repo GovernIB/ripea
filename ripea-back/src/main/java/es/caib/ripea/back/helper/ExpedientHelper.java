@@ -1,5 +1,6 @@
 package es.caib.ripea.back.helper;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExpedientService;
@@ -105,7 +106,7 @@ public class ExpedientHelper {
 	public static void setConversioDefinitiu(
 			HttpServletRequest request,
 			AplicacioService aplicacioService) {
-		boolean isConversioDefinitiuActiva = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu"));
+		boolean isConversioDefinitiuActiva = Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU));
 		request.getSession().setAttribute(
 				SESSION_CONVERSIO_DEFINITIU_ACTIVA,
 				isConversioDefinitiuActiva);

@@ -8,6 +8,7 @@ import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -75,7 +76,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional
 	@Override
 	public EntitatDto update(EntitatDto entitat) {
-
 		logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
 		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false, false, false);
 		entity.update(
@@ -98,21 +98,17 @@ public class EntitatServiceImpl implements EntitatService {
 		return conversioTipusHelper.convertir(entity, EntitatDto.class);
 	}
 	
-	
 	@Transactional
 	@Override
 	public byte[] getLogo() throws NoSuchFileException, IOException {
-
-		String filePath = configHelper.getConfig("es.caib.ripea.capsalera.logo");
+		String filePath = configHelper.getConfig(PropertyConfig.ENTITAT_LOGO);
 		Path path = Paths.get(filePath);
 		return Files.readAllBytes(path);
 	}
-	
 
 	@Transactional
 	@Override
 	public EntitatDto updateActiva(Long id, boolean activa) {
-
 		logger.debug("Actualitzant propietat activa d'una entitat existent (id=" + id + ", activa=" + activa + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(id, false, false, false, false, false);
 		entitat.updateActiva(activa);
@@ -123,7 +119,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public EntitatDto delete(Long id) {
-
 		logger.debug("Esborrant entitat (id=" + id +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(id, false, false, false, false, false);
 		configHelper.deleteConfigEntitat(entitat.getCodi());
@@ -135,7 +130,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findById(Long id) {
-
 		logger.debug("Consulta de l'entitat (id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(id, false, false, false, false, false);
 		EntitatDto dto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
@@ -146,7 +140,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findByCodi(String codi) {
-
 		logger.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
 		EntitatDto entitat = conversioTipusHelper.convertir(entitatRepository.findByCodi(codi), EntitatDto.class);
 		if (entitat != null) {
@@ -158,7 +151,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findByUnitatArrel(String unitatArrel) {
-
 		logger.debug("Consulta de l'entitat amb unitatArrel (unitatArrel=" + unitatArrel + ")");
 		EntitatDto entitat = conversioTipusHelper.convertir(entitatRepository.findByUnitatArrel(unitatArrel), EntitatDto.class);
 		if (entitat != null) {
@@ -170,7 +162,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<EntitatDto> findPaginat(PaginacioParamsDto paginacioParams) {
-
 		logger.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
 		PaginaDto<EntitatDto> resposta = paginacioHelper.esPaginacioActivada(paginacioParams) ?
 						paginacioHelper.toPaginaDto(entitatRepository.findBy(paginacioHelper.toSpringDataPageable(paginacioParams)), EntitatDto.class)
@@ -179,19 +170,16 @@ public class EntitatServiceImpl implements EntitatService {
 		return resposta;
 	}
 	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<EntitatDto> findAll() {
 		logger.debug("Consulta de totes les entitats");
 		return conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
 	}
-	
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<EntitatDto> findAccessiblesUsuariActual() {
-
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
 		return cacheHelper.findEntitatsAccessiblesUsuari(auth.getName());
@@ -200,7 +188,6 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public void evictEntitatsAccessiblesUsuari() {
-
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
 		cacheHelper.evictEntitatsAccessiblesUsuari(auth.getName());

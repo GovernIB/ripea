@@ -1179,7 +1179,7 @@ public class PinbalHelper {
 		return configHelper.getAsBoolean(PropertyConfig.PINBAL_BASIC_AUTH);
 	}
 	private String getPinbalDefaultSia() {
-		return configHelper.getConfig("es.caib.ripea.pinbal.codi.sia.peticions");
+		return configHelper.getConfig(PropertyConfig.PINBAL_DEFAULT_SIA);
 	}
 
 }

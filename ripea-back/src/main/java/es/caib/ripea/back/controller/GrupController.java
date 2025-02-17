@@ -4,6 +4,7 @@ import es.caib.ripea.back.command.GrupCommand;
 import es.caib.ripea.back.command.GrupFiltreCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
@@ -40,7 +41,7 @@ public class GrupController extends BaseAdminController {
 		GrupFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
-		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
+		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ADMIN_ORGAN_GESTIO_PERMISOS)));
 		return "grupList";
 	}
 	
