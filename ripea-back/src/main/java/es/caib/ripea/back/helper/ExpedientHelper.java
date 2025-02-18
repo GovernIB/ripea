@@ -119,7 +119,7 @@ public class ExpedientHelper {
 	public static void setUrlValidacioDefinida(
 			HttpServletRequest request,
 			AplicacioService aplicacioService) {
-		boolean isUrlValidacioDefinida = aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false;
+		boolean isUrlValidacioDefinida = aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES) != null;
 		request.getSession().setAttribute(
 				SESSION_URL_VALIDACIO,
 				isUrlValidacioDefinida);
@@ -132,7 +132,7 @@ public class ExpedientHelper {
 	public static void setUrlsInstruccioActiu(
 			HttpServletRequest request,
 			AplicacioService aplicacioService) {
-		boolean isUrlsInstruccioActiu = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.generar.urls.instruccio"));
+		boolean isUrlsInstruccioActiu = Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.GENERAR_URL_INSTRUCCIO));
 		request.getSession().setAttribute(
 				SESSION_URLS_INSTRUCCIO,
 				isUrlsInstruccioActiu);

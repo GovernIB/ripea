@@ -116,10 +116,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("firmaPendent", firmaPendent);
 		model.addAttribute("nomCookieExpsSeguits", COOKIE_EXPS_SEGUITS);
 		model.addAttribute("expedientsSeguits", expedientsSeguits);
-		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
-		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
-		model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
-		model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
+		String separador = aplicacioService.propertyFindByNom(PropertyConfig.NUMERO_EXPEDIENT_SEPARADOR);
+		model.addAttribute("separadorDefinit", (separador != null && !separador.equals("/")));
+		model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
+		model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
 		model.addAttribute("grups", grupService.findGrupsPermesosProcedimentsGestioActiva(entitatActual.getId(), rolActual, RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null));
 		
 		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
@@ -309,7 +309,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (! isExportacioExcelActiva() && format != null && format.equals("XLSX"))
-			throw new SecurityException("És necessari activar la propietat 'es.caib.ripea.expedient.exportacio.excel' per realitzar la exportació a excel");
+			throw new SecurityException("És necessari activar la propietat '"+PropertyConfig.EXPORTACIO_EXCEL +"' per realitzar la exportació a excel");
 		
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
@@ -2032,11 +2032,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	}
 	
 	private boolean isFiltreDataCreacioActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.filtre.data.creacio.actiu"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FILTRE_DATA_CREACIO_ACTIU));
 	}
 	
 	private boolean isExportacioExcelActiva() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL));
 	}
 
 	private ExpedientFiltreCommand getRelacionarFiltreCommand(

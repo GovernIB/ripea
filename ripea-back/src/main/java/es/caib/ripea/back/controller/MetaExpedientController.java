@@ -1239,7 +1239,7 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 	
 	private boolean isObligarInteressatActiu() {
-		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.permetre.obligar.interessat");
+		return aplicacioService.propertyBooleanFindByKey(PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientController.class);

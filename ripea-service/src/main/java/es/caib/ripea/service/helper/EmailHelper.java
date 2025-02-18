@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1118,7 +1119,7 @@ public class EmailHelper {
 	}
 
 	public String getPrefixRipea() {
-		String entorn = configHelper.getConfig("es.caib.ripea.entorn");
+		String entorn = configHelper.getConfig(PropertyConfig.ENTORN);
 		String prefix;
 		if (entorn == null || entorn.equals("PRO")) {
 			prefix = "[RIPEA]";

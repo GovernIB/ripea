@@ -6,6 +6,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.CarpetaCommand;
 import es.caib.ripea.back.command.ContenidorCommand.Create;
 import es.caib.ripea.back.command.ContenidorCommand.Update;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -133,7 +134,7 @@ public class ContingutCarpetaController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (! isExportacioExcelActiva() && format != null && format.equals("XLSX"))
-			throw new SecurityException("És necessari activar la propietat 'es.caib.ripea.expedient.exportacio.excel' per realitzar la exportació a excel");
+			throw new SecurityException("És necessari activar la propietat '"+PropertyConfig.EXPORTACIO_EXCEL +"' per realitzar la exportació a excel");
 		
 		FitxerDto fitxer = carpetaService.exportIndexCarpetes(
 				entitatActual.getId(),
@@ -149,7 +150,7 @@ public class ContingutCarpetaController extends BaseUserController {
 	}
 
 	private boolean isExportacioExcelActiva() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL));
 	}
 	
 	@InitBinder

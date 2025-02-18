@@ -798,11 +798,11 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	}
 
 	private boolean isHabilitarAvisFirmaParcialActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.AVIS_FIRMA_PARCIAL));
 	}
 
 	private boolean isFirmaParcialHabilitada() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.firma.parcial"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_PARCIAL));
 	}
 
 	private boolean isCreacioFluxUsuariActiu() {

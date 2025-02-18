@@ -499,21 +499,21 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 
 	private int getArxiuMaxReintentsExpedients() {
-		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
+		String arxiuMaxReintentsExpedients = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_EXPEDIENT);
 		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;
 	}
 	
 	private int getArxiuMaxReintentsDocuments() {
-		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
+		String arxiuMaxReintentsDocuments = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_DOCUMENTS);
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
 	}
 	private int getArxiuMaxReintentsInteressats() {
-		String arxiuMaxReintentsInteressats = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats");
+		String arxiuMaxReintentsInteressats = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_INTERESSATS);
 		return arxiuMaxReintentsInteressats != null && !arxiuMaxReintentsInteressats.isEmpty() ? Integer.valueOf(arxiuMaxReintentsInteressats) : 0;
 	}
 	
 	private int getMaxReintentsCanviEstatRebudaDistribucio() {
-		String maxReintentsCanviEstatRebudaDistribucio = configHelper.getConfig("es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio");
+		String maxReintentsCanviEstatRebudaDistribucio = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_CANVI_ESTST_DISTRIBUCIO);
 		return maxReintentsCanviEstatRebudaDistribucio != null && !maxReintentsCanviEstatRebudaDistribucio.isEmpty() ? Integer.valueOf(maxReintentsCanviEstatRebudaDistribucio) : 0;
 	}
 	

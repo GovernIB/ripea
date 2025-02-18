@@ -2094,7 +2094,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	private boolean isPermesReobrir() {
-		return configHelper.getAsBoolean("es.caib.ripea.expedient.permetre.reobrir");
+		return configHelper.getAsBoolean(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT);
 	}
 
 	private boolean isIncorporacioDuplicadaPermesa() {
@@ -2110,11 +2110,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	private boolean isImportacioRelacionatsActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.importacio.expedient.relacionat.activa");
+		return configHelper.getAsBoolean(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA);
 	}
 
 	private boolean isTancamentLogicActiu() {
-		return configHelper.getAsBoolean("es.caib.ripea.expedient.tancament.logic");
+		return configHelper.getAsBoolean(PropertyConfig.TANCAMENT_LOGIC);
 	}
 	
 	private List<Long> toListLong(List<Serializable> original) {

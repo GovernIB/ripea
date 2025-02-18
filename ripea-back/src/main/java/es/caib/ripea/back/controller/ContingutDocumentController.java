@@ -9,6 +9,7 @@ import es.caib.ripea.back.command.DocumentCommand.DocumentFisicOrigenEnum;
 import es.caib.ripea.back.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.back.command.DocumentGenericCommand;
 import es.caib.ripea.back.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.*;
 import es.caib.ripea.service.intf.service.*;
@@ -1188,7 +1189,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			}
 
 			// ========================= CONCATENTAR ===================================
-			if (totsDocumentsPdf && Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar"))) {
+			if (totsDocumentsPdf && Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONCATENAR_MULTIPLES_PDFS))) {
 				
 				Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 				if (docsIdx != null) {
@@ -1598,19 +1599,19 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	}
 
 	private String obtenirEstatsElaboracioIdentificadorEniObligat() {
-		return aplicacioService.propertyFindByNom("es.caib.ripea.estat.elaboracio.identificador.origen.obligat");
+		return aplicacioService.propertyFindByNom(PropertyConfig.ESTAT_ELABORACIO_ENI_OBLIGATORI);
 	}
 	
 	private String isMascaraPermesa() {
-		return aplicacioService.propertyFindByNom("es.caib.ripea.identificador.origen.mascara");
+		return aplicacioService.propertyFindByNom(PropertyConfig.IDENTIFICADOR_ORIGEN_MASCARA);
 	}
 	
 	private Boolean isPropagarModificacioDefinitiusActiva() {
-		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.propagar.modificacio.arxiu");
+		return aplicacioService.propertyBooleanFindByKey(PropertyConfig.PROPAGAR_MODIFICACIO_ARXIU);
 	}
 	
 	private Boolean isDeteccioFirmaAutomaticaActiva() {
-		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.deteccio.firma.automatica");
+		return aplicacioService.propertyBooleanFindByKey(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA);
 	}
 	
 	private Boolean isPluginSummarizeActiu() {
@@ -1811,7 +1812,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute(
 				"escanejarActiu",
 				propertyEscanejarActiu);
-		boolean modificacioCustodiatsActiva = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false);
+		boolean modificacioCustodiatsActiva = aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false);
 		model.addAttribute(
 				"isPermesModificarCustodiats",
 				modificacioCustodiatsActiva);

@@ -7,6 +7,7 @@ import es.caib.ripea.persistence.entity.config.ConfigGroupEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.config.ConfigGroupRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
@@ -81,7 +82,7 @@ public class ConfigHelper {
             return;
         }
 
-        ConfigEntity mostrarLogsConfig = configRepository.findByKey("es.caib.ripea.mostrar.logs.integracio");
+        ConfigEntity mostrarLogsConfig = configRepository.findByKey(PropertyConfig.MOSTRAR_LOGS_INTEGRACIO);
         boolean mostrarLogs = mostrarLogsConfig != null && Boolean.parseBoolean(mostrarLogsConfig.getValue());
         if (mostrarLogs) {
             log.info("[CFG] Inicialitzant propietats");

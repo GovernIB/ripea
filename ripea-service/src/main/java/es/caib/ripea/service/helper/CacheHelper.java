@@ -4,6 +4,7 @@ import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.DominiException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -231,7 +232,7 @@ public class CacheHelper {
 				}
 			}
 			
-			boolean isObligarInteressatActiu = configHelper.getAsBoolean("es.caib.ripea.permetre.obligar.interessat");
+			boolean isObligarInteressatActiu = configHelper.getAsBoolean(PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT);
 			MetaExpedientEntity procediment = expedient.getMetaExpedient();
 			if (isObligarInteressatActiu && procediment.isInteressatObligatori()
 					&& (expedient.getInteressatsORepresentants() == null
@@ -752,12 +753,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsIntegracio")
 	public boolean mostrarLogsIntegracio() {
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.integracio");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_INTEGRACIO);
+        return prop != null && prop.equals("true");
 	}
 	@CacheEvict(value = "mostrarLogsIntegracio")
 	public void evictMostrarLogsIntegracio() {
@@ -769,13 +766,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsEmail")
 	public boolean mostrarLogsEmail() {
-		
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.email");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_EMAIL);
+        return prop != null && prop.equals("true");
 	}
 	
 	@CacheEvict(value = "mostrarLogsPermisos")
@@ -784,13 +776,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsPermisos")
 	public boolean mostrarLogsPermisos() {
-		
-		String prop = configHelper.getConfig("es.caib.ripea.activar.logs.permisos");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_PERMISOS);
+        return prop != null && prop.equals("true");
 	}
 	
 	@CacheEvict(value = "mostrarLogsGrups")
@@ -798,23 +785,14 @@ public class CacheHelper {
 	}
 	@Cacheable(value = "mostrarLogsGrups")
 	public boolean mostrarLogsGrups() {
-		
-		String prop = configHelper.getConfig("es.caib.ripea.activar.logs.grups");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_GRUPS);
+        return prop != null && prop.equals("true");
 	}
 	
 	@Cacheable(value = "mostrarLogsSegonPla")
 	public boolean mostrarLogsSegonPla() {
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.segonpla");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_SEGONPLA);
+        return prop != null && prop.equals("true");
 	}
 	@CacheEvict(value = "mostrarLogsSegonPla")
 	public void evictMostrarLogsSegonPla() {
@@ -822,12 +800,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsRendiment")
 	public boolean mostrarLogsRendiment() {
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.rendiment");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_RENDIMENT);
+        return prop != null && prop.equals("true");
 	}
 	
 	@CacheEvict(value = "mostrarLogsRendiment")
@@ -837,11 +811,7 @@ public class CacheHelper {
 	@Cacheable(value = "mostrarLogsRendimentDescarregarAnotacio")
 	public boolean mostrarLogsRendimentDescarregarAnotacio() {
 		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+        return prop != null && prop.equals("true");
 	}
 	
 	@CacheEvict(value = "mostrarLogsRendimentDescarregarAnotacio")
@@ -850,12 +820,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsCercadorAnotacio")
 	public boolean mostrarLogsCercadorAnotacio() {
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.cercador.anotacions");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_CERCADOR_ANOTACIO);
+        return prop != null && prop.equals("true");
 	}
 	
 	@CacheEvict(value = "mostrarLogsCercadorAnotacio")
@@ -865,12 +831,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsCreacioContingut")
 	public boolean mostrarLogsCreacioContingut() {
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.creacio.contingut");
-		if (prop != null && prop.equals("true")) {
-			return true;
-		} else {
-			return false;
-		}
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_CREACIO_CONTINGUT);
+        return prop != null && prop.equals("true");
 	}
 	
 	@CacheEvict(value = "mostrarLogsCreacioContingut")

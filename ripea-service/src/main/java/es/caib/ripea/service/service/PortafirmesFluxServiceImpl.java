@@ -10,6 +10,7 @@ import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -55,7 +56,7 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 		String idioma = usuariDto.getIdioma();
 		String usuariCodi = usuariDto.getCodi();
 		
-		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
+		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
 		boolean saveUserActual = false;
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 			saveUserActual = true;

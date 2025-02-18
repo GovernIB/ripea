@@ -9,6 +9,7 @@ import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -2572,11 +2573,11 @@ public class ContingutServiceImpl implements ContingutService {
     }
 
     public boolean isMantenirEstatCarpetaActiu() {
-		return configHelper.getAsBoolean("es.caib.ripea.carpetes.mantenir.estat");
+		return configHelper.getAsBoolean(PropertyConfig.MANTENIR_ESTAT_CARPETA);
 	}
     
 	public boolean isPropagarMetadadesActiu() {
-		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
+		return configHelper.getAsBoolean(PropertyConfig.PROPAGAR_METADADES);
 	}
 	
 	private String buildIdsDominiString(String valorDomini, Long entitatId, DominiDto domini) {

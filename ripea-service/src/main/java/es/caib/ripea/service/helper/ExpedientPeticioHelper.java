@@ -6,6 +6,7 @@ package es.caib.ripea.service.helper;
 import es.caib.distribucio.rest.client.integracio.domini.*;
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -404,7 +405,7 @@ public class ExpedientPeticioHelper {
 	}
 	
 	public boolean getPropertyGuardarContingutAnnexosDistribucio() {
-		return configHelper.getAsBoolean("es.caib.ripea.anotacions.annexos.save");
+		return configHelper.getAsBoolean(PropertyConfig.GUARDAR_CONTINGUT_ANNEXOS_DISTRIBUCIO);
 	}
 
 	private RegistreInteressatEntity crearInteressatEntity(

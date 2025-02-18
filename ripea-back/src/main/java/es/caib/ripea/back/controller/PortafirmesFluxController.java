@@ -7,6 +7,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.helper.SessioHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.*;
 import org.slf4j.Logger;
@@ -152,7 +153,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
 		List<PortafirmesFluxRespostaDto> resposta;
 		
-		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
+		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 			
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), true);

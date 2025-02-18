@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
@@ -689,11 +690,11 @@ public class EntityComprovarHelper {
 	
 	public boolean comprovarSiEsPotReobrirExpedient(ExpedientEntity expedient) {
 
-		boolean isReobrirPermes = configHelper.getAsBoolean("es.caib.ripea.expedient.permetre.reobrir");
+		boolean isReobrirPermes = configHelper.getAsBoolean(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT);
 		
 		boolean expedientTancat = expedient.getEstat() == ExpedientEstatEnumDto.TANCAT;
 		
-		boolean isTancamentLogicActiu = configHelper.getAsBoolean("es.caib.ripea.expedient.tancament.logic");
+		boolean isTancamentLogicActiu = configHelper.getAsBoolean(PropertyConfig.TANCAMENT_LOGIC);
 		
 		return isReobrirPermes && expedientTancat && (!isTancamentLogicActiu || (isTancamentLogicActiu && expedient.getTancatData() == null));		
 

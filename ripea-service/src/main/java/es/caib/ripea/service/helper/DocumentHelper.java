@@ -250,7 +250,7 @@ public class DocumentHelper {
 					"id=" + entity.getId() + ")",
 					ex);
 			
- 			if (ex instanceof ValidacioFirmaException && !configHelper.getAsBoolean("es.caib.ripea.document.deteccio.firma.automatica")) {
+ 			if (ex instanceof ValidacioFirmaException && !configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA)) {
  				throw new ValidationException(
  						document.getId(),
  						DocumentEntity.class,
@@ -1614,7 +1614,7 @@ public class DocumentHelper {
 	}
 	
 	public boolean isModificacioCustodiatsActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
+		return configHelper.getAsBoolean(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS);
 	}
 	public boolean isPropagarConversioDefinitiuActiu() {
 		return configHelper.getAsBoolean(PropertyConfig.CONVERSIO_DEFINITIU_PROPAGAR_ARXIU);
@@ -1626,10 +1626,10 @@ public class DocumentHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");
 	}
 	public boolean isFirmatPujatManualmentDefinitu(){
-		return configHelper.getAsBoolean("es.caib.ripea.document.guardar.definitiu.arxiu");
+		return configHelper.getAsBoolean(PropertyConfig.CREAR_FIRMAT_DEFINITIU);
 	}
 	public boolean isEnviarContingutExistentActiu(){
-		return configHelper.getAsBoolean("es.caib.ripea.document.enviar.contingut.existent");
+		return configHelper.getAsBoolean(PropertyConfig.ENVIAR_CONTINGUT_EXISTENT);
 	}
     public boolean isArxiuCaib(String codiEntitat) {
         if (configHelper.getEntitatActualCodi()==null) {

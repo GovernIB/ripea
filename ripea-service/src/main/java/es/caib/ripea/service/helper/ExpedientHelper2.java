@@ -7,6 +7,7 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -283,11 +284,11 @@ public class ExpedientHelper2 {
 	}
 	
 	private boolean isTancamentLogicActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC));
 	}
 	
 	private int getDiesPerTancament() {
-		String dies = aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic.dies");
+		String dies = aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC_DIES);
 		
 		return dies != null ? Integer.parseInt(dies) : 60;
 	}

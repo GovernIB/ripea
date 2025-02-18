@@ -3,6 +3,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.MetaDocumentCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -153,7 +154,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		String rolActual = RolHelper.getRolActual(request);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
 		if (command.isFirmaPortafirmesActiva() && tipusDocumentPortafirmes && Utils.isEmpty(command.getPortafirmesDocumentTipus())) {
 			bindingResult.rejectValue("portafirmesDocumentTipus", "NotNull");
 		}
@@ -478,7 +479,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		
-		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
 		if (tipusDocumentPortafirmes) {
 			List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 			model.addAttribute("portafirmesDocumentTipus", tipus);
@@ -497,7 +498,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		model.addAttribute(
 				"isFirmaBiometrica",
 				Boolean.parseBoolean(
-						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
+						aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
 
 		loadServeisPinbal(model, false);
 	}

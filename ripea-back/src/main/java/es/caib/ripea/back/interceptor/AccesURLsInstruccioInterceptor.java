@@ -4,6 +4,7 @@
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.ExpedientHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -25,7 +26,7 @@ public class AccesURLsInstruccioInterceptor implements AsyncHandlerInterceptor {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		if (! ExpedientHelper.isUrlsInstruccioActiu(request)) {
-			throw new SecurityException("Es necessari activar la propietat 'es.caib.ripea.expedient.generar.urls.instruccio' per accedir a la gestió d'URLs d'instrucció", null);
+			throw new SecurityException("Es necessari activar la propietat '"+PropertyConfig.GENERAR_URL_INSTRUCCIO+"' per accedir a la gestió d'URLs d'instrucció", null);
 		}
 		return true;
 	}

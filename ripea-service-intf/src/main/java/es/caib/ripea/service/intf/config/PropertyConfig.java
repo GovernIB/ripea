@@ -229,7 +229,59 @@ public class PropertyConfig {
 	public static final String IMPORTACIO_ACTIVA									= "es.caib.ripea.creacio.importacio.activa";
 	public static final String MOURER_DOCUMENTS_ACTIU								= "es.caib.ripea.creacio.documents.copiarMoure.activa";
 	public static final String VINCULAR_DOCUMENTS_ACTIU								= "es.caib.ripea.creacio.documents.vincular.activa";
-	
+	public static final String IMPRIMIBLE_NO_FIRMAT_ACTIU							= "es.caib.ripea.descarregar.imprimible.nofirmats";
+	public static final String REOBRIR_EXPEDIENT_TANCAT								= "es.caib.ripea.expedient.permetre.reobrir";
+	public static final String MODIFICAR_DOCUMENTS_CUSTODIATS                       = "es.caib.ripea.document.modificar.custodiats";
+	public static final String PUBLICAR_DOCUMENTS_ACTIVA                            = "es.caib.ripea.creacio.documents.publicar.activa";
+	public static final String FIRMA_BIOMETRICA_ACTIVA                              = "es.caib.ripea.documents.firma.biometrica.activa";
+	public static final String VALIDACIO_URL_IMPRIMIBLES                            = "es.caib.ripea.documents.validacio.url";
+	public static final String MOURE_MATEIX_EXPEDIENTS                              = "es.caib.ripea.creacio.documents.moure.mateix.expedient";
+	public static final String IMPORTACIO_RELACIONATS_ACTIVA                        = "es.caib.ripea.importacio.expedient.relacionat.activa";
+	public static final String PERMATRE_ESBORRAR_FINAL                              = "es.caib.ripea.document.esborrar.finals";
+	public static final String ESTAT_ELABORACIO_ENI_OBLIGATORI                      = "es.caib.ripea.estat.elaboracio.identificador.origen.obligat";
+	public static final String IDENTIFICADOR_ORIGEN_MASCARA                         = "es.caib.ripea.identificador.origen.mascara";
+	public static final String PROPAGAR_MODIFICACIO_ARXIU                           = "es.caib.ripea.document.propagar.modificacio.arxiu";
+	public static final String FILTRE_DATA_CREACIO_ACTIU                            = "es.caib.ripea.filtre.data.creacio.actiu";
+	public static final String DETECCIO_FIRMA_AUTOMATICA                            = "es.caib.ripea.document.deteccio.firma.automatica";
+	public static final String DESACTIVAR_COMPROVACIO_NOMS_DUPLICATS                = "es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu";
+	public static final String CREAR_FIRMAT_DEFINITIU                               = "es.caib.ripea.document.guardar.definitiu.arxiu";
+	public static final String NUMERO_EXPEDIENT_SEPARADOR                           = "es.caib.ripea.numero.expedient.separador";
+	public static final String PROPAGAR_NUMERO_EXPEDIENT                            = "es.caib.ripea.numero.expedient.propagar.arxiu";
+	public static final String ENVIAR_CONTINGUT_EXISTENT                            = "es.caib.ripea.document.enviar.contingut.existent";
+	public static final String PROPAGAR_METADADES                                   = "es.caib.ripea.expedient.propagar.metadades";
+	public static final String GENERAR_URL_INSTRUCCIO                               = "es.caib.ripea.expedient.generar.urls.instruccio";
+	public static final String CONCATENAR_MULTIPLES_PDFS                            = "es.caib.ripea.notificacio.multiple.pdf.concatenar";
+	public static final String NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE               = "es.caib.ripea.notificacio.multiple.document.generat.visible";
+	public static final String PERMETRE_PUNTS_NOM_EXPEDIENT                         = "es.caib.ripea.expedient.permetre.punts";
+	public static final String EXPORTACIO_EXCEL                                     = "es.caib.ripea.expedient.exportacio.excel";
+	public static final String EXPORTACIO_INSIDE                                    = "es.caib.ripea.expedient.exportar.inside";
+    public static final String TANCAMENT_LOGIC								        = "es.caib.ripea.expedient.tancament.logic";
+    public static final String OBTENIR_DATA_FIRMA_FROM_ATRIBUT_DOC 					= "es.caib.ripea.obtenir.data.firma.atributs.document";
+    public static final String TANCAMENT_LOGIC_DIES								    = "es.caib.ripea.expedient.tancament.logic.dies";
+    public static final String MANTENIR_ESTAT_CARPETA								= "es.caib.ripea.carpetes.mantenir.estat";
+    public static final String ENTORN								                = "es.caib.ripea.entorn";
+    public static final String GUARDAR_CONTINGUT_ANNEXOS_DISTRIBUCIO				= "es.caib.ripea.anotacions.annexos.save";
+    public static final String REGISTRE_EXPEDIENT_SERIE_DOCUMENTAL 				    = "es.caib.ripea.anotacions.registre.expedient.serie.documental";
+    public static final String PERMETRE_OBLIGAR_INTERESSAT 				            = "es.caib.ripea.permetre.obligar.interessat";
+
+    public static final String MOSTRAR_LOGS_EMAIL 				                    = "es.caib.ripea.mostrar.logs.email";
+    public static final String MOSTRAR_LOGS_CREACIO_CONTINGUT 				        = "es.caib.ripea.mostrar.logs.creacio.contingut";
+    public static final String MOSTRAR_LOGS_PERMISOS 				                = "es.caib.ripea.activar.logs.permisos";
+    public static final String MOSTRAR_LOGS_RENDIMENT 				                = "es.caib.ripea.mostrar.logs.rendiment";
+    public static final String MOSTRAR_LOGS_GRUPS 				                    = "es.caib.ripea.activar.logs.grups";
+    public static final String MOSTRAR_LOGS_CERCADOR_ANOTACIO 				        = "es.caib.ripea.mostrar.logs.cercador.anotacions";
+    public static final String MOSTRAR_LOGS_SEGONPLA 				                = "es.caib.ripea.mostrar.logs.segonpla";
+    public static final String MOSTRAR_LOGS_INTEGRACIO 				                = "es.caib.ripea.mostrar.logs.integracio";
+
+    public static final String AVIS_FIRMA_PARCIAL 				                    = "es.caib.ripea.portafirmes.avis.firma.parcial";
+    public static final String FIRMA_PARCIAL 				                        = "es.caib.ripea.portafirmes.firma.parcial";
+    public static final String FILTRAR_USUARI_DESCRIPCIO 				            = "es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio";
+    public static final String TIPUS_DOC_PORTAFIRMES_ACTIU 				            = "es.caib.ripea.activar.tipus.document.portafirmes";
+    public static final String MAX_REINTENTS_CANVI_ESTST_DISTRIBUCIO 		        = "es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio";
+    public static final String MAX_REINTENTS_EXPEDIENT 		                        = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients";
+    public static final String MAX_REINTENTS_DOCUMENTS 		                        = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents";
+    public static final String MAX_REINTENTS_INTERESSATS 		                    = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats";
+
 	public static String getPropertySuffix(String propertyValue) {
 		if (propertyValue.startsWith(PROPERTY_PREFIX)) {
             return propertyValue.substring(PROPERTY_PREFIX.length());

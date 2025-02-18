@@ -1322,7 +1322,7 @@ public class ContingutHelper {
 			throw new ValidationException(
 					contingut.getId(),
 					ContingutEntity.class,
-					"Un contingut definitiu no es pot esborrar, verificau la propitat es.caib.ripea.document.esborrar.finals");
+					"Un contingut definitiu no es pot esborrar, verificau la propitat "+PropertyConfig.PERMATRE_ESBORRAR_FINAL);
 		}
 		
 		// Cancel·lar enviament si el document conté enviaments pendents
@@ -2227,7 +2227,7 @@ public class ContingutHelper {
 	}
 
 	private boolean isPermesEsborrarFinals() {
-		return configHelper.getAsBoolean("es.caib.ripea.document.esborrar.finals");
+		return configHelper.getAsBoolean(PropertyConfig.PERMATRE_ESBORRAR_FINAL);
 	}
 	
 	public boolean isConversioDefinitiuActiu() {
@@ -2421,7 +2421,7 @@ public class ContingutHelper {
 
 	
 	public int getArxiuMaxReintentsDocuments() {
-		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
+		String arxiuMaxReintentsDocuments = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_DOCUMENTS);
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
 	}
 	private boolean getPropertyGuardarCertificacioExpedient() {

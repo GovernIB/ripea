@@ -12,6 +12,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -104,7 +105,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 		
 		// Activar l'ús del tipus de document de portafirmes
-		boolean tipusDocumentPortafirmes = configHelper.getAsBoolean("es.caib.ripea.activar.tipus.document.portafirmes");
+		boolean tipusDocumentPortafirmes = configHelper.getAsBoolean(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
 		
 		DocumentPortafirmesEntity documentPortafirmes = DocumentPortafirmesEntity.getBuilder(
 				DocumentEnviamentEstatEnumDto.PENDENT,

@@ -200,7 +200,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromMetaDocumentId(metadocumentId));
 		List<PortafirmesFluxRespostaDto> resposta;
 
-		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
+		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), true);

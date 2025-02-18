@@ -7445,13 +7445,11 @@ public class PluginHelper {
 	}
 
 	private boolean isComprovacioNomsDesactivada() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu");
+		return configHelper.getAsBoolean(PropertyConfig.DESACTIVAR_COMPROVACIO_NOMS_DUPLICATS);
 	}
 
 	private String getPropertyPluginRegistreExpedientSerieDocumental() {
-		return configHelper.getConfig(
-				"es.caib.ripea.anotacions.registre.expedient.serie.documental");
+		return configHelper.getConfig(PropertyConfig.REGISTRE_EXPEDIENT_SERIE_DOCUMENTAL);
 	}
 
 	public boolean isCarpetaLogica() {
@@ -7459,18 +7457,15 @@ public class PluginHelper {
 	}
 
 	public boolean isPropagarNumeroExpedientActiu() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.numero.expedient.propagar.arxiu");
+		return configHelper.getAsBoolean(PropertyConfig.PROPAGAR_NUMERO_EXPEDIENT);
 	}
 
 	public boolean isModificacioCustodiatsActiva() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.document.modificar.custodiats");
+		return configHelper.getAsBoolean(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS);
 	}
 
 	private boolean isObtenirDataFirmaFromAtributDocument() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.obtenir.data.firma.atributs.document");
+		return configHelper.getAsBoolean(PropertyConfig.OBTENIR_DATA_FIRMA_FROM_ATRIBUT_DOC);
 	}
 
 	public void setArxiuPlugin(

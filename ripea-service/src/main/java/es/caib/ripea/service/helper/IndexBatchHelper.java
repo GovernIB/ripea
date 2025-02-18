@@ -628,7 +628,7 @@ public class IndexBatchHelper {
 	}
 
 	private String getCsvUrl() throws NoSuchFileException, IOException {
-		return configHelper.getConfig("es.caib.ripea.documents.validacio.url");
+		return configHelper.getConfig(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES);
 	}
 
 	protected enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};

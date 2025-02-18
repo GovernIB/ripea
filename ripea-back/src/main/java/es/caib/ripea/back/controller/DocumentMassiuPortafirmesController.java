@@ -4,6 +4,7 @@ import es.caib.ripea.back.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.back.command.PortafirmesEnviarCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -285,7 +286,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromMetaDocumentId(metadocumentId));
 		List<PortafirmesFluxRespostaDto> resposta;
 
-		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
+		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request) ,true);
@@ -457,10 +458,10 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 	}
 
 	private boolean isHabilitarAvisFirmaParcialActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.AVIS_FIRMA_PARCIAL));
 	}
 	private boolean isFirmaParcialHabilitada() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.firma.parcial"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_PARCIAL));
 	}
 	
 }

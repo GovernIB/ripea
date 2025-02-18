@@ -3,6 +3,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.ExpedientFiltreCommand;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
@@ -204,6 +205,6 @@ public class ExpedientSeguidorController extends BaseUserController {
 	}
 	
 	private boolean isFiltreDataCreacioActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.filtre.data.creacio.actiu"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FILTRE_DATA_CREACIO_ACTIU));
 	}
 }

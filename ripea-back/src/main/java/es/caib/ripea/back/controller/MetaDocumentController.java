@@ -6,6 +6,7 @@ import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.ExceptionHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
@@ -93,7 +94,7 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		
-		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
 		if (command.isFirmaPortafirmesActiva() && tipusDocumentPortafirmes && Utils.isEmpty(command.getPortafirmesDocumentTipus())) {
 			bindingResult.rejectValue("portafirmesDocumentTipus", "NotNull");
 		}
@@ -278,7 +279,7 @@ public class MetaDocumentController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		
-		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
 		if (tipusDocumentPortafirmes) {
 			List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 			model.addAttribute("portafirmesDocumentTipus", tipus);
@@ -297,7 +298,7 @@ public class MetaDocumentController extends BaseAdminController {
 		model.addAttribute(
 				"isFirmaBiometrica",
 				Boolean.parseBoolean(
-						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
+						aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
 		loadServeisPinbal(model, false);
 	}
 	

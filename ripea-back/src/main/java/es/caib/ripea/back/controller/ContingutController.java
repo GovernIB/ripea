@@ -152,27 +152,27 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_ANOTACIONS_ACTIVES)));
 			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
 			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
-			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa")));
-			model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
-			model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
+			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PUBLICAR_DOCUMENTS_ACTIVA)));
+			model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
+			model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES) != null);
 			model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
-			model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
-			model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.expedient.permetre.reobrir", true));
+			model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
+			model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT, true));
 			model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
 			model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU, false));
-			model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
-			model.addAttribute("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.importacio.expedient.relacionat.activa")));
-			model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.esborrar.finals", true));
+			model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false));
+			model.addAttribute("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
+			model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey(PropertyConfig.PERMATRE_ESBORRAR_FINAL, true));
 			model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
 			model.addAttribute("isGenerarUrlsInstruccioActiu", isGenerarUrlsInstruccioActiu());
-			model.addAttribute("isNotificacioMultipleGenerarDocumentVisible", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.document.generat.visible")));
-			model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
-			model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
+			model.addAttribute("isNotificacioMultipleGenerarDocumentVisible", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE)));
+			model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONCATENAR_MULTIPLES_PDFS)));
+			model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
 			model.addAttribute("isExpedientExpanditPerDefecte", aplicacioService.getUsuariActual().isExpedientExpandit());
 			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL));
-			model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
-			model.addAttribute("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic")));
-			model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
+			model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
+			model.addAttribute("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC)));
+			model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MANTENIR_ESTAT_CARPETA)));
 			
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
@@ -279,16 +279,16 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
 		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
 		model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_CREACIO_ACTIVA)));
-		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
-		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
-		model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.esborrar.finals", true));
+		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false));
+		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES) != null);
+		model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey(PropertyConfig.PERMATRE_ESBORRAR_FINAL, true));
 		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU, false));
 		model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_ANOTACIONS_ACTIVES)));
 		model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
 		model.addAttribute("isExpedientExpanditPerDefecte", aplicacioService.getUsuariActual().isExpedientExpandit());
 		model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL));
-		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
-		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
+		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MANTENIR_ESTAT_CARPETA)));
+		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
 		
 		//model.addAttribute("paddingCurrentFill", 60 * contingut.getPath().size());
@@ -425,7 +425,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		} else {
 			command.setOrigenId(contingutOrigenId);
 		}
-		model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.moure.mateix.expedient")));
+		model.addAttribute("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
 		model.addAttribute(command);
 		return "contingutMoureForm";
 	}
@@ -745,7 +745,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		if (! isGenerarUrlsInstruccioActiu())
-			throw new SecurityException("Es necessari activar la propietat 'es.caib.ripea.expedient.generar.urls.instruccio' per accedir a la gestió d'URLs d'instrucció");
+			throw new SecurityException("Es necessari activar la propietat '"+PropertyConfig.GENERAR_URL_INSTRUCCIO+"' per accedir a la gestió d'URLs d'instrucció");
 		
 		String url = urlInstruccioService.getURLInstruccio(entitatActual.getId(), contingutId, urlInstruccioId);
 		
@@ -758,7 +758,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	}
 
 	private boolean isGenerarUrlsInstruccioActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.generar.urls.instruccio"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.GENERAR_URL_INSTRUCCIO));
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutId}/log", method = RequestMethod.GET)
@@ -1075,7 +1075,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		if (isVistaArbreMoureDocuments) {
 			model.addAttribute("isVistaArbreMoureDocuments", true);
 			List<ExpedientDto> expedientsMetaExpedient = null;
-			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.moure.mateix.expedient"));
+			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS));
 			
 			Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
 							

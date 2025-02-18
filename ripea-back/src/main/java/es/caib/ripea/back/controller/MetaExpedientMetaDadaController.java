@@ -396,7 +396,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	}
 	
 	private boolean isMarcarEnviableArxiuActiu() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.propagar.metadades"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES));
 	}
 
 	

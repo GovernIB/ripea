@@ -4,6 +4,7 @@
 package es.caib.ripea.back.validation;
 
 import es.caib.ripea.back.command.ContenidorCommand;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public class ExpedientODocumentNomValidator implements ConstraintValidator<Exped
 	}
 
 	private boolean isPermesPuntsNomExpedient() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.permetre.punts"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMETRE_PUNTS_NOM_EXPEDIENT));
 	}
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpedientODocumentNomValidator.class);
