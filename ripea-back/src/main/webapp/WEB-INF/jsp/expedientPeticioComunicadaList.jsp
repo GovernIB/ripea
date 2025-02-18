@@ -40,11 +40,9 @@ table.dataTable td {
 
 </style>
 
+<script type="text/javascript">
 
-
-<script>
 	$(document).ready(function() {
-
 
 		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get("expedientPeticioComunicades/" + accio,
@@ -79,9 +77,6 @@ table.dataTable td {
 			});
 		});
 
-
-
-
     	$('#nomesAmbErrorsConsultaBtn').click(function() {
     		nomesAmbErrors = !$(this).hasClass('active');
     		$('#nomesAmbErrorsConsulta').val(nomesAmbErrors);
@@ -92,18 +87,13 @@ table.dataTable td {
 		} else {
 			$('#nomesAmbErrorsConsultaBtn').removeClass('active')
 		}
-		
-
-		
 	});
-
 
 </script>
 </head>
 <body>
 
-
-	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" modelAttribute="expedientPeticioFiltreCommand">
+	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well defaultFilterEnter" modelAttribute="expedientPeticioFiltreCommand">
 
 		<div class="row">
 			<div class="col-md-4">
@@ -125,7 +115,6 @@ table.dataTable td {
 				
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
