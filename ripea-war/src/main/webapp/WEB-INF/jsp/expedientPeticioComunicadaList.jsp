@@ -103,7 +103,7 @@ table.dataTable td {
 <body>
 
 
-	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
+	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well defaultFilterEnter" commandName="expedientPeticioFiltreCommand">
 
 		<div class="row">
 			<div class="col-md-4">
@@ -125,7 +125,6 @@ table.dataTable td {
 				
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
