@@ -12,7 +12,7 @@ import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DigitalitzacioService;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

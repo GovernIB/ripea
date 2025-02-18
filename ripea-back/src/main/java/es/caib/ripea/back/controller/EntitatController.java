@@ -15,7 +15,7 @@ import es.caib.ripea.service.intf.dto.config.ConfigGroupDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.ConfigService;
 import es.caib.ripea.service.intf.service.EntitatService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -51,6 +51,7 @@ public class SessioHelper {
 				usuariActual = aplicacioService.getUsuariActual();
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, new Boolean(true));
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuariActual);
+				request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, RolHelper.getRolActual(request));
 				// Forçam el refresc de l'entitat actual i dels permisos d'administració d'òrgan
 				entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
 				if (RolHelper.isRolActualDissenyadorOrgan(request)) {

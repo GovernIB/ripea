@@ -7,7 +7,7 @@ import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.MetaExpedientMetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import lombok.Getter;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotNull;
 

@@ -7,7 +7,7 @@ import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioTipusEnumDto;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

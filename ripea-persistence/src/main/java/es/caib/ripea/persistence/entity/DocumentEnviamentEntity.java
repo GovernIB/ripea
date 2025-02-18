@@ -3,8 +3,8 @@ package es.caib.ripea.persistence.entity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import lombok.Getter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

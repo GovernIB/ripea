@@ -5,7 +5,7 @@ import es.caib.ripea.back.validation.CodiMetaExpedientNoRepetit;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;

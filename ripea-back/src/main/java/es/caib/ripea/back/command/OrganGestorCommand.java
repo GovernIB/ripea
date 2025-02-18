@@ -7,8 +7,8 @@ import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Command per al manteniment d'organs.

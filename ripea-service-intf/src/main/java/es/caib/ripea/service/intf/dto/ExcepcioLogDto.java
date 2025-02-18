@@ -6,7 +6,7 @@ package es.caib.ripea.service.intf.dto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.Serializable;
 import java.util.Date;

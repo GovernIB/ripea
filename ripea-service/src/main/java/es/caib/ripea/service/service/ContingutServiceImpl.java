@@ -17,7 +17,7 @@ import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DominiService;
 import es.caib.ripea.service.intf.utils.Utils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -12,7 +12,7 @@ import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.utils.Utils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

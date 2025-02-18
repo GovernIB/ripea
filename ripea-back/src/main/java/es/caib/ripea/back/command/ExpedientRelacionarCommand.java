@@ -5,7 +5,7 @@ package es.caib.ripea.back.command;
 
 import es.caib.ripea.back.command.ExpedientRelacionarCommand.Relacionar;
 import es.caib.ripea.back.validation.ExpedientRelacionar;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotNull;
 

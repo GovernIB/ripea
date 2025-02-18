@@ -28,7 +28,7 @@ public class RolHelper {
 	private static final String ROLE_USER = "tothom";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
-	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
+	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
 	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService, OrganGestorService organGestorService) {
 		

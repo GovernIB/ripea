@@ -5,7 +5,7 @@ package es.caib.ripea.service.intf.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 
 @Getter @Setter

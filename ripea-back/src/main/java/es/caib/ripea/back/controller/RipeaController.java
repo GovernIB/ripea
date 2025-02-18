@@ -10,7 +10,7 @@ import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -137,9 +137,6 @@ public class RipeaController {
 		}
 		public String getStackTrace() {
 			return ExceptionUtils.getStackTrace(throwable);
-		}
-		public String getFullStackTrace() {
-			return ExceptionUtils.getFullStackTrace(throwable);
 		}
 		public String getRootCauseMessage() {
 			return ExceptionUtils.getRootCauseMessage(throwable);

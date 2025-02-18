@@ -7,7 +7,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import lombok.Getter;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.*;

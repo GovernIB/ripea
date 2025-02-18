@@ -6,7 +6,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,10 +112,10 @@ public class AjaxUserController extends BaseUserController {
 	
 	private Class<?> findEnumDtoClass(String className) throws ClassNotFoundException{
 		try {
-			return Class.forName("es.caib.ripea.core.api.dto." + className);
+			return Class.forName("es.caib.ripea.service.intf.dto." + className);
 		} catch(ClassNotFoundException e) {
 			// TODO: això hauria de cercar per tots els subpackages de dto
-			return Class.forName("es.caib.ripea.core.api.dto.historic." + className);
+			return Class.forName("es.caib.ripea.service.intf.dto.historic." + className);
 		}		
 	}
 

@@ -4,7 +4,7 @@ import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsFiltreDto;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 

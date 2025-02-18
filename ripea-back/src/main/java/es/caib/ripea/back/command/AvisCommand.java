@@ -6,7 +6,7 @@ package es.caib.ripea.back.command;
 import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

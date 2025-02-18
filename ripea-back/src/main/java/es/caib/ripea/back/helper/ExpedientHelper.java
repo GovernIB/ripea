@@ -21,7 +21,6 @@ import java.util.List;
 public class ExpedientHelper {
 
 	private static final String REQUEST_PARAMETER_ACCES_EXPEDIENTS = "ExpedientHelper.teAccesExpedients";
-	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 	private static final String REQUEST_PARAMETER_STATISTICS_EXPEDIENTS = "ExpedientHelper.teAccesEstadistiques";
 	private static final String SESSION_CONVERSIO_DEFINITIU_ACTIVA = "ExpedientHelper.isConversioDefinitiuActiva";
 	private static final String SESSION_URL_VALIDACIO = "ExpedientHelper.isUrlValidacioDefinida";
@@ -53,12 +52,9 @@ public class ExpedientHelper {
 			HttpServletRequest request) {
 		return teAccesEstadistiques(request, null);
 	}
-	public static Boolean teAccesExpedients(
-			HttpServletRequest request,
-			MetaExpedientService metaExpedientService) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
+
+	public static Boolean teAccesExpedients(HttpServletRequest request, MetaExpedientService metaExpedientService) {
+		String rolActual = (String)request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
 		Boolean teAcces = (Boolean)request.getSession().getAttribute(REQUEST_PARAMETER_ACCES_EXPEDIENTS);
 		if (RolHelper.isRolActualUsuari(request) && teAcces == null && metaExpedientService != null) {
 			teAcces = new Boolean(false);
@@ -66,19 +62,13 @@ public class ExpedientHelper {
 			if (entitatActual != null) {
 				teAcces = metaExpedientService.hasPermissionForAnyProcediment(entitatActual.getId(), rolActual, PermissionEnumDto.READ);
 			}
-			request.getSession().setAttribute(
-					REQUEST_PARAMETER_ACCES_EXPEDIENTS,
-					teAcces);
+			request.getSession().setAttribute(REQUEST_PARAMETER_ACCES_EXPEDIENTS, teAcces);
 		}
 		return teAcces;
 	}
 	
-	public static Boolean teAccesEstadistiques(
-			HttpServletRequest request,
-			MetaExpedientService metaExpedientService) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
+	public static Boolean teAccesEstadistiques(HttpServletRequest request, MetaExpedientService metaExpedientService) {
+		String rolActual = (String)request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
 		Boolean teAcces = (Boolean)request.getAttribute(REQUEST_PARAMETER_STATISTICS_EXPEDIENTS);
 		if (RolHelper.isRolActualUsuari(request) && teAcces == null && metaExpedientService != null) {
 			teAcces = new Boolean(false);

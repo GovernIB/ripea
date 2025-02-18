@@ -3,7 +3,7 @@ package es.caib.ripea.service.intf.dto;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

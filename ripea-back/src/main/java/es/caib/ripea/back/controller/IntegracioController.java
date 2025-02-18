@@ -11,7 +11,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.intf.utils.Utils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -6,7 +6,7 @@ package es.caib.ripea.back.command;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 

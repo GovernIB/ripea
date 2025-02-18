@@ -1,7 +1,7 @@
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;

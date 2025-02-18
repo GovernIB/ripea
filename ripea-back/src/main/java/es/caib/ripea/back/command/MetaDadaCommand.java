@@ -11,7 +11,7 @@ import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import lombok.Getter;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

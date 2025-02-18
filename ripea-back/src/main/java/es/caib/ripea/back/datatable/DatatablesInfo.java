@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.back.datatable;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 

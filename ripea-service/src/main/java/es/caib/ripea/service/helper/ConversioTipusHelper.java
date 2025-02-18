@@ -1,24 +1,12 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
-import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
-import es.caib.ripea.persistence.aggregation.HistoricAggregation;
-import es.caib.ripea.persistence.aggregation.HistoricExpedientAggregation;
-import es.caib.ripea.persistence.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.entity.config.ConfigEntity;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
-import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
-import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
-import es.caib.ripea.service.intf.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.service.intf.utils.Utils;
-import ma.glasnost.orika.*;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.Type;
+import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -30,18 +18,94 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
 
-import java.math.BigDecimal;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
+import es.caib.ripea.persistence.aggregation.HistoricAggregation;
+import es.caib.ripea.persistence.aggregation.HistoricExpedientAggregation;
+import es.caib.ripea.persistence.aggregation.HistoricUsuariAggregation;
+import es.caib.ripea.persistence.entity.AlertaEntity;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
+import es.caib.ripea.persistence.entity.DadaEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
+import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.service.intf.dto.AlertaDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PermisOrganGestorDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.RegistreAnnexDto;
+import es.caib.ripea.service.intf.dto.RegistreDto;
+import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.service.intf.dto.SeguimentConsultaPinbalDto;
+import es.caib.ripea.service.intf.dto.SeguimentDto;
+import es.caib.ripea.service.intf.dto.SicresTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.SicresValidezDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.service.intf.utils.Utils;
+import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.CustomMapper;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import ma.glasnost.orika.metadata.Type;
 
-/**
- * Helper per a convertir entre diferents formats de documents.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class ConversioTipusHelper {
 
@@ -63,13 +127,13 @@ public class ConversioTipusHelper {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
-					public Date convert(DateTime source, Type<? extends Date> destinationClass) {
+					public Date convert(DateTime source, Type<? extends Date> destinationClass, MappingContext mappingContext) {
 						return source.toDate();
 					}
 				});
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaContingutEntity, ExecucioMassivaContingutDto>() {
-					public ExecucioMassivaContingutDto convert(ExecucioMassivaContingutEntity source, Type<? extends ExecucioMassivaContingutDto> destinationClass) {
+					public ExecucioMassivaContingutDto convert(ExecucioMassivaContingutEntity source, Type<? extends ExecucioMassivaContingutDto>destinationClass, MappingContext mappingContext) {
 						ExecucioMassivaContingutDto target = new ExecucioMassivaContingutDto();
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
@@ -84,7 +148,7 @@ public class ConversioTipusHelper {
 				});
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<AlertaEntity, AlertaDto>() {
-					public AlertaDto convert(AlertaEntity source, Type<? extends AlertaDto> destinationClass) {
+					public AlertaDto convert(AlertaEntity source, Type<? extends AlertaDto>destinationClass, MappingContext mappingContext) {
 						AlertaDto target = new AlertaDto();
 						target.setId(source.getId());
 						target.setText(source.getText());
@@ -111,7 +175,7 @@ public class ConversioTipusHelper {
 		
 		/*mapperFactory.getConverterFactory()..registerConverter(
 				new CustomConverter<MetaExpedientTascaValidacioEntity, MetaExpedientTascaValidacioDto>() {
-					public MetaExpedientTascaValidacioDto convert(MetaExpedientTascaValidacioEntity source, Type<? extends MetaExpedientTascaValidacioDto> destinationClass) {
+					public MetaExpedientTascaValidacioDto convert(MetaExpedientTascaValidacioEntity source, Type<? extends MetaExpedientTascaValidacioDto>destinationClass, MappingContext mappingContext) {
 						MetaExpedientTascaValidacioDto target = new MetaExpedientTascaValidacioDto();
 						target.setId(source.getId());
 						target.setItemId(source.getItemId());
@@ -129,7 +193,7 @@ public class ConversioTipusHelper {
 		*/
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<PermisDto, PermisOrganGestorDto>() {
-					public PermisOrganGestorDto convert(PermisDto source, Type<? extends PermisOrganGestorDto> destinationClass) {
+					public PermisOrganGestorDto convert(PermisDto source, Type<? extends PermisOrganGestorDto>destinationClass, MappingContext mappingContext) {
 						PermisOrganGestorDto target = new PermisOrganGestorDto();
 						target.setId(source.getId());
 						target.setPrincipalNom(source.getPrincipalNom());
@@ -151,7 +215,7 @@ public class ConversioTipusHelper {
 
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientTascaEntity, ExpedientTascaDto>() {
-					public ExpedientTascaDto convert(ExpedientTascaEntity source, Type<? extends ExpedientTascaDto> destinationClass) {
+					public ExpedientTascaDto convert(ExpedientTascaEntity source, Type<? extends ExpedientTascaDto>destinationClass, MappingContext mappingContext) {
 						organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(source.getExpedient().getId()));
 						ExpedientTascaDto target = new ExpedientTascaDto();
 						target.setId(source.getId());
@@ -201,7 +265,7 @@ public class ConversioTipusHelper {
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<MetaExpedientTascaEntity, MetaExpedientTascaDto>() {
-					public MetaExpedientTascaDto convert(MetaExpedientTascaEntity source, Type<? extends MetaExpedientTascaDto> destinationClass) {
+					public MetaExpedientTascaDto convert(MetaExpedientTascaEntity source, Type<? extends MetaExpedientTascaDto>destinationClass, MappingContext mappingContext) {
 						MetaExpedientTascaDto target = new MetaExpedientTascaDto();
 						target.setActiva(source.isActiva());
 						target.setCodi(source.getCodi());
@@ -225,7 +289,7 @@ public class ConversioTipusHelper {
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<InteressatEntity, InteressatDto>() {
-					public InteressatDto convert(InteressatEntity source, Type<? extends InteressatDto> destinationClass) {
+					public InteressatDto convert(InteressatEntity source, Type<? extends InteressatDto>destinationClass, MappingContext mappingContext) {
 						source = deproxyInteressatEntity(source);
 						return getInteressatDto(source);
 					}
@@ -234,7 +298,7 @@ public class ConversioTipusHelper {
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<MetaDadaEntity, MetaDadaDto>() {
-					public MetaDadaDto convert(MetaDadaEntity source, Type<? extends MetaDadaDto> destinationClass) {
+					public MetaDadaDto convert(MetaDadaEntity source, Type<? extends MetaDadaDto>destinationClass, MappingContext mappingContext) {
 						MetaDadaDto target = new MetaDadaDto();
 						target.setId(source.getId());
 						target.setCodi(source.getCodi());
@@ -273,7 +337,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<CarpetaEntity, ContingutDto>() {
 					@Override
-					public CarpetaDto convert(CarpetaEntity source, Type<? extends ContingutDto> destinationType) {
+					public CarpetaDto convert(CarpetaEntity source, Type<? extends ContingutDto> destinationClass, MappingContext mappingContext) {
 						CarpetaDto target = new CarpetaDto();
 						if(source instanceof HibernateProxy) {
 							HibernateProxy hibernateProxy = (HibernateProxy) source;
@@ -306,14 +370,14 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<OrganGestorEntity, Long>() {
 					@Override
-					public Long convert(OrganGestorEntity source, Type<? extends Long> destinationType) {
+					public Long convert(OrganGestorEntity source, Type<? extends Long> destinationClass, MappingContext mappingContext) {
 						return source.getId();
 					}
 				});
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<EntitatEntity, Long>() {
 					@Override
-					public Long convert(EntitatEntity source, Type<? extends Long> destinationType) {
+					public Long convert(EntitatEntity source, Type<? extends Long> destinationClass, MappingContext mappingContext) {
 						return source.getId();
 					}
 				});	
@@ -321,7 +385,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<HistoricExpedientAggregation, HistoricExpedientDto>() {
 					@Override
-					public HistoricExpedientDto convert(HistoricExpedientAggregation source, Type<? extends HistoricExpedientDto> destinationType) {
+					public HistoricExpedientDto convert(HistoricExpedientAggregation source, Type<? extends HistoricExpedientDto> destinationClass, MappingContext mappingContext) {
 						HistoricExpedientDto target = new HistoricExpedientDto();
 						target.setData(source.getData());
 						target.setNumExpedientsCreats(source.getNumExpedientsCreats());
@@ -337,7 +401,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<HistoricUsuariAggregation, HistoricUsuariDto>() {
 					@Override
-					public HistoricUsuariDto convert(HistoricUsuariAggregation source, Type<? extends HistoricUsuariDto> destinationType) {
+					public HistoricUsuariDto convert(HistoricUsuariAggregation source, Type<? extends HistoricUsuariDto> destinationClass, MappingContext mappingContext) {
 						HistoricUsuariDto target = new HistoricUsuariDto(null, null);
 						target.setData(source.getData());
 						target.setNumExpedientsCreats(source.getNumExpedientsCreats());
@@ -354,7 +418,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<HistoricAggregation, HistoricInteressatDto>() {
 					@Override
-					public HistoricInteressatDto convert(HistoricAggregation source, Type<? extends HistoricInteressatDto> destinationType) {
+					public HistoricInteressatDto convert(HistoricAggregation source, Type<? extends HistoricInteressatDto> destinationClass, MappingContext mappingContext) {
 						HistoricInteressatDto target = new HistoricInteressatDto(null, null);
 						target.setData(source.getData());
 						target.setNumExpedientsCreats(source.getNumExpedientsCreats());
@@ -368,7 +432,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientPeticioEntity, ExpedientPeticioDto>() {
 					@Override
-					public ExpedientPeticioDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioDto> destinationType) {
+					public ExpedientPeticioDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioDto> destinationClass, MappingContext mappingContext) {
 						ExpedientPeticioDto target = new ExpedientPeticioDto();
 						target.setId(source.getId());
 						target.setRegistre(convertir(source.getRegistre(), RegistreDto.class));
@@ -399,7 +463,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientPeticioEntity, ExpedientPeticioListDto>() {
 					@Override
-					public ExpedientPeticioListDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioListDto> destinationType) {
+					public ExpedientPeticioListDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioListDto> destinationClass, MappingContext mappingContext) {
 						ExpedientPeticioListDto target = new ExpedientPeticioListDto();
 						target.setId(source.getId());
 						RegistreDto registre = new RegistreDto();
@@ -481,7 +545,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentPortafirmesEntity, SeguimentDto>() {
 					@Override
-					public SeguimentDto convert(DocumentPortafirmesEntity source, Type<? extends SeguimentDto> destinationType) {
+					public SeguimentDto convert(DocumentPortafirmesEntity source, Type<? extends SeguimentDto> destinationClass, MappingContext mappingContext) {
 						SeguimentDto target = new SeguimentDto();
 						target.setId(source.getId());
 						target.setExpedientId(source.getExpedient().getId());
@@ -499,7 +563,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentNotificacioEntity, SeguimentDto>() {
 					@Override
-					public SeguimentDto convert(DocumentNotificacioEntity source, Type<? extends SeguimentDto> destinationType) {
+					public SeguimentDto convert(DocumentNotificacioEntity source, Type<? extends SeguimentDto> destinationClass, MappingContext mappingContext) {
 						SeguimentDto target = new SeguimentDto();
 						target.setId(source.getId());
 						target.setExpedientId(source.getExpedient().getId());
@@ -544,7 +608,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientTascaEntity, SeguimentDto>() {
 					@Override
-					public SeguimentDto convert(ExpedientTascaEntity source, Type<? extends SeguimentDto> destinationType) {
+					public SeguimentDto convert(ExpedientTascaEntity source, Type<? extends SeguimentDto> destinationClass, MappingContext mappingContext) {
 						SeguimentDto target = new SeguimentDto();
 						target.setId(source.getId());
 						target.setExpedientId(source.getExpedient().getId());
@@ -566,7 +630,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientEntity, SeguimentArxiuPendentsDto>() {
 					@Override
-					public SeguimentArxiuPendentsDto convert(ExpedientEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+					public SeguimentArxiuPendentsDto convert(ExpedientEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
 						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
 						target.setId(source.getId());
 						target.setElementNom(source.getNom());
@@ -582,7 +646,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentEntity, SeguimentArxiuPendentsDto>() {
 					@Override
-					public SeguimentArxiuPendentsDto convert(DocumentEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+					public SeguimentArxiuPendentsDto convert(DocumentEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
 						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
 						target.setId(source.getId());
 						target.setExpedientId(source.getExpedient().getId());
@@ -601,7 +665,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<InteressatEntity, SeguimentArxiuPendentsDto>() {
 					@Override
-					public SeguimentArxiuPendentsDto convert(InteressatEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationType) {
+					public SeguimentArxiuPendentsDto convert(InteressatEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
 						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
 						target.setId(source.getId());
 						target.setExpedientId(source.getExpedient().getId());
@@ -626,7 +690,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaEntity, ExecucioMassivaDto>() {
 					@Override
-					public ExecucioMassivaDto convert(ExecucioMassivaEntity source, Type<? extends ExecucioMassivaDto> destinationType) {
+					public ExecucioMassivaDto convert(ExecucioMassivaEntity source, Type<? extends ExecucioMassivaDto> destinationClass, MappingContext mappingContext) {
 						ExecucioMassivaDto target = new ExecucioMassivaDto();
 						target.setId(source.getId());
 						target.setTipus(source.getTipus());
@@ -648,7 +712,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientEntity, CodiValorDto>() {
 					@Override
-					public CodiValorDto convert(ExpedientEntity source, Type<? extends CodiValorDto> destinationClass) {
+					public CodiValorDto convert(ExpedientEntity source, Type<? extends CodiValorDto>destinationClass, MappingContext mappingContext) {
 						CodiValorDto target = new CodiValorDto();
 						target.setCodi(source.getId().toString());
 						target.setValor(source.getNom());
@@ -658,7 +722,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<OrganGestorEntity, OrganGestorDto>() {
 					@Override
-					public OrganGestorDto convert(OrganGestorEntity source, Type<? extends OrganGestorDto> destinationClass) {
+					public OrganGestorDto convert(OrganGestorEntity source, Type<? extends OrganGestorDto>destinationClass, MappingContext mappingContext) {
 						OrganGestorDto target = new OrganGestorDto();
 						target.setId(source.getId());
 						target.setCodi(source.getCodi());
@@ -688,7 +752,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<RegistreAnnexEntity, RegistreAnnexDto>() {
 					@Override
-					public RegistreAnnexDto convert(RegistreAnnexEntity source, Type<? extends RegistreAnnexDto> destinationClass) {
+					public RegistreAnnexDto convert(RegistreAnnexEntity source, Type<? extends RegistreAnnexDto>destinationClass, MappingContext mappingContext) {
 						RegistreAnnexDto target = new RegistreAnnexDto();
 
 						target.setId(source.getId());
@@ -736,7 +800,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ConfigEntity, OrganConfigDto>() {
 					@Override
-					public OrganConfigDto convert(ConfigEntity source, Type<? extends OrganConfigDto> destinationClass) {
+					public OrganConfigDto convert(ConfigEntity source, Type<? extends OrganConfigDto>destinationClass, MappingContext mappingContext) {
 						OrganConfigDto target = new OrganConfigDto();
 						OrganGestorEntity organGestor = organGestorRepository.findByCodi(source.getOrganCodi());
 						target.setOrganGestorId(organGestor.getId());

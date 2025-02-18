@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.back.command;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**

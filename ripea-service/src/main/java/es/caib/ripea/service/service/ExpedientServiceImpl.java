@@ -18,7 +18,7 @@ import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

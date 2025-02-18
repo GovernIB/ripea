@@ -2,7 +2,7 @@ package es.caib.ripea.service.intf.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

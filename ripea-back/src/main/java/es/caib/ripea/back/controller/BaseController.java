@@ -8,7 +8,7 @@ import es.caib.ripea.back.command.NotificacioEnviamentCommand;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.*;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;

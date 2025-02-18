@@ -8,7 +8,7 @@ import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
