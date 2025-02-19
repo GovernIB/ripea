@@ -7436,8 +7436,7 @@ public class PluginHelper {
 	}
 
 	private boolean getPropertyViaFirmaDispositius() {
-		return configHelper.getAsBoolean(
-				"es.caib.ripea.plugin.viafirma.caib.dispositius.enabled");
+		return configHelper.getAsBoolean(PropertyConfig.VIAFIRMA_DISPOSITIUS_ENABLED);
 	}
 
 	public boolean getPropertyPropagarConversioDefinitiuActiu() {
@@ -7592,8 +7591,8 @@ public class PluginHelper {
 		try {
 			ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
 			viaFirmaPlugin.getDeviceUser(
-					configHelper.getConfig("es.caib.ripea.plugin.viafirma.caib.callback.username"),
-					configHelper.getConfig("es.caib.ripea.plugin.viafirma.caib.callback.password"));
+					configHelper.getConfig(PropertyConfig.VIAFIRMA_PLUGIN_CALLBACK_USR),
+					configHelper.getConfig(PropertyConfig.VIAFIRMA_PLUGIN_CALLBACK_PAS));
 //			ViaFirmaDocument resultat = viaFirmaPlugin.downloadDocument("user", "pass", "prova");
 			return null;
 		} catch (Exception ex) {

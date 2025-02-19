@@ -6,6 +6,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.TipusDocumentalCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -41,7 +42,7 @@ public class TipusDocumentalController extends BaseAdminController {
 			HttpServletRequest request,
 			Model model) {
 		getEntitatActualComprovantPermisAdminEntitat(request); 
-		model.addAttribute("tipusDocumentalsNtiCodiEspecific", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.tipus.documentals.nti.codi.especific")));
+		model.addAttribute("tipusDocumentalsNtiCodiEspecific", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TIPUS_DOCUMENTALS_NIF_CODI_ESPECIFIC)));
 		return "tipusDocumentalList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)

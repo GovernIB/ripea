@@ -6,6 +6,7 @@ package es.caib.ripea.service.helper;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,7 +190,7 @@ public class UsuariHelper {
 	}
 
 	private String getIdiomaPerDefecte() {
-		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
+		return configHelper.getConfig(PropertyConfig.IDIOMA_DEFECTE);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(UsuariHelper.class);

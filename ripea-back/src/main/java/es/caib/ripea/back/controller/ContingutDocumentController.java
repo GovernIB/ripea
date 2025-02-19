@@ -1615,7 +1615,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	}
 	
 	private Boolean isPluginSummarizeActiu() {
-		String aux = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.summarize.class");
+		String aux = aplicacioService.propertyFindByNom(PropertyConfig.SUMMARIZE_PLUGIN_CLASS);
 		return (aux!=null && !aux.isEmpty());
 	}
 	
@@ -1808,7 +1808,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				EnumHelper.getOptionsForEnum(
 						DocumentNtiTipoDocumentalEnumDto.class,
 						"document.nti.tipdoc.enum."));
-		boolean propertyEscanejarActiu = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.nou.escanejar.actiu", false);
+		boolean propertyEscanejarActiu = aplicacioService.propertyBooleanFindByKey(PropertyConfig.SCAN_ACTIU, false);
 		model.addAttribute(
 				"escanejarActiu",
 				propertyEscanejarActiu);
@@ -1824,7 +1824,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("isPluginSummarizeActiu", isPluginSummarizeActiu());
 		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
 		
-		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty("es.caib.ripea.document.scanner.mock", false));
+		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty(PropertyConfig.SCANNER_MOCK, false));
 		
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);

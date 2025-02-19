@@ -1623,7 +1623,7 @@ public class DocumentHelper {
 		return configHelper.getAsBoolean(PropertyConfig.CONVERSIO_DEFINITIU);
 	}
 	public boolean isPropagarModificacioDefinitiusActiva() {
-		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");
+		return configHelper.getAsBoolean(PropertyConfig.PROPAGAR_MODIFICACIO_ARXIU);
 	}
 	public boolean isFirmatPujatManualmentDefinitu(){
 		return configHelper.getAsBoolean(PropertyConfig.CREAR_FIRMAT_DEFINITIU);

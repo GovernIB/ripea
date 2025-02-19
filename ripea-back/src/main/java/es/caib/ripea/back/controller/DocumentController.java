@@ -794,7 +794,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	}
 
 	private boolean isViaFirmaDispositiusEnabled() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VIAFIRMA_DISPOSITIUS_ENABLED));
 	}
 
 	private boolean isHabilitarAvisFirmaParcialActiu() {

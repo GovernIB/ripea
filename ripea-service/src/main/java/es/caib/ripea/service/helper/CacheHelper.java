@@ -810,7 +810,7 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsRendimentDescarregarAnotacio")
 	public boolean mostrarLogsRendimentDescarregarAnotacio() {
-		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio");
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_RENDIMENT_DESCARREGA);
         return prop != null && prop.equals("true");
 	}
 	

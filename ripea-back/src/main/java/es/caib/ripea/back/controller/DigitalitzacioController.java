@@ -6,6 +6,7 @@ package es.caib.ripea.back.controller;
 
 import es.caib.ripea.back.helper.ExceptionHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
@@ -151,7 +152,7 @@ public class DigitalitzacioController extends BaseUserController {
 				returnScannedFile,
 				returnSignedFile);
 		
-		boolean debug = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.digitalitzacio.log", false);
+		boolean debug = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DIGITALITZACIO_LOGS, false);
 		if (debug) {
 			logger.info("Recuperar resultat scan: " + ToStringBuilder.reflectionToString(resposta));
 		}

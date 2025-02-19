@@ -2211,11 +2211,11 @@ public class ContingutHelper {
 	}
 
 	public String getBaseDir() {
-		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
+		return configHelper.getConfig(PropertyConfig.APP_DATA_DIR) + "/esborrats-tmp";
 	}
 	
 	public String getBaseDirFirma() {
-		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-firma-tmp";
+		return configHelper.getConfig(PropertyConfig.APP_DATA_DIR) + "/esborrats-firma-tmp";
 	}
 
 	public boolean isCarpetaLogica() {

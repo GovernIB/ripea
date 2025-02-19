@@ -5,6 +5,7 @@ package es.caib.ripea.back.validation;
 
 import es.caib.ripea.back.command.ViaFirmaEnviarCommand;
 import es.caib.ripea.back.helper.MessageHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,6 +49,6 @@ public class ViaFirmaValidator implements ConstraintValidator<ViaFirma, ViaFirma
 	}
 	
 	private boolean isViaFirmaDispositiusEnabled() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled"));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VIAFIRMA_DISPOSITIUS_ENABLED));
 	}
 }

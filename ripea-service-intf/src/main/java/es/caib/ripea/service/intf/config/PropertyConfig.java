@@ -282,6 +282,15 @@ public class PropertyConfig {
     public static final String MAX_REINTENTS_DOCUMENTS 		                        = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents";
     public static final String MAX_REINTENTS_INTERESSATS 		                    = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats";
 
+    public static final String DIGITALITZACIO_LOGS 		                            = "es.caib.ripea.plugin.digitalitzacio.log";
+    public static final String MOSTRAR_LOGS_RENDIMENT_DESCARREGA 		            = "es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio";
+    public static final String IDIOMA_DEFECTE 		                                = "es.caib.ripea.usuari.idioma.defecte";
+    public static final String ESCANEIG_IDS 		                                = "es.caib.ripea.plugin.escaneig.ids";
+    public static final String VIAFIRMA_DISPOSITIUS_ENABLED  		                = "es.caib.ripea.plugin.viafirma.caib.dispositius.enabled";
+    public static final String TIPUS_DOCUMENTALS_NIF_CODI_ESPECIFIC   		        = "es.caib.ripea.tipus.documentals.nti.codi.especific";
+    public static final String VALIDATE_SIGNATURE_ATTACHED   		                = "es.caib.ripea.firma.detectar.attached.validate.signature";
+    public static final String SCANNER_MOCK   		                                = "es.caib.ripea.document.scanner.mock";
+
 	public static String getPropertySuffix(String propertyValue) {
 		if (propertyValue.startsWith(PROPERTY_PREFIX)) {
             return propertyValue.substring(PROPERTY_PREFIX.length());

@@ -9,6 +9,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -310,13 +311,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyBaseUrl() {
 		logger.debug("Consulta de la propietat base URL");
-		return configHelper.getConfig("es.caib.ripea.base.url");
+		return configHelper.getConfig(PropertyConfig.BASE_URL);
 	}
 
 	@Override
 	public String propertyPluginEscaneigIds() {
 		logger.debug("Consulta de la propietat amb les ids pels plugins d'escaneig de documents");
-		return configHelper.getConfig("es.caib.ripea.plugin.escaneig.ids");
+		return configHelper.getConfig(PropertyConfig.ESCANEIG_IDS);
 	}
 
 	@Override
@@ -424,7 +425,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	private String getIdiomaPerDefecte() {
-		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
+		return configHelper.getConfig(PropertyConfig.IDIOMA_DEFECTE);
 	}
 	
 	

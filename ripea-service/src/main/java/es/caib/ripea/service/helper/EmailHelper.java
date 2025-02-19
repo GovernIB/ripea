@@ -870,7 +870,7 @@ public class EmailHelper {
 	}
 
 	private String getEnllacExpedient(Long expedientId) {
-		String baseUrl = configHelper.getConfig("es.caib.ripea.base.url");
+		String baseUrl = configHelper.getConfig(PropertyConfig.BASE_URL);
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
 		return baseUrl != null ? enllacExpedient : "";
 	}
@@ -970,7 +970,7 @@ public class EmailHelper {
 		if (estat == TascaEstatEnumDto.REBUTJADA) {
 			rebutjMotiu = "\tMotiu: " + expedientTascaEntity.getMotiuRebuig() + "\n";
 		}
-		String enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/contingut/" + expedientTascaEntity.getExpedient().getId() + "?tascaId=" + expedientTascaEntity.getId() + "\n";
+		String enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/" + expedientTascaEntity.getExpedient().getId() + "?tascaId=" + expedientTascaEntity.getId() + "\n";
 		String titol = expedientTascaEntity.getTitol();
 		String observacions = expedientTascaEntity.getObservacions();
 		if (estatAnterior == null) {
@@ -1300,7 +1300,7 @@ public class EmailHelper {
 	}
 
 	private String getRemitent() {
-		return configHelper.getConfig("es.caib.ripea.email.remitent");
+		return configHelper.getConfig(PropertyConfig.EMAIL_REMITENT);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);

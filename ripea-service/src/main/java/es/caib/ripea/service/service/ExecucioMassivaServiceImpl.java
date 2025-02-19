@@ -6,6 +6,7 @@ package es.caib.ripea.service.service;
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -118,7 +119,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
 		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
 			FitxerDto resultat = new FitxerDto();
-			String directoriDesti = configHelper.getConfig("es.caib.ripea.app.data.dir") + execucioMassiva.getDocumentNom();
+			String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR) + execucioMassiva.getDocumentNom();
             try {
                 byte[] bytes = Files.readAllBytes(Paths.get(directoriDesti));
 				resultat.setContingut(bytes);
@@ -320,9 +321,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			int numFiles = 0;
 			List<String> nomsArxius = new ArrayList<String>();
 			List<DocumentDto> docsExp = new ArrayList<DocumentDto>();
-			double maxMbFitxer	= Integer.parseInt(configHelper.getConfig("es.caib.ripea.segonpla.arxiu.maxMb", "100"));
+			double maxMbFitxer	= Integer.parseInt(configHelper.getConfig(PropertyConfig.ARXIU_MAX_MB, "100"));
 			double actualMbFitxer = 0;
-			Integer maxMinExec = Integer.parseInt(configHelper.getConfig("es.caib.ripea.segonpla.arxiu.maxTempsExec", "10"));
+			Integer maxMinExec = Integer.parseInt(configHelper.getConfig(PropertyConfig.SEGON_PLA_TIMEOUT, "10"));
 			long maxTempsProces	= t1+(maxMinExec*60*1000);
 			boolean error = false;
 
@@ -447,7 +448,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				out.close();
 	
 				if (numFiles > 0) {
-					String directoriDesti = configHelper.getConfig("es.caib.ripea.app.data.dir");
+					String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR);
 					String documentNom = "/exportZip/documentsExpedients_" + Calendar.getInstance().getTimeInMillis() + ".zip";
 					File fContent = new File(directoriDesti + documentNom);
 					fContent.getParentFile().mkdirs();
