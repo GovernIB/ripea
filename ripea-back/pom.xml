@@ -12,7 +12,7 @@
 	<packaging>war</packaging>
 	<properties>
 		<node.version>v22.13.1</node.version>
-		<frontend.app.path>src/main/jsapp</frontend.app.path>
+		<frontend.app.path>src/main/jsapp/ripea-front</frontend.app.path>
 	</properties>
 	<dependencies>
 		<dependency>
