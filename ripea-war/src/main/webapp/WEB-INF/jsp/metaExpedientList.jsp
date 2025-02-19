@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%  pageContext.setAttribute("isRolActualDissenyadorOrgan", es.caib.ripea.war.helper.RolHelper.isRolActualDissenyadorOrgan(request)); %>
 
 <html>
 <head>
@@ -24,16 +25,13 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
 <style>
 	#metaExpedientFiltreForm {
 		margin-bottom: 15px;
 	}
-	
 	.badge {
 		background-color: #333;
 	}
-	
 	table.dataTable tr > td:nth-child(1), 
 	table.dataTable tr > td:nth-child(2), 
 	table.dataTable tr > td:nth-child(3),
@@ -42,6 +40,7 @@
 		max-width: 1px;
 	}
 </style>
+
 <script type="text/javascript">
 	$(function() {
 	    $("form input").keypress(function (e) {
@@ -54,14 +53,9 @@
 	    });
 	});
 	
-	var myHelpers = {
-	        hlpIsAdministradorOrgan: isRolAdminOrgan};
-	
+	var myHelpers = {hlpIsAdministradorOrgan: isRolAdminOrgan};
 	$.views.helpers(myHelpers);
-	
-    function isRolAdminOrgan() {
-        return ${isRolAdminOrgan};
-    }
+    function isRolAdminOrgan() { return ${isRolAdminOrgan}; }
     function tancarModalImportacio() {
         $('#metaexpedients').DataTable().ajax.reload();
     	webutilRefreshMissatges();
@@ -271,7 +265,9 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
+								<c:if test="${not isRolActualDissenyadorOrgan}">
+									<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
+								</c:if>
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
 								<c:if test="${isRolAdmin || isRolAdminOrgan}">
