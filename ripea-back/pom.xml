@@ -12,7 +12,7 @@
 	<packaging>war</packaging>
 	<properties>
 		<node.version>v22.13.1</node.version>
-		<frontend.app.path>src/main/reactapp</frontend.app.path>
+		<frontend.app.path>src/main/jsapp</frontend.app.path>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -239,7 +239,7 @@
 							<webResources>
 								<resource>
 									<directory>${frontend.app.path}/dist</directory>
-									<targetPath>reactapp</targetPath>
+									<targetPath>jsapp</targetPath>
 								</resource>
 							</webResources>
 							<archive>
