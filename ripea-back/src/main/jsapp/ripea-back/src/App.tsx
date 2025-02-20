@@ -3,11 +3,7 @@ import React from 'react';
 import { BaseApp } from './components/BaseApp';
 import logo from './assets/logo.png';
 import govern_logo from './assets/goib_logo_v.svg';
-import uenegroma from './assets/uenegroma.png';
-import feder7 from './assets/feder7.png';
-import una_manera from './assets/una_manera.png';
 import AppRoutes from './AppRoutes';
-
 
 export const App: React.FC = () => {
     // const { t } = useTranslation();
@@ -35,13 +31,11 @@ export const App: React.FC = () => {
             mr: 4,
             borderRight: '1px solid #fff'
         }}
-        title="RIPEA"
-        title_logo={logo}
+        title={<img src={logo} alt="title_logo" />}
         version="1.0.1"
         availableLanguages={['ca', 'es']}
         // menuEntries={menuEntries}
         appbarBackgroundColor="#ff9523"
-        foot_logos={[uenegroma,feder7,una_manera]}
         // appbarBackgroundImg={headerBackground}
         >
         <AppRoutes />

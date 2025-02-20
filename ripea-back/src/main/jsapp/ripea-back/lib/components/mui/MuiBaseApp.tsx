@@ -6,7 +6,6 @@ import { useOptionalResourceApiContext } from '../ResourceApiContext';
 import { useMessageDialog } from './Dialog';
 import { useTemporalMessage } from './TemporalMessage';
 import AppBar from './AppBar';
-import AppFoot from './AppFoot';
 import Menu, { MenuEntry } from './Menu';
 import OfflineMessage from './OfflineMessage';
 import { useToolbarMenuIcon } from './ToolbarMenuIcon';
@@ -15,11 +14,10 @@ import { FormFieldNumber } from './form/FormFieldNumber';
 import { FormFieldText } from './form/FormFieldText';
 
 export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
-    title?: string;
-    title_logo?: string;
+    title?: string | React.ReactElement;
+    footer?: React.ReactElement;
     version?: string;
     logo?: string;
-    foot_logos?: string[];
     logoStyle?: any;
     menuTitle?: string;
     menuEntries?: MenuEntry[];
@@ -104,10 +102,9 @@ const useMenu = (
 export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
     const {
         title,
-        title_logo,
+        footer,
         version,
         logo,
-        foot_logos,
         logoStyle,
         menuTitle,
         menuEntries,
@@ -134,7 +131,6 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         menuWidth);
     const appbarComponent = <AppBar
         title={title}
-        title_logo={title_logo}
         version={version}
         logo={logo}
         logoStyle={logoStyle}
@@ -145,13 +141,12 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         backgroundColor={appbarBackgroundColor}
         backgroundImg={appbarBackgroundImg} />;
     const offlineComponent = <OfflineMessage />;
-    const appfootComponent=<AppFoot title={title} version={version} logos={foot_logos}/>;
     return <BaseApp
         formFieldComponents={mergedFormFieldComponents}
         {...otherProps}
         contentComponentSlots={{
             appbar: appbarComponent,
-            appfoot: appfootComponent,
+            footer,
             menu: menuComponent,
             offline: offlineComponent,
         }}>
