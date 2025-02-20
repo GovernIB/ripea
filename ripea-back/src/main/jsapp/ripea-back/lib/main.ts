@@ -21,6 +21,7 @@ export { useContentDialog, useMessageDialog, Dialog } from './components/mui/Dia
 export { envVar } from './util/envVars';
 export { numberFormat, numberFormatCurrency } from './util/numberFormat';
 export { dateFormatLocale, timeFormatLocale } from './util/dateFormat';
+export { toolbarBackgroundStyle } from './util/toolbar';
 
 export type { MenuEntry } from './components/mui/Menu';
 export type { NewGridColDef as GridColDef } from './components/mui/grid/MuiGrid';

@@ -8,8 +8,7 @@ import { useOptionalAuthContext } from '../AuthContext';
 import { toolbarBackgroundStyle } from '../../util/toolbar';
 
 type AppBarProps = {
-    title?: string;
-    title_logo?: string;
+    title?: string | React.ReactElement;
     version?: string;
     logo?: string;
     logoStyle?: any;
@@ -24,7 +23,6 @@ type AppBarProps = {
 export const AppBar: React.FC<AppBarProps> = (props) => {
     const {
         title,
-        title_logo,
         version,
         logo,
         logoStyle,
@@ -48,9 +46,7 @@ export const AppBar: React.FC<AppBarProps> = (props) => {
                 variant="h6"
                 component="div"
                 title={title + (version ? ' v' + version : '')}
-                sx={{ flexGrow: 1 }}>
-                { title_logo ? <img src={title_logo} alt="title_logo" /> :title }
-            </Typography>
+                sx={{ flexGrow: 1 }}>{title}</Typography>
             {additionalToolbarComponents}
             {authButton}
         </Toolbar>

@@ -18,6 +18,10 @@ import {
     useBaseAppContext,
     useResourceApiContext,
 } from 'reactlib';
+import Footer from './Footer';
+import uenegroma from '../assets/uenegroma.png';
+import feder7 from '../assets/feder7.png';
+import una_manera from '../assets/una_manera.png';
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -31,10 +35,9 @@ export type HeaderBackgroundModuleItem = {
 export type BaseAppProps = React.PropsWithChildren & {
     code: string;
     logo?: string;
-    foot_logos?: string[];
     style?: any;
     logoStyle?: any;
-    title?: string;
+    title?: string | React.ReactElement;
     title_logo?: string;
     version: string;
     availableLanguages?: string[];
@@ -94,11 +97,9 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
         logo,
-        foot_logos,
         style,
         logoStyle,
         title,
-        title_logo,
         version,
         availableLanguages,
         menuEntries,
@@ -128,11 +129,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     return <MuiBaseApp
         code={code}
         logo={logo}
-        foot_logos={foot_logos}
         logoStyle={logoStyle}
         appbarStyle={style}
         title={title}
-        title_logo={title_logo}
+        footer={<Footer title="RIPEA" version={version} logos={[uenegroma,feder7,una_manera]}/>}
         version={version}
         persistentSession
         persistentLanguage

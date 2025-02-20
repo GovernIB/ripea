@@ -5,10 +5,9 @@ import { MuiGrid } from '../../../lib/components/mui/grid/MuiGrid';
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
-
     const columns = [
         {
-            field: 'numero',
+            field: 'codi',
             flex: 0.5,
         },
         {
@@ -20,9 +19,11 @@ const ExpedientGrid: React.FC = () => {
             flex: 1.5,
         },
     ];
-
     return <GridPage>
-        <MuiGrid titleDisabled resourceName={'expedientResource'} columns={columns} />
+        <MuiGrid
+            resourceName="expedientResource"
+            columns={columns}
+            paginationActive />
         {/* <Box
             sx={{
                 display: 'flex',
