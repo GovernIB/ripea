@@ -20,10 +20,11 @@ export const App: React.FC = () => {
     //     icon: 'widgets',
     //     resourceName: 'app',
     // }];
+    const version = '1.0.1';
     return <BaseApp
         code="cmd"
         logo={govern_logo}
-        style={{height:'110px'}}
+        style={{ height: '110px' }}
         logoStyle={{
             '& img': { height: '65px' },
             pl: 2,
@@ -31,13 +32,13 @@ export const App: React.FC = () => {
             mr: 4,
             borderRight: '1px solid #fff'
         }}
-        title={<img src={logo} alt="title_logo" />}
-        version="1.0.1"
+        title={<img src={logo} alt={'RIPEA v' + version} />}
+        version={version}
         availableLanguages={['ca', 'es']}
         // menuEntries={menuEntries}
         appbarBackgroundColor="#ff9523"
         // appbarBackgroundImg={headerBackground}
-        >
+    >
         <AppRoutes />
     </BaseApp>;
 }
