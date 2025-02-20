@@ -1,10 +1,7 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.config;
 
 /**
- * Propietats de configuració de l'aplicació.
+ * Configuració base.
  * 
  * @author Límit Tecnologies
  */
@@ -17,6 +14,10 @@ public class BaseConfig {
 
 	public static final String APP_PROPERTIES = BASE_PACKAGE + ".properties";
 	public static final String APP_SYSTEM_PROPERTIES = BASE_PACKAGE + ".system.properties";
+
+	public static final String API_PATH = "/api";
+
+	public static final String DEFAULT_LOCALE = "ca";
 
 	public static final String ROLE_SUPER = "IPA_SUPER";
 	public static final String ROLE_ADMIN = "IPA_ADMIN";

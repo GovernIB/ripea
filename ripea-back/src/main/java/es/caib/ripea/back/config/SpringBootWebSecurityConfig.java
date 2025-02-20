@@ -42,8 +42,17 @@ import java.util.Set;
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 
+	//protected final JwtAuthConverter jwtAuthConverter;
+
+	/*public WebSecurityConfig(JwtAuthConverter jwtAuthConverter) {
+		this.jwtAuthConverter = jwtAuthConverter;
+	}*/
+
 	@Bean
 	public SecurityFilterChain oauth2LoginSecurityFilterChain(HttpSecurity http) throws Exception {
+		/*if (jwtAuthConverter != null) {
+			http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthConverter);
+		}*/
 		http.oauth2Login().
 			userInfoEndpoint().userService(oauth2UserService());
 		http.logout().
