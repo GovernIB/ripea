@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.back.error;
 
+import es.caib.ripea.back.controller.ExpedientController;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,8 @@ import javax.servlet.http.HttpServletRequest;
  * @author Límit Tecnologies
  */
 @Slf4j
-@ControllerAdvice
-public class GlobalExceptionHandler {
+@ControllerAdvice(basePackageClasses = { ExpedientController.class })
+public class RipeaJspExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)

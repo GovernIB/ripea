@@ -1,11 +1,7 @@
-/**
- * 
- */
-package es.caib.ripea.persistence.config;
+package es.caib.ripea.persistence.base.config;
 
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.persistence.repository.UsuariRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -18,26 +14,25 @@ import java.util.Optional;
 /**
  * Configuració per a les entitats de base de dades auditables.
  * 
- * @author Limit Tecnologies
+ * @author Límit Tecnologies
  */
 @Configuration
 @EnableJpaAuditing
 public class AuditingConfig {
 
-	@Autowired
-	private UsuariRepository usuariRepository;
+	@Value("${" + PropertyConfig.DEFAULT_AUDITOR + ":unknown}")
+	private String defaultAuditor;
 
 	@Bean
-	public AuditorAware<UsuariEntity> auditorProvider() {
-		return new AuditorAware<UsuariEntity>() {
+	public AuditorAware<String> auditorProvider() {
+		return new AuditorAware<String>() {
 			@Override
-			public Optional<UsuariEntity> getCurrentAuditor() {
+			public Optional<String> getCurrentAuditor() {
 				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 				if (authentication != null && authentication.isAuthenticated()) {
-					return usuariRepository.findById(authentication.getName());
-				} else {
-					return Optional.empty();
+					return Optional.of(authentication.getName());
 				}
+				return Optional.ofNullable(defaultAuditor);
 			}
 		};
 	}

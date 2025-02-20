@@ -1,5 +1,10 @@
 package es.caib.ripea.service.intf.config;
 
+/**
+ * Propietats de configuració.
+ *
+ * @author Límit Tecnologies
+ */
 public class PropertyConfig {
 
 	private static final String PROPERTY_PREFIX = "es.caib.ripea.";
@@ -10,6 +15,7 @@ public class PropertyConfig {
 	public static final String MAIL_FROM = PROPERTY_PREFIX + "mail.from";
 	public static final String FILES_PATH = PROPERTY_PREFIX + "files.path";
 	public static final String DEFAULT_AUDITOR = PROPERTY_PREFIX + "default.auditor";
+	public static final String HTTP_HEADER_ANSWERS = PROPERTY_PREFIX + "http.header.answers";
 
 	public static final String PERSISTENCE_CONTAINER_TRANSACTIONS_DISABLED = PROPERTY_PREFIX + "persist.container-transactions-disabled";
 	public static final String PERSISTENCE_TRANSACTION_MANAGER_ENABLED = PROPERTY_PREFIX + "persist.transaction-manager.enabled";
@@ -293,8 +299,9 @@ public class PropertyConfig {
 
 	public static String getPropertySuffix(String propertyValue) {
 		if (propertyValue.startsWith(PROPERTY_PREFIX)) {
-            return propertyValue.substring(PROPERTY_PREFIX.length());
-        }
+			return propertyValue.substring(PROPERTY_PREFIX.length());
+		}
 		return propertyValue;
 	}
+
 }
