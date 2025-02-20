@@ -152,8 +152,7 @@ public class DigitalitzacioController extends BaseUserController {
 				returnScannedFile,
 				returnSignedFile);
 		
-		boolean debug = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DIGITALITZACIO_LOGS, false);
-		if (debug) {
+		if (aplicacioService.propertyBooleanFindByKey(PropertyConfig.DIGITALITZACIO_PLUGIN_DEBUG, false)) {
 			logger.info("Recuperar resultat scan: " + ToStringBuilder.reflectionToString(resposta));
 		}
 		

@@ -810,7 +810,7 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsRendimentDescarregarAnotacio")
 	public boolean mostrarLogsRendimentDescarregarAnotacio() {
-		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_RENDIMENT_DESCARREGA);
+		String prop = configHelper.getConfig(PropertyConfig.MOSTRAR_LOGS_RENDIMENT_ANOTACIONS);
         return prop != null && prop.equals("true");
 	}
 	

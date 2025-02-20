@@ -13,7 +13,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Resource;
 
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +80,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ViaFirmaHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
@@ -302,10 +302,7 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 	
 	@Override
-	public SignatureInfoDto checkIfSignedAttached(
-			byte[] contingut, 
-			String contentType) {
-		
+	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType) {		
 		if (aplicacioService.getBooleanJbossProperty(PropertyConfig.VALIDATE_SIGNATURE_ATTACHED, true)) {
 			return pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(
 					contingut,
@@ -319,82 +316,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Resum getSummarize(byte[] bytes, String contentType) {
-
 		return pluginHelper.getSummarize(bytes, contentType);
-
-//		Resum resum = Resum.builder().build();
-//		String documentText = null;
-//
-//		String resumUrl = configHelper.getConfig("es.caib.notib.summarize.resum.url");
-//		String titolUrl = configHelper.getConfig("es.caib.notib.summarize.titol.url");
-//
-//		if (resumUrl == null && titolUrl == null)
-//			return resum;
-//
-//		// Extreure el text del document
-//		if ("application/pdf".equalsIgnoreCase(contentType)) {
-//			documentText = extractTextFromPDF(bytes);
-//		} else if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(contentType)) {
-//			documentText = extractTextFromDocx(bytes);
-//		} else if ("application/vnd.oasis.opendocument.text".equalsIgnoreCase(contentType)) {
-//			documentText = extractTextFromOdt(bytes);
-//		}
-//
-//		if (documentText != null) {
-//			resum = summarize(documentText, resumUrl, titolUrl);
-//		}
-//        return resum;
     }
-	
-//	private Resum summarize(String text, String resumUrl, String titolUrl) {
-//		Resum resum = Resum.builder().build();
-//
-//		try {
-//			RestTemplate restTemplate = new RestTemplate();
-//			String tipusPeticio = configHelper.getConfig("es.caib.notib.summarize.url.tipus");
-//
-//			String summaryText = null;
-//			String titleText = null;
-//
-//			if ("POST".equalsIgnoreCase(tipusPeticio)) {
-//				// Crea els headers de la petició
-//				HttpHeaders headers = new HttpHeaders();
-//				headers.setContentType(MediaType.TEXT_PLAIN);
-//
-//				// Crea un objecte HttpEntity que inclou el cos de la petició i els headers
-//				HttpEntity<String> requestEntity = new HttpEntity<>(text, headers);
-//
-//				// POST
-//				if (resumUrl != null)
-//					summaryText = restTemplate.postForObject(resumUrl, requestEntity, String.class);
-//				if (titolUrl != null)
-//					titleText = restTemplate.postForObject(titolUrl, requestEntity, String.class);
-//
-//			} else {
-//
-//				String params = "?text=" + URLEncoder.encode(text, "UTF-8");
-//
-//				// GET
-//				if (resumUrl != null)
-//					summaryText = restTemplate.getForObject(resumUrl + params, String.class);
-//				if (titolUrl != null)
-//					titleText = restTemplate.getForObject(titolUrl + params, String.class);
-//
-//			}
-//
-//			resum = Resum.builder()
-//					.titol(titleText)
-//					.resum(summaryText)
-//					.build();
-//
-//		} catch (UnsupportedEncodingException e) {
-//			logger.error("Error encoding text for summarize URL", e);
-//		} catch (Exception e) {
-//			logger.error("Error fetching summarized text from remote service", e);
-//		}
-//		return resum;
-//	}
-
 
     @Transactional
 	@Override

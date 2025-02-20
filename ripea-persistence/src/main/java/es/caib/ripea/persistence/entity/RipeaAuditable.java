@@ -1,20 +1,18 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.entity;
 
-import org.springframework.data.domain.Auditable;
-import org.springframework.lang.Nullable;
-
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
+
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.data.domain.Auditable;
+import org.springframework.lang.Nullable;
 
 /**
  * Classe basse de on extendre per a activar les auditories.

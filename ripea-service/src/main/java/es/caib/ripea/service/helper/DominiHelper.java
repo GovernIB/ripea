@@ -1,13 +1,18 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.DominiEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.repository.DominiRepository;
-import es.caib.ripea.service.intf.dto.DominiDto;
-import es.caib.ripea.service.intf.exception.CipherException;
-import es.caib.ripea.service.intf.exception.DominiException;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.ValidationException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import javax.sql.DataSource;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,17 +25,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-import javax.sql.DataSource;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
+import es.caib.ripea.persistence.entity.DominiEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.repository.DominiRepository;
+import es.caib.ripea.service.intf.dto.DominiDto;
+import es.caib.ripea.service.intf.exception.CipherException;
+import es.caib.ripea.service.intf.exception.DominiException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 
 /**
  * Helper per recuperar el resultat d'una consulta d'un domini.

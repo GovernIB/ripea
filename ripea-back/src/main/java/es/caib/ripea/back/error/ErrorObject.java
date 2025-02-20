@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.error;
 
 import lombok.Getter;
@@ -20,7 +17,10 @@ public class ErrorObject {
 	protected final int status;
 	protected final String message;
 	protected Throwable throwable;
+	protected String errorClassName;
+	protected String exceptionMessage;
 	protected String stackTrace;
+	protected String requestUri;
 	protected boolean notFound;
 	protected boolean sistemaExtern;
 	protected boolean accessDenied;
@@ -30,5 +30,18 @@ public class ErrorObject {
 		SPRING,
 		EJB
 	}
-
+	
+	public String getErrorClassName() {
+		if (throwable!=null) {
+			return throwable.getClass().getCanonicalName();
+		}
+		return "";
+	}
+	
+	@Override
+	public String toString() {
+		return "ErrorObject [status=" + status + ", message=" + message + ", stackTrace="
+				+ stackTrace + ", notFound=" + notFound + ", sistemaExtern=" + sistemaExtern + ", accessDenied="
+				+ accessDenied + ", accessDeniedSource=" + accessDeniedSource + "]";
+	}
 }
