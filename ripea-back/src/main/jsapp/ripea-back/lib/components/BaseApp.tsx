@@ -224,8 +224,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
         children,
     } = props;
     const margins = {
-        margin: 0,
-        marginBottom: 0
+        margin: '16px 24px',
     };
     const mainBoxHeight = contentExpandsToAvailableHeight ? '100vh' : undefined;
     const childrenOrOfflineComponent = !offline ? children : offlineComponent;

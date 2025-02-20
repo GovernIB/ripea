@@ -150,10 +150,8 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
             menu: menuComponent,
             offline: offlineComponent,
         }}>
-        <>
-            <MuiComponentsConfigurer />
-            {children}
-        </>
+        <MuiComponentsConfigurer />
+        {children}
     </BaseApp>;
 }
 

@@ -20,7 +20,10 @@ const ExpedientGrid: React.FC = () => {
         },
     ];
     return <GridPage>
-        <MuiGrid titleDisabled resourceName={'expedientResource'} columns={columns} />
+        <MuiGrid
+            resourceName="expedientResource"
+            columns={columns}
+            paginationActive />
         {/* <Box
             sx={{
                 display: 'flex',
