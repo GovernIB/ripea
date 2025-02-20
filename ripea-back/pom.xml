@@ -314,12 +314,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-							<webResources>
-								<resource>
-									<directory>${frontend.app.path}/dist</directory>
-									<targetPath>reactapp</targetPath>
-								</resource>
-							</webResources>
 							<archive>
 								<manifestEntries>
 									<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
@@ -359,12 +353,6 @@
 						<configuration>
 							<packagingExcludes>**/RipeaBackBootApp.class,WEB-INF/lib/*.jar</packagingExcludes>
 							<attachClasses>true</attachClasses>
-							<webResources>
-								<resource>
-									<directory>${frontend.app.path}/dist</directory>
-									<targetPath>reactapp</targetPath>
-								</resource>
-							</webResources>
 							<archive>
 								<manifestEntries>
 									<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
@@ -417,6 +405,18 @@
 								</configuration>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<webResources>
+								<resource>
+									<directory>${frontend.app.path}/dist</directory>
+									<targetPath>reactapp</targetPath>
+								</resource>
+							</webResources>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
