@@ -126,7 +126,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/api/historic/**",
 				"/api-docs/**",
 				"/**/api-docs/",
-				"/public/**"
+				"/public/**",
+				"/api",
+				"/api/**"
 		};
 		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);
@@ -215,6 +217,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				excludePathPatterns(
 						"/entitat/getEntitatLogo");
 	}
+
 
 	/**
 	 * Configura el firewall per permetre caràcters codificats com el % ja que aquests s'usen en la codificació
