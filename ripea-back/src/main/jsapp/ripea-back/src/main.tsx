@@ -10,7 +10,7 @@ import theme from './theme';
 import App from './App.tsx'
 import {
     envVar,
-    KeycloakAuthProvider as AuthProvider,
+    // KeycloakAuthProvider as AuthProvider,
     ResourceApiProvider
 } from 'reactlib';
 
@@ -52,7 +52,7 @@ const getEnvApiUrl = () => {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>
+        {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
             <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
@@ -61,6 +61,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     </BrowserRouter>
                 </ThemeProvider>
              </ResourceApiProvider> 
-        </AuthProvider>
+        {/*</AuthProvider>*/}
     </React.StrictMode>,
 );
