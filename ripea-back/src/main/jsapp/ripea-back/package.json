@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "vite --open",
         "build": "tsc -b && vite build",
-        "build-jboss": "tsc && vite build --base=/comandaback/",
+        "build-jboss": "tsc && vite build --base=/ripeaback/",
         "lint": "eslint .",
         "preview": "vite preview"
     },
