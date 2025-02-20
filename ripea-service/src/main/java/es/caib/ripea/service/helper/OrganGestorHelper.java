@@ -1,12 +1,15 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +20,41 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.*;
+import es.caib.ripea.persistence.entity.AvisEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientOrganPareEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.repository.AvisRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientOrganPareRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
+import es.caib.ripea.service.intf.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.OrganEstatEnumDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.OrganismeDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.intf.dto.TipusTransicioEnumDto;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Component
 public class OrganGestorHelper {
@@ -60,17 +95,13 @@ public class OrganGestorHelper {
 	public List<OrganGestorEntity> findAmbEntitatPermis(
 			EntitatEntity entitat,
 			Permission permis) {
-		List<Serializable> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				permis);
 		if (objectsIds == null || objectsIds.isEmpty()) {
 			return new ArrayList<OrganGestorEntity>();
 		} else {
-			List<Long> objectsIdsTypeLong = new ArrayList<Long>();
-			for (Serializable oid: objectsIds) {
-				objectsIdsTypeLong.add((Long)oid);
-			}
-			return organGestorRepository.findByEntitatAndIds(entitat, objectsIdsTypeLong);
+			return organGestorRepository.findByEntitatAndIds(entitat, objectsIds);
 		}
 	}
 

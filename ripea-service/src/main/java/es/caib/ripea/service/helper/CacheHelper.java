@@ -1,14 +1,18 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
-import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.DominiException;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +20,67 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.acls.model.*;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.*;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DadaEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.NodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ComunitatDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ErrorsValidacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
+import es.caib.ripea.service.intf.dto.OrganEstatEnumDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.OrganismeDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
+import es.caib.ripea.service.intf.dto.ResultatDominiDto;
+import es.caib.ripea.service.intf.dto.TipusViaDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
+import es.caib.ripea.service.intf.exception.DominiException;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
@@ -99,15 +153,11 @@ public class CacheHelper {
 					ExtendedPermission.READ,
 					ExtendedPermission.ADMINISTRATION},
 				auth);
-		List<Serializable> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				ExtendedPermission.ADMINISTRATION);
 		if (objectsIds != null && !objectsIds.isEmpty()) {
-			List<Long> objectsIdsTypeLong = new ArrayList<Long>();
-			for (Serializable oid: objectsIds) {
-				objectsIdsTypeLong.add((Long)oid);
-			}
-			List<EntitatEntity> entitatsOfOrgans = entitatRepository.findByOrgansIds(objectsIdsTypeLong);
+			List<EntitatEntity> entitatsOfOrgans = entitatRepository.findByOrgansIds(objectsIds);
 			entitats.addAll(entitatsOfOrgans);
 			// remove duplicates
 			entitats = new ArrayList<EntitatEntity>(new HashSet<EntitatEntity>(entitats));

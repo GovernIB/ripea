@@ -1667,26 +1667,19 @@ public class ExpedientHelper {
 		}else {
 			// Si ets usuari normal, permisos de lectura de varies fonts
 
-			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
+			idsMetaExpedientsPermesos = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ);
 
             if (cacheHelper.mostrarLogsRendiment())
                 logger.info("findPermisosPerExpedients > idsMetaExpedientsPermesos (" + (idsMetaExpedientsPermesos!=null?idsMetaExpedientsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
 
             long t2 = System.currentTimeMillis();
-			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaExpedientOrganGestorEntity.class,
-					ExtendedPermission.READ));
+			idsMetaExpedientOrganPairsPermesos = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ);
 
             if (cacheHelper.mostrarLogsRendiment())
                 logger.info("findPermisosPerExpedients > idsMetaExpedientOrganPairsPermesos (" + (idsMetaExpedientOrganPairsPermesos!=null?idsMetaExpedientOrganPairsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t2) + " ms");
 
             long t3 = System.currentTimeMillis();
-			idsOrgansAmbProcedimentsComunsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
-					OrganGestorEntity.class,
-					ExtendedPermission.COMU,
-					ExtendedPermission.READ));
+			idsOrgansAmbProcedimentsComunsPermesos = permisosHelper.getObjectsIdsWithTwoPermissions(OrganGestorEntity.class,ExtendedPermission.COMU,ExtendedPermission.READ);
 
             if (cacheHelper.mostrarLogsRendiment())
                 logger.info("findPermisosPerExpedients > idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos!=null?idsOrgansAmbProcedimentsComunsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t3) + " ms");
@@ -1698,9 +1691,7 @@ public class ExpedientHelper {
                 logger.info("findPermisosPerExpedients > procedimentsComunsIds (" + (procedimentsComunsIds!=null?procedimentsComunsIds.size():0) + ") time:  " + (System.currentTimeMillis() - t4) + " ms");
 
             long t5 = System.currentTimeMillis();
-			idsGrupsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					GrupEntity.class,
-					ExtendedPermission.READ));
+			idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ);
 
             if (cacheHelper.mostrarLogsRendiment())
                 logger.info("findPermisosPerExpedients > idsGrupsPermesos (" + (idsGrupsPermesos!=null?idsGrupsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");
@@ -2424,15 +2415,5 @@ public class ExpedientHelper {
 		return documentNtiTipoFirmaEnumDto;
 	}
 
-	
-	private List<Long> toListLong(List<Serializable> original) {
-		List<Long> listLong = new ArrayList<Long>(original.size());
-		for (Serializable s: original) { 
-			listLong.add((Long)s); 
-		}
-		return listLong;
-	}
-
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
-
 }

@@ -1636,9 +1636,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		
 		// Cercam els metaExpedients amb permisos assignats directament
-		List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaNodeEntity.class,
-				ExtendedPermission.READ));
+		List<Long> metaExpedientIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ);
 		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty()) {
 			hasAnyPermissions = true;
 		}
@@ -1646,31 +1644,23 @@ public class ExpedientServiceImpl implements ExpedientService {
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIdPermesos;
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					OrganGestorEntity.class,
-					ExtendedPermission.ADMINISTRATION));
+			organIdPermesos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.ADMINISTRATION);
 		} else {
-			organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					OrganGestorEntity.class,
-					ExtendedPermission.READ));
+			organIdPermesos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.READ);
 		}
+		
 		if (organIdPermesos != null && !organIdPermesos.isEmpty()) {
 			hasAnyPermissions = true;
 		}
 		
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
-		List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaExpedientOrganGestorEntity.class,
-				ExtendedPermission.READ));
+		List<Long> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ);
 		if (metaExpedientOrganIdPermesos != null && !metaExpedientOrganIdPermesos.isEmpty()) {
 			hasAnyPermissions = true;
 		}
 		
 		// Cercam els òrgans amb permisos per procediemnts comuns
-		List<Long> organProcedimentsComunsIdsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
-				OrganGestorEntity.class,
-				ExtendedPermission.COMU,
-				ExtendedPermission.READ));
+		List<Long> organProcedimentsComunsIdsPermesos = permisosHelper.getObjectsIdsWithTwoPermissions(OrganGestorEntity.class, ExtendedPermission.COMU, ExtendedPermission.READ);
 		if (organProcedimentsComunsIdsPermesos != null && !organProcedimentsComunsIdsPermesos.isEmpty()) {
 			hasAnyPermissions = true;
 		}

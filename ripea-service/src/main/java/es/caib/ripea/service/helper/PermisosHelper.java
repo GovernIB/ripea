@@ -3,16 +3,16 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.AclClassRepository;
-import es.caib.ripea.persistence.repository.AclEntryRepository;
-import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
-import es.caib.ripea.persistence.repository.AclSidRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
-import es.caib.ripea.service.intf.dto.PermisDto;
-import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -20,14 +20,33 @@ import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.*;
+import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-import java.util.*;
+import es.caib.ripea.persistence.entity.AclClassEntity;
+import es.caib.ripea.persistence.entity.AclEntryEntity;
+import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
+import es.caib.ripea.persistence.entity.AclSidEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.repository.AclClassRepository;
+import es.caib.ripea.persistence.repository.AclEntryRepository;
+import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
+import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 /**
  * Helper per a la gestió de permisos dins les ACLs.
@@ -49,8 +68,6 @@ public class PermisosHelper {
 	private AclClassRepository aclClassRepository;
 	@Autowired
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
-	@Autowired
-	private PluginHelper pluginHelper;
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
@@ -161,7 +178,7 @@ public class PermisosHelper {
 	 * @param permission Permís que es vol esbrinar si conté
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
-	public List<Serializable> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
+	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
@@ -183,7 +200,7 @@ public class PermisosHelper {
 					sids,
 					permission.getMask());
 		} else {
-			return new ArrayList<Serializable>();
+			return new ArrayList<Long>();
 		}
 	}
 	
@@ -196,7 +213,7 @@ public class PermisosHelper {
 	 * @param permission2 per comporvar
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
-	public List<Serializable> getObjectsIdsWithTwoPermissions(Class<?> clazz, Permission permission1, Permission permission2) {
+	public List<Long> getObjectsIdsWithTwoPermissions(Class<?> clazz, Permission permission1, Permission permission2) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
@@ -219,7 +236,7 @@ public class PermisosHelper {
 					permission1.getMask(),
 					permission2.getMask());
 		} else {
-			return new ArrayList<Serializable>();
+			return new ArrayList<Long>();
 		}
 	}
 
@@ -855,9 +872,6 @@ public class PermisosHelper {
 			}
 		
 	}
-	
-
-
 
 	public void eliminarPermisosOrgan(OrganGestorEntity organGestor) {
 		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
