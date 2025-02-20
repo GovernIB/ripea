@@ -582,7 +582,7 @@ public class PermisosHelper {
 					permis = permisosUsuari.get(principal);
 					if (permis == null) {
 						permis = new PermisDto();
-						permis.setId(ace.getId());
+						permis.setId((Long)ace.getId());
 						permis.setPrincipalNom(principal);
 						permis.setPrincipalTipus(PrincipalTipusEnumDto.USUARI);
 						permisosUsuari.put(principal, permis);
@@ -592,7 +592,7 @@ public class PermisosHelper {
 					permis = permisosRol.get(grantedAuthority);
 					if (permis == null) {
 						permis = new PermisDto();
-						permis.setId(ace.getId());
+						permis.setId((Long)ace.getId());
 						permis.setPrincipalNom(grantedAuthority);
 						permis.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
 						permisosRol.put(grantedAuthority, permis);

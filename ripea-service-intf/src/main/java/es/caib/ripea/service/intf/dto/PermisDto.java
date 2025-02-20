@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Setter
 public class PermisDto implements Serializable {
 
-	private Serializable id;
+	private Long id;
 	private String principalNom;
 	private String principalCodiNom;
 	private PrincipalTipusEnumDto principalTipus;
