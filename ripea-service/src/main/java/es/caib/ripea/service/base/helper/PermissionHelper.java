@@ -1,6 +1,5 @@
 package es.caib.ripea.service.base.helper;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
 import org.springframework.lang.Nullable;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.core.Authentication;
@@ -37,11 +36,12 @@ public class PermissionHelper {
 			String targetType,
 			@Nullable BasePermission permission) {
 		// TODO tot el tema de controlar permisos de RIPEA
-		boolean hasRoleConsulta = isCurrentUserInRole(auth, BaseConfig.ROLE_ADMIN);
+		/*boolean hasRoleConsulta = isCurrentUserInRole(auth, BaseConfig.ROLE_ADMIN);
 		boolean hasRoleAdmin = isCurrentUserInRole(auth, BaseConfig.ROLE_ADMIN);
 		boolean readPermissionAllowed = isReadOperation(permission) && hasRoleConsulta;
 		boolean writePermissionAllowed = isWriteOperation(permission) && hasRoleAdmin;
-		return readPermissionAllowed || writePermissionAllowed;
+		return readPermissionAllowed || writePermissionAllowed;*/
+		return true;
 	}
 
 	/**

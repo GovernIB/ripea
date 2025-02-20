@@ -40,6 +40,8 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Public areas</web-resource-name>
+			<url-pattern>/api</url-pattern>
+			<url-pattern>/api/*</url-pattern>
 			<url-pattern>/ws/v0/bustia</url-pattern>
 			<url-pattern>/ws/v1/bustia</url-pattern>
 			<url-pattern>/ws/MCGDws</url-pattern>
