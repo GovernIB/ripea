@@ -1,6 +1,4 @@
-import React from 'react';
-// import { useTranslation } from 'react-i18next';
-// import { Box, Typography } from '@mui/material';
+import React, {useState} from 'react';
 import {
     GridPage,
     MuiGrid,
@@ -8,11 +6,13 @@ import {
     FormField,
     useFilterApiRef
 } from 'reactlib';
+import Button from "@mui/material/Button";
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
+    const [springFilter, setSpringFilter] = useState("");
     const filterRef = useFilterApiRef();
-    //filterRef.current.clear();
+
     const columns = [
         {
             field: 'codi',
@@ -27,9 +27,29 @@ const ExpedientGrid: React.FC = () => {
             flex: 1.5,
         },
     ];
+
+    const and = (...options :any[]) :string => {
+        return options.filter(a=>a!=null).join(" AND ");
+    }
+    const like = (option :string, value :any) :string | null => {
+        return value ?`${option}~'%${value}%'` :null;
+    }
+
     const springFilterBuilder = (data: any) => {
-        console.log('>>> springFilterBuilder', data)
-        return '';
+        let filterStr :string = '';
+
+        filterStr += and(
+            like("codi", data.codi),
+            like("nom", data.nom),
+        )
+        console.log('>>> springFilterBuilder:', filterStr)
+        return filterStr;
+    }
+    const cercar = ()=> {
+        filterRef.current.filter()
+    }
+    const netejar = ()=> {
+        filterRef.current.clear()
     }
     return <GridPage>
         <MuiFilter
@@ -40,23 +60,21 @@ const ExpedientGrid: React.FC = () => {
             componentProps={{
                 sx: { mb: 2 }
             }}
-            apiRef={filterRef}>
+            apiRef={filterRef}
+            onSpringFilterChange={setSpringFilter}
+            buttonControlled
+        >
+            <FormField name="codi" />
             <FormField name="nom" />
+
+            <Button onClick={netejar}>Netejar</Button>
+            <Button onClick={cercar} variant="contained">Cercar</Button>
         </MuiFilter>
         <MuiGrid
             resourceName="expedientResource"
             columns={columns}
             paginationActive
-            filter={''} />
-        {/* <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: 'calc(100vh - 72px)',
-            }}>
-            <Typography variant="h2">{t('page.notFound')}</Typography>
-        </Box> */}
+            filter={springFilter} />
     </GridPage>;
 }
 

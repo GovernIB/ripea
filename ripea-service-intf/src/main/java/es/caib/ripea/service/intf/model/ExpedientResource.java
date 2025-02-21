@@ -106,6 +106,7 @@ public class ExpedientResource extends BaseResource<Long> {
 	@Setter
 	@NoArgsConstructor
 	public static class ExpedientFilterForm implements Serializable {
+		private String codi;
 		private String nom;
 	}
 
