@@ -6,12 +6,12 @@ import {
     MuiGrid,
     MuiFilter,
     FormField,
-    //useFilterApiRef
+    useFilterApiRef
 } from 'reactlib';
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
-    //const filterRef = useFilterApiRef();
+    const filterRef = useFilterApiRef();
     //filterRef.current.clear();
     const columns = [
         {
@@ -40,7 +40,7 @@ const ExpedientGrid: React.FC = () => {
             componentProps={{
                 sx: { mb: 2 }
             }}
-            apiRef={}>
+            apiRef={filterRef}>
             <FormField name="nom" />
         </MuiFilter>
         <MuiGrid
