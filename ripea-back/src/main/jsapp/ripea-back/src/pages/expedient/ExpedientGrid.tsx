@@ -1,14 +1,18 @@
+import React from 'react';
 // import { useTranslation } from 'react-i18next';
 // import { Box, Typography } from '@mui/material';
 import {
     GridPage,
     MuiGrid,
     MuiFilter,
-    FormField
+    FormField,
+    //useFilterApiRef
 } from 'reactlib';
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
+    //const filterRef = useFilterApiRef();
+    //filterRef.current.clear();
     const columns = [
         {
             field: 'codi',
@@ -35,7 +39,8 @@ const ExpedientGrid: React.FC = () => {
             commonFieldComponentProps={{ size: 'small' }}
             componentProps={{
                 sx: { mb: 2 }
-            }}>
+            }}
+            apiRef={}>
             <FormField name="nom" />
         </MuiFilter>
         <MuiGrid
