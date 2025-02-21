@@ -1,14 +1,18 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import es.caib.ripea.persistence.entity.DadaEntity;
-import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Entitat de base de dades que representa un node.
@@ -21,18 +25,18 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public class NodeResourceEntity extends ContingutResourceEntity {
+public abstract class NodeResourceEntity extends ContingutResourceEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(
 			name = "metanode_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metanode_node_fk"))
-	protected MetaNodeEntity metaNode;
+	protected MetaNodeResourceEntity metaNode;
 
-	@OneToMany(
-			mappedBy = "node",
-			cascade = { CascadeType.ALL },
-			fetch = FetchType.LAZY)
-	protected Set<DadaEntity> dades;
+//	@OneToMany(
+//			mappedBy = "node",
+//			cascade = { CascadeType.ALL },
+//			fetch = FetchType.LAZY)
+//	protected Set<DadaEntity> dades;
 
 }
