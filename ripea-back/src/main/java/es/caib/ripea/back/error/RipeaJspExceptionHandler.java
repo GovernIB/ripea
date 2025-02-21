@@ -117,8 +117,9 @@ public class RipeaJspExceptionHandler {
 				ex.getMessage());
 		errorObject.setThrowable(ex);
 		errorObject.setStackTrace(ExceptionUtils.getStackTrace(ex));
+		errorObject.setRequestUri(request.getRequestURI());
+		errorObject.setExceptionMessage(ex.getMessage());
 		model.addObject("errorObject", errorObject);
 		return model;
 	}
-
 }

@@ -5,22 +5,7 @@ package es.caib.ripea.plugin.caib.conversio;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 import java.util.Properties;
-
-import org.apache.poi.xwpf.usermodel.IBodyElement;
-import org.apache.poi.xwpf.usermodel.IRunElement;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFFooter;
-import org.apache.poi.xwpf.usermodel.XWPFHeader;
-import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.xmlbeans.XmlCursor;
-import org.jdom.Namespace;
-import org.jopendocument.dom.ODPackage;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Element;
@@ -136,7 +121,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 					documentKind).to(
 					ConverterTypeTo.PDF);
 			
-			byte[] contingut;
+			/*byte[] contingut;
 			// xdocreport gives error when trying to convert docx/odt which has hyperlink in header/footer to pdf
 			// that's why hyperlinks needs to be removed
 			// error is: java.lang.RuntimeException: Not all annotations could be added to the document (the document doesn't have enough pages). at com.lowagie.text.pdf.PdfDocument.close(Unknown Source)
@@ -144,9 +129,9 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 				contingut = removeLinksHeaderFooterDocx(arxiu.getArxiuContingut());
 			} else {
 				contingut = removeLinksHeaderFooterOdt(arxiu.getArxiuContingut());
-			}
+			}*/
 			
-			ByteArrayInputStream bais = new ByteArrayInputStream(contingut);
+			ByteArrayInputStream bais = new ByteArrayInputStream(arxiu.getArxiuContingut());
 			baosConversio = new ByteArrayOutputStream();
 			IConverter converter = ConverterRegistry.getRegistry().getConverter(options);
 			converter.convert(bais, baosConversio, options);
@@ -180,9 +165,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 		return convertit;
 	}
 
-	
-
-	  
+/*
 	private byte[] removeLinksHeaderFooterOdt(byte[] contingut) {
 		try {
 
@@ -316,7 +299,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 			}
 		}
 	}
-	
+*/
 	
 	private void estamparBarcodePdf417(
 			PdfContentByte contentByte,

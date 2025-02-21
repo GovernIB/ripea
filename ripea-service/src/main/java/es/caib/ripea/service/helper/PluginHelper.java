@@ -34,9 +34,6 @@ import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
-import org.jdom.Element;
-import org.jopendocument.dom.ODPackage;
-import org.jopendocument.dom.text.TextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6116,26 +6113,15 @@ public class PluginHelper {
 		return resum;
 	}
 
-	public static String extractTextFromDocument(
-			byte[] bytes,
-			String contentType) {
+	public static String extractTextFromDocument(byte[] bytes, String contentType) {
 		String documentText = null;
-
-		// Extreure el text del document
-		if ("application/pdf".equalsIgnoreCase(
-				contentType)) {
-			documentText = extractTextFromPDF(
-					bytes);
-		} else if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(
-				contentType)) {
-			documentText = extractTextFromDocx(
-					bytes);
-		} else if ("application/vnd.oasis.opendocument.text".equalsIgnoreCase(
-				contentType)) {
-			documentText = extractTextFromOdt(
-					bytes);
+		if ("application/pdf".equalsIgnoreCase(contentType)) {
+			documentText = extractTextFromPDF(bytes);
+		} else if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(contentType)) {
+			documentText = extractTextFromDocx(bytes);
+		} else if ("application/vnd.oasis.opendocument.text".equalsIgnoreCase(contentType)) {
+//			documentText = extractTextFromOdt(bytes);
 		}
-
 		return documentText;
 	}
 
@@ -6187,7 +6173,7 @@ public class PluginHelper {
 		}
 		return text;
 	}
-
+/*
 	private static String extractTextFromOdt(
 			byte[] bytes) throws SistemaExternException {
 		StringBuilder text = new StringBuilder();
@@ -6254,7 +6240,7 @@ public class PluginHelper {
 			}
 		}
 	}
-
+*/
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 
 		loadPluginProperties("USUARIS");
@@ -7436,7 +7422,7 @@ public class PluginHelper {
 	}
 
 	private boolean getPropertyViaFirmaDispositius() {
-		return configHelper.getAsBoolean(PropertyConfig.VIAFIRMA_DISPOSITIUS_ENABLED);
+		return configHelper.getAsBoolean(PropertyConfig.VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED);
 	}
 
 	public boolean getPropertyPropagarConversioDefinitiuActiu() {

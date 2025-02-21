@@ -1,18 +1,14 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.plugin.unitat.NodeDir3;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.service.OrganGestorService;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
@@ -28,8 +24,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
-import java.util.*;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.plugin.unitat.NodeDir3;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.IntegracioHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.OrganEstatEnumDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.OrganGestorFiltreDto;
+import es.caib.ripea.service.intf.dto.OrganismeDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PermisOrganGestorDto;
+import es.caib.ripea.service.intf.dto.PrediccioSincronitzacio;
+import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
@@ -768,9 +807,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				false);
 		
 		// Cercam els metaExpedients amb permisos assignats directament
-		List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaNodeEntity.class,
-				ExtendedPermission.READ));
+		List<Long> metaExpedientIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ);
 		
 		// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
 		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty() && !directOrganPermisRequired) {
@@ -1095,12 +1132,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				}
 				// Cercam els òrgans amb permisos per procediments comuns
 				if (metaExpedient.getOrganGestor() == null) {
-					List<Long> organProcedimentsComunsIds = toListLong(
-							permisosHelper.getObjectsIdsWithTwoPermissions(
-									OrganGestorEntity.class,
-									ExtendedPermission.COMU,
-									permis));
-
+					List<Long> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(OrganGestorEntity.class, ExtendedPermission.COMU, permis);
 					if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
 						organCodis.addAll(organGestorRepository.findCodisByIdList(organProcedimentsComunsIds));
 					}

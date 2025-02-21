@@ -138,15 +138,6 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public String propertyBaseUrl();
 
-
-	/**
-	 * Retorna el valor de la propietat es.caib.ripea.plugin.escaneig..ids.
-	 * 
-	 * @return el valor del paràmetre.
-	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
-	public String propertyPluginEscaneigIds();
-
 	/**
 	 * Retorna els valors dels paràmetres de configuració de l'aplicació
 	 * agrupades dins un grup determinat

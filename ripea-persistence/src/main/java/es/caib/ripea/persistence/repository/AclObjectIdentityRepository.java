@@ -3,15 +3,15 @@
  */
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.AclClassEntity;
-import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
-import es.caib.ripea.persistence.entity.AclSidEntity;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.io.Serializable;
-import java.util.List;
+import es.caib.ripea.persistence.entity.AclClassEntity;
+import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
+import es.caib.ripea.persistence.entity.AclSidEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -30,11 +30,10 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			"and entry.sid in (:sids) " +
 			"and entry.mask = :mask " +
 			"and entry.granting = true")
-	public List<Serializable> findObjectsWithPermissions(
+	public List<Long> findObjectsWithPermissions(
 			@Param("classname") String classname, 
 			@Param("sids") List<AclSidEntity> sids,
 			@Param("mask") Integer mask);
-	
 	
 	@Query(	"select " +
 			"    distinct oi.objectId " +
@@ -44,7 +43,7 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			"    oi.classname.classname = :classname " +
 			"and (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.sid in (:sids) and entry.mask = :mask1 and entry.granting = true) = 1 " +
 			"and (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.sid in (:sids) and entry.mask = :mask2 and entry.granting = true) = 1 ")
-	public List<Serializable> findObjectsWithPermissions(
+	public List<Long> findObjectsWithPermissions(
 			@Param("classname") String classname, 
 			@Param("sids") List<AclSidEntity> sids, 
 			@Param("mask1") Integer mask1,

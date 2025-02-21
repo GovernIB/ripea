@@ -14,7 +14,6 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-
 </head>
 <body>
 	<div class="text-right" data-toggle="botons-titol">
@@ -31,9 +30,6 @@
 		<thead>
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="tipusdocumental.columna.codi"/></th>
-<%-- 				<c:if test="${tipusDocumentalsNtiCodiEspecific}"> --%>
-<%-- 					<th data-col-name="codiEspecific" data-orderable="false"><spring:message code="tipusdocumental.columna.codi.especific"/></th> --%>
-<%-- 				</c:if> --%>
 				<th data-col-name="nomEspanyol" data-orderable="false"><spring:message code="tipusdocumental.columna.nom"/></th>
 				<th data-col-name="nomCatala" data-orderable="false"><spring:message code="tipusdocumental.columna.nom.catala"/></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

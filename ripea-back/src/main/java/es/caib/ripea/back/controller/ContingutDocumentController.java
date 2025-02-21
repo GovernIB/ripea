@@ -1824,7 +1824,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("isPluginSummarizeActiu", isPluginSummarizeActiu());
 		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
 		
-		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty(PropertyConfig.SCANNER_MOCK, false));
+		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty(PropertyConfig.DIGITALITZACIO_PLUGIN_SCANNER_MOCK, false));
 		
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);

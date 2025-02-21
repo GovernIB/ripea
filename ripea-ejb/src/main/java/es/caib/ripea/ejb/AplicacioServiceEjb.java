@@ -110,12 +110,6 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public String propertyPluginEscaneigIds() {
-		return delegateService.propertyPluginEscaneigIds();
-	}
-
-	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
 	public Properties propertiesFindByGroup(String codiGrup) {
 		return delegateService.propertiesFindByGroup(codiGrup);
 	}

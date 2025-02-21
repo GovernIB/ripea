@@ -3,16 +3,22 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.helper.PermisosHelper.ListObjectIdentifiersExtractor;
-import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import static es.caib.ripea.service.service.MetaExpedientServiceImpl.progresActualitzacio;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -25,12 +31,54 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.*;
-
-import static es.caib.ripea.service.service.MetaExpedientServiceImpl.progresActualitzacio;
+import es.caib.ripea.persistence.entity.AvisEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientSequenciaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.repository.AvisRepository;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientSequenciaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaNodeRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.service.helper.PermisosHelper.ListObjectIdentifiersExtractor;
+import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArbreJsonDto;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
+import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 /**
  * Utilitats comunes pels meta-expedients.
@@ -320,15 +368,13 @@ public class MetaExpedientHelper {
 		
 		long t1 = System.currentTimeMillis();
 		// Cercam els metaExpedients amb permisos assignats directament
-		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, permis));
+		List<Long> metaExpedientIds = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, permis);
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis metaExpedientIds (" + (Utils.isNotEmpty(metaExpedientIds) ? metaExpedientIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
 		
 		long t2 = System.currentTimeMillis();
 		// Cercam els òrgans amb permisos assignats directament
-		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				OrganGestorEntity.class,
-				isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis));
+		List<Long> organIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis);
 		List<String> organCodis = organGestorRepository.findCodisByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organIds));
 		organCodis = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organCodis);
 		if (cacheHelper.mostrarLogsRendiment())
@@ -337,24 +383,20 @@ public class MetaExpedientHelper {
 		
 		long t3 = System.currentTimeMillis();
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
-		List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaExpedientOrganGestorEntity.class,
-				permis));
+		List<Long> metaExpedientOrganIds = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class,	permis);
 		// there is no need to find descendants because for the query to find procediments it doesn't matter  
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis metaExpedientOrganIds (" + (Utils.isNotEmpty(metaExpedientOrganIds) ? metaExpedientOrganIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
 		long t4 = System.currentTimeMillis();
 		// Cercam els òrgans amb permisos per procediemnts comuns
-		List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
+		List<Long> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
 				OrganGestorEntity.class,
 				ExtendedPermission.COMU,
 				permis);
 
 		// Cercam els òrgans amb permisos de administracio comuns
-		List<Long> organAdmIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				OrganGestorEntity.class,
-				ExtendedPermission.ADM_COMU));
+		List<Long> organAdmIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.ADM_COMU);
 		boolean accessAllComu = false;
 		if (Utils.isNotEmpty(organProcedimentsComunsIds) || Utils.isNotEmpty(organAdmIds)) {
 			accessAllComu = true;

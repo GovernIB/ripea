@@ -49,6 +49,6 @@ public class ViaFirmaValidator implements ConstraintValidator<ViaFirma, ViaFirma
 	}
 	
 	private boolean isViaFirmaDispositiusEnabled() {
-		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VIAFIRMA_DISPOSITIUS_ENABLED));
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED));
 	}
 }
