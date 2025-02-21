@@ -106,7 +106,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						null,
 						resourceApiService.permissionsCurrentUser(
 								getResourceClass(),
-								null)).toArray(new Link[0]));
+								id)).toArray(new Link[0]));
 		return ResponseEntity.ok(entityModel);
 	}
 

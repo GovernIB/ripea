@@ -124,7 +124,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
-										null)).toArray(new Link[0])));
+										created.getId())).toArray(new Link[0])));
 	}
 
 	@Override
