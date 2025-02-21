@@ -1,14 +1,13 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.PermissionDeniedException;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,48 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DadaEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPublicacioEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.NodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.CarpetaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaNodeRepository;
+import es.caib.ripea.persistence.repository.NodeRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.PermissionDeniedException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
@@ -271,16 +306,12 @@ public class EntityComprovarHelper {
 
 		Set<String> organCodis = new HashSet<>();
 		// Cercam els òrgans amb permisos assignats directament
-		List<Long> organIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				OrganGestorEntity.class,
-				ExtendedPermission.READ));
+		List<Long> organIdPermesos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.READ);
 //		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIdPermesos);
 		organCodis.addAll(organGestorRepository.findCodisByIdList(organIdPermesos));
 
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
-		List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaExpedientOrganGestorEntity.class,
-				ExtendedPermission.READ));
+		List<Long> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ);
 		if (metaExpedientOrganIdPermesos != null && !metaExpedientOrganIdPermesos.isEmpty()) {
 			organCodis.addAll(metaExpedientOrganGestorRepository.findOrganGestorCodisByMetaExpedientOrganGestorIds(metaExpedientOrganIdPermesos));
 //			organGestorHelper.afegirOrganGestorFillsIds(entitat, organsIdsPerMetaExpedientOrganIdPermesos);
@@ -1150,7 +1181,7 @@ public class EntityComprovarHelper {
 		boolean grantedOrganProcedimentsComuns = false;
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(procedimentId).orElse(null);
 		if (metaExpedient.isComu()) {
-			List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
+			List<Long> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
 					OrganGestorEntity.class,
 					ExtendedPermission.COMU,
 					permission);
@@ -1366,18 +1397,6 @@ public class EntityComprovarHelper {
 		}
 		return true;
 	}
-	
-	
 
-	
-	private List<Long> toListLong(List<Serializable> original) {
-		List<Long> listLong = new ArrayList<Long>(original.size());
-		for (Serializable s: original) { 
-			listLong.add((Long)s); 
-		}
-		return listLong;
-	}
-	
 	private static final Logger logger = LoggerFactory.getLogger(EntityComprovarHelper.class);
-
 }

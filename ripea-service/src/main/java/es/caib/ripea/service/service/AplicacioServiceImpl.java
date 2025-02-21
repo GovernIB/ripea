@@ -1,20 +1,11 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.entity.GrupEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.GrupRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.UsuariRepository;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +15,41 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.IntegracioHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PinbalHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
+import es.caib.ripea.service.intf.dto.GenericDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
@@ -312,12 +334,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public String propertyBaseUrl() {
 		logger.debug("Consulta de la propietat base URL");
 		return configHelper.getConfig(PropertyConfig.BASE_URL);
-	}
-
-	@Override
-	public String propertyPluginEscaneigIds() {
-		logger.debug("Consulta de la propietat amb les ids pels plugins d'escaneig de documents");
-		return configHelper.getConfig(PropertyConfig.ESCANEIG_IDS);
 	}
 
 	@Override

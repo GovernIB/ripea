@@ -8,5 +8,6 @@ package es.caib.ripea.service.intf.base.model;
 public enum ResourceArtifactType {
 	ACTION,
 	REPORT,
-	FILTER
+	FILTER,
+	PERSPECTIVE
 }

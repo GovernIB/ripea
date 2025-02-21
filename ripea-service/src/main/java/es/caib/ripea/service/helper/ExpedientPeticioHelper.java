@@ -3,14 +3,9 @@
  */
 package es.caib.ripea.service.helper;
 
-import es.caib.distribucio.rest.client.integracio.domini.*;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +14,39 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.distribucio.rest.client.integracio.domini.Annex;
+import es.caib.distribucio.rest.client.integracio.domini.AnnexEstat;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
+import es.caib.distribucio.rest.client.integracio.domini.Interessat;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.entity.RegistreEntity;
+import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.persistence.repository.RegistreInteressatRepository;
+import es.caib.ripea.persistence.repository.RegistreRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -392,10 +418,7 @@ public class ExpedientPeticioHelper {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId));
 		} else if (rolActual.equals("tothom")) {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.getCreateWritePermesos(entitatId));
-			
-			List<Long> idsGrupsPermesos = Utils.toListLong(permisosHelper.getObjectsIdsWithPermission(
-					GrupEntity.class,
-					ExtendedPermission.READ));
+			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ);
 			permisosPerAnotacionsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 		}
 

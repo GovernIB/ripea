@@ -1,15 +1,7 @@
 package es.caib.ripea.service.intf.utils;
 
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.security.crypto.codec.Base64;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -17,8 +9,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.security.crypto.codec.Base64;
+
+import es.caib.ripea.service.intf.dto.FitxerDto;
 
 public class Utils {
 	
@@ -95,14 +105,6 @@ public class Utils {
     public static boolean isBiggerThan( String string, int size) {
 		return isNotEmpty(string) && string.length() > size;
     }
-    
-    public static List<Long> toListLong(List<Serializable> original) {
-		List<Long> listLong = new ArrayList<Long>(original.size());
-		for (Serializable s: original) { 
-			listLong.add((Long)s); 
-		}
-		return listLong;
-	}
 
 	public static <T> List<T> getUniqueValues(List<T> objects) {
 		if (objects != null) {

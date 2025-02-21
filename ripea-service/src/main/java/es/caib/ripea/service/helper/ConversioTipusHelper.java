@@ -41,8 +41,11 @@ import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
@@ -77,8 +80,11 @@ import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
@@ -120,17 +126,20 @@ public class ConversioTipusHelper {
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
-	@Autowired
-	private ConfigHelper configHelper;
+	@Autowired private ConfigHelper configHelper;
 
+	@SuppressWarnings("rawtypes")
 	public ConversioTipusHelper() {
+		
 		mapperFactory = new DefaultMapperFactory.Builder().build();
+
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
 					public Date convert(DateTime source, Type<? extends Date> destinationClass, MappingContext mappingContext) {
 						return source.toDate();
 					}
 				});
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaContingutEntity, ExecucioMassivaContingutDto>() {
 					public ExecucioMassivaContingutDto convert(ExecucioMassivaContingutEntity source, Type<? extends ExecucioMassivaContingutDto>destinationClass, MappingContext mappingContext) {
@@ -146,6 +155,7 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<AlertaEntity, AlertaDto>() {
 					public AlertaDto convert(AlertaEntity source, Type<? extends AlertaDto>destinationClass, MappingContext mappingContext) {
@@ -172,26 +182,30 @@ public class ConversioTipusHelper {
 					}
 				})
 	        .register();
-		
-		/*mapperFactory.getConverterFactory()..registerConverter(
-				new CustomConverter<MetaExpedientTascaValidacioEntity, MetaExpedientTascaValidacioDto>() {
-					public MetaExpedientTascaValidacioDto convert(MetaExpedientTascaValidacioEntity source, Type<? extends MetaExpedientTascaValidacioDto>destinationClass, MappingContext mappingContext) {
-						MetaExpedientTascaValidacioDto target = new MetaExpedientTascaValidacioDto();
-						target.setId(source.getId());
-						target.setItemId(source.getItemId());
-						target.setActiva(source.isActiva());
-						target.setItemValidacio(source.getItemValidacio());
-						target.setMetaExpedientTasca(metaExpedientTasca);
-						if (ItemValidacioTascaEnum.DADA.equals(source.getItemValidacio())) {
-							
-						} else {
-							
-						}
-						return target;
-					}
-				});		
-		*/
-		mapperFactory.getConverterFactory().registerConverter(
+	      
+	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientDto.class).byDefault().register();
+	      
+	      mapperFactory.classMap(MetaExpedientComentariEntity.class, MetaExpedientComentariDto.class)
+	      .customize(new CustomMapper<MetaExpedientComentariEntity, MetaExpedientComentariDto>() {
+	      		@Override
+				public void mapAtoB(MetaExpedientComentariEntity source, MetaExpedientComentariDto target, MappingContext context) {
+	      			target.setCreatedBy(convertir(source.getCreatedBy().get(), UsuariDto.class));
+	      			target.setLastModifiedBy(convertir(source.getLastModifiedBy().get(), UsuariDto.class));
+	      		}
+		      })
+	      .byDefault().register(); 
+
+	      mapperFactory.classMap(MetaNodeEntity.class, MetaNodeDto.class)
+	      .customize(new CustomMapper<MetaNodeEntity, MetaNodeDto>() {
+      		@Override
+			public void mapAtoB(MetaNodeEntity source, MetaNodeDto target, MappingContext context) {
+      			target.setCreatedBy(convertir(source.getCreatedBy().get(), UsuariDto.class));
+      			target.setLastModifiedBy(convertir(source.getLastModifiedBy().get(), UsuariDto.class));
+      		}
+	      })
+	      .byDefault().register();
+
+	      mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<PermisDto, PermisOrganGestorDto>() {
 					public PermisOrganGestorDto convert(PermisDto source, Type<? extends PermisOrganGestorDto>destinationClass, MappingContext mappingContext) {
 						PermisOrganGestorDto target = new PermisOrganGestorDto();
@@ -380,7 +394,7 @@ public class ConversioTipusHelper {
 					public Long convert(EntitatEntity source, Type<? extends Long> destinationClass, MappingContext mappingContext) {
 						return source.getId();
 					}
-				});	
+				});
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<HistoricExpedientAggregation, HistoricExpedientDto>() {

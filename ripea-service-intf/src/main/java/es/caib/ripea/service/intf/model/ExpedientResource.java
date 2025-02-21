@@ -12,6 +12,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.io.Serializable;
 
 /**
  * Informació d'una aplicació a monitoritzar.
@@ -100,5 +101,12 @@ public class ExpedientResource extends BaseResource<Long> {
 	private PrioritatEnumDto prioritat;
 	@Size(max = 1024)
 	private String prioritatMotiu;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class ExpedientFilterForm implements Serializable {
+		private String nom;
+	}
 
 }

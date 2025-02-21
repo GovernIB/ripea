@@ -51,9 +51,14 @@ public class SessioHelper {
 				usuariActual = aplicacioService.getUsuariActual();
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, new Boolean(true));
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuariActual);
-				request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, RolHelper.getRolActual(request));
 				// Forçam el refresc de l'entitat actual i dels permisos d'administració d'òrgan
 				entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+				//Assignam el darrer rol utilitzat com a rol actual, sino en posam un per defecte.
+				if (usuariActual.getRolActual()!=null && RolHelper.getRolsUsuariActual(request).contains(usuariActual.getRolActual())) {
+					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, usuariActual.getRolActual());
+				} else {
+					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, RolHelper.getRolActual(request));
+				}
 				if (RolHelper.isRolActualDissenyadorOrgan(request)) {
 					resultat = "/ripea/metaExpedient";
 				}

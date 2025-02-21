@@ -55,9 +55,8 @@ public class RipeaController {
 
 	@RequestMapping(value = ModalHelper.ACCIO_MODAL_TANCAR, method = RequestMethod.GET)
 	@ResponseStatus(value = HttpStatus.OK)
-	public void modalTancar() {
-		System.out.println("Passam per modalTancar");
-	}
+	public void modalTancar() {}
+	
 	@RequestMapping(value = AjaxHelper.ACCIO_AJAX_OK, method = RequestMethod.GET)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void ajaxOk() {

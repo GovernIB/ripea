@@ -124,7 +124,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
-										null)).toArray(new Link[0])));
+										created.getId())).toArray(new Link[0])));
 	}
 
 	@Override
@@ -529,15 +529,13 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 
 	@Override
 	protected Link[] buildArtifactsLinks(List<ResourceArtifact> artifacts) {
-		List<Link> ls = new ArrayList<>();
-		Link selfLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
-		ls.add(selfLinkWithDefaultProperties(selfLink, false));
+		List<Link> ls = new ArrayList<>(
+				Arrays.asList(super.buildArtifactsLinks(artifacts)));
 		artifacts.forEach(a -> {
 			if (ResourceArtifactType.ACTION == a.getType()) {
 				ls.add(buildActionLinkWithAffordances(a));
 			}
 		});
-		ls.addAll(Arrays.asList(super.buildArtifactsLinks(artifacts)));
 		return ls.toArray(new Link[0]);
 	}
 
@@ -750,15 +748,15 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 	private Link buildActionLinkWithAffordances(ResourceArtifact artifact) {
 		String rel = "exec_" + artifact.getCode();
-		Link actionLink = buildActionLink(artifact);
+		Link actionLink = buildActionLink(artifact).withRel(rel);
 		if (artifact.getFormClass() != null) {
-			return Affordances.of(Link.of(actionLink.toUri().toString()).withRel(rel)).
+			return Affordances.of(actionLink).
 					afford(HttpMethod.POST).
 					withInputAndOutput(artifact.getFormClass()).
 					withName(rel).
 					toLink();
 		} else {
-			return Affordances.of(Link.of(actionLink.toUri().toString()).withRel(rel)).
+			return Affordances.of(actionLink).
 					afford(HttpMethod.POST).
 					withName(rel).
 					toLink();

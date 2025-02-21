@@ -20,6 +20,7 @@ public class PropertyConfig {
 	public static final String PERSISTENCE_CONTAINER_TRANSACTIONS_DISABLED = PROPERTY_PREFIX + "persist.container-transactions-disabled";
 	public static final String PERSISTENCE_TRANSACTION_MANAGER_ENABLED = PROPERTY_PREFIX + "persist.transaction-manager.enabled";
 
+	public static final String IDIOMA_DEFECTE 	= "es.caib.ripea.usuari.idioma.defecte";
 	public static final String APP_DATA_DIR 	= "es.caib.ripea.app.data.dir";
 	public static final String EMAIL_REMITENT 	= "es.caib.ripea.email.remitent";
 	public static final String BASE_URL 		= "es.caib.ripea.base.url";
@@ -170,24 +171,25 @@ public class PropertyConfig {
 	
 	public static final String CONCSV_BASE_URL				= "es.caib.ripea.concsv.base.url";	
 	
-	public static final String VIAFIRMA_PLUGIN_CLASS			= "es.caib.ripea.plugin.viafirma.class";
-	public static final String VIAFIRMA_PLUGIN_URL				= "es.caib.ripea.plugin.viafirma.caib.apiurl";
-	public static final String VIAFIRMA_PLUGIN_CONSUMER_KEY		= "es.caib.ripea.plugin.viafirma.caib.consumerkey";
-	public static final String VIAFIRMA_PLUGIN_CONSUMER_SECRET	= "es.caib.ripea.plugin.viafirma.caib.consumersecret";
-	public static final String VIAFIRMA_PLUGIN_AUTH_MODE		= "es.caib.ripea.plugin.viafirma.caib.authmode";
-	public static final String VIAFIRMA_PLUGIN_GROUP			= "es.caib.ripea.plugin.viafirma.caib.group.codi";
-	public static final String VIAFIRMA_PLUGIN_AUTH_TYPE		= "es.caib.ripea.plugin.viafirma.caib.authtype";
-	public static final String VIAFIRMA_PLUGIN_CALLBACK_URL		= "es.caib.ripea.plugin.viafirma.caib.callback.url";
-	public static final String VIAFIRMA_PLUGIN_CALLBACK_USR		= "es.caib.ripea.plugin.viafirma.caib.callback.username";
-	public static final String VIAFIRMA_PLUGIN_CALLBACK_PAS		= "es.caib.ripea.plugin.viafirma.caib.callback.password";
-	public static final String VIAFIRMA_PLUGIN_PROXY_HOST		= "es.caib.ripea.plugin.viafirma.caib.proxy.host";
-	public static final String VIAFIRMA_PLUGIN_PROXY_PORT		= "es.caib.ripea.plugin.viafirma.caib.proxy.port";
-	public static final String VIAFIRMA_PLUGIN_CAIB_APP_CODE	= "es.caib.ripea.plugin.viafirma.caib.app.codi";
-	public static final String VIAFIRMA_PLUGIN_ENDPOINT_NAME	= "es.caib.ripea.plugin.viafirma.endpointName";
+	public static final String VIAFIRMA_PLUGIN_CLASS				= "es.caib.ripea.plugin.viafirma.class";
+	public static final String VIAFIRMA_PLUGIN_URL					= "es.caib.ripea.plugin.viafirma.caib.apiurl";
+	public static final String VIAFIRMA_PLUGIN_CONSUMER_KEY			= "es.caib.ripea.plugin.viafirma.caib.consumerkey";
+	public static final String VIAFIRMA_PLUGIN_CONSUMER_SECRET		= "es.caib.ripea.plugin.viafirma.caib.consumersecret";
+	public static final String VIAFIRMA_PLUGIN_AUTH_MODE			= "es.caib.ripea.plugin.viafirma.caib.authmode";
+	public static final String VIAFIRMA_PLUGIN_GROUP				= "es.caib.ripea.plugin.viafirma.caib.group.codi";
+	public static final String VIAFIRMA_PLUGIN_AUTH_TYPE			= "es.caib.ripea.plugin.viafirma.caib.authtype";
+	public static final String VIAFIRMA_PLUGIN_CALLBACK_URL			= "es.caib.ripea.plugin.viafirma.caib.callback.url";
+	public static final String VIAFIRMA_PLUGIN_CALLBACK_USR			= "es.caib.ripea.plugin.viafirma.caib.callback.username";
+	public static final String VIAFIRMA_PLUGIN_CALLBACK_PAS			= "es.caib.ripea.plugin.viafirma.caib.callback.password";
+	public static final String VIAFIRMA_PLUGIN_PROXY_HOST			= "es.caib.ripea.plugin.viafirma.caib.proxy.host";
+	public static final String VIAFIRMA_PLUGIN_PROXY_PORT			= "es.caib.ripea.plugin.viafirma.caib.proxy.port";
+	public static final String VIAFIRMA_PLUGIN_CAIB_APP_CODE		= "es.caib.ripea.plugin.viafirma.caib.app.codi";
+	public static final String VIAFIRMA_PLUGIN_ENDPOINT_NAME		= "es.caib.ripea.plugin.viafirma.endpointName";
+	public static final String VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED	= "es.caib.ripea.plugin.viafirma.caib.dispositius.enabled";
 	
-	public static final String DISTRIBUCIO_PLUGIN_URL			= "es.caib.ripea.distribucio.backofficeIntegracio.ws.url";
-	public static final String DISTRIBUCIO_PLUGIN_USR			= "es.caib.ripea.distribucio.backofficeIntegracio.ws.username";
-	public static final String DISTRIBUCIO_PLUGIN_PAS			= "es.caib.ripea.distribucio.backofficeIntegracio.ws.password";
+	public static final String DISTRIBUCIO_PLUGIN_URL				= "es.caib.ripea.distribucio.backofficeIntegracio.ws.url";
+	public static final String DISTRIBUCIO_PLUGIN_USR				= "es.caib.ripea.distribucio.backofficeIntegracio.ws.username";
+	public static final String DISTRIBUCIO_PLUGIN_PAS				= "es.caib.ripea.distribucio.backofficeIntegracio.ws.password";
 	
 	public static final String DISTRIBUCIO_REGLA_PLUGIN_URL			= "es.caib.ripea.distribucio.regla.ws.url";
 	public static final String DISTRIBUCIO_REGLA_PLUGIN_USR			= "es.caib.ripea.distribucio.regla.ws.username";
@@ -195,13 +197,14 @@ public class PropertyConfig {
 	public static final String DISTRIBUCIO_REGLA_PLUGIN_CODI_BACK	= "es.caib.ripea.distribucio.regla.ws.codi.backoffice";
 	public static final String DISTRIBUCIO_REGLA_PLUGIN_AUTH_BASIC	= "es.caib.ripea.distribucio.regla.autenticacio.basic";
 	
-	public static final String DIGITALITZACIO_PLUGIN_CLASS		= "es.caib.ripea.plugin.digitalitzacio.class";
-	public static final String DIGITALITZACIO_PLUGIN_URL		= "es.caib.ripea.plugin.digitalitzacio.digitalib.base.url";
-	public static final String DIGITALITZACIO_PLUGIN_USR		= "es.caib.ripea.plugin.digitalitzacio.digitalib.username";
-	public static final String DIGITALITZACIO_PLUGIN_PAS		= "es.caib.ripea.plugin.digitalitzacio.digitalib.password";
-	public static final String DIGITALITZACIO_PLUGIN_PERFIL		= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
-	public static final String DIGITALITZACIO_PLUGIN_DEBUG		= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
-	public static final String DIGITALITZACIO_PLUGIN_ENDPOINT	= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
+	public static final String DIGITALITZACIO_PLUGIN_CLASS			= "es.caib.ripea.plugin.digitalitzacio.class";
+	public static final String DIGITALITZACIO_PLUGIN_URL			= "es.caib.ripea.plugin.digitalitzacio.digitalib.base.url";
+	public static final String DIGITALITZACIO_PLUGIN_USR			= "es.caib.ripea.plugin.digitalitzacio.digitalib.username";
+	public static final String DIGITALITZACIO_PLUGIN_PAS			= "es.caib.ripea.plugin.digitalitzacio.digitalib.password";
+	public static final String DIGITALITZACIO_PLUGIN_PERFIL			= "es.caib.ripea.plugin.digitalitzacio.digitalib.perfil";
+	public static final String DIGITALITZACIO_PLUGIN_DEBUG			= "es.caib.ripea.plugin.digitalitzacio.log";
+	public static final String DIGITALITZACIO_PLUGIN_ENDPOINT		= "es.caib.ripea.plugin.digitalitzacio.endpointName";
+	public static final String DIGITALITZACIO_PLUGIN_SCANNER_MOCK	= "es.caib.ripea.plugin.digitalitzacio.scanner.mock";
 	
 	public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO 					= "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";	
 	public static final String ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON 	= "es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron";	
@@ -274,6 +277,7 @@ public class PropertyConfig {
     public static final String MOSTRAR_LOGS_CREACIO_CONTINGUT 				        = "es.caib.ripea.mostrar.logs.creacio.contingut";
     public static final String MOSTRAR_LOGS_PERMISOS 				                = "es.caib.ripea.activar.logs.permisos";
     public static final String MOSTRAR_LOGS_RENDIMENT 				                = "es.caib.ripea.mostrar.logs.rendiment";
+    public static final String MOSTRAR_LOGS_RENDIMENT_ANOTACIONS 		            = "es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio";
     public static final String MOSTRAR_LOGS_GRUPS 				                    = "es.caib.ripea.activar.logs.grups";
     public static final String MOSTRAR_LOGS_CERCADOR_ANOTACIO 				        = "es.caib.ripea.mostrar.logs.cercador.anotacions";
     public static final String MOSTRAR_LOGS_SEGONPLA 				                = "es.caib.ripea.mostrar.logs.segonpla";
@@ -287,15 +291,7 @@ public class PropertyConfig {
     public static final String MAX_REINTENTS_EXPEDIENT 		                        = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients";
     public static final String MAX_REINTENTS_DOCUMENTS 		                        = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents";
     public static final String MAX_REINTENTS_INTERESSATS 		                    = "es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats";
-
-    public static final String DIGITALITZACIO_LOGS 		                            = "es.caib.ripea.plugin.digitalitzacio.log";
-    public static final String MOSTRAR_LOGS_RENDIMENT_DESCARREGA 		            = "es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio";
-    public static final String IDIOMA_DEFECTE 		                                = "es.caib.ripea.usuari.idioma.defecte";
-    public static final String ESCANEIG_IDS 		                                = "es.caib.ripea.plugin.escaneig.ids";
-    public static final String VIAFIRMA_DISPOSITIUS_ENABLED  		                = "es.caib.ripea.plugin.viafirma.caib.dispositius.enabled";
-    public static final String TIPUS_DOCUMENTALS_NIF_CODI_ESPECIFIC   		        = "es.caib.ripea.tipus.documentals.nti.codi.especific";
     public static final String VALIDATE_SIGNATURE_ATTACHED   		                = "es.caib.ripea.firma.detectar.attached.validate.signature";
-    public static final String SCANNER_MOCK   		                                = "es.caib.ripea.document.scanner.mock";
 
 	public static String getPropertySuffix(String propertyValue) {
 		if (propertyValue.startsWith(PROPERTY_PREFIX)) {
