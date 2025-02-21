@@ -1,7 +1,11 @@
 // import { useTranslation } from 'react-i18next';
 // import { Box, Typography } from '@mui/material';
-import { GridPage } from 'reactlib';
-import { MuiGrid } from '../../../lib/components/mui/grid/MuiGrid';
+import {
+    GridPage,
+    MuiGrid,
+    MuiFilter,
+    FormField
+} from 'reactlib';
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
@@ -19,7 +23,21 @@ const ExpedientGrid: React.FC = () => {
             flex: 1.5,
         },
     ];
+    const springFilterBuilder = (data: any) => {
+        console.log('>>> springFilterBuilder', data)
+        return '';
+    }
     return <GridPage>
+        <MuiFilter
+            resourceName="expedientResource"
+            code="EXPEDIENT_FILTER"
+            springFilterBuilder={springFilterBuilder}
+            commonFieldComponentProps={{ size: 'small' }}
+            componentProps={{
+                sx: { mb: 2 }
+            }}>
+            <FormField name="nom" />
+        </MuiFilter>
         <MuiGrid
             resourceName="expedientResource"
             columns={columns}

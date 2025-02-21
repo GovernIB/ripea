@@ -1,9 +1,15 @@
 import React from 'react';
+import Box from '@mui/material/Box';
 import Filter, { FilterProps } from '../../form/Filter';
 import { useOptionalGridContext } from '../grid/GridContext';
 
-export const MuiFilter: React.FC<FilterProps> = (props) => {
+type MuiFilterProps = FilterProps & {
+    componentProps?: any;
+}
+
+export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
     const {
+        componentProps,
         onSpringFilterChange,
         children,
         ...otherProps
@@ -15,11 +21,13 @@ export const MuiFilter: React.FC<FilterProps> = (props) => {
         }
         onSpringFilterChange?.(filter);
     }
-    return <Filter
-        onSpringFilterChange={handleSpringFilterChange}
-        {...otherProps}>
-        {children}
-    </Filter>;
+    return <Box {...componentProps}>
+        <Filter
+            onSpringFilterChange={handleSpringFilterChange}
+            {...otherProps}>
+            {children}
+        </Filter>
+    </Box>;
 }
 
 export default MuiFilter;

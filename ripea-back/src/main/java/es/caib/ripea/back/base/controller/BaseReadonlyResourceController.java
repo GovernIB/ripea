@@ -533,13 +533,32 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	protected Link[] buildArtifactsLinks(List<ResourceArtifact> artifacts) {
 		List<Link> ls = new ArrayList<>();
 		Link selfLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
-		ls.add(selfLinkWithDefaultProperties(selfLink, false));
+		ls.add(selfLink);
 		artifacts.forEach(a -> {
-			if (ResourceArtifactType.REPORT == a.getType()) {
+			if (ResourceArtifactType.FILTER == a.getType()) {
+				ls.add(buildFilterLinkWithAffordances(a));
+			} else if (ResourceArtifactType.REPORT == a.getType()) {
 				ls.add(buildReportLinkWithAffordances(a));
 			}
 		});
 		return ls.toArray(new Link[0]);
+	}
+
+	private Link buildFilterLinkWithAffordances(ResourceArtifact artifact) {
+		String rel = "filter_" + artifact.getCode();
+		Link findLink = buildFindLink(null).withRel(rel);
+		if (artifact.getFormClass() != null) {
+			return Affordances.of(findLink).
+					afford(HttpMethod.GET).
+					withInputAndOutput(artifact.getFormClass()).
+					withName(rel).
+					toLink();
+		} else {
+			return Affordances.of(findLink).
+					afford(HttpMethod.GET).
+					withName(rel).
+					toLink();
+		}
 	}
 
 	@SneakyThrows
@@ -549,15 +568,15 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 	private Link buildReportLinkWithAffordances(ResourceArtifact artifact) {
 		String rel = "generate_" + artifact.getCode();
-		Link reportLink = buildReportLink(artifact);
+		Link reportLink = buildReportLink(artifact).withRel(rel);
 		if (artifact.getFormClass() != null) {
-			return Affordances.of(Link.of(reportLink.toUri().toString()).withRel(rel)).
+			return Affordances.of(reportLink).
 					afford(HttpMethod.POST).
 					withInputAndOutput(artifact.getFormClass()).
 					withName(rel).
 					toLink();
 		} else {
-			return Affordances.of(Link.of(reportLink.toUri().toString()).withRel(rel)).
+			return Affordances.of(reportLink).
 					afford(HttpMethod.POST).
 					withName(rel).
 					toLink();

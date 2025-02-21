@@ -143,12 +143,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		log.debug("Consultant els artefactes permesos (type={})", type);
 		List<ResourceArtifact> artifacts = new ArrayList<>(super.artifactGetAllowed(type));
 		if (type == null || type == ResourceArtifactType.ACTION) {
-			return actionExecutorMap.entrySet().stream().
-					map(r -> new ResourceArtifact(
-							ResourceArtifactType.ACTION,
-							r.getKey(),
-							r.getValue().getParameterClass())).
-					collect(Collectors.toList());
+			artifacts.addAll(
+					actionExecutorMap.entrySet().stream().
+							map(r -> new ResourceArtifact(
+									ResourceArtifactType.ACTION,
+									r.getKey(),
+									r.getValue().getParameterClass())).
+							collect(Collectors.toList()));
 		}
 		return artifacts;
 	}

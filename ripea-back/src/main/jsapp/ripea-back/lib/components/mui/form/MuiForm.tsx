@@ -15,7 +15,7 @@ type MuiFormProps = FormProps & {
     hiddenSaveButton?: boolean;
     hiddenDeleteButton?: boolean;
     componentProps?: any;
-}
+};
 
 const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
     const {

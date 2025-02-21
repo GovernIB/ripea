@@ -6,6 +6,7 @@ import es.caib.ripea.service.base.helper.ObjectMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.Resource;
@@ -51,7 +52,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	private Class<R> resourceClass;
 	private Class<E> entityClass;
-	private final Map<String, ReportDataGenerator<?, ?>> reportGeneratorMap = new HashMap<>();
+	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>();
+	private final Map<String, PerspectiveApplicator<R, E>> perspectiveApplicatorMap = new HashMap<>();
+	private final Map<String, ReportDataGenerator<?, ?>> reportDataGeneratorMap = new HashMap<>();
 
 	@Override
 	@Transactional(readOnly = true)
@@ -132,13 +135,32 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public List<ResourceArtifact> artifactGetAllowed(ResourceArtifactType type) {
 		log.debug("Consultant els artefactes permesos (type={})", type);
 		List<ResourceArtifact> artifacts = new ArrayList<>();
+		if (type == null || type == ResourceArtifactType.PERSPECTIVE) {
+			artifacts.addAll(
+					perspectiveApplicatorMap.keySet().stream().
+							map(pa -> new ResourceArtifact(
+									ResourceArtifactType.PERSPECTIVE,
+									pa,
+									null)).
+							collect(Collectors.toList()));
+		}
 		if (type == null || type == ResourceArtifactType.REPORT) {
-			return reportGeneratorMap.entrySet().stream().
-					map(r -> new ResourceArtifact(
-							ResourceArtifactType.REPORT,
-							r.getKey(),
-							r.getValue().getParameterClass())).
-					collect(Collectors.toList());
+			artifacts.addAll(
+					reportDataGeneratorMap.entrySet().stream().
+							map(rdge -> new ResourceArtifact(
+									ResourceArtifactType.REPORT,
+									rdge.getKey(),
+									rdge.getValue().getParameterClass())).
+							collect(Collectors.toList()));
+		}
+		if (type == null || type == ResourceArtifactType.FILTER) {
+			artifacts.addAll(
+					filterProcessorMap.entrySet().stream().
+							map(fpe -> new ResourceArtifact(
+									ResourceArtifactType.FILTER,
+									fpe.getKey(),
+									fpe.getValue().getResourceClass())).
+							collect(Collectors.toList()));
 		}
 		return artifacts;
 	}
@@ -148,7 +170,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public Optional<Class<?>> artifactGetFormClass(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
 		log.debug("Consultant la classe de formulari per l'artefacte (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.REPORT) {
-			ReportDataGenerator<?, ?> generator = reportGeneratorMap.get(code);
+			ReportDataGenerator<?, ?> generator = reportDataGeneratorMap.get(code);
 			if (generator != null) {
 				return generator.getParameterClass() != null ? Optional.of(generator.getParameterClass()) : Optional.empty();
 			}
@@ -163,7 +185,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				"Generant l'informe(code={}, params={})",
 				code,
 				params);
-		ReportDataGenerator<P, ?> generator = (ReportDataGenerator<P, ?>)reportGeneratorMap.get(code);
+		ReportDataGenerator<P, ?> generator = (ReportDataGenerator<P, ?>)reportDataGeneratorMap.get(code);
 		if (generator != null) {
 			return generator.generate(code, params);
 		} else {
@@ -432,9 +454,19 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entityClass;
 	}
 
+	protected void register(FilterProcessor<?> filterProcessor) {
+		Arrays.stream(filterProcessor.getSupportedPerspectiveCodes()).
+				forEach(c -> filterProcessorMap.put(c, filterProcessor));
+	}
+
+	protected void register(PerspectiveApplicator<R, E> perspectiveApplicator) {
+		Arrays.stream(perspectiveApplicator.getSupportedPerspectiveCodes()).
+				forEach(c -> perspectiveApplicatorMap.put(c, perspectiveApplicator));
+	}
+
 	protected void register(ReportDataGenerator<?, ?> reportGenerator) {
 		Arrays.stream(reportGenerator.getSupportedReportCodes()).
-				forEach(c -> reportGeneratorMap.put(c, reportGenerator));
+				forEach(c -> reportDataGeneratorMap.put(c, reportGenerator));
 	}
 
 	private Pageable toProcessedPageableSort(Pageable pageable) {
@@ -713,9 +745,107 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	public interface ReportDataGenerator <P, D> {
+	/**
+	 * Interfície a implementar pels artefactes encarregats de filtrar els recursos.
+	 *
+	 * @param <R> classe del recurs que representa el filtre.
+	 */
+	public interface FilterProcessor <R extends Serializable> {
+		/**
+		 * Retorna els codis suportats en aquest processador.
+		 *
+		 * @return els codis suportats.
+		 */
+		String[] getSupportedPerspectiveCodes();
+		/**
+		 * Retorna la classe que gestiona aquest processador.
+		 * @return la classe del recurs.
+		 */
+		Class<R> getResourceClass();
+	}
+
+	/**
+	 * Interfície a implementar pels artefactes encarregats d'aplicar perspectives als recursos.
+	 *
+	 * @param <R> classe del recurs suportat.
+	 */
+	public interface PerspectiveApplicator <R extends Resource<?>, E extends Persistable<?>> {
+		/**
+		 * Retorna els codis suportats en aquest aplicador.
+		 *
+		 * @return els codis suportats.
+		 */
+		String[] getSupportedPerspectiveCodes();
+		/**
+		 * Aplica la perspectiva a múltiples recursos. Es pot sobreescriure o deixar sense implementar.
+		 * Si es deixa sense implementar s'aplicarà la perspectiva a cada recurs per separat.
+		 *
+		 * @param code
+		 *            el codi de la perspectiva a aplicar.
+		 * @param entities
+		 *            la llista d'entitats per a aplicar la perspectiva.
+		 * @param resources
+		 *            la llista de recursos a on aplicar la perspectiva.
+		 * @return true si s'ha fet alguna modificació o false en cas contrari.
+		 * @throws PerspectiveApplicationException
+		 *             si es produeix algun error aplicant la perspectiva.
+		 */
+		default boolean applyMultiple(
+				String code,
+				List<E> entities,
+				List<R> resources) throws PerspectiveApplicationException {
+			return false;
+		}
+		/**
+		 * Aplica la perspectiva a un únic recurs.
+		 *
+		 * @param code
+		 *            el codi de la perspectiva a aplicar.
+		 * @param entity
+		 *            l'entitat per a aplicar la perspectiva.
+		 * @param resource
+		 *            el recurs a on aplicar la perspectiva.
+		 * @throws PerspectiveApplicationException
+		 *             si es produeix algun error aplicant la perspectiva.
+		 */
+		void applySingle(
+				String code,
+				E entity,
+				R resource) throws PerspectiveApplicationException;
+	}
+
+	/**
+	 * Interfície a implementar pels artefactes encarregats de generar dades pels informes.
+	 *
+	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
+	 * @param <D> classe de la llista de dades retornades al generar l'informe.
+	 */
+	public interface ReportDataGenerator<P, D> {
+		/**
+		 * Retorna els codis suportats en aquest generador.
+		 *
+		 * @return els codis suportats.
+		 */
 		String[] getSupportedReportCodes();
-		Class<P> getParameterClass();
+		/**
+		 * Retorna la classe pels paràmetres.
+		 *
+		 * @return la classe pels paràmetres o null si no en te
+		 */
+		default Class<P> getParameterClass() {
+			return null;
+		}
+		/**
+		 * Genera les dades per l'informe.
+		 *
+		 * @param code
+		 *            el codi de l'informe.
+		 * @param params
+		 *            els paràmetres per a la generació.
+		 * @return la llista amb les dades generades.
+		 * @throws ReportGenerationException
+		 *             si es produeix algun error generant les dades.
+		 */
 		List<D> generate(
 				String code,
 				P params) throws ReportGenerationException;

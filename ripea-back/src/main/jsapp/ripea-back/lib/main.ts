@@ -14,6 +14,7 @@ export { MuiGrid, useGridApiRef, useGridApiContext } from './components/mui/grid
 export { useFormApiRef, useFormApiContext } from './components/form/Form';
 export { MuiForm } from './components/mui/form/MuiForm';
 export { FormField } from './components/form/FormField';
+export { MuiFilter } from './components/mui/form/MuiFilter';
 
 export { Toolbar } from './components/mui/Toolbar';
 export { useContentDialog, useMessageDialog, Dialog } from './components/mui/Dialog';

@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -45,5 +46,12 @@ public class ExpedientResource extends BaseResource<Long> {
 	@Size(max = 10)
 	@Setter(AccessLevel.NONE)
 	private String versio;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class ExpedientFilterForm implements Serializable {
+		private String nom;
+	}
 
 }
