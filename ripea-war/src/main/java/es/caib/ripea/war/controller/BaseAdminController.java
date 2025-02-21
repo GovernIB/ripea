@@ -7,6 +7,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class BaseAdminController extends BaseController {
 
-	@Autowired
-	public MetaExpedientService metaExpedientService;
+	@Autowired public MetaExpedientService metaExpedientService;
+	@Autowired public OrganGestorService organGestorService;
 	
 	public EntitatDto getEntitatActualComprovantPermisAdminEntitat(HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
@@ -85,24 +86,28 @@ public class BaseAdminController extends BaseController {
 		return entitat;
 	}
 	
+	protected boolean hasPermisAdmComu(HttpServletRequest request) {
+		boolean hasPermisAdmComu = RolHelper.isRolActualAdministrador(request);
+		if (RolHelper.isRolAmbFiltreOrgan(request)) {
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+			if (organActual!=null)
+				hasPermisAdmComu = organGestorService.hasPermisAdminComu(organActual.getId());
+		}
+		return hasPermisAdmComu;
+	}
+
 	protected MetaExpedientDto comprovarAccesMetaExpedient(HttpServletRequest request, Long metaExpedientId) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		
 		MetaExpedientDto metaExpedient = null;
 		if (RolHelper.isRolActualRevisor(request)) {
 			metaExpedient = metaExpedientService.findById(entitat.getId(), metaExpedientId);
-		} else if (RolHelper.isRolActualDissenyadorOrgan(request)) {
+		} else if (RolHelper.isRolAmbFiltreOrgan(request)) {
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 			metaExpedient = metaExpedientService.getAndCheckOrganPermission(
 					entitat.getId(),
 					metaExpedientId,
-					EntitatHelper.getOrganGestorActual(request),
-					true);
-		} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			metaExpedient = metaExpedientService.getAndCheckOrganPermission(
-					entitat.getId(),
-					metaExpedientId,
-					EntitatHelper.getOrganGestorActual(request),
-					false);
+					organActual,
+					RolHelper.isRolActualDissenyadorOrgan(request));
 		} else {
 			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 			metaExpedient = metaExpedientService.getAndCheckAdminPermission(

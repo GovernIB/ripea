@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AnotacionsPendentsHelper {
 
     private static final String REQUEST_PARAMETER_ANOTACIONS_PENDENTS_COUNT = "AnotacionsPendentsHelper.countAnotacionsPendents";
-    public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
     private static ExpedientPeticioService expedientPeticioService = null;
 
@@ -23,7 +22,7 @@ public class AnotacionsPendentsHelper {
                 AnotacionsPendentsHelper.expedientPeticioService = expedientPeticioService;
             }
             EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-            String rolActual = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+            String rolActual = (String) request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
             if (entitatActual != null) {
                 count = new Long(expedientPeticioService.countAnotacionsPendents(entitatActual.getId(), rolActual, EntitatHelper.getOrganGestorActualId(request)));
                 request.getSession().setAttribute(

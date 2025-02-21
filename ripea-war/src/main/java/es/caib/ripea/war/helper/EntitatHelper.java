@@ -143,12 +143,26 @@ public class EntitatHelper {
 	
 	public static OrganGestorDto getOrganGestorActual(HttpServletRequest request) {
 		OrganGestorDto organGestorActual = (OrganGestorDto)request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL);
+		List<OrganGestorDto> organsGestors = findOrganGestorsAccessibles(request);
 		if (organGestorActual == null) {
-			List<OrganGestorDto> organsGestors = findOrganGestorsAccessibles(request);
 			if (organsGestors != null && organsGestors.size() > 0) {
 				organGestorActual = organsGestors.get(0);
 				setOrganGestorActual(request, organGestorActual);
 			}
+		} else {
+			//Encara que el organ gestor no sigui null, comprovar si es accessible actualment
+			//S'ha detectat que al canviar de rol es manté en sessió el organ anterior
+			if (organsGestors != null && organsGestors.size() > 0) {
+				for (OrganGestorDto og: organsGestors) {
+					if(og.getId().equals(organGestorActual.getId())) {
+						return organGestorActual;
+					}
+				}
+				//Si arribam aqui es que el organ gestor seleccionat per el rol anterior, no esta entre els permesos per el rol actual
+				return organsGestors.get(0);
+			}
+			
+			return null;
 		}
 		return organGestorActual;
 	}

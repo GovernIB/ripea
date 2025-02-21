@@ -65,7 +65,6 @@ import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ExpedientEstatCommand;
@@ -101,7 +100,6 @@ public class MetaExpedientController extends BaseAdminController {
 	private static final String SESSION_ATTRIBUTE_IMPORT_TEMPORAL = "MetaExpedientController.session.import.temporal";
 
 	@Autowired private MetaExpedientService metaExpedientService;
-	@Autowired private OrganGestorService organGestorService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PortafirmesFluxService portafirmesFluxService;
 	@Autowired private Validator validator;
@@ -165,11 +163,12 @@ public class MetaExpedientController extends BaseAdminController {
 		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
 		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
 
+		boolean filtrePerOrgan = RolHelper.isRolAmbFiltreOrgan(request);
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
 				filtreDto,
-				organActual == null ? false : RolHelper.isRolAmbFiltreOrgan(request),
+				filtrePerOrgan,
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
 				RolHelper.getRolActual(request),
 				hasPermisAdmComu(request));
@@ -935,12 +934,8 @@ public class MetaExpedientController extends BaseAdminController {
 		ReglaDistribucioDto regla = metaExpedientService.consultarReglaDistribucio(metaExpedientId);
 		model.addAttribute("regla", regla);
 		model.addAttribute("metaExpedient", metaExpedient);
-		
 		return "metaExpedientReglaDetall";
-		
 	}
-	
-	
 
 	@RequestMapping(value = "/{metaExpedientCarpetaId}/deleteCarpeta", method = RequestMethod.GET)
 	@ResponseBody
@@ -951,15 +946,6 @@ public class MetaExpedientController extends BaseAdminController {
 		metaExpedientService.deleteCarpetaMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientCarpetaId);
-	}
-
-	private boolean hasPermisAdmComu(HttpServletRequest request) {
-		boolean hasPermisAdmComu = RolHelper.isRolActualAdministrador(request);
-		if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-			hasPermisAdmComu = organGestorService.hasPermisAdminComu(organActual.getId());
-		}
-		return hasPermisAdmComu;
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)

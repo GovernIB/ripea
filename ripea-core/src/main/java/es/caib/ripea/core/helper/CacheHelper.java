@@ -193,7 +193,7 @@ public class CacheHelper {
 				OrganGestorDto.class);
 	}
 	
-	@Cacheable(value = "findOrganismesEntitatAmbPermisDisseny", key="{#entitatId, #usuariCodi}")
+	@Cacheable(value = "findOrganismesEntitatDisseny", key="{#entitatId, #usuariCodi}")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		return conversioTipusHelper.convertirList(
@@ -205,7 +205,7 @@ public class CacheHelper {
 	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {}
 	@CacheEvict(value = "findOrganismesEntitatAmbPermis", allEntries = true)
 	public void evictAllOrganismesEntitatAmbPermis() {}
-	@CacheEvict(value = "findOrganismesEntitatAmbPermisDisseny", key="{#entitatId, #usuariCodi}")
+	@CacheEvict(value = "findOrganismesEntitatDisseny", key="{#entitatId, #usuariCodi}")
 	public void evictOrganismesEntitatAmbPermisDisseny(Long entitatId, String usuariCodi) {}
 
 	@Cacheable(value = "errorsValidacioNode", key = "#node.id")

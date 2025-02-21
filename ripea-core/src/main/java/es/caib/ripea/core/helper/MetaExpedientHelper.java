@@ -186,31 +186,16 @@ public class MetaExpedientHelper {
 	}
 
 	public List<Long> findMetaExpedientIdsFiltratsAmbPermisosOrganGestor(Long entitatId, Long organGestorId, boolean hasPermisAdmComu) {
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		/**
+		 * Estam filtrant per organ gestor:
+		 * - Si cambio de perfil y no tengo ningún órgano asignado no debe aparecer nada, independientemente que sea adm de entidad. 
+		 */
 		if (organGestorId == null) {
-			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
-			permisosHelper.filterGrantedAnyList(
-					metaExpedients,
-					new ListObjectIdentifiersExtractor<MetaExpedientEntity>() {
-						public List<Serializable> getObjectIdentifiers(MetaExpedientEntity metaExpedient) {
-							List<Serializable> ids = new ArrayList<Serializable>();
-							OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
-							while (organGestor != null) {
-								ids.add(organGestor.getId());
-								organGestor = organGestor.getPare();
-							}
-							return ids;
-						}
-					},
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION },
-					auth);
-			List<Long> ids = new ArrayList<Long>();
-			for (MetaExpedientEntity me : metaExpedients) {
-				ids.add(me.getId());
-			}
-			return ids;
+			return new ArrayList<Long>();
 		} else {
 			List<Long> procedimentIds = new ArrayList<>();
 			if (hasPermisAdmComu) {
