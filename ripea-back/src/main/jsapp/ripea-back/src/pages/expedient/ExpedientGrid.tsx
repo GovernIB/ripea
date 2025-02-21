@@ -41,7 +41,8 @@ const ExpedientGrid: React.FC = () => {
         <MuiGrid
             resourceName="expedientResource"
             columns={columns}
-            paginationActive />
+            paginationActive
+            filter={''} />
         {/* <Box
             sx={{
                 display: 'flex',
