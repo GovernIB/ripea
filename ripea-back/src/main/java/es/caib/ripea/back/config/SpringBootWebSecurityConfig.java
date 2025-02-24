@@ -7,7 +7,6 @@ import com.nimbusds.jose.shaded.json.JSONArray;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWarDeployment;
@@ -42,35 +41,65 @@ import java.util.Set;
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 
-	//protected final JwtAuthConverter jwtAuthConverter;
+//	protected final JwtAuthConverter jwtAuthConverter;
 
-	/*public WebSecurityConfig(JwtAuthConverter jwtAuthConverter) {
-		this.jwtAuthConverter = jwtAuthConverter;
-	}*/
+//	public SpringBootWebSecurityConfig(JwtAuthConverter jwtAuthConverter) {
+//		this.jwtAuthConverter = jwtAuthConverter;
+//	}
+
+//	@Bean
+//	@Order(1)
+//	public SecurityFilterChain oauth2ResourceSecurityFilterChain(HttpSecurity http) throws Exception {
+//		http
+//				.authorizeHttpRequests(authorize -> authorize
+//						.requestMatchers(new MultiPackageRequestMatcher(
+//								"es.caib.ripea.back.base.controller",
+//								"es.caib.ripea.back.resourcecontroller"
+//						)).authenticated()
+//						.anyRequest().permitAll()
+//				)
+//				.oauth2ResourceServer(oauth2 -> {
+//					if (jwtAuthConverter != null) {
+//						oauth2.jwt().jwtAuthenticationConverter(jwtAuthConverter);
+//					}
+//				})
+//				.logout(logout -> logout
+//						.invalidateHttpSession(true)
+//						.clearAuthentication(true)
+//						.deleteCookies("OAuth_Token_Request_State", "JSESSIONID")
+//						.logoutSuccessUrl("/")
+//				)
+//				.headers(headers -> headers.frameOptions().sameOrigin())
+//				.csrf(csrf -> csrf.disable())
+//				.cors();
+//		return http.build();
+//	}
 
 	@Bean
+//	@Order(2)
 	public SecurityFilterChain oauth2LoginSecurityFilterChain(HttpSecurity http) throws Exception {
-		/*if (jwtAuthConverter != null) {
-			http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthConverter);
-		}*/
-		http.oauth2Login().
-			userInfoEndpoint().userService(oauth2UserService());
-		http.logout().
-			invalidateHttpSession(true).
-			clearAuthentication(true).
-			deleteCookies("OAuth_Token_Request_State", "JSESSIONID").
-			//addLogoutHandler(oauth2LogoutHandler()).
-			//logoutUrl(LOGOUT_URL).
-			logoutSuccessUrl("/");
-		http.authorizeRequests().
-				requestMatchers(publicRequestMatchers()).permitAll().
-				requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER).
-				requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN).
-				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).				
-				anyRequest().authenticated();
-		http.headers().frameOptions().sameOrigin();
-		http.csrf().disable();
-		http.cors();
+		http
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers(publicRequestMatchers()).permitAll()
+                        .requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER)
+                        .requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN)
+                        .requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY)
+						.anyRequest().authenticated()
+				)
+				.oauth2Login(oauth2 -> oauth2
+						.userInfoEndpoint().userService(oauth2UserService())
+				)
+				.logout(logout -> logout
+						.invalidateHttpSession(true)
+						.clearAuthentication(true)
+						.deleteCookies("OAuth_Token_Request_State", "JSESSIONID")
+						//.addLogoutHandler(oauth2LogoutHandler())
+						// .logoutUrl(LOGOUT_URL)
+						.logoutSuccessUrl("/")
+				)
+				.headers(headers -> headers.frameOptions().sameOrigin())
+				.csrf(csrf -> csrf.disable())
+				.cors();
 		return http.build();
 	}
 
