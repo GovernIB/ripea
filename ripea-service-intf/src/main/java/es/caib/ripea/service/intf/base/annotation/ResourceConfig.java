@@ -3,6 +3,7 @@ package es.caib.ripea.service.intf.base.annotation;
 import es.caib.ripea.service.intf.base.model.Resource;
 import org.springframework.core.annotation.AliasFor;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,6 +28,7 @@ public @interface ResourceConfig {
 	public ResourceSort[] defaultSortFields() default {};
 	public String[] quickFilterFields() default {};
 	public Class<? extends Resource> parentEntity() default Resource.class;
+	public Class<? extends Serializable>[] artifactFormClasses() default {};
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)

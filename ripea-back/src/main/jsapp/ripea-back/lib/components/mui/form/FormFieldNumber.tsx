@@ -1,10 +1,10 @@
 import React from 'react';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 import TextField from '@mui/material/TextField';
-import Icon from '@mui/material/Icon';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useFormContext } from '../../form/FormContext';
 import { FormFieldCustomProps } from '../../form/FormField';
+import { useFormFieldCommon } from './FormFieldText';
 
 type CustomProps = {
     name: string;
@@ -61,15 +61,11 @@ export const FormFieldNumber: React.FC<FormFieldCustomProps> = (props) => {
         onChange,
         componentProps,
     } = props;
-    const helperText = inline ? field?.helperText : fieldError?.message ?? field.helperText;
-    const title = field.title ?? (inline ? helperText : undefined);
-    const inlineErrorIconElement = fieldError && inline ? <Icon fontSize="small" color="error" title={fieldError.message} sx={{ mr: 1 }}>
-        warning
-    </Icon> : null;
-    const startAdornment = inlineErrorIconElement ? <>
-        {inlineErrorIconElement}
-        {componentProps?.slotProps?.input?.startAdornment}
-    </> : componentProps?.slotProps?.input?.startAdornment;
+    const {
+        helperText,
+        title,
+        startAdornment,
+    } = useFormFieldCommon(field, fieldError, inline, componentProps);
     const inputProps = {
         readOnly,
         ...componentProps?.slotProps?.input,
@@ -85,7 +81,7 @@ export const FormFieldNumber: React.FC<FormFieldCustomProps> = (props) => {
     return <TextField
         name={name}
         label={!inline ? label : undefined}
-        placeholder={inline ? label : undefined}
+        placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
         value={value ?? ''}
         required={required ?? field.required}
         disabled={disabled}

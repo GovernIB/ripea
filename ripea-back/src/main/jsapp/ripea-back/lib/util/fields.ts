@@ -15,6 +15,19 @@ booleanTextFalse,
 booleanNullAsFalse
 }*/
 
+export const processType = (field?: any, forcedType?: any) => {
+    const processedType = forcedType ?? field?.type;
+    if (processedType != null) {
+        if (processedType === 'select') {
+            return field?.dataSource != null ? 'reference' : 'enum';
+        } else {
+            return processedType;
+        }
+    } else {
+        return 'text';
+    }
+}
+
 export const isFieldNumericType = (field: any, forcedType?: any) => {
     const type = forcedType ?? field?.type;
     const isNumeric = type === 'number' ||

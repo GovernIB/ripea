@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -18,18 +17,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "numero", "nom" })
+@ResourceConfig(
+		quickFilterFields = { "numero", "nom" },
+		artifactFormClasses = { ExpedientResource.ExpedientFilterForm.class })
 public class ExpedientResource extends NodeResource {
 
 	@NotNull
-	@Size(max = 256)
-	private String nom;
 	private int any;
+	@NotNull
 	private long sequencia;
 	@NotNull
 	@Size(max = 256)
 	private String codi;
-	@NotNull
 	@Size(max = 64)
 	private String numero;
 
@@ -104,6 +103,6 @@ public class ExpedientResource extends NodeResource {
 	public static class ExpedientFilterForm implements Serializable {
 		private String codi;
 		private String nom;
+		private ResourceReference<OrganGestorResource, Long> organGestor;
 	}
-
 }

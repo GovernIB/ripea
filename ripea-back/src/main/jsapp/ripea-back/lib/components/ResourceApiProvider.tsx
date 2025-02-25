@@ -29,7 +29,7 @@ type ResourceApiMethods = {
     patch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     delette: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
     onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<void>;
-    artifacts: (args: ResourceApiRequestArgs) => Promise<State>;
+    artifacts: (args: ResourceApiRequestArgs) => Promise<ResourceApiArtifact[]>;
     action: (args: ResourceApiActionArgs) => Promise<any>;
     report: (args: ResourceApiReportArgs) => Promise<any[]>;
 }
@@ -95,6 +95,13 @@ export type ResourceApiFindResponse = {
 export type ResourceApiBlobResponse = {
     blob: Blob;
     fileName: string;
+};
+
+export type ResourceApiArtifact = {
+    type: 'ACTION' | 'REPORT' | 'FILTER';
+    code: string;
+    formClassActive: boolean;
+    fields?: any[];
 };
 
 export type ResourceApiGetOneArgs = ResourceApiRequestArgs & {
@@ -481,9 +488,35 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 });
         });
     }, [request]);
-    const artifacts = React.useCallback((args?: ResourceApiRequestArgs): Promise<State> => {
+    const artifacts = React.useCallback((args?: ResourceApiRequestArgs): Promise<ResourceApiArtifact[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts', null, { ...args }).then(resolve).catch(reject);
+            request('artifacts', null, { ...args }).then((state: State) => {
+                const embeddedArtifacts = state.getEmbedded().map((e: any) => e.data);
+                const getActionRelFromArtifact = (artifact: any) => {
+                    if (artifact?.type === 'ACTION') {
+                        return 'exec_' + artifact.code;
+                    } else if (artifact?.type === 'REPORT') {
+                        return 'generate_' + artifact.code;
+                    } else if (artifact?.type === 'FILTER') {
+                        return 'filter_' + artifact.code;
+                    }
+                }
+                const resourceApiArtifacts: ResourceApiArtifact[] = embeddedArtifacts.map((a: any) => {
+                    const actionRel = getActionRelFromArtifact(a);
+                    const fields = a.formClassActive ? state.action(actionRel)?.fields as any[] : undefined;
+                    const mappedFields = fields?.map(f => ({
+                        ...f,
+                        type: f.type === 'search' ? 'selecta' : f.type
+                    }));
+                    return {
+                        type: a.type,
+                        code: a.code,
+                        formClassActive: a.formClassActive,
+                        fields: mappedFields
+                    };
+                });
+                resolve(resourceApiArtifacts);
+            }).catch(reject);
         });
     }, [request]);
     const action = React.useCallback((args?: ResourceApiActionArgs): Promise<any[]> => {
