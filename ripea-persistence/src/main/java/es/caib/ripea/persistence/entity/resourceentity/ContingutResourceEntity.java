@@ -1,12 +1,7 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.model.ExpedientResource;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,8 +16,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.Date;
-import java.util.Set;
+
+import es.caib.ripea.persistence.base.entity.BaseOnlyAuditableEntity;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Entitat de base de dades que representa un contingut.
@@ -35,7 +35,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ContingutResourceEntity extends BaseAuditableEntity<ExpedientResource> {
+public abstract class ContingutResourceEntity extends BaseOnlyAuditableEntity {
 
 	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;

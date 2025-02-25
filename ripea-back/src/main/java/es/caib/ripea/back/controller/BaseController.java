@@ -9,6 +9,7 @@ import es.caib.ripea.back.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.*;
 import org.apache.commons.lang3.ArrayUtils;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
@@ -374,14 +375,9 @@ public class BaseController implements MessageSourceAware {
 
         boolean isPermetreEnviamentPostal = entitatActual.isPermetreEnviamentPostal();
         if ( document.getExpedientPare().getOrganGestorId() != null ) {
-            OrganGestorDto organGestor = organGestorService.findById(
-                    entitatActual.getId(),
-                    document.getExpedientPare().getOrganGestorId()
-            );
-
             isPermetreEnviamentPostal = isPermetreEnviamentPostal
-                    || organGestor.isPermetreEnviamentPostal()
-                    || organGestorService.isPermisAntecesor(document.getExpedientPare().getOrganGestorId(), false);
+                    || organGestorService.isPermisEnviamentPostalOrganOrAntecesor(
+                    		document.getExpedientPare().getOrganGestorId());
         }
 
 		if (isPermetreEnviamentPostal) {
@@ -504,14 +500,5 @@ public class BaseController implements MessageSourceAware {
 			resultat.add(aux);
 		}
 		return resultat;
-	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
 	}
 }

@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,9 @@ import es.caib.ripea.persistence.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
@@ -70,6 +71,7 @@ public class EmailHelper {
     @Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
     @Autowired private DocumentRepository documentRepository;
+    @Autowired private UsuariRepository usuariRepository;
     @Autowired private DocumentHelper documentHelper;
 
 	public void contingutAgafatPerAltreUsusari(
@@ -130,7 +132,7 @@ public class EmailHelper {
 				"\tContinguts: " + em.getContinguts().size() + "\n";
 
 		UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(
-				em.getCreatedBy().get().getCodi(),
+				em.getCreatedBy().get(),
 				false,
 				false);
 
@@ -281,7 +283,7 @@ public class EmailHelper {
 				"Informació del procediment:\n" +
 						"\tNom: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
 						"Comentari: \n\t" + comentari.replace("\n", "\n\t") + "\n" +
-						"Usuari: " + metaExpComnt.getCreatedBy().get().getNom() + "\n" +
+						"Usuari: " + metaExpComnt.getCreatedBy().get() + "\n" +
 						"Data: " + Utils.convertDateToString(metaExpComnt.getCreatedDate().get(), "dd-MM-yyyy HH:mm:ss");
 
 		sendOrSaveEmail(
@@ -499,10 +501,9 @@ public class EmailHelper {
 			logger.info("novaAnotacioPendent end (id=" + expedientPeticioId + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
-	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(
-			MetaExpedientEntity metaExpedientEntity,
-			Long entitatId) {
-		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy().get();
+	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(MetaExpedientEntity metaExpedientEntity, Long entitatId) {
+		
+		UsuariEntity organAdminCreador = usuariRepository.findById(metaExpedientEntity.getCreatedBy().get()).get();
 
         List<String> emailsNoAgrupats = new ArrayList<>();
         List<String> emailsAgrupats = new ArrayList<>();
@@ -539,7 +540,8 @@ public class EmailHelper {
 
 
 		DocumentEntity document = documentPortafirmes.getDocument();
-		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().get().getCodi();
+		UsuariEntity organAdminCreador = usuariRepository.findById(documentPortafirmes.getCreatedBy().get()).get();
+		String enviamentCreatedByCodi = organAdminCreador.getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 
 		String subject = getPrefixRipea() + " Canvi d'estat de document enviat a portafirmes";
@@ -590,7 +592,7 @@ public class EmailHelper {
 			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
 
 		DocumentEntity document = documentPortafirmes.getDocument();
-		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().get().getCodi();
+		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().get();
 		ExpedientEntity expedient = document.getExpedient();
 
 		String subject = getPrefixRipea() + " Firma parcial de document enviat a portafirmes";
@@ -637,7 +639,7 @@ public class EmailHelper {
 			"documentViaFirma=" + documentViaFirma.getId() + ")");
 
 		DocumentEntity document = documentViaFirma.getDocument();
-		String enviamentCreatedByCodi = documentViaFirma.getCreatedBy().get().getCodi();
+		String enviamentCreatedByCodi = documentViaFirma.getCreatedBy().get();
 		ExpedientEntity expedient = document.getExpedient();
 
 		String subject = getPrefixRipea() + " Canvi d'estat de document enviat a ViaFirma";
@@ -678,7 +680,7 @@ public class EmailHelper {
 			"documentNotificacioId=" + documentNotificacio.getId() + ")");
 
 		DocumentEntity document = documentNotificacio.getDocument();
-		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().get().getCodi();
+		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().get();
 		ExpedientEntity expedient = document.getExpedient();
 
 		String subject = getPrefixRipea() + " Canvi d'estat de notificació";
@@ -723,7 +725,7 @@ public class EmailHelper {
 			"documentNotificacioId=" + documentNotificacio.getId() + ")");
 
 		DocumentEntity document = documentNotificacio.getDocument();
-		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().get().getCodi();
+		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().get();
 		ExpedientEntity expedient = document.getExpedient();
 
 
@@ -771,7 +773,7 @@ public class EmailHelper {
 						true,
 						estatAnterior == null,
 						expedientTascaEntity.getExpedient(),
-						expedientTascaEntity.getCreatedBy().get().getCodi(),
+						expedientTascaEntity.getCreatedBy().get(),
 						expedientTascaEntity.getResponsables(),
 						null));
 
@@ -788,7 +790,7 @@ public class EmailHelper {
 						true,
 						false,
 						expedientTascaEntity.getExpedient(),
-						expedientTascaEntity.getCreatedBy().get().getCodi(),
+						expedientTascaEntity.getCreatedBy().get(),
 						expedientTascaEntity.getResponsables(),
 						null));
 
@@ -806,7 +808,7 @@ public class EmailHelper {
 						true,
 						false,
 						expedientTascaEntity.getExpedient(),
-						expedientTascaEntity.getCreatedBy().get().getCodi(),
+						expedientTascaEntity.getCreatedBy().get(),
 						expedientTascaEntity.getResponsables(),
 						expedientTascaEntity.getDelegat()));
 
@@ -827,7 +829,7 @@ public class EmailHelper {
 						true,
 						false,
 						expedientTascaEntity.getExpedient(),
-						expedientTascaEntity.getCreatedBy().get().getCodi(),
+						expedientTascaEntity.getCreatedBy().get(),
 						expedientTascaEntity.getResponsables(),
 						delegat),
 				comentari);
@@ -843,7 +845,7 @@ public class EmailHelper {
 				true,
 				false,
 				expedientTascaEntity.getExpedient(),
-				expedientTascaEntity.getCreatedBy().get().getCodi(),
+				expedientTascaEntity.getCreatedBy().get(),
 				expedientTascaEntity.getResponsables(),
 				null);
 

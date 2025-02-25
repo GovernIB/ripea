@@ -326,21 +326,25 @@
 					if (plugin.settings.selectionEnabled && index == 0) {
 						columns.push({
 							data: '<null>',
+							defaultContent: '',
 							orderable: false,
 							visible: true});
 					} else if ((!plugin.settings.selectionEnabled && plugin.settings.dragEnabled && index == 0) || (plugin.settings.selectionEnabled && plugin.settings.dragEnabled && index == 1)) {
 						columns.push({
 							data: '<null>',
+							defaultContent: '',
 							orderable: false,
 							visible: true});
 					} else if (plugin.settings.editable && $(this).is(':last-child')) {
 						columns.push({
 							data: '<null>',
+							defaultContent: '',
 							orderable: false,
 							visible: true});
 					} else if (plugin.settings.rowInfo && $(this).is(':last-child')) {
 						columns.push({
 							data: '<null>',
+							defaultContent: '',
 							orderable: false,
 							visible: true});
 					} else {
@@ -368,6 +372,7 @@
 						} else {
 							columns.push({
 								data: '<null>',
+								defaultContent: '',
 								orderable: orderable,
 								visible: visible,
 								className: className,

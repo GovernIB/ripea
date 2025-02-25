@@ -6,6 +6,7 @@ package es.caib.ripea.persistence.entity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;

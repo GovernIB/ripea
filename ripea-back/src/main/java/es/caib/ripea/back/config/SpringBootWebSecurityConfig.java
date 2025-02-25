@@ -83,7 +83,7 @@ public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 						.requestMatchers(publicRequestMatchers()).permitAll()
                         .requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER)
                         .requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN)
-                        .requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY)
+//                        .requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY)
 						.anyRequest().authenticated()
 				)
 				.oauth2Login(oauth2 -> oauth2

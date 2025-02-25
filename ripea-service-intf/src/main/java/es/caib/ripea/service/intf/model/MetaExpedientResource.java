@@ -25,7 +25,7 @@ import javax.validation.constraints.Size;
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nom"
 )
-public class MetaExpedientResource extends BaseResource<Long> {
+public class MetaExpedientResource extends MetaNodeResource {
 
 	@NotNull
 	@Size(max = 64)

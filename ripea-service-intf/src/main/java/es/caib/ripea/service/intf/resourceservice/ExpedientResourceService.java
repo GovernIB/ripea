@@ -8,6 +8,4 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
  *
  * @author Límit Tecnologies
  */
-public interface ExpedientResourceService extends MutableResourceService<ExpedientResource, Long> {
-
-}
+public interface ExpedientResourceService extends MutableResourceService<ExpedientResource, Long> {}

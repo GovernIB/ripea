@@ -1564,14 +1564,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	    binder.registerCustomEditor(
-		        Long[].class,
-		        new StringArrayPropertyEditor(null)); 
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"),true));
+	    binder.registerCustomEditor(Long[].class, new StringArrayPropertyEditor(null));
+	    binder.registerCustomEditor(LocalDateTime.class, new CustomDateTimeEditor("dd/MM/yyyy HH:mm:ss"));
 	}
 	
 	private void emplenarModelDescarrega(

@@ -88,7 +88,7 @@ $(document).ready(function() {
 				}
 		);
 	});
-	
+
 	$('#taulaDades').on('draw.dt', function () {
 		$('#seleccioAll').on('click', function() {
 			$.get(
@@ -112,7 +112,7 @@ $(document).ready(function() {
 			return false;
 		});
 
-		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
+ 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
 
 		$("span[class^='stateColor-']").each(function( index ) {
 			var fullClassNameString = this.className;
@@ -143,8 +143,9 @@ $(document).ready(function() {
 		});
 		    
 	});
+
 	if (mostrarMeusExpedients) {
-		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
+ 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
 	}
 	$('#meusExpedientsBtn').click(function() {
 		mostrarMeusExpedients = !$(this).hasClass('active');
@@ -302,16 +303,6 @@ $(document).ready(function() {
 	$('#organGestorId').on('change', function() {
 		var organGestorId = $(this).val();
 		findActiusPerLectura(organGestorId);
-
-		/*$('#metaExpedientId').val('').trigger('change')
-
-		if (organGestorId) {
-			$("#metaExpedientId").data('urlParamAddicional', organGestorId);
-		} else {
-			$("#metaExpedientId").data('urlParamAddicional', null);
-
-		}*/
-
 	});
 });
 
@@ -595,14 +586,14 @@ function removeCookie(cname) {
 	<table
 		id="taulaDades"
 		data-toggle="datatable" 
-		data-url="<c:url value="/expedient/datatable"/>" 
-		class="table table-bordered table-striped table-hover"
-		data-default-order="19"
-		data-default-dir="desc"
+		data-url="<c:url value="/expedient/datatable"/>"
+		data-selection-enabled="true"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
-		data-selection-enabled="true"
-		data-save-state="true"
+		data-save-state="true" 
+		data-default-order="20"
+		data-default-dir="desc"
+		class="table table-bordered table-striped table-hover"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -620,8 +611,9 @@ function removeCookie(cname) {
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>
-				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
-				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>	
+				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>	
+				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>
+				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">
@@ -716,6 +708,12 @@ function removeCookie(cname) {
 					</script>
 					</th>	
 				</c:if>
+				<th data-col-name="rolActualAdminEntitatOAdminOrgan" data-visible="false"></th>
+				<th data-col-name="potModificar" data-visible="false"></th>
+				<th data-col-name="rolActualPermisPerModificarExpedient" data-visible="false"></th>
+				<th data-col-name="expedientAgafatPerUsuariActual" data-visible="false"></th>
+				<th data-col-name="potTancar" data-visible="false"></th>
+				<th data-col-name="conteDocuments" data-visible="false"></th>
 				<th data-col-name="numSeguidors" data-orderable="false" data-template="#cellSeguidorsTemplate" width="1%">
 					<script id="cellSeguidorsTemplate" type="text/x-jsrender">
 						{{if numSeguidors > 0}}
@@ -724,7 +722,7 @@ function removeCookie(cname) {
 							<a href="expedient/{{:id}}/seguidors" data-toggle="modal" data-refresh-tancar="true" data-modal-id="seguidors{{:id}}" class="btn btn-default disabled"><span class="fa fa-lg fa-users"></span>&nbsp;<span class="badge">{{:numSeguidors}}</span></a>
 						{{/if}}							
 					</script>
-				</th>			
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -845,13 +843,7 @@ function removeCookie(cname) {
 							</ul>
 						</div>
 					</script>
-				</th>
-				<th data-col-name="rolActualAdminEntitatOAdminOrgan" data-visible="false"></th>
-				<th data-col-name="potModificar" data-visible="false"></th>
-				<th data-col-name="rolActualPermisPerModificarExpedient" data-visible="false"></th>
-				<th data-col-name="expedientAgafatPerUsuariActual" data-visible="false"></th>
-				<th data-col-name="potTancar" data-visible="false"></th>
-				<th data-col-name="conteDocuments" data-visible="false"></th>	
+				</th>				
 			</tr>
 		</thead>
 	</table>

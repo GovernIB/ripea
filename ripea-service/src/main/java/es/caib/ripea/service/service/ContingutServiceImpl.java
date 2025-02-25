@@ -50,6 +50,8 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
+	private UsuariRepository usuariRepository;
+	@Autowired
 	private MetaNodeRepository metaNodeRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
@@ -1929,20 +1931,14 @@ public class ContingutServiceImpl implements ContingutService {
 							dto.setTipusDocumentNom(source.getMetaDocument() != null ? source.getMetaDocument().getNom() : null);
 							dto.setExpedientId(source.getExpedient().getId());
 							dto.setExpedientNumeroNom(source.getExpedient().getNumeroINom());
-							dto.setCreatedDate(
-									Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-							dto.setCreatedByCodiAndNom(source.getCreatedBy().get().getCodiAndNom());
+							dto.setCreatedDate(Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+							UsuariEntity organAdminCreador = usuariRepository.findById(source.getCreatedBy().get()).get();
+							dto.setCreatedByCodiAndNom(organAdminCreador.getCodiAndNom());
 							return dto;
 						}
 					});
 		
 	}
-	
-	
-	
-	
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -2085,9 +2081,9 @@ public class ContingutServiceImpl implements ContingutService {
 							dto.setTipusDocumentNom(source.getMetaDocument() != null ? source.getMetaDocument().getNom() : null);
 							dto.setExpedientId(source.getExpedient().getId());
 							dto.setExpedientNumeroNom(source.getExpedient().getNumeroINom());
-							dto.setCreatedDate(
-									Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-							dto.setCreatedByCodiAndNom(source.getCreatedBy().get().getCodiAndNom());
+							dto.setCreatedDate(Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+							UsuariEntity organAdminCreador = usuariRepository.findById(source.getCreatedBy().get()).get();
+							dto.setCreatedByCodiAndNom(organAdminCreador.getCodiAndNom());
 							return dto;
 						}
 					});

@@ -10,11 +10,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,7 +31,6 @@ public class EntitatResource extends BaseResource<Long> {
 	@Size(max = 9)
 	private String unitatArrel;
 	private boolean activa;
-//	private byte[] logoImgBytes;
 	@Size(max = 7)
 	private String capsaleraColorFons;
 	@Size(max = 7)
@@ -44,5 +38,4 @@ public class EntitatResource extends BaseResource<Long> {
 	Date dataSincronitzacio;
 	Date dataActualitzacio;
 	private boolean permetreEnviamentPostal;
-
 }

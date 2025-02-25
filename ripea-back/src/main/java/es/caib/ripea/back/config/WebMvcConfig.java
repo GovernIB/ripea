@@ -1,10 +1,7 @@
-/**
- * 
- */
 package es.caib.ripea.back.config;
 
-import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
-import es.caib.ripea.back.interceptor.*;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +26,29 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
+import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
+
+import es.caib.ripea.back.interceptor.AccesAdminEntitatInterceptor;
+import es.caib.ripea.back.interceptor.AccesAdminEntitatOAdminOrganORevisorInterceptor;
+import es.caib.ripea.back.interceptor.AccesAdminEntitatORevisorInterceptor;
+import es.caib.ripea.back.interceptor.AccesAdminEntitatOrUsuariInterceptor;
+import es.caib.ripea.back.interceptor.AccesFluxosFirmaUsuariInterceptor;
+import es.caib.ripea.back.interceptor.AccesSuperInterceptor;
+import es.caib.ripea.back.interceptor.AccesURLsInstruccioInterceptor;
+import es.caib.ripea.back.interceptor.AjaxInterceptor;
+import es.caib.ripea.back.interceptor.AnotacionsPendentsInterceptor;
+import es.caib.ripea.back.interceptor.AplicacioInterceptor;
+import es.caib.ripea.back.interceptor.AvisosInterceptor;
+import es.caib.ripea.back.interceptor.ExpedientsInterceptor;
+import es.caib.ripea.back.interceptor.FluxFirmaInterceptor;
+import es.caib.ripea.back.interceptor.LlistaEntitatsInterceptor;
+import es.caib.ripea.back.interceptor.LlistaRolsInterceptor;
+import es.caib.ripea.back.interceptor.MetaExpedientInterceptor;
+import es.caib.ripea.back.interceptor.ModalInterceptor;
+import es.caib.ripea.back.interceptor.NodecoInterceptor;
+import es.caib.ripea.back.interceptor.SeguimentEnviamentsUsuariInterceptor;
+import es.caib.ripea.back.interceptor.SessioInterceptor;
+import es.caib.ripea.back.interceptor.TasquesPendentsInterceptor;
 
 /**
  * Configuració de Spring MVC.
@@ -40,49 +59,27 @@ import java.util.List;
 @DependsOn("ejbClientConfig")
 public class WebMvcConfig implements WebMvcConfigurer {
 
-	@Autowired
-	private MetaExpedientInterceptor metaExpedientInterceptor;
-	@Autowired
-	private AplicacioInterceptor aplicacioInterceptor;
-	@Autowired
-	private SessioInterceptor sessioInterceptor;
-	@Autowired
-	private LlistaEntitatsInterceptor llistaEntitatsInterceptor;
-	@Autowired
-	private LlistaRolsInterceptor llistaRolsInterceptor;
-	@Autowired
-	private ModalInterceptor modalInterceptor;
-	@Autowired
-	private NodecoInterceptor nodecoInterceptor;
-	@Autowired
-	private AjaxInterceptor ajaxInterceptor;
-	@Autowired
-	private ExpedientsInterceptor expedientsInterceptor;
-	@Autowired
-	private TasquesPendentsInterceptor tasquesPendentsInterceptor;
-	@Autowired
-	private AnotacionsPendentsInterceptor anotacionsPendentsInterceptor;
-	@Autowired
-	private SeguimentEnviamentsUsuariInterceptor seguimentEnviamentsUsuariInterceptor;
-	@Autowired
-	private AvisosInterceptor avisosInterceptor;
-	@Autowired
-	private FluxFirmaInterceptor fluxFirmaInterceptor;
-
-	@Autowired
-	private AccesAdminEntitatInterceptor accesAdminEntitatInterceptor;
-	@Autowired
-	private AccesAdminEntitatOAdminOrganORevisorInterceptor accesAdminEntitatOAdminOrganORevisorInterceptor;
-	@Autowired
-	private AccesAdminEntitatORevisorInterceptor accesAdminEntitatORevisorInterceptor;
-	@Autowired
-	private AccesAdminEntitatOrUsuariInterceptor accesAdminEntitatOrUsuariInterceptor;
-	@Autowired
-	private AccesURLsInstruccioInterceptor accesURLsInstruccioInterceptor;
-	@Autowired
-	private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
-	@Autowired
-	private AccesSuperInterceptor accesSuperInterceptor;
+	@Autowired private MetaExpedientInterceptor metaExpedientInterceptor;
+	@Autowired private AplicacioInterceptor aplicacioInterceptor;
+	@Autowired private SessioInterceptor sessioInterceptor;
+	@Autowired private LlistaEntitatsInterceptor llistaEntitatsInterceptor;
+	@Autowired private LlistaRolsInterceptor llistaRolsInterceptor;
+	@Autowired private ModalInterceptor modalInterceptor;
+	@Autowired private NodecoInterceptor nodecoInterceptor;
+	@Autowired private AjaxInterceptor ajaxInterceptor;
+	@Autowired private ExpedientsInterceptor expedientsInterceptor;
+	@Autowired private TasquesPendentsInterceptor tasquesPendentsInterceptor;
+	@Autowired private AnotacionsPendentsInterceptor anotacionsPendentsInterceptor;
+	@Autowired private SeguimentEnviamentsUsuariInterceptor seguimentEnviamentsUsuariInterceptor;
+	@Autowired private AvisosInterceptor avisosInterceptor;
+	@Autowired private FluxFirmaInterceptor fluxFirmaInterceptor;
+	@Autowired private AccesAdminEntitatInterceptor accesAdminEntitatInterceptor;
+	@Autowired private AccesAdminEntitatOAdminOrganORevisorInterceptor accesAdminEntitatOAdminOrganORevisorInterceptor;
+	@Autowired private AccesAdminEntitatORevisorInterceptor accesAdminEntitatORevisorInterceptor;
+	@Autowired private AccesAdminEntitatOrUsuariInterceptor accesAdminEntitatOrUsuariInterceptor;
+	@Autowired private AccesURLsInstruccioInterceptor accesURLsInstruccioInterceptor;
+	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
+	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
 
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {

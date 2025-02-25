@@ -15,17 +15,17 @@
 pageContext.setAttribute(
 		"multiplicitatEnumOptions",
 		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.MultiplicitatEnumDto.class,
+		es.caib.ripea.service.intf.dto.MultiplicitatEnumDto.class,
 		"multiplicitat.enum."));
 pageContext.setAttribute(
 		"metadocumentSequenciatipEnumOptions",
 		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
+		es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
 		"metadocument.seqtip.enum."));
 pageContext.setAttribute(
 		"metadocumentFluxtipEnumOptions",
 		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
+		es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto.class,
 		"metadocument.fluxtip.enum."));
 %>
 

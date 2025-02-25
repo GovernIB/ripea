@@ -7,14 +7,14 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-java.util.List<EnumHelper.HtmlOption> tipusEnum = EnumHelper.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class, "interessat.tipus.enum.");
+java.util.List<EnumHelper.HtmlOption> tipusEnum = EnumHelper.getOptionsForEnum(es.caib.ripea.service.intf.dto.InteressatTipusEnumDto.class, "interessat.tipus.enum.");
 Boolean esRepresentant = (Boolean) request.getAttribute("esRepresentant");
 if (esRepresentant != null && esRepresentant) {
 	tipusEnum.remove(2);
 }
 pageContext.setAttribute("tipusEnumOptions", tipusEnum);
-pageContext.setAttribute("documentTipusEnumOptions", es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto.class, "interessat.document.tipus.enum."));
-pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto.class, "interessat.idioma.enum."));
+pageContext.setAttribute("documentTipusEnumOptions", es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto.class, "interessat.document.tipus.enum."));
+pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto.class, "interessat.idioma.enum."));
 %>
 
 <c:set var="potModificar">${potModificar == null || potModificar == true ? true : false}</c:set>
@@ -142,9 +142,9 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.back.helper.EnumHelp
 			}
 			netejar = true;
 			var tipusInt = 1;
-			if (this.value == '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.PERSONA_FISICA%>') {
+			if (this.value == '<%=es.caib.ripea.service.intf.dto.InteressatTipusEnumDto.PERSONA_FISICA%>') {
 				tipusInt = 1;
-			} else if (this.value == '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.PERSONA_JURIDICA%>') {
+			} else if (this.value == '<%=es.caib.ripea.service.intf.dto.InteressatTipusEnumDto.PERSONA_JURIDICA%>') {
 				tipusInt = 2;
 				$('#documentTipus').val("NIF");
 				$('#documentTipus').change();
@@ -302,7 +302,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.back.helper.EnumHelp
 
 		$('select#pais').change(function() {
 			if ($(this).val() == '724') {
-				if ($('select#tipus').val() != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>') {
+				if ($('select#tipus').val() != '<%=es.caib.ripea.service.intf.dto.InteressatTipusEnumDto.ADMINISTRACIO%>') {
 					$('#provincia').prop("disabled", false);
 					$('#municipi').prop("disabled", false);
 				} else {

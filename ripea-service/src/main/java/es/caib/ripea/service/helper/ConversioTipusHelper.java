@@ -58,6 +58,7 @@ import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.AlertaDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
@@ -126,6 +127,7 @@ public class ConversioTipusHelper {
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ConfigHelper configHelper;
 
 	@SuppressWarnings("rawtypes")
@@ -184,6 +186,33 @@ public class ConversioTipusHelper {
 	        .register();
 	      
 	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientDto.class).byDefault().register();
+	      
+	      mapperFactory.classMap(InteressatEntity.class, InteressatDto.class).byDefault().register();
+	      mapperFactory.classMap(InteressatPersonaFisicaEntity.class, InteressatPersonaFisicaDto.class)
+	      .use(InteressatEntity.class, InteressatDto.class)
+//	      .customize(new CustomMapper<InteressatPersonaFisicaEntity, InteressatDto>() {
+//	      		@Override
+//				public void mapAtoB(InteressatPersonaFisicaEntity source, InteressatDto target, MappingContext context) {
+//	      			target.setNom
+//	      		}
+//		      })
+	      .byDefault().register();
+	      mapperFactory.classMap(InteressatPersonaJuridicaEntity.class, InteressatPersonaJuridicaDto.class)
+	      .use(InteressatEntity.class, InteressatDto.class)
+//	      .customize(new CustomMapper<InteressatPersonaJuridicaEntity, InteressatDto>() {
+//	      		@Override
+//				public void mapAtoB(InteressatPersonaJuridicaEntity source, InteressatDto target, MappingContext context) {
+//	      		}
+//		      })
+	      .byDefault().register();
+	      mapperFactory.classMap(InteressatAdministracioEntity.class, InteressatAdministracioDto.class)
+	      .use(InteressatEntity.class, InteressatDto.class)
+//	      .customize(new CustomMapper<InteressatAdministracioEntity, InteressatDto>() {
+//	      		@Override
+//				public void mapAtoB(InteressatAdministracioEntity source, InteressatDto target, MappingContext context) {
+//	      		}
+//		      })
+	      .byDefault().register();
 	      
 	      mapperFactory.classMap(MetaExpedientComentariEntity.class, MetaExpedientComentariDto.class)
 	      .customize(new CustomMapper<MetaExpedientComentariEntity, MetaExpedientComentariDto>() {
@@ -301,13 +330,13 @@ public class ConversioTipusHelper {
 				});
 		
 		
-		mapperFactory.getConverterFactory().registerConverter(
+		/*mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<InteressatEntity, InteressatDto>() {
 					public InteressatDto convert(InteressatEntity source, Type<? extends InteressatDto>destinationClass, MappingContext mappingContext) {
 						source = deproxyInteressatEntity(source);
 						return getInteressatDto(source);
 					}
-				});
+				});*/
 		
 		
 		mapperFactory.getConverterFactory().registerConverter(
@@ -464,8 +493,8 @@ public class ConversioTipusHelper {
 						}
 						target.setUsuariActualitzacio(source.getUsuariActualitzacio() != null ? source.getUsuariActualitzacio().getCodiAndNom() : "");
 						if ("".equals(target.getUsuariActualitzacio()) && source.getLastModifiedBy() != null) {
-							target.setUsuariActualitzacio(
-									source.getLastModifiedBy().get().getCodiAndNom());
+							String usuCodiAndNom = usuariRepository.findById(source.getLastModifiedBy().get()).get().getCodiAndNom();
+							target.setUsuariActualitzacio(usuCodiAndNom);
 						}
 						target.setObservacions(source.getObservacions());
 						target.setGrupId(source.getGrup() != null ? source.getGrup().getId() : null);
@@ -887,7 +916,10 @@ public class ConversioTipusHelper {
 	            	target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
 	            	target.setExpedientNumeroTitol(source.getExpedient() != null ? source.getExpedient().getNomINumero() : null);
 	            	target.setProcedimentCodiNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getCodiSiaINom() : null);
-	            	target.setCreatedBy(source.getCreatedBy().get().getNom());
+	            	if (source.getCreatedBy()!=null) {
+	            		String usuCodiAndNom = usuariRepository.findById(source.getCreatedBy().get()).get().getCodiAndNom();
+	            		target.setCreatedBy(usuCodiAndNom);	
+	            	}
 	            	target.setCreatedDate(
 				            Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
 	            	target.setError(HtmlUtils.htmlEscape(source.getError()));

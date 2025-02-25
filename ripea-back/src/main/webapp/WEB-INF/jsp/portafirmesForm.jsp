@@ -12,7 +12,7 @@
 pageContext.setAttribute(
 		"metadocumentSeqtipEnumOptions",
 		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
+		es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto.class,
 		"metadocument.seqtip.enum."));
 %>
 <c:set var="titol"><spring:message code="contenidor.document.portafirmes.titol"/></c:set>

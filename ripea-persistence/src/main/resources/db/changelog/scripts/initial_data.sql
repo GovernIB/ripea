@@ -556,3 +556,4 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 ('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents','5','Nombre de reintents de guardar documents en arxiu','4','INT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats','5','Nombre de reintents de guardar interessats en arxiu','5','INT','0','0','0','0','0');
+

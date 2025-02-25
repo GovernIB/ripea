@@ -20,15 +20,15 @@ import java.util.List;
  */
 public class RolHelper {
 
-	private static final String ROLE_SUPER = "IPA_SUPER";
-	private static final String ROLE_ADMIN = "IPA_ADMIN";
-	private static final String ROLE_DISSENY = "IPA_DISSENY";
-	private static final String ROLE_ADMIN_ORGAN = "IPA_ORGAN_ADMIN";
-	private static final String ROLE_REVISOR = "IPA_REVISIO";
-	private static final String ROLE_USER = "tothom";
+	private static final String ROLE_SUPER 			= "IPA_SUPER";
+	private static final String ROLE_ADMIN 			= "IPA_ADMIN";
+	private static final String ROLE_DISSENY 		= "IPA_DISSENY";
+	private static final String ROLE_ADMIN_ORGAN 	= "IPA_ORGAN_ADMIN";
+	private static final String ROLE_REVISOR 		= "IPA_REVISIO";
+	private static final String ROLE_USER 			= "tothom";
 
-	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
-	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
+	private static final String REQUEST_PARAMETER_CANVI_ROL  = "canviRol";
+	public  static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
 	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService, OrganGestorService organGestorService) {
 		
@@ -37,13 +37,7 @@ public class RolHelper {
 		if (canviRol != null && canviRol.length() > 0) {
 			
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
-			//Si el usuari actual era dissenyador de organ, hem de actualitzar el llistat de organs
-			//Ja que el nou usuari no ha de tenir el llistat de organs amb permis disseny, sino admin
-			if (isRolActualDissenyadorOrgan(request)) { //NO CRIDAR a cap funcio de isRolActual aqui, perque s'actualitza el rol en sessio!!!
-//			if (request.isUserInRole(ROLE_DISSENY)) {
-				EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-			}
-			
+
 			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 				aplicacioService.setRolUsuariActual(canviRol);
@@ -51,7 +45,11 @@ public class RolHelper {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 				aplicacioService.setRolUsuariActual(canviRol);
 			}
+			
 			AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
+			
+			//Un cop canviat el rol, actualitzam organs gestors si procedeix
+			EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
 		}
 	}
 	
@@ -165,7 +163,7 @@ public class RolHelper {
 			if (entitatActual.isUsuariActualAdministration() && request.isUserInRole(ROLE_ADMIN)) {
 				rols.add(ROLE_ADMIN);
 			}
-			if (request.isUserInRole(ROLE_ADMIN_ORGAN) && isUsuariActualTeOrgans(request)) {
+			if (request.isUserInRole(ROLE_ADMIN_ORGAN)) {
 				rols.add(ROLE_ADMIN_ORGAN);
 			}
 			if (entitatActual.isUsuariActualRead() && request.isUserInRole(ROLE_DISSENY)) {
@@ -178,14 +176,7 @@ public class RolHelper {
 				rols.add(ROLE_REVISOR);
 			}
 		}
-		
-		//El rol dissenyador, no es compatible amb el rol Usuari
-		//"Es necessita disposar d'un nou perfil d'usuari per a dissenyar procediments, dominis o grups i que que no pugui accedir 
-		// als expedients dels procediments creats ni a altres seccions."
-		if (rols.contains(ROLE_DISSENY)) {
-			rols.remove(ROLE_USER);
-		}
-		
+
 		return rols;
 	}
 

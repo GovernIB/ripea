@@ -1,5 +1,11 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -9,21 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.Date;
-import java.io.Serializable;
-
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @ResourceConfig(quickFilterFields = { "numero", "nom" })
-public class ExpedientResource extends BaseResource<Long> {
+public class ExpedientResource extends NodeResource {
 
 	@NotNull
 	@Size(max = 256)

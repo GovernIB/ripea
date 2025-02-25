@@ -8,7 +8,7 @@
 pageContext.setAttribute(
 		"interessatsTipusEnum",
 		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
-				 es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class,
+				 es.caib.ripea.service.intf.dto.InteressatTipusEnumDto.class,
 				"interessat.tipus.enum."));
 %>
 <c:choose>

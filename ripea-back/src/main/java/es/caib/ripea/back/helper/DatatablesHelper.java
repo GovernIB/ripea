@@ -1,7 +1,21 @@
-/**
- * 
- */
 package es.caib.ripea.back.helper;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.validation.BindingResult;
 
 import es.caib.ripea.back.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.service.intf.dto.PaginaDto;
@@ -9,15 +23,6 @@ import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.validation.BindingResult;
-
-import javax.servlet.http.HttpServletRequest;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 
 /**
  * Mètodes d'ajuda per a gestionar datatables.
@@ -28,10 +33,7 @@ public class DatatablesHelper {
 
 	private static final String ATRIBUT_ID = "DT_Id";
 	private static final String ATRIBUT_ROW_ID = "DT_RowId";
-	//private static final String ATRIBUT_ROW_DATA = "DT_RowData";
 	private static final String ATRIBUT_ROW_SELECTED = "DT_RowSelected";
-
-
 
 	public static PaginacioParamsDto getPaginacioDtoFromRequest(
 			HttpServletRequest request) {
@@ -369,8 +371,10 @@ public class DatatablesHelper {
 			for (int i = 0;; i++) {
 				String paramPrefix = "columns[" + i + "]";
 				if (request.getParameter(paramPrefix + "[data]") != null) {
-					columnsData.add(request.getParameter(paramPrefix + "[data]"));
-					columnsName.add(request.getParameter(paramPrefix + "[name]"));
+					String columnData = request.getParameter(paramPrefix + "[data]");
+					String columnName = request.getParameter(paramPrefix + "[name]");
+					columnsData.add(columnData);
+					columnsName.add(columnName);
 					columnsSearchable.add(Boolean.parseBoolean(request.getParameter(paramPrefix + "[searchable]")));
 					columnsOrderable.add(Boolean.parseBoolean(request.getParameter(paramPrefix + "[orderable]")));
 					columnsSearchValue.add(request.getParameter(paramPrefix + "[search][value]"));

@@ -3,14 +3,6 @@
  */
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.persistence.entity.MetaNodeTipusEnum;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,6 +15,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
+import es.caib.ripea.service.intf.model.MetaNodeResource;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * Classe del model de dades que representa un meta-node.
  * 
@@ -34,7 +34,7 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy=InheritanceType.JOINED)
-public abstract class MetaNodeResourceEntity extends BaseAuditableEntity<MetaExpedientResource> {
+public abstract class MetaNodeResourceEntity extends BaseAuditableEntity<MetaNodeResource> {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	protected String codi;

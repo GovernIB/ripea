@@ -16,7 +16,7 @@
 	<script src="<c:url value="/webjars/moment/2.15.1/min/locales.min.js"/>"></script>
 	<script src="<c:url value="/webjars/moment/2.15.1/locale/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/css/bootstrap-datetimepicker.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build//js/bootstrap-datetimepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build/js/bootstrap-datetimepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/jquery.maskedinput.min.js"/>"></script>

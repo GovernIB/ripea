@@ -1,24 +1,16 @@
 package es.caib.ripea.back.controller;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
-import es.caib.ripea.back.command.*;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
-import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.MetaExpedientService;
-import es.caib.ripea.service.intf.service.OrganGestorService;
-import es.caib.ripea.service.intf.service.PortafirmesFluxService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,18 +21,72 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.Validator;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.RequestContext;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
+
+import es.caib.ripea.back.command.ExpedientEstatCommand;
+import es.caib.ripea.back.command.FileCommand;
+import es.caib.ripea.back.command.MetaDocumentCommand;
+import es.caib.ripea.back.command.MetaExpedientCommand;
+import es.caib.ripea.back.command.MetaExpedientFiltreCommand;
+import es.caib.ripea.back.command.MetaExpedientImportEditCommand;
+import es.caib.ripea.back.command.MetaExpedientImportRolsacCommand;
+import es.caib.ripea.back.command.MetaExpedientTascaCommand;
+import es.caib.ripea.back.helper.ConversioTipusHelper;
+import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.EnumHelper;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.JsonResponse;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SessioHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientActiuEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.PortafirmesFluxService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -55,7 +101,6 @@ public class MetaExpedientController extends BaseAdminController {
 	private static final String SESSION_ATTRIBUTE_IMPORT_TEMPORAL = "MetaExpedientController.session.import.temporal";
 
 	@Autowired private MetaExpedientService metaExpedientService;
-	@Autowired private OrganGestorService organGestorService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PortafirmesFluxService portafirmesFluxService;
 	@Autowired private Validator validator;
@@ -119,11 +164,12 @@ public class MetaExpedientController extends BaseAdminController {
 		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
 		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
 
+		boolean filtrePerOrgan = RolHelper.isRolAmbFiltreOrgan(request);
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
 				filtreDto,
-				organActual == null ? false : RolHelper.isRolAmbFiltreOrgan(request),
+				filtrePerOrgan,
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
 				RolHelper.getRolActual(request),
 				hasPermisAdmComu(request));
@@ -907,34 +953,15 @@ public class MetaExpedientController extends BaseAdminController {
 				metaExpedientCarpetaId);
 	}
 
-	private boolean hasPermisAdmComu(HttpServletRequest request) {
-		boolean hasPermisAdmComu = RolHelper.isRolActualAdministrador(request);
-		if (RolHelper.isRolActualAdministradorOrgan(request)) {
-			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-			hasPermisAdmComu = organGestorService.hasPermisAdminComu(organActual.getId());
-		}
-		return hasPermisAdmComu;
-	}
-
 	@RequestMapping(value = "/{metaExpedientId}/new", method = RequestMethod.GET)
 	public String getNewAmbPare(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientCommand command = new MetaExpedientCommand(RolHelper.isRolActualAdministradorOrgan(request));
 		command.setPareId(metaExpedientId);
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
 		fillFormModel(request, metaExpedient, model);
-//		if (RolHelper.isRolActualAdministrador(request)) {
-//			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitatActual.getId()));
-//		} else {
-//			model.addAttribute(
-//					"organsGestors",
-//					organGestorService.findAccessiblesUsuariActualRolAdmin(
-//							entitatActual.getId(),
-//							EntitatHelper.getOrganGestorActual(request).getId()));
-//		}
 		return "metaExpedientForm";
 	}
 

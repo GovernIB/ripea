@@ -293,8 +293,8 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
-    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor) {
-		return delegateService.isPermisAntecesor(organGestorId, incloureOrganGestor);
+	@RolesAllowed("tothom")
+	public Boolean isPermisEnviamentPostalOrganOrAntecesor(Long organGestorId) {
+		return delegateService.isPermisEnviamentPostalOrganOrAntecesor(organGestorId);
 	}
 }

@@ -1,8 +1,10 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,17 +27,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Entitat de base de dades que representa un expedient.
- *
- * @author Límit Tecnologies
- */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "expedient")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ExpedientResourceEntity extends NodeResourceEntity {
+public class ExpedientResourceEntity extends NodeResourceEntity implements ResourceEntity<ExpedientResource, Long> {
 
 	@Column(name = "estat", nullable = false)
 	protected ExpedientEstatEnumDto estat;

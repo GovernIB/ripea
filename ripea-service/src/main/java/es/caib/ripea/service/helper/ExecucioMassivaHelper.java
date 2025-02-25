@@ -61,7 +61,7 @@ public class ExecucioMassivaHelper{
 			try {
 				
 				Authentication orgAuthentication = SecurityContextHolder.getContext().getAuthentication();
-				final String user = exm.getCreatedBy().get().getCodi();
+				final String user = exm.getCreatedBy().get();
 		        Principal principal = new Principal() {
 					public String getName() {
 						return user;

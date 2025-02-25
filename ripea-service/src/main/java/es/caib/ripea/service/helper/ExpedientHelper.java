@@ -2,7 +2,6 @@ package es.caib.ripea.service.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -81,6 +80,7 @@ import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
@@ -186,6 +186,8 @@ public class ExpedientHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
+	@Autowired
+	private UsuariRepository usuariRepository;
 	@Autowired
 	private InteressatRepository interessatRepository;
 	@Autowired
@@ -1423,7 +1425,7 @@ public class ExpedientHelper {
 	public String retornar(ExpedientEntity expedient) {
 		
 		UsuariEntity usuariActual = expedient.getAgafatPer();
-		UsuariEntity usuariCreador = expedient.getCreatedBy().get();
+		UsuariEntity usuariCreador = usuariRepository.findById(expedient.getCreatedBy().get()).get();
 		
 		expedient.updateAgafatPer(usuariCreador);
 		
