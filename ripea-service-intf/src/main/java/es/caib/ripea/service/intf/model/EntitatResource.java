@@ -1,20 +1,21 @@
 package es.caib.ripea.service.intf.model;
 
-import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.model.BaseResource;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
+
+import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
-public class EntitatResource extends BaseResource<Long> {
+public class EntitatResource extends BaseAuditableResource<Long> {
 
 	@NotNull
 	@Size(max = 64)
@@ -35,7 +36,7 @@ public class EntitatResource extends BaseResource<Long> {
 	private String capsaleraColorFons;
 	@Size(max = 7)
 	private String capsaleraColorLletra;
-	Date dataSincronitzacio;
-	Date dataActualitzacio;
+	private Date dataSincronitzacio;
+	private Date dataActualitzacio;
 	private boolean permetreEnviamentPostal;
 }

@@ -1,7 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.model.BaseResource;
+import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
-public class MetaNodeResource extends BaseResource<Long> {
+public class MetaNodeResource extends BaseAuditableResource<Long> {
 
 	protected String codi;
 	protected String nom;

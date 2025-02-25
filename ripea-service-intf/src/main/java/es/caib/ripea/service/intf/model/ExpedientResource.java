@@ -23,6 +23,15 @@ import lombok.Setter;
 public class ExpedientResource extends NodeResource {
 
 	@NotNull
+	private ExpedientEstatEnumDto estat;
+	@NotNull
+	@Size(max = 46)
+	private String ntiClasificacionSia;	
+	@NotNull
+	private Date ntiFechaApertura;
+	@NotNull
+	private ResourceReference<OrganGestorResource, Long> organGestor;
+	@NotNull
 	private int any;
 	@NotNull
 	private long sequencia;
@@ -34,18 +43,13 @@ public class ExpedientResource extends NodeResource {
 
 	@NotNull
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
-	@NotNull
-	private ResourceReference<EntitatResource, Long> entitat;
-	protected ResourceReference<UsuariResource, String> agafatPer;
+	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
 	private ResourceReference<GrupResource, Long> grup;
-	private ResourceReference<OrganGestorResource, Long> organGestor;
-
-	@NotNull
-	private ExpedientEstatEnumDto estat;
 
 	// Tancat
 	private Date tancatData;
+	@Size(max = 1024)
 	private String tancatMotiu;
 	private Date tancatProgramat;
 
@@ -54,43 +58,34 @@ public class ExpedientResource extends NodeResource {
 	private Date esborratData;
 
 	// Arxiu
-	@Size(max = 36)
-	private String arxiuUuid;
 	private Date arxiuDataActualitzacio;
 	private Date arxiuIntentData;
 	private int arxiuReintents;
 	private boolean arxiuPropagat;
 
 	// Registre
-	@Size(max = 80)
-	private String numeroRegistre;
 	@Size(max = 4000)
-	protected String registresImportats;
+	private String registresImportats;
 
 	// NTI
 	@NotNull
 	@Size(max = 5)
-	protected String ntiVersion;
+	private String ntiVersion;
 	@NotNull
 	@Size(max = 52)
-	protected String ntiIdentificador;
+	private String ntiIdentificador;
 	@NotNull
 	@Size(max = 9)
-	protected String ntiOrgano;
-	@NotNull
-	protected Date ntiFechaApertura;
-	@NotNull
-	@Size(max = 6)
-	protected String ntiClasificacionSia;
+	private String ntiOrgano;
 
 	// Sistra
 	@Size(max = 16)
-	protected String sistraBantelNum;
-	protected boolean sistraPublicat;
+	private String sistraBantelNum;
+	private boolean sistraPublicat;
 	@Size(max = 9)
-	protected String sistraUnitatAdministrativa;
+	private String sistraUnitatAdministrativa;
 	@Size(max = 100)
-	protected String sistraClau;
+	private String sistraClau;
 
 	// Prioritat
 	private PrioritatEnumDto prioritat;

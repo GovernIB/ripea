@@ -128,7 +128,7 @@ public class DocumentResourceEntity extends NodeResourceEntity implements Resour
 
 	@Column(name = "val_ok")
 	private boolean validacioFirmaCorrecte;
-	@Column(name = "val_error")
+	@Column(name = "val_error", length = 1000)
 	private String validacioFirmaErrorMsg;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "annex_estat")

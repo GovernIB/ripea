@@ -12,11 +12,6 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- * Informació d'una aplicació a monitoritzar.
- *
- * @author Límit Tecnologies
- */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -70,5 +65,4 @@ public class UsuariResource extends BaseResource<String> {
 	public void setId(String id) {
 		this.codi = id;
 	}
-
 }
