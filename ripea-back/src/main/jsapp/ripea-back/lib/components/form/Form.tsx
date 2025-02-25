@@ -96,16 +96,6 @@ export const useFormApiContext: () => FormApiRef = () => {
     return formContext.apiRef;
 }
 
-const getActionRel = (resourceType: FormResourceType, resourceTypeCode: string) => {
-    if (resourceType === 'action') {
-        return 'exec' + resourceTypeCode;
-    } else if (resourceType === 'report') {
-        return 'generate' + resourceTypeCode;
-    } else if (resourceType === 'filter') {
-        return 'filter_' + resourceTypeCode;
-    }
-}
-
 export const Form: React.FC<FormProps> = (props) => {
     const {
         resourceName,
@@ -355,17 +345,14 @@ export const Form: React.FC<FormProps> = (props) => {
         // Obté els camps pel formulari fent una petició al servidor
         if (apiIsReady) {
             debug && logConsole.debug('Loading fields' + (resourceType ? ' of type' : ''), resourceType, resourceTypeCode);
+            setApiActions(apiCurrentActions);
             if (resourceType == null) {
                 setFields(apiCurrentFields);
-                setApiActions(apiCurrentActions);
             } else if (resourceTypeCode != null) {
-                apiArtifacts({}).then((state: any) => {
-                    const artifacts = state.getEmbedded().map((e: any) => e.data);
+                apiArtifacts({}).then((artifacts: any[]) => {
                     const artifact = artifacts.find((a: any) => a.type === resourceType.toUpperCase() && a.code === resourceTypeCode);
                     if (artifact.formClassActive) {
-                        const actionRel = getActionRel(resourceType, resourceTypeCode);
-                        const action = state.action(actionRel);
-                        setFields(action.fields);
+                        setFields(artifact.fields);
                     }
                 });
             }

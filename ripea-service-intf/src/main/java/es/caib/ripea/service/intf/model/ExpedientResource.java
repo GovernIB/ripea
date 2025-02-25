@@ -11,8 +11,8 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Informació d'una aplicació a monitoritzar.
@@ -22,7 +22,9 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "numero", "nom" })
+@ResourceConfig(
+		quickFilterFields = { "numero", "nom" },
+		artifactFormClasses = { ExpedientResource.ExpedientFilterForm.class })
 public class ExpedientResource extends BaseResource<Long> {
 
 	@NotNull
@@ -108,6 +110,7 @@ public class ExpedientResource extends BaseResource<Long> {
 	public static class ExpedientFilterForm implements Serializable {
 		private String codi;
 		private String nom;
+		private ResourceReference<OrganGestorResource, Long> organGestor;
 	}
 
 }

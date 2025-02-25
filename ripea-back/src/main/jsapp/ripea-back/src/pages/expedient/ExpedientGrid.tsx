@@ -66,6 +66,7 @@ const ExpedientGrid: React.FC = () => {
         >
             <FormField name="codi" />
             <FormField name="nom" />
+            <FormField name="organGestor" />
 
             <Button onClick={netejar}>Netejar</Button>
             <Button onClick={cercar} variant="contained">Cercar</Button>

@@ -21,6 +21,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -48,20 +49,21 @@ public abstract class BaseHalFormsConfig {
 	private HalFormsConfiguration createHalFormsConfiguration(Set<Class<MutableResourceController>> resourceControllerClasses) {
 		HalFormsConfiguration halFormsConfiguration = new HalFormsConfiguration();
 		if (resourceControllerClasses != null) {
-			for (Class<MutableResourceController> r: resourceControllerClasses) {
-				halFormsConfiguration = withResourceController(halFormsConfiguration, r);
+			for (Class<MutableResourceController> rc: resourceControllerClasses) {
+				Class<?> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+						rc,
+						ReadonlyResourceController.class,
+						0);
+				halFormsConfiguration = withResourceClass(halFormsConfiguration, resourceClass, resourceControllerClasses);
 			}
 		}
 		return halFormsConfiguration;
 	}
 
-	private HalFormsConfiguration withResourceController(
+	private HalFormsConfiguration withResourceClass(
 			HalFormsConfiguration halFormsConfiguration,
-			Class<MutableResourceController> resourceControllerClass) {
-		Class<?> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-				resourceControllerClass,
-				ReadonlyResourceController.class,
-				0);
+			Class<?> resourceClass,
+			Set<Class<MutableResourceController>> resourceControllerClasses) {
 		MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder = new MutableHolder<>(halFormsConfiguration);
 		ReflectionUtils.doWithFields(
 				resourceClass,
@@ -77,11 +79,35 @@ public abstract class BaseHalFormsConfig {
 				field -> {
 					configurationWithResourceReferenceOptions(
 							halFormsConfigurationHolder,
-							resourceControllerClass,
 							resourceClass,
-							field);
+							field,
+							resourceControllerClasses);
 				},
 				field -> ResourceReference.class.isAssignableFrom(field.getType()));
+		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
+		if (resourceConfig != null && resourceConfig.artifactFormClasses().length > 0) {
+			for (Class<?> artifactFormClass: resourceConfig.artifactFormClasses()) {
+				ReflectionUtils.doWithFields(
+						artifactFormClass,
+						field -> {
+							configurationWithEnumOptions(
+									halFormsConfigurationHolder,
+									artifactFormClass,
+									field);
+						},
+						this::isEnumField);
+				ReflectionUtils.doWithFields(
+						artifactFormClass,
+						field -> {
+							configurationWithResourceReferenceOptions(
+									halFormsConfigurationHolder,
+									artifactFormClass,
+									field,
+									resourceControllerClasses);
+						},
+						field -> ResourceReference.class.isAssignableFrom(field.getType()));
+			}
+		}
 		return halFormsConfigurationHolder.getValue();
 	}
 
@@ -104,22 +130,26 @@ public abstract class BaseHalFormsConfig {
 
 	private void configurationWithResourceReferenceOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
-			Class<MutableResourceController> resourceControllerClass,
 			Class<?> resourceClass,
-			Field resourceField) {
+			Field resourceField,
+			Set<Class<MutableResourceController>> resourceControllerClasses) {
 		log.info("New HAL-FORMS resource reference options (class={}, field={})", resourceClass, resourceField.getName());
-		halFormsConfigurationHolder.setValue(
-				halFormsConfigurationHolder.getValue().withOptions(
-						resourceClass,
-						resourceField.getName(),
-						metadata -> HalFormsOptions.
-								remote(getRemoteOptionsLink(
-										resourceControllerClass,
-										resourceField.getName())).
-								withValueField("id").
-								withPromptField(getRemoteOptionsPromptField(resourceField)).
-								withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
-								withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L)));
+		Link remoteOptionsLink = getRemoteOptionsLink(
+				resourceClass,
+				resourceField,
+				resourceControllerClasses);
+		if (remoteOptionsLink != null) {
+			halFormsConfigurationHolder.setValue(
+					halFormsConfigurationHolder.getValue().withOptions(
+							resourceClass,
+							resourceField.getName(),
+							metadata -> HalFormsOptions.
+									remote(remoteOptionsLink).
+									withValueField("id").
+									withPromptField(getRemoteOptionsPromptField(resourceField)).
+									withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
+									withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L)));
+		}
 	}
 
 	private boolean isEnumField(Field field) {
@@ -147,27 +177,45 @@ public abstract class BaseHalFormsConfig {
 	}
 
 	private Link getRemoteOptionsLink(
-			Class<MutableResourceController> resourceControllerClass,
-			String fieldName) {
-		Link findLink = linkTo(methodOn(resourceControllerClass).fieldOptionsFind(
-				fieldName,
-				null,
-				null,
-				null,
-				null,
-				null)).withRel(IanaLinkRelations.SELF_VALUE);
-		// Al link generat li canviam les variables namedQuery i
-		// perspective perquè no les posa com a múltiples.
-		String findLinkHref = findLink.getHref().
-				replace("namedQuery", "namedQuery*").
-				replace("perspective", "perspective*");
-		// I a més hi afegim les variables page, size i sort que no les
-		// detecta a partir de la classe de tipus Pageable
-		TemplateVariables findTemplateVariables = new TemplateVariables(
-				new TemplateVariable("page", TemplateVariable.VariableType.REQUEST_PARAM),
-				new TemplateVariable("size", TemplateVariable.VariableType.REQUEST_PARAM),
-				new TemplateVariable("sort", TemplateVariable.VariableType.REQUEST_PARAM).composite());
-		return Link.of(UriTemplate.of(findLinkHref).with(findTemplateVariables), findLink.getRel());
+			Class<?> resourceClass,
+			Field resourceField,
+			Set<Class<MutableResourceController>> resourceControllerClasses) {
+		Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(resourceField);
+		Optional<Class<MutableResourceController>> resourceControllerClass = resourceControllerClasses.stream().
+				filter(rc -> {
+					Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+							rc,
+							ReadonlyResourceController.class,
+							0);
+					return controllerResourceClass.equals(referencedResourceClass);
+				}).findFirst();
+		if (resourceControllerClass.isPresent()) {
+			Link findLink = linkTo(methodOn(resourceControllerClass.get()).fieldOptionsFind(
+					resourceField.getName(),
+					null,
+					null,
+					null,
+					null,
+					null)).withRel(IanaLinkRelations.SELF_VALUE);
+			// Al link generat li canviam les variables namedQuery i
+			// perspective perquè no les posa com a múltiples.
+			String findLinkHref = findLink.getHref().
+					replace("namedQuery", "namedQuery*").
+					replace("perspective", "perspective*");
+			// I a més hi afegim les variables page, size i sort que no les
+			// detecta a partir de la classe de tipus Pageable
+			TemplateVariables findTemplateVariables = new TemplateVariables(
+					new TemplateVariable("page", TemplateVariable.VariableType.REQUEST_PARAM),
+					new TemplateVariable("size", TemplateVariable.VariableType.REQUEST_PARAM),
+					new TemplateVariable("sort", TemplateVariable.VariableType.REQUEST_PARAM).composite());
+			return Link.of(UriTemplate.of(findLinkHref).with(findTemplateVariables), findLink.getRel());
+		} else {
+			log.error("Couldn't find resource controller class from field (" +
+					"resourceClass=" + resourceClass + "," +
+					"fieldName=" + resourceField.getName() + "," +
+					"referencedResourceClass=" + referencedResourceClass + ")");
+			return null;
+		}
 	}
 
 	private String getRemoteOptionsPromptField(Field field) {
