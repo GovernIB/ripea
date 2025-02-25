@@ -1258,9 +1258,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
     @Override
-    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor) {
+    public Boolean isPermisEnviamentPostalOrganOrAntecesor(Long organGestorId) {
         OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);
-        List<OrganGestorEntity> organGestorEntityList = organGestorHelper.findPares(organGestor,incloureOrganGestor);
+        if (organGestor.isPermetreEnviamentPostal()) return true;
+        List<OrganGestorEntity> organGestorEntityList = organGestorHelper.findPares(organGestor, false);
         for (OrganGestorEntity organGestorEntity: organGestorEntityList) {
             if (organGestorEntity.isPermetreEnviamentPostal() && organGestorEntity.isPermetreEnviamentPostalDescendents()){
                 return true;

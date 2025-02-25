@@ -165,7 +165,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	@RolesAllowed("tothom")
 	public OrganGestorDto findById(
 			Long entitatId,
 			Long id) {
@@ -302,8 +302,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
-    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor) {
-		return delegate.isPermisAntecesor(organGestorId, incloureOrganGestor);
+	@RolesAllowed("tothom")
+    public Boolean isPermisEnviamentPostalOrganOrAntecesor(Long organGestorId) {
+		return delegate.isPermisEnviamentPostalOrganOrAntecesor(organGestorId);
 	}
 }

@@ -394,14 +394,9 @@ public class BaseController implements MessageSourceAware {
 
         boolean isPermetreEnviamentPostal = entitatActual.isPermetreEnviamentPostal();
         if ( document.getExpedientPare().getOrganGestorId() != null ) {
-            OrganGestorDto organGestor = organGestorService.findById(
-                    entitatActual.getId(),
-                    document.getExpedientPare().getOrganGestorId()
-            );
-
             isPermetreEnviamentPostal = isPermetreEnviamentPostal
-                    || organGestor.isPermetreEnviamentPostal()
-                    || organGestorService.isPermisAntecesor(document.getExpedientPare().getOrganGestorId(), false);
+                    || organGestorService.isPermisEnviamentPostalOrganOrAntecesor(
+                    		document.getExpedientPare().getOrganGestorId());
         }
 
 		if (isPermetreEnviamentPostal) {

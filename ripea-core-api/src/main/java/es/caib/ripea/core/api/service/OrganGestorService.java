@@ -242,7 +242,7 @@ public interface OrganGestorService {
 			Long entitatId,
 			String codi);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public OrganGestorDto findById(
 			Long entitatId,
 			Long id);
@@ -310,6 +310,6 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('tothom')")
 	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId);
 
-    @PreAuthorize("hasRole('IPA_ADMIN')")
-    public Boolean isPermisAntecesor(Long organGestorId, boolean incloureOrganGestor);
+	@PreAuthorize("hasRole('tothom')")
+    public Boolean isPermisEnviamentPostalOrganOrAntecesor(Long organGestorId);
 }
