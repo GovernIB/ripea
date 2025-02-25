@@ -218,7 +218,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         }).catch(() => { });
     }
     const autoFocus = componentProps?.autoFocus;
-    const startAdornmentIcons = [];
+    const startAdornmentIcons: React.ReactElement[] = [];
     const optionsErrorIconElement = optionsError != null ? <Icon fontSize="small" color="error" title={optionsError.message} sx={{ ml: 1 }}>
         warning
     </Icon> : null;
