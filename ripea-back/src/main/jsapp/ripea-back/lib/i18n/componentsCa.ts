@@ -63,6 +63,23 @@ const componentsCa = {
             success: 'Element esborrat',
             error: 'Error esborrant element',
         },
+        field: {
+            reference: {
+                open: 'Obrir',
+                close: 'Tancar',
+                clear: 'Esborrar',
+                loading: 'Carregant...',
+                noOptions: 'Sense opcions',
+                page: 'Mostrant {{size}} de {{totalElements}} elements',
+                advanced: {
+                    title: 'Seleccionar valor'
+                }
+            },
+            checkboxSelect: {
+                true: 'Si',
+                false: 'No',
+            },
+        },
     },
     buttons: {
         answerRequired: {

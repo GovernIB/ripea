@@ -59,6 +59,23 @@ const componentsEn = {
             success: 'Element deleted',
             error: 'Error deleting element',
         },
+        field: {
+            reference: {
+                open: 'Open',
+                close: 'Close',
+                clear: 'Clear',
+                loading: 'Loading...',
+                noOptions: 'No options',
+                page: 'Showing {{size}} out of {{totalElements}} elements',
+                advanced: {
+                    title: 'Select value'
+                }
+            },
+            checkboxSelect: {
+                true: 'Yes',
+                false: 'No',
+            },
+        },
     },
     buttons: {
         answerRequired: {

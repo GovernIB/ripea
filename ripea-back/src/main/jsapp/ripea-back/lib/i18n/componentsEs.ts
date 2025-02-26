@@ -59,6 +59,23 @@ const componentsEs = {
             success: 'Elemento borrado',
             error: 'Error borrando elemento',
         },
+        field: {
+            reference: {
+                open: 'Abrir',
+                close: 'Cerrar',
+                clear: 'Borrar',
+                loading: 'Cargando...',
+                noOptions: 'Sin opciones',
+                page: 'Mostrando {{size}} de {{totalElements}} elementos',
+                advanced: {
+                    title: 'Seleccionar valor'
+                }
+            },
+            checkboxSelect: {
+                true: 'Si',
+                false: 'No',
+            },
+        },
     },
     buttons: {
         answerRequired: {
