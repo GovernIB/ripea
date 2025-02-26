@@ -16,9 +16,11 @@ public interface PermissionEvaluatorService extends PermissionEvaluator {
 		DELETE,
 		GET_ONE,
 		FIND,
+		ONCHANGE,
 		ARTIFACT,
 		ACTION,
-		REPORT
+		REPORT,
+		OPTIONS
 	}
 
 }
