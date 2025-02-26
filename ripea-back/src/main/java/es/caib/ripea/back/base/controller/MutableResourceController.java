@@ -174,4 +174,59 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
 
+	/**
+	 * Consulta paginada de les opcions disponibles per a emplenar un camp de
+	 * tipus ResourceReference que pertany al formulari de l'acció.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param code
+	 *            codi de l'acció.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param quickFilter
+	 *            text per a filtrar múltiples camps.
+	 * @param filter
+	 *            consulta en format Spring Filter.
+	 * @param namedQueries
+	 *            llista de noms de consultes a aplicar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @param pageable
+	 *            informació sobre la pagina de resultats que es vol obtenir.
+	 * @return la pàgina amb els resultats de la consulta.
+	 */
+	<RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactActionFieldOptionsFind(
+			final String code,
+			final String fieldName,
+			final String quickFilter,
+			final String filter,
+			final String[] namedQueries,
+			final String[] perspectives,
+			final Pageable pageable);
+
+	/**
+	 * Consulta d'una de les opcions disponibles per a emplenar un camp de
+	 * tipus ResourceReference que pertany al formulari de l'acció.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param <RID>
+	 *            Tipus de l'id del recurs (ha d'estendre de Serializable).
+	 * @param code
+	 *            codi de l'acció.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param id
+	 *            id de l'element que es vol consultar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @return L'element amb l'id especificat.
+	 */
+	<RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactActionFieldOptionsGetOne(
+			final String code,
+			final String fieldName,
+			final RID id,
+			final String[] perspectives);
+
 }

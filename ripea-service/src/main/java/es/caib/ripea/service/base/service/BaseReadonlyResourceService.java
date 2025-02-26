@@ -5,6 +5,7 @@ import es.caib.ripea.persistence.base.repository.BaseRepository;
 import es.caib.ripea.service.base.helper.ObjectMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
@@ -54,7 +55,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	private Class<E> entityClass;
 	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>();
 	private final Map<String, PerspectiveApplicator<R, E>> perspectiveApplicatorMap = new HashMap<>();
-	private final Map<String, ReportDataGenerator<?, ?>> reportDataGeneratorMap = new HashMap<>();
+	private final Map<String, ReportDataGenerator<?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
 
 	@Override
 	@Transactional(readOnly = true)
@@ -132,8 +133,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ResourceArtifact> artifactGetAllowed(ResourceArtifactType type) {
-		log.debug("Consultant els artefactes permesos (type={})", type);
+	public List<ResourceArtifact> artifactFindAll(ResourceArtifactType type) {
+		log.debug("Querying all artifacts (type={})", type);
 		List<ResourceArtifact> artifacts = new ArrayList<>();
 		if (type == null || type == ResourceArtifactType.PERSPECTIVE) {
 			artifacts.addAll(
@@ -150,16 +151,16 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 							map(rdge -> new ResourceArtifact(
 									ResourceArtifactType.REPORT,
 									rdge.getKey(),
-									rdge.getValue().getParameterClass())).
+									artifactGetFormClass(ResourceArtifactType.REPORT, rdge.getKey()))).
 							collect(Collectors.toList()));
 		}
 		if (type == null || type == ResourceArtifactType.FILTER) {
 			artifacts.addAll(
-					filterProcessorMap.entrySet().stream().
-							map(fpe -> new ResourceArtifact(
+					artifactGetFilterAll().stream().
+							map(f -> new ResourceArtifact(
 									ResourceArtifactType.FILTER,
-									fpe.getKey(),
-									fpe.getValue().getResourceClass())).
+									f.code(),
+									artifactGetFormClass(ResourceArtifactType.FILTER, f.code()))).
 							collect(Collectors.toList()));
 		}
 		return artifacts;
@@ -167,12 +168,30 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<Class<?>> artifactGetFormClass(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
-		log.debug("Consultant la classe de formulari per l'artefacte (type={}, code={})", type, code);
-		if (type == ResourceArtifactType.REPORT) {
-			ReportDataGenerator<?, ?> generator = reportDataGeneratorMap.get(code);
-			if (generator != null) {
-				return generator.getParameterClass() != null ? Optional.of(generator.getParameterClass()) : Optional.empty();
+	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
+		log.debug("Querying artifact form class (type={}, code={})", type, code);
+		if (type == ResourceArtifactType.PERSPECTIVE) {
+			PerspectiveApplicator<?, ?> perspectiveApplicator = perspectiveApplicatorMap.get(code);
+			if (perspectiveApplicator != null) {
+				return new ResourceArtifact(
+						ResourceArtifactType.PERSPECTIVE,
+						code,
+						null);
+			}
+		} else if (type == ResourceArtifactType.REPORT) {
+			ReportDataGenerator<?, ?> reportDataGenerator = reportDataGeneratorMap.get(code);
+			if (reportDataGenerator != null) {
+				return new ResourceArtifact(
+						ResourceArtifactType.REPORT,
+						code,
+						artifactGetFormClass(type, code));
+			}
+		} else if (type == ResourceArtifactType.FILTER) {
+			if (artifactIsPresentInResourceConfig(type, code)) {
+				return new ResourceArtifact(
+						ResourceArtifactType.FILTER,
+						code,
+						artifactGetFormClass(type, code));
 			}
 		}
 		throw new ArtifactNotFoundException(getResourceClass(), type, code);
@@ -180,7 +199,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public <P> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException {
+	public <P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException {
 		log.debug(
 				"Generant l'informe(code={}, params={})",
 				code,
@@ -454,19 +473,81 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return entityClass;
 	}
 
-	protected void register(FilterProcessor<?> filterProcessor) {
-		Arrays.stream(filterProcessor.getSupportedPerspectiveCodes()).
-				forEach(c -> filterProcessorMap.put(c, filterProcessor));
+	protected void register(
+			String reportCode,
+			ReportDataGenerator<?, ?> reportGenerator) {
+		if (artifactIsPresentInResourceConfig(ResourceArtifactType.REPORT, reportCode)) {
+			reportDataGeneratorMap.put(reportCode, reportGenerator);
+		} else {
+			log.error("Artifact not registered because it doesn't exist in ResourceConfig annotation (" +
+					"resourceClass=" + getResourceClass() + ", " +
+					"artifactType=" + ResourceArtifactType.REPORT + ", " +
+					"artifactCode=" + reportCode + ")");
+		}
 	}
 
-	protected void register(PerspectiveApplicator<R, E> perspectiveApplicator) {
-		Arrays.stream(perspectiveApplicator.getSupportedPerspectiveCodes()).
-				forEach(c -> perspectiveApplicatorMap.put(c, perspectiveApplicator));
+	protected void register(
+			String filterCode,
+			FilterProcessor<?> filterProcessor) {
+		if (artifactIsPresentInResourceConfig(ResourceArtifactType.FILTER, filterCode)) {
+			filterProcessorMap.put(filterCode, filterProcessor);
+		} else {
+			log.error("Artifact not registered because it doesn't exist in ResourceConfig annotation (" +
+					"resourceClass=" + getResourceClass() + ", " +
+					"artifactType=" + ResourceArtifactType.FILTER + ", " +
+					"artifactCode=" + filterCode + ")");
+		}
 	}
 
-	protected void register(ReportDataGenerator<?, ?> reportGenerator) {
-		Arrays.stream(reportGenerator.getSupportedReportCodes()).
-				forEach(c -> reportDataGeneratorMap.put(c, reportGenerator));
+	protected void register(
+			String perspectiveCode,
+			PerspectiveApplicator<R, E> perspectiveApplicator) {
+		if (artifactIsPresentInResourceConfig(ResourceArtifactType.PERSPECTIVE, perspectiveCode)) {
+			perspectiveApplicatorMap.put(perspectiveCode, perspectiveApplicator);
+		} else {
+			log.error("Artifact not registered because it doesn't exist in ResourceConfig annotation (" +
+					"resourceClass=" + getResourceClass() + ", " +
+					"artifactType=" + ResourceArtifactType.PERSPECTIVE + ", " +
+					"artifactCode=" + perspectiveCode + ")");
+		}
+	}
+
+	protected Class<? extends Serializable> artifactGetFormClass(ResourceArtifactType type, String code) {
+		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
+		if (resourceConfig != null) {
+			Optional<ResourceConfigArtifact> artifact = Arrays.stream(resourceConfig.artifacts()).
+					filter(a -> a.type() == type && a.code().equals(code)).
+					findFirst();
+			if (artifact.isPresent() && !artifact.get().formClass().equals(Serializable.class)) {
+				return artifact.get().formClass();
+			}
+		}
+		return null;
+	}
+
+	protected boolean artifactIsPresentInResourceConfig(
+			ResourceArtifactType type,
+			String code) {
+		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
+		if (resourceConfig != null) {
+			Optional<ResourceConfigArtifact> artifacts = Arrays.stream(resourceConfig.artifacts()).
+					filter(a -> a.type() == type && a.code().equals(code)).
+					findFirst();
+			return artifacts.isPresent();
+		} else {
+			return false;
+		}
+	}
+
+	protected List<ResourceConfigArtifact> artifactGetFilterAll() {
+		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
+		if (resourceConfig != null) {
+			return Arrays.stream(resourceConfig.artifacts()).
+					filter(a -> a.type() == ResourceArtifactType.FILTER).
+					collect(Collectors.toList());
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	private Pageable toProcessedPageableSort(Pageable pageable) {
@@ -746,36 +827,11 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	/**
-	 * Interfície a implementar pels artefactes encarregats de filtrar els recursos.
-	 *
-	 * @param <R> classe del recurs que representa el filtre.
-	 */
-	public interface FilterProcessor <R extends Serializable> {
-		/**
-		 * Retorna els codis suportats en aquest processador.
-		 *
-		 * @return els codis suportats.
-		 */
-		String[] getSupportedPerspectiveCodes();
-		/**
-		 * Retorna la classe que gestiona aquest processador.
-		 * @return la classe del recurs.
-		 */
-		Class<R> getResourceClass();
-	}
-
-	/**
 	 * Interfície a implementar pels artefactes encarregats d'aplicar perspectives als recursos.
 	 *
 	 * @param <R> classe del recurs suportat.
 	 */
 	public interface PerspectiveApplicator <R extends Resource<?>, E extends Persistable<?>> {
-		/**
-		 * Retorna els codis suportats en aquest aplicador.
-		 *
-		 * @return els codis suportats.
-		 */
-		String[] getSupportedPerspectiveCodes();
 		/**
 		 * Aplica la perspectiva a múltiples recursos. Es pot sobreescriure o deixar sense implementar.
 		 * Si es deixa sense implementar s'aplicarà la perspectiva a cada recurs per separat.
@@ -818,23 +874,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * Interfície a implementar pels artefactes encarregats de generar dades pels informes.
 	 *
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
-	 * @param <D> classe de la llista de dades retornades al generar l'informe.
+	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportDataGenerator<P, D> {
-		/**
-		 * Retorna els codis suportats en aquest generador.
-		 *
-		 * @return els codis suportats.
-		 */
-		String[] getSupportedReportCodes();
-		/**
-		 * Retorna la classe pels paràmetres.
-		 *
-		 * @return la classe pels paràmetres o null si no en te
-		 */
-		default Class<P> getParameterClass() {
-			return null;
-		}
+	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
 		/**
 		 * Genera les dades per l'informe.
 		 *
@@ -846,9 +888,17 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		 * @throws ReportGenerationException
 		 *             si es produeix algun error generant les dades.
 		 */
-		List<D> generate(
+		List<R> generate(
 				String code,
 				P params) throws ReportGenerationException;
+	}
+
+	/**
+	 * Interfície a implementar pels artefactes encarregats de filtrar els recursos.
+	 *
+	 * @param <R> classe del recurs que representa el filtre.
+	 */
+	public interface FilterProcessor <R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<R> {
 	}
 
 }

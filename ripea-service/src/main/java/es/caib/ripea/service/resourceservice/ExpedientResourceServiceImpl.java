@@ -29,18 +29,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @PostConstruct
 	public void init() {
-		register(new ExpedientFilterProcessor());
-	}
-
-	private static class ExpedientFilterProcessor implements FilterProcessor<ExpedientResource.ExpedientFilterForm> {
-		@Override
-		public String[] getSupportedPerspectiveCodes() {
-			return new String[] { "EXPEDIENT_FILTER" };
-		}
-		@Override
-		public Class<ExpedientResource.ExpedientFilterForm> getResourceClass() {
-			return ExpedientResource.ExpedientFilterForm.class;
-		}
 	}
 
     @Override

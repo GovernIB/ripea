@@ -2,7 +2,6 @@ package es.caib.ripea.service.base.service;
 
 import es.caib.ripea.service.base.helper.PermissionHelper;
 import es.caib.ripea.service.intf.base.exception.UnknownPermissionException;
-import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
@@ -18,7 +17,7 @@ import java.io.Serializable;
  */
 @Slf4j
 @Service("permissionEvaluatorService")
-public class PermissionEvaluatorServiceImpl implements PermissionEvaluatorService {
+public class PermissionEvaluatorService implements es.caib.ripea.service.intf.base.service.PermissionEvaluatorService {
 
 	@Autowired
 	private PermissionHelper permissionHelper;
@@ -68,6 +67,8 @@ public class PermissionEvaluatorServiceImpl implements PermissionEvaluatorServic
 					return (BasePermission)BasePermission.READ;
 				case UPDATE:
 				case PATCH:
+				case ONCHANGE:
+				case OPTIONS:
 				case ACTION:
 					return (BasePermission)BasePermission.WRITE;
 				case CREATE:

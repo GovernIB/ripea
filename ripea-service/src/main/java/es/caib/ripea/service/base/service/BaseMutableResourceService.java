@@ -139,16 +139,16 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ResourceArtifact> artifactGetAllowed(ResourceArtifactType type) {
-		log.debug("Consultant els artefactes permesos (type={})", type);
-		List<ResourceArtifact> artifacts = new ArrayList<>(super.artifactGetAllowed(type));
+	public List<ResourceArtifact> artifactFindAll(ResourceArtifactType type) {
+		log.debug("Querying allowed artifacts (type={})", type);
+		List<ResourceArtifact> artifacts = new ArrayList<>(super.artifactFindAll(type));
 		if (type == null || type == ResourceArtifactType.ACTION) {
 			artifacts.addAll(
 					actionExecutorMap.entrySet().stream().
 							map(r -> new ResourceArtifact(
 									ResourceArtifactType.ACTION,
 									r.getKey(),
-									r.getValue().getParameterClass())).
+									artifactGetFormClass(ResourceArtifactType.ACTION, r.getKey()))).
 							collect(Collectors.toList()));
 		}
 		return artifacts;
@@ -156,15 +156,18 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<Class<?>> artifactGetFormClass(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
-		log.debug("Consultant la classe de formulari per l'artefacte (type={}, code={})", type, code);
+	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
+		log.debug("Querying artifact form class (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.ACTION) {
 			ActionExecutor<?, ?> generator = actionExecutorMap.get(code);
 			if (generator != null) {
-				return generator.getParameterClass() != null ? Optional.of(generator.getParameterClass()) : Optional.empty();
+				return new ResourceArtifact(
+						ResourceArtifactType.ACTION,
+						code,
+						artifactGetFormClass(type, code));
 			}
 		}
-		return super.artifactGetFormClass(type, code);
+		return super.artifactGetOne(type, code);
 	}
 
 	protected void updateEntityWithResource(E entity, R resource) {
@@ -492,15 +495,25 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		}
 	}
 
-	protected void register(ActionExecutor<?, ?> actionExecutor) {
-		Arrays.stream(actionExecutor.getSupportedActionCodes()).
-				forEach(c -> actionExecutorMap.put(c, actionExecutor));
+	protected void register(
+			String actionCode,
+			ActionExecutor<?, ?> actionExecutor) {
+		if (artifactIsPresentInResourceConfig(ResourceArtifactType.ACTION, actionCode)) {
+			actionExecutorMap.put(actionCode, actionExecutor);
+		} else {
+			log.error("Artifact not registered because it doesn't exist in ResourceConfig annotation (" +
+					"resourceClass=" + getResourceClass() + ", " +
+					"artifactType=" + ResourceArtifactType.ACTION + ", " +
+					"artifactCode=" + actionCode + ")");
+		}
 	}
 
-	protected void register(OnChangeLogicProcessor<R> logicProcessor) {
-		Arrays.stream(logicProcessor.getSupportedFieldNames()).
-				forEach(f -> onChangeLogicProcessorMap.put(f, logicProcessor));
+	protected void register(
+			String fieldName,
+			OnChangeLogicProcessor<R> logicProcessor) {
+		onChangeLogicProcessorMap.put(fieldName, logicProcessor);
 	}
+
 	private Map<String, Object> onChangeLogicProcessRecursive(
 			R previous,
 			String fieldName,
@@ -605,13 +618,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 *
 	 * @param <R> classe del recurs.
 	 */
-	public interface OnChangeLogicProcessor <R extends Resource<?>> {
-		/**
-		 * Retorna la llista de camps que gestiona aquest processdor.
-		 *
-		 * @return els camps suportats.
-		 */
-		String[] getSupportedFieldNames();
+	public interface OnChangeLogicProcessor <R extends Serializable> {
 		/**
 		 * Processa la lògica onChange d'un camp.
 		 *
@@ -640,21 +647,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 * @param <P> classe dels paràmetres necessaris per a executar l'acció.
 	 * @param <R> classe de la resposta retornada com a resultat.
 	 */
-	public interface ActionExecutor<P, R> {
-		/**
-		 * Retorna els codis suportats en aquest executor.
-		 *
-		 * @return els codis suportats.
-		 */
-		String[] getSupportedActionCodes();
-		/**
-		 * Retorna la classe pels paràmetres.
-		 *
-		 * @return la classe pels paràmetres o null si no en te
-		 */
-		default Class<P> getParameterClass() {
-			return null;
-		}
+	public interface ActionExecutor<P, R extends Serializable> extends OnChangeLogicProcessor<R> {
 		/**
 		 * Executa l'acció.
 		 *
@@ -667,6 +660,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		 *             si es produeix algun error generant les dades.
 		 */
 		R exec(String code, P params) throws ActionExecutionException;
+		default void processOnChangeLogic(
+				R previous,
+				String fieldName,
+				Object fieldValue,
+				Map<String, AnswerRequiredException.AnswerValue> answers,
+				R target) {
+		}
 	}
 
 }

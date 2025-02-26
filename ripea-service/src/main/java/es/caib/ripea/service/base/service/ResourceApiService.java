@@ -3,7 +3,6 @@ package es.caib.ripea.service.base.service;
 import es.caib.ripea.service.base.helper.PermissionHelper;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
-import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class ResourceApiServiceImpl implements ResourceApiService {
+public class ResourceApiService implements es.caib.ripea.service.intf.base.service.ResourceApiService {
 
 	@Autowired
 	private PermissionHelper permissionHelper;
