@@ -506,7 +506,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     const fields = a.formClassActive ? state.action(actionRel)?.fields as any[] : undefined;
                     const mappedFields = fields?.map(f => ({
                         ...f,
-                        type: f.type === 'search' ? 'selecta' : f.type
+                        type: f.type === 'search' ? 'select' : f.type
                     }));
                     return {
                         type: a.type,
