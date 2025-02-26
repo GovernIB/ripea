@@ -1,22 +1,127 @@
 import { useTranslation } from 'react-i18next';
-import { Box, Typography } from '@mui/material';
-// import { useParams } from 'react-router-dom';
-import { BasePage } from 'reactlib';
+import { useParams } from 'react-router-dom';
+import {
+    BasePage,
+    useResourceApiService,
+} from 'reactlib';
+import React, {useState} from "react";
+import {Box, Typography, Card, CardContent, Grid} from '@mui/material';
+import {formatDate} from '../../util/dateUtils';
+import TabComponent from "../../components/TabComponent";
+import InteressatsGrid from "./detall/InteressatsGrid.tsx";
+import DocumentsGrid from "./detall/DocumentsGrid.tsx";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+const CardProp = (props :any) => {
+    const { title, children, ...other } = props;
+    return <>
+        <Typography sx={{ color: 'text.secondary', fontSize: 14, mt: 1, fontStyle: "italic" }}>
+            {title}
+        </Typography>
+        <Typography variant="body2" {...other}>{children}</Typography>
+    </>;
+}
 
 const Expedient: React.FC = () => {
     const { t } = useTranslation();
-    // const { id } = useParams();
-    return <BasePage>
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: 'calc(100vh - 72px)',
-            }}>
-            <Typography variant="h2">{t('page.notFound')}</Typography>
-        </Box>
-    </BasePage>;
+    const { id } = useParams();
+
+    const {
+        isReady: appApiIsReady,
+        getOne: appGetOne,
+    } = useResourceApiService('expedientResource');
+    const [expedient, setExpedient] = useState<any>();
+    if (appApiIsReady && !expedient) {
+        appGetOne(id).then((app) => setExpedient(app))
+    }
+
+    const border= { border: '1px solid #e3e3e3', borderRadius: 1 };
+    const backgroundColor= { backgroundColor: '#f5f5f5' };
+
+    const tabs = [
+        {
+            value: "contingut",
+            label: t('page.contingut.tabs.contingut'),
+            content: <DocumentsGrid/>,
+        },
+        {
+            value: "dades",
+            label: t('page.contingut.tabs.dades'),
+            content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
+        },
+        {
+            value: "interessats",
+            label: t('page.contingut.tabs.interessats'),
+            content: <InteressatsGrid/>,
+        },
+        {
+            value: "remeses",
+            label: t('page.contingut.tabs.remeses'),
+            content: <Typography>{t('page.contingut.tabs.remeses')}</Typography>,
+        },
+        {
+            value: "publicacions",
+            label: t('page.contingut.tabs.publicacions'),
+            content: <Typography>{t('page.contingut.tabs.publicacions')}</Typography>,
+        },
+        {
+            value: "anotacions",
+            label: t('page.contingut.tabs.anotacions'),
+            content: <Typography>{t('page.contingut.tabs.anotacions')}</Typography>,
+        },
+        {
+            value: "versions",
+            label: t('page.contingut.tabs.versions'),
+            content: <Typography>{t('page.contingut.tabs.versions')}</Typography>,
+        },
+        {
+            value: "tasques",
+            label: t('page.contingut.tabs.tasques'),
+            content: <Typography>{t('page.contingut.tabs.tasques')}</Typography>,
+        },
+    ]
+    if(expedient) {
+        return <BasePage>
+            <div style={border}>
+            <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', p: 1 }}>
+                <Typography variant="h5"><FontAwesomeIcon icon="folder-open" /> {expedient.nom}</Typography>
+            </Box>
+
+            <Grid container direction={"row"} sx={{ p: 1, alignItems: "stretch" }}>
+                <Grid item xs={3}>
+                    <Card sx={{ backgroundColor, border }}>
+                        <CardContent>
+                            <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
+                                Informació de l'expedient
+                            </Typography>
+
+                            <CardProp title={t('page.contingut.detalle.numero')}>{expedient.numero}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.titol')}>{expedient.nom}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.metaExpedient')}>{expedient.metaExpedient.description}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.organGestor')}>{expedient.organGestor.description}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient.ntiFechaApertura)}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.estat')}
+                                      sx={{borderLeft: `3px solid ${'red'}`, pl: 1}}>{expedient.estat}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.prioritat')}
+                                      sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>{expedient.prioritat}</CardProp>
+                            <CardProp title={t('page.contingut.detalle.clasificacio')}>{expedient.ntiClasificacionSia}</CardProp>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                <Grid item xs={9}>
+                    <TabComponent
+                        indicatorColor={"primary"}
+                        textColor={"primary"}
+                        aria-label="scrollable force tabs"
+                        tabs={tabs}
+                        variant="scrollable"
+                    />
+                </Grid>
+            </Grid>
+            </div>
+        </BasePage>;
+    }
 }
 
 export default Expedient;

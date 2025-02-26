@@ -3,7 +3,11 @@ import { BaseApp } from './components/BaseApp';
 import logo from './assets/logo.png';
 import govern_logo from './assets/goib_logo_v.svg';
 import AppRoutes from './AppRoutes';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
 
+// Agregar todos los iconos sólidos a la biblioteca
+library.add(fas);
 export const App: React.FC = () => {
     const version = '1.0.1';
     return <BaseApp
