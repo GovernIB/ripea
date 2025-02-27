@@ -75,10 +75,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ear-plugin</artifactId>
-				<version>2.8</version>
+				<version>3.2.0</version>
 				<configuration>
+					<generateApplicationXml>true</generateApplicationXml>
+					<defaultLibBundleDir>/lib</defaultLibBundleDir>
+					<includeLibInApplicationXml>false</includeLibInApplicationXml>
+					<version>6</version>
+					<initializeInOrder>true</initializeInOrder>
+					<skinnyWars>true</skinnyWars>				
 					<finalName>ripea</finalName>
-					<version>5</version>
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
@@ -92,7 +97,7 @@
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>ripea-ejb</artifactId>
-							<bundleFileName>ripea.jar</bundleFileName>
+							<bundleFileName>ripea-ejb.jar</bundleFileName>
 						</ejbModule>
 						<webModule>
 							<groupId>${project.groupId}</groupId>

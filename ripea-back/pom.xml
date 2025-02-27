@@ -351,7 +351,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
-							<packagingExcludes>**/RipeaBackBootApp.class,WEB-INF/lib/*.jar</packagingExcludes>
+							<packagingExcludes>**/RipeaBackBootApp.class,**/SpringBootWebSecurityConfig.class,WEB-INF/lib/*.jar</packagingExcludes>
 							<attachClasses>true</attachClasses>
 							<archive>
 								<manifestEntries>
