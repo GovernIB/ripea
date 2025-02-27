@@ -1,5 +1,12 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
@@ -100,12 +107,22 @@ public class ExpedientResource extends NodeResource {
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
-	@Getter
+    private String interessatsResum;
+    public String getTipusStr() {
+        return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
+    }
+
+    @Getter
 	@Setter
 	@NoArgsConstructor
 	public static class ExpedientFilterForm implements Serializable {
-		private String codi;
-		private String nom;
-		private ResourceReference<OrganGestorResource, Long> organGestor;
+        private String numero;
+        private String nom;
+        private ExpedientEstatEnumDto estat;
+        private ResourceReference<InteressatResource, Long> interessat;
+        private ResourceReference<OrganGestorResource, Long> organGestor;
+        private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+        private LocalDateTime dataCreacioInici;
+        private LocalDateTime dataCreacioFinal;
 	}
 }

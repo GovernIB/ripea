@@ -9,7 +9,7 @@ import {
 import {Button, Box, Typography, Grid} from "@mui/material";
 import {formatDate} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Icon } from '@mui/material';
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
@@ -30,13 +30,13 @@ const ExpedientGrid: React.FC = () => {
             headerName: 'Avisos',
             flex: 0.5,
             renderCell: (params: any) => (<>
-                {!params.row.valid && <FontAwesomeIcon icon={"triangle-exclamation"} className="text-warning" title="validacio"/>}
-                {params.row.errorLastEnviament && <FontAwesomeIcon icon={"pencil-square"} className="text-danger" title="enviaments"/>}
-                {params.row.errorLastNotificacio && <FontAwesomeIcon icon={"envelope-square"} className="text-danger" title="notificacions"/>}
-                {params.row.ambEnviamentsPendents && <FontAwesomeIcon icon={"pencil-square"} className="text-primary" title="enviaments"/>}
-                {params.row.ambNotificacionsPendents && <FontAwesomeIcon icon={"envelope-square"} className="text-primary" title="notificacions"/>}
-                {params.row.alerta && <FontAwesomeIcon icon={"exclamation-circle"} className="text-danger" title="alertes"/>}
-                {params.row.arxiuUuid == null && <FontAwesomeIcon icon={"exclamation-triangle"} className="text-danger" title="pendentGuardarArxiu"/>}
+                {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
+                {params.row.errorLastEnviament && <Icon color={"error"} title="enviaments">mode_square</Icon>}
+                {params.row.errorLastNotificacio && <Icon color={"error"} title="notificacions">email_square</Icon>}
+                {params.row.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments">mode_square</Icon>}
+                {params.row.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">email_square</Icon>}
+                {params.row.alerta && <Icon color={"error"} title="alertes">warning_circle</Icon>}
+                {params.row.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning_triangle</Icon>}
             </>),
         },
         {
@@ -79,9 +79,9 @@ const ExpedientGrid: React.FC = () => {
             (data.estat == null || data.estat==='TANCAT')
                 ?builder.eq("estat",`'${data.estat}'`)
                 :builder.neq("estat", `'TANCAT'`),
-            // in("interessat", data.interessat),
-            // eq("organGestor", data.organGestor),
-            // eq("metaExpedient", data.metaExpedient),
+            // builder.in("interessat", data.interessat),
+            builder.eq("organGestor.id", data.organGestor?.id),
+            // builder.eq("metaExpedient", data.metaExpedient),
             builder.between("createdDate", `'${data.dataCreacioInici}'`, `'${data.dataCreacioFinal}'`),
         )
         console.log('>>> springFilterBuilder:', filterStr)
@@ -116,16 +116,15 @@ const ExpedientGrid: React.FC = () => {
                     <Grid item xs={2}><FormField name="numero" componentProps={fieldProps}/></Grid>
                     <Grid item xs={4}><FormField name="nom" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="estat" componentProps={fieldProps}/></Grid>
-                    {/*<Grid item xs={3}><FormField name="interessat" componentProps={fieldProps}/></Grid>*/}
-                    {/*<Grid item xs={3}><FormField name="organGestor" componentProps={fieldProps}/></Grid>*/}
+                    <Grid item xs={3}><FormField name="interessat" componentProps={fieldProps}/></Grid>
+                    <Grid item xs={3}><FormField name="organGestor" componentProps={fieldProps}/></Grid>
                     {/*<Grid item xs={3}><FormField name="metaExpedient" componentProps={fieldProps}/></Grid>*/}
                     <Grid item xs={3}><FormField name="dataCreacioInici" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="dataCreacioFinal" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="organGestor" componentProps={fieldProps}/></Grid>
 
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-                        <Button onClick={netejar}><FontAwesomeIcon icon="eraser" /> Netejar</Button>
-                        <Button onClick={cercar} variant="contained"><FontAwesomeIcon icon="filter" /> Cercar</Button>
+                        <Button onClick={netejar}><Icon>eraser</Icon> Netejar</Button>
+                        <Button onClick={cercar} variant="contained"><Icon>filter_alt</Icon> Cercar</Button>
                     </Grid>
                 </Grid>
             </MuiFilter>

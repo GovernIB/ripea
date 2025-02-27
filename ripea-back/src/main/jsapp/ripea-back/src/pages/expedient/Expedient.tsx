@@ -5,12 +5,12 @@ import {
     useResourceApiService,
 } from 'reactlib';
 import React, {useState} from "react";
-import {Box, Typography, Card, CardContent, Grid} from '@mui/material';
+import {Box, Typography, Card, CardContent, Grid, Icon} from '@mui/material';
 import {formatDate} from '../../util/dateUtils';
 import TabComponent from "../../components/TabComponent";
 import InteressatsGrid from "./detall/InteressatsGrid.tsx";
 import DocumentsGrid from "./detall/DocumentsGrid.tsx";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import TasquesGrid from "./detall/TasquesGrid.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -84,7 +84,7 @@ const Expedient: React.FC = () => {
         return <BasePage>
             <div style={border}>
             <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', p: 1 }}>
-                <Typography variant="h5"><FontAwesomeIcon icon="folder-open" /> {expedient.nom}</Typography>
+                <Typography variant="h5"><Icon>folder</Icon> {expedient.nom}</Typography>
             </Box>
 
             <Grid container direction={"row"} sx={{ p: 1, alignItems: "stretch" }}>
