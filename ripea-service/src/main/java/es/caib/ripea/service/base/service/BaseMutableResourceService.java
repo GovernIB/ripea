@@ -1,6 +1,5 @@
 package es.caib.ripea.service.base.service;
 
-import es.caib.ripea.persistence.base.entity.EmbeddableEntity;
 import es.caib.ripea.persistence.base.repository.JpaRepositoryLocator;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.*;
@@ -219,18 +218,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			Object builderInstance = ReflectionUtils.invokeMethod(builderMethod, null);
 			Class<?> builderReturnType = builderMethod.getReturnType();
 			// Es crida el mètode "embedded" del builder si l'entitat és de tipus EmbeddedEntity
-			boolean isEmbeddedEntity = EmbeddableEntity.class.isAssignableFrom(getEntityClass());
 			boolean builderEmbeddedMethodCalled = false;
-			if (isEmbeddedEntity) {
-				Method embeddedMethod = ReflectionUtils.findMethod(builderReturnType, "embedded", resource.getClass());
-				if (embeddedMethod != null) {
-					ReflectionUtils.invokeMethod(
-							embeddedMethod,
-							builderInstance,
-							resource);
-					builderEmbeddedMethodCalled = true;
-				}
-			}
 			// Es criden els altres mètodes del builder que accepten només 1 argument de tipus Persistable
 			for (Method builderCallableMethod : ReflectionUtils.getDeclaredMethods(builderReturnType)) {
 				if (builderCallableMethod.getParameterTypes().length == 1) {
@@ -252,11 +240,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			E entity = (E) ReflectionUtils.invokeMethod(
 					ReflectionUtils.findMethod(builderReturnType, "build"),
 					builderInstance);
-			// Si l'entitat és de tipus embedde i no s'ha pogut cridar el mètode "embedded" del builder
-			// es configura el recurs cridant el mètode "setEmbedded" de l'entitat.
-			if (isEmbeddedEntity && !builderEmbeddedMethodCalled) {
-				((EmbeddableEntity) entity).setEmbedded(resource);
-			}
 			// Es crea la pk a partir de la informació del recurs
 			ID pk = getPkFromResource(resource);
 			if (pk != null) {
@@ -354,11 +337,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			}
 		});
 		// Actualitza els demés camps de l'entitat
-		if (entity instanceof EmbeddableEntity) {
-			((EmbeddableEntity)entity).setEmbedded(resource);
-		} else {
-			updateEntityWithResource(entity, resource);
-		}
+		updateEntityWithResource(entity, resource);
 	}
 
 	protected Persistable<?> getReferencedEntityForResourceField(
@@ -414,12 +393,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	}
 	protected void reorderSetOrder(E entity, R resource, long nextValue) {
 		Reorderable entityReorderable = null;
-		if (entity instanceof EmbeddableEntity) {
-			R embeddedResource = ((EmbeddableEntity<R, ?>) entity).getEmbedded();
-			if (embeddedResource instanceof Reorderable) {
-				entityReorderable = (Reorderable)embeddedResource;
-			}
-		} else if (entity instanceof Reorderable) {
+		if (entity instanceof Reorderable) {
 			entityReorderable = (Reorderable)entity;
 		}
 		if (entityReorderable != null) {
@@ -440,9 +414,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		}
 	}
 	private Long reorderGetSequenceFromEntity(E entity) {
-		if (entity instanceof EmbeddableEntity) {
-			return reorderGetSequenceFromResource(((EmbeddableEntity<R, ?>) entity).getEmbedded());
-		} else if (entity instanceof Reorderable) {
+		if (entity instanceof Reorderable) {
 			return ((Reorderable)entity).getOrder();
 		} else {
 			log.error("Couldn't get order from entity class {}", getEntityClass());

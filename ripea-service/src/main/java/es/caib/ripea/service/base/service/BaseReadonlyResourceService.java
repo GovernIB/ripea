@@ -1,6 +1,5 @@
 package es.caib.ripea.service.base.service;
 
-import es.caib.ripea.persistence.base.entity.EmbeddableEntity;
 import es.caib.ripea.persistence.base.repository.BaseRepository;
 import es.caib.ripea.service.base.helper.ObjectMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
@@ -621,33 +620,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					} else {
 						// Si s'ha arribat al final del path s'agafa l'ordenació
 						// definida a l'anotació del recurs de l'entitat.
-						if (EmbeddableEntity.class.isAssignableFrom(entityField.getType())) {
-							log.debug("\t\t\tDetectat camp d'entitat que és referencia final " + path[0] + " de tipus EmbeddableEntity, s'afegeix ordenació de l'anotació del recurs");
-							Class<?> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-									entityField.getType(),
-									EmbeddableEntity.class,
-									0);
-							List<String> sortPaths = new ArrayList<String>();
-							for (SortedField sortedField: getResourceDefaultSortFields(resourceClass)) {
-								String[] ops = toProcessedSortPath(
-										sortedField.getField().split("\\."),
-										entityField.getType());
-								if (ops != null) {
-									sortPaths.addAll(Arrays.asList(ops));
-								}
-							}
-							if (!sortPaths.isEmpty()) {
-								// Retorna els paths afegint de nou el primer camp
-								return sortPaths.stream().
-										filter(p -> !p.isEmpty()).
-										map(p -> path[0] + "." + p).
-										toArray(String[]::new);
-							} else {
-								return new String[] { String.join(".", path[0], "id") };
-							}
-						} else {
-							return new String[] { String.join(".", path[0], "id") };
-						}
+						return new String[] { String.join(".", path[0], "id") };
 					}
 				} else {
 					// Si el camp no és una referència a una altra entitat
@@ -656,26 +629,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					return new String[] { path[0] };
 				}
 			} else {
-				if (EmbeddableEntity.class.isAssignableFrom(entityClass)) {
-					Class<?> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-							entityClass,
-							EmbeddableEntity.class,
-							0);
-					log.debug("\t\t\tDetectat camp que no pertany a l'entitat " + path[0] + ", el cercam al recurs " + resourceClass);
-					Field resourceField = ReflectionUtils.findField(resourceClass, path[0]);
-					if (resourceField != null) {
-						// Si el camp pertany al recurs aleshores hi afegeix .embedded just abans
-						log.debug("\t\t\t\t Camp " + path[0] + " trobat al recurs, l'afegim posant '.embedded'");
-						return new String[]{String.join(".", "embedded", path[0])};
-					} else {
-						// Si el camp tampoc pertany al recurs aleshores retorna null
-						log.warn("Ordenació no aplicable pel recurs {}, camp no trobat: {}", resourceClass, path[0]);
-						return null;
-					}
-				} else {
-					log.warn("Ordenació no aplicable pel recurs {}, camp no trobat: {}", resourceClass, path[0]);
-					return null;
-				}
+				log.warn("Ordenació no aplicable pel recurs {}, camp no trobat: {}", resourceClass, path[0]);
+				return null;
 			}
 		} else {
 			return null;

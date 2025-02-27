@@ -1,6 +1,5 @@
 package es.caib.ripea.service.base.helper;
 
-import es.caib.ripea.persistence.base.entity.EmbeddableEntity;
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.exception.ObjectMappingException;
@@ -200,32 +199,16 @@ public class ObjectMappingHelper {
 				0);
 		String descriptionFieldName = getResourceDescriptionFieldName(resourceClass);
 		if (descriptionFieldName != null) {
-			if (persistable instanceof EmbeddableEntity<?, ?>) {
-				EmbeddableEntity<?, ?> embeddableEntity = (EmbeddableEntity<?, ?>)persistable;
-				Object embedded = embeddableEntity.getEmbedded();
-				try {
-					return (String)getFieldValue(
-							embedded,
-							descriptionFieldName);
-				} catch (Exception ex) {
-					log.warn(
-							"Couldn't find description field {} in embedded class {}",
-							descriptionFieldName,
-							embedded.getClass().getName(),
-							ex);
-				}
-			} else {
-				try {
-					return (String)getFieldValue(
-							persistable,
-							descriptionFieldName);
-				} catch (Exception ex) {
-					log.warn(
-							"Couldn't find description field {} in entity class {}",
-							descriptionFieldName,
-							persistable.getClass().getName(),
-							ex);
-				}
+			try {
+				return (String)getFieldValue(
+						persistable,
+						descriptionFieldName);
+			} catch (Exception ex) {
+				log.warn(
+						"Couldn't find description field {} in entity class {}",
+						descriptionFieldName,
+						persistable.getClass().getName(),
+						ex);
 			}
 		}
 		return resourceClass.getSimpleName() + " (id=" + persistable.getId() + ")";
