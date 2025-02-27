@@ -38,7 +38,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             List<InteressatResource> interessats= interessatResourceRepository.findByExpedient(entity).stream()
                     .map(interessatResourceEntity -> objectMappingHelper.newInstanceMap(interessatResourceEntity, InteressatResource.class))
                     .collect(Collectors.toList());
-
             if (!interessats.isEmpty()) {
                 for (InteressatResource interessat : interessats) {
                     switch (interessat.getTipus()){
@@ -59,10 +58,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     }
                 }
             }
-
-            resource.setInteressatsResum(interessatsResum);
+            //resource.setInteressatsResum(interessatsResum);
         }
-
         return resource;
     }
 }

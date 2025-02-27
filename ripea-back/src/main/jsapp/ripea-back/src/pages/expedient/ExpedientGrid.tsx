@@ -121,6 +121,7 @@ const ExpedientGrid: React.FC = () => {
                     {/*<Grid item xs={3}><FormField name="metaExpedient" componentProps={fieldProps}/></Grid>*/}
                     <Grid item xs={3}><FormField name="dataCreacioInici" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="dataCreacioFinal" componentProps={fieldProps}/></Grid>
+                    <Grid item xs={3}><FormField name="organGestor" componentProps={fieldProps}/></Grid>
 
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
                         <Button onClick={netejar}><FontAwesomeIcon icon="eraser" /> Netejar</Button>

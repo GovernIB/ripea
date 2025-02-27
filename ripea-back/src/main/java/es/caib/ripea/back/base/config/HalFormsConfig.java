@@ -2,8 +2,8 @@ package es.caib.ripea.back.base.config;
 
 import es.caib.ripea.back.base.controller.MutableResourceController;
 import es.caib.ripea.back.base.controller.ReadonlyResourceController;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
@@ -14,7 +14,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.mediatype.hal.forms.HalFormsConfiguration;
@@ -26,6 +28,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -36,18 +39,20 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @author Límit Tecnologies
  */
 @Slf4j
+@Configuration
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL_FORMS)
-public abstract class BaseHalFormsConfig {
+public class HalFormsConfig {
+
+	@Autowired(required = false)
+	private Set<ReadonlyResourceController> resourceControllers;
 
 	@Bean
 	HalFormsConfiguration halFormsConfiguration() {
-		return createHalFormsConfiguration(
-				TypeUtil.findAssignableClasses(
-						ReadonlyResourceController.class,
-						getControllerPackages()));
+		Set<Class<ReadonlyResourceController>> resourceControllerClasses = resourceControllers.stream().
+				map(rc -> (Class<ReadonlyResourceController>)rc.getClass()).
+				collect(Collectors.toSet());
+		return createHalFormsConfiguration(resourceControllerClasses);
 	}
-
-	protected abstract String[] getControllerPackages();
 
 	private HalFormsConfiguration createHalFormsConfiguration(Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
 		HalFormsConfiguration halFormsConfiguration = new HalFormsConfiguration();
@@ -91,7 +96,7 @@ public abstract class BaseHalFormsConfig {
 		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
 			for (ResourceConfigArtifact artifact: resourceConfig.artifacts()) {
-				if (Serializable.class.equals(artifact.formClass())) {
+				if (!Serializable.class.equals(artifact.formClass())) {
 					ReflectionUtils.doWithFields(
 							artifact.formClass(),
 							field -> {
@@ -142,23 +147,33 @@ public abstract class BaseHalFormsConfig {
 			ResourceConfigArtifact artifact,
 			Field formField,
 			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
-		log.debug("New HAL-FORMS resource reference options (class={}, field={})", resourceClass, formField.getName());
 		Link remoteOptionsLink = getRemoteOptionsLink(
 				resourceClass,
 				artifact,
 				formField,
 				resourceControllerClasses);
 		if (remoteOptionsLink != null) {
+			Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
+			log.debug("New HAL-FORMS resource reference options (class={}, field={})", optionsResourceClass, formField.getName());
 			halFormsConfigurationHolder.setValue(
 					halFormsConfigurationHolder.getValue().withOptions(
-							resourceClass,
+							optionsResourceClass,
 							formField.getName(),
-							metadata -> HalFormsOptions.
-									remote(remoteOptionsLink).
-									withValueField("id").
-									withPromptField(getRemoteOptionsPromptField(formField)).
-									withMinItems(TypeUtil.isNotNullField(formField) ? 1L : 0L).
-									withMaxItems(TypeUtil.isCollectionFieldType(formField) ? null : 1L)));
+							metadata -> {
+								// Aquí hem de tornar a calcular el remoteOptionsLink perquè si no ho feim
+								// l'enllaç no inclou el prefix 'http://localhost:8080/webcontext'
+								Link repeatedRemoteOptionsLink = getRemoteOptionsLink(
+										resourceClass,
+										artifact,
+										formField,
+										resourceControllerClasses);
+								return HalFormsOptions.
+										remote(repeatedRemoteOptionsLink).
+										withValueField("id").
+										withPromptField(getRemoteOptionsPromptField(formField)).
+										withMinItems(TypeUtil.isNotNullField(formField) ? 1L : 0L).
+										withMaxItems(TypeUtil.isCollectionFieldType(formField) ? null : 1L);
+							}));
 		}
 	}
 
