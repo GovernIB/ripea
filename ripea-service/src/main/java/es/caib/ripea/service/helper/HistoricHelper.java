@@ -28,18 +28,12 @@ import java.util.*;
 @Component
 public class HistoricHelper {
 
-	@Autowired
-	private HistoricExpedientRepository historicExpedientRepository;
-	@Autowired
-	private HistoricUsuariRepository historicUsuariRepository;
-	@Autowired
-	private HistoricInteressatRepository historicInteressatRepository;
-	@Autowired
-	private ContingutLogRepository contingutLogRepository;
-	@Autowired
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private HistoricExpedientRepository historicExpedientRepository;
+	@Autowired private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired private HistoricInteressatRepository historicInteressatRepository;
+	@Autowired private ContingutLogRepository contingutLogRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	
 	@Transactional
 	public void generateOldMontlyHistorics (int nMonths) {

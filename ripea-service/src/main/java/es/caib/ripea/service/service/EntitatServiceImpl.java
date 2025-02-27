@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -33,32 +30,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * Implementació del servei de gestió d'entitats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class EntitatServiceImpl implements EntitatService {
 
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private PermisosEntitatHelper permisosEntitatHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConfigHelper configHelper;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private PermisosEntitatHelper permisosEntitatHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConfigHelper configHelper;
 	
 	@Transactional
 	@Override

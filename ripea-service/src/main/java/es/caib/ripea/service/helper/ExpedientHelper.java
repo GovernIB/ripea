@@ -116,84 +116,44 @@ import es.caib.ripea.service.intf.exception.InteressatTipusDocumentException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Mètodes comuns per a la gestió d'expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class ExpedientHelper {
 
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private CarpetaRepository carpetaRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private CarpetaHelper carpetaHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private ExpedientInteressatHelper expedientInteressatHelper;
-	@Autowired
-	private MetaDadaRepository metaDadaRepository;
-	@Autowired
-	private DadaRepository dadaRepository;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-	@Autowired
-	private AlertaRepository alertaRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private ExpedientHelper2 expedientHelper2;
-	@Autowired
-	private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private CarpetaRepository carpetaRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private CarpetaHelper carpetaHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private EmailHelper emailHelper;
+	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private DadaRepository dadaRepository;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private ExpedientHelper2 expedientHelper2;
+	@Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 

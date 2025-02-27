@@ -1,44 +1,44 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
-import es.caib.ripea.service.intf.dto.MetaDadaDto;
-import es.caib.ripea.service.intf.dto.PaginaDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
-import es.caib.ripea.service.intf.service.MetaDadaService;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.NodeEntity;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.MetaDadaHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.MetaNodeHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.service.MetaDadaService;
 
-/**
- * Implementació del servei de gestió de meta-dades.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class MetaDadaServiceImpl implements MetaDadaService {
 
-	@Resource private MetaDadaRepository metaDadaRepository;
-	@Resource private EntitatRepository entitatRepository;
-	@Resource private NodeRepository nodeRepository;
-	@Resource private DadaRepository dadaRepository;
-	@Resource ConversioTipusHelper conversioTipusHelper;
-	@Resource PaginacioHelper paginacioHelper;
-	@Resource private PermisosHelper permisosHelper;
-	@Resource private EntityComprovarHelper entityComprovarHelper;
-	@Resource private MetaNodeHelper metaNodeHelper;
-	@Resource private MetaExpedientHelper metaExpedientHelper;
-	@Resource private MetaDadaHelper metaDadaHelper;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaNodeHelper metaNodeHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private MetaDadaHelper metaDadaHelper;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 
 	@Transactional

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.ExpedientEntity;
@@ -20,20 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Implementació dels mètodes per a gestionar els seguidors dels expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	
 	@Override
 	@Transactional

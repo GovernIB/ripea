@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import java.util.Date;
@@ -48,11 +45,6 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Mètodes per a la gestió de peticions de crear expedients 
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class ExpedientPeticioHelper {
 	

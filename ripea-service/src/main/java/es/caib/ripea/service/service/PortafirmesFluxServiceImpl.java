@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -26,24 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implementació del servei de gestió de meta-documents.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private UsuariRepository usuariRepository;
 	
 	@Override
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(

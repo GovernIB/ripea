@@ -1,28 +1,26 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.MetaDadaRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.MetaDadaDto;
-import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.MetaDadaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 
 @Component
 public class MetaDadaHelper {
 	
-	@Resource private MetaDocumentRepository metaDocumentRepository;
-	@Resource private EntitatRepository entitatRepository;
-	@Resource private MetaDadaRepository metaDadaRepository;
-	@Resource private DocumentRepository documentRepository;
-	@Resource private ConversioTipusHelper conversioTipusHelper;
-	@Resource private EntityComprovarHelper entityComprovarHelper;
-	@Resource private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 
 	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
 		return metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi);

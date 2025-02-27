@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.DominiEntity;
@@ -26,28 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Implementació del servei de gestió de meta-documents.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class DominiServiceImpl implements DominiService {
 
-	@Autowired
-	private DominiRepository dominiRepository;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private DominiHelper dominiHelper;
-	@Autowired
-	private MetaDadaRepository metaDadaRepository;
+	@Autowired private DominiRepository dominiRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private DominiHelper dominiHelper;
+	@Autowired private MetaDadaRepository metaDadaRepository;
 	
 	@Transactional
 	@Override

@@ -29,34 +29,20 @@ import java.util.Map;
 @Service
 public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private ExpedientEstatHelper expedientEstatHelper;
-    @Autowired
-    private ExpedientRepositoryCommnand expedientRepositoryCommnand;
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private EmailHelper emailHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ExpedientEstatHelper expedientEstatHelper;
+    @Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 
 
 	@Transactional(readOnly = true)

@@ -25,36 +25,21 @@ import java.util.List;
 @Service
 public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private MetaExpedientTascaRepository metaExpedientTascaRepository;
-	@Autowired
-	private ExpedientTascaComentariRepository expedientTascaComentariRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private AlertaRepository alertaRepository;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private TascaHelper tascaHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired private ExpedientTascaComentariRepository expedientTascaComentariRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private EmailHelper emailHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private TascaHelper tascaHelper;
 
 	@Transactional(readOnly = true)
 	@Override

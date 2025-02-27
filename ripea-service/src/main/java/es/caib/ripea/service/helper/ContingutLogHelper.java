@@ -1,55 +1,41 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Persistable;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Utilitat per a gestionar el registre d'accions dels contenidors.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Persistable;
+import org.springframework.stereotype.Component;
+
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.ContingutLogEntity;
+import es.caib.ripea.persistence.entity.ContingutMovimentEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.repository.ContingutLogRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.service.intf.dto.ContingutLogDetallsDto;
+import es.caib.ripea.service.intf.dto.ContingutLogDto;
+import es.caib.ripea.service.intf.dto.ContingutMovimentDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
+
 @Component
 public class ContingutLogHelper {
 
-	@Resource
-	private ContingutRepository contingutRepository;
-	@Resource
-	private DadaRepository dadaRepository;
-	@Resource
-	private InteressatRepository interessatRepository;
-	@Resource
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Resource
-	private DocumentPublicacioRepository documentPublicacioRepository;
-	@Resource
-	private ContingutLogRepository contingutLogRepository;
-	@Resource
-	private ContingutMovimentRepository contingutMovimentRepository;
-
-	@Resource
-	private ContingutHelper contenidorHelper;
-	@Resource
-	private UsuariHelper usuariHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-
-
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private ContingutLogRepository contingutLogRepository;
+	@Autowired private ContingutMovimentRepository contingutMovimentRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
 
 	public ContingutLogEntity logCreacio(
 			ContingutEntity contingut,

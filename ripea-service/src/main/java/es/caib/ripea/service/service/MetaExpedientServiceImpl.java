@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -111,11 +109,6 @@ import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Implementació del servei de gestió de meta-expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class MetaExpedientServiceImpl implements MetaExpedientService {
 
@@ -148,8 +141,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired private CacheHelper cacheHelper;
-	@Resource private MetaDocumentHelper metaDocumentHelper;
-	@Resource private MetaDadaHelper metaDadaHelper;
+	@Autowired private MetaDocumentHelper metaDocumentHelper;
+	@Autowired private MetaDadaHelper metaDadaHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 //	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import es.caib.ripea.persistence.repository.*;
@@ -10,33 +7,17 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Utilitat per a eliminar continguts orfes.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Slf4j
 @Component
 public class ContingutsOrfesHelper {
 
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private NodeRepository nodeRepository;
-	@Autowired
-	private DadaRepository dadaRepository;
-	@Autowired
-	private AlertaRepository alertaRepository;
-	@Autowired
-	private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
-	@Autowired
-	private ContingutMovimentRepository contingutMovimentRepository;
-	@Autowired
-	private ContingutLogRepository contingutLogRepository;
-
-
-	// Mètodes per evitar errors al tenir continguts orfes en base de dades
-	// ////////////////////////////////////////////////////////////////////
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private NodeRepository nodeRepository;
+	@Autowired private DadaRepository dadaRepository;
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+	@Autowired private ContingutMovimentRepository contingutMovimentRepository;
+	@Autowired private ContingutLogRepository contingutLogRepository;
 
 	public void deleteContingutsOrfes() {
 

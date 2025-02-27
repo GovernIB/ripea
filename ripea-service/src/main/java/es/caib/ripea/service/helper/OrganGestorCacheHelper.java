@@ -17,12 +17,10 @@ import java.util.*;
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class OrganGestorCacheHelper {
 
-    @Autowired
-    private CacheHelper cacheHelper;
+    @Autowired private CacheHelper cacheHelper;
     @Autowired
     OrganGestorCacheHelper self;
-    @Autowired
-    private OrganGestorRepository organGestorRepository;
+    @Autowired private OrganGestorRepository organGestorRepository;
 
     @Cacheable(value = "codisOrgansFills", key="#codiEntitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisOrgansFills(String codiEntitat, String codiDir3Organ) {

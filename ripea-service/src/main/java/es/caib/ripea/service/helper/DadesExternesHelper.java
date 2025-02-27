@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import es.caib.ripea.service.intf.dto.ComunitatDto;
@@ -12,16 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Mètodes comuns per a gestionar les alertes.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class DadesExternesHelper {
 
-	@Autowired
-	private CacheHelper cacheHelper;
+	@Autowired private CacheHelper cacheHelper;
 
 	public PaisDto getPaisAmbCodi(
 			String paisCodi) {

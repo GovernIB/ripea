@@ -1,7 +1,15 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -9,32 +17,13 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.permission.ExtendedPermission;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Utilitat per omplir els permisos de les entitats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class PermisosEntitatHelper {
 
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private OrganGestorService organGestorService;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private OrganGestorService organGestorService;
 
-	
 	public void omplirPermisosPerEntitats(List<EntitatDto> entitats, boolean ambLlistaPermisos) {
 		// Filtra les entitats per saber els permisos per a l'usuari actual
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -43,7 +32,6 @@ public class PermisosEntitatHelper {
 			public Long getObjectIdentifier(EntitatDto entitat) {
 				return entitat.getId();
 			}
-
 		};
 		List<EntitatDto> entitatsRead = new ArrayList<EntitatDto>();
 		entitatsRead.addAll(entitats);

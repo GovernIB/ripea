@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,10 +128,6 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.Utils;
 
-/**
- * Implementació dels mètodes per a gestionar documents.
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
@@ -141,7 +135,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;
 	@Autowired private DocumentViaFirmaRepository documentViaFirmaRepository;
 	@Autowired private DispositiuEnviamentRepository dispositiuEnviamentRepository;
-	@Resource  private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ContingutHelper contingutHelper;

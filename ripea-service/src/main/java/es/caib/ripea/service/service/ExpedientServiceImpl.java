@@ -129,11 +129,6 @@ import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Implementació dels mètodes per a gestionar expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class ExpedientServiceImpl implements ExpedientService {
 

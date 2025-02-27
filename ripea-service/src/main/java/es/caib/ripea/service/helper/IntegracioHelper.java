@@ -1,24 +1,36 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.utils.Utils;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.*;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioDto;
+import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
+import es.caib.ripea.service.intf.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class IntegracioHelper {
 	
-	@Resource private UsuariHelper usuariHelper;
-	@Resource private CacheHelper cacheHelper;
-	@Resource private ConfigHelper configHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ConfigHelper configHelper;
 
 	public static final int DEFAULT_MAX_ACCIONS = 20;
 

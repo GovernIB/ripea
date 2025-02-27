@@ -1,46 +1,70 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.MetaDocumentService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.*;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.MetaDocumentHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.MetaNodeHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PinbalServeiDto;
+import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.utils.Utils;
 
-/**
- * Implementació del servei de gestió de meta-documents.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class MetaDocumentServiceImpl implements MetaDocumentService {
 
-	@Resource private MetaDocumentRepository metaDocumentRepository;
-	@Resource private EntitatRepository entitatRepository;
-	@Resource private MetaDadaRepository metaDadaRepository;
-	@Resource private DocumentRepository documentRepository;
-	@Resource private ConversioTipusHelper conversioTipusHelper;
-	@Resource private MetaNodeHelper metaNodeHelper;
-	@Resource private ContingutHelper contenidorHelper;
-	@Resource private PaginacioHelper paginacioHelper;
-	@Resource private PermisosHelper permisosHelper;
-	@Resource private PluginHelper pluginHelper;
-	@Resource private EntityComprovarHelper entityComprovarHelper;
-	@Resource private MetaExpedientHelper metaExpedientHelper;
-	@Resource private MetaDocumentHelper metaDocumentHelper;
-	@Resource private MetaExpedientRepository metaExpedientRepository;
-	@Resource private CacheHelper cacheHelper;
-	@Resource private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private MetaNodeHelper metaNodeHelper;
+	@Autowired private ContingutHelper contenidorHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private MetaDocumentHelper metaDocumentHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 
 	@Transactional

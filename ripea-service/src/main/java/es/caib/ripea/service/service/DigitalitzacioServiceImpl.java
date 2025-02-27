@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.service.helper.PluginHelper;
@@ -17,18 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Implementació del servei de gestió de meta-dades.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class DigitalitzacioServiceImpl implements DigitalitzacioService {
 
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@Override
 	public List<DigitalitzacioPerfilDto> getPerfilsDisponibles() {

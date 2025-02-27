@@ -9,15 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class ApplicationHelper {
 	
-	
-    @Autowired
-    private ProcessosInicialsRepository processosInicialsRepository;
+    @Autowired private ProcessosInicialsRepository processosInicialsRepository;
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void setProcessAsProcessed(Long id){
 		
 		processosInicialsRepository.updateInit(id, false);
 	}
-	 
-
 }

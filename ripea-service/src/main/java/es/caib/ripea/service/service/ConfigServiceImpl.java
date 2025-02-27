@@ -1,6 +1,21 @@
 package es.caib.ripea.service.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.google.common.base.Strings;
+
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.config.ConfigEntity;
@@ -9,7 +24,11 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.config.ConfigGroupRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
-import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
@@ -18,40 +37,20 @@ import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
 import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
 import es.caib.ripea.service.intf.service.ConfigService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
-/**
- * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Slf4j
 @Service
 public class ConfigServiceImpl implements ConfigService {
 
-    @Autowired
-    private ConfigGroupRepository configGroupRepository;
-    @Autowired
-    private ConfigRepository configRepository;
-    @Autowired
-    private ConversioTipusHelper conversioTipusHelper;
-    @Autowired
-    private EntitatRepository entitatRepository;
-    @Autowired
-    private PluginHelper pluginHelper;
-    @Autowired
-    private ConfigHelper configHelper;
-    @Autowired
-    private OrganGestorRepository organGestorRepository;
-    @Autowired
-    private PaginacioHelper paginacioHelper;
-    @Autowired
-    private CacheHelper cacheHelper;
+    @Autowired private ConfigGroupRepository configGroupRepository;
+    @Autowired private ConfigRepository configRepository;
+    @Autowired private ConversioTipusHelper conversioTipusHelper;
+    @Autowired private EntitatRepository entitatRepository;
+    @Autowired private PluginHelper pluginHelper;
+    @Autowired private ConfigHelper configHelper;
+    @Autowired private OrganGestorRepository organGestorRepository;
+    @Autowired private PaginacioHelper paginacioHelper;
+    @Autowired private CacheHelper cacheHelper;
 
     @Override
     @Transactional

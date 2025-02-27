@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,38 +57,23 @@ import es.caib.ripea.service.permission.ExtendedPermission;
 @Component
 public class OrganGestorHelper {
 
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientOrganPareRepository expedientOrganPareRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private AvisRepository avisRepository;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-    @Autowired
-    private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientOrganPareRepository expedientOrganPareRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private AvisRepository avisRepository;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+    @Autowired private ConversioTipusHelper conversioTipusHelper;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
-    @Autowired
-    private OrganGestorCacheHelper organGestorCacheHelper;
+    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
 	public List<OrganGestorEntity> findAmbEntitatPermis(
 			EntitatEntity entitat,

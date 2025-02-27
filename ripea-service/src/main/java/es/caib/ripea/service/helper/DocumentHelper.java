@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import com.sun.jersey.core.util.Base64;
@@ -32,36 +29,19 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.zip.ZipOutputStream;
 
-/**
- * Mètodes per a gestionar els arxius associats a un document
- * tenint en compte que hi pot haver configurat (o no) un plugin
- * de gestió documental.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class DocumentHelper {
 
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private DocumentFirmaAppletHelper firmaAppletHelper;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private DocumentFirmaAppletHelper firmaAppletHelper;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,

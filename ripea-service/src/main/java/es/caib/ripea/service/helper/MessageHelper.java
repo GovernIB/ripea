@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import org.springframework.context.MessageSource;
@@ -10,11 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
-/**
- * Helper per a mostrar missatges multiidioma.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class MessageHelper implements MessageSourceAware {
 

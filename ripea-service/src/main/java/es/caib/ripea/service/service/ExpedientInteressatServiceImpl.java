@@ -20,11 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Implementació dels mètodes per a gestionar interessats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class ExpedientInteressatServiceImpl implements ExpedientInteressatService {
 

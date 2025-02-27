@@ -1,26 +1,36 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.*;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.Date;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 	
 @Component
 public class TestHelper {
 
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Autowired
-	private EmailHelper emailHelper;
+	@Autowired private EmailHelper emailHelper;
 	
 	public void testCanviEstatDocumentPortafirmes() {
 		

@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
@@ -25,22 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Implementació del servei de gestió de urls d'instrucció.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class URLInstruccioServiceImpl implements URLInstruccioService {
 
-	@Autowired
-	private URLInstruccioRepository urlInstruccionRepository;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
+	@Autowired private URLInstruccioRepository urlInstruccionRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
 	
 	@Transactional
 	@Override

@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.service.service;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
@@ -24,34 +21,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-/**
- * Implementació dels mètodes per importar documents desde l'arxiu.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class ImportacioServiceImpl implements ImportacioService {
 
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private CarpetaHelper carpetaHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private CarpetaHelper carpetaHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	

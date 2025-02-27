@@ -1,7 +1,3 @@
-
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import java.util.Map;

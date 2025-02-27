@@ -1,17 +1,11 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.GrupEntity;
-import es.caib.ripea.persistence.entity.ProcesosInicialsEntity;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.GrupRepository;
-import es.caib.ripea.persistence.repository.ProcessosInicialsRepository;
-import es.caib.ripea.service.intf.dto.PermisDto;
-import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.service.intf.service.ConfigService;
-import lombok.Synchronized;
-import lombok.extern.slf4j.Slf4j;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -22,40 +16,31 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.ProcesosInicialsEntity;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.ProcessosInicialsRepository;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.service.intf.service.ConfigService;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class StartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Autowired
-    private ConfigService configService;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-    @Autowired
-    private ProcessosInicialsRepository processosInicialsRepository;
-    @Autowired
-    private ApplicationHelper applicationHelper;
-    @Autowired
-    private HistoricHelper historicHelper;
-    @Autowired
-    private GrupHelper grupHelper;
-    @Autowired
-    private EntitatRepository entitatRepository;
-    @Autowired
-    private ConversioTipusHelper conversioTipusHelper;
-    @Autowired
-    private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private GrupRepository grupRepository;
+    @Autowired private ConfigService configService;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ExpedientRepository expedientRepository;
+    @Autowired private ProcessosInicialsRepository processosInicialsRepository;
+    @Autowired private ApplicationHelper applicationHelper;
+    @Autowired private HistoricHelper historicHelper;
+    @Autowired private GrupHelper grupHelper;
+    @Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private GrupRepository grupRepository;
 
     public static int counter = 0;
 

@@ -1,40 +1,22 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.service.intf.dto.ArbreDto;
-import es.caib.ripea.service.intf.dto.ArbreNodeDto;
-import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-/**
- * Helper per a operacions amb unitats organitzatives.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+
 @Component
 public class UnitatOrganitzativaHelper {
 
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private PaginacioHelper paginacioHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-
-
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private PluginHelper pluginHelper;
 
 	public UnitatOrganitzativaDto findPerEntitatAndCodi(
 			String entitatCodi,

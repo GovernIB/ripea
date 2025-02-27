@@ -1,7 +1,11 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.PluginHelper;
@@ -10,27 +14,12 @@ import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.TipusViaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.service.UnitatOrganitzativaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.List;
-
-/**
- * Implementació del servei de gestió d'entitats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class UnitatOrganitzativaServiceImpl implements UnitatOrganitzativaService {
 
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-
-
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private PluginHelper pluginHelper;
 
 	@Override
 	public List<UnitatOrganitzativaDto> findByEntitat(

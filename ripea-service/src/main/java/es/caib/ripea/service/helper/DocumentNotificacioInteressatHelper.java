@@ -13,28 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
-/**
- * Utilitat per gestionar l'enviament de notificacions dels documents
- * d'expedients per interessat
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class DocumentNotificacioInteressatHelper {
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearEnviarNotificacioInteressat(

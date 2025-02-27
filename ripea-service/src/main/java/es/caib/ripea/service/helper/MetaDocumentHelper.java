@@ -1,33 +1,26 @@
 package es.caib.ripea.service.helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
-import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 @Component
 public class MetaDocumentHelper {
 	
-	@Resource private MetaDocumentRepository metaDocumentRepository;
-	@Resource private EntitatRepository entitatRepository;
-	@Resource private MetaDadaRepository metaDadaRepository;
-	@Resource private DocumentRepository documentRepository;
-	@Resource private ConversioTipusHelper conversioTipusHelper;
-	@Resource private MetaNodeHelper metaNodeHelper;
-	@Resource private ContingutHelper contenidorHelper;
-	@Resource private PaginacioHelper paginacioHelper;
-	@Resource private PermisosHelper permisosHelper;
-	@Resource private PluginHelper pluginHelper;
-	@Resource private EntityComprovarHelper entityComprovarHelper;
-	@Resource private MetaExpedientHelper metaExpedientHelper;
-	@Resource private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	
 	public MetaDocumentEntity update(
 			Long metaExpedientId,

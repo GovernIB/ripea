@@ -1,12 +1,12 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.service.intf.dto.PaginaDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDto;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,19 +15,15 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.*;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDto;
 
-/**
- * Helper per a convertir les dades de paginació entre el DTO i Spring-Data.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class PaginacioHelper {
 
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
 
 	public boolean esPaginacioActivada(PaginacioParamsDto dto) {
 		return dto.getPaginaTamany() > 0;

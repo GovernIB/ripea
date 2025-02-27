@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.AlertaEntity;
@@ -21,27 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implementació del servei de gestió d'entitats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class AlertaServiceImpl implements AlertaService {
 
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private AlertaRepository alertaRepository;
-
-	@Autowired
-	private AlertaHelper alertaHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-
-
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private AlertaHelper alertaHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
 
 	@Override
 	@Transactional

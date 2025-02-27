@@ -1,12 +1,9 @@
 package es.caib.ripea.service.helper;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,60 +59,32 @@ import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Helper per a la comprovació de l'existencia d'entitats de base de dades.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class EntityComprovarHelper {
 
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private MetaNodeRepository metaNodeRepository;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private MetaDadaRepository metaDadaRepository;
-	@Autowired
-	private NodeRepository nodeRepository;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private CarpetaRepository carpetaRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private DadaRepository dadaRepository;
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private DocumentPublicacioRepository documentPublicacioRepository;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private PermisosHelper permisosHelper;
-    @Autowired
-    private OrganGestorHelper organGestorHelper;
-    @Autowired
-    private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-	@Resource
-	private RolHelper rolHelper;
-	@Autowired
-	private GrupRepository grupRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-    @Autowired
-    private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private MetaNodeRepository metaNodeRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private NodeRepository nodeRepository;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private CarpetaRepository carpetaRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private DadaRepository dadaRepository;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private PermisosHelper permisosHelper;
+    @Autowired private OrganGestorHelper organGestorHelper;
+    @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private RolHelper rolHelper;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ConfigHelper configHelper;
+    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,

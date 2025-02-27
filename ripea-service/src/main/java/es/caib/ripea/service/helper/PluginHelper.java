@@ -202,11 +202,6 @@ import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 
-/**
- * Helper per a interactuar amb els plugins.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class PluginHelper {
 

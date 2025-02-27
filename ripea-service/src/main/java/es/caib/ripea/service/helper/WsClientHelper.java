@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import org.slf4j.Logger;
@@ -21,12 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Utilitat per a instanciar clients per al servei d'enviament
- * de contingut a bústies.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class WsClientHelper<T> {
 
 	public T generarClientWs(

@@ -1,22 +1,15 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
-import com.google.common.base.Strings;
-import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.integracio.domini.Estat;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.ExpedientPeticioService;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,62 +19,96 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.*;
+import com.google.common.base.Strings;
 
-/**
- * Implementació dels mètodes per a gestionar expedient peticions.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.persistence.repository.RegistreRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.DateHelper;
+import es.caib.ripea.service.helper.DistribucioHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.ExpedientPeticioHelper;
+import es.caib.ripea.service.helper.ExpedientPeticioHelper0;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PermisosPerAnotacions;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.SynchronizationHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MassiuAnnexProcesarFiltreDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientSelectDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.RegistreAnnexDto;
+import es.caib.ripea.service.intf.dto.RegistreDto;
+import es.caib.ripea.service.intf.dto.RegistreJustificantDto;
+import es.caib.ripea.service.intf.dto.ResultDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Slf4j
 public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private RegistreRepository registreRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private EntitatRepository entitatRepository;
-	@Autowired
-	private ExpedientHelper  expedientHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Resource
-	private ExpedientPeticioHelper expedientPeticioHelper;
-	@Resource
-	private DocumentRepository documentRepository;
-	@Resource
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ExpedientPeticioHelper0 expedientPeticioHelper0;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private GrupRepository grupRepository;
-	@Autowired
-	private DistribucioHelper distribucioHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private RegistreRepository registreRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private ExpedientHelper  expedientHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ExpedientPeticioHelper0 expedientPeticioHelper0;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private DistribucioHelper distribucioHelper;
 	
 	@Transactional(readOnly = true)
 	@Override

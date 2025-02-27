@@ -1,17 +1,9 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/**
- * Mètodes per a la generació d'un fitxer CSV.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class CsvHelper {
 

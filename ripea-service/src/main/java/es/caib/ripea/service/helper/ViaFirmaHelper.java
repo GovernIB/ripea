@@ -7,11 +7,6 @@ import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaRespostaDto;
 import org.springframework.stereotype.Component;
 
-/**
- * Helper per interpretar la resposta de viaFirma
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class ViaFirmaHelper {
 

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import java.io.Serializable;
@@ -48,32 +45,18 @@ import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Helper per a la gestió de permisos dins les ACLs.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class PermisosHelper {
 
-	@Autowired
-	private LookupStrategy lookupStrategy;
-	@Autowired
-	private MutableAclService aclService;
-	@Autowired
-	private AclSidRepository aclSidRepository;
-	@Autowired
-	private AclEntryRepository aclEntryRepository;
-	@Autowired
-	private AclClassRepository aclClassRepository;
-	@Autowired
-	private AclObjectIdentityRepository aclObjectIdentityRepository;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ConfigHelper configHelper;
+	@Autowired private LookupStrategy lookupStrategy;
+	@Autowired private MutableAclService aclService;
+	@Autowired private AclSidRepository aclSidRepository;
+	@Autowired private AclEntryRepository aclEntryRepository;
+	@Autowired private AclClassRepository aclClassRepository;
+	@Autowired private AclObjectIdentityRepository aclObjectIdentityRepository;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ConfigHelper configHelper;
 
 	public void assignarPermisUsuari(
 			String userName,

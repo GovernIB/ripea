@@ -1,32 +1,45 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
-import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
-import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.InteressatRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.service.DocumentEnviamentService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPublicacioEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DocumentNotificacioHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.HibernateHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
 
-/**
- * Implementació dels mètodes per a gestionar els enviaments
- * de documents.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 
@@ -40,7 +53,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Autowired private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private DocumentRepository documentRepository;
-	@Resource  private PluginHelper pluginHelper;
+	@Autowired private PluginHelper pluginHelper;
 
 	@Transactional
 	@Override

@@ -14,8 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DistribucioReglaHelper  {
 
-    @Autowired
-	private ConfigHelper configHelper;
+    @Autowired private ConfigHelper configHelper;
 	
 	public CrearReglaResponseDto crearRegla(
 			String entitat, 

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import es.caib.ripea.persistence.entity.AlertaEntity;
@@ -11,20 +8,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Mètodes comuns per a gestionar les alertes.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class AlertaHelper {
 
-	@Autowired
-	private AlertaRepository alertaRepository;
-	@Autowired
-	private ContingutRepository contingutRepository;
-
-
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private ContingutRepository contingutRepository;
 
 	public AlertaEntity crearAlerta(
 			String text,

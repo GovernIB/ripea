@@ -1,10 +1,24 @@
 package es.caib.ripea.service.helper;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import es.caib.pinbal.client.recobriment.ecot103.ClientEcot103;
 import es.caib.pinbal.client.recobriment.ecot103.ClientEcot103.SolicitudEcot103;
-import es.caib.pinbal.client.recobriment.model.*;
+import es.caib.pinbal.client.recobriment.model.ScspFuncionario;
+import es.caib.pinbal.client.recobriment.model.ScspJustificante;
+import es.caib.pinbal.client.recobriment.model.ScspRespuesta;
 import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimiento;
+import es.caib.pinbal.client.recobriment.model.ScspTitular;
 import es.caib.pinbal.client.recobriment.model.ScspTitular.ScspTipoDocumentacion;
+import es.caib.pinbal.client.recobriment.model.SolicitudBase;
+import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc;
 import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.FetRegistral;
 import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.Lloc;
 import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.TitularDadesAdicionals;
@@ -42,27 +56,28 @@ import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
-import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PinbalServeiDocPermesEnumDto;
+import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.exception.PinbalException;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Mètodes comuns per a gestionar les alertes.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Slf4j
 @Component
 public class PinbalHelper {
@@ -70,7 +85,7 @@ public class PinbalHelper {
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private ConfigHelper configHelper;
-	@Resource private OrganGestorHelper organGestorHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
 
 	/** SVDDGPCIWS02 - Consulta de datos de identidad */
 	public String novaPeticioSvddgpciws02(

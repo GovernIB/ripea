@@ -1,58 +1,47 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.CarpetaRepository;
-import es.caib.ripea.persistence.repository.ContingutRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.ExpedientCarpetaArbreRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Helper per a convertir les dades de paginació entre el DTO
- * i Spring-Data.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientCarpetaArbreEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.repository.CarpetaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientCarpetaArbreRepository;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArbreJsonDto;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+
 @Component
 public class CarpetaHelper {
 
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private CarpetaRepository carpetaRepository;
-	@Resource
-	private ContingutRepository contingutRepository;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private ContingutHelper contingutHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private ContingutLogHelper contingutLogHelper;
-	@Resource
-	private ExpedientCarpetaArbreRepository expedientCarpetaArbreRepository;
-	@Resource
-	private ExpedientHelper expedientHelper;
-	@Resource
-	private CacheHelper cacheHelper;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private CarpetaRepository carpetaRepository;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private ExpedientCarpetaArbreRepository expedientCarpetaArbreRepository;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private CacheHelper cacheHelper;
 	
 	public CarpetaDto create(
 			Long entitatId,

@@ -14,32 +14,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Utilitat per gestionar l'enviament de notificacions dels documents d'expedients
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class DocumentNotificacioHelper {
 	
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private DadesExternesService dadesExternesService;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private DocumentNotificacioInteressatHelper documentNotificacioInteressatHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private DadesExternesService dadesExternesService;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private DocumentNotificacioInteressatHelper documentNotificacioInteressatHelper;
 
 	public Map<String, String> crear(
 			DocumentNotificacioDto notificacioDto, 

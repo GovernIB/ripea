@@ -32,12 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Mètodes per generar un índex d'un expedient
- * 
- * @author Limit Tecnologies <limit@limit.es>
- *
- */
 @Component
 public class IndexHelper {
 
@@ -50,22 +44,14 @@ public class IndexHelper {
     
     private static final Integer BATCH_SIZE = 10;
     
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private IndexBatchHelper indexBatchHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private IndexBatchHelper indexBatchHelper;
 	
 	//### Genera índex PDF ###
 	public byte[] generarIndexPdfPerCarpetes(

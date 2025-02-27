@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
@@ -10,11 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Mètodes per a la gestió del log d'excepcions.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class ExcepcioLogHelper {
 

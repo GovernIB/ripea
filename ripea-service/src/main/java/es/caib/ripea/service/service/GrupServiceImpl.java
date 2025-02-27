@@ -27,36 +27,20 @@ import java.util.*;
 @Service
 public class GrupServiceImpl implements GrupService {
 	
-	
-	@Autowired
-	private GrupRepository grupRepository;
-	@Autowired
-	private GrupRepositoryCommnand grupRepositoryCommnand;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private GrupHelper grupHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-    @Autowired
-    private OrganGestorCacheHelper organGestorCacheHelper;
-
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private GrupRepositoryCommnand grupRepositoryCommnand;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private GrupHelper grupHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private CacheHelper cacheHelper;
+    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
 	@Transactional
 	@Override

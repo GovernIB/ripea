@@ -82,47 +82,35 @@ import es.caib.ripea.service.intf.exception.DominiException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Utilitat per a accedir a les caches. Els mètodes cacheables es
- * defineixen aquí per evitar la impossibilitat de fer funcionar
- * l'anotació @Cacheable als mètodes privats degut a limitacions
- * AOP.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class CacheHelper {
 
-	@Resource private EntitatRepository entitatRepository;
-	@Resource private DadaRepository dadaRepository;
-	@Resource private DocumentRepository documentRepository;
-	@Resource private MetaDadaRepository metaDadaRepository;
-	@Resource private MetaDocumentRepository metaDocumentRepository;
-	@Resource private ConversioTipusHelper conversioTipusHelper;
-	@Resource private PermisosHelper permisosHelper;
-	@Resource private PermisosEntitatHelper permisosEntitatHelper;
-	private PluginHelper pluginHelper;
-	@Resource private UsuariRepository usuariRepository;
-	@Resource private ExpedientTascaRepository expedientTascaRepository;
-	@Resource private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Resource private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private DadaRepository dadaRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private PermisosEntitatHelper permisosEntitatHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private AclSidRepository aclSidRepository;
-	@Resource private ExpedientPeticioRepository expedientPeticioRepository;
-	@Resource private EntityComprovarHelper entityComprovarHelper;
-	@Resource private OrganGestorHelper organGestorHelper;
-	@Resource private OrganGestorRepository organGestorRepository;
-	@Resource private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private ConfigHelper configHelper;
-//	@Autowired private TascaHelper tascaHelper;
-
+	@Autowired private MutableAclService aclService;
+	
+	private PluginHelper pluginHelper;
 	@Autowired
 	public void setPluginHelper(PluginHelper pluginHelper) {
 		this.pluginHelper = pluginHelper;
 	}
-
-	@Resource
-	private MutableAclService aclService;
-
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
@@ -131,10 +119,7 @@ public class CacheHelper {
 		return expedientTascaRepository.countTasquesPendents(usuariEntity);
 	}
 	@CacheEvict(value = "tasquesUsuari", key="#usuariCodi")
-	public void evictCountTasquesPendents(String usuariCodi) {
-	}
-
-
+	public void evictCountTasquesPendents(String usuariCodi) {}
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(String usuariCodi) {

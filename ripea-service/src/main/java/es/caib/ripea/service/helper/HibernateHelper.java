@@ -1,17 +1,9 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 
 
-/**
- * Helper per a operacions amb usuaris.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class HibernateHelper {
 
 	@SuppressWarnings("unchecked")

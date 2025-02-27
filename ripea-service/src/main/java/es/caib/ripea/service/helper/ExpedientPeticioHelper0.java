@@ -1,7 +1,11 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
@@ -9,15 +13,8 @@ import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class ExpedientPeticioHelper0 {
@@ -27,8 +24,6 @@ public class ExpedientPeticioHelper0 {
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
-	@Autowired private OrganGestorHelper organGestorHelper;
-	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private DistribucioHelper distribucioHelper;
 
 	public void consultarIGuardarAnotacioPeticioPendent(

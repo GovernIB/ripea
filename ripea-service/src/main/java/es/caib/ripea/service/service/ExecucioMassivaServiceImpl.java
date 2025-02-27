@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.*;
@@ -34,11 +31,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/**
- * Implementació dels mètodes per a gestionar documents.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 

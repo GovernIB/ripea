@@ -1,17 +1,7 @@
-/**
- *
- */
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
-import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.PaginaDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
-import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.TipusDocumentalService;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,29 +9,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.TipusDocumentalService;
 
-/**
- * Implementació del servei de gestió de meta-documents.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 
-	@Autowired
-	private TipusDocumentalRepository tipusDocumentalRepository;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	
+	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private PluginHelper pluginHelper;
 	
 	@Transactional
 	@Override

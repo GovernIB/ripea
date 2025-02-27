@@ -1,12 +1,9 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.SeguimentService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +13,56 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.ConsultaPinbalRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
+import es.caib.ripea.service.helper.DateHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.ExpedientPeticioHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PermisosPerAnotacions;
+import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.intf.dto.ArxiuPendentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.ResultDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsFiltreDto;
+import es.caib.ripea.service.intf.dto.SeguimentConsultaFiltreDto;
+import es.caib.ripea.service.intf.dto.SeguimentConsultaPinbalDto;
+import es.caib.ripea.service.intf.dto.SeguimentDto;
+import es.caib.ripea.service.intf.dto.SeguimentFiltreDto;
+import es.caib.ripea.service.intf.dto.SeguimentNotificacionsFiltreDto;
+import es.caib.ripea.service.intf.service.SeguimentService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Service
 public class SeguimentServiceImpl implements SeguimentService {
@@ -36,9 +79,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ExpedientHelper expedientHelper;
-	@Resource  private ExpedientPeticioHelper expedientPeticioHelper;
-	@Resource  private ConsultaPinbalRepository consultaPinbalRepository;
-	@Resource  private UsuariRepository usuariRepository;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;
+	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
     @Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 

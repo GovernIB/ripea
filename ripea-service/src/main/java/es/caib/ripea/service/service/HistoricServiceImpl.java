@@ -35,29 +35,18 @@ import java.util.*;
 @Service
 public class HistoricServiceImpl implements HistoricService {
 
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private HistoricExpedientRepository historicExpedientRepository;
-	@Autowired
-	private HistoricUsuariRepository historicUsuariRepository;
-	@Autowired
-	private HistoricInteressatRepository historicInteressatRepository;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private HistoricHelper historicHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private HistoricExpedientRepository historicExpedientRepository;
+	@Autowired private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired private HistoricInteressatRepository historicInteressatRepository;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private HistoricHelper historicHelper;
 
-	@Autowired
-	private ExportacioCsvHistoric exportacioCsvHistoric;
-	@Autowired
-	private ExportacioXMLHistoric exportacioXMLHistoric;
+	@Autowired private ExportacioCsvHistoric exportacioCsvHistoric;
+	@Autowired private ExportacioXMLHistoric exportacioXMLHistoric;
 
 	@Override
 	public void generateOldHistorics() {

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import static es.caib.ripea.service.service.MetaExpedientServiceImpl.progresActualitzacio;
@@ -55,7 +52,6 @@ import es.caib.ripea.persistence.repository.MetaExpedientSequenciaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.service.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
@@ -80,66 +76,37 @@ import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
-/**
- * Utilitats comunes pels meta-expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class MetaExpedientHelper {
 
-	@Autowired
-	private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private MetaNodeRepository metaNodeRepository;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-    @Autowired
-    private OrganGestorHelper organGestorHelper;
-    @Autowired
-    private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
-    @Autowired
-    private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
-	@Autowired
-	private MetaExpedientTascaRepository metaExpedientTascaRepository;
-	@Autowired
-	private AvisRepository avisRepository;
-    @Autowired
-    private EmailHelper emailHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private DistribucioReglaHelper distribucioReglaHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private MetaExpedientComentariRepository metaExpedientComentariRepository;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private MetaNodeHelper metaNodeHelper;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private MetaNodeRepository metaNodeRepository;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private PermisosHelper permisosHelper;
+    @Autowired private OrganGestorHelper organGestorHelper;
+    @Autowired private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+    @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired private AvisRepository avisRepository;
+    @Autowired private EmailHelper emailHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private MetaNodeHelper metaNodeHelper;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
 
-	@Autowired
-	private ExpedientRepository expedientRepository;
-    @Autowired
-    private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired private ExpedientRepository expedientRepository;
+    @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
 	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,

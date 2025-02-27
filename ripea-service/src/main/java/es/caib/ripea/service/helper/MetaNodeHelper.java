@@ -1,7 +1,13 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
@@ -11,33 +17,14 @@ import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaNodeAmbMetaDadesDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.permission.ExtendedPermission;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Utilitat per omplir les meta-dades dels meta-nodes.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class MetaNodeHelper {
 
-	@Resource
-	private MetaDadaRepository metaDadaRepository;
-	@Resource
-	ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private MetaExpedientHelper metaExpedientHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 
 	public void omplirMetaDadesPerMetaNodes(
 			List<? extends MetaNodeAmbMetaDadesDto> metaNodes) {

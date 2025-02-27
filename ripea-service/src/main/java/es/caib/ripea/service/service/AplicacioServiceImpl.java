@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,16 +52,16 @@ import es.caib.ripea.service.permission.ExtendedPermission;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	@Resource private UsuariRepository usuariRepository;
-	@Resource private CacheHelper cacheHelper;
-	@Resource private PluginHelper pluginHelper;
-	@Resource private PinbalHelper pinbalHelper;	
-	@Resource private ConversioTipusHelper conversioTipusHelper;
-	@Resource private IntegracioHelper integracioHelper;
-	@Resource private ExcepcioLogHelper excepcioLogHelper;
-	@Resource private UsuariHelper usuariHelper;
-	@Resource private GrupRepository grupRepository;
-	@Resource private RolHelper rolHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private PinbalHelper pinbalHelper;	
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private IntegracioHelper integracioHelper;
+	@Autowired private ExcepcioLogHelper excepcioLogHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private RolHelper rolHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;

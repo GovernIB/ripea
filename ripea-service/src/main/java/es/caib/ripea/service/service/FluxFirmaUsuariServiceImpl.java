@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -26,28 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Implementació del servei de gestió de fluxos de firma d'un usuari.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 
-	@Autowired
-	private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@Transactional
 	@Override

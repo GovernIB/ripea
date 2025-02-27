@@ -56,12 +56,6 @@ import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
 
-/**
- * Mètodes per generar un índex d'un expedient relacionat en una transacció separada
- * 
- * @author Limit Tecnologies <limit@limit.es>
- *
- */
 @Component
 public class IndexBatchHelper {
 
@@ -70,24 +64,15 @@ public class IndexBatchHelper {
     private SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
     private SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private IndexValidacioHelper indexValidacioHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private ContingutService contingutService;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private IndexValidacioHelper indexValidacioHelper;
 	
 	@Transactional(readOnly = true)
 	public void processarBatchPDF(

@@ -9,18 +9,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Utilitats comunes per gestionar les carpetes d'un procediment
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class MetaExpedientCarpetaHelper {
 
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private MetaExpedientCarpetaRepository metaExpedientCarpetaRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private MetaExpedientCarpetaRepository metaExpedientCarpetaRepository;
 
 	public List<MetaExpedientCarpetaDto> findCarpetesArrelMetaExpedient(MetaExpedientEntity metaExpedient) {
 		List<MetaExpedientCarpetaEntity> metaExpedientCarpetes = metaExpedientCarpetaRepository.findByMetaExpedientAndPare(metaExpedient, null);

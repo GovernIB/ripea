@@ -28,14 +28,10 @@ import java.util.*;
 @Component
 public class ConfigHelper {
 
-    @Autowired
-    private ConfigRepository configRepository;
-    @Autowired
-    private ConfigGroupRepository configGroupRepository;
-    @Autowired
-    private OrganGestorRepository organGestorRepository;
-    @Autowired
-    private Environment springEnvironment;
+    @Autowired private ConfigRepository configRepository;
+    @Autowired private ConfigGroupRepository configGroupRepository;
+    @Autowired private OrganGestorRepository organGestorRepository;
+    @Autowired private Environment springEnvironment;
 
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
     private static ThreadLocal<String> organCodi = new ThreadLocal<>();

@@ -1,25 +1,25 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
-import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
+import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
 
 @Component
 public class ExpedientEstatHelper {
 	
 	@Autowired private ExpedientEstatRepository expedientEstatRepository;
-	@Resource  private ConversioTipusHelper conversioTipusHelper;
-	@Resource  private EntityComprovarHelper entityComprovarHelper;
-	@Resource  private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
 
 	public ExpedientEstatEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedientEntity, String codi) {
 		return expedientEstatRepository.findByMetaExpedientAndCodi(metaExpedientEntity, codi);

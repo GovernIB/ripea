@@ -13,11 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Utilitat per tractar documents XML i el seu contingut.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class XmlHelper {
 
 	/** Obté tots els nodes en la ruta assenyalada dins el node passat com a paràmetre

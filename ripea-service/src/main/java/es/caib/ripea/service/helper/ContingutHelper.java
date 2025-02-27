@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.helper;
 
 import com.lowagie.text.pdf.AcroFields;
@@ -51,76 +48,40 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/**
- * Utilitat per a gestionar contenidors.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class ContingutHelper {
 
-	@Autowired
-	private ContingutRepository contingutRepository;
-	@Autowired
-	private DadaRepository dadaRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private ContingutMovimentRepository contenidorMovimentRepository;
-	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private CarpetaRepository carpetaRepository;
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
-	@Autowired
-	private GrupRepository grupRepository;
-	@Autowired
-	private AlertaRepository alertaRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired
-	private TipusDocumentalRepository tipusDocumentalRepository;
-	@Autowired
-	private IndexHelper indexHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
-	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private DadaRepository dadaRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ContingutMovimentRepository contenidorMovimentRepository;
+	@Autowired private DocumentRepository documentRepository;
+	@Autowired private CarpetaRepository carpetaRepository;
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private AlertaRepository alertaRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+	@Autowired private IndexHelper indexHelper;
+	@Autowired private MessageHelper messageHelper;
+	@Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 
 	private static final int NO_ESBORRAT = 0;
 

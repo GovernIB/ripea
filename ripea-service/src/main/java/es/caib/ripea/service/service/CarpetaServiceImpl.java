@@ -1,7 +1,15 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
@@ -10,52 +18,31 @@ import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.helper.CarpetaHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.CarpetaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-/**
- * Implementació dels mètodes per a gestionar carpetes.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class CarpetaServiceImpl implements CarpetaService {
 
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private CarpetaRepository carpetaRepository;
-	@Resource
-	private ContingutRepository contingutRepository;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private ContingutHelper contingutHelper;
-	@Resource
-	private PluginHelper pluginHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private ContingutLogHelper contingutLogHelper;
-	@Resource
-	private CarpetaHelper carpetaHelper;
-
-
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private CarpetaRepository carpetaRepository;
+	@Autowired private ContingutRepository contingutRepository;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private CarpetaHelper carpetaHelper;
 
 	@Transactional
 	@Override

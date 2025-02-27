@@ -17,12 +17,9 @@ import java.util.Map;
 @Component
 public class IndexValidacioHelper {
 
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private DocumentHelper documentHelper;
 	
 	public Map<Integer, Date> recuperarDataFirma(DocumentEntity document) {
 		Map<Integer, Date> datesFirmes = null;

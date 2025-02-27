@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.AvisEntity;
@@ -22,22 +19,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Implementació del servei de gestió d'avisos.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 public class AvisServiceImpl implements AvisService {
 
-	@Autowired
-	private AvisRepository avisRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	
-	
+	@Autowired private AvisRepository avisRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
 
 	@Transactional
 	@Override

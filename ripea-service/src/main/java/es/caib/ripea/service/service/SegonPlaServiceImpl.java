@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -62,11 +61,6 @@ import es.caib.ripea.service.intf.service.SegonPlaService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Implementació del servei de gestió d'entitats.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Service
 @Slf4j
 public class SegonPlaServiceImpl implements SegonPlaService {
@@ -74,8 +68,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
-	@Resource  private EntitatRepository entitatRepository;
-	@Resource  private CacheHelper cacheHelper;
+	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private CacheHelper cacheHelper;
 	@Autowired private JavaMailSender mailSender;
 	@Autowired private TestHelper testHelper;
 	@Autowired private EmailPendentEnviarRepository emailPendentEnviarRepository;

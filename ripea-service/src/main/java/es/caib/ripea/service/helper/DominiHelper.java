@@ -34,11 +34,6 @@ import es.caib.ripea.service.intf.exception.DominiException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 
-/**
- * Helper per recuperar el resultat d'una consulta d'un domini.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class DominiHelper {
 
