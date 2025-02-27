@@ -59,6 +59,11 @@
 			<artifactId>ripea-service-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>ripea-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>

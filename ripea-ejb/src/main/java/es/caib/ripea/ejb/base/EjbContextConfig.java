@@ -33,7 +33,7 @@ import java.util.Locale;
 		JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan({
-	BaseConfig.BASE_PACKAGE + ".logic",
+	BaseConfig.BASE_PACKAGE + ".service",
 	BaseConfig.BASE_PACKAGE + ".persist"
 })
 //@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
