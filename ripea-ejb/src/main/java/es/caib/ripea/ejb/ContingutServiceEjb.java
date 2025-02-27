@@ -32,7 +32,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void dadaSave(
 			Long entitatId,
 			Long contingutId,
@@ -46,7 +46,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void deleteReversible(
 			Long entitatId,
 			Long contingutId,
@@ -76,7 +76,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
@@ -85,7 +85,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutDto copy(
 			Long entitatId,
 			Long contingutOrigenId,
@@ -95,7 +95,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutDto findAmbIdUser(
 			Long entitatId,
 			Long contingutId,
@@ -125,7 +125,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ValidacioErrorDto> findErrorsValidacio(
 			Long entitatId,
 			Long contingutId) {
@@ -133,7 +133,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<AlertaDto> findAlertes(
 			Long entitatId,
 			Long contingutId) throws NotFoundException {
@@ -149,7 +149,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ContingutLogDto> findLogsPerContingutUser(
 			Long entitatId,
 			Long contingutId) {
@@ -169,7 +169,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutLogDetallsDto findLogDetallsPerContingutUser(
 			Long entitatId,
 			Long contingutId,
@@ -189,7 +189,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ContingutMovimentDto> findMovimentsPerContingutUser(
 			Long entitatId,
 			Long contingutId) {
@@ -215,7 +215,7 @@ public class ContingutServiceEjb implements ContingutService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ArxiuDetallDto getArxiuDetall(
 			Long entitatId,
 			Long contingutId) {
@@ -225,13 +225,13 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public List<CodiValorDto> sincronitzarEstatArxiu(Long entitatId, Long contingutId) {
         return delegateService.sincronitzarEstatArxiu(entitatId, contingutId);
     }
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto exportacioEni(
 			Long entitatId,
 			Long contingutId) {
@@ -241,7 +241,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre, String rolActual)
@@ -252,7 +252,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<DocumentDto> findDocumentsMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
@@ -266,7 +266,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long link(
 			Long entitatId, 
 			Long contingutOrigenId, 
@@ -282,7 +282,7 @@ public class ContingutServiceEjb implements ContingutService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void order(
 			Long entitatId,
 			Long contingutId, 
@@ -348,7 +348,7 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void checkIfPermitted(
 			Long contingutId,
 			String rolActual, 
@@ -360,26 +360,26 @@ public class ContingutServiceEjb implements ContingutService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long getPareId(Long contingutId) {
 		return delegateService.getPareId(contingutId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long getExpedientId(Long contingutId) {
 		return delegateService.getExpedientId(contingutId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean isDeleted(Long contingutId) {
 		return delegateService.isDeleted(contingutId);
 	}
 
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ContingutMassiuDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
@@ -394,20 +394,20 @@ public class ContingutServiceEjb implements ContingutService {
 
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ContingutDto> getFillsBasicInfo(Long contingutId) {
 		return delegateService.getFillsBasicInfo(contingutId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutDto getBasicInfo(Long contingutId, boolean checkPermissions) {
 		return delegateService.getBasicInfo(contingutId, checkPermissions);
 	}
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ResultDto<ContingutMassiuDto> findDocumentsPerFirmaSimpleWebMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,

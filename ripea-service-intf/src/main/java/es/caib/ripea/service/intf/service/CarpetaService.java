@@ -34,7 +34,7 @@ public interface CarpetaService {
 	 * @throws ValidationException
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public CarpetaDto create(
 			Long entitatId,
 			Long pareId,
@@ -54,7 +54,7 @@ public interface CarpetaService {
 	 * @throws ValidationException
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void update(
 			Long entitatId,
 			Long id,
@@ -71,7 +71,7 @@ public interface CarpetaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public CarpetaDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -87,7 +87,7 @@ public interface CarpetaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<CarpetaDto> findByEntitatAndExpedient(
 			Long entitatId,
 			Long expedientId) throws NotFoundException;
@@ -101,10 +101,10 @@ public interface CarpetaService {
 	 * 			Atribut id de l'expedient actual.
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId, String rolActual);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportIndexCarpetes(Long entitatId, Set<Long> carpetaIds, String format) throws IOException;
 
 }

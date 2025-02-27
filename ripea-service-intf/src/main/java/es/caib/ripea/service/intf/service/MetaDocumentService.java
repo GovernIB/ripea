@@ -37,7 +37,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -93,7 +93,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto update(
 			Long entitatId,
 			Long metaExpedientId,
@@ -144,7 +144,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -166,7 +166,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -185,7 +185,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto findById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -204,7 +204,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto findByCodi(
 			Long entitatId,
 			Long metaExpedientId,
@@ -223,7 +223,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -269,7 +269,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto getPlantilla(
 			Long entitatId,
 			Long contingutId,
@@ -288,7 +288,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto getDadesNti(
 			Long entitatId,
 			Long contingutId,
@@ -308,7 +308,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contenidorId, 
@@ -325,7 +325,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaDocumentDto> findActiusPerModificacio(
 			Long entitatId,
 			Long documentId) throws NotFoundException;
@@ -334,7 +334,7 @@ public interface MetaDocumentService {
 	 * Consulta la llista de tipus de document del plugin de portafirmes.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus();
 	
 	/**
@@ -346,7 +346,7 @@ public interface MetaDocumentService {
 	 *            Id del procediment.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId);
 	
 	/**
@@ -356,7 +356,7 @@ public interface MetaDocumentService {
 	 * 
 	 * @return El tipus de document o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	MetaDocumentDto findById(
 			Long metaDocumentId);
 	
@@ -369,7 +369,7 @@ public interface MetaDocumentService {
 	 *            El tipus genèric del que es volen recuperar el tipus.
 	 * @return El tipus de document genèric o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	MetaDocumentDto findByTipusGeneric(
 			Long entitatId,
 			MetaDocumentTipusGenericEnumDto tipusGeneric);
@@ -383,7 +383,7 @@ public interface MetaDocumentService {
 	 *            Id del procediment.
 	 * @return La llista de tipus o null si el plugin no suporta la consulta.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId);
 	
 	/**
@@ -400,7 +400,7 @@ public interface MetaDocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void marcarPerDefecte(
 			Long entitatId,
 			Long metaExpedientId,
@@ -408,21 +408,21 @@ public interface MetaDocumentService {
 			boolean remove) throws NotFoundException;
 
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
 			Long metaExpedientId) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void moveTo(
 			Long entitatId,
 			Long metaDocumentId,
 			int posicio) throws NotFoundException;
 
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PinbalServeiDto findPinbalServei(Long metaDocumentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaDocumentDto> findByMetaExpedientAndFirmaSimpleWebActiva(
 			Long entitatId,
 			Long metaExpedientId);

@@ -88,7 +88,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultDto<GrupDto> findByEntitat(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -97,7 +97,7 @@ public interface GrupService {
 			GrupFiltreDto filtre, 
 			ResultEnumDto resultEnum) throws NotFoundException;
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -116,7 +116,7 @@ public interface GrupService {
 	 * @param organId TODO
 	 * @param marcarPerDefecte TODO
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -134,71 +134,71 @@ public interface GrupService {
 	 * @param rolActual TODO
 	 * @param organId TODO
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void desvincularAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PermisDto> findPermisos(
 			Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void updatePermis(
 			Long id,
 			PermisDto permis);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void deletePermis(
 			Long id,
 			Long permisId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean checkIfAlreadyExistsWithCodi(
 			Long entitatId,
 			String codi, 
 			Long grupId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void marcarPerDefecte(
 			Long entitatId,
 			Long procedimentId,
 			Long grupId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			Long organGestorId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void esborrarPerDefecte(
 			Long entitatId,
 			Long procedimentId,
 			Long grupId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<GrupDto> findGrups(
 			Long entitatId,
 			Long organGestorId,
 			Long metaExpedientId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public GrupDto findGrupById(Long grupId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public GrupDto findGrupByExpedientPeticioAndProcedimentId(
 			Long expedientPeticioId,
 			Long procedimentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
 			Long entitatId,
 			String rolActual,
 			Long organGestorId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean checkIfHasGrupPerDefecte(Long procedimentId);
 
 }

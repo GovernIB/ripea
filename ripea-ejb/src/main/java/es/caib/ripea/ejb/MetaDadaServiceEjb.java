@@ -31,7 +31,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
@@ -43,7 +43,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
@@ -55,7 +55,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDadaDto updateActiva(
 			Long entitatId,
 			Long metaNodeId,
@@ -104,7 +104,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
@@ -116,7 +116,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDadaDto findById(
 			Long entitatId,
 			Long metaNodeId,
@@ -128,7 +128,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDadaDto findByCodi(
 			Long entitatId,
 			Long metaNodeId,
@@ -140,7 +140,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<MetaDadaDto> findByMetaNodePaginat(
 			Long entitatId,
 			Long metaNodeId,
@@ -152,7 +152,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDadaDto> findActiveByMetaNode(
 			Long entitatId,
 			Long metaNodeId) {
@@ -162,7 +162,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDadaDto> findByNode(
 			Long entitatId,
 			Long nodeId) {
@@ -172,7 +172,7 @@ public class MetaDadaServiceEjb implements MetaDadaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long findMetaNodeIdByNodeId(
 			Long entitatId,
 			Long nodeId) {

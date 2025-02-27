@@ -7,7 +7,7 @@ import es.caib.ripea.back.validation.ExpedientODocumentNom;
 import es.caib.ripea.back.validation.NomDocumentNoRepetit;
 import es.caib.ripea.back.validation.ValidIfSeparada;
 import es.caib.ripea.service.intf.dto.*;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.joda.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;

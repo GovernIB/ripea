@@ -104,7 +104,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_DISSENY') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DominiDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
@@ -119,7 +119,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DominiDto findByCodiAndEntitat(
 			String codi,
 			Long entitatId) throws NotFoundException;
@@ -138,7 +138,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultatDominiDto getResultDomini(
 			Long entitatId,
 			DominiDto domini,
@@ -160,7 +160,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultatConsultaDto getSelectedDomini(
 			Long entitatId,
 			DominiDto domini,
@@ -177,7 +177,7 @@ public interface DominiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DominiDto> findByMetaNodePermisLecturaAndTipusDomini(
 			Long entitatId, 
 			MetaExpedientDto metaExpedient);

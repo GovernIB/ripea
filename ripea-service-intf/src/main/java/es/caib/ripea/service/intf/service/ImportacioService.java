@@ -32,7 +32,7 @@ public interface ImportacioService {
 	 * @throws ValidationException
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public int importarDocuments(
 			Long entitatId,
 			Long contingutId,
@@ -41,10 +41,10 @@ public interface ImportacioService {
 	 * Retorna la llista dels expedients on s'ha importat el document que s'intetna importar actualment
 	 * 
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DocumentDto> consultaExpedientsAmbImportacio();
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Map<String, String> consultaDocumentsWithExpedient();
 
 

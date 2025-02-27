@@ -32,7 +32,7 @@ public class HistoricServiceEjb implements HistoricService {
 	}
 	
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN"})
+	@RolesAllowed("**")
 	public PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
 			Long entitatId,
 			HistoricFiltreDto filtre,
@@ -42,13 +42,13 @@ public class HistoricServiceEjb implements HistoricService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricExpedientDto> getDadesEntitat(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesEntitat(entitatId, rolActual, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(
 			Long entitatId, 
 			String rolActual,
@@ -57,13 +57,13 @@ public class HistoricServiceEjb implements HistoricService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricOrganGestorSerializer.RegistresOrganGestor> getRegistresDadesOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament) {
 		return delegateService.getRegistresDadesOrgansGestors(entitatId, rolActual, filtre, tipusAgrupament);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN"})
+	@RolesAllowed("**")
 	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
 			Long entitatId, 
 			String rolActual, 
@@ -73,85 +73,85 @@ public class HistoricServiceEjb implements HistoricService {
 
 	
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesUsuari(usuariCodi, entitatId, rolActual, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<RegistresUsuariDiari> getRegistresDadesUsuaris(List<String> usuarisCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament) {
 		return delegateService.getRegistresDadesUsuaris(usuarisCodi, entitatId, rolActual, filtre, tipusAgrupament);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesInteressat(interessatDocNum, entitatId, rolActual, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<RegistresInteressatDiari> getRegistresDadesInteressat(List<String> interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament) {
 		return delegateService.getRegistresDadesInteressat(interessatsDocNum, entitatId, rolActual, filtre, tipusAgrupament);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesActualsEntitat(entitatId, rolActual, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesActualsOrgansGestors(entitatId, rolActual, filtre);
 	}
 
     @Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
     public List<RegistreOrganGestor> getRegistresDadesActualsOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
         return delegateService.getRegistresDadesActualsOrgansGestors(entitatId, rolActual, filtre);
     }
 
     @Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesActualsUsuari(codiUsuari, entitatId, rolActual, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public List<HistoricInteressatDto> getDadesActualsInteressat(String codiUsuari, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		return delegateService.getDadesActualsInteressat(codiUsuari, entitatId, rolActual, filtre);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN"})
+	@RolesAllowed("**")
 	public List<Long> comprovarAccesEstadistiques(Long entitatId, String rolActual) {
 		return delegateService.comprovarAccesEstadistiques(entitatId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public FitxerDto exportarHistoricEntitat(EntitatDto entitat, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
 		return delegateService.exportarHistoricEntitat(entitat, rolActual, filtre, format);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public FitxerDto exportarHistoricOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
 		return delegateService.exportarHistoricOrgansGestors(entitatId, rolActual, filtre, format);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public FitxerDto exportarHistoricUsuaris(String[] usuarisCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
 		return delegateService.exportarHistoricUsuaris(usuarisCodi, entitatId, rolActual, filtre, format);
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN", "IPA_API_HIST"})
+	@RolesAllowed("**")
 	public FitxerDto exportarHistoricInteressats(String[] interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
 		return delegateService.exportarHistoricInteressats(interessatsDocNum, entitatId, rolActual, filtre, format);
 	}

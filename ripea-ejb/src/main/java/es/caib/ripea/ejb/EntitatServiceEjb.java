@@ -61,7 +61,7 @@ public class EntitatServiceEjb implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public EntitatDto findById(Long id) {
 		return delegateService.findById(id);
 	}
@@ -79,7 +79,7 @@ public class EntitatServiceEjb implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<EntitatDto> findAccessiblesUsuariActual() {
 		return delegateService.findAccessiblesUsuariActual();
 	}
@@ -140,13 +140,13 @@ public class EntitatServiceEjb implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public void evictEntitatsAccessiblesUsuari() {
 		delegateService.evictEntitatsAccessiblesUsuari();
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public EntitatDto findByUnitatArrel(String unitatArrel) {
 		return delegateService.findByUnitatArrel(unitatArrel);
 	}
@@ -158,13 +158,13 @@ public class EntitatServiceEjb implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		delegateService.setConfigEntitat(entitatDto);
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public void removeEntitatPerDefecteUsuari(String usuariCodi) {
         delegateService.removeEntitatPerDefecteUsuari(usuariCodi);
     }

@@ -10,7 +10,7 @@ import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusValidacioTascaEnum;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import java.util.Date;
 

@@ -20,7 +20,7 @@ public interface DadesExternesService {
 	 * 
 	 * @return el llistat de països.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PaisDto> findPaisos();
 
 	/**
@@ -28,7 +28,7 @@ public interface DadesExternesService {
 	 * 
 	 * @return el llistat de províncies.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ProvinciaDto> findProvincies();
 
 	/**
@@ -36,7 +36,7 @@ public interface DadesExternesService {
 	 * 
 	 * @return el llistat de comunitats.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ComunitatDto> findComunitats();
 	
 	/**
@@ -44,7 +44,7 @@ public interface DadesExternesService {
 	 * 
 	 * @return el llistat de províncies.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ProvinciaDto> findProvinciesPerComunitat(String comunitatCodi);
 
 	/**
@@ -54,7 +54,7 @@ public interface DadesExternesService {
 	 *            El codi de la província.
 	 * @return el llistat de municipis.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MunicipiDto> findMunicipisPerProvincia(String provinciaCodi);
 
 	/**
@@ -64,10 +64,10 @@ public interface DadesExternesService {
 	 *            El codi de la província.
 	 * @return el llistat de nivells de administracions.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<NivellAdministracioDto> findNivellAdministracions();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(
 			String provinciaCodi);
 

@@ -5,7 +5,7 @@ package es.caib.ripea.back.command;
 
 import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.MetaExpedientDominiDto;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Command per a els dominis del meta-expedient.

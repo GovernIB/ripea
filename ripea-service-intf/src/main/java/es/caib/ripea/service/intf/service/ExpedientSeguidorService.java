@@ -25,7 +25,7 @@ public interface ExpedientSeguidorService {
 	 *            L'identificador de l'expedient a seguir.
 	 * @return el llistat de municipis.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void follow(
 			Long entitatId,
 			Long expedientId);
@@ -39,7 +39,7 @@ public interface ExpedientSeguidorService {
 	 *            L'identificador de l'expedient a seguir.
 	 * @return el llistat de municipis.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void unfollow(
 			Long entitatId,
 			Long expedientId);
@@ -53,7 +53,7 @@ public interface ExpedientSeguidorService {
 	 *            L'identificador de l'expedient a seguir.
 	 * @return el llistat de municipis.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<UsuariDto> getFollowersExpedient(
 			Long entitatId,
 			Long expedientId);

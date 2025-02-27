@@ -30,31 +30,31 @@ public class ExecucioMassivaServiceEjb implements ExecucioMassivaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException {
 		delegateService.crearExecucioMassiva(entitatId, dto);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
 		return delegateService.descarregarDocumentExecMassiva(entitatId, execMassivaId);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException {
 		return delegateService.findExecucionsMassivesPerUsuari(entitatId, usuari, pagina);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExecucioMassivaDto> findExecucionsMassivesGlobals() throws NotFoundException {
 		return delegateService.findExecucionsMassivesGlobals();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException {
 		return delegateService.findContingutPerExecucioMassiva(exm_id);
 	}
@@ -64,7 +64,7 @@ public class ExecucioMassivaServiceEjb implements ExecucioMassivaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void saveExecucioMassiva(
 			Long entitatId,
 			ExecucioMassivaDto dto,

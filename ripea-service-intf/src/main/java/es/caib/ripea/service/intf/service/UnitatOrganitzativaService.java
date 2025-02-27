@@ -25,7 +25,7 @@ public interface UnitatOrganitzativaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<UnitatOrganitzativaDto> findByEntitat(
 			String entitatCodi);
 
@@ -61,7 +61,7 @@ public interface UnitatOrganitzativaService {
 	 *            Atribut codi de l'unitat.
 	 * @return La llista d'unitats organitzatives que compleixen el filtre.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<UnitatOrganitzativaDto> findByFiltre(
 			String codiDir3, 
 			String denominacio, 

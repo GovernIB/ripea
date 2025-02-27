@@ -7,7 +7,7 @@ import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

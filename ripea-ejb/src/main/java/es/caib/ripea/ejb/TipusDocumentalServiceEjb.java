@@ -73,14 +73,14 @@ public class TipusDocumentalServiceEjb implements TipusDocumentalService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<TipusDocumentalDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegateService.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public TipusDocumentalDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
 		return delegateService.findByCodiAndEntitat(codi, entitatId);
 

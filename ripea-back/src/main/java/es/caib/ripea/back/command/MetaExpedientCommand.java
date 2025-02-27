@@ -12,7 +12,7 @@ import es.caib.ripea.back.validation.MetaExpedientCodiSiaNoRepetit;
 import es.caib.ripea.back.validation.OrganGestorMetaExpedientNotNull;
 import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
 import java.io.IOException;

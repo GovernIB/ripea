@@ -108,7 +108,7 @@ public interface URLInstruccioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<URLInstruccioDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 	
@@ -121,7 +121,7 @@ public interface URLInstruccioService {
 	 * @param urlInstruccioId
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getURLInstruccio(Long entitatId, Long contingutId, Long urlInstruccioId);
 
 }

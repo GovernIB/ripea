@@ -106,7 +106,7 @@ public interface TipusDocumentalService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<TipusDocumentalDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
@@ -121,7 +121,7 @@ public interface TipusDocumentalService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public TipusDocumentalDto findByCodiAndEntitat(
 			String codi,
 			Long entitatId) throws NotFoundException;

@@ -3,15 +3,36 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.MetaExpedientService;
-import lombok.experimental.Delegate;
+import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import java.util.List;
-import java.util.Locale;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.CrearReglaResponseDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import lombok.experimental.Delegate;
 
 /**
  * Implementació de MetaExpedientService com a EJB que empra una clase
@@ -20,7 +41,7 @@ import java.util.Locale;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Stateless
-public class MetaExpedientServiceEjb implements MetaExpedientService {
+public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientService> implements MetaExpedientService {
 
 	@Delegate
 	private MetaExpedientService delegateService;
@@ -64,7 +85,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) {
@@ -82,35 +103,35 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) {
 		return delegateService.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
 			Long entitatId, String rolActual) {
 		return delegateService.findActiusAmbEntitatPerCreacio(entitatId, rolActual);
 	}
 	
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(
 			Long entitatId, String rolActual) {
 		return delegateService.findActiusAmbEntitatPerModificacio(entitatId, rolActual);
 	}	
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findActius(
 			Long entitatId, String filtreNomOrCodiSia, String rolActual, boolean comu, Long organId) {
 		return delegateService.findActius(entitatId, filtreNomOrCodiSia, rolActual, comu, organId);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public long getProximNumeroSequencia(
 			Long entitatId,
 			Long id,
@@ -122,7 +143,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -134,7 +155,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -146,7 +167,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientTascaDto tascaUpdateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -160,7 +181,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -172,7 +193,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientTascaDto tascaFindById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -184,7 +205,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -196,7 +217,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			Long id) {
@@ -206,7 +227,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
@@ -218,7 +239,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public void permisDelete(Long entitatId, Long id, Long permisId, Long organGestorId, String rolActual, Long organId) {
 		delegateService.permisDelete(
 				entitatId,
@@ -228,7 +249,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
 			Long organGestorId,
@@ -248,7 +269,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientDto getAndCheckAdminPermission(
 			Long entitatId,
 			Long id, Long organId) {
@@ -259,7 +280,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<GrupDto> findGrupsAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -271,7 +292,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
 			Long organGestorId, String filtre) {
@@ -304,7 +325,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findByClassificacio(
 			Long entitatId,
 			String codiSia) {
@@ -314,7 +335,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientDto canviarEstatRevisioASellecionat(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, 
@@ -327,13 +348,13 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public int countMetaExpedientsPendentRevisar(Long entitatId) {
 		return delegateService.countMetaExpedientsPendentRevisar(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public boolean isMetaExpedientPendentRevisio(
 			Long entitatId,
 			Long id) {
@@ -341,7 +362,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public boolean comprovarPermisosMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -353,7 +374,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
 			String rolActual) {
@@ -361,13 +382,13 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public boolean isRevisioActiva() {
 		return delegateService.isRevisioActiva();
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
 			Long entitatId,
 			String filtreNomOrCodiSia, 
@@ -504,7 +525,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public MetaExpedientDto findByIdAmbElements(
 			Long entitatId,
 			Long id, 
@@ -516,31 +537,31 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis) {
 		return delegateService.hasPermissionForAnyProcediment(entitatId, rolActual, permis);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaExpedientTascaValidacioDto> findValidacionsTasca(Long metaExpedientTascaId) {
 		return delegateService.findValidacionsTasca(metaExpedientTascaId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean createValidacioTasca(MetaExpedientTascaValidacioDto metaExpedientTascaValidacioDto) {
 		return delegateService.createValidacioTasca(metaExpedientTascaValidacioDto);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaExpedientTascaValidacioDto updateValidacioTasca(Long metaExpedientTascaValidacioId, String accio) {
 		return delegateService.updateValidacioTasca(metaExpedientTascaValidacioId, accio);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public int createValidacionsTasca(
 			Long entitatId,
 			Long tascaID,
@@ -549,7 +570,7 @@ public class MetaExpedientServiceEjb implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaExpedientDto getAndCheckOrganPermission(
 			Long entitatId,
 			Long id,

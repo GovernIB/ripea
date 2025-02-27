@@ -29,7 +29,7 @@ public interface FluxFirmaUsuariService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FluxFirmaUsuariDto create(
 			Long entitatId,
 			FluxFirmaUsuariDto flux,
@@ -47,7 +47,7 @@ public interface FluxFirmaUsuariService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FluxFirmaUsuariDto update(
 			Long id,
 			Long entitatId,
@@ -64,7 +64,7 @@ public interface FluxFirmaUsuariService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FluxFirmaUsuariDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -80,7 +80,7 @@ public interface FluxFirmaUsuariService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FluxFirmaUsuariDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -94,7 +94,7 @@ public interface FluxFirmaUsuariService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<FluxFirmaUsuariDto> findByEntitatAndUsuariPaginat(
 			Long entitatId, 
 			FluxFirmaUsuariFiltreDto filtre,
@@ -109,7 +109,7 @@ public interface FluxFirmaUsuariService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<FluxFirmaUsuariDto> findByEntitatAndUsuari(
 			Long entitatId) throws NotFoundException;
 

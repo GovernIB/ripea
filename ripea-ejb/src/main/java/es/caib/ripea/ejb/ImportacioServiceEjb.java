@@ -31,7 +31,7 @@ public class ImportacioServiceEjb implements ImportacioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public int importarDocuments(Long entitatId, Long contingutId, ImportacioDto dades) throws NotFoundException {
 		return delegateService.importarDocuments(
 				entitatId, 
@@ -40,13 +40,13 @@ public class ImportacioServiceEjb implements ImportacioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return delegateService.consultaExpedientsAmbImportacio();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Map<String, String> consultaDocumentsWithExpedient() {
 		return delegateService.consultaDocumentsWithExpedient();
 	}

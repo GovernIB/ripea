@@ -9,7 +9,7 @@ import es.caib.ripea.back.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.back.command.DocumentCommand.UpdateFisic;
 import es.caib.ripea.back.command.DocumentGenericCommand.ConcatenarDigital;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

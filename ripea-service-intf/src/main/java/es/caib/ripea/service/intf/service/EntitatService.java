@@ -83,7 +83,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public EntitatDto findById(
 			Long id) throws NotFoundException;
 
@@ -112,7 +112,7 @@ public interface EntitatService {
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<EntitatDto> findAccessiblesUsuariActual();
 
 	/**
@@ -208,10 +208,10 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	byte[] getLogo() throws NoSuchFileException, IOException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void evictEntitatsAccessiblesUsuari();
 
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	EntitatDto findByUnitatArrel(String unitatArrel);
 	
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN')")
@@ -224,9 +224,9 @@ public interface EntitatService {
 	 * @param entitatDto
 	 *            Atribut entitatDto
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void setConfigEntitat(EntitatDto entitatDto);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     void removeEntitatPerDefecteUsuari(String usuariCodi);
 }

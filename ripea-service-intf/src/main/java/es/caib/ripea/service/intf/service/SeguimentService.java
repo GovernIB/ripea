@@ -7,14 +7,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public interface SeguimentService {
 
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams,
 			String rolActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
 			SeguimentNotificacionsFiltreDto filtre,
@@ -35,7 +35,7 @@ public interface SeguimentService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultDto<SeguimentArxiuPendentsDto> findPendentsArxiu(
 			Long entitatId,
 			SeguimentArxiuPendentsFiltreDto filtre,
@@ -45,7 +45,7 @@ public interface SeguimentService {
 			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum,
 			Long organActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<SeguimentConsultaPinbalDto> findConsultesPinbal(
 			Long entitatId,
 			SeguimentConsultaFiltreDto filtre,

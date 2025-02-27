@@ -33,7 +33,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientDto create(
 			Long entitatId,
 			Long contenidorId,
@@ -76,7 +76,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientDto findById(
 			Long entitatId,
 			Long id, 
@@ -86,7 +86,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
@@ -97,7 +97,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
@@ -107,7 +107,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String agafarUser(
 			Long entitatId,
 			Long id) {
@@ -126,7 +126,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String alliberarUser(
 			Long entitatId,
 			Long id) {
@@ -142,7 +142,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String tancar(
 			Long entitatId,
 			Long id,
@@ -152,7 +152,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void reobrir(
 			Long entitatId,
 			Long id) throws NotFoundException {
@@ -160,7 +160,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void relacioCreate(
 			Long entitatId,
 			Long id,
@@ -173,7 +173,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean relacioDelete(
 			Long entitatId, 
 			Long expedientId, 
@@ -187,7 +187,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientDto> relacioFindAmbExpedient(
 			Long entitatId, 
 			Long expedientId) {
@@ -195,7 +195,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto exportacio(
 			Long entitatId,
 			Collection<Long> expedientIds,
@@ -207,13 +207,13 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientSelectorDto> findPerUserAndProcediment(Long entitatId, Long metaExpedientId, String rolActual) throws NotFoundException {
 		return delegateService.findPerUserAndProcediment(entitatId, metaExpedientId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
@@ -290,7 +290,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean incorporar(
 			Long entitatId,
 			Long expedientId,
@@ -315,7 +315,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto exportIndexExpedients(Long entitatId, Set<Long> expedientIds, String format) throws IOException {
 		return delegateService.exportIndexExpedients(
 				entitatId, 
@@ -324,7 +324,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto exportIndexExpedient(Long entitatId, Set<Long> expedientId, boolean exportar, String format) throws IOException {
 		return delegateService.exportIndexExpedient(
 				entitatId,
@@ -334,7 +334,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
@@ -345,7 +345,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 				paginacioParams, rolActual);
 	}
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<Long> findIdsExpedientsPerTancamentMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException {
@@ -354,7 +354,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 				filtre, rolActual);
 	}
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void assignar(
 			Long entitatId,
 			Long expedientId,
@@ -365,7 +365,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 				usuariCodi);
 	}
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return delegateService.consultaExpedientsAmbImportacio();
 	}
@@ -376,12 +376,12 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception guardarExpedientArxiu(Long expId) {
 		return delegateService.guardarExpedientArxiu(expId);
 	}
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text, 
@@ -411,7 +411,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean hasReadPermissionsAny(
 			String rolActual,
 			Long entitatId) {
@@ -421,7 +421,7 @@ public class ExpedientServiceEjb implements ExpedientService {
 
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
 			Long id,
 			ExpedientFiltreDto filtre,
@@ -431,27 +431,27 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void importarExpedient(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
 			throws NotFoundException {
 		delegateService.importarExpedient(entitatId, expedientPareId, expedientId, rolActual);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
 			throws NotFoundException {
 		return delegateService.esborrarExpedientFill(entitatId, expedientPareId, expedientId, rolActual);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
 		return delegateService.retryMoverAnnexArxiu(registreAnnexId);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public long countByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {
@@ -461,31 +461,31 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutVistaEnumDto getVistaUsuariActual() {
 		return delegateService.getVistaUsuariActual();
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void setVistaUsuariActual(
 			ContingutVistaEnumDto vistaActual) {
 		delegateService.setVistaUsuariActual(vistaActual);
 	}
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds, boolean ambDocuments) throws IOException {
 		return delegateService.exportarEniExpedient(entitatId, expedientIds, ambDocuments);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getNom(Long id) {
 		return delegateService.getNom(id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientDto changeExpedientPrioritat(
 			Long entitatId,
 			Long expedientId,
@@ -495,19 +495,19 @@ public class ExpedientServiceEjb implements ExpedientService {
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat) {
         delegateService.changeExpedientsPrioritat(entitatId, expedientsId, prioritat);
     }
     
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MoureDestiVistaEnumDto getVistaMoureUsuariActual() {
 		return delegateService.getVistaMoureUsuariActual();
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String retornaUser(Long entitatId, Long id) throws NotFoundException {
 		return delegateService.retornaUser(entitatId, id);
 	}

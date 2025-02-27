@@ -8,67 +8,67 @@ import java.util.List;
 
 public interface ExpedientPeticioService {
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual, Long organActualId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ExpedientPeticioDto findOne(
 			Long expedientPeticioId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto getAnnexContent(
 			Long annexId, boolean versioImprimible);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ArxiuFirmaDto> annexFirmaInfo(
 			String fitxerArxiuUuid);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public RegistreAnnexDto findAnnexById(
 			Long annexId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto getAnnexFirmaContingut(
 			Long annexId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void rebutjar(
 			Long expedientPeticioId,
 			String observacions);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public RegistreDto findRegistreById(Long registreId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ExpedientDto findByEntitatAndMetaExpedientAndExpedientNumero(Long entitatId,
 	                                                                    Long metaExpedientId,
 	                                                                    String expedientNumero);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto getJustificantContent(String arxiuUuid);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean comprovarExistenciaInteressatsPeticio(
 			Long entitatId, 
 			Long expedientId, 
 			Long expedientPeticioId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
 			Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
@@ -85,22 +85,22 @@ public interface ExpedientPeticioService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findMetaExpedientsPermesosPerAnotacions(
 			Long entitatId,
 			Long organActualId,
 			String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void canviarProcediment(
 			Long expedientPeticioId,
 			Long procedimentId, 
 			Long grupId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void retornarPendent(Long expedientPeticioId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void evictCountAnotacionsPendents(
 			Long entitatId);
 
@@ -114,6 +114,6 @@ public interface ExpedientPeticioService {
 	public void comunicadaReprocessar(
 			Long expedientPeticioId) throws Throwable;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     public Long getPeriodeActualitzacioContadorAnotacionsPendents();
 }

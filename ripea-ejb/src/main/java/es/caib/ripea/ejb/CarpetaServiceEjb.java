@@ -31,7 +31,7 @@ public class CarpetaServiceEjb implements CarpetaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public CarpetaDto create(
 			Long entitatId,
 			Long contenidorId,
@@ -43,7 +43,7 @@ public class CarpetaServiceEjb implements CarpetaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void update(
 			Long entitatId,
 			Long id,
@@ -55,7 +55,7 @@ public class CarpetaServiceEjb implements CarpetaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public CarpetaDto findById(
 			Long entitatId,
 			Long id) {
@@ -63,19 +63,19 @@ public class CarpetaServiceEjb implements CarpetaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<CarpetaDto> findByEntitatAndExpedient(Long entitatId, Long expedientId) throws NotFoundException {
 		return delegateService.findByEntitatAndExpedient(entitatId, expedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId, String rolActual) {
 		return delegateService.findArbreCarpetesExpedient(entitatId, expedients, expedientId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto exportIndexCarpetes(Long entitatId, Set<Long> carpetaIds, String format) throws IOException {
 		return delegateService.exportIndexCarpetes(entitatId, carpetaIds, format);
 	}

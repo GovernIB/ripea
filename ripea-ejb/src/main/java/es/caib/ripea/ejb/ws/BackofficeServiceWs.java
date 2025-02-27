@@ -25,7 +25,7 @@ import java.util.List;
 @WebContext(
 		contextRoot = "/ripea/ws",
 		urlPattern = "/backoffice",
-		authMethod = "WSBASIC",
+		authMethod = "BASIC",
 		transportGuarantee = "NONE",
 		secureWSDLAccess = false)
 @RolesAllowed({ "DIS_BSTWS" })

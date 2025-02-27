@@ -32,13 +32,13 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) {
 		return delegateService.create(entitatId, expedientId, interessat, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto create(
 			Long entitatId,
 			Long expedientId,
@@ -49,55 +49,55 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) {
 		return delegateService.update(entitatId, expedientId, interessat, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant, String rolActual) {
 		return delegateService.update(entitatId, expedientId, interessatId, representant, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void delete(Long entitatId, Long expedientId, Long interessatId, String rolActual) {
 		delegateService.delete(entitatId, expedientId, interessatId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void deleteRepresentant(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual) {
 		delegateService.deleteRepresentant(entitatId, expedientId, interessatId, representantId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto findById(Long id, boolean consultarDadesExternes) {
 		return delegateService.findById(id, consultarDadesExternes);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto findRepresentantById(Long interessatId, Long id) {
 		return delegateService.findRepresentantById(interessatId, id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public long countByExpedient(Long entitatId, Long expedientId) {
 		return delegateService.countByExpedient(entitatId, expedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<InteressatDto> findAmbDocumentPerNotificacio(Long entitatId, Long documentId) {
 		return delegateService.findAmbDocumentPerNotificacio(entitatId, documentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<InteressatPersonaFisicaDto> findByFiltrePersonaFisica(
 			String documentNum,
 			String nom,
@@ -108,7 +108,7 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<InteressatPersonaJuridicaDto> findByFiltrePersonaJuridica(
 			String documentNum,
 			String raoSocial,
@@ -117,13 +117,13 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<InteressatAdministracioDto> findByFiltreAdministracio(String organCodi, Long expedientId) {
 		return delegateService.findByFiltreAdministracio(organCodi, expedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<InteressatDto> findByExpedient(
 			Long entitatId,
 			Long expedientId,
@@ -132,7 +132,7 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto findByExpedientAndDocumentNum(
 			String documentNum,
 			Long expedientId) throws NotFoundException {
@@ -140,31 +140,31 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<InteressatDto> findByText(String text) {
 		return delegateService.findByText(text);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException {
 		return delegateService.findByDocumentNum(documentNum);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception guardarInteressatsArxiu(Long expId) {
 		return delegateService.guardarInteressatsArxiu(expId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long findExpedientIdByInteressat(Long interessatId) {
 		return delegateService.findExpedientIdByInteressat(interessatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public InteressatDto createRepresentant(
 			Long entitatId,
 			Long expedientId,
@@ -182,7 +182,7 @@ public class ExpedientInteressatServiceEjb implements ExpedientInteressatService
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats) throws NotFoundException {
 		return delegateService.importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
 	}

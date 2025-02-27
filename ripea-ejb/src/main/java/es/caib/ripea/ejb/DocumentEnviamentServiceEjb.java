@@ -30,7 +30,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Map<String, String>  notificacioCreate(
 			Long entitatId,
 			Long documentId,
@@ -42,7 +42,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentNotificacioDto notificacioUpdate(
 			Long entitatId,
 			Long documentId,
@@ -54,7 +54,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentNotificacioDto notificacioDelete(
 			Long entitatId,
 			Long documentId,
@@ -66,7 +66,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentNotificacioDto notificacioFindAmbIdAndDocument(
 			Long entitatId,
 			Long documentId,
@@ -78,7 +78,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentPublicacioDto publicacioCreate(
 			Long entitatId,
 			Long documentId,
@@ -90,7 +90,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentPublicacioDto publicacioUpdate(
 			Long entitatId,
 			Long documentId,
@@ -102,7 +102,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentPublicacioDto publicacioFindAmbId(
 			Long entitatId,
 			Long documentId,
@@ -114,7 +114,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentPublicacioDto publicacioDelete(
 			Long entitatId,
 			Long documentId,
@@ -126,7 +126,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentEnviamentDto> findAmbExpedient(
 			Long entitatId,
 			Long expedientId, 
@@ -138,7 +138,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentEnviamentDto> findAmbDocument(
 			Long entitatId,
 			Long documentId) {
@@ -148,7 +148,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentEnviamentDto> findNotificacionsAmbDocument(
 			Long entitatId, 
 			Long documentId)
@@ -165,7 +165,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public int enviamentsCount(
 			Long entitatId,
 			Long expedientId, 
@@ -177,7 +177,7 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentNotificacioDto notificacioFindAmbIdAndExpedient(Long entitatId,
 			Long expedientId,
 			Long notificacioId) {
@@ -185,19 +185,19 @@ public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds) {
 		return delegateService.checkIfAnyInteressatIsAdministracio(interessatsIds);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean checkIfDocumentIsZip(Long documentId) {
 		return delegateService.checkIfDocumentIsZip(documentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto) {
 		return delegateService.ampliarPlazoEnviament(documentNotificacioDto);
 	}

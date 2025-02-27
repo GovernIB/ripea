@@ -36,7 +36,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentDto create(
 			Long entitatId,
 			Long contenidorId,
@@ -54,7 +54,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto document,
@@ -69,7 +69,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentDto findById(
 			Long entitatId,
 			Long documentId, 
@@ -81,7 +81,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
@@ -95,7 +95,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto descarregarContingutOriginal(
 			Long entitatId,
 			Long id,
@@ -107,7 +107,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto descarregarImprimible(
 			Long entitatId,
 			Long id,
@@ -119,7 +119,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception pinbalNovaConsulta(
 			Long entitatId,
 			Long pareId,
@@ -135,7 +135,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void portafirmesEnviar(
 			Long entitatId,
 			Long id,
@@ -169,7 +169,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long id, 
@@ -193,7 +193,7 @@ public class DocumentServiceEjb implements DocumentService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
 			Long documentId, 
@@ -205,7 +205,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ViaFirmaUsuariDto> viaFirmaUsuaris(
 			UsuariDto usuariActual)
 			throws NotFoundException, IllegalStateException, SistemaExternException {
@@ -213,7 +213,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void viaFirmaEnviar(
 			Long entitatId, 
 			Long documentId, 
@@ -227,26 +227,26 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void viaFirmaCancelar(Long entitatId, Long documentId)
 			throws NotFoundException, IllegalStateException, SistemaExternException {
 		delegateService.viaFirmaCancelar(entitatId, documentId);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void viaFirmaReintentar(Long entitatId, Long documentId) throws NotFoundException, SistemaExternException {
 		delegateService.viaFirmaReintentar(entitatId, documentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentViaFirmaDto viaFirmaInfo(Long entitatId, Long documentId) throws NotFoundException {
 		return delegateService.viaFirmaInfo(entitatId, documentId);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ViaFirmaDispositiuDto> viaFirmaDispositius(
 			String viaFirmaUsuari, 
 			UsuariDto usuariActual)
@@ -257,7 +257,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception processarRespostaViaFirma(String messageJson) {
 		return delegateService.processarRespostaViaFirma(messageJson);
 	}
@@ -270,7 +270,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) {
@@ -280,7 +280,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto getFitxerPDF(
 			Long entitatId,
 			Long id) {
@@ -290,7 +290,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String generarIdentificadorFirmaClient(
 			Long entitatId,
 			Long id) {
@@ -300,7 +300,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void processarFirmaClient(
 			Long entitatId,
 			Long documentId,
@@ -318,7 +318,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override	
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto infoDocument(
 			Long entitatId, 
 			Long id, 
@@ -330,7 +330,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override	
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ArxiuFirmaDetallDto> getDetallSignants(
 			Long entitatId,
 			Long id,
@@ -353,7 +353,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void documentActualitzarEstat(Long entitatId, Long documentId, DocumentEstatEnumDto nouEstat) {
 		delegateService.documentActualitzarEstat(
 				entitatId, 
@@ -362,19 +362,19 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentDto> findAnnexosAmbExpedient(Long entitatId, DocumentDto document) {
 		return delegateService.findAnnexosAmbExpedient(entitatId, document);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(Long entitatId, Long documentId, Long enviamentId) {
 		return delegateService.recuperarBlocksFirmaEnviament(entitatId, documentId, enviamentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
 			String rolActual,
@@ -384,7 +384,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception portafirmesReintentar(
 			Long entitatId,
 			Long id, 
@@ -398,7 +398,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException {
@@ -406,13 +406,13 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Exception guardarDocumentArxiu(Long docId) {
 		return delegateService.guardarDocumentArxiu(docId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean updateTipusDocument(
 			Long entitatId, 
 			Long documentId, 
@@ -430,19 +430,19 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public void updateTipusDocumentDefinitiu(Long entitatId, Long documentId, Long tipusDocumentId) {
         delegateService.updateTipusDocumentDefinitiu(entitatId, documentId, tipusDocumentId);
     }
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId) {
 		return delegateService.notificacioDescarregarJustificantEnviamentNotib(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public SignatureInfoDto checkIfSignedAttached(
 			byte[] contingut,
 			String contentType) {
@@ -452,14 +452,14 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     @TransactionAttribute(TransactionAttributeType.NEVER)
     public Resum getSummarize(byte[] bytes, String contentType) {
         return delegateService.getSummarize(bytes, contentType);
     }
 
     @Override
-    @RolesAllowed("tothom")
+    @RolesAllowed("**")
 	public long countByMetaDocument(
 			Long entitatId,
 			Long metaDocumentId) {
@@ -469,7 +469,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId) {
@@ -479,14 +479,14 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void actualitzarEstatADefinititu(
 			Long documentId) {
 		delegateService.actualitzarEstatADefinititu(documentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentDto findAmbId(
 			Long documentId,
 			String rolActual,
@@ -522,7 +522,7 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String firmaSimpleWebStart(
 			FitxerDto fitxerPerFirmar,
 			String motiu, 
@@ -534,45 +534,45 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FirmaResultatDto firmaSimpleWebEnd(
 			String transactionID) {
 		return delegateService.firmaSimpleWebEnd(transactionID);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId)  throws SistemaExternException {
 		return delegateService.recuperarUrlViewEstatFluxDeFirmes(portafirmesId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long getAndSaveFitxerTamanyFromArxiu(Long documentId) {
 		return delegateService.getAndSaveFitxerTamanyFromArxiu(documentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void notificacioActualitzarEstat(
 			String identificador) {
 		delegateService.notificacioActualitzarEstat(identificador);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void notificacioActualitzarEstat(Long id) {
 		delegateService.notificacioActualitzarEstat(id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId) {
 		return delegateService.findIdsAllDocumentsOfExpedient(expedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String firmaSimpleWebStartMassiu(
 			Set<Long> ids,
 			String motiu,
@@ -585,13 +585,13 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DocumentDto> findByExpedient(Long id, Long expedientId, String rolActual) {
 		return delegateService.findByExpedient(id, expedientId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
 			Long entitatId,
 			Long expedientId, 
@@ -607,19 +607,19 @@ public class DocumentServiceEjb implements DocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto descarregarFirmaSeparada(Long entitatId, Long id, Long tascaId) {
 		return delegateService.descarregarFirmaSeparada(entitatId, id, tascaId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException {
 		return delegateService.updateCsvInfo(documentId);
 	}
 
     @Override
-    @RolesAllowed("tothom")
+    @RolesAllowed("**")
     public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
         delegateService.enviarDocument(documentId, emails, desinataris);
     }

@@ -17,28 +17,28 @@ import java.util.List;
  */
 public interface AvisService {
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	AvisDto create(AvisDto avis);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	AvisDto update(AvisDto avis);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	AvisDto updateActiva(Long id, boolean activa);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	AvisDto delete(Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	AvisDto findById(Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<AvisDto> findActive();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<AvisDto> findActiveAdmin(Long entitatId);
 
 

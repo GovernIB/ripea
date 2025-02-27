@@ -25,7 +25,7 @@ public interface AplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void processarAutenticacioUsuari() throws NotFoundException;
 
 	/**
@@ -33,7 +33,7 @@ public interface AplicacioService {
 	 * 
 	 * @return L'usuari actual.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public UsuariDto getUsuariActual();
 	
 	/**
@@ -41,7 +41,7 @@ public interface AplicacioService {
 	 * 
 	 * @return L'usuari actual.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public UsuariDto updateUsuariActual(UsuariDto asDto);
 
 	/**
@@ -51,7 +51,7 @@ public interface AplicacioService {
 	 *            Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public UsuariDto findUsuariAmbCodi(String codi);
 
 	/**
@@ -61,7 +61,7 @@ public interface AplicacioService {
 	 *            Text per a fer la consulta.
 	 * @return La llista d'usuaris.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<UsuariDto> findUsuariAmbText(String text);
 
 	/**
@@ -135,7 +135,7 @@ public interface AplicacioService {
 	 * 
 	 * @return el valor del paràmetre.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String propertyBaseUrl();
 
 	/**
@@ -146,84 +146,84 @@ public interface AplicacioService {
 	 */
 	Properties propertiesFindByGroup(String codiGrup);
 
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	String propertyFindByNom(String nom);
 
 	List<UsuariDto> findUsuariAmbTextDades(String text);
 
 	UsuariDto findUsuariCarrecAmbCodiDades(String codi);
 	
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Boolean propertyBooleanFindByKey(String key);
 
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean propertyBooleanFindByKey(
 			String key,
 			boolean defaultValueIfNull);
 
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void setRolUsuariActual(String rolActual);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<String> findUsuarisCodisAmbRol(String rol);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public UsuariDto findUsuariAmbCodiDades(String codi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void evictRolsDisponiblesEnAcls();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean getBooleanJbossProperty(
 			String key,
 			boolean defaultValueIfNull);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void evictRolsPerUsuari(String usuariCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void evictCountAnotacionsPendents(String usuariCodi);
 
 	public boolean mostrarLogsRendiment();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void actualitzarOrganCodi(
 			String organCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getEntitatActualCodi();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getValueForOrgan(String entitatCodi,
 			String organCodi,
 			String keyGeneral);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi,
 			String organCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Properties getGroupPropertiesEntitatOrGeneral(
 			String groupCode,
 			String entitatCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Properties getGroupPropertiesOrganOrEntitatOrGeneral(
 			String groupCode,
 			String entitatCodi,
 			String organCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean doesCurrentUserHasRol(
 			String rol);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Long getProcedimentPerDefecte(Long entitatId, String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean mostrarLogsCercadorAnotacio();
 
 }

@@ -19,7 +19,7 @@ public class ExpedientEstatServiceEjb implements ExpedientEstatService {
 		this.delegateService = delegateService;
 	}
 
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientEstatDto> findExpedientEstatByMetaExpedientPaginat(
 			Long entitatId,
 			Long metaExpedientId,
@@ -28,25 +28,25 @@ public class ExpedientEstatServiceEjb implements ExpedientEstatService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientEstatDto findExpedientEstatById(Long entitatId, Long id) {
 		return delegateService.findExpedientEstatById(entitatId, id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientEstatDto createExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual, Long organId) {
 		return delegateService.createExpedientEstat(entitatId, estat, rolActual, organId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientEstatDto updateExpedientEstat(Long entitatId, ExpedientEstatDto estat, String rolActual, Long organId) {
 		return delegateService.updateExpedientEstat(entitatId, estat, rolActual, organId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientEstatDto moveTo(
 			Long entitatId,
 			Long metaExpedientId,
@@ -56,19 +56,19 @@ public class ExpedientEstatServiceEjb implements ExpedientEstatService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual, Long organId) throws NotFoundException {
 		return delegateService.deleteExpedientEstat(entitatId, expedientEstatId, rolActual, organId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId, String rolActual) {
 		return delegateService.findExpedientEstats(entitatId, expedientId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientDto changeExpedientEstat(
 			Long entitatId,
 			Long expedientId,
@@ -80,13 +80,13 @@ public class ExpedientEstatServiceEjb implements ExpedientEstatService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(Long entitatId, Long metaExpedientId) {
 		return delegateService.findExpedientEstatsByMetaExpedient(entitatId, metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ResultDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,

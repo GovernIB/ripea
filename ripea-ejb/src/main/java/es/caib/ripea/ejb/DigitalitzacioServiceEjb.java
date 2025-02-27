@@ -27,13 +27,13 @@ public class DigitalitzacioServiceEjb implements DigitalitzacioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<DigitalitzacioPerfilDto> getPerfilsDisponibles() {
 		return delegateService.getPerfilsDisponibles();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DigitalitzacioTransaccioRespostaDto iniciarDigitalitzacio(String codiPerfil, String urlReturn) {
 		return delegateService.iniciarDigitalitzacio(
 				codiPerfil, 
@@ -41,7 +41,7 @@ public class DigitalitzacioServiceEjb implements DigitalitzacioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public DigitalitzacioResultatDto recuperarResultat(String idTransaccio, boolean returnScannedFile,
 			boolean returnSignedFile) {
 		return delegateService.recuperarResultat(
@@ -51,7 +51,7 @@ public class DigitalitzacioServiceEjb implements DigitalitzacioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void tancarTransaccio(String idTransaccio) {
 		delegateService.tancarTransaccio(idTransaccio);
 	}

@@ -8,7 +8,7 @@ import es.caib.ripea.service.intf.dto.BackofficeTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ReglaDto;
 import es.caib.ripea.service.intf.dto.ReglaTipusEnumDto;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
 

@@ -54,25 +54,25 @@ public class AvisServiceEjb implements AvisService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public AvisDto findById(Long id) {
 		return delegateService.findById(id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams) {
 		return delegateService.findPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<AvisDto> findActive() {
 		return delegateService.findActive();
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public List<AvisDto> findActiveAdmin(Long entitatId) {
         return delegateService.findActiveAdmin(entitatId);
     }

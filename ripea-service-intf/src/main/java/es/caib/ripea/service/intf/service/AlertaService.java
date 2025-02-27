@@ -69,7 +69,7 @@ public interface AlertaService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina d'Alertes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<AlertaDto> findPaginat(PaginacioParamsDto paginacioParams);
 
 }

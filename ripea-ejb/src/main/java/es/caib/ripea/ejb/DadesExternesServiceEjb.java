@@ -28,19 +28,19 @@ public class DadesExternesServiceEjb implements DadesExternesService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<PaisDto> findPaisos() {
 		return delegateService.findPaisos();
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ComunitatDto> findComunitats() {
 		return delegateService.findComunitats();
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ProvinciaDto> findProvincies() {
 		return delegateService.findProvincies();
 	}
@@ -51,19 +51,19 @@ public class DadesExternesServiceEjb implements DadesExternesService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MunicipiDto> findMunicipisPerProvincia(String provinciaCodi) {
 		return delegateService.findMunicipisPerProvincia(provinciaCodi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<NivellAdministracioDto> findNivellAdministracions() {
 		return delegateService.findNivellAdministracions();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(String provinciaCodi) {
 		return delegateService.findMunicipisPerProvinciaPinbal(provinciaCodi);
 	}

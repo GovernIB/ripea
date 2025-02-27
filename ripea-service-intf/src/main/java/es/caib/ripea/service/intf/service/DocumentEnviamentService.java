@@ -234,10 +234,10 @@ public interface DocumentEnviamentService {
 			Long expedientId,
 			Long notificacioId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean checkIfDocumentIsZip(Long documentId);
 
 }

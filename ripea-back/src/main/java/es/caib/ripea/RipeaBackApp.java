@@ -1,13 +1,12 @@
 package es.caib.ripea;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
@@ -24,6 +23,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 
+import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -65,11 +65,16 @@ public class RipeaBackApp extends SpringBootServletInitializer {
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		try {
-			Manifest manifest = new Manifest(servletContext.getResourceAsStream("/META-INF/MANIFEST.MF"));
-			Attributes attributes = manifest.getMainAttributes();
-			String version = attributes.getValue("Implementation-Version");
-			String buildTimestamp = attributes.getValue("Build-Timestamp");
-			log.info("Carregant l'aplicació " + BaseConfig.APP_NAME + " versió " + version + " generada en data " + buildTimestamp);
+			InputStream manifestStream = servletContext.getResourceAsStream("/META-INF/MANIFEST.MF");
+			if (manifestStream == null) {
+			    log.warn("El archivo MANIFEST.MF no se encontró en la ruta especificada.");
+			} else {
+				Manifest manifest = new Manifest(manifestStream);
+				Attributes attributes = manifest.getMainAttributes();
+				String version = attributes.getValue("Implementation-Version");
+				String buildTimestamp = attributes.getValue("Build-Timestamp");
+				log.info("Carregant l'aplicació " + BaseConfig.APP_NAME + " versió " + version + " generada en data " + buildTimestamp);
+			}
 		} catch (IOException ex) {
 			throw new ServletException("Couldn't read MANIFEST.MF", ex);
 		}

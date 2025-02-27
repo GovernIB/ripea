@@ -31,7 +31,7 @@ public interface OrganGestorService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public OrganGestorDto findItem(Long id) throws NotFoundException;
 	
 	/**
@@ -42,7 +42,7 @@ public interface OrganGestorService {
 	 *            Id de l'entitat.
 	 * @return Llistat dels organs gestors de l'entitat
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findByEntitat(Long entitatId);
 
 	/**
@@ -57,7 +57,7 @@ public interface OrganGestorService {
 	 *            Paràmetre de filtre 
 	 * @return Llistat dels organs gestors de l'entitat
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findByEntitat(Long entitatId, String filter);
 	
 	/**
@@ -102,7 +102,7 @@ public interface OrganGestorService {
 	 * @return
 	 * 			  Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId);
 		
 	/**
@@ -117,7 +117,7 @@ public interface OrganGestorService {
 	 * @return
 	 * 		      Llistat de tots els organs gestors accesssibles per a l'entitat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(
 			Long entitatId,
 			Long organGestorId,
@@ -131,7 +131,7 @@ public interface OrganGestorService {
 	 * @return
 	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId);
 
 	/**
@@ -150,7 +150,7 @@ public interface OrganGestorService {
 	 * @return
 	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganismeDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
@@ -221,18 +221,18 @@ public interface OrganGestorService {
 			Long permisId,
 			Long entitatId) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(
 			Long entitatId,
 			String filter, 
 			boolean directOrganPermisRequired);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public OrganGestorDto findItemByEntitatAndCodi(
 			Long entitatId,
 			String codi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public OrganGestorDto findById(
 			Long entitatId,
 			Long id);
@@ -252,16 +252,16 @@ public interface OrganGestorService {
 			Long entitatId,
 			Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     boolean hasPermisAdminComu(Long organId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(Long entitatId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDissenyCache(Long entitatId);
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
@@ -275,31 +275,31 @@ public interface OrganGestorService {
 			Long entitatId,
 			OrganGestorFiltreDto filtre);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<OrganGestorDto> findAll(
 			String filter);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getOrganCodiFromContingutId(
 			Long contingutId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void actualitzarOrganCodi(
 			String organCodi);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getOrganCodiFromAnnexId(
 			Long annexId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getOrganCodi();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getOrganCodiFromMetaDocumentId(Long metaDocumentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     public Boolean isPermisEnviamentPostalOrganOrAntecesor(Long organGestorId);
 }

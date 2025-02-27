@@ -1,16 +1,9 @@
-/**
- * 
- */
 package es.caib.ripea.back.command;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
-/**
- * Command per a copiar, moure o enviar contenidors.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class MarcarProcessatCommand {
 
 	@NotBlank
@@ -28,5 +21,4 @@ public class MarcarProcessatCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-
 }

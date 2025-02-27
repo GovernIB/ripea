@@ -30,7 +30,7 @@ public interface ExpedientInteressatService {
 	 * @return L'interessat creat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto create(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) throws NotFoundException;
 
 	/**
@@ -44,7 +44,7 @@ public interface ExpedientInteressatService {
 	 * @return L'interessat creat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto create(
 			Long id,
 			Long expedientId,
@@ -64,7 +64,7 @@ public interface ExpedientInteressatService {
 	 * @return L'interessat modificat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto update(Long entitatId, Long expedientId, InteressatDto interessat, String rolActual) throws NotFoundException;
 
 	/**
@@ -81,7 +81,7 @@ public interface ExpedientInteressatService {
 	 * @return L'interessat modificat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto update(Long entitatId, Long expedientId, Long interessatId, InteressatDto representant, String rolActual);
 
 	/**
@@ -94,7 +94,7 @@ public interface ExpedientInteressatService {
 	 * @param rolActual TODO
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void delete(Long entitatId, Long expedientId, Long interessatId, String rolActual);
 
 	/**
@@ -110,7 +110,7 @@ public interface ExpedientInteressatService {
 	 * @param rolActual TODO
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void deleteRepresentant(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual);
 
 	/**
@@ -121,7 +121,7 @@ public interface ExpedientInteressatService {
 	 * @return l'interessat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto findById(Long id, boolean consultarDadesExternes) throws NotFoundException;
 
 	/**
@@ -133,7 +133,7 @@ public interface ExpedientInteressatService {
 	 * @return l'interessat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	InteressatDto findRepresentantById(Long interessatId, Long id);
 
 	/**
@@ -144,7 +144,7 @@ public interface ExpedientInteressatService {
 	 * @return Els insteressats associats a l'expedient.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<InteressatDto> findByExpedient(
 			Long entitatId,
 			Long expedientId,
@@ -158,7 +158,7 @@ public interface ExpedientInteressatService {
 	 * @return El nombre d'insteressats associats a l'expedient.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public long countByExpedient(Long entitatId, Long expedientId) throws NotFoundException;
 
 	/**
@@ -170,7 +170,7 @@ public interface ExpedientInteressatService {
 	 * @return Els insteressats associats a l'expedient.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<InteressatDto> findAmbDocumentPerNotificacio(Long entitatId, Long documentId) throws NotFoundException;
 
 	/**
@@ -183,7 +183,7 @@ public interface ExpedientInteressatService {
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<InteressatPersonaFisicaDto> findByFiltrePersonaFisica(
 			String documentNum,
 			String nom,
@@ -201,7 +201,7 @@ public interface ExpedientInteressatService {
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<InteressatPersonaJuridicaDto> findByFiltrePersonaJuridica(
 			String documentNum,
 			String raoSocial,
@@ -215,7 +215,7 @@ public interface ExpedientInteressatService {
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<InteressatAdministracioDto> findByFiltreAdministracio(
 			String organCodi,
 			Long expedientId) throws NotFoundException;
@@ -228,7 +228,7 @@ public interface ExpedientInteressatService {
 	 * @return La llista d'interessats trobats.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto findByExpedientAndDocumentNum(
 			String documentNum,
 			Long expedientId) throws NotFoundException;
@@ -239,7 +239,7 @@ public interface ExpedientInteressatService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<InteressatDto> findByText(String text);
 
 	/**
@@ -248,16 +248,16 @@ public interface ExpedientInteressatService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Exception guardarInteressatsArxiu(Long expId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     public Long findExpedientIdByInteressat(Long interessatId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public InteressatDto createRepresentant(
 			Long entitatId,
 			Long expedientId,
@@ -266,6 +266,6 @@ public interface ExpedientInteressatService {
 			boolean propagarArxiu,
 			String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats);
 }

@@ -1,7 +1,7 @@
 package es.caib.ripea.back.command;
 
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
 

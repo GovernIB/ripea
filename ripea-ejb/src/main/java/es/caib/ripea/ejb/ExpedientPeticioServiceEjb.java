@@ -29,7 +29,7 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
@@ -41,42 +41,42 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientPeticioDto findOne(
 			Long expedientPeticioId) {
 		return delegateService.findOne(expedientPeticioId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto getAnnexContent(
 			Long annexId, boolean versioImprimible) {
 		return delegateService.getAnnexContent(annexId, versioImprimible);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ArxiuFirmaDto> annexFirmaInfo(
 			String fitxerArxiuUuid) {
 		return delegateService.annexFirmaInfo(fitxerArxiuUuid);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public RegistreAnnexDto findAnnexById(
 			Long annexId) {
 		return delegateService.findAnnexById(annexId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto getAnnexFirmaContingut(
 			Long annexId) {
 		return delegateService.getAnnexFirmaContingut(annexId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void rebutjar(
 			Long expedientPeticioId,
 			String observacions) {
@@ -85,19 +85,19 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi) {
 		return delegateService.findMetaExpedientSelect(entitatCodi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public RegistreDto findRegistreById(Long registreId) {
 		return delegateService.findRegistreById(registreId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
@@ -106,7 +106,7 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientDto findByEntitatAndMetaExpedientAndExpedientNumero(Long entitatId,
 	                                                                    Long metaExpedientId,
 	                                                                    String expedientNumero) {
@@ -114,25 +114,25 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public FitxerDto getJustificantContent(String arxiuUuid) {
 		return delegateService.getJustificantContent(arxiuUuid);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId) {
 		return delegateService.countAnotacionsPendents(entitatId, rolActual, organActualId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean comprovarExistenciaInteressatsPeticio(Long entitatId, Long expedientId, Long expedientPeticioId) {
 		return delegateService.comprovarExistenciaInteressatsPeticio(entitatId, expedientId, expedientPeticioId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(Long entitatId,
 	                                                                     MassiuAnnexProcesarFiltreDto filtre,
 	                                                                     PaginacioParamsDto paginacioParams,
@@ -171,7 +171,7 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaExpedientDto> findMetaExpedientsPermesosPerAnotacions(
 			Long entitatId,
 			Long organActualId,
@@ -183,7 +183,7 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void canviarProcediment(
 			Long expedientPeticioId,
 			Long procedimentId, 
@@ -196,13 +196,13 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void retornarPendent(Long expedientPeticioId) {
 		delegateService.retornarPendent(expedientPeticioId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void evictCountAnotacionsPendents(
 			Long entitatId) {
 		delegateService.evictCountAnotacionsPendents(entitatId);
@@ -229,7 +229,7 @@ public class ExpedientPeticioServiceEjb implements ExpedientPeticioService {
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public Long getPeriodeActualitzacioContadorAnotacionsPendents() {
         return delegateService.getPeriodeActualitzacioContadorAnotacionsPendents();
     }

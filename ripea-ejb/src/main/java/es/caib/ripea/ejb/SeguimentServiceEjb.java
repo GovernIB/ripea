@@ -76,7 +76,7 @@ public  class SeguimentServiceEjb implements SeguimentService {
 	}
 
 	@Override
-	@RolesAllowed({ "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom" })
+	@RolesAllowed("**")
 	public ResultDto<SeguimentArxiuPendentsDto> findPendentsArxiu(
 			Long entitatId,
 			SeguimentArxiuPendentsFiltreDto filtre,
@@ -96,7 +96,7 @@ public  class SeguimentServiceEjb implements SeguimentService {
 	}
 
 	@Override
-	@RolesAllowed({ "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom" })
+	@RolesAllowed("**")
 	public PaginaDto<SeguimentConsultaPinbalDto> findConsultesPinbal(
 			Long entitatId,
 			SeguimentConsultaFiltreDto filtre,

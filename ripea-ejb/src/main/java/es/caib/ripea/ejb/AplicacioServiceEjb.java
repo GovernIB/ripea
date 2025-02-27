@@ -32,31 +32,31 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public void processarAutenticacioUsuari() {
 		delegateService.processarAutenticacioUsuari();
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public UsuariDto getUsuariActual() {
 		return delegateService.getUsuariActual();
 	}
 	
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public UsuariDto updateUsuariActual(UsuariDto usuari) {
 		return delegateService.updateUsuariActual(usuari);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return delegateService.findUsuariAmbCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return delegateService.findUsuariAmbText(text);
 	}
@@ -103,13 +103,13 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public String propertyBaseUrl() {
 		return delegateService.propertyBaseUrl();
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Properties propertiesFindByGroup(String codiGrup) {
 		return delegateService.propertiesFindByGroup(codiGrup);
 	}
@@ -130,13 +130,13 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public Boolean propertyBooleanFindByKey(String key) {
 		return delegateService.propertyBooleanFindByKey(key);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public boolean propertyBooleanFindByKey(
 			String key,
 			boolean defaultValueIfNull) {
@@ -146,7 +146,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public void setRolUsuariActual(String rolActual) {
 		delegateService.setRolUsuariActual(rolActual);
 	}
@@ -158,19 +158,19 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public UsuariDto findUsuariAmbCodiDades(String codi) {
 		return delegateService.findUsuariAmbCodiDades(codi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void evictRolsDisponiblesEnAcls() {
 		delegateService.evictRolsDisponiblesEnAcls();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean getBooleanJbossProperty(
 			String key,
 			boolean defaultValueIfNull) {
@@ -180,13 +180,13 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void evictRolsPerUsuari(String usuariCodi) {
 		delegateService.evictRolsPerUsuari(usuariCodi);
 	}
 
     @Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
     public void evictCountAnotacionsPendents(String usuariCodi) {
         delegateService.evictCountAnotacionsPendents(usuariCodi);
     }
@@ -197,20 +197,20 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void actualitzarOrganCodi(
 			String organCodi) {
 		delegateService.actualitzarOrganCodi(organCodi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getEntitatActualCodi() {
 		return delegateService.getEntitatActualCodi();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getValueForOrgan(
 			String entitatCodi,
 			String organCodi,
@@ -222,20 +222,20 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi,
 			String organCodi) {
 		return delegateService.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi) {
 		return delegateService.getAllPropertiesEntitatOrGeneral(entitatCodi);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Properties getGroupPropertiesEntitatOrGeneral(
 			String groupCode,
 			String entitatCodi) {
@@ -245,7 +245,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Properties getGroupPropertiesOrganOrEntitatOrGeneral(
 			String groupCode,
 			String entitatCodi,
@@ -257,19 +257,19 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean doesCurrentUserHasRol(String rol) {
 		return delegateService.doesCurrentUserHasRol(rol);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
 		return delegateService.getProcedimentPerDefecte(entitatId, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean mostrarLogsCercadorAnotacio() {
 		return delegateService.mostrarLogsCercadorAnotacio();
 	}

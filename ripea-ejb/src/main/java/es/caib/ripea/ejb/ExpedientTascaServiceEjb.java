@@ -28,13 +28,13 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientTascaDto findOne(Long expedientPeticioId) {
 		return delegateService.findOne(expedientPeticioId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ExpedientTascaDto> findAmbExpedient(
 			Long entitatId,
 			Long expedientId,
@@ -43,7 +43,7 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaExpedientTascaDto> findAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId) {
 		return delegateService.findAmbMetaExpedient(entitatId,
@@ -51,7 +51,7 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientTascaDto createTasca(
 			Long entitatId,
 			Long expedientId,
@@ -63,13 +63,13 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaExpedientTascaDto findMetaExpedientTascaById(Long metaExpedientTascaId) {
 		return delegateService.findMetaExpedientTascaById(metaExpedientTascaId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientTascaDto> findAmbAuthentication(
 			Long entitatId,
 			UsuariTascaFiltreDto filtre,
@@ -81,14 +81,14 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public long countTasquesPendents() {
 		return delegateService.countTasquesPendents();
 	}
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutDto findTascaExpedient(Long entitatId,
 	                                       Long contingutId,
 	                                       Long tascaId,
@@ -103,7 +103,7 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void deleteTascaReversible(
 			Long entitatId,
 			Long tascaId,
@@ -150,7 +150,7 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId) {
 		return delegateService.findByTascaBasicInfo(contingutId, tascaId);
 	}
@@ -161,32 +161,32 @@ public class ExpedientTascaServiceEjb implements ExpedientTascaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto) {
 		delegateService.changeTascaPrioritat(expedientTascaDto);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientTascaDto updateDelegat(Long expedientTascaId, String delegatCodi, String comentari) {
 		return delegateService.updateDelegat(expedientTascaId, delegatCodi, comentari);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientTascaDto cancelarDelegacio(Long expedientTascaId, String comentari) {
 		return delegateService.cancelarDelegacio(expedientTascaId, comentari);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public ExpedientTascaDto reobrirTasca(Long expedientTascaId, List<String> responsablesCodi, String motiu,
 			String rolActual) {
 		return delegateService.reobrirTasca(expedientTascaId, responsablesCodi, motiu, rolActual);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
 		return delegateService.getValidacionsPendentsTasca(expedientTascaId);
 	}

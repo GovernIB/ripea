@@ -40,13 +40,13 @@ public class PinbalServeiServiceEjb implements PinbalServeiService {
 	}
 
 	@Override
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PinbalServeiDto> findActius() {
 		return delegateService.findActius();
 	}
 	
 	@Override
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PinbalServeiDto> findAll() {
 		return delegateService.findAll();
 	}

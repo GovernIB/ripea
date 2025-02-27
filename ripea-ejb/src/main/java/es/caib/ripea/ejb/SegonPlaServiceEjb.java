@@ -26,19 +26,19 @@ public class SegonPlaServiceEjb implements SegonPlaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
 		delegateService.consultarIGuardarAnotacionsPeticionsPendents();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void buidarCacheDominis() {
 		delegateService.buidarCacheDominis();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void enviarEmailsPendentsAgrupats() {
 		delegateService.enviarEmailsPendentsAgrupats();
 	}
@@ -49,13 +49,13 @@ public class SegonPlaServiceEjb implements SegonPlaService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void guardarExpedientsDocumentsArxiu() {
 		delegateService.guardarExpedientsDocumentsArxiu();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void guardarInteressatsArxiu() {
 		delegateService.guardarInteressatsArxiu();
 	}

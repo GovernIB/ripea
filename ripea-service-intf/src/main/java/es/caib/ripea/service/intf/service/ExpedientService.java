@@ -46,7 +46,7 @@ public interface ExpedientService {
 	 *             Si el nom del contenidor conté caràcters invàlids o si ja existeix un
 	 *             altre expedient amb el mateix tipus, sequencia i any.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ExpedientDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -77,7 +77,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ExpedientDto findById(
 			Long entitatId,
 			Long id, 
@@ -92,7 +92,7 @@ public interface ExpedientService {
 	 * 
 	 * @return L'expedient.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
 			String nom);
@@ -111,7 +111,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
@@ -131,7 +131,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ExpedientSelectorDto> findPerUserAndProcediment(
 			Long entitatId,
 			Long metaExpedientId,
@@ -149,7 +149,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
 			ExpedientFiltreDto filtre, 
@@ -166,7 +166,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String agafarUser(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -196,13 +196,13 @@ public interface ExpedientService {
 	 * Allibera un expedient agafat per l'usuari actual.
 	 * EL DEIXA SENSE ASSIGNAR.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String alliberarUser(Long entitatId, Long id) throws NotFoundException;
 	
 	/**
 	 * Retorna un expedient agafat per l'usuari actual al creador del expedient.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String retornaUser(Long entitatId, Long id) throws NotFoundException;
 
 	/**
@@ -237,7 +237,7 @@ public interface ExpedientService {
 	 * @throws ExpedientTancarSenseDocumentsDefinitiusException
 	 *             Si l'expedient no conté cap document definitiu.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String tancar(
 			Long entitatId,
 			Long id,
@@ -254,7 +254,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void reobrir(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -272,7 +272,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void relacioCreate(
 			Long entitatId,
 			Long expedientId,
@@ -291,7 +291,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean relacioDelete(
 			Long entitatId,
 			Long expedientId,
@@ -307,7 +307,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'expedient que es vol consultar.
 	 * @return La llista d'expedients relacionats.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ExpedientDto> relacioFindAmbExpedient(
 			Long entitatId, 
 			Long expedientId);
@@ -327,13 +327,13 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportacio(
 			Long entitatId,
 			Collection<Long> expedientIds,
 			String format) throws IOException, NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
 			Long entitatId, ExpedientFiltreDto filtre, Long expedientId,
 			PaginacioParamsDto paginacioParams, 
@@ -345,16 +345,16 @@ public interface ExpedientService {
 	
 	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual, Long organActualId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean hasWritePermission(Long expedientId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	ExpedientDto update(
 			Long entitatId,
 			Long id,
@@ -367,14 +367,14 @@ public interface ExpedientService {
 			PrioritatEnumDto prioritat,
 			String prioritatMotiu);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long metaDocumentId, 
 			String rolActual);
 
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
@@ -397,7 +397,7 @@ public interface ExpedientService {
 	 * @return Un document amb l'índex.
 	 * @throws IOException 
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportIndexExpedients(
 			Long entitatId, 
 			Set<Long> expedientIds,
@@ -414,7 +414,7 @@ public interface ExpedientService {
 	 * @return Un document amb l'índex.
 	 * @throws IOException 
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
 			Set<Long> expedientIds,
@@ -432,23 +432,23 @@ public interface ExpedientService {
 	 * @return Document exportat ENI.
 	 * @throws IOException 
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportarEniExpedient(
 			Long entitatId, 
 			Set<Long> expedientIds,
 			boolean ambDocuments) throws IOException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<Long> findIdsExpedientsPerTancamentMassiu(Long entitatId,
 			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void assignar(
 			Long entitatId,
 			Long expedientId,
@@ -458,16 +458,16 @@ public interface ExpedientService {
 	 * Retorna la llista dels expedients on s'ha importat el document que s'intetna importar actualment
 	 * 
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DocumentDto> consultaExpedientsAmbImportacio();
 	
 	@PreAuthorize("hasRole('IPA_ORGAN_ADMIN')")
 	public boolean isOrganGestorPermes (Long expedientId, String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Exception guardarExpedientArxiu(Long expId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text, 
@@ -482,7 +482,7 @@ public interface ExpedientService {
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean hasReadPermissionsAny(
 			String rolActual,
 			Long entitatId);
@@ -518,7 +518,7 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void importarExpedient(
 			Long entitatId,
 			Long expedientPareId,
@@ -538,43 +538,43 @@ public interface ExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean esborrarExpedientFill(
 			Long entitatId,
 			Long expedientPareId,
 			Long expedientId,
 			String rolActual) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public long countByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutVistaEnumDto getVistaUsuariActual();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void setVistaUsuariActual(
 			ContingutVistaEnumDto vistaActual);
 
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String getNom(
 			Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	ExpedientDto changeExpedientPrioritat(
 			Long entitatId,
 			Long expedientId,
 			PrioritatEnumDto prioritat,
 			String prioritatMotiu);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MoureDestiVistaEnumDto getVistaMoureUsuariActual();
 }

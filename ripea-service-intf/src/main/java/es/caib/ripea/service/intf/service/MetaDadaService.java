@@ -33,7 +33,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDadaDto create(
 			Long entitatId,
 			Long metaNodeId,
@@ -55,7 +55,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDadaDto update(
 			Long entitatId,
 			Long metaNodeId,
@@ -74,7 +74,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDadaDto delete(
 			Long entitatId,
 			Long metaNodeId,
@@ -99,7 +99,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDadaDto updateActiva(
 			Long entitatId,
 			Long metaNodeId,
@@ -118,7 +118,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void moveUp(
 			Long entitatId,
 			Long metaNodeId,
@@ -136,7 +136,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void moveDown(
 			Long entitatId,
 			Long metaNodeId,
@@ -156,7 +156,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void moveTo(
 			Long entitatId,
 			Long metaNodeId,
@@ -176,7 +176,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDadaDto findById(
 			Long entitatId,
 			Long metaNodeId,
@@ -195,7 +195,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaDadaDto findByCodi(
 			Long entitatId,
 			Long metaNodeId,
@@ -214,7 +214,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<MetaDadaDto> findByMetaNodePaginat(
 			Long entitatId,
 			Long metaNodeId,
@@ -231,7 +231,7 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaDadaDto> findActiveByMetaNode(
 			Long entitatId,
 			Long metaNodeId) throws NotFoundException;
@@ -247,12 +247,12 @@ public interface MetaDadaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaDadaDto> findByNode(
 			Long entitatId,
 			Long nodeId) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	Long findMetaNodeIdByNodeId(
 			Long entitatId,
 			Long nodeId);

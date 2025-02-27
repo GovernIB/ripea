@@ -33,7 +33,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	PaginaDto<HistoricExpedientDto> getPageDadesEntitat(
 			Long entitatId,
 			HistoricFiltreDto filtre,
@@ -50,7 +50,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<HistoricExpedientDto> getDadesEntitat(Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
 	/**
@@ -60,10 +60,10 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> getDadesOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<RegistresOrganGestor> getRegistresDadesOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament);
 
 	/**
@@ -74,7 +74,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(Long entitatId, String rolActual, HistoricFiltreDto filtre);
 	
 	/**
@@ -87,10 +87,10 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<HistoricUsuariDto> getDadesUsuari(String usuariCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<RegistresUsuariDiari> getRegistresDadesUsuaris(List<String> usuarisCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament);
 
 	/**
@@ -105,10 +105,10 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<RegistresInteressatDiari> getRegistresDadesInteressat(List<String> interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament);
 
 	/**
@@ -120,7 +120,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<HistoricExpedientDto> getDadesActualsEntitat(Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
 	/**
@@ -131,10 +131,10 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	Map<OrganGestorDto, HistoricExpedientDto> getDadesActualsOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<RegistreOrganGestor> getRegistresDadesActualsOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
 	/**
@@ -147,7 +147,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
 	/**
@@ -160,7 +160,7 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	List<HistoricInteressatDto> getDadesActualsInteressat(String interessatDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre);
 
 	/**
@@ -171,19 +171,19 @@ public interface HistoricService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	List<Long> comprovarAccesEstadistiques(Long entitatId, String rolActual);
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportarHistoricEntitat(EntitatDto entitat, String rolActual, HistoricFiltreDto filtre, String format) throws Exception;
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportarHistoricOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception;
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportarHistoricUsuaris(String[] usuarisCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception;
 
-	@PreAuthorize("hasRole('tothom') or hasRole('IPA_ADMIN') or hasRole('IPA_API_HIST') ")
+	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportarHistoricInteressats(String[] interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception;
 
 

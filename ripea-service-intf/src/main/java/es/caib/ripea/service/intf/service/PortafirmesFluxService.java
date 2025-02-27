@@ -28,7 +28,7 @@ public interface PortafirmesFluxService {
 	 * 				El nom del tipus de document per definir nom flux.
 	 * @return El id de la transacció i la url de redirecció.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn,
 			boolean isPlantilla) throws SistemaExternException;
@@ -40,7 +40,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la transacció.
 	 * @return La el id del flux de firma o error.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId);
 	
 	/**
@@ -49,7 +49,7 @@ public interface PortafirmesFluxService {
 	 * @param transaccioId
 	 * 				Id de la transacció.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void tancarTransaccio(String idTransaccio);
 	
 	/**
@@ -61,7 +61,7 @@ public interface PortafirmesFluxService {
 	 * 				Indica si recuperar integrants flux
 	 * @return Informació bàsica del flux de firma.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId, boolean signerInfo);
 	
 	/**
@@ -74,7 +74,7 @@ public interface PortafirmesFluxService {
 	 * 
 	 * @return La el id del flux de firma o error.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar);
 	
 	/**
@@ -84,7 +84,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la transacció.
 	 * @return La el id del flux de firma o error.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean esborrarPlantilla(String plantillaFluxId);
 	
 	/**
@@ -94,7 +94,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la plantilla.
 	 * @return Informació bàsica del flux de firma.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId);
 	
 	/**
@@ -104,7 +104,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la plantilla.
 	 * @return Informació bàsica del flux de firma.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String recuperarUrlEdicioPlantilla(
 			String plantillaFluxId,
 			String returnUrl);
@@ -114,7 +114,7 @@ public interface PortafirmesFluxService {
 	 * 
 	 * @return Els càrrecs
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PortafirmesCarrecDto> recuperarCarrecs();
 	
 }

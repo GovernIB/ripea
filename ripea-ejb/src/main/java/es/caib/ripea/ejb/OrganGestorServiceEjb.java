@@ -33,19 +33,19 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public OrganGestorDto findItem(Long id) {
 		return delegateService.findItem(id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findByEntitat(Long entitatId) {
 		return delegateService.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findByEntitat(Long entitatId, String filterText) {
 		return delegateService.findByEntitat(entitatId, filterText);
 	}
@@ -59,7 +59,7 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganismeDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
@@ -116,25 +116,25 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId) {
 		return delegateService.findAccessiblesUsuariActualRolAdminOrDisseny(entitatId, organGestorId);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId, String filterText) {
 		return delegateService.findAccessiblesUsuariActualRolAdminOrDisseny(entitatId, organGestorId, filterText);
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId) {
 		return delegateService.findOrganismesEntitatAmbPermis(entitatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(
 			Long entitatId,
 			String filter,
@@ -146,7 +146,7 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public OrganGestorDto findItemByEntitatAndCodi(
 			Long entitatId,
 			String codi) {
@@ -196,13 +196,13 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean hasPermisAdminComu(Long organId) {
 		return delegateService.hasPermisAdminComu(organId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void evictOrganismesEntitatAmbPermis(
 			Long entitatId,
 			String usuariCodi) {
@@ -211,7 +211,7 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(
 			Long entitatId) {
 		return delegateService.findOrganismesEntitatAmbPermisCache(
@@ -240,21 +240,21 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAll(
 			String filter) {
 		return delegateService.findAll(filter);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getOrganCodiFromContingutId(
 			Long contingutId) {
 		return delegateService.getOrganCodiFromContingutId(contingutId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void actualitzarOrganCodi(
 			String organCodi) {
 		delegateService.actualitzarOrganCodi(organCodi);
@@ -262,38 +262,38 @@ public class OrganGestorServiceEjb implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getOrganCodiFromAnnexId(
 			Long annexId) {
 		return delegateService.getOrganCodiFromAnnexId(annexId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getOrganCodi() {
 		return delegateService.getOrganCodi();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getOrganCodiFromMetaDocumentId(Long metaDocumentId) {
 		return delegateService.getOrganCodiFromMetaDocumentId(metaDocumentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId) {
 		return delegateService.getOrganCodiFromMetaExpedientId(metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisDissenyCache(Long entitatId) {
 		return delegateService.findOrganismesEntitatAmbPermisDissenyCache(entitatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Boolean isPermisEnviamentPostalOrganOrAntecesor(Long organGestorId) {
 		return delegateService.isPermisEnviamentPostalOrganOrAntecesor(organGestorId);
 	}

@@ -29,7 +29,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto create(
 			Long entitatId,
 			Long metaExpedientId,
@@ -61,7 +61,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto update(
 			Long entitatId,
 			Long metaExpedientId,
@@ -91,7 +91,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto updateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -105,7 +105,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto delete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -117,7 +117,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto findById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -129,7 +129,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto findByCodi(
 			Long entitatId,
 			Long metaExpedientId,
@@ -141,7 +141,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PaginaDto<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -170,7 +170,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public FitxerDto getPlantilla(
 			Long entitatId,
 			Long contingutId,
@@ -182,7 +182,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contenidorId, 
@@ -194,7 +194,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findActiusPerModificacio(
 			Long entitatId,
 			Long documentId) throws NotFoundException {
@@ -204,19 +204,19 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
 		return delegateService.portafirmesFindDocumentTipus();
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findByMetaExpedient(Long entitatId, Long metaExpedientId) {
 		return delegateService.findByMetaExpedient(entitatId, metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "tothom"})
+	@RolesAllowed("**")
 	public MetaDocumentDto getDadesNti(Long entitatId, Long contingutId, Long id) throws NotFoundException {
 		return delegateService.getDadesNti(
 				entitatId, 
@@ -225,14 +225,14 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto findById(
 			Long metaDocumentId) {
 		return delegateService.findById(metaDocumentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto findByTipusGeneric(
 			Long entitatId, 
 			MetaDocumentTipusGenericEnumDto tipusGeneric) {
@@ -242,19 +242,19 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId) {
 		return delegateService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatId, metaExpedientId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void marcarPerDefecte(Long entitatId, Long metaExpedientId, Long metaDocumentId, boolean remove) throws NotFoundException {
 		delegateService.marcarPerDefecte(entitatId, metaExpedientId, metaDocumentId, remove);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
 			Long metaExpedientId) throws NotFoundException {
 		return delegateService.findByMetaExpedientAndPerDefecteTrue(
@@ -262,7 +262,7 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void moveTo(
 			Long entitatId,
 			Long metaDocumentId,
@@ -275,13 +275,13 @@ public class MetaDocumentServiceEjb implements MetaDocumentService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PinbalServeiDto findPinbalServei(Long metaDocumentId) {
 		return delegateService.findPinbalServei(metaDocumentId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findByMetaExpedientAndFirmaSimpleWebActiva(
 			Long entitatId,
 			Long metaExpedientId) {

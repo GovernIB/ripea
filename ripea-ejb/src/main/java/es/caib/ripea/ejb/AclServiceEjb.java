@@ -33,20 +33,20 @@ public class AclServiceEjb extends AbstractServiceEjb<AclService> implements Acl
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<ObjectIdentity> findChildren(ObjectIdentity parentIdentity) {
 		return delegateService.findChildren(parentIdentity);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Acl readAclById(
 			ObjectIdentity object) throws NotFoundException {
 		return delegateService.readAclById(object);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Acl readAclById(
 			ObjectIdentity object,
 			List<Sid> sids) throws NotFoundException {
@@ -54,14 +54,14 @@ public class AclServiceEjb extends AbstractServiceEjb<AclService> implements Acl
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Map<ObjectIdentity, Acl> readAclsById(
 			List<ObjectIdentity> objects) throws NotFoundException {
 		return delegateService.readAclsById(objects);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public Map<ObjectIdentity, Acl> readAclsById(
 			List<ObjectIdentity> objects,
 			List<Sid> sids) throws NotFoundException {

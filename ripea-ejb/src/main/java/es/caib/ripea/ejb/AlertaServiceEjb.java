@@ -55,7 +55,7 @@ public class AlertaServiceEjb extends AbstractServiceEjb<AlertaService> implemen
 	}
 
 	@Override
-	@RolesAllowed({"tothom"})
+	@RolesAllowed("**")
 	public PaginaDto<AlertaDto> findPaginat(
 			PaginacioParamsDto paginacioParams) {
 		return delegateService.findPaginat(paginacioParams);

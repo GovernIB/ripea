@@ -90,9 +90,9 @@ public interface ExpedientTascaService {
 			Long entitatId, 
 			Long expedientTascaId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto);
 }

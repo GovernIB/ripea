@@ -111,7 +111,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -129,10 +129,10 @@ public interface MetaExpedientService {
 	 * 
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id, Long organId);
 	
-	@PreAuthorize("hasRole('tothom')")	
+	@PreAuthorize("isAuthenticated()")	
 	public MetaExpedientDto getAndCheckOrganPermission(Long entitatId, Long id, OrganGestorDto organActual, boolean inclouRolDissenyador);
 	
 	/**
@@ -160,7 +160,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
 
@@ -175,7 +175,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(
 			Long entitatId, String rolActual) throws NotFoundException;
 
@@ -190,7 +190,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerModificacio(
 			Long entitatId, String rolActual) throws NotFoundException;
 
@@ -208,7 +208,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findActius(
 			Long entitatId, String filtreNomOrCodiSia, String rolActual, boolean comu, Long organId) throws NotFoundException;
 
@@ -225,7 +225,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public long getProximNumeroSequencia(
 			Long entitatId,
 			Long id,
@@ -246,7 +246,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -268,7 +268,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientTascaDto tascaUpdate(
 			Long entitatId,
 			Long metaExpedientId,
@@ -291,7 +291,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientTascaDto tascaUpdateActiu(
 			Long entitatId,
 			Long metaExpedientId,
@@ -313,7 +313,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientTascaDto tascaDelete(
 			Long entitatId,
 			Long metaExpedientId,
@@ -332,7 +332,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientTascaDto tascaFindById(
 			Long entitatId,
 			Long metaExpedientId,
@@ -351,22 +351,22 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<MetaExpedientTascaDto> tascaFindPaginatByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientTascaValidacioDto> findValidacionsTasca(Long metaExpedientTascaId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean createValidacioTasca(MetaExpedientTascaValidacioDto metaExpedientTascaValidacioDto);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientTascaValidacioDto updateValidacioTasca(Long metaExpedientTascaValidacioId, String accio);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public int createValidacionsTasca(Long entitatId, Long tascaID, List<MetaExpedientTascaValidacioDto> validacions);
 	
 	/**
@@ -380,7 +380,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -399,7 +399,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
@@ -421,7 +421,7 @@ public interface MetaExpedientService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void permisDelete(
 			Long entitatId,
 			Long id,
@@ -440,7 +440,7 @@ public interface MetaExpedientService {
 	  * @throws NotFoundException
 	  *             Si no s'ha trobat l'objecte amb l'id especificat.
 	  */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<MetaExpedientDto> findByEntitatOrOrganGestor(
 			Long entitatId,
 			Long organGestorId,
@@ -450,13 +450,13 @@ public interface MetaExpedientService {
 			String rolActual,
 			boolean hasPermisAdmComu);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<GrupDto> findGrupsAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId, 
 			String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
 			Long entitatId,
 			Long organGestorId, 
@@ -473,41 +473,41 @@ public interface MetaExpedientService {
 			Long entitatId,
 			String codiDir3, String codiSia);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findByClassificacio(
 			Long entitatId,
 			String codiSia);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientDto canviarEstatRevisioASellecionat(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, 
 			String rolActual);
 
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public int countMetaExpedientsPendentRevisar(Long entitatId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean isMetaExpedientPendentRevisio(
 			Long entitatId,
 			Long id);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean comprovarPermisosMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			PermissionEnumDto permission);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
 			String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	boolean isRevisioActiva();
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientDto> findActiusAmbEntitatPerConsultaEstadistiques(
 			Long entitatId, 
 			String filtreNomOrCodiSia,
@@ -612,7 +612,7 @@ public interface MetaExpedientService {
 			Long metaExpedientId, 
 			boolean activa);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public MetaExpedientDto findByIdAmbElements(
 			Long entitatId,
 			Long id, 
@@ -621,7 +621,7 @@ public interface MetaExpedientService {
 //	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis);
 
 }

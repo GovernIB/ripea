@@ -30,7 +30,7 @@ public class PortafirmesFluxServiceEjb implements PortafirmesFluxService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
 			String urlReturn, 
 			boolean isPlantilla) {
@@ -40,48 +40,48 @@ public class PortafirmesFluxServiceEjb implements PortafirmesFluxService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId) {
 		return delegateService.recuperarFluxFirma(transactionId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void tancarTransaccio(String idTransaccio) {
 		delegateService.tancarTransaccio(idTransaccio);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String idTransaccio, boolean signerInfo) {
 		return delegateService.recuperarDetallFluxFirma(idTransaccio, signerInfo);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId) {
 		return delegateService.recuperarUrlMostrarPlantilla(plantillaFluxId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
 		return delegateService.recuperarPlantillesDisponibles(entitatId, rolActual, filtrar);
 	}
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String recuperarUrlEdicioPlantilla(String plantillaFluxId, String returnUrl) {
 		return delegateService.recuperarUrlEdicioPlantilla(plantillaFluxId, returnUrl);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public boolean esborrarPlantilla(String plantillaFluxId) {
 		return delegateService.esborrarPlantilla(plantillaFluxId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<PortafirmesCarrecDto> recuperarCarrecs() {
 		return delegateService.recuperarCarrecs();
 	}

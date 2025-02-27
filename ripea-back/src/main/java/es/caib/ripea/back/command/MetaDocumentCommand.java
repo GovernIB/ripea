@@ -8,7 +8,7 @@ import es.caib.ripea.back.validation.CodiMetaDocumentNoRepetit;
 import es.caib.ripea.back.validation.ResponsableNotEmpty;
 import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;

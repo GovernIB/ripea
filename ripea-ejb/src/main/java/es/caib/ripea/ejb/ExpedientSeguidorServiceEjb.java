@@ -28,7 +28,7 @@ public class ExpedientSeguidorServiceEjb implements ExpedientSeguidorService {
 	}
 	
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void follow(Long entitatId, Long expedientId) {
 		delegateService.follow(
 				entitatId, 
@@ -36,7 +36,7 @@ public class ExpedientSeguidorServiceEjb implements ExpedientSeguidorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public void unfollow(Long entitatId, Long expedientId) {
 		delegateService.unfollow(
 				entitatId,
@@ -44,7 +44,7 @@ public class ExpedientSeguidorServiceEjb implements ExpedientSeguidorService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public List<UsuariDto> getFollowersExpedient(Long entitatId, Long expedientId) {
 		return delegateService.getFollowersExpedient(
 				entitatId, 

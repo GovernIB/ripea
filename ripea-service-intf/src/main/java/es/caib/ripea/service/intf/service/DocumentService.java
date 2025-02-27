@@ -40,7 +40,7 @@ public interface DocumentService {
 	 * @throws ValidationException
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentDto create(
 			Long entitatId,
 			Long pareId,
@@ -64,7 +64,7 @@ public interface DocumentService {
 	 * @throws ValidationException
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto document,
@@ -84,7 +84,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentDto findById(
 			Long entitatId,
 			Long documentId, 
@@ -94,7 +94,7 @@ public interface DocumentService {
 	 * Actualitza i retorna la informació NTI de un document (codi CSV, etc)
 	 * https://github.com/GovernIB/ripea/issues/1451
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentDto updateCsvInfo(Long documentId) throws NotFoundException;
 	
 	/**
@@ -108,7 +108,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	/*@PreAuthorize("hasRole('tothom')")
+	/*@PreAuthorize("isAuthenticated()")
 	public List<DocumentVersioDto> findVersionsByDocument(
 			Long entitatId,
 			Long id) throws NotFoundException;*/
@@ -124,7 +124,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	/*@PreAuthorize("hasRole('tothom')")
+	/*@PreAuthorize("isAuthenticated()")
 	public DocumentVersioDto findDarreraVersio(
 			Long entitatId,
 			Long id) throws NotFoundException;*/
@@ -142,7 +142,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	/*@PreAuthorize("hasRole('tothom')")
+	/*@PreAuthorize("isAuthenticated()")
 	public DocumentVersioDto findVersio(
 			Long entitatId,
 			Long id,
@@ -177,7 +177,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto infoDocument(
 			Long entitatId,
 			Long id,
@@ -215,13 +215,13 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto descarregar(Long entitatId, Long id, String versio, Long tascaId) throws NotFoundException;
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto descarregarContingutOriginal(Long entitatId, Long id, Long tascaId) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto descarregarFirmaSeparada(Long entitatId, Long id, Long tascaId);
 	
 	/**
@@ -240,7 +240,7 @@ public interface DocumentService {
 	 * @throws PinbalException
 	 *             Si s'han produit errors en la consulta a PINBAL.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Exception pinbalNovaConsulta(
 			Long entitatId,
 			Long pareId,
@@ -274,7 +274,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void portafirmesEnviar(
 			Long entitatId,
 			Long documentId,
@@ -305,7 +305,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ViaFirmaDispositiuDto> viaFirmaDispositius(
 			String viaFirmaUsuari,
 			UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException;
@@ -322,7 +322,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ViaFirmaUsuariDto> viaFirmaUsuaris(UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	
@@ -344,7 +344,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void viaFirmaEnviar(
 			Long entitatId,
 			Long documentId,
@@ -365,7 +365,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void viaFirmaCancelar(
 			Long entitatId,
 			Long documentId) throws NotFoundException, IllegalStateException, SistemaExternException;
@@ -388,7 +388,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long documentId, 
@@ -432,7 +432,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentPortafirmesDto portafirmesInfo(
 			Long entitatId,
 			Long documentId, 
@@ -451,7 +451,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void viaFirmaReintentar(
 			Long entitatId,
 			Long documentId) throws NotFoundException, SistemaExternException;
@@ -467,7 +467,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentViaFirmaDto viaFirmaInfo(
 			Long entitatId,
 			Long documentId) throws NotFoundException;
@@ -484,7 +484,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Exception processarRespostaViaFirma(String messageJson);
 
 	/**
@@ -516,12 +516,12 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) throws NotFoundException, SistemaExternException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto getFitxerPDF(
 			Long entitatId,
 			Long id) throws NotFoundException, SistemaExternException;
@@ -540,7 +540,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String generarIdentificadorFirmaClient(
 			Long entitatId,
 			Long id) throws NotFoundException, SistemaExternException;
@@ -560,7 +560,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void processarFirmaClient(
 			Long entitatId,
 			Long documentId,
@@ -639,7 +639,7 @@ public interface DocumentService {
 	 * @param rolActual TODO
 	 * @return true si s'ha actualitzat
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean updateTipusDocument(
 			Long entitatId, 
 			Long documentId, 
@@ -649,37 +649,37 @@ public interface DocumentService {
 			String rolActual);
 
 	// Mètode implementat únicament per solucionar error de documents que s'han creat sense el seu tipus, i ja estan com a definitius
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void updateTipusDocumentDefinitiu(
 			Long entitatId,
 			Long documentId,
 			Long tipusDocumentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Resum getSummarize(byte[] bytes, String contentType);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public long countByMetaDocument(
 			Long entitatId,
 			Long metaDocumentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId);
 
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void actualitzarEstatADefinititu(
 			Long documentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DocumentDto findAmbId(
 			Long documentId,
 			String rolActual,
@@ -695,7 +695,7 @@ public interface DocumentService {
 	 * @throws SistemaExternException
 	 *            Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId)  throws SistemaExternException;
 
 	public void portafirmesCallbackIntegracioOk(
@@ -708,33 +708,33 @@ public interface DocumentService {
 			String errorDescripcio,
 			Throwable throwable);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String firmaSimpleWebStart(
 			FitxerDto fitxerPerFirmar,
 			String motiu, String base);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FirmaResultatDto firmaSimpleWebEnd(String transactionID);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Long getAndSaveFitxerTamanyFromArxiu(Long documentId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void notificacioActualitzarEstat(String identificador);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void notificacioActualitzarEstat(Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public String firmaSimpleWebStartMassiu(Set<Long> ids, String motiu, String urlReturnToRipea, Long entitatId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DocumentDto> findByExpedient(Long id, Long expedientId, String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
 			Long entitatId,
 			Long expedientId, 
@@ -742,6 +742,6 @@ public interface DocumentService {
 			String rolActual, 
 			Long tascaId) throws IOException;
 
-    @PreAuthorize("hasRole('tothom')")
+    @PreAuthorize("isAuthenticated()")
     public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris);
 }

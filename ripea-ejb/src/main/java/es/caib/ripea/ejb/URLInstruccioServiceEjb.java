@@ -60,13 +60,13 @@ public class URLInstruccioServiceEjb implements URLInstruccioService {
 	}
 
 	@Override
-	@RolesAllowed({"tothom", "IPA_ADMIN"})
+	@RolesAllowed("**")
 	public List<URLInstruccioDto> findByEntitat(Long entitatId) throws NotFoundException {
 		return delegateService.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("**")
 	public String getURLInstruccio(Long entitatId, Long contingutId, Long urlInstruccioId) {
 		return delegateService.getURLInstruccio(entitatId, contingutId, urlInstruccioId);
 	}

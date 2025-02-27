@@ -18,9 +18,9 @@ public interface PinbalServeiService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public PinbalServeiDto findById(Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PinbalServeiDto> findActius();
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<PinbalServeiDto> findAll();
 }

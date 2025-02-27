@@ -22,7 +22,7 @@ public interface DigitalitzacioService {
 	 * 
 	 * @return La llista dels perfils.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<DigitalitzacioPerfilDto> getPerfilsDisponibles();
 	
 	/**
@@ -34,7 +34,7 @@ public interface DigitalitzacioService {
 	 * 				Url on es retornarà la cridada de Portafib. 
 	 * @return Resposta de DigutalIB amb el id de la transacció.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DigitalitzacioTransaccioRespostaDto iniciarDigitalitzacio(
 			String codiPerfil,
 			String urlReturn);
@@ -50,7 +50,7 @@ public interface DigitalitzacioService {
 	 * 				Indica si s'ha escanejat un document amb firma. 
 	 * @return L'estat i el document escanejat.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public DigitalitzacioResultatDto recuperarResultat(
 			String idTransaccio,
 			boolean returnScannedFile,
@@ -62,7 +62,7 @@ public interface DigitalitzacioService {
 	 * @param transaccioId
 	 * 				Id de la transacció.
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void tancarTransaccio(
 			String idTransaccio);
 

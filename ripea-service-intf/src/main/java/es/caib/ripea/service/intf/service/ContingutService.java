@@ -34,7 +34,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void dadaSave(
 			Long entitatId,
 			Long contingutId,
@@ -60,7 +60,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void deleteReversible(
 			Long entitatId,
 			Long contingutId, 
@@ -119,7 +119,7 @@ public interface ContingutService {
 	 *             Si ja existeix un altre contingut amb el mateix nom
 	 *             a dins el destí.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
@@ -143,7 +143,7 @@ public interface ContingutService {
 	 *             Si ja existeix un altre contingut amb el mateix nom
 	 *             a dins el destí.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutDto copy(
 			Long entitatId,
 			Long contingutOrigenId,
@@ -168,7 +168,7 @@ public interface ContingutService {
 	 *             Si ja existeix un altre contingut amb el mateix nom
 	 *             a dins el destí.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Long link(
 			Long entitatId,
 			Long contingutOrigenId,
@@ -193,7 +193,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutDto findAmbIdUser(
 			Long entitatId,
 			Long contingutId,
@@ -212,7 +212,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutDto findAmbIdUserPerMoureCopiarVincular(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -244,7 +244,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ValidacioErrorDto> findErrorsValidacio(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -260,7 +260,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<AlertaDto> findAlertes(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -292,7 +292,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ContingutLogDto> findLogsPerContingutUser(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -329,7 +329,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutLogDetallsDto findLogDetallsPerContingutUser(
 			Long entitatId,
 			Long contingutId,
@@ -346,7 +346,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ContingutMovimentDto> findMovimentsPerContingutAdmin(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -362,7 +362,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ContingutMovimentDto> findMovimentsPerContingutUser(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -402,12 +402,12 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ArxiuDetallDto getArxiuDetall(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
     List<CodiValorDto> sincronitzarEstatArxiu(
             Long entitatId,
             Long contingutId);
@@ -423,7 +423,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public FitxerDto exportacioEni(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
@@ -455,7 +455,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<DocumentDto> findDocumentsMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
@@ -472,7 +472,7 @@ public interface ContingutService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<DocumentDto> findDocumentsPerCopiarCsv(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
@@ -495,7 +495,7 @@ public interface ContingutService {
 	 *             Si ja existeix un altre contingut amb el mateix nom
 	 *             a dins el destí.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void order(
 			Long entitatId,
 			Long contingutId,
@@ -523,37 +523,37 @@ public interface ContingutService {
 			boolean ambMapPerTipusDocument, 
 			boolean ambMapPerEstat);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public void checkIfPermitted(
 			Long contingutId,
 			String rolActual, 
 			PermissionEnumDto permission);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Long getPareId(
 			Long contingutId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public Long getExpedientId(Long contingutId);
 	
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public boolean isDeleted(
 			Long contingutId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ContingutMassiuDto> findDocumentsPerFirmaMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			String rolActual) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public List<ContingutDto> getFillsBasicInfo(Long contingutId);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ContingutDto getBasicInfo(Long contingutId, boolean checkPermissions);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("isAuthenticated()")
 	public ResultDto<ContingutMassiuDto> findDocumentsPerFirmaSimpleWebMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
