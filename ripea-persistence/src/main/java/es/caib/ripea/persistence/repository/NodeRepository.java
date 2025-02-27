@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
@@ -11,15 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus node.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface NodeRepository extends JpaRepository<NodeEntity, Long> {
 
 	@Query(	"select " +
@@ -54,15 +47,9 @@ public interface NodeRepository extends JpaRepository<NodeEntity, Long> {
 			@Param("pares") List<? extends ContingutEntity> pares,
 			@Param("metaNodesPermesos") List<MetaNodeEntity> metaNodesPermesos);
 
-
-
-	// Mètodes per evitar errors al tenir continguts orfes en base de dades
-	// ////////////////////////////////////////////////////////////////////
-
 	@Modifying
 	@Query(value = "delete from ipa_node " +
 			" where id not in (select id from ipa_expedient) " +
 			"   and id not in (select id from ipa_document)", nativeQuery = true)
 	int deleteNodesOrfes();
-
 }

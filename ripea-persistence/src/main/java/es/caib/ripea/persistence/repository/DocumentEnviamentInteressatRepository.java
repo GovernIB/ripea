@@ -1,18 +1,12 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
-/**
-
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface DocumentEnviamentInteressatRepository extends JpaRepository<DocumentEnviamentInteressatEntity, Long> {
 
 	
@@ -24,7 +18,4 @@ public interface DocumentEnviamentInteressatRepository extends JpaRepository<Doc
 	DocumentEnviamentInteressatEntity findByIdentificadorIReferencia(
 			@Param("notificacioIdentificador") String notificacioIdentificador,
 			@Param("enviamentReferencia") String enviamentReferencia);
-	
-	
-
 }

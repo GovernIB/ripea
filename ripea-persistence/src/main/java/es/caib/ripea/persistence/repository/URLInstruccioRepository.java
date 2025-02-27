@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -10,15 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus url instrucció.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface URLInstruccioRepository extends JpaRepository<URLInstruccioEntity, Long> {
 
 	List<URLInstruccioEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
@@ -52,7 +45,4 @@ public interface URLInstruccioRepository extends JpaRepository<URLInstruccioEnti
 	List<URLInstruccioEntity> findByEntitatAndCodi(
 			EntitatEntity entitat,
 			String dominiCodi);
-	
-	
-
 }

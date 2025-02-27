@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.aggregation.MetaExpedientCountAggregation;
@@ -14,19 +11,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus document.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
-	//DocumentEntity findTopByOrderByIdDesc
 	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null order by data desc")
 	Page<DocumentEntity> findLastByUuid(Pageable pageable);
 	

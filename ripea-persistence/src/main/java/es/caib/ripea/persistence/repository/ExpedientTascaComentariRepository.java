@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.ExpedientTascaComentariEntity;
@@ -8,15 +5,11 @@ import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus expedientTascaComentari.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface ExpedientTascaComentariRepository extends JpaRepository<ExpedientTascaComentariEntity, Long> {
 	
 	List<ExpedientTascaComentariEntity> findByExpedientTascaOrderByCreatedDateAsc(ExpedientTascaEntity expedientTasca);
@@ -27,8 +20,5 @@ public interface ExpedientTascaComentariRepository extends JpaRepository<Expedie
 			+ "    ExpedientTascaComentariEntity comment "
 			+ "where "
 			+ "    comment.expedientTasca = :expedientTasca")
-	long countByExpedientTasca(
-            @Param("expedientTasca") ExpedientTascaEntity expedientTasca);
-
-
+	long countByExpedientTasca(@Param("expedientTasca") ExpedientTascaEntity expedientTasca);
 }

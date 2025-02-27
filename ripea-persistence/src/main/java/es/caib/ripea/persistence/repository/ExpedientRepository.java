@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.*;
@@ -12,17 +9,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus expedient.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long> {
 
 	ExpedientEntity findByMetaExpedientAndPareAndNomAndEsborrat(

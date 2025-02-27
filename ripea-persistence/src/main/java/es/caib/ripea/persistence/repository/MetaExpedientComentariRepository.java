@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
@@ -8,10 +5,12 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
+@Component
 public interface MetaExpedientComentariRepository extends JpaRepository<MetaExpedientComentariEntity, Long> {
 	
 	List<MetaExpedientComentariEntity> findByMetaExpedientOrderByCreatedDateAsc(
@@ -28,6 +27,4 @@ public interface MetaExpedientComentariRepository extends JpaRepository<MetaExpe
 	
 	
 	public List<MetaExpedientComentariEntity> findByEmailEnviatFalseAndCreatedDateGreaterThan(Date createdDate);
-
-
 }

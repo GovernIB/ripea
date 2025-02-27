@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -12,15 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
 
-/**
- * Definició dels mètodes necessaris per a gestionar un organ gestor
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
@@ -52,7 +46,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
 
-
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where " +
@@ -62,7 +55,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("canditats")List<OrganGestorEntity> canditats,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
-
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
@@ -83,7 +75,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") OrganEstatEnumDto estat,
 			Pageable paginacio);
-	
 
 	@Query(	"select " +
 			"    og.codi " + 
@@ -106,7 +97,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") OrganEstatEnumDto estat);
 
-
 	@Query("from " +
 			"    OrganGestorEntity og " +
 			" where " +
@@ -115,7 +105,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitatAndIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("ids") List<Long> ids);
-
 
 	@Query("from " +
 			"    OrganGestorEntity og " +

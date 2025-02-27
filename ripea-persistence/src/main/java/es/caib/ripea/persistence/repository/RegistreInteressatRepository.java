@@ -1,19 +1,10 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus interessat.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface RegistreInteressatRepository extends JpaRepository<RegistreInteressatEntity, Long> {
-
 	RegistreInteressatEntity findByRepresentant(RegistreInteressatEntity representant);
-
 }

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
@@ -10,16 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus contingut.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface ExecucioMassivaContingutRepository extends JpaRepository<ExecucioMassivaContingutEntity, Long> {
 	
 	public List<ExecucioMassivaContingutEntity> findByExecucioMassivaOrderByOrdreAsc (ExecucioMassivaEntity execucioMassiva);
@@ -40,15 +33,9 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 			"	and	e.dataFi is null ")
 	public Long findExecucioMassivaContingutId(@Param("ara") Date ara);
 
-
-
-	// Mètodes per evitar errors al tenir continguts orfes en base de dades
-	// ////////////////////////////////////////////////////////////////////
-
 	@Modifying
 	@Query(value = "delete from ipa_massiva_contingut where contingut_id = :contingutId ", nativeQuery = true)
 	int deleteExecucioMassivaFromContingutsOrfes(@Param("contingutId") Long contingutId);
 
 	long countByElementIdInAndEstat(List<Long> elementIds, ExecucioMassivaEstatDto estat);
-
 }

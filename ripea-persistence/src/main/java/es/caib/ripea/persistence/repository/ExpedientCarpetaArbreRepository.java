@@ -1,21 +1,14 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.ExpedientCarpetaArbreEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Definició dels mètodes necessaris per a gestionar la vista que representra les carpetes d'un expedient
- * en arbre.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface ExpedientCarpetaArbreRepository extends JpaRepository<ExpedientCarpetaArbreEntity, Long> {
 
 	@Query(	"select c " +
@@ -29,5 +22,4 @@ public interface ExpedientCarpetaArbreRepository extends JpaRepository<Expedient
 	List<ExpedientCarpetaArbreEntity> findByPare(
 			@Param("entitat") Long entitat, 
 			@Param("pare") Long pare);
-
 }

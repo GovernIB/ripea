@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -12,10 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
+@Component
 public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEntity, Long> {
 	
 	@Query(	"select " +
@@ -27,7 +26,6 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 	public Long findExpedientId(
 			@Param("id") Long id);
 	
-	
 	@Query(	"select " +
 			"    a " +
 			"from " +
@@ -37,8 +35,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"and (a.document is null or a.error is not null)" )
 	List<RegistreAnnexEntity> findDocumentsDeAnotacionesNoMogutsASerieFinal(
 			@Param("expedient") ExpedientEntity expedient);
-	
-	
+
 	@Query(	"select " +
 			"    a " +
 			"from " +
@@ -75,11 +72,8 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
-			Pageable pageable);
-	
-	
-	
-	
+			Pageable pageable);	
+
 	@Query(	"select " +
 			"    a.id " +
 			"from " +
@@ -122,10 +116,5 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"from RegistreAnnexEntity a " +
 			"where a.annexArxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.ESBORRANY " +
 			"and a.document is not null " )
-	public List<Long> findIdsEsborranysAmbDocument();
-
-
-
-	
-	
+	public List<Long> findIdsEsborranysAmbDocument();	
 }

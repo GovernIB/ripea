@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.repository;
 
 import java.util.List;
@@ -8,17 +5,13 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.AclClassEntity;
 import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
 import es.caib.ripea.persistence.entity.AclSidEntity;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus ACL-SID.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Component
 public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIdentityEntity, Long> {
 
 	@Query(	"select " +

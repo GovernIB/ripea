@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.persistence.repository;
 
 import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
@@ -12,10 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
+@Component
 public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEntity, Long> {
 
 	List<ExpedientTascaEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
