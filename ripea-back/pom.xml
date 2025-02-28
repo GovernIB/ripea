@@ -17,19 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -292,6 +280,18 @@
 			<id>ide</id>
 			<dependencies>
 				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-web</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-validation</artifactId>
+				</dependency>				
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-hateoas</artifactId>
+				</dependency>
+				<dependency>
 					<groupId>org.apache.tomcat.embed</groupId>
 					<artifactId>tomcat-embed-jasper</artifactId>
 				</dependency>
@@ -335,20 +335,37 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-jasper</artifactId>
-					<scope>provided</scope>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-hateoas</artifactId>
+				    <!--exclusions>
+				        <exclusion>
+				            <groupId>org.springframework.boot</groupId>
+				            <artifactId>spring-boot-starter-web</artifactId>
+				        </exclusion>
+				    </exclusions-->
+				</dependency>
+				<dependency>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-webmvc</artifactId>
+				</dependency>
+				
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-web</artifactId>
 				</dependency>
 				<dependency>
 					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-					<scope>provided</scope>
+					<artifactId>spring-boot-starter-validation</artifactId>
 				</dependency>
+				<dependency>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-jasper</artifactId>
+				</dependency>				
 				<dependency>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-actuator</artifactId>
-				</dependency>				
-			</dependencies>
+				</dependency>
+			</dependencies>	
 			<build>
 				<plugins>
 					<plugin>
