@@ -1,6 +1,5 @@
 package es.caib.ripea.service.base.service;
 
-import es.caib.ripea.persistence.base.entity.EmbeddableEntity;
 import es.caib.ripea.persistence.base.repository.JpaRepositoryLocator;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.*;
@@ -139,16 +138,16 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ResourceArtifact> artifactGetAllowed(ResourceArtifactType type) {
-		log.debug("Consultant els artefactes permesos (type={})", type);
-		List<ResourceArtifact> artifacts = new ArrayList<>(super.artifactGetAllowed(type));
+	public List<ResourceArtifact> artifactFindAll(ResourceArtifactType type) {
+		log.debug("Querying allowed artifacts (type={})", type);
+		List<ResourceArtifact> artifacts = new ArrayList<>(super.artifactFindAll(type));
 		if (type == null || type == ResourceArtifactType.ACTION) {
 			artifacts.addAll(
 					actionExecutorMap.entrySet().stream().
 							map(r -> new ResourceArtifact(
 									ResourceArtifactType.ACTION,
 									r.getKey(),
-									r.getValue().getParameterClass())).
+									artifactGetFormClass(ResourceArtifactType.ACTION, r.getKey()))).
 							collect(Collectors.toList()));
 		}
 		return artifacts;
@@ -156,15 +155,18 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<Class<?>> artifactGetFormClass(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
-		log.debug("Consultant la classe de formulari per l'artefacte (type={}, code={})", type, code);
+	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
+		log.debug("Querying artifact form class (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.ACTION) {
 			ActionExecutor<?, ?> generator = actionExecutorMap.get(code);
 			if (generator != null) {
-				return generator.getParameterClass() != null ? Optional.of(generator.getParameterClass()) : Optional.empty();
+				return new ResourceArtifact(
+						ResourceArtifactType.ACTION,
+						code,
+						artifactGetFormClass(type, code));
 			}
 		}
-		return super.artifactGetFormClass(type, code);
+		return super.artifactGetOne(type, code);
 	}
 
 	protected void updateEntityWithResource(E entity, R resource) {
@@ -216,18 +218,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			Object builderInstance = ReflectionUtils.invokeMethod(builderMethod, null);
 			Class<?> builderReturnType = builderMethod.getReturnType();
 			// Es crida el mètode "embedded" del builder si l'entitat és de tipus EmbeddedEntity
-			boolean isEmbeddedEntity = EmbeddableEntity.class.isAssignableFrom(getEntityClass());
 			boolean builderEmbeddedMethodCalled = false;
-			if (isEmbeddedEntity) {
-				Method embeddedMethod = ReflectionUtils.findMethod(builderReturnType, "embedded", resource.getClass());
-				if (embeddedMethod != null) {
-					ReflectionUtils.invokeMethod(
-							embeddedMethod,
-							builderInstance,
-							resource);
-					builderEmbeddedMethodCalled = true;
-				}
-			}
 			// Es criden els altres mètodes del builder que accepten només 1 argument de tipus Persistable
 			for (Method builderCallableMethod : ReflectionUtils.getDeclaredMethods(builderReturnType)) {
 				if (builderCallableMethod.getParameterTypes().length == 1) {
@@ -249,11 +240,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			E entity = (E) ReflectionUtils.invokeMethod(
 					ReflectionUtils.findMethod(builderReturnType, "build"),
 					builderInstance);
-			// Si l'entitat és de tipus embedde i no s'ha pogut cridar el mètode "embedded" del builder
-			// es configura el recurs cridant el mètode "setEmbedded" de l'entitat.
-			if (isEmbeddedEntity && !builderEmbeddedMethodCalled) {
-				((EmbeddableEntity) entity).setEmbedded(resource);
-			}
 			// Es crea la pk a partir de la informació del recurs
 			ID pk = getPkFromResource(resource);
 			if (pk != null) {
@@ -351,11 +337,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			}
 		});
 		// Actualitza els demés camps de l'entitat
-		if (entity instanceof EmbeddableEntity) {
-			((EmbeddableEntity)entity).setEmbedded(resource);
-		} else {
-			updateEntityWithResource(entity, resource);
-		}
+		updateEntityWithResource(entity, resource);
 	}
 
 	protected Persistable<?> getReferencedEntityForResourceField(
@@ -411,12 +393,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	}
 	protected void reorderSetOrder(E entity, R resource, long nextValue) {
 		Reorderable entityReorderable = null;
-		if (entity instanceof EmbeddableEntity) {
-			R embeddedResource = ((EmbeddableEntity<R, ?>) entity).getEmbedded();
-			if (embeddedResource instanceof Reorderable) {
-				entityReorderable = (Reorderable)embeddedResource;
-			}
-		} else if (entity instanceof Reorderable) {
+		if (entity instanceof Reorderable) {
 			entityReorderable = (Reorderable)entity;
 		}
 		if (entityReorderable != null) {
@@ -437,9 +414,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		}
 	}
 	private Long reorderGetSequenceFromEntity(E entity) {
-		if (entity instanceof EmbeddableEntity) {
-			return reorderGetSequenceFromResource(((EmbeddableEntity<R, ?>) entity).getEmbedded());
-		} else if (entity instanceof Reorderable) {
+		if (entity instanceof Reorderable) {
 			return ((Reorderable)entity).getOrder();
 		} else {
 			log.error("Couldn't get order from entity class {}", getEntityClass());
@@ -492,15 +467,25 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		}
 	}
 
-	protected void register(ActionExecutor<?, ?> actionExecutor) {
-		Arrays.stream(actionExecutor.getSupportedActionCodes()).
-				forEach(c -> actionExecutorMap.put(c, actionExecutor));
+	protected void register(
+			String actionCode,
+			ActionExecutor<?, ?> actionExecutor) {
+		if (artifactIsPresentInResourceConfig(ResourceArtifactType.ACTION, actionCode)) {
+			actionExecutorMap.put(actionCode, actionExecutor);
+		} else {
+			log.error("Artifact not registered because it doesn't exist in ResourceConfig annotation (" +
+					"resourceClass=" + getResourceClass() + ", " +
+					"artifactType=" + ResourceArtifactType.ACTION + ", " +
+					"artifactCode=" + actionCode + ")");
+		}
 	}
 
-	protected void register(OnChangeLogicProcessor<R> logicProcessor) {
-		Arrays.stream(logicProcessor.getSupportedFieldNames()).
-				forEach(f -> onChangeLogicProcessorMap.put(f, logicProcessor));
+	protected void register(
+			String fieldName,
+			OnChangeLogicProcessor<R> logicProcessor) {
+		onChangeLogicProcessorMap.put(fieldName, logicProcessor);
 	}
+
 	private Map<String, Object> onChangeLogicProcessRecursive(
 			R previous,
 			String fieldName,
@@ -605,13 +590,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 *
 	 * @param <R> classe del recurs.
 	 */
-	public interface OnChangeLogicProcessor <R extends Resource<?>> {
-		/**
-		 * Retorna la llista de camps que gestiona aquest processdor.
-		 *
-		 * @return els camps suportats.
-		 */
-		String[] getSupportedFieldNames();
+	public interface OnChangeLogicProcessor <R extends Serializable> {
 		/**
 		 * Processa la lògica onChange d'un camp.
 		 *
@@ -640,21 +619,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 * @param <P> classe dels paràmetres necessaris per a executar l'acció.
 	 * @param <R> classe de la resposta retornada com a resultat.
 	 */
-	public interface ActionExecutor<P, R> {
-		/**
-		 * Retorna els codis suportats en aquest executor.
-		 *
-		 * @return els codis suportats.
-		 */
-		String[] getSupportedActionCodes();
-		/**
-		 * Retorna la classe pels paràmetres.
-		 *
-		 * @return la classe pels paràmetres o null si no en te
-		 */
-		default Class<P> getParameterClass() {
-			return null;
-		}
+	public interface ActionExecutor<P, R extends Serializable> extends OnChangeLogicProcessor<R> {
 		/**
 		 * Executa l'acció.
 		 *
@@ -667,6 +632,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		 *             si es produeix algun error generant les dades.
 		 */
 		R exec(String code, P params) throws ActionExecutionException;
+		default void processOnChangeLogic(
+				R previous,
+				String fieldName,
+				Object fieldValue,
+				Map<String, AnswerRequiredException.AnswerValue> answers,
+				R target) {
+		}
 	}
 
 }

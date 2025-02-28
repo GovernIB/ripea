@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.base.service.ResourceServiceLocator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,12 @@ public class HalFormsUtil {
 				if (newInstance != null) {
 					values.putAll(toMap(newInstance));
 				}
-			} catch (ComponentNotFoundException ignored) {}
+			} catch (ComponentNotFoundException ex) {
+				try {
+					values.putAll(toMap(resourceClass.getDeclaredConstructor().newInstance()));
+				} catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+				}
+			}
 		}
 		return values;
 	}

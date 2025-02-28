@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Mètodes a implementar pels serveis que gestionen un recurs en mode només lectura.
@@ -67,18 +66,20 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 *            el tipus d'artefacte que es vol consultar (si és null es retornen tots els tipus).
 	 * @return la llista dels artefactes permesos.
 	 */
-	List<ResourceArtifact> artifactGetAllowed(ResourceArtifactType type);
+	List<ResourceArtifact> artifactFindAll(ResourceArtifactType type);
 
 	/**
-	 * Retorna la classe que representa el formulari de paràmetres per l'artefacte.
+	 * Retorna l'artefacte amb el tipus i codi especificat.
 	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
 	 * @param code
 	 *            el codi de l'artefacte.
-	 * @return la classe que representa el formulari de paràmetres.
+	 * @return l'artefacte.
 	 * @throws ArtifactNotFoundException
-	 *             si no es troba l'artefacte amb el codi especificat.
+	 *             si no es troba l'artefacte amb el tipus i el codi especificat.
 	 */
-	Optional<Class<?>> artifactGetFormClass(ResourceArtifactType type, String code) throws ArtifactNotFoundException;
+	ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException;
 
 	/**
 	 * Genera l'informe amb el codi especificat.
@@ -94,6 +95,6 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 * @throws ReportGenerationException
 	 *             si es produeix algun error generant l'informe.
 	 */
-	<P> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException;
+	<P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException;
 
 }

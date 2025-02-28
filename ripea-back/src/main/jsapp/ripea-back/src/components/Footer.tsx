@@ -25,10 +25,6 @@ export const Footer: React.FC<AppFootProps> = (props) => {
         backgroundImg,
     } = props;
     const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor, backgroundImg) : {};
-    const imgs = logos && logos.map((logo) => 
-        <Box sx={{ mr: 2, pt: 1, pr: 2, cursor: 'pointer', ...logoStyle }}>
-            <img src={logo} alt="foot_logo" style={{maxHeight: '40px'}}/>
-        </Box>)
     return <footer>
         <Toolbar style={{ ...style, ...backgroundStyle }}>
             <Typography
@@ -39,7 +35,11 @@ export const Footer: React.FC<AppFootProps> = (props) => {
                 {(title ? title : '') + (version ? ' v' + version : '')}
                 {/* {version && <Typography variant="caption">{title}&nbsp;v{version}</Typography>} */}
             </Typography>
-            {imgs ? imgs :null}
+            {logos && logos.map((logo) =>
+                <Box sx={{ mr: 2, pt: 1, pr: 2, cursor: 'pointer', ...logoStyle }} key={logo}>
+                    <img src={logo} alt="foot_logo" style={{maxHeight: '40px'}}/>
+                </Box>)
+            }
         </Toolbar>
     </footer>;
 }

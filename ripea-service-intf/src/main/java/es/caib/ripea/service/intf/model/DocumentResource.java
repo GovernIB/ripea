@@ -44,7 +44,7 @@ public class DocumentResource extends NodeResource {
 	@Size(max = 256)
 	private String fitxerContentType;
 	private Long fitxerTamany;
-	private byte[] fitxerContingut;
+//	private byte[] fitxerContingut;
 	@Size(max = 32)
 	private String versioDarrera;
 	@NotNull

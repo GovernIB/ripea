@@ -14,7 +14,7 @@ import java.io.Serializable;
  * 
  * @author Límit Tecnologies
  */
-public interface Resource<ID extends Serializable> {
+public interface Resource<ID extends Serializable> extends Serializable {
 
 	/**
 	 * Obté el valor del camp id.

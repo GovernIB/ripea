@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifact;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -65,6 +66,21 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	ResponseEntity<CollectionModel<EntityModel<ResourceArtifact>>> artifacts();
 
 	/**
+	 * Retorna la informació d'un artefacte.
+	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @return la informació de l'artefacte.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'artefacte especificat.
+	 */
+	ResponseEntity<EntityModel<ResourceArtifact>> artifactGetOne(
+			final ResourceArtifactType type,
+			final String code) throws ArtifactNotFoundException;
+
+	/**
 	 * Generació d'un informe associat al recurs.
 	 *
 	 * @param code
@@ -85,5 +101,115 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String code,
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
+
+	/**
+	 * Consulta paginada de les opcions disponibles per a emplenar un camp de
+	 * tipus ResourceReference que pertany al formulari de l'informe.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param code
+	 *            codi de l'informe.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param quickFilter
+	 *            text per a filtrar múltiples camps.
+	 * @param filter
+	 *            consulta en format Spring Filter.
+	 * @param namedQueries
+	 *            llista de noms de consultes a aplicar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @param pageable
+	 *            informació sobre la pagina de resultats que es vol obtenir.
+	 * @return la pàgina amb els resultats de la consulta.
+	 */
+	<RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactReportFieldOptionsFind(
+			final String code,
+			final String fieldName,
+			final String quickFilter,
+			final String filter,
+			final String[] namedQueries,
+			final String[] perspectives,
+			final Pageable pageable);
+
+	/**
+	 * Consulta d'una de les opcions disponibles per a emplenar un camp de
+	 * tipus ResourceReference que pertany al formulari de l'informe.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param <RID>
+	 *            Tipus de l'id del recurs (ha d'estendre de Serializable).
+	 * @param code
+	 *            codi de l'informe.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param id
+	 *            id de l'element que es vol consultar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @return L'element amb l'id especificat.
+	 */
+	<RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactReportFieldOptionsGetOne(
+			final String code,
+			final String fieldName,
+			final RID id,
+			final String[] perspectives);
+
+	/**
+	 * Consulta paginada de les opcions disponibles per a emplenar un camp de
+	 * tipus ResourceReference que pertany al formulari del filtre.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param code
+	 *            codi del filtre.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param quickFilter
+	 *            text per a filtrar múltiples camps.
+	 * @param filter
+	 *            consulta en format Spring Filter.
+	 * @param namedQueries
+	 *            llista de noms de consultes a aplicar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @param pageable
+	 *            informació sobre la pagina de resultats que es vol obtenir.
+	 * @return la pàgina amb els resultats de la consulta.
+	 */
+	<RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactFilterFieldOptionsFind(
+			final String code,
+			final String fieldName,
+			final String quickFilter,
+			final String filter,
+			final String[] namedQueries,
+			final String[] perspectives,
+			final Pageable pageable);
+
+	/**
+	 * Consulta d'una de les opcions disponibles per a emplenar un camp de
+	 * tipus ResourceReference que pertany al formulari del filtre.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param <RID>
+	 *            Tipus de l'id del recurs (ha d'estendre de Serializable).
+	 * @param code
+	 *            codi del filtre.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param id
+	 *            id de l'element que es vol consultar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @return L'element amb l'id especificat.
+	 */
+	<RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactFilterFieldOptionsGetOne(
+			final String code,
+			final String fieldName,
+			final RID id,
+			final String[] perspectives);
 
 }

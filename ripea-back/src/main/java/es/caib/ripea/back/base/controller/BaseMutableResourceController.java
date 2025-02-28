@@ -5,21 +5,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.back.config.WebMvcConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ComponentNotFoundException;
-import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
-import es.caib.ripea.service.intf.base.model.*;
+import es.caib.ripea.service.intf.base.model.OnChangeEvent;
+import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifact;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
-import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
-import es.caib.ripea.service.intf.base.service.ResourceServiceLocator;
 import es.caib.ripea.service.intf.base.util.JsonUtil;
-import es.caib.ripea.service.intf.base.util.RequestSessionUtil;
-import es.caib.ripea.service.intf.base.util.TypeUtil;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,12 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -74,7 +64,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 /**
  * <p>Classe base pels controladors de l'API REST que conté els mètodes
  * necessaris per a modificar recursos.</p>
- * 
+ *
  * @param <R>
  *            el tipus del recurs que ha de gestionar aquest Controller. Aquest
  *            tipus ha d'estendre de EntityResource&lt;ID&gt;.
@@ -86,8 +76,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  */
 @Slf4j
 public abstract class BaseMutableResourceController<R extends Resource<? extends Serializable>, ID extends Serializable>
-	extends BaseReadonlyResourceController<R, ID>
-	implements MutableResourceController<R, ID> {
+		extends BaseReadonlyResourceController<R, ID>
+		implements MutableResourceController<R, ID> {
 
 	@Value("${" + PropertyConfig.HTTP_HEADER_ANSWERS + ":Bb-Answers}")
 	private String httpHeaderAnswers;
@@ -96,8 +86,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	protected ObjectMapper objectMapper;
 	@Autowired
 	protected SmartValidator validator;
-
-	private ExpressionParser parser;
 
 	@Override
 	@PostMapping
@@ -280,79 +268,38 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@RequestParam(value = "perspective", required = false)
 			@Parameter(description = "Perspectives de la consulta")
 			final String[] perspectives,
-			@Parameter(description = "Paginació dels resultats", required = false)
+			@Parameter(description = "Paginació dels resultats")
 			final Pageable pageable) {
 		log.debug("Consultant possibles valors del camp amb filtre i paginació (" +
-				"fieldName={},quickFilter={},filter={},namedQueries={},perspectives={},pageable={})",
+						"fieldName={}, quickFilter={}, filter={}, namedQueries={}, perspectives={}, pageable={})",
 				fieldName,
 				quickFilter,
 				filter,
 				namedQueries,
 				perspectives,
 				pageable);
-		Class<?> resourceClass = getResourceClass();
-		Optional<FieldAndClass> referencedResourceFieldAndClass = findReferenceFieldAndClass(resourceClass, fieldName);
-		if (referencedResourceFieldAndClass.isPresent()) {
-			Link resourceCollectionBaseSelfLink = linkTo(methodOn(getClass()).fieldOptionsFind(
-					fieldName,
-					quickFilter,
-					filter,
-					namedQueries,
-					perspectives,
-					pageable)).withSelfRel();
-			if (pageable != null) {
-				// Només es fa la consulta de recursos si la petició conté informació de paginació.
-				Class<?> referencedResourceClass = referencedResourceFieldAndClass.get().getClazz();
-				ReadonlyResourceService<RR, ?> resourceService = (ReadonlyResourceService<RR, ?>) ResourceServiceLocator.getInstance().
-						getReadOnlyEntityResourceServiceForResourceClass(referencedResourceClass);
-				Page<RR> page = resourceService.findPage(
-						quickFilter,
-						fieldOptionsProcessedFilterWithFieldAnnotation(
-								referencedResourceFieldAndClass.get().getField(),
-								filter),
-						fieldOptionsProcessedNamedQueriesWithFieldAnnotation(
-								referencedResourceFieldAndClass.get().getField(),
-								namedQueries),
-						perspectives,
-						fieldOptionsProcessedPageableWithResourceAnnotation(
-								pageable,
-								referencedResourceClass));
-				Link singleResourceSelfLink = linkTo(methodOn(getClass()).fieldOptionsGetOne(
-						fieldName,
-						SELF_RESOURCE_ID_TOKEN,
-						null)).withSelfRel();
-				return ResponseEntity.ok(
-						toPagedModel(
-								page,
-								perspectives,
-								singleResourceSelfLink,
-								ResourcePermissions.readOnly(),
-								buildOptionsLinks(
-										quickFilter,
-										filter,
-										namedQueries,
-										perspectives,
-										pageable,
-										page,
-										resourceCollectionBaseSelfLink,
-										ResourcePermissions.readOnly()).toArray(new Link[0])));
-			} else {
-				// Si la petició no conté informació depaginació únicament es retornen els ellaços
-				// a les possibles accions sobre aquest recurs.
-				return ResponseEntity.ok(
-						PagedModel.empty(
-								buildOptionsLinks(
-										quickFilter,
-										filter,
-										namedQueries,
-										perspectives,
-										null,
-										null,
-										resourceCollectionBaseSelfLink,
-										ResourcePermissions.readOnly())));
-			}
-		}
-		throw new ResourceFieldNotFoundException(resourceClass, fieldName);
+		Link resourceCollectionBaseSelfLink = linkTo(methodOn(getClass()).fieldOptionsFind(
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable)).withSelfRel();
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).fieldOptionsGetOne(
+				fieldName,
+				SELF_RESOURCE_ID_TOKEN,
+				null)).withSelfRel();
+		return fieldOptionsFind(
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable,
+				null,
+				null,
+				resourceCollectionBaseSelfLink,
+				singleResourceBaseSelfLink);
 	}
 
 	@Override
@@ -369,31 +316,21 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@RequestParam(value = "perspective", required = false)
 			@Parameter(description = "Perspectives de la consulta")
 			final String[] perspectives) {
-		log.debug("Consultant un dels possibles valors del camp (fieldName={},id={},perspectives={})",
+		log.debug("Consultant un dels possibles valors del camp (fieldName={}, id={}, perspectives={})",
 				fieldName,
 				id,
 				perspectives);
-		Class<?> resourceClass = getResourceClass();
-		Optional<FieldAndClass> referencedResourceFieldAndClass = findReferenceFieldAndClass(resourceClass, fieldName);
-		if (referencedResourceFieldAndClass.isPresent()) {
-			Class<?> referencedResourceClass = referencedResourceFieldAndClass.get().getClazz();
-			ReadonlyResourceService<RR, RID> resourceService = (ReadonlyResourceService<RR, RID>)ResourceServiceLocator.getInstance().
-					getReadOnlyEntityResourceServiceForResourceClass(referencedResourceClass);
-			RR resource = resourceService.getOne(id, perspectives);
-			Link singleResourceSelfLink = linkTo(methodOn(getClass()).fieldOptionsGetOne(
-					fieldName,
-					SELF_RESOURCE_ID_TOKEN,
-					null)).withSelfRel();
-			EntityModel<RR> entityModel = toEntityModel(
-					resource,
-					buildSingleResourceLinks(
-							resource.getId(),
-							perspectives,
-							singleResourceSelfLink,
-							ResourcePermissions.readOnly()).toArray(new Link[0]));
-			return ResponseEntity.ok(entityModel);
-		}
-		throw new ResourceFieldNotFoundException(resourceClass, fieldName);
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).fieldOptionsGetOne(
+				fieldName,
+				SELF_RESOURCE_ID_TOKEN,
+				null)).withSelfRel();
+		return fieldOptionsGetOne(
+				fieldName,
+				id,
+				perspectives,
+				null,
+				null,
+				singleResourceBaseSelfLink);
 	}
 
 	@Override
@@ -407,13 +344,110 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@RequestBody(required = false)
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		Object paramsObject = getArtifactFormClass(
+		Object paramsObject = getArtifactParamsAsObjectWithFormClass(
 				ResourceArtifactType.ACTION,
 				code,
 				params,
 				bindingResult);
 		Object result = getMutableResourceService().actionExec(code, paramsObject);
 		return ResponseEntity.ok(result);
+	}
+
+	@Override
+	@GetMapping(value = "/artifacts/action/{code}/fields/{fieldName}/options")
+	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari de l'acció")
+	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
+	public <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactActionFieldOptionsFind(
+			@PathVariable
+			@Parameter(description = "Codi de l'informe")
+			final String code,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName,
+			@RequestParam(value = "quickFilter", required = false)
+			@Parameter(description = "Filtre ràpid (text)")
+			final String quickFilter,
+			@RequestParam(value = "filter", required = false)
+			@Parameter(description = "Consulta en format Spring Filter")
+			final String filter,
+			@RequestParam(value = "namedQuery", required = false)
+			@Parameter(description = "Consultes predefinides")
+			final String[] namedQueries,
+			@RequestParam(value = "perspective", required = false)
+			@Parameter(description = "Perspectives de la consulta")
+			final String[] perspectives,
+			@Parameter(description = "Paginació dels resultats")
+			final Pageable pageable) {
+		log.debug("Consultant possibles valors del camp del formulari de l'acció (" +
+						"code={}, fieldName={}, quickFilter={}, filter={}, namedQueries={}, perspectives={}, pageable={})",
+				code,
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable);
+		Link resourceCollectionBaseSelfLink = linkTo(methodOn(getClass()).artifactActionFieldOptionsFind(
+				code,
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable)).withSelfRel();
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).artifactActionFieldOptionsGetOne(
+				code,
+				fieldName,
+				SELF_RESOURCE_ID_TOKEN,
+				null)).withSelfRel();
+		return fieldOptionsFind(
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable,
+				ResourceArtifactType.ACTION,
+				code,
+				resourceCollectionBaseSelfLink,
+				singleResourceBaseSelfLink);
+	}
+
+	@Override
+	@GetMapping(value = "/artifacts/action/{code}/fields/{fieldName}/options/{id}")
+	@Operation(summary = "Consulta d'una de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari de l'acció")
+	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
+	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactActionFieldOptionsGetOne(
+			@PathVariable
+			@Parameter(description = "Codi de l'informe")
+			final String code,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName,
+			@PathVariable
+			@Parameter(description = "Id de l'element")
+			final RID id,
+			@RequestParam(value = "perspective", required = false)
+			@Parameter(description = "Perspectives de la consulta")
+			final String[] perspectives) {
+		log.debug("Consultant un dels possibles valors del camp del formulari de l'acció (" +
+						"code={}, fieldName={}, id={}, perspectives={})",
+				code,
+				fieldName,
+				id,
+				perspectives);
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).artifactActionFieldOptionsGetOne(
+				code,
+				fieldName,
+				SELF_RESOURCE_ID_TOKEN,
+				null)).withSelfRel();
+		return fieldOptionsGetOne(
+				fieldName,
+				id,
+				perspectives,
+				ResourceArtifactType.ACTION,
+				code,
+				singleResourceBaseSelfLink);
 	}
 
 	protected MutableResourceService<R, ID> getMutableResourceService() {
@@ -492,7 +526,18 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				filter(l -> l.getRel().value().equals("self")).
 				findFirst().orElse(null);
 		if (selfLink != null) {
-			if (resourcePermissions.isCreateGranted()) {
+			if (resourcePermissions.isCreateGranted() && resourcePermissions.isWriteGranted()) {
+				links.set(
+						links.indexOf(selfLink),
+						Affordances.of(selfLink).
+								afford(HttpMethod.POST).
+								withInputAndOutput(getResourceClass()).
+								withName("create").
+								andAfford(HttpMethod.PATCH).
+								withInputAndOutput(getResourceClass()).
+								withName("onChange").
+								toLink());
+			} else if (resourcePermissions.isCreateGranted()) {
 				links.set(
 						links.indexOf(selfLink),
 						Affordances.of(selfLink).
@@ -500,31 +545,17 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								withInputAndOutput(getResourceClass()).
 								withName("create").
 								toLink());
+			} else if (resourcePermissions.isWriteGranted()) {
+				links.set(
+						links.indexOf(selfLink),
+						Affordances.of(selfLink).
+								afford(HttpMethod.PATCH).
+								withInputAndOutput(getResourceClass()).
+								withName("onChange").
+								toLink());
 			}
 		}
 		return links;
-	}
-
-	protected List<Link> buildOptionsLinks(
-			String quickFilter,
-			String filter,
-			String[] namedQuery,
-			String[] perspective,
-			Pageable pageable,
-			Page<?> page,
-			Link resourceCollectionBaseSelfLink,
-			ResourcePermissions resourcePermissions) {
-		return buildResourceCollectionLinks(
-				quickFilter,
-				filter,
-				namedQuery,
-				perspective,
-				pageable,
-				page,
-				resourceCollectionBaseSelfLink,
-				resourcePermissions).stream().
-				filter(l -> !l.getRel().value().equals("getOne")).
-				collect(Collectors.toList());
 	}
 
 	@Override
@@ -632,91 +663,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		}
 	}
 
-	private Optional<FieldAndClass> findReferenceFieldAndClass(
-			Class<?> resourceClass,
-			String fieldName) {
-		if (!fieldName.isBlank()) {
-			String currentFieldName;
-			if (fieldName.contains(".")) {
-				String[] fieldNameParts = fieldName.split("\\.");
-				currentFieldName = fieldNameParts[0];
-			} else {
-				currentFieldName = fieldName;
-			}
-			Field currentField = ReflectionUtils.findField(resourceClass, currentFieldName);
-			if (currentField != null && ResourceReference.class.isAssignableFrom(currentField.getType())) {
-				Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(currentField);
-				if (fieldName.contains(".")) {
-					return findReferenceFieldAndClass(
-							referencedResourceClass,
-							fieldName.substring(currentFieldName.length() + 1));
-				} else {
-					return Optional.of(
-							new FieldAndClass(currentField, referencedResourceClass));
-				}
-			}
-		}
-		return Optional.empty();
-	}
-
-	private String fieldOptionsProcessedFilterWithFieldAnnotation(Field field, String filterFromRequest) {
-		String processedFilter = filterFromRequest;
-		ResourceField resourceFieldAnnotation = field.getAnnotation(ResourceField.class);
-		if (resourceFieldAnnotation != null && resourceFieldAnnotation.springFilter().isEmpty()) {
-			String springFilter = resourceFieldAnnotation.springFilter();
-			if (springFilter.startsWith("#{") && springFilter.endsWith("}")) {
-				String expressionToParse = springFilter.substring(2, springFilter.length() - 1);
-				StandardEvaluationContext context = new StandardEvaluationContext(
-						new ProcessedOptionsQueryExpressionContext(RequestSessionUtil.getRequestSession()));
-				String parsedSpringFilter = getExpressionParser().
-						parseExpression(expressionToParse).
-						getValue(context, String.class);
-				processedFilter = parsedSpringFilter + (filterFromRequest != null ? " and (" + filterFromRequest + ")" : "");
-			} else {
-				processedFilter = springFilter + (filterFromRequest != null ? " and (" + filterFromRequest + ")" : "");
-			}
-		}
-		return processedFilter;
-	}
-
-	private String[] fieldOptionsProcessedNamedQueriesWithFieldAnnotation(Field field, String[] namedQueries) {
-		List<String> processedNamedQueries = Arrays.asList(namedQueries != null ? namedQueries : new String[0]);
-		ResourceField resourceFieldAnnotation = field.getAnnotation(ResourceField.class);
-		if (resourceFieldAnnotation != null) {
-			Collections.addAll(processedNamedQueries, resourceFieldAnnotation.namedQueries());
-		}
-		return processedNamedQueries.toArray(new String[0]);
-	}
-
-	private Pageable fieldOptionsProcessedPageableWithResourceAnnotation(
-			Pageable pageable,
-			Class<?> resourceClass) {
-		if (pageable != null) {
-			ResourceConfig resourceConfigAnotation = resourceClass.getAnnotation(ResourceConfig.class);
-			if (resourceConfigAnotation != null) {
-				Sort sort = Sort.unsorted();
-				if (resourceConfigAnotation.defaultSortFields().length > 0) {
-					List<Sort.Order> orders = new ArrayList<>();
-					for (ResourceConfig.ResourceSort sortField: resourceConfigAnotation.defaultSortFields()) {
-						orders.add(new Sort.Order(sortField.direction(), sortField.field()));
-					}
-					sort = Sort.by(orders);
-				}/* else if (!resourceConfigAnotation.descriptionField().isEmpty()) {
-					sort = Sort.by(Sort.Order.asc(resourceConfigAnotation.descriptionField()));
-				}*/
-				if (pageable.isPaged()) {
-					return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSortOr(sort));
-				} else {
-					return new WebMvcConfig.UnpagedButSorted(pageable.getSortOr(sort));
-				}
-			} else {
-				return pageable;
-			}
-		} else {
-			return Pageable.unpaged();
-		}
-	}
-
 	private void updateResourceIdAndPk(
 			ID id,
 			R resource) {
@@ -732,13 +678,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 					resource,
 					id);
 		}
-	}
-
-	private ExpressionParser getExpressionParser() {
-		if (parser == null) {
-			parser = new SpelExpressionParser();
-		}
-		return parser;
 	}
 
 	@SneakyThrows
@@ -768,13 +707,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	public static class OnChangeForSerialization {
 		@JsonInclude
 		private Map<String, Object> map;
-	}
-
-	@Getter
-	@AllArgsConstructor
-	private static class FieldAndClass {
-		private Field field;
-		private Class<?> clazz;
 	}
 
 	@Getter

@@ -4,18 +4,18 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import lombok.Getter;
 
 /**
- * Excepció que es llença quan no es troba l'artefacte.
+ * Excepció que es llença quan no es troba el formulari de l'artefacte.
  * 
  * @author Límit Tecnologies
  */
 @Getter
-public class ArtifactNotFoundException extends NotFoundException {
+public class ArtifactFormNotFoundException extends NotFoundException {
 
 	private final Class<?> resourceClass;
 	private final ResourceArtifactType type;
 	private final String code;
 
-	public ArtifactNotFoundException(
+	public ArtifactFormNotFoundException(
 			Class<?> resourceClass,
 			ResourceArtifactType type,
 			String code) {

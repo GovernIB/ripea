@@ -7,8 +7,9 @@ const AppRoutes: React.FC = () => {
     return <Routes>
         <Route path="expedient">
             <Route index element={<ExpedientGrid />} />
-            <Route path=":id" element={<Expedient />} />
+            {/*<Route path=":id" element={<Expedient />} />*/}
         </Route>
+        <Route path="contingut/:id" element={<Expedient />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }
