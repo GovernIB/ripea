@@ -45,7 +45,7 @@ export const useFormFieldDateCommon = (
         if (textValue != null) {
             onChange(textValue);
         }
-        if (value != null && error != null) {
+        if (changedValue == null || (value != null && error != null)) {
             onChange(null);
         }
     }
