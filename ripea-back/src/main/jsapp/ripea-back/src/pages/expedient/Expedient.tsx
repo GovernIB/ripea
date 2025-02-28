@@ -77,7 +77,7 @@ const Expedient: React.FC = () => {
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
-            content: <Typography>{t('page.contingut.tabs.tasques')}</Typography>,
+            content: <TasquesGrid/>,
         },
     ]
     if(expedient) {

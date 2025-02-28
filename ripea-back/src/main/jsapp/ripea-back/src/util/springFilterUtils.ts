@@ -1,22 +1,32 @@
 
 const filter = (options :any[]) :any[] => {
-    return options.filter(a=>a!=null && a.length>0 && !a.includes("null") && !a.includes("undefined"));
+    return options.filter(a=>a!=null && a.length>0 && !a.includes("undefined") &&
+        !(a.includes("null") && !(a.includes("is not null") || a.includes("is null"))));
 }
-
 export const and = (...options :any[]) :string => {
     return filter(options).join(" AND ");
 }
 export const or = (...options :any[]) :string => {
     return filter(options).join(" OR ");
 }
+
 export const like = (option :string, value :string) :string => {
     return `${option}~'%${value}%'`;
 }
 export const neq = (option :string, value :any) :string => {
-    return `${option}!${value}`;
+    return value===null ?`${option} is not null` :`${option}!${value}`;
 }
 export const eq = (option :string, value :any) :string => {
-    return `${option}:${value}`;
+    return value===null ?`${option} is null` :`${option}:${value}`;
+}
+export const equals = (option :string, value :any, equals :boolean) :string => {
+    return equals ?eq(option,value) :neq(option,value);
+}
+export const concat = (...options :any[]) :string => {
+    return options.length>0 ?`concat(${ filter(options).join(",' ',") })` :'';
+}
+export const exists = (value :string) :string => {
+    return value.length>0 ?`exists(${value})` :'';
 }
 
 export const greaterThan = (option :string, value :any) :string => {

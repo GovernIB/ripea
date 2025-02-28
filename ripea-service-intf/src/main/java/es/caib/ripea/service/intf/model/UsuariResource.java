@@ -53,6 +53,10 @@ public class UsuariResource extends BaseResource<String> {
 
 	private boolean expedientExpandit = true;
 
+    public String getCodiAndNom(){
+        return  codi + " - " + nom;
+    }
+
 	@Size(max = 16)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
 

@@ -1,7 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;

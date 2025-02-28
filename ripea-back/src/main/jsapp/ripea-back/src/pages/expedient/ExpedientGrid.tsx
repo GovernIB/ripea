@@ -69,20 +69,49 @@ const ExpedientGrid: React.FC = () => {
             field: 'interessatsResum',
             flex: 1,
         },
+        {
+            field: 'grup',
+            flex: 0.5,
+            valueFormatter: (value: any) => {
+                return value?.description;
+            }
+        },
     ];
 
     const springFilterBuilder = (data: any) :string => {
-        let filterStr :string = '';
+        let filterStr :string = '';console.log(data)
         filterStr += builder.and(
-            builder.like("numero", data.numero),
+            builder.like("numero", data?.numero),
             builder.like("nom", data.nom),
-            (data.estat == null || data.estat==='TANCAT')
-                ?builder.eq("estat",`'${data.estat}'`)
-                :builder.neq("estat", `'TANCAT'`),
-            // builder.in("interessat", data.interessat),
+            data.estat && builder.equals("estat",`'TANCAT'`, (data.estat==='TANCAT')),
+            builder.exists(
+                builder.or(
+                    builder.like("interessats.documentNum", data.interessat),
+                    builder.like(builder.concat("interessats.nom", "interessats.llinatge1", "interessats.llinatge2"), data.interessat),
+                    builder.like("interessats.raoSocial", data.interessat),
+                    builder.like("interessats.organNom", data.interessat)
+                )
+            ),
             builder.eq("organGestor.id", data.organGestor?.id),
-            // builder.eq("metaExpedient", data.metaExpedient),
+            builder.eq("metaExpedient.id", data.metaExpedient?.id),
             builder.between("createdDate", `'${data.dataCreacioInici}'`, `'${data.dataCreacioFinal}'`),
+
+            builder.like("registresImportats", data.numeroRegistre),
+            builder.eq("grup.codi", data.grup?.id),
+            builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
+
+            data.agafat && builder.equals("agafatPer", null, (data.agafat === 'false')),
+            // data.pendentFirmar && (
+            //     builder.exists(
+            //         builder.and(
+            //             builder.or(
+            //                 builder.equals("DocumentPortafirmesEntity.estat", `'PENDENT'`, (data.pendentFirmar === 'true')),
+            //                 builder.equals("DocumentPortafirmesEntity.estat", `'ENVIAT'`, (data.pendentFirmar === 'true')),
+            //             ),
+            //             builder.equals("DocumentPortafirmesEntity.error", false, (data.pendentFirmar === 'true')),
+            //         )
+            //     )
+            // )
         )
         console.log('>>> springFilterBuilder:', filterStr)
         return filterStr;
@@ -118,9 +147,16 @@ const ExpedientGrid: React.FC = () => {
                     <Grid item xs={3}><FormField name="estat" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="interessat" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="organGestor" componentProps={fieldProps}/></Grid>
-                    {/*<Grid item xs={3}><FormField name="metaExpedient" componentProps={fieldProps}/></Grid>*/}
+                    <Grid item xs={3}><FormField name="metaExpedient" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="dataCreacioInici" componentProps={fieldProps}/></Grid>
                     <Grid item xs={3}><FormField name="dataCreacioFinal" componentProps={fieldProps}/></Grid>
+
+                    <Grid item xs={2}><FormField name="numeroRegistre" componentProps={fieldProps}/></Grid>
+                    <Grid item xs={3}><FormField name="grup" componentProps={fieldProps}/></Grid>
+                    <Grid item xs={3}><FormField name="agafatPer" componentProps={fieldProps}/></Grid>
+
+                    <Grid item xs={2}><FormField name="agafat" componentProps={fieldProps}/></Grid>
+                    <Grid item xs={2}><FormField name="pendentFirmar" componentProps={fieldProps}/></Grid>
 
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
                         <Button onClick={netejar}><Icon>eraser</Icon> Netejar</Button>

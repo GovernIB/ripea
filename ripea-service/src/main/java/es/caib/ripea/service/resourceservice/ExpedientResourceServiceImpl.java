@@ -58,7 +58,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     }
                 }
             }
-            //resource.setInteressatsResum(interessatsResum);
+            resource.setInteressatsResum(interessatsResum);
         }
         return resource;
     }

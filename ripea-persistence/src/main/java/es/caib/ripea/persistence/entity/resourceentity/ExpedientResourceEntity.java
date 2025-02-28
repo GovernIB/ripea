@@ -9,20 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -83,11 +70,11 @@ public class ExpedientResourceEntity extends NodeResourceEntity implements Resou
 			name = "agafat_per_codi",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "agafatper_expedient_fk"))
 	protected UsuariResourceEntity agafatPer;
-//	@OneToMany(
-//			mappedBy = "expedient",
-//			fetch = FetchType.LAZY,
-//			orphanRemoval = true)
-//	protected Set<InteressatEntity> interessats = new HashSet<InteressatEntity>();
+	@OneToMany(
+			mappedBy = "expedient",
+			fetch = FetchType.LAZY,
+			orphanRemoval = true)
+	protected List<InteressatResourceEntity> interessats = new ArrayList<InteressatResourceEntity>();
 	@ManyToMany(
 			cascade = {
 					CascadeType.DETACH,

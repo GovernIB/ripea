@@ -119,10 +119,17 @@ public class ExpedientResource extends NodeResource {
         private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat;
-        private ResourceReference<InteressatResource, Long> interessat;
+        private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
         private LocalDateTime dataCreacioInici;
         private LocalDateTime dataCreacioFinal;
+
+        private String numeroRegistre;
+        private ResourceReference<GrupResource, Long> grup;
+        private ResourceReference<UsuariResource, String> agafatPer;
+
+        private Boolean agafat;
+        private Boolean pendentFirmar;
 	}
 }
