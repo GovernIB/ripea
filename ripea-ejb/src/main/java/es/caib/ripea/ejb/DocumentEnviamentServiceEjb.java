@@ -3,27 +3,27 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.DocumentEnviamentService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Implementació de ContenidorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class DocumentEnviamentServiceEjb implements DocumentEnviamentService {
+public class DocumentEnviamentServiceEjb extends AbstractServiceEjb<DocumentEnviamentService> implements DocumentEnviamentService {
 
-	@Delegate
-	private DocumentEnviamentService delegateService;
+	@Delegate private DocumentEnviamentService delegateService;
 
 	protected void setDelegateService(DocumentEnviamentService delegateService) {
 		this.delegateService = delegateService;

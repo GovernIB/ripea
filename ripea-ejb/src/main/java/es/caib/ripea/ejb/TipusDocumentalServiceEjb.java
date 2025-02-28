@@ -1,5 +1,11 @@
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
@@ -7,17 +13,12 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.TipusDocumentalService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
 @Stateless
-public class TipusDocumentalServiceEjb implements TipusDocumentalService {
+public class TipusDocumentalServiceEjb extends AbstractServiceEjb<TipusDocumentalService> implements TipusDocumentalService {
 
-	@Delegate
-	private TipusDocumentalService delegateService;
+	@Delegate private TipusDocumentalService delegateService;
 
-	protected void delegate(TipusDocumentalService delegateService) {
+	protected void setDelegateService(TipusDocumentalService delegateService) {
 		this.delegateService = delegateService;
 	}
 

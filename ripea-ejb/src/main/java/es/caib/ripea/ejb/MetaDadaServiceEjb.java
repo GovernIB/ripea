@@ -3,6 +3,12 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -10,21 +16,10 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.MetaDadaService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de MetaDadaService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class MetaDadaServiceEjb implements MetaDadaService {
+public class MetaDadaServiceEjb extends AbstractServiceEjb<MetaDadaService> implements MetaDadaService {
 
-	@Delegate
-	private MetaDadaService delegateService;
+	@Delegate private MetaDadaService delegateService;
 
 	protected void setDelegateService(MetaDadaService delegateService) {
 		this.delegateService = delegateService;

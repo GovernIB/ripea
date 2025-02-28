@@ -3,6 +3,12 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
@@ -11,21 +17,10 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de InteressatService com a EJB que empra una clase delegada per
- * accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class ExpedientInteressatServiceEjb implements ExpedientInteressatService {
+public class ExpedientInteressatServiceEjb extends AbstractServiceEjb<ExpedientInteressatService> implements ExpedientInteressatService {
 
-	@Delegate
-	private ExpedientInteressatService delegateService;
+	@Delegate private ExpedientInteressatService delegateService;
 
 	protected void setDelegateService(ExpedientInteressatService delegateService) {
 		this.delegateService = delegateService;

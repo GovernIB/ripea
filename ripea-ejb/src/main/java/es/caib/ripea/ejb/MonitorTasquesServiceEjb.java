@@ -1,17 +1,18 @@
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.MonitorTascaInfo;
 import es.caib.ripea.service.intf.service.MonitorTasquesService;
 import lombok.experimental.Delegate;
 
-import javax.ejb.Stateless;
-import java.util.List;
-
 @Stateless
-public class MonitorTasquesServiceEjb implements MonitorTasquesService {
+public class MonitorTasquesServiceEjb extends AbstractServiceEjb<MonitorTasquesService> implements MonitorTasquesService {
 
-	@Delegate
-	private MonitorTasquesService delegateService;
+	@Delegate private MonitorTasquesService delegateService;
 
 	protected void setDelegateService(MonitorTasquesService delegateService) {
 		this.delegateService = delegateService;

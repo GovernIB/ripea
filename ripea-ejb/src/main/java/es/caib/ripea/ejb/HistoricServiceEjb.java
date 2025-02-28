@@ -1,7 +1,23 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.dto.historic.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricFiltreDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.service.intf.dto.historic.serializer.HistoricInteressatSerializer.RegistresInteressatDiari;
 import es.caib.ripea.service.intf.dto.historic.serializer.HistoricOrganGestorSerializer;
 import es.caib.ripea.service.intf.dto.historic.serializer.HistoricOrganGestorSerializer.RegistreOrganGestor;
@@ -9,17 +25,10 @@ import es.caib.ripea.service.intf.dto.historic.serializer.HistoricUsuariSerializ
 import es.caib.ripea.service.intf.service.HistoricService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 @Stateless
-public class HistoricServiceEjb implements HistoricService {
+public class HistoricServiceEjb extends AbstractServiceEjb<HistoricService> implements HistoricService {
 
-	@Delegate
-	private HistoricService delegateService;
+	@Delegate private HistoricService delegateService;
 
 	protected void setDelegateService(HistoricService delegateService) {
 		this.delegateService = delegateService;

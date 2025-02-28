@@ -1,25 +1,32 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.SeguimentService;
-import lombok.experimental.Delegate;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
-/**
- * Implementació de SeguimentService com a EJB que empra una clase delegada
- * per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ArxiuPendentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.ResultDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsFiltreDto;
+import es.caib.ripea.service.intf.dto.SeguimentConsultaFiltreDto;
+import es.caib.ripea.service.intf.dto.SeguimentConsultaPinbalDto;
+import es.caib.ripea.service.intf.dto.SeguimentDto;
+import es.caib.ripea.service.intf.dto.SeguimentFiltreDto;
+import es.caib.ripea.service.intf.dto.SeguimentNotificacionsFiltreDto;
+import es.caib.ripea.service.intf.service.SeguimentService;
+import lombok.experimental.Delegate;
+
 @Stateless
-public  class SeguimentServiceEjb implements SeguimentService {
+public  class SeguimentServiceEjb extends AbstractServiceEjb<SeguimentService> implements SeguimentService {
 
-	@Delegate
-	private SeguimentService delegateService;
+	@Delegate private SeguimentService delegateService;
 
-	protected void delegate(SeguimentService delegateService) {
+	protected void setDelegateService(SeguimentService delegateService) {
 		this.delegateService = delegateService;
 	}
 

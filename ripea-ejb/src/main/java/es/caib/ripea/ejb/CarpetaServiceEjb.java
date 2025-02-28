@@ -3,28 +3,27 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.CarpetaService;
-import lombok.experimental.Delegate;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Implementació de ContenidorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
-@Stateless
-public class CarpetaServiceEjb implements CarpetaService {
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 
-	@Delegate
-	private CarpetaService delegateService;
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.CarpetaService;
+import lombok.experimental.Delegate;
+
+@Stateless
+public class CarpetaServiceEjb extends AbstractServiceEjb<CarpetaService> implements CarpetaService {
+
+	@Delegate private CarpetaService delegateService;
 
 	protected void setDelegateService(CarpetaService delegateService) {
 		this.delegateService = delegateService;

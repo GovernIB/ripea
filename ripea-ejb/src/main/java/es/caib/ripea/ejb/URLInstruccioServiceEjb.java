@@ -1,5 +1,11 @@
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.URLInstruccioDto;
@@ -8,23 +14,12 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.URLInstruccioService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de URLInstruccioService com a EJB que empra una clase delegada
- * per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class URLInstruccioServiceEjb implements URLInstruccioService {
+public class URLInstruccioServiceEjb extends AbstractServiceEjb<URLInstruccioService> implements URLInstruccioService {
 
-	@Delegate
-	private URLInstruccioService delegateService;
+	@Delegate private URLInstruccioService delegateService;
 
-	protected void delegate(URLInstruccioService delegateService) {
+	protected void setDelegateService(URLInstruccioService delegateService) {
 		this.delegateService = delegateService;
 	}
 

@@ -1,25 +1,24 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.FluxFirmaUsuariDto;
+import es.caib.ripea.service.intf.dto.FluxFirmaUsuariFiltreDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de FluxFirmaUsuariService com a EJB que empra una clase delegada
- * per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class FluxFirmaUsuariServiceEjb implements FluxFirmaUsuariService {
+public class FluxFirmaUsuariServiceEjb extends AbstractServiceEjb<FluxFirmaUsuariService> implements FluxFirmaUsuariService {
 
-	@Delegate
-	private FluxFirmaUsuariService delegateService;
+	@Delegate private FluxFirmaUsuariService delegateService;
 
 	protected void setDelegateService(FluxFirmaUsuariService delegateService) {
 		this.delegateService = delegateService;

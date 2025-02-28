@@ -16,17 +16,10 @@ import javax.ejb.Stateless;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Implementació de AclService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
 public class AclServiceEjb extends AbstractServiceEjb<AclService> implements AclService {
 
-	@Delegate
-	private AclService delegateService = null;
+	@Delegate private AclService delegateService = null;
 
 	protected void setDelegateService(AclService delegateService) {
 		this.delegateService = delegateService;

@@ -1,5 +1,11 @@
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
@@ -9,21 +15,10 @@ import es.caib.ripea.service.intf.exception.NotDefinedConfigException;
 import es.caib.ripea.service.intf.service.ConfigService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de ConfigService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class ConfigServiceEjb implements ConfigService {
+public class ConfigServiceEjb extends AbstractServiceEjb<ConfigService> implements ConfigService {
 
-	@Delegate
-	private ConfigService delegateService;
+	@Delegate private ConfigService delegateService;
 
 	protected void setDelegateService(ConfigService delegateService) {
 		this.delegateService = delegateService;

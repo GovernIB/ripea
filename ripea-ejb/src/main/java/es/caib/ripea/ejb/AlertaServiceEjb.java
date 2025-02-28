@@ -14,17 +14,10 @@ import lombok.experimental.Delegate;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
-/**
- * Implementació de AlertaService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
 public class AlertaServiceEjb extends AbstractServiceEjb<AlertaService> implements AlertaService {
 
-	@Delegate
-	private AlertaService delegateService;
+	@Delegate private AlertaService delegateService;
 
 	protected void setDelegateService(AlertaService delegateService) {
 		this.delegateService = delegateService;

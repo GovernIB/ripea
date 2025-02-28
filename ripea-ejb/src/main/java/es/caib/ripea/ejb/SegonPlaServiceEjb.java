@@ -3,25 +3,19 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.service.SegonPlaService;
-import lombok.experimental.Delegate;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
-/**
- * Implementació de SegonPlaService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.service.SegonPlaService;
+import lombok.experimental.Delegate;
+
 @Stateless
-public class SegonPlaServiceEjb implements SegonPlaService {
+public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> implements SegonPlaService {
 
-	@Delegate
-	private SegonPlaService delegateService;
+	@Delegate private SegonPlaService delegateService;
 
-	protected void delegate(SegonPlaService delegateService) {
+	protected void setDelegateService(SegonPlaService delegateService) {
 		this.delegateService = delegateService;
 	}
 
@@ -90,5 +84,4 @@ public class SegonPlaServiceEjb implements SegonPlaService {
 	public void tancarExpedientsArxiu() {
 		delegateService.tancarExpedientsArxiu();
 	}
-
 }

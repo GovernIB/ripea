@@ -3,27 +3,26 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de BustiaService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class ExecucioMassivaServiceEjb implements ExecucioMassivaService {
+public class ExecucioMassivaServiceEjb extends AbstractServiceEjb<ExecucioMassivaService> implements ExecucioMassivaService {
 
-	@Delegate
-	private ExecucioMassivaService delegateService;
+	@Delegate private ExecucioMassivaService delegateService;
 
 	protected void setDelegateService(ExecucioMassivaService delegateService) {
 		this.delegateService = delegateService;

@@ -3,30 +3,39 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.ExpedientService;
-import lombok.experimental.Delegate;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Implementació de ContenidorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
-@Stateless
-public class ExpedientServiceEjb implements ExpedientService {
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 
-	@Delegate
-	private ExpedientService delegateService;
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.ExpedientComentariDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
+import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.RespostaPublicacioComentariDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import lombok.experimental.Delegate;
+
+@Stateless
+public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> implements ExpedientService {
+
+	@Delegate private ExpedientService delegateService;
 
 	protected void setDelegateService(ExpedientService delegateService) {
 		this.delegateService = delegateService;

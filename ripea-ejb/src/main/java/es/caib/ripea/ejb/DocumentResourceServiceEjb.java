@@ -5,17 +5,18 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import lombok.experimental.Delegate;
 
 @Stateless
-public class DocumentResourceServiceEjb implements DocumentResourceService {
+public class DocumentResourceServiceEjb extends AbstractServiceEjb<DocumentResourceService> implements DocumentResourceService {
 
 	@Delegate private DocumentResourceService delegateService;
 	
-	protected void delegate(DocumentResourceService delegateService) {
+	protected void setDelegateService(DocumentResourceService delegateService) {
 		this.delegateService = delegateService;
 	}
 

@@ -3,26 +3,27 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PinbalServeiDto;
+import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de MetaDocumentService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class MetaDocumentServiceEjb implements MetaDocumentService {
+public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentService> implements MetaDocumentService {
 
-	@Delegate
-	private MetaDocumentService delegateService;
+	@Delegate private MetaDocumentService delegateService;
 
 	protected void setDelegateService(MetaDocumentService delegateService) {
 		this.delegateService = delegateService;

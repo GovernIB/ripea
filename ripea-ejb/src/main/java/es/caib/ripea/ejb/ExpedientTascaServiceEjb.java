@@ -3,25 +3,29 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.ExpedientTascaService;
-import lombok.experimental.Delegate;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Implementació de ExpedientTascaService com a EJB que empra una clase delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
-@Stateless
-public class ExpedientTascaServiceEjb implements ExpedientTascaService {
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 
-	@Delegate
-	private ExpedientTascaService delegateService;
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaComentariDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariTascaFiltreDto;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import lombok.experimental.Delegate;
+
+@Stateless
+public class ExpedientTascaServiceEjb extends AbstractServiceEjb<ExpedientTascaService> implements ExpedientTascaService {
+
+	@Delegate private ExpedientTascaService delegateService;
 
 	protected void setDelegateService(ExpedientTascaService delegateService) {
 		this.delegateService = delegateService;

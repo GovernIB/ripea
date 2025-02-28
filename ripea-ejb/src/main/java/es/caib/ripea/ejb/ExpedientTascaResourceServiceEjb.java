@@ -3,23 +3,20 @@ package es.caib.ripea.ejb;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.ejb.Stateless;
-
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
 import lombok.experimental.Delegate;
 
-@Stateless
-public class ExpedientResourceServiceEjb extends AbstractServiceEjb<ExpedientResourceService> implements ExpedientResourceService {
+public class ExpedientTascaResourceServiceEjb extends AbstractServiceEjb<ExpedientTascaResourceService> implements ExpedientTascaResourceService {
 
-	@Delegate private ExpedientResourceService delegateService;
-	
-	protected void setDelegateService(ExpedientResourceService delegateService) {
+	@Delegate private ExpedientTascaResourceService delegateService;
+
+	protected void setDelegateService(ExpedientTascaResourceService delegateService) {
 		this.delegateService = delegateService;
 	}
-
+	
 	@Override
 	public <P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException {
 		return delegateService.reportGenerate(code, params);

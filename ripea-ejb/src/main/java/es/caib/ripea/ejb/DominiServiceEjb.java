@@ -1,18 +1,24 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.DominiDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
+import es.caib.ripea.service.intf.dto.ResultatDominiDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.DominiService;
 import lombok.experimental.Delegate;
 
-import javax.ejb.Stateless;
-import java.util.List;
-
 @Stateless
-public class DominiServiceEjb implements DominiService {
+public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implements DominiService {
 
-	@Delegate
-	private DominiService delegateService;
+	@Delegate private DominiService delegateService;
 
 	protected void setDelegateService(DominiService delegateService) {
 		this.delegateService = delegateService;

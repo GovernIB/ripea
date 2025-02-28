@@ -1,19 +1,26 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.ResultDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.ExpedientEstatService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
 @Stateless
-public class ExpedientEstatServiceEjb implements ExpedientEstatService {
+public class ExpedientEstatServiceEjb extends AbstractServiceEjb<ExpedientEstatService> implements ExpedientEstatService {
 
-	@Delegate
-	private ExpedientEstatService delegateService;
+	@Delegate private ExpedientEstatService delegateService;
 
 	protected void setDelegateService(ExpedientEstatService delegateService) {
 		this.delegateService = delegateService;

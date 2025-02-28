@@ -3,25 +3,24 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.DadesExternesService;
-import lombok.experimental.Delegate;
+import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import java.util.List;
 
-/**
- * Implementació de DadesExternesService que empra una clase delegada per accedir a la
- * funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ComunitatDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.service.DadesExternesService;
+import lombok.experimental.Delegate;
+
 @Stateless
-public class DadesExternesServiceEjb implements DadesExternesService {
+public class DadesExternesServiceEjb extends AbstractServiceEjb<DadesExternesService> implements DadesExternesService {
 
-	@Delegate
-	private DadesExternesService delegateService;
+	@Delegate private DadesExternesService delegateService;
 
 	protected void setDelegateService(DadesExternesService delegateService) {
 		this.delegateService = delegateService;

@@ -34,17 +34,10 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import lombok.experimental.Delegate;
 
-/**
- * Implementació de MetaExpedientService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
 public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientService> implements MetaExpedientService {
 
-	@Delegate
-	private MetaExpedientService delegateService;
+	@Delegate private MetaExpedientService delegateService;
 
 	protected void setDelegateService(MetaExpedientService delegateService) {
 		this.delegateService = delegateService;

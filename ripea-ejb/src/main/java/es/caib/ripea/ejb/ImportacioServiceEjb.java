@@ -3,28 +3,23 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.ImportacioService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Implementació de ContenidorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class ImportacioServiceEjb implements ImportacioService {
+public class ImportacioServiceEjb extends AbstractServiceEjb<ImportacioService> implements ImportacioService {
 
-	@Delegate
-	private ImportacioService delegateService;
+	@Delegate private ImportacioService delegateService;
 
 	protected void setDelegateService(ImportacioService delegateService) {
 		this.delegateService = delegateService;

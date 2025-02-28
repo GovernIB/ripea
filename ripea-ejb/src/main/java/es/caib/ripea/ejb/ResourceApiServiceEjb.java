@@ -5,17 +5,18 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import lombok.experimental.Delegate;
 
 @Stateless
-public class ResourceApiServiceEjb implements ResourceApiService {
+public class ResourceApiServiceEjb extends AbstractServiceEjb<ResourceApiService> implements ResourceApiService {
 
 	@Delegate private ResourceApiService delegateService;
 	
-	protected void delegate(ResourceApiService delegateService) {
+	protected void setDelegateService(ResourceApiService delegateService) {
 		this.delegateService = delegateService;
 	}
 	
@@ -33,5 +34,4 @@ public class ResourceApiServiceEjb implements ResourceApiService {
 	public ResourcePermissions permissionsCurrentUser(Class<?> resourceClass, Serializable resourceId) {
 		return delegateService.permissionsCurrentUser(resourceClass, resourceId);
 	}
-
 }

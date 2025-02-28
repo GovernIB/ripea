@@ -3,6 +3,12 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
@@ -10,22 +16,12 @@ import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.service.PortafirmesFluxService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació del servei de gestió de meta-documents.
- *
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class PortafirmesFluxServiceEjb implements PortafirmesFluxService {
+public class PortafirmesFluxServiceEjb extends AbstractServiceEjb<PortafirmesFluxService> implements PortafirmesFluxService {
 
-	@Delegate
-	private PortafirmesFluxService delegateService;
+	@Delegate private PortafirmesFluxService delegateService;
 
-	protected void delegate(PortafirmesFluxService delegateService) {
+	protected void setDelegateService(PortafirmesFluxService delegateService) {
 		this.delegateService = delegateService;
 	}
 

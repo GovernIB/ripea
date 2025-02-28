@@ -3,27 +3,22 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.service.AvisService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de AvisService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class AvisServiceEjb implements AvisService {
+public class AvisServiceEjb extends AbstractServiceEjb<AvisService> implements AvisService {
 
-	@Delegate
-	private AvisService delegateService;
+	@Delegate private AvisService delegateService;
 
 	protected void setDelegateService(AvisService delegateService) {
 		this.delegateService = delegateService;

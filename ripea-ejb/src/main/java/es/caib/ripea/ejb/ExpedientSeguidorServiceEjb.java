@@ -3,25 +3,20 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de ExpedientSeguidorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class ExpedientSeguidorServiceEjb implements ExpedientSeguidorService {
+public class ExpedientSeguidorServiceEjb extends AbstractServiceEjb<ExpedientSeguidorService> implements ExpedientSeguidorService {
 
-	@Delegate
-	private ExpedientSeguidorService delegateService;
+ 	@Delegate private ExpedientSeguidorService delegateService;
 
 	protected void setDelegateService(ExpedientSeguidorService delegateService) {
 		this.delegateService = delegateService;

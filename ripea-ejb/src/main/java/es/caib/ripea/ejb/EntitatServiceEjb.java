@@ -3,6 +3,14 @@
  */
 package es.caib.ripea.ejb;
 
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -10,23 +18,10 @@ import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.service.EntitatService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.List;
-
-/**
- * Implementació de EntitatService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class EntitatServiceEjb implements EntitatService {
+public class EntitatServiceEjb extends AbstractServiceEjb<EntitatService> implements EntitatService {
 
-	@Delegate
-	private EntitatService delegateService;
+	@Delegate private EntitatService delegateService;
 
 	protected void setDelegateService(EntitatService delegateService) {
 		this.delegateService = delegateService;

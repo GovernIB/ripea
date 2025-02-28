@@ -3,29 +3,42 @@
  */
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.AlertaDto;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.ContingutFiltreDto;
+import es.caib.ripea.service.intf.dto.ContingutLogDetallsDto;
+import es.caib.ripea.service.intf.dto.ContingutLogDto;
+import es.caib.ripea.service.intf.dto.ContingutMassiuDto;
+import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.service.intf.dto.ContingutMovimentDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.service.intf.dto.ResultDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ContingutService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Implementació de ContenidorService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class ContingutServiceEjb implements ContingutService {
+public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> implements ContingutService {
 
-	@Delegate
-	private ContingutService delegateService;
+	@Delegate private ContingutService delegateService;
 
 	protected void setDelegateService(ContingutService delegateService) {
 		this.delegateService = delegateService;

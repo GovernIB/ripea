@@ -3,31 +3,25 @@
  */
 package es.caib.ripea.ejb;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.service.UnitatOrganitzativaService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-
-/**
- * Implementació de UnitatsOrganitzativesService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class UnitatOrganitzativaServiceEjb implements UnitatOrganitzativaService {
+public class UnitatOrganitzativaServiceEjb extends AbstractServiceEjb<UnitatOrganitzativaService> implements UnitatOrganitzativaService {
 
-	@Delegate
-	private UnitatOrganitzativaService delegateService;
+	@Delegate private UnitatOrganitzativaService delegateService;
 
-	protected void delegate(UnitatOrganitzativaService delegateService) {
+	protected void setDelegateService(UnitatOrganitzativaService delegateService) {
 		this.delegateService = delegateService;
 	}
 
-	@Override
 	@RolesAllowed("**")
 	public List<UnitatOrganitzativaDto> findByEntitat(
 			String entitatCodi) {

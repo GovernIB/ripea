@@ -10,17 +10,10 @@ import javax.ejb.Stateless;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Implementació de AplicacioService com a EJB que empra una clase
- * delegada per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
 public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> implements AplicacioService {
 
-	@Delegate
-	private AplicacioService delegateService;
+	@Delegate private AplicacioService delegateService;
 
 	protected void setDelegateService(AplicacioService delegateService) {
 		this.delegateService = delegateService;

@@ -1,26 +1,31 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.service.intf.dto.*;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.OrganGestorFiltreDto;
+import es.caib.ripea.service.intf.dto.OrganismeDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PermisOrganGestorDto;
+import es.caib.ripea.service.intf.dto.PrediccioSincronitzacio;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import lombok.experimental.Delegate;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import java.util.List;
-import java.util.Locale;
-
-/**
- * Implementació de OrganGestorService com a EJB que empra una clase delegada
- * per accedir a la funcionalitat del servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Stateless
-public class OrganGestorServiceEjb implements OrganGestorService {
+public class OrganGestorServiceEjb extends AbstractServiceEjb<OrganGestorService> implements OrganGestorService {
 
-	@Delegate
-	private OrganGestorService delegateService;
+	@Delegate private OrganGestorService delegateService;
 
 	protected void setDelegateService(OrganGestorService delegateService) {
 		this.delegateService = delegateService;
