@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.util.I18nUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.util.ReflectionUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,6 +81,7 @@ public class HalFormsConfig {
 					configurationWithEnumOptions(
 							halFormsConfigurationHolder,
 							resourceClass,
+							null,
 							field);
 				},
 				this::isEnumField);
@@ -102,7 +105,8 @@ public class HalFormsConfig {
 							field -> {
 								configurationWithEnumOptions(
 										halFormsConfigurationHolder,
-										artifact.formClass(),
+										resourceClass,
+										artifact,
 										field);
 							},
 							this::isEnumField);
@@ -127,18 +131,24 @@ public class HalFormsConfig {
 	private void configurationWithEnumOptions(
 			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
 			Class<?> resourceClass,
-			Field resourceField) {
-		log.debug("New HAL-FORMS enum options (class={}, field={})", resourceClass, resourceField.getName());
+			ResourceConfigArtifact artifact,
+			Field formField) {
+		Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
+		log.debug("New HAL-FORMS enum options (class={}, field={})", optionsResourceClass, formField.getName());
 		halFormsConfigurationHolder.setValue(
 				halFormsConfigurationHolder.getValue().withOptions(
-						resourceClass,
-						resourceField.getName(),
-						metadata -> HalFormsOptions.
-								inline(getInlineOptionsEnumConstants(resourceField)).
-								withValueField("id").
-								withPromptField("description").
-								withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
-								withMaxItems(TypeUtil.isMultipleFieldType(resourceField) ? null : 1L)));
+						optionsResourceClass,
+						formField.getName(),
+						metadata -> {
+							Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
+							return HalFormsOptions.
+									inline(getInlineOptionsEnumConstants(formField)).
+									withValueField("id").
+									withPromptField("description").
+									withMinItems(TypeUtil.isNotNullField(formField) ? 1L : 0L).
+									withMaxItems(TypeUtil.isMultipleFieldType(formField) ? null : 1L).
+									withSelectedValue(newResourceValues.get(formField.getName()));
+						}));
 	}
 
 	private void configurationWithResourceReferenceOptions(
@@ -167,12 +177,14 @@ public class HalFormsConfig {
 										artifact,
 										formField,
 										resourceControllerClasses);
+								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
 								return HalFormsOptions.
 										remote(repeatedRemoteOptionsLink).
 										withValueField("id").
 										withPromptField(getRemoteOptionsPromptField(formField)).
 										withMinItems(TypeUtil.isNotNullField(formField) ? 1L : 0L).
-										withMaxItems(TypeUtil.isCollectionFieldType(formField) ? null : 1L);
+										withMaxItems(TypeUtil.isCollectionFieldType(formField) ? null : 1L).
+										withSelectedValue(newResourceValues.get(formField.getName()));
 							}));
 		}
 	}

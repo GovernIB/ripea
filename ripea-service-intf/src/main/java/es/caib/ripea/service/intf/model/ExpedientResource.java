@@ -1,12 +1,5 @@
 package es.caib.ripea.service.intf.model;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
@@ -20,6 +13,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -118,7 +112,7 @@ public class ExpedientResource extends NodeResource {
 	public static class ExpedientFilterForm implements Serializable {
         private String numero;
         private String nom;
-        private ExpedientEstatEnumDto estat;
+        private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
