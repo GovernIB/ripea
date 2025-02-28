@@ -82,7 +82,7 @@
 					<includeLibInApplicationXml>false</includeLibInApplicationXml>
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
-					<skinnyWars>true</skinnyWars>				
+					<skinnyWars>true</skinnyWars>
 					<finalName>ripea</finalName>
 					<archive>
 						<manifestEntries>

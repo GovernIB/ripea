@@ -49,7 +49,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.3.2</version>
 				<configuration>
-					<packagingExcludes>**/RipeaBackBootApp.class,WEB-INF/lib/*.jar</packagingExcludes>
+					<packagingExcludes>**/RipeaBackBootApp.class</packagingExcludes>
 					<attachClasses>true</attachClasses>
 					<archive>
 						<manifestEntries>
