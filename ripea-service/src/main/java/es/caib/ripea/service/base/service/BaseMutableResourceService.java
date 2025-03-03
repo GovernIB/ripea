@@ -8,7 +8,9 @@ import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.base.util.CompositePkUtil;
 import es.caib.ripea.service.intf.base.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.Hibernate;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +20,6 @@ import org.springframework.util.ReflectionUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -493,17 +494,19 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			Map<String, AnswerRequiredException.AnswerValue> answers,
 			int level) {
 		Map<String, Object> changes = new HashMap<>();
-		R target = (R)Proxy.newProxyInstance(
-				getClass().getClassLoader(),
-				new Class[] { getResourceClass() },
-				(o, method, objects) -> {
-					if (method.getName().startsWith("set")) {
-						String fieldName1 = StringUtil.decapitalize(
-								method.getName().substring("set".length()));
-						changes.put(fieldName1, objects[0]);
-					}
-					return null;
-				});
+		ProxyFactory factory = new ProxyFactory(newResourceInstance());
+		factory.setProxyTargetClass(true);
+		factory.addAdvice((MethodInterceptor) invocation -> {
+			String methodName = invocation.getMethod().getName();
+			Object[] arguments = invocation.getArguments();
+			if (methodName.startsWith("set") && arguments.length > 0) {
+				changes.put(
+						StringUtil.decapitalize(methodName.substring("set".length())),
+						arguments[0]);
+			}
+			return invocation.proceed();
+		});
+		R target = (R)factory.getProxy();
 		if (onChangeLogicProcessorMap.get(fieldName) != null) {
 			onChangeLogicProcessorMap.get(fieldName).processOnChangeLogic(
 					previous,

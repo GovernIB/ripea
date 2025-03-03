@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * @author Límit Tecnologies
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 public @interface ResourceField {
 
 	public String type() default "";

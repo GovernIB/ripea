@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -56,6 +57,7 @@ public class ExpedientResource extends NodeResource {
 	private String numero;
 
 	@NotNull
+	@ResourceField(onChangeActive = true)
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
