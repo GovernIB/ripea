@@ -78,6 +78,11 @@ public abstract class ContingutResourceEntity extends BaseOnlyAuditableEntity {
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_contingut_fk"))
 	protected EntitatResourceEntity entitat;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "expedient_id")
+    @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_contingut_fk")
+    protected ExpedientResourceEntity expedient;
+
 	@OneToMany(
 			mappedBy = "pare",
 			fetch = FetchType.LAZY,

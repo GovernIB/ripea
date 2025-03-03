@@ -36,6 +36,7 @@ const InteressatsGrid: React.FC = () => {
             height={5}
             filter={`expedient.id:${id}`}
             titleDisabled
+            readOnly
         />
     </GridPage>
 }

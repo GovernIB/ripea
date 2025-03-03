@@ -26,6 +26,15 @@ const translationEs = {
                 tasques: "Tareas",
             }
         },
+        anotacio:{
+            tabs:{
+                resum: 'Resumen',
+                estat: 'Estado',
+                registre: 'Información registro',
+                interessats: 'Interesados',
+                annexos: 'Annexos',
+            },
+        },
         notFound: "No encontrado",
     }
 };

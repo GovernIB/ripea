@@ -38,5 +38,6 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 	
 	@NotNull
 	protected ResourceReference<EntitatResource, Long> entitat;
+	protected ResourceReference<ExpedientResource, Long> expedient;
 	protected ResourceReference<ContingutResource, Long> pare;
 }

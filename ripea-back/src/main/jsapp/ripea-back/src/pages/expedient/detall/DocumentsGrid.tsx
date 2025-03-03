@@ -2,10 +2,12 @@ import {
     GridPage,
     MuiGrid,
 } from 'reactlib';
-// import {useParams} from "react-router-dom";
+import ContingutActionButton from "./ContingutActionButton.tsx";
+import React from "react";
+import {useParams} from "react-router-dom";
 
 const DocumentsGrid: React.FC = () => {
-    // const { id } = useParams();
+    const { id } = useParams();
 
     const columns = [
         {
@@ -31,6 +33,16 @@ const DocumentsGrid: React.FC = () => {
             field: 'createdBy',
             flex: 0.5,
         },
+        {
+            field: 'id',
+            headerName: '',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.5,
+            renderCell: (params: any) => {
+                return <ContingutActionButton entity={params?.row}/>;
+            }
+        },
     ];
     return <GridPage>
         <MuiGrid
@@ -38,8 +50,9 @@ const DocumentsGrid: React.FC = () => {
             columns={columns}
             paginationActive
             height={5}
-            // filter={`expedient.id:${id}`}
+            filter={`expedient.id:${id}`}
             titleDisabled
+            readOnly
         />
     </GridPage>
 }

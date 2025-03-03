@@ -11,6 +11,8 @@ import TabComponent from "../../components/TabComponent";
 import InteressatsGrid from "./detall/InteressatsGrid.tsx";
 import DocumentsGrid from "./detall/DocumentsGrid.tsx";
 import TasquesGrid from "./detall/TasquesGrid.tsx";
+import AnotacionsGrid from "./detall/AnotacionsGrid.tsx";
+import ExpedientActionButton from "./ExpedientActionButton.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -67,7 +69,7 @@ const Expedient: React.FC = () => {
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
-            content: <Typography>{t('page.contingut.tabs.anotacions')}</Typography>,
+            content: <AnotacionsGrid/>,
         },
         {
             value: "versions",
@@ -105,6 +107,8 @@ const Expedient: React.FC = () => {
                             <CardProp title={t('page.contingut.detalle.prioritat')}
                                       sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>{expedient.prioritat}</CardProp>
                             <CardProp title={t('page.contingut.detalle.clasificacio')}>{expedient.ntiClasificacionSia}</CardProp>
+
+                            <ExpedientActionButton entity={expedient}/>
                         </CardContent>
                     </Card>
                 </Grid>
