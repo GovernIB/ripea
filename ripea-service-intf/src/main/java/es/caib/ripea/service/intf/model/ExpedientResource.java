@@ -23,12 +23,16 @@ import java.util.Date;
 		quickFilterFields = { "numero", "nom" },
 		artifacts = {
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class)
 		})
 public class ExpedientResource extends NodeResource {
 
+	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
 	@NotNull

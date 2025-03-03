@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Servei amb la funcionalitat básica per a la gestió d'un recurs en mode només lectura.
@@ -68,15 +69,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		R response = entityToResource(entity);
 		afterConversion(entity, response);
 		if (perspectives != null) {
-			R perspectivesResponse = applyPerspectives(entity, response, perspectives);
-			if (perspectivesResponse != null) {
-				return perspectivesResponse;
-			} else {
-				return response;
-			}
-		} else {
-			return response;
+			applyPerspectives(entity, response, perspectives);
 		}
+		return response;
 	}
 
 	@Override
@@ -111,16 +106,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				resultat.getTotalElements());
 		afterConversion(resultat.getContent(), response.getContent());
 		if (perspectives != null) {
-			List<R> perspectivesResponse = applyPerspectives(
+			applyPerspectives(
 					resultat.getContent(),
 					response.getContent(),
 					perspectives);
-			if (perspectivesResponse != null) {
-				response = new PageImpl<>(
-						perspectivesResponse,
-						pageable,
-						response.getTotalElements());
-			}
 		}
 		long elapsedConversion = System.currentTimeMillis() - t0;
 		log.debug(
@@ -272,20 +261,40 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return resultat;
 	}
 
-	protected List<R> applyPerspectives(
+	protected void applyPerspectives(
 			List<E> entities,
 			List<R> resources,
 			String[] perspectives) {
-		List<R> resourcesWithPerspectives = new ArrayList<>();
-		for (int i = 0; i < entities.size(); i++) {
-			R resourceWithPerspectives = applyPerspectives(entities.get(i), resources.get(i), perspectives);
-			if (resourceWithPerspectives != null) {
-				resourcesWithPerspectives.add(resourceWithPerspectives);
+		Arrays.stream(perspectives).forEach(p -> {
+			PerspectiveApplicator<R, E> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			if (perspectiveApplicator != null) {
+				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
+				if (!modified) {
+					IntStream.range(0, entities.size()).forEach(i -> {
+						perspectiveApplicator.applySingle(
+								p,
+								entities.get(i),
+								resources.get(i));
+					});
+				}
 			} else {
-				resourcesWithPerspectives.add(resources.get(i));
+				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
 			}
-		}
-		return resourcesWithPerspectives;
+		});
+	}
+
+	protected void applyPerspectives(
+			E entity,
+			R resource,
+			String[] perspectives) {
+		Arrays.stream(perspectives).forEach(p -> {
+			PerspectiveApplicator<R, E> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			if (perspectiveApplicator != null) {
+				perspectiveApplicator.applySingle(p, entity, resource);
+			} else {
+				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
+			}
+		});
 	}
 
 	protected Specification<E> toProcessedSpecification(
@@ -403,13 +412,6 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	protected String additionalSpringFilter(
 			String currentSpringFilter,
 			String[] namedQueries) {
-		return null;
-	}
-
-	protected R applyPerspectives(
-			E entity,
-			R resource,
-			String[] perspectives) {
 		return null;
 	}
 

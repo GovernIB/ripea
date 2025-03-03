@@ -1,21 +1,32 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "id, titol" }, descriptionField = "titol")
+@ResourceConfig(
+        quickFilterFields = { "id, titol" },
+        descriptionField = "titol",
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE)
+        })
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {
+
+    public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
 
     private Long id;
     private Date dataInici;
