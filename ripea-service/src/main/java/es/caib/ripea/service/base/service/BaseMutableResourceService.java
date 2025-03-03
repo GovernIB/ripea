@@ -117,7 +117,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		return onChangeLogicProcessRecursive(
 				previous,
 				fieldName,
-				fieldName,
+				fieldValue,
 				answers,
 				0);
 	}
