@@ -10,7 +10,7 @@ type TabComponentProps = {
     tabs: TabProps[];
 };
 
-function TabPanel(props) {
+const TabPanel = (props:any) => {
     const { children, value, index, ...other } = props;
 
     return (
@@ -45,7 +45,7 @@ const TabComponent: React.FC<TabComponentProps> = (props :TabComponentProps) => 
             {...other}
             sx={{px: 1}}
         >
-            {tabs.map((tab) => <Tab label={tab.label} value={tab.value} key={"tab-"+tab.value}/>)}
+            {tabs.map((tab) => <Tab {...tab}  key={"tab-"+tab.value}/>)}
         </Tabs>
 
         {tabs.map((tab) =>

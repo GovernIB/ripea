@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -105,7 +106,9 @@ public class ExpedientResource extends NodeResource {
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
-    private String interessatsResum;
+    private List<InteressatResource> interessats;
+    private int numComentaris;
+    private int numSeguidors;
     public String getTipusStr() {
         return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
     }
@@ -120,7 +123,7 @@ public class ExpedientResource extends NodeResource {
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
-        private LocalDateTime dataCreacioInici;
+        private LocalDateTime dataCreacioInici = LocalDateTime.now();
         private LocalDateTime dataCreacioFinal;
 
         private String numeroRegistre;

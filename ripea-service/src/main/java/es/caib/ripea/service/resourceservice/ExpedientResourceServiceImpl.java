@@ -1,20 +1,26 @@
 package es.caib.ripea.service.resourceservice;
 
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -27,42 +33,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
 
-	private final InteressatResourceRepository interessatResourceRepository;
+    private final MetaExpedientResourceRepository metaExpedientResourceRepository;
 
-	@PostConstruct
+    @PostConstruct
 	public void init() {
 		register("INTERESSATS_RESUM", new InteressatsPerspectiveApplicator());
 		register("metaExpedient", new MetaExpedientOnchangeLogicProcessor());
 	}
 
+    @Override
+    protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
+        resource.setNumComentaris(entity.getComentaris().size());
+        resource.setNumSeguidors(entity.getSeguidors().size());
+    }
+
 	private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResource, ExpedientResourceEntity> {
 		@Override
 		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-			List<InteressatResource> interessats= interessatResourceRepository.findByExpedient(entity).stream()
-					.map(interessatResourceEntity -> objectMappingHelper.newInstanceMap(interessatResourceEntity, InteressatResource.class))
-					.collect(Collectors.toList());
-			StringBuilder interessatsResum = new StringBuilder();
-			if (!interessats.isEmpty()) {
-				for (InteressatResource interessat: interessats) {
-					switch (interessat.getTipus()) {
-						case InteressatPersonaFisicaEntity:
-							interessatsResum.append(interessat.getNom() == null ? "" : interessat.getNom() + " ");
-							interessatsResum.append(interessat.getLlinatge1() == null ? "" : interessat.getLlinatge1() + " ");
-							interessatsResum.append(interessat.getLlinatge2() == null ? "" : interessat.getLlinatge2() + " ");
-							interessatsResum.append("(").append(interessat.getDocumentNum()).append(")").append("\n");
-							break;
-						case InteressatPersonaJuridicaEntity:
-							interessatsResum.append(interessat.getRaoSocial()).append(" ");
-							interessatsResum.append("(").append(interessat.getDocumentNum()).append(")").append("\n");
-							break;
-						case InteressatAdministracioEntity:
-							interessatsResum.append(interessat.getNomComplet()).append(" ");
-							interessatsResum.append("(").append(interessat.getDocumentNum()).append(")").append("\n");
-							break;
-					}
-				}
-			}
-			resource.setInteressatsResum(interessatsResum.toString());
+			List<InteressatResource> interessats= entity.getInteressats().stream()
+                    .map(interessatResourceEntity -> objectMappingHelper.newInstanceMap(interessatResourceEntity, InteressatResource.class))
+                    .collect(Collectors.toList());
+            resource.setInteressats(interessats);
 		}
 	}
 
@@ -75,7 +66,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				Map<String, AnswerRequiredException.AnswerValue> answers,
 				ExpedientResource target) {
 
+            Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional =
+                    metaExpedientResourceRepository.findById(previous.getMetaExpedient().getId());
+
+            metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity)->{
+                MetaExpedientResource metaExpedientResource =
+                        objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+                target.setOrganGestor(metaExpedientResource.getOrganGestor());
+//                target.getSequencia(metaExpedientResource);
+            });
 		}
 	}
-
 }

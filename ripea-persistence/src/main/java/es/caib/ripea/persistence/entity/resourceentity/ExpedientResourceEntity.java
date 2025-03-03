@@ -108,20 +108,20 @@ public class ExpedientResourceEntity extends NodeResourceEntity implements Resou
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_rel_rel_fk"))
 	protected List<ExpedientResourceEntity> relacionatsPer = new ArrayList<>();
 
-//	@OneToMany(mappedBy = "expedient")
-//	private List<ExpedientPeticioEntity> peticions = new ArrayList<ExpedientPeticioEntity>();
-//
-//	@OneToMany(
-//			mappedBy = "expedient",
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//	private List<ExpedientTascaEntity> tasques = new ArrayList<ExpedientTascaEntity>();
-//
-//	@OneToMany(
-//			mappedBy = "expedient",
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//	private List<ExpedientComentariEntity> comentaris = new ArrayList<ExpedientComentariEntity>();
+	@OneToMany(mappedBy = "expedient")
+	private List<ExpedientPeticioResourceEntity> peticions = new ArrayList<ExpedientPeticioResourceEntity>();
+
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientTascaResourceEntity> tasques = new ArrayList<ExpedientTascaResourceEntity>();
+
+	@OneToMany(
+			mappedBy = "expedient",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<ExpedientComentariResourceEntity> comentaris = new ArrayList<ExpedientComentariResourceEntity>();
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(

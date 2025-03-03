@@ -2,19 +2,33 @@ import React, {useState} from 'react';
 import {
     GridPage,
     MuiGrid,
-    MuiFilter,
-    FormField,
-    useFilterApiRef,
 } from 'reactlib';
-import {Button, Box, Typography, Grid} from "@mui/material";
+import {Button, Box, Typography, Icon, Grid} from "@mui/material";
 import {formatDate} from '../../util/dateUtils';
-import * as builder from '../../util/springFilterUtils';
-import { Icon } from '@mui/material';
+import ExpedientActionButton from "./ExpedientActionButton.tsx";
+import {useNavigate} from "react-router-dom";
+import CommentDialog from "./CommentDialog.tsx";
+import ExpedientFilter from "./ExpedientFilter.tsx";
+import GridFormField from "../../components/GridFormField.tsx";
+import {useFormContext} from "../../../lib/components/form/FormContext.tsx";
+
+const ExpedientGridForm = () => {
+    const formContext = useFormContext();
+    const {data} = formContext;
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        {!data?.id && <GridFormField xs={12} name="metaExpedient"/>}
+        <GridFormField xs={12} name="nom" />
+        <GridFormField xs={12} name="organGestor" disabled={!!data?.id}/>
+        <GridFormField xs={12} name="sequencia" disabled/>
+        <GridFormField xs={12} name="any"/>
+        <GridFormField xs={12} name="prioritat"/>
+    </Grid>
+}
 
 const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
+    let navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState("");
-    const filterRef = useFilterApiRef();
 
     const columns = [
         {
@@ -28,6 +42,8 @@ const ExpedientGrid: React.FC = () => {
         {
             field: 'avisos',
             headerName: 'Avisos',
+            sortable: false,
+            disableColumnMenu: true,
             flex: 0.5,
             renderCell: (params: any) => (<>
                 {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
@@ -66,112 +82,93 @@ const ExpedientGrid: React.FC = () => {
             }
         },
         {
-            field: 'interessatsResum',
+            field: 'interessats',
             flex: 1,
+            valueFormatter: (value: any) => {
+                let resum='';
+                for(const interessat of value){
+                    switch (interessat.tipus) {
+						case 'InteressatPersonaFisicaEntity':
+							resum += interessat?.nom == null ? "" : interessat?.nom + " ";
+							resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
+							resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
+							resum += "("+interessat?.documentNum+")"+"\n";
+							break;
+						case 'InteressatPersonaJuridicaEntity':
+							resum += interessat?.raoSocial+" ";
+							resum += "("+interessat?.documentNum+")"+"\n";
+							break;
+						case 'InteressatAdministracioEntity':
+							resum += interessat?.nomComplet+" ";
+							resum += "("+interessat?.documentNum+")"+"\n";
+							break;
+					}
+                }
+                return resum;
+            }
         },
         {
             field: 'grup',
             flex: 0.5,
+            sortable: false,
+            disableColumnMenu: true,
             valueFormatter: (value: any) => {
                 return value?.description;
             }
         },
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.5,
+            renderCell: (params: any)=> {
+                return <CommentDialog entity={params?.row}/>;
+            }
+        },
+        {
+            field: 'numSeguidors',
+            headerName: '',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.5,
+            renderCell: (params: any)=> {
+                return (<Button variant="contained" sx={{borderRadius: 1}} color={"inherit"}><Icon>people</Icon>{params.row.numSeguidors}</Button>);
+            }
+        },
+        {
+            field: 'id',
+            headerName: '',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 1,
+            renderCell: (params: any) => {
+                return <ExpedientActionButton entity={params?.row}/>;
+            }
+        },
     ];
 
-    const springFilterBuilder = (data: any) :string => {
-        let filterStr :string = '';console.log(data)
-        filterStr += builder.and(
-            builder.like("numero", data?.numero),
-            builder.like("nom", data.nom),
-            data.estat && builder.equals("estat",`'TANCAT'`, (data.estat==='TANCAT')),
-            builder.exists(
-                builder.or(
-                    builder.like("interessats.documentNum", data.interessat),
-                    builder.like(builder.concat("interessats.nom", "interessats.llinatge1", "interessats.llinatge2"), data.interessat),
-                    builder.like("interessats.raoSocial", data.interessat),
-                    builder.like("interessats.organNom", data.interessat)
-                )
-            ),
-            builder.eq("organGestor.id", data.organGestor?.id),
-            builder.eq("metaExpedient.id", data.metaExpedient?.id),
-            builder.between("createdDate", `'${data.dataCreacioInici}'`, `'${data.dataCreacioFinal}'`),
-
-            builder.like("registresImportats", data.numeroRegistre),
-            builder.eq("grup.codi", data.grup?.id),
-            builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
-
-            data.agafat && builder.equals("agafatPer", null, (data.agafat === 'false')),
-            // data.pendentFirmar && (
-            //     builder.exists(
-            //         builder.and(
-            //             builder.or(
-            //                 builder.equals("DocumentPortafirmesEntity.estat", `'PENDENT'`, (data.pendentFirmar === 'true')),
-            //                 builder.equals("DocumentPortafirmesEntity.estat", `'ENVIAT'`, (data.pendentFirmar === 'true')),
-            //             ),
-            //             builder.equals("DocumentPortafirmesEntity.error", false, (data.pendentFirmar === 'true')),
-            //         )
-            //     )
-            // )
-        )
-        console.log('>>> springFilterBuilder:', filterStr)
-        return filterStr;
-    }
-    const cercar = ()=> {
-        filterRef.current.filter()
-    }
-    const netejar = ()=> {
-        filterRef.current.clear()
-    }
-    const fieldProps={sx: {backgroundColor: 'white'}}
     return <GridPage>
         <div style={{border: '1px solid #e3e3e3'}}>
             <Box sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3', p: 1}}>
                 <Typography variant="h5">Buscador de expedientes</Typography>
             </Box>
-            <MuiFilter
-                resourceName="expedientResource"
-                code="EXPEDIENT_FILTER"
-                springFilterBuilder={springFilterBuilder}
-                commonFieldComponentProps={{size: 'small'}}
-                componentProps={{
-                    sx: {m: 3, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: 1}
-                }}
-                apiRef={filterRef}
-                onSpringFilterChange={setSpringFilter}
-                buttonControlled
-                container
-            >
-                <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                    <Grid item xs={2}><FormField name="numero" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={4}><FormField name="nom" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="estat" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="interessat" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="organGestor" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="metaExpedient" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="dataCreacioInici" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="dataCreacioFinal" componentProps={fieldProps}/></Grid>
 
-                    <Grid item xs={2}><FormField name="numeroRegistre" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="grup" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={3}><FormField name="agafatPer" componentProps={fieldProps}/></Grid>
+            <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
 
-                    <Grid item xs={2}><FormField name="agafat" componentProps={fieldProps}/></Grid>
-                    <Grid item xs={2}><FormField name="pendentFirmar" componentProps={fieldProps}/></Grid>
-
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-                        <Button onClick={netejar}><Icon>eraser</Icon> Netejar</Button>
-                        <Button onClick={cercar} variant="contained"><Icon>filter_alt</Icon> Cercar</Button>
-                    </Grid>
-                </Grid>
-            </MuiFilter>
             <MuiGrid
                 resourceName="expedientResource"
                 columns={columns}
                 paginationActive
                 filter={springFilter}
-                rowUpdateLink={"/contingut/{{id}}"}
                 sortModel={[{field: 'createdDate', sort: 'desc'}]}
                 perspectives={["INTERESSATS_RESUM"]}
+                titleDisabled
+                popupEditCreateActive
+                popupEditFormDialogTitle={"Crear nuevo expediente"}
+                popupEditFormContent={<ExpedientGridForm/>}
+                // readOnly
+                onRowDoubleClick={(prop)=>navigate(`/contingut/${prop?.id}`)}
             />
         </div>
     </GridPage>
