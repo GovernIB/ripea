@@ -344,7 +344,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@RequestBody(required = false)
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		Object paramsObject = getArtifactParamsAsObjectWithFormClass(
+		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
 				ResourceArtifactType.ACTION,
 				code,
 				params,

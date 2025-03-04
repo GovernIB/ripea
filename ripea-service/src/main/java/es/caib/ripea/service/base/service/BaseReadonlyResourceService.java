@@ -1,7 +1,9 @@
 package es.caib.ripea.service.base.service;
 
+import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.persistence.base.repository.BaseRepository;
 import es.caib.ripea.service.base.helper.ObjectMappingHelper;
+import es.caib.ripea.service.base.helper.ResourceEntityMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
@@ -35,38 +37,41 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Servei amb la funcionalitat básica per a la gestió d'un recurs en mode només lectura.
+ * Servei amb la funcionalitat básica per a la gestió d'un recurs que només es pot consultar.
  *
  * @param <R> classe del recurs.
  * @param <ID> classe de la clau primària del recurs.
+ * @param <E> classe de l'entitat de base de dades del recurs.
  *
  * @author Límit Tecnologies
  */
 @Slf4j
-public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID extends Serializable, E extends Persistable<ID>>
+public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID extends Serializable, E extends ResourceEntity<R, ID>>
 		implements ReadonlyResourceService<R, ID> {
 
 	@Autowired
-	protected BaseRepository<E, ID> resourceRepository;
+	protected BaseRepository<E, ID> entityRepository;
 	@Autowired
 	protected ObjectMappingHelper objectMappingHelper;
+	@Autowired
+	protected ResourceEntityMappingHelper resourceEntityMappingHelper;
 
 	private Class<R> resourceClass;
 	private Class<E> entityClass;
+	private final Map<String, ReportDataGenerator<?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
 	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>();
 	private final Map<String, PerspectiveApplicator<R, E>> perspectiveApplicatorMap = new HashMap<>();
-	private final Map<String, ReportDataGenerator<?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
 
 	@Override
 	@Transactional(readOnly = true)
 	public R getOne(
 			ID id,
 			String[] perspectives) throws ResourceNotFoundException {
-		log.debug("Consultant recurs amb id (id={}, perspectives={})", id, perspectives);
+		log.debug("Getting single resource (id={}, perspectives={})", id, perspectives);
 		beforeGetOne(perspectives);
 		E entity = getEntity(id, perspectives);
 		beforeConversion(entity);
-		R response = entityToResource(entity);
+		R response = resourceEntityMappingHelper.entityToResource(entity, getResourceClass());
 		afterConversion(entity, response);
 		if (perspectives != null) {
 			applyPerspectives(entity, response, perspectives);
@@ -84,15 +89,17 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			Pageable pageable) {
 		long t0 = System.currentTimeMillis();
 		log.debug(
-				"Consulta de pàgina d'entitats amb filtre i paginació (filter={}, namedQueries={}, perspectives={}, pageable={})",
+				"Querying entities page with filter and pagination (quickFilter={}, filter={}, namedQueries={}, perspectives={}, pageable={})",
+				quickFilter,
 				filter,
 				Arrays.toString(namedQueries),
 				Arrays.toString(perspectives),
 				pageable);
 		beforeFind(
+				quickFilter,
 				filter,
 				namedQueries,
-				perspectives);
+				pageable);
 		Page<E> resultat = internalFindEntities(
 				quickFilter,
 				filter,
@@ -113,7 +120,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 		long elapsedConversion = System.currentTimeMillis() - t0;
 		log.debug(
-				"Temps consumit en la consulta (database={}ms, conversion={}ms)",
+				"Query elapsed time (database={}ms, conversion={}ms)",
 				elapsedDatabase,
 				elapsedConversion);
 		return response;
@@ -188,10 +195,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	@Override
 	@Transactional(readOnly = true)
 	public <P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException {
-		log.debug(
-				"Generant l'informe(code={}, params={})",
-				code,
-				params);
+		log.debug("Generating report (code={}, params={})", code, params);
 		ReportDataGenerator<P, ?> generator = (ReportDataGenerator<P, ?>)reportDataGeneratorMap.get(code);
 		if (generator != null) {
 			return generator.generate(code, params);
@@ -205,9 +209,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		Specification<E> pkSpec = new PkSpec<>(id);
 		String additionalSpringFilter = additionalSpringFilter(null, null);
 		if (additionalSpringFilter != null && !additionalSpringFilter.trim().isEmpty()) {
-			result = resourceRepository.findOne(pkSpec.and(getSpringFilterSpecification(additionalSpringFilter)));
+			result = entityRepository.findOne(pkSpec.and(getSpringFilterSpecification(additionalSpringFilter)));
 		} else {
-			result = resourceRepository.findOne(pkSpec);
+			result = entityRepository.findOne(pkSpec);
 		}
 		if (result.isPresent()) {
 			return result.get();
@@ -236,13 +240,13 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			if (pageable.isUnpaged()) {
 				Sort processedSort = toProcessedSort(
 						addDefaultSort(pageable.getSort()));
-				List<E> resultList = resourceRepository.findAll(
+				List<E> resultList = entityRepository.findAll(
 						processedSpecification,
 						processedSort);
 				resultat = new PageImpl<E>(resultList, pageable, resultList.size());
 			} else {
 				Pageable processedPageable = toProcessedPageableSort(pageable);
-				resultat = resourceRepository.findAll(
+				resultat = entityRepository.findAll(
 						processedSpecification,
 						processedPageable);
 			}
@@ -251,11 +255,11 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			if (pageable.isUnpaged()) {
 				Sort processedSort = toProcessedSort(
 						addDefaultSort(pageable.getSort()));
-				List<E> resultList = resourceRepository.findAll(processedSort);
+				List<E> resultList = entityRepository.findAll(processedSort);
 				resultat = new PageImpl<>(resultList, pageable, resultList.size());
 			} else {
 				Pageable processedPageable = toProcessedPageableSort(pageable);
-				resultat = resourceRepository.findAll(processedPageable);
+				resultat = entityRepository.findAll(processedPageable);
 			}
 		}
 		return resultat;
@@ -264,7 +268,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	protected void applyPerspectives(
 			List<E> entities,
 			List<R> resources,
-			String[] perspectives) {
+			String[] perspectives) throws ArtifactNotFoundException {
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<R, E> perspectiveApplicator = perspectiveApplicatorMap.get(p);
 			if (perspectiveApplicator != null) {
@@ -297,11 +301,11 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		});
 	}
 
-	protected Specification<E> toProcessedSpecification(
+	protected <P> Specification<P> toProcessedSpecification(
 			String quickFilter,
 			String filter,
 			String[] namedFilters) {
-		Specification<E> processedSpecification = getSpringFilterSpecification(
+		Specification<P> processedSpecification = getSpringFilterSpecification(
 				buildSpringFilterForQuickFilter(
 						getResourceClass(),
 						null,
@@ -315,7 +319,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 						additionalSpringFilter(filter, namedFilters)));
 		if (namedFilters != null) {
 			for (String namedFilter: namedFilters) {
-				Specification<E> namedSpecification = null;
+				Specification<P> namedSpecification = null;
 				String namedSpringFilter = namedFilterToSpringFilter(namedFilter);
 				if (namedSpringFilter != null) {
 					namedSpecification = getSpringFilterSpecification(namedSpringFilter);
@@ -327,21 +331,21 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 						namedSpecification);
 			}
 		}
-		Specification<E> finalSpecification = processSpecification(processedSpecification);
+		Specification<P> finalSpecification = processSpecification(processedSpecification);
 		return finalSpecification != null ? finalSpecification : Specification.where(null);
 	}
 
-	protected Specification<E> getSpringFilterSpecification(String springFilter) {
+	protected <P> Specification<P> getSpringFilterSpecification(String springFilter) {
 		if (springFilter != null) {
-			return new FilterSpecification<E>(springFilter);
+			return new FilterSpecification<P>(springFilter);
 		} else {
 			return null;
 		}
 	}
 
-	protected Specification<E> appendSpecificationWithAnd(
-			Specification<E> currentSpecification,
-			Specification<E> specification) {
+	protected <P> Specification<P> appendSpecificationWithAnd(
+			Specification<P> currentSpecification,
+			Specification<P> specification) {
 		if (specification != null) {
 			if (currentSpecification != null) {
 				return currentSpecification.and(specification);
@@ -387,14 +391,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return null;
 	}
 
-	protected R entityToResource(E entity) {
-		return objectMappingHelper.newInstanceMap(
-				entity,
-				getResourceClass());
-	}
 	protected List<R> entitiesToResources(List<E> entities) {
 		return entities.stream().
-				map(this::entityToResource).
+				map(e -> resourceEntityMappingHelper.entityToResource(e, getResourceClass())).
 				collect(Collectors.toList());
 	}
 
@@ -418,25 +417,20 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	protected String namedFilterToSpringFilter(String name) {
 		return null;
 	}
-	protected Specification<E> namedFilterToSpecification(String name) {
+	protected <P> Specification<P> namedFilterToSpecification(String name) {
 		return null;
 	}
 
-	protected Specification<E> processSpecification(Specification<E> specification) {
+	protected <P> Specification<P> processSpecification(Specification<P> specification) {
 		return specification;
-	}
-
-	protected Sort getSortWithPerspectives(
-			String[] perspectives,
-			Sort currentSort) {
-		return null;
 	}
 
 	protected void beforeGetOne(String[] perspectives) {}
 	protected void beforeFind(
+			String quickFilter,
 			String springFilter,
 			String[] namedQueries,
-			String[] perspectives) {}
+			Pageable pageable) {}
 	protected void beforeConversion(E entity) {}
 	protected void afterConversion(E entity, R resource) {}
 	protected void beforeConversion(List<E> entities) {
@@ -722,7 +716,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					springFilter.append(filterFieldPrefix);
 				}
 				springFilter.append(fieldName);
-				springFilter.append('~');
+				springFilter.append("~~");
 				springFilter.append("'");
 				springFilter.append("*");
 				springFilter.append(cleanReservedFilterCharacters(quickFilter));
@@ -788,7 +782,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 *
 	 * @param <R> classe del recurs suportat.
 	 */
-	public interface PerspectiveApplicator <R extends Resource<?>, E extends Persistable<?>> {
+	public interface PerspectiveApplicator <R extends Resource<?>, E extends ResourceEntity<R, ?>> {
 		/**
 		 * Aplica la perspectiva a múltiples recursos. Es pot sobreescriure o deixar sense implementar.
 		 * Si es deixa sense implementar s'aplicarà la perspectiva a cada recurs per separat.
@@ -833,7 +827,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
 	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
+	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<R> {
 		/**
 		 * Genera les dades per l'informe.
 		 *

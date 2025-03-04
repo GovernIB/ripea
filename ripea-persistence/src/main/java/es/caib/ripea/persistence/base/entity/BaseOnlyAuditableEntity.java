@@ -15,8 +15,6 @@ import java.time.LocalDateTime;
 /**
  * Base per a definir les demés entitats de l'aplicació.
  *
- * @param <R> classe del recurs associat.
- *
  * @author Límit Tecnologies
  */
 @Getter

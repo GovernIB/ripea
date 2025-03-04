@@ -1,28 +1,23 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
-import es.caib.ripea.service.intf.model.ExpedientTascaResource;
+import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "expedient_peticio")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ExpedientPeticioResourceEntity extends BaseAuditableEntity<ExpedientTascaResource> {
+public class ExpedientPeticioResourceEntity extends BaseAuditableEntity<ExpedientPeticioResource> {
 
     @Column(name = "identificador", nullable = false)
     String identificador;

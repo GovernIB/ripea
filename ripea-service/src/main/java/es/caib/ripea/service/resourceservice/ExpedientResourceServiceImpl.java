@@ -56,7 +56,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     @Override
-    protected void beforeCreateSave(ExpedientResourceEntity entity, ExpedientResource resource) {
+    protected void beforeCreateSave(
+            ExpedientResourceEntity entity,
+            ExpedientResource resource,
+            Map<String, AnswerRequiredException.AnswerValue> answers) {
         entity.setCodi(entity.getMetaExpedient().getCodi());
         entity.setEntitat(entity.getMetaExpedient().getEntitat());
         entity.setEstat(ExpedientEstatEnumDto.OBERT);
@@ -69,7 +72,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     @Override
-    protected void afterCreateSave(ExpedientResourceEntity entity, ExpedientResource resource) {
+    protected void afterCreateSave(
+            ExpedientResourceEntity entity,
+            ExpedientResource resource,
+            Map<String, AnswerRequiredException.AnswerValue> answers,
+            boolean anyOrderChanged) {
         Optional<MetaExpedientSequenciaResourceEntity> metaExpedientSequenciaResourceEntity
                 = metaExpedientSequenciaResourceRepository.findByMetaExpedientAndAny(entity.getMetaExpedient(), resource.getAny());
 
@@ -106,6 +113,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 String fieldName,
                 Object fieldValue,
                 Map<String, AnswerRequiredException.AnswerValue> answers,
+                String[] previousFieldNames,
                 ExpedientResource target) {
 
             if (fieldValue != null) {
@@ -144,6 +152,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 String fieldName,
                 Object fieldValue,
                 Map<String, AnswerRequiredException.AnswerValue> answers,
+                String[] previousFieldNames,
                 ExpedientResource target) {
 
             if (fieldValue != null && previous.getMetaExpedient() != null) {

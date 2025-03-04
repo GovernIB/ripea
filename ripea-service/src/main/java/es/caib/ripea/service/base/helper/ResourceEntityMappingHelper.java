@@ -1,0 +1,176 @@
+package es.caib.ripea.service.base.helper;
+
+import es.caib.ripea.persistence.base.entity.ResourceEntity;
+import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
+import es.caib.ripea.service.intf.base.model.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Persistable;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
+
+/**
+ * Mètodes per a transformar recursos en entitats i a l'inrevés.
+ *
+ * @author Límit Tecnologies
+ */
+@Component
+public class ResourceEntityMappingHelper {
+
+	private final ObjectMappingHelper objectMappingHelper;
+
+	@Autowired
+	public ResourceEntityMappingHelper(ObjectMappingHelper objectMappingHelper) {
+		this.objectMappingHelper = objectMappingHelper;
+	}
+
+	public <E extends ResourceEntity<R, ?>, R extends Resource<?>> E resourceToEntity(
+			R resource,
+			Serializable pkFromResource,
+			Class<E> entityClass,
+			Map<String, Persistable<?>> referencedEntities) throws ResourceNotCreatedException {
+		Method builderMethod = ReflectionUtils.findMethod(entityClass, "builder");
+		if (builderMethod != null) {
+			Object builderInstance = ReflectionUtils.invokeMethod(builderMethod, null);
+			Class<?> builderReturnType = builderMethod.getReturnType();
+			boolean builderMethodCalled = callBuilderMethodForResource(
+					resource,
+					entityClass,
+					builderInstance,
+					builderReturnType);
+			if (referencedEntities != null) {
+				// Es criden els altres mètodes del builder que accepten només 1 argument de tipus Persistable
+				for (Method builderCallableMethod: ReflectionUtils.getDeclaredMethods(builderReturnType)) {
+					if (builderCallableMethod.getParameterTypes().length == 1) {
+						String builderMethodName = builderCallableMethod.getName();
+						Class<?> builderMethodArgType = builderCallableMethod.getParameterTypes()[0];
+						if (Persistable.class.isAssignableFrom(builderMethodArgType)) {
+							Persistable<?> referencedEntity = referencedEntities.get(builderMethodName);
+							if (referencedEntity != null) {
+								ReflectionUtils.invokeMethod(builderCallableMethod, builderInstance, referencedEntity);
+							}
+						}
+					}
+				}
+			}
+			// Es crida el mètode build per a crear la instància de l'entitat
+			E entity = (E)ReflectionUtils.invokeMethod(
+					ReflectionUtils.findMethod(builderReturnType, "build"),
+					builderInstance);
+			// Només inicialitza el camp id si la pk te un valor diferent a null
+			if (pkFromResource != null) {
+				Field idField = ReflectionUtils.findField(entityClass, "id");
+				if (idField != null) {
+					idField.setAccessible(true);
+					ReflectionUtils.setField(
+							idField,
+							entity,
+							pkFromResource);
+				}
+			}
+			return entity;
+		} else {
+			try {
+				return entityClass.getConstructor().newInstance();
+			} catch (Exception ex) {
+				throw new ResourceNotCreatedException(
+						resource.getClass(),
+						"Couldn't create new entity instance (resourceClass=" + entityClass + ")",
+						ex);
+			}
+		}
+	}
+
+	public <E extends ResourceEntity<R, ?>, R extends Resource<?>> void updateEntityWithResource(
+			E entity,
+			R resource,
+			Map<String, Persistable<?>> referencedEntities) {
+		List<String> processedFieldNames = new ArrayList<>();
+		// Actualitza els camps de l'entitat que son de tipus Persistable o byte[]
+		ReflectionUtils.doWithFields(entity.getClass(), new ReflectionUtils.FieldCallback() {
+			@Override
+			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+				// Es modifica el valor de cada camp de l'entitat que és de tipus de Persistable
+				// amb la referencia especificada al resource.
+				String methodSuffix = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+				if (Persistable.class.isAssignableFrom(field.getType()) && referencedEntities != null) {
+					Persistable<?> referencedEntity = referencedEntities.get(field.getName());
+					String setMethodName = "set" + methodSuffix;
+					Method setMethod = ReflectionUtils.findMethod(
+							entity.getClass(),
+							setMethodName,
+							field.getType());
+					if (setMethod != null) {
+						ReflectionUtils.invokeMethod(
+								setMethod,
+								entity,
+								referencedEntity);
+					}
+					processedFieldNames.add(field.getName());
+				}
+				if (byte[].class.isAssignableFrom(field.getType())) {
+					// Només es modifica el valor dels camps de tipus byte[] (arxius adjunts) si
+					// el valor del camp al recurs és null o si te una llargada major que 0.
+					String getMethodName = "get" + methodSuffix;
+					Method getMethod = ReflectionUtils.findMethod(resource.getClass(), getMethodName);
+					if (getMethod != null) {
+						byte[] fileValue = (byte[])ReflectionUtils.invokeMethod(getMethod, resource);
+						String setMethodName = "set" + methodSuffix;
+						Method setMethod = ReflectionUtils.findMethod(
+								entity.getClass(),
+								setMethodName,
+								byte[].class);
+						if (setMethod != null) {
+							if (fileValue == null || fileValue.length != 0) {
+								ReflectionUtils.invokeMethod(
+										setMethod,
+										entity,
+										fileValue);
+							}
+						}
+					}
+					processedFieldNames.add(field.getName());
+				}
+			}
+		});
+		// Actualitza els demés camps de l'entitat
+		objectMappingHelper.map(
+				resource,
+				entity,
+				processedFieldNames.toArray(new String[0]));
+	}
+
+	public <E extends ResourceEntity<R, ?>, R extends Resource<?>> R entityToResource(
+			E entity,
+			Class<R> resourceClass) {
+		return objectMappingHelper.newInstanceMap(
+				entity,
+				resourceClass);
+	}
+
+	private <R, E> boolean callBuilderMethodForResource(
+			R resource,
+			Class<E> entityClass,
+			Object builderInstance,
+			Class<?> builderReturnType) {
+		boolean builderMethodCalled = false;
+		Optional<Method> resourceMethod = Arrays.stream(ReflectionUtils.getAllDeclaredMethods(builderReturnType)).
+				filter(m -> {
+					Class<?>[] parameterTypes = m.getParameterTypes();
+					return parameterTypes.length > 0 && parameterTypes[0].isAssignableFrom(resource.getClass());
+				}).findFirst();
+		if (resourceMethod.isPresent()) {
+			ReflectionUtils.invokeMethod(
+					resourceMethod.get(),
+					builderInstance,
+					resource);
+			builderMethodCalled = true;
+		}
+		return builderMethodCalled;
+	}
+
+}

@@ -3,6 +3,10 @@ package es.caib.ripea.service.intf.base.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.service.intf.base.exception.CompositePkParsingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Base64;
@@ -10,14 +14,16 @@ import java.util.UUID;
 
 /**
  * Utilitats per a serialitzar i deserialitzar claus primàries compostes.
- * 
+ *
  * @author Límit Tecnologies
  */
-public class CompositePkUtil {
+@Component
+public class CompositePkUtil implements ApplicationContextAware {
 
-	private static final ObjectMapper objectMapper = new ObjectMapper();
+	@Autowired
+	protected ObjectMapper objectMapper;
 
-	public static <CPK extends Serializable> CPK getCompositePkFromSerializedId(
+	public <CPK extends Serializable> CPK getCompositePkFromSerializedId(
 			String id,
 			Class<?> pkClass) {
 		if (id != null) {
@@ -34,7 +40,7 @@ public class CompositePkUtil {
 		}
 	}
 
-	public static String getSerializedIdFromCompositePk(Serializable pk) {
+	public String getSerializedIdFromCompositePk(Serializable pk) {
 		if (pk != null) {
 			try {
 				byte[] idBase64 = Base64.getEncoder().encode(objectMapper.writeValueAsString(pk).getBytes());
@@ -47,10 +53,19 @@ public class CompositePkUtil {
 		}
 	}
 
-	public static boolean isCompositePkClass(Class<?> clazz) {
+	public boolean isCompositePkClass(Class<?> clazz) {
 		return !(String.class.isAssignableFrom(clazz) ||
 				Number.class.isAssignableFrom(clazz) ||
 				UUID.class.isAssignableFrom(clazz));
+	}
+
+	private static ApplicationContext applicationContext;
+	public static CompositePkUtil getInstance() {
+		return applicationContext.getBean(CompositePkUtil.class);
+	}
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		CompositePkUtil.applicationContext = applicationContext;
 	}
 
 }

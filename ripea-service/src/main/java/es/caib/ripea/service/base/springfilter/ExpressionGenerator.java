@@ -107,7 +107,7 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 		Class<?> expectedInputType = expectedInputTypes.get(ctx);
 		if (inputContextIsOrEndsWithId(ctx)) {
 			if (isInputTypeCompositePk(expectedInputType)) {
-				Object value = CompositePkUtil.getCompositePkFromSerializedId(
+				Object value = CompositePkUtil.getInstance().getCompositePkFromSerializedId(
 						StringConverter.cleanStringInput(ctx.getText()),
 						getPkPathType(
 								ctx,
@@ -281,7 +281,7 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 	}
 
 	private static boolean isInputTypeCompositePk(Class<?> inputType) {
-		return CompositePkUtil.isCompositePkClass(inputType);
+		return CompositePkUtil.getInstance().isCompositePkClass(inputType);
 	}
 
 	private static boolean inputContextIsOrEndsWithId(InputContext ctx) {

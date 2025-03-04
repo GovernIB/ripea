@@ -24,6 +24,7 @@ public @interface ResourceConfig {
 	public String resourceDescription() default "";
 	public String resourceDescriptionI18n() default "";
 	public String descriptionField() default "";
+	public String orderField() default "";
 	public ResourceSort[] defaultSortFields() default {};
 	public String[] quickFilterFields() default {};
 	public Class<? extends Resource> parentEntity() default Resource.class;

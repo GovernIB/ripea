@@ -120,6 +120,6 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	 * @throws ActionExecutionException
 	 *             si es produeix algun error executant l'acció.
 	 */
-	<P> Object actionExec(String code, P params) throws ArtifactNotFoundException, ActionExecutionException;
+	<P extends Serializable> Serializable actionExec(String code, P params) throws ArtifactNotFoundException, ActionExecutionException;
 
 }
