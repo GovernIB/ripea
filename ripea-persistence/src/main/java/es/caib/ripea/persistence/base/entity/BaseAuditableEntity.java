@@ -27,9 +27,12 @@ import java.time.LocalDateTime;
 public abstract class BaseAuditableEntity<R> implements AuditableEntity, ResourceEntity<R, Long> {
 
 	@Id
-//    @SequenceGenerator(name = "RIPEA_SEQ", sequenceName = "IPA_HIBERNATE_SEQ")
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RIPEA_SEQ")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_seq")
+	@SequenceGenerator(
+			name = "hibernate_seq",
+			sequenceName = BaseConfig.DB_PREFIX + "hibernate_seq",
+			allocationSize = 1)
 	private @Nullable Long id;
 
 	@CreatedBy
