@@ -238,7 +238,7 @@ public class ObjectMappingHelper {
 		return type.isPrimitive() ||
 				Boolean.class == type ||
 				Character.class == type ||
-				Serializable.class.isAssignableFrom(type) ||
+				(Serializable.class.isAssignableFrom(type) && !ResourceEntity.class.isAssignableFrom(type)) ||
 				CharSequence.class.isAssignableFrom(type) ||
 				Number.class.isAssignableFrom(type) ||
 				Date.class.isAssignableFrom(type) ||
