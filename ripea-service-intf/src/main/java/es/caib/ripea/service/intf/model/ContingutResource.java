@@ -22,7 +22,7 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 	@NotNull
 	@Size(max = 1024)
 	protected String nom;
-	@NotNull
+//	@NotNull
 	protected ContingutTipusEnumDto tipus;
 	protected int esborrat = 0;
 	protected Date esborratData;
@@ -36,7 +36,7 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 	protected String numeroRegistre;
 	protected boolean arxiuPropagat;
 	
-	@NotNull
+//	@NotNull
 	protected ResourceReference<EntitatResource, Long> entitat;
 	protected ResourceReference<ExpedientResource, Long> expedient;
 	protected ResourceReference<ContingutResource, Long> pare;

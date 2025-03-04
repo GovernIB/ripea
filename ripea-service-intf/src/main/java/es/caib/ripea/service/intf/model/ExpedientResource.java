@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.Date;
 import java.util.List;
 
@@ -37,20 +38,21 @@ public class ExpedientResource extends NodeResource {
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
-	@NotNull
+//	@NotNull
 	private ExpedientEstatEnumDto estat;
-	@NotNull
+//	@NotNull
 	@Size(max = 46)
 	private String ntiClasificacionSia;	
-	@NotNull
+//	@NotNull
 	private Date ntiFechaApertura;
 	@NotNull
 	private ResourceReference<OrganGestorResource, Long> organGestor;
 	@NotNull
-	private int any;
+    @ResourceField(onChangeActive = true)
+	private Integer any = Year.now().getValue();
 	@NotNull
-	private long sequencia;
-	@NotNull
+	private Long sequencia;
+//	@NotNull
 	@Size(max = 256)
 	private String codi;
 	@Size(max = 64)
@@ -84,13 +86,13 @@ public class ExpedientResource extends NodeResource {
 	private String registresImportats;
 
 	// NTI
-	@NotNull
+//	@NotNull
 	@Size(max = 5)
 	private String ntiVersion;
-	@NotNull
+//	@NotNull
 	@Size(max = 52)
 	private String ntiIdentificador;
-	@NotNull
+//	@NotNull
 	@Size(max = 9)
 	private String ntiOrgano;
 
@@ -104,13 +106,21 @@ public class ExpedientResource extends NodeResource {
 	private String sistraClau;
 
 	// Prioritat
-	private PrioritatEnumDto prioritat;
+	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
     private List<InteressatResource> interessats;
     private int numComentaris;
     private int numSeguidors;
+    private int numContingut;
+    private int numDades;
+    private int numInteressats;
+    private int numRemeses;
+    private int numPublicacions;
+    private int numAnotacions;
+    private int numVersions;
+    private int numTasques;
     public String getTipusStr() {
         return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
     }

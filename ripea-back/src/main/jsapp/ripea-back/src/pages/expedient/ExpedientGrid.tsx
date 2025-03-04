@@ -3,7 +3,7 @@ import {
     GridPage,
     MuiGrid,
 } from 'reactlib';
-import {Button, Box, Typography, Icon, Grid} from "@mui/material";
+import {Box, Typography, Icon, Grid, IconButton, Badge} from "@mui/material";
 import {formatDate} from '../../util/dateUtils';
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import {useNavigate} from "react-router-dom";
@@ -17,11 +17,12 @@ const ExpedientGridForm = () => {
     const {data} = formContext;
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         {!data?.id && <GridFormField xs={12} name="metaExpedient"/>}
-        <GridFormField xs={12} name="nom" />
-        <GridFormField xs={12} name="organGestor" disabled={!!data?.id}/>
+        <GridFormField xs={12} name="nom"/>
+        <GridFormField xs={12} name="organGestor" disabled={!!data?.id} /*filter={''}*//>
         <GridFormField xs={12} name="sequencia" disabled/>
         <GridFormField xs={12} name="any"/>
-        <GridFormField xs={12} name="prioritat"/>
+        <GridFormField xs={12} name="prioritat" required/>
+        { data?.prioritat!='B_NORMAL' && <GridFormField xs={12} name="prioritatMotiu" required/>}
     </Grid>
 }
 
@@ -133,7 +134,12 @@ const ExpedientGrid: React.FC = () => {
             disableColumnMenu: true,
             flex: 0.5,
             renderCell: (params: any)=> {
-                return (<Button variant="contained" sx={{borderRadius: 1}} color={"inherit"}><Icon>people</Icon>{params.row.numSeguidors}</Button>);
+                return (
+                    <IconButton aria-label="people" color={"inherit"} /*variant="contained"*/>
+                        <Badge badgeContent={params.row.numSeguidors} color="secondary">
+                            <Icon>people</Icon>
+                        </Badge>
+                    </IconButton>);
             }
         },
         {
