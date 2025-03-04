@@ -1,5 +1,6 @@
 package es.caib.ripea.persistence.base.entity;
 
+import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -26,6 +27,8 @@ import java.time.LocalDateTime;
 public abstract class BaseAuditableEntity<R> implements AuditableEntity, ResourceEntity<R, Long> {
 
 	@Id
+//    @SequenceGenerator(name = "RIPEA_SEQ", sequenceName = "IPA_HIBERNATE_SEQ")
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RIPEA_SEQ")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private @Nullable Long id;
 
