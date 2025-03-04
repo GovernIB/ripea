@@ -182,6 +182,12 @@
 						{{if comu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="permisDirecte" data-template="#cellpermisDirecteTemplate" width="1%">
+					<spring:message code="metaexpedient.form.camp.permisDirecte"/>
+					<script id="cellpermisDirecteTemplate" type="text/x-jsrender">
+						{{if permisDirecte}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>				
 				<th data-col-name="gestioAmbGrupsActiva" data-template="#cellGrupTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.grup"/>
 					<script id="cellGrupTemplate" type="text/x-jsrender">

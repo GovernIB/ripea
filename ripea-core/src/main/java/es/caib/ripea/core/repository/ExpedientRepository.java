@@ -71,9 +71,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"from " +
 			"    ExpedientEntity e " +
 			"    left join e.metaexpedientOrganGestorPares meogp " +
-			"where " +
-			"    e.esborrat = 0 " +
-			"and e.entitat = :entitat " +
+			"where	e.esborrat = 0 " +
+			"and	e.entitat = :entitat " +
 			"and (" +
 			"     (:esNullIdsMetaExpedientsPermesos = false and (e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
 			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
@@ -85,7 +84,14 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			or meogp.organGestor.id in (:idsOrgansPermesos3))) " +
 			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
 			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
-		//TODO if organ is in :idsOrgansAmbProcedimentsComunsPermesos it is also already in :idsOrgansPermesos as well so check :idsOrgansAmbProcedimentsComunsPermesos doesn't do anything, probably :idsOrgansPermesos check should be only allowed for procediments no comuns
+			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
+			// - Per admin: es compleix la primera condicio = No filtra
+			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
+			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
+					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
+					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
+					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
+					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos3)))" +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
@@ -119,7 +125,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" + 
 			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+ 
 			"					 ) != 0) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
+			"and (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
 			"			select dp.expedient.id " + 
@@ -186,6 +192,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
 			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
 			@Param("isAdmin") boolean isAdmin,
+			@Param("noFiltreGrups") boolean noFiltreGrups,
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
 			@Param("numeroRegistre") String numeroRegistre,
@@ -201,9 +208,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    left join e.organGestorPares eogp " +
 			"    left join eogp.metaExpedientOrganGestor eogpmeog " +
 			"    left join eogp.metaExpedientOrganGestor.organGestor eogpmeogog " +
-			"where " +
-			"    e.esborrat = 0 " +
-			"and e.entitat = :entitat " +
+			"where	e.esborrat = 0 " +
+			"and	e.entitat = :entitat " +
 			"and (" +
 			"     (:esNullMetaExpedientIdPermesos = false and (e.metaExpedient.id in (:metaExpedientIdPermesos0) " +
 			"			or e.metaExpedient.id in (:metaExpedientIdPermesos1) " +
@@ -219,6 +225,14 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			or eogpmeogog.id in (:organIdPermesos3))) " +
 			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos)) " +
 			"     or (:esNullOrganProcedimentsComunsIdsPermesos = false and eogpmeogog.id in (:organProcedimentsComunsIdsPermesos) and e.metaExpedient.id in (:procedimentsComunsIds))) " +
+			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
+			// - Per admin: es compleix la primera condicio = No filtra
+			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
+			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
+					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
+					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
+					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
+					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos3)))" +			
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
@@ -252,7 +266,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"						or (dada.valor like '%,' || :metaExpedientDominiValor || ',%')" + 
 			"						or (dada.valor like '%' || :metaExpedientDominiValor || ',%'))"	+ 
 			"					 ) != 0) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
+			"and (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
 			"			select dp.expedient.id " + 
@@ -319,6 +333,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
 			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
 			@Param("isAdmin") boolean isAdmin,
+			@Param("noFiltreGrups") boolean noFiltreGrups,
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
 			@Param("numeroRegistre") String numeroRegistre,

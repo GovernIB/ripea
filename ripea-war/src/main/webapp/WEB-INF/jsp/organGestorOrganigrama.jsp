@@ -273,6 +273,11 @@
  													{{if administrationComuns}}<span class="fa fa-check"></span>{{/if}}
 												</script>
 											</th>
+											<th data-col-name="disseny" data-template="#cellPermisdissenyTemplate" data-orderable="false" width="5%"><spring:message code="organgestor.permis.columna.disseny" /> 
+												<script id="cellPermisdissenyTemplate" type="text/x-jsrender">
+ 													{{if disseny}}<span class="fa fa-check"></span>{{/if}}
+												</script>
+											</th>											
 											<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-orderable="false" width="5%">
 												<script id="cellAccionsTemplate" type="text/x-jsrender">
 													<div class="dropdown"> 

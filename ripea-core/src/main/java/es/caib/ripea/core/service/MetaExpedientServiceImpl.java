@@ -151,7 +151,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Resource private MetaDadaHelper metaDadaHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
-//	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
 
 	@Transactional
 	@Override
@@ -168,8 +167,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		MetaExpedientEntity metaExpedientPare = null;
 		if (metaExpedient.getPareId() != null) {
-
-		metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
+			metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
 		}
 		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
 		MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
@@ -184,9 +182,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(),
-				metaExpedient.isInteressatObligatori()).
+				metaExpedient.isInteressatObligatori(),
+				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
 				expressioNumero(metaExpedient.getExpressioNumero()).
 				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
+		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -209,10 +209,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional
 	@Override
-	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, MetaExpedientRevisioEstatEnumDto estatAnterior, Long organId) {
-		logger.debug(
-				"Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" +
-						metaExpedient + ")");
+	public MetaExpedientDto update(
+			Long entitatId,
+			MetaExpedientDto metaExpedient,
+			String rolActual,
+			MetaExpedientRevisioEstatEnumDto estatAnterior,
+			Long organId) {
+		
+		logger.debug("Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedientEntity;
 		MetaExpedientEntity metaExpedientPare = null;
@@ -236,7 +241,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(), 
 				metaExpedient.getTipusClassificacio(),
-				metaExpedient.isInteressatObligatori());
+				metaExpedient.isInteressatObligatori(),
+				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():metaExpedientEntity.isPermisDirecte());
 		
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -317,7 +323,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				procedimentImportat.isGestioAmbGrupsActiva(),
-				procedimentImportat.isInteressatObligatori()).
+				procedimentImportat.isInteressatObligatori(),
+				false).
 				expressioNumero(procedimentImportat.getExpressioNumero()).
 				tipusClassificacio(procedimentImportat.getTipusClassificacio()).build();
 		
@@ -443,7 +450,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorEntity,
 				procedimentImportat.isGestioAmbGrupsActiva(),
 				procedimentImportat.getTipusClassificacio(),
-				procedimentImportat.isInteressatObligatori());
+				procedimentImportat.isInteressatObligatori(),
+				false);
 		
 		Long metaExpedientEntityId = metaExpedientEntity.getId();
 

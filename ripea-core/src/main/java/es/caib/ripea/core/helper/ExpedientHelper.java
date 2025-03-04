@@ -1738,18 +1738,36 @@ public class ExpedientHelper {
 			//Si ets admin veruas els expedients de tots els procediments de la entitat
 			idsMetaExpedientsPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);
 
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > idsMetaExpedientsPermesos (" + (idsMetaExpedientsPermesos!=null?idsMetaExpedientsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
 
-		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-
-			//Si ets admin de organ, veuras tots els expedients del organ seleccionat a la capçalera + fills
+			//En principi el dissenyador no pot accedir al llistat de expedients, pero si en un futur pot, hauria de passar per aqui.
+			
+			//Aquets dos rols treballen amb l'organ seleccionat a la capçalera + fills
 			if (organActual!=null) {
 				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findOne(organActual).getCodi());
 			}
-
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > idsOrgansPermesos (" + (idsOrgansPermesos!=null?idsOrgansPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
+			
+			//A no ser que el procediment estigui marcat com a permis directe, en tal cas has de tenir permisos al procediment, no al organ.
+			//Pero no li podem passar tota la llista de procediments, sino nomes els dels organs que té permís
+			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					MetaNodeEntity.class,
+					ExtendedPermission.READ));
+			
+			List<Long> aux = new ArrayList<Long>();
+			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
+				for (Long metaExpId: idsMetaExpedientsPermesos) {
+					MetaExpedientEntity mEx = metaExpedientRepository.findOne(metaExpId);
+					if(mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
+						aux.add(metaExpId);
+					}
+				}
+			}
+			
+			if (aux.size()>0) {
+				idsMetaExpedientsPermesos = aux;
+			} else {
+				idsMetaExpedientsPermesos = null;
+			}
 
 		}else {
 			// Si ets usuari normal, permisos de lectura de varies fonts
@@ -1758,16 +1776,10 @@ public class ExpedientHelper {
 					MetaNodeEntity.class,
 					ExtendedPermission.READ));
 
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > idsMetaExpedientsPermesos (" + (idsMetaExpedientsPermesos!=null?idsMetaExpedientsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
-
             long t2 = System.currentTimeMillis();
 			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
 					ExtendedPermission.READ));
-
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > idsMetaExpedientOrganPairsPermesos (" + (idsMetaExpedientOrganPairsPermesos!=null?idsMetaExpedientOrganPairsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t2) + " ms");
 
             long t3 = System.currentTimeMillis();
 			idsOrgansAmbProcedimentsComunsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
@@ -1775,22 +1787,13 @@ public class ExpedientHelper {
 					ExtendedPermission.COMU,
 					ExtendedPermission.READ));
 
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos!=null?idsOrgansAmbProcedimentsComunsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t3) + " ms");
-
             long t4 = System.currentTimeMillis();
 			procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > procedimentsComunsIds (" + (procedimentsComunsIds!=null?procedimentsComunsIds.size():0) + ") time:  " + (System.currentTimeMillis() - t4) + " ms");
 
             long t5 = System.currentTimeMillis();
 			idsGrupsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					GrupEntity.class,
 					ExtendedPermission.READ));
-
-            if (cacheHelper.mostrarLogsRendiment())
-                logger.info("findPermisosPerExpedients > idsGrupsPermesos (" + (idsGrupsPermesos!=null?idsGrupsPermesos.size():0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");
 		}
 
 		permisosPerExpedientsDto.setIdsMetaExpedientsPermesos(idsMetaExpedientsPermesos);
@@ -1800,6 +1803,15 @@ public class ExpedientHelper {
 		permisosPerExpedientsDto.setIdsProcedimentsComuns(procedimentsComunsIds);
 		permisosPerExpedientsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 
+        if (cacheHelper.mostrarLogsPermisos()) {
+            logger.info(rolActual+" - findPermisosPerExpedients > idsOrgansPermesos (" + (idsOrgansPermesos!=null?idsOrgansPermesos.toString():"NULL") + ")");
+            logger.info(rolActual+" - findPermisosPerExpedients > idsMetaExpedientsPermesos (" + (idsMetaExpedientsPermesos!=null?idsMetaExpedientsPermesos.toString():"NULL") + ")");
+            logger.info(rolActual+" - findPermisosPerExpedients > idsMetaExpedientOrganPairsPermesos (" + (idsMetaExpedientOrganPairsPermesos!=null?idsMetaExpedientOrganPairsPermesos.toString():"NULL") + ")");
+            logger.info(rolActual+" - findPermisosPerExpedients > idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos!=null?idsOrgansAmbProcedimentsComunsPermesos.toString():"NULL") + ")");
+            logger.info(rolActual+" - findPermisosPerExpedients > procedimentsComunsIds (" + (procedimentsComunsIds!=null?procedimentsComunsIds.toString():"NULL") + ")");
+            logger.info(rolActual+" - findPermisosPerExpedients > idsGrupsPermesos (" + (idsGrupsPermesos!=null?idsGrupsPermesos.toString():"NULL") + ")");
+        }
+		
 		return permisosPerExpedientsDto;
 	}
 	

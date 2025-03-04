@@ -17,6 +17,26 @@ public class PermissionDeniedException extends RuntimeException {
 	private Class<?> objectClass;
 	private String userName;
 	private String permissionName;
+	private String extendedInfo;
+	
+	public PermissionDeniedException(
+			Object objectId,
+			Class<?> objectClass,
+			String userName,
+			String permissionName,
+			String extendedInfo) {
+		super(getExceptionMessage(
+				objectId,
+				objectClass,
+				userName,
+				permissionName,
+				extendedInfo));
+		this.objectId = objectId;
+		this.objectClass = objectClass;
+		this.userName = userName;
+		this.permissionName = permissionName;
+		this.extendedInfo = extendedInfo;
+	}
 	
 	public PermissionDeniedException(
 			Object objectId,
@@ -27,7 +47,8 @@ public class PermissionDeniedException extends RuntimeException {
 				objectId,
 				objectClass,
 				userName,
-				permissionName));
+				permissionName,
+				null));
 		this.objectId = objectId;
 		this.objectClass = objectClass;
 		this.userName = userName;
@@ -42,13 +63,32 @@ public class PermissionDeniedException extends RuntimeException {
 				objectId,
 				objectClass,
 				SecurityContextHolder.getContext().getAuthentication().getName(),
-				permissionName));
+				permissionName,
+				null));
 		this.objectId = objectId;
 		this.objectClass = objectClass;
 		this.userName = SecurityContextHolder.getContext().getAuthentication().getName();
 		this.permissionName = permissionName;
 	}
 
+	public PermissionDeniedException(
+			Class<?> objectClass,
+			Object objectId,
+			String permissionName,
+			String extendedInfo) {
+		super(getExceptionMessage(
+				objectId,
+				objectClass,
+				SecurityContextHolder.getContext().getAuthentication().getName(),
+				permissionName,
+				extendedInfo));
+		this.objectId = objectId;
+		this.objectClass = objectClass;
+		this.userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		this.permissionName = permissionName;
+		this.extendedInfo = extendedInfo;
+	}
+	
 	public Object getObjectId() {
 		return objectId;
 	}
@@ -61,12 +101,16 @@ public class PermissionDeniedException extends RuntimeException {
 	public String getPermissionName() {
 		return permissionName;
 	}
+	public String getExtendedInfo() {
+		return extendedInfo;
+	}
 
 	public static String getExceptionMessage(
 			Object objectId,
 			Class<?> objectClass,
 			String userName,
-			String permissionName) {
+			String permissionName,
+			String extendedInfo) {
 		StringBuilder sb = new StringBuilder();
 		if (objectClass != null)
 			sb.append(objectClass.getName());
@@ -81,6 +125,8 @@ public class PermissionDeniedException extends RuntimeException {
 		sb.append(userName);
 		sb.append(", ");
 		sb.append(permissionName);
+		if (extendedInfo != null)
+			sb.append(": " + extendedInfo);
 		return sb.toString();
 	}
 

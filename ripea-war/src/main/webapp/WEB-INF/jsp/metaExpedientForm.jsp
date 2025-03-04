@@ -461,6 +461,13 @@ function calculateClassificacioId() {
 				<c:if test="${isObligarInteressatActiu}">
 					<rip:inputCheckbox name="interessatObligatori" textKey="metaexpedient.form.camp.interessat"/>
 				</c:if>
+
+				<rip:inputCheckbox 
+					name="permisDirecte"
+					textKey="metaexpedient.form.camp.permisDirecte"
+					disabled="${!isRolActualAdministrador}"
+					comment="metaexpedient.form.camp.permisDirecte.info" />
+
 				<c:if test="${ not empty metaExpedientCommand.id}">
 					<div style="min-height: 60px;">
 						<div class="alert well-sm alert-info" >
@@ -500,7 +507,7 @@ function calculateClassificacioId() {
 			</div>
 		</div>
 		<div id="modal-botons">
-			<c:if test="${!consultar}">
+			<c:if test="${!consultar or isRolActualAdministrador}">
 				<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>
 					<c:choose>
 						<c:when test="${empty metaExpedientCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
