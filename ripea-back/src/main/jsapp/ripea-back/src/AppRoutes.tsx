@@ -1,10 +1,11 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import NotFoundPage from './pages/NotFound';
 import Expedient from './pages/expedient/Expedient';
 import ExpedientGrid from './pages/expedient/ExpedientGrid';
 
 const AppRoutes: React.FC = () => {
     return <Routes>
+        <Route path="/" element={<Navigate to="/expedient" />} />
         <Route path="expedient">
             <Route index element={<ExpedientGrid />} />
             {/*<Route path=":id" element={<Expedient />} />*/}
