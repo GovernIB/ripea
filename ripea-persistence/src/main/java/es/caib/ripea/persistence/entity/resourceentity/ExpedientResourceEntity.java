@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ExpedientResourceEntity extends NodeResourceEntity implements ResourceEntity<ExpedientResource, Long> {
+public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResource> {
 
 	@Column(name = "estat", nullable = false)
 	protected ExpedientEstatEnumDto estat;

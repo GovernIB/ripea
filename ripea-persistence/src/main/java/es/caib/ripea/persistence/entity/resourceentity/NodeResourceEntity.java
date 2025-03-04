@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class NodeResourceEntity extends ContingutResourceEntity {
+public abstract class NodeResourceEntity<R> extends ContingutResourceEntity<R> {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(

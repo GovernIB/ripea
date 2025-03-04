@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import es.caib.ripea.persistence.base.entity.BaseOnlyAuditableEntity;
+import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import lombok.Getter;
@@ -35,7 +35,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ContingutResourceEntity extends BaseOnlyAuditableEntity {
+public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> {
 
 	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;

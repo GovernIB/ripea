@@ -34,7 +34,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DocumentResourceEntity extends NodeResourceEntity implements ResourceEntity<DocumentResource, Long> {
+public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource> {
 
 	@Column(name = "tipus", nullable = false)
 	private DocumentTipusEnumDto documentTipus;
