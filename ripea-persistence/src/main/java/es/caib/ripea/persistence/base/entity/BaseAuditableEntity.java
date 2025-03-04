@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 public abstract class BaseAuditableEntity<R> implements AuditableEntity, ResourceEntity<R, Long> {
 
 	@Id
-	//@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_seq")
 	@SequenceGenerator(
 			name = "hibernate_seq",
