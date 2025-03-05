@@ -41,6 +41,7 @@ export const FormFieldTime: React.FC<FormFieldCustomProps> = (props) => {
         readOnly={readOnly}
         onChange={handleOnChange}
         ampm={false}
+        {...componentProps}
         slotProps={{
             field: { clearable: dateError == null },
             textField: {

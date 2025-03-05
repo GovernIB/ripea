@@ -8,10 +8,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.ArtifactFormNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
@@ -29,6 +26,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +37,9 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.TemplateVariable.VariableType;
 import org.springframework.hateoas.mediatype.Affordances;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ReflectionUtils;
@@ -52,6 +52,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.groups.Default;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -200,6 +203,32 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 									null,
 									resourcePermissions)));
 		}
+	}
+
+	@Override
+	@GetMapping(value = "/{resourceId}/fields/{fieldName}/download")
+	@Operation(summary = "Descàrrega de l'arxiu associat a un camp del recurs")
+	@PreAuthorize("hasPermission(#resourceId, this.getResourceClassName(), this.getOperation('FIELDDOWNLOAD'))")
+	public ResponseEntity<InputStreamResource> fieldDownload(
+			@PathVariable
+			@Parameter(description = "Identificador del recurs")
+			final ID id,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName) throws IOException {
+		log.debug("Descàrrega de l'arxiu associat al camp del recurs (id={}, fieldName={})",
+				id,
+				fieldName);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DownloadableFile file = getReadonlyResourceService().fieldDownload(
+				id,
+				fieldName,
+				baos);
+		if (file.getContent() != null && baos.size() == 0) {
+			baos.write(file.getContent());
+		}
+		InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(baos.toByteArray()));
+		return writeDownloadableFileToResponse(file, resource);
 	}
 
 	@Override
@@ -1140,6 +1169,24 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		} else {
 			return Pageable.unpaged();
 		}
+	}
+
+	protected ResponseEntity<InputStreamResource> writeDownloadableFileToResponse(
+			DownloadableFile file,
+			InputStreamResource resource) throws IOException {
+		ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.ok();
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Disposition", "attachment; filename=" + file.getName());
+		headers.set("Access-Control-Expose-Headers", "Content-Disposition");
+		bodyBuilder.headers(headers);
+		MediaType mediaType = file.getContentType() != null ? MediaType.valueOf(file.getContentType()) : MediaType.APPLICATION_OCTET_STREAM;
+		bodyBuilder.contentType(mediaType);
+		if (file.getContent() != null) {
+			bodyBuilder.contentLength(file.getContent().length);
+		} else if (file.getContentLength() != null) {
+			bodyBuilder.contentLength(file.getContentLength());
+		}
+		return bodyBuilder.body(resource);
 	}
 
 	private ExpressionParser getExpressionParser() {

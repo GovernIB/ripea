@@ -6,6 +6,7 @@ import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -57,6 +59,21 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String[] namedQueries,
 			final String[] perspectives,
 			final Pageable pageable);
+
+	/**
+	 * Descàrrega de l'arxiu associat a un camp del recurs.
+	 *
+	 * @param id
+	 *            id de l'element que es vol consultar.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @return l'arxiu associat al camp.
+	 * @throws IOException
+	 *             si es produeix algun error al escriure l'arxiu a la resposta.
+	 */
+	ResponseEntity<InputStreamResource> fieldDownload(
+			final ID id,
+			final String fieldName) throws IOException;
 
 	/**
 	 * Retorna la llista d'artefactes relacionats amb aquest servei.

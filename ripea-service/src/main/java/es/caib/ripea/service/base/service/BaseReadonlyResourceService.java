@@ -7,14 +7,8 @@ import es.caib.ripea.service.base.helper.ResourceEntityMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
-import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.base.exception.*;
+import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.AllArgsConstructor;
@@ -30,6 +24,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -61,6 +56,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	private final Map<String, ReportDataGenerator<?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
 	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>();
 	private final Map<String, PerspectiveApplicator<R, E>> perspectiveApplicatorMap = new HashMap<>();
+	private final Map<String, FieldDownloader<E>> fieldDownloaderMap = new HashMap<>();
 
 	@Override
 	@Transactional(readOnly = true)
@@ -124,6 +120,28 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				elapsedDatabase,
 				elapsedConversion);
 		return response;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DownloadableFile fieldDownload(
+			ID id,
+			String fieldName,
+			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException {
+		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
+		if (field != null) {
+			FieldDownloader<E> fieldDownloader = fieldDownloaderMap.get(fieldName);
+			if (fieldDownloader != null) {
+				return fieldDownloader.download(
+						getEntity(id, null),
+						fieldName,
+						out);
+			} else {
+				throw new FieldArtifactNotFoundException(getResourceClass(), FieldArtifactType.DOWNLOAD, fieldName);
+			}
+		} else {
+			throw new ResourceFieldNotFoundException(getResourceClass(), fieldName);
+		}
 	}
 
 	@Override
@@ -507,6 +525,12 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	protected void register(
+			String fieldName,
+			FieldDownloader<E> fieldDownloader) {
+		fieldDownloaderMap.put(fieldName, fieldDownloader);
+	}
+
 	protected Class<? extends Serializable> artifactGetFormClass(ResourceArtifactType type, String code) {
 		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
@@ -850,6 +874,28 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * @param <R> classe del recurs que representa el filtre.
 	 */
 	public interface FilterProcessor <R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<R> {
+	}
+
+	/**
+	 * Interfície a implementar per a retornar els arxius associats a un camp.
+	 *
+	 * @param <E> classe del recurs.
+	 */
+	public interface FieldDownloader <E extends ResourceEntity<?, ?>> {
+		/**
+		 * Retorna l'arxiu associat.
+		 *
+		 * @param entity
+		 *            el recurs amb els valors previs a la modificació.
+		 * @param fieldName
+		 *            el nom del camp del recurs.
+		 * @param out
+		 *            stream a on posar el fitxer generat.
+		 */
+		DownloadableFile download(
+				E entity,
+				String fieldName,
+				OutputStream out);
 	}
 
 }

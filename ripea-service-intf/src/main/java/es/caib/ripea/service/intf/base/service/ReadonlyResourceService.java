@@ -1,14 +1,14 @@
 package es.caib.ripea.service.intf.base.service;
 
-import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
-import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.exception.*;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -58,6 +58,28 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 			String[] namedQueries,
 			String[] perspectives,
 			Pageable pageable);
+
+	/**
+	 * Descàrrega del fitxer associat a un camp del recurs.
+	 *
+	 * @param id
+	 *            clau primària del recurs.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param out
+	 *            stream a on posar el fitxer generat.
+	 * @return el fitxer associat al camp.
+	 * @throws ResourceNotFoundException
+	 *             si no s'ha trobat el recurs especificat.
+	 * @throws ResourceFieldNotFoundException
+	 *            si no es troba el camp del recurs.
+	 * @throws FieldArtifactNotFoundException
+	 *            si el camp no té cap artefacte de descàrrega associat.
+	 */
+	DownloadableFile fieldDownload(
+			ID id,
+			String fieldName,
+			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException;
 
 	/**
 	 * Retorna la llista d'artefactes del tipus especificat als quals l'usuari te accés.
