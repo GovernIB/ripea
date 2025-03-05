@@ -17,7 +17,7 @@ public interface AuditableEntity {
 	 * @param createdDate
 	 *            la data de creació de l'entitat.
 	 */
-	public void updateCreated(String createdBy, LocalDateTime createdDate);
+	void updateCreated(String createdBy, LocalDateTime createdDate);
 
 	/**
 	 * Actualitza la informació de la darrera modificació.
@@ -27,34 +27,34 @@ public interface AuditableEntity {
 	 * @param lastModifiedDate
 	 *            la data de la darrera modificació.
 	 */
-	public void updateLastModified(String lastModifiedBy, LocalDateTime lastModifiedDate);
+	void updateLastModified(String lastModifiedBy, LocalDateTime lastModifiedDate);
 
 	/**
 	 * Retorna l'usuari de creació.
 	 * 
 	 * @return l'usuari de creació.
 	 */
-	public String getCreatedBy();
+	String getCreatedBy();
 
 	/**
 	 * Retorna la data de creació.
 	 * 
 	 * @return la data de creació.
 	 */
-	public LocalDateTime getCreatedDate();
+	LocalDateTime getCreatedDate();
 
 	/**
 	 * Retorna l'usuari de modificació.
 	 * 
 	 * @return l'usuari de modificació.
 	 */
-	public String getLastModifiedBy();
+	String getLastModifiedBy();
 
 	/**
 	 * Retorna la data de modificació.
 	 * 
 	 * @return la data de modificació.
 	 */
-	public LocalDateTime getLastModifiedDate();
+	LocalDateTime getLastModifiedDate();
 
 }
