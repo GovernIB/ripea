@@ -130,6 +130,7 @@ export const FormFieldDuration: React.FC<FormFieldDurationProps> = (props) => {
         format={format}
         ampm={false}
         clearable={dateError == null}
+        {...componentProps}
         slotProps={{
             textField: {
                 ...componentProps,

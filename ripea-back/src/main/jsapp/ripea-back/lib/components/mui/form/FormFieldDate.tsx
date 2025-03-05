@@ -101,10 +101,10 @@ export const FormFieldDate: React.FC<FormFieldCustomProps> = (props) => {
         disabled={disabled}
         readOnly={readOnly}
         onChange={handleOnChange}
+        {...componentProps}
         slotProps={{
             field: { clearable: dateError == null },
             textField: {
-                ...componentProps,
                 required: required ?? field.required,
                 error: fieldError != null || dateError != null,
                 placeholder: componentProps?.placeholder ?? (inline ? label : undefined),

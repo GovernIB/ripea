@@ -51,10 +51,10 @@ export const FormFieldDateTimeLocal: React.FC<FormFieldDateTimeLocalProps> = (pr
         onChange={handleOnChange}
         ampm={false}
         views={views}
+        {...componentProps}
         slotProps={{
             field: { clearable: dateError == null },
             textField: {
-                ...componentProps,
                 required: required ?? field.required,
                 error: fieldError != null || dateError != null,
                 placeholder: componentProps?.placeholder ?? (inline ? label : undefined),
