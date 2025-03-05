@@ -128,6 +128,7 @@ public class ObjectMappingHelper {
 						if (!isStaticFinal(field)) {
 							try {
 								Object value = getFieldValue(object, field.getName());
+								ReflectionUtils.makeAccessible(field);
 								ReflectionUtils.setField(
 										field,
 										cln,
