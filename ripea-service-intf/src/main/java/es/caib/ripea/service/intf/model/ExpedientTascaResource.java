@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,12 +30,13 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
 
-    private Long id;
+//    private Long id;
     private Date dataInici;
     private Date dataFi;
     private TascaEstatEnumDto estat;
 //    private Long metaExpedientTascaId;
     private String motiuRebuig;
+    @ResourceField(onChangeActive = true)
     private Date dataLimit;
 //    @SuppressWarnings("unused")
 //    private String dataLimitString;
@@ -49,10 +52,11 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     private String titol;
     private String observacions;
+    @ResourceField(onChangeActive = true)
     private Integer duracio;
 //    @SuppressWarnings("unused")
 //    private String duracioFormat;
-    private PrioritatEnumDto prioritat;
+    private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     private String responsablesStr;
 
     private ResourceReference<ExpedientResource, Long> expedient;
@@ -60,4 +64,5 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private ResourceReference<UsuariResource, String> responsableActual;
     private ResourceReference<UsuariResource, String> delegat;
 
+    private List<ResourceReference<UsuariResource, String>> observadors;
 }

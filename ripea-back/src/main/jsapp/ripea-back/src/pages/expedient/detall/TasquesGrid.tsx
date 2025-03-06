@@ -4,9 +4,25 @@ import {
 } from 'reactlib';
 import {useParams} from "react-router-dom";
 import {formatDate} from "../../../util/dateUtils.ts";
-import Button from "@mui/material/Button";
+import {Button, Grid} from "@mui/material";
+import GridFormField from "../../../components/GridFormField.tsx";
+import React from "react";
 
-const InteressatsGrid: React.FC = () => {
+const TasquesGridForm = () => {
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="metaExpedientTasca"/>
+        <GridFormField xs={12} name="metaExpedientTasca.descripcio" readOnly disabled/>
+        <GridFormField xs={12} name="responsableActual"/>
+        <GridFormField xs={12} name="observadors"/>
+        <GridFormField xs={6} name="duracio"/>
+        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}}/>
+        <GridFormField xs={12} name="titol"/>
+        <GridFormField xs={12} name="observacions" type={"textarea"}/>
+        <GridFormField xs={12} name="prioritat" required/>
+    </Grid>
+}
+
+const TasquesGrid: React.FC = () => {
     const { id } = useParams();
 
     const columns = [
@@ -77,10 +93,17 @@ const InteressatsGrid: React.FC = () => {
             height={5}
             filter={`expedient.id:${id}`}
             titleDisabled
-            readOnly
             perspectives={["RESPONSABLES_RESUM"]}
+            popupEditCreateActive
+            popupEditFormContent={<TasquesGridForm/>}
+            popupEditFormAdditionalData={{
+                expedient: {
+                    id: id
+                },
+            }}
+            // readOnly
         />
     </GridPage>
 }
 
-export default InteressatsGrid;
+export default TasquesGrid;

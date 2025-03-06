@@ -49,15 +49,15 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
     @JoinColumn(name = "delegat")
     private UsuariResourceEntity delegat;
 
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = BaseConfig.DB_PREFIX + "expedient_tasca_obse",
-//            joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
-//            inverseJoinColumns = {@JoinColumn(name = "observador_codi")})
-//    @org.hibernate.annotations.ForeignKey(
-//            name = BaseConfig.DB_PREFIX + "expedient_obse_tasca_fk",
-//            inverseName = BaseConfig.DB_PREFIX + "expedient_tascaobse_fk")
-//    private List<UsuariResourceEntity> observadors = new ArrayList<UsuariResourceEntity>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = BaseConfig.DB_PREFIX + "expedient_tasca_obse",
+            joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
+            inverseJoinColumns = {@JoinColumn(name = "observador_codi")})
+    @org.hibernate.annotations.ForeignKey(
+            name = BaseConfig.DB_PREFIX + "expedient_obse_tasca_fk",
+            inverseName = BaseConfig.DB_PREFIX + "expedient_tascaobse_fk")
+    private List<UsuariResourceEntity> observadors = new ArrayList<UsuariResourceEntity>();
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_inici", nullable = false)
