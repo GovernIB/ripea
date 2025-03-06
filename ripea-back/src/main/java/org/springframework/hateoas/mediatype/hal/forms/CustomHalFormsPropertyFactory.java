@@ -20,6 +20,7 @@ package org.springframework.hateoas.mediatype.hal.forms;
 
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.base.util.HalFormsUtil;
+import es.caib.ripea.service.intf.base.util.TypeUtil;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.hateoas.AffordanceModel.InputPayloadMetadata;
 import org.springframework.hateoas.AffordanceModel.PropertyMetadata;
@@ -31,6 +32,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Size;
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
@@ -93,10 +95,20 @@ class CustomHalFormsPropertyFactory {
 					inputType = "checkbox";
 				} else if (Duration.class.isAssignableFrom(resolvedType)) {
 					inputType = null;
-				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
-					inputType = "search";
 				} else if (resolvedType.isArray() && byte.class.equals(resolvedType.getComponentType())) {
 					inputType = "file";
+				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
+					inputType = "search";
+				} else {
+					try {
+						Field currentField = payload.getType().getDeclaredField(metadata.getName());
+						if (TypeUtil.isMultipleFieldType(currentField)) {
+							Class<?> multipleType = TypeUtil.getMultipleFieldType(currentField);
+							if (multipleType != null && (ResourceReference.class.isAssignableFrom(multipleType) || multipleType.isEnum())) {
+								inputType = "search";
+							}
+						}
+					} catch (NoSuchFieldException ignored) {}
 				}
 			}
 

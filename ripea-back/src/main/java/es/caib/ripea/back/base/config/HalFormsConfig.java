@@ -84,7 +84,7 @@ public class HalFormsConfig {
 							null,
 							field);
 				},
-				this::isEnumField);
+				this::isEnumTypeMultipleAware);
 		ReflectionUtils.doWithFields(
 				resourceClass,
 				field -> {
@@ -95,7 +95,7 @@ public class HalFormsConfig {
 							field,
 							resourceControllerClasses);
 				},
-				field -> ResourceReference.class.isAssignableFrom(field.getType()));
+				this::isResourceReferenceTypeMultipleAware);
 		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
 			for (ResourceConfigArtifact artifact: resourceConfig.artifacts()) {
@@ -109,7 +109,7 @@ public class HalFormsConfig {
 										artifact,
 										field);
 							},
-							this::isEnumField);
+							this::isEnumTypeMultipleAware);
 					ReflectionUtils.doWithFields(
 							artifact.formClass(),
 							field -> {
@@ -120,7 +120,7 @@ public class HalFormsConfig {
 										field,
 										resourceControllerClasses);
 							},
-							field -> ResourceReference.class.isAssignableFrom(field.getType()));
+							this::isResourceReferenceTypeMultipleAware);
 				}
 
 			}
@@ -189,21 +189,27 @@ public class HalFormsConfig {
 		}
 	}
 
-	private boolean isEnumField(Field field) {
-		if (field.getType().isArray()) {
-			return field.getType().getComponentType().isEnum();
-		} else {
-			return field.getType().isEnum();
+	private Class<?> getFieldTypeMultipleAware(Field field) {
+		Class<?> fieldType = field.getType();
+		if (TypeUtil.isMultipleFieldType(field)) {
+			fieldType = TypeUtil.getMultipleFieldType(field);
 		}
+		return fieldType;
+	}
+
+	private boolean isEnumTypeMultipleAware(Field field) {
+		Class<?> fieldType = getFieldTypeMultipleAware(field);
+		return fieldType != null && fieldType.isEnum();
+	}
+
+	private boolean isResourceReferenceTypeMultipleAware(Field field) {
+		Class<?> fieldType = getFieldTypeMultipleAware(field);
+		return fieldType != null && ResourceReference.class.isAssignableFrom(fieldType);
 	}
 
 	private FieldOption[] getInlineOptionsEnumConstants(Field field) {
-		Object[] enumConstants;
-		if (field.getType().isArray()) {
-			enumConstants = field.getType().getComponentType().getEnumConstants();
-		} else {
-			enumConstants = field.getType().getEnumConstants();
-		}
+		Class<?> fieldType = getFieldTypeMultipleAware(field);
+		Object[] enumConstants = fieldType.getEnumConstants();
 		return Arrays.stream(enumConstants).
 				map(e -> new FieldOption(
 						e.toString(),
@@ -230,7 +236,7 @@ public class HalFormsConfig {
 			Link findLink = getFindLinkWithSelfRel(
 					resourceControllerClass.get(),
 					artifact,
-					resourceField);
+					resourceField.getName());
 			if (findLink != null) {
 				// Al link generat li canviam les variables namedQuery i
 				// perspective perquè no les posa com a múltiples.
@@ -265,14 +271,14 @@ public class HalFormsConfig {
 	private Link getFindLinkWithSelfRel(
 			Class<?> resourceControllerClass,
 			ResourceConfigArtifact artifact,
-			Field resourceField) {
+			String fieldName) {
 		Class<ReadonlyResourceController> readonlyResourceControllerClass = (Class<ReadonlyResourceController>)resourceControllerClass;
 		boolean isMutableResourceController = MutableResourceController.class.isAssignableFrom(resourceControllerClass);
 		if (artifact == null) {
 			if (isMutableResourceController) {
 				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)resourceControllerClass;
 				return linkTo(methodOn(mutableResourceControllerClass).fieldOptionsFind(
-						resourceField.getName(),
+						fieldName,
 						null,
 						null,
 						null,
@@ -286,7 +292,7 @@ public class HalFormsConfig {
 				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)resourceControllerClass;
 				return linkTo(methodOn(mutableResourceControllerClass).artifactActionFieldOptionsFind(
 						artifact.code(),
-						resourceField.getName(),
+						fieldName,
 						null,
 						null,
 						null,
@@ -298,7 +304,7 @@ public class HalFormsConfig {
 		} else if (artifact.type() == ResourceArtifactType.REPORT) {
 			return linkTo(methodOn(readonlyResourceControllerClass).artifactReportFieldOptionsFind(
 					artifact.code(),
-					resourceField.getName(),
+					fieldName,
 					null,
 					null,
 					null,
@@ -307,7 +313,7 @@ public class HalFormsConfig {
 		} else if (artifact.type() == ResourceArtifactType.FILTER) {
 			return linkTo(methodOn(readonlyResourceControllerClass).artifactFilterFieldOptionsFind(
 					artifact.code(),
-					resourceField.getName(),
+					fieldName,
 					null,
 					null,
 					null,

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/expedientTasca")
+@RequestMapping(BaseConfig.API_PATH + "/expedientTasques")
 @Tag(name = "Tasques", description = "Servei de gestió de tasques")
 public class ExpedientTascaResourceController extends BaseMutableResourceController<ExpedientTascaResource, Long> {
 

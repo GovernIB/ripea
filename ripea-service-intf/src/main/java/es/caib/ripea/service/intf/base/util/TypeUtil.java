@@ -9,10 +9,7 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.ClassUtils;
 
 import javax.validation.constraints.NotNull;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -71,12 +68,31 @@ public class TypeUtil {
 		return isArrayFieldType(field) || isCollectionFieldType(field);
 	}
 
+	public static Class<?> getMultipleFieldType(Field field) {
+		if (isArrayFieldType(field)) {
+			return getArrayFieldType(field);
+		} else if (isCollectionFieldType(field)) {
+			return getCollectionFieldType(field);
+		} else {
+			return null;
+		}
+	}
+
 	public static boolean isArrayFieldType(Field field) {
 		return field.getType().isArray();
 	}
 
 	public static boolean isCollectionFieldType(Field field) {
 		return Collection.class.isAssignableFrom(field.getType()) && field.getGenericType() instanceof ParameterizedType;
+	}
+
+	public static Class<?> getArrayFieldType(Field field) {
+		if (field.getType().isArray()) {
+			//return Array.newInstance(field.getType(), 0).getClass();
+			return field.getType().getComponentType();
+		} else {
+			return null;
+		}
 	}
 
 	public static Class<?> getCollectionFieldType(Field field) {
