@@ -1,29 +1,38 @@
 package es.caib.ripea.service.intf.model;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "fitxerNom" }, descriptionField = "fitxerNom")
+@ResourceConfig(
+        quickFilterFields = { "fitxerNom" },
+        descriptionField = "fitxerNom",
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_PATH_CODE),
+        })
 public class DocumentResource extends NodeResource {
-	
+
+    public static final String PERSPECTIVE_PATH_CODE = "PATH";
+
 	@NotNull
 	private DocumentTipusEnumDto documentTipus;
 	@NotNull
@@ -109,4 +118,29 @@ public class DocumentResource extends NodeResource {
 	private ArxiuEstatEnumDto arxiuEstat;
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
+
+    @Transient
+    private List<ParentPath> parentPath;
+    @Transient
+    public List<String> treePath;
+
+    @Getter
+    @Setter
+    public static class ParentPath {
+        private Long id;
+        private String nom;
+        private String createdBy;
+        private LocalDateTime createdDate;
+        private ContingutTipusEnumDto tipus;
+
+//        private ParentPath parentPath;
+
+        public ParentPath(Long id, String nom, String createdBy, LocalDateTime createdDate, ContingutTipusEnumDto tipus) {
+            this.id = id;
+            this.nom = nom;
+            this.createdBy = createdBy;
+            this.createdDate = createdDate;
+            this.tipus = tipus;
+        }
+    }
 }

@@ -2,17 +2,25 @@ import {
     GridPage,
     MuiGrid,
 } from 'reactlib';
-import ContingutActionButton from "./ContingutActionButton.tsx";
-import React from "react";
+import React, {useState} from "react";
 import {useParams} from "react-router-dom";
+import ContingutIcon from "./ContingutIcon.tsx";
 
 const DocumentsGrid: React.FC = () => {
     const { id } = useParams();
+    const [expand, setExpand] = useState<boolean>(true);
+    const [vista, setVista] = useState<string>();
+    const handleChange = (event) => {
+        setVista(event.target.value);
+    };
 
     const columns = [
         {
             field: 'nom',
             flex: 0.5,
+            renderCell:(params: any)=>{
+                return <ContingutIcon entity={params?.row}>{params?.row.nom}</ContingutIcon>
+            }
         },
         {
             field: 'descripcio',
@@ -33,26 +41,28 @@ const DocumentsGrid: React.FC = () => {
             field: 'createdBy',
             flex: 0.5,
         },
-        {
-            field: 'id',
-            headerName: '',
-            sortable: false,
-            disableColumnMenu: true,
-            flex: 0.5,
-            renderCell: (params: any) => {
-                return <ContingutActionButton entity={params?.row}/>;
-            }
-        },
     ];
     return <GridPage>
         <MuiGrid
             resourceName="documentResource"
             columns={columns}
             paginationActive
-            height={5}
             filter={`expedient.id:${id}`}
+            perspectives={["PATH"]}
             titleDisabled
             readOnly
+            treeData
+            getTreeDataPath={(row)=>{
+                console.log(row);
+                switch (vista){
+                    case "estat":return [`${row.estat}`,`${row.nom}`];
+                    case "tipus":return [`${row.metaNode?.description}`,`${row.nom}`];
+                    default:return row.parentPath.map((a:any)=>a.nom);
+                }
+            }}
+            // checkboxSelection
+            isGroupExpandedByDefault={()=>expand}
+
         />
     </GridPage>
 }
