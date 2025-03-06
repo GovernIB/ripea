@@ -10,9 +10,9 @@ import React from "react";
 
 const TasquesGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaExpedientTasca"/>
+        <GridFormField xs={12} name="metaExpedientTasca" required/>
         <GridFormField xs={12} name="metaExpedientTasca.descripcio" readOnly disabled/>
-        <GridFormField xs={12} name="responsableActual"/>
+        <GridFormField xs={12} name="responsableActual" required/>
         <GridFormField xs={12} name="observadors" multiple/>
         <GridFormField xs={6} name="duracio"/>
         <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}}/>
@@ -90,7 +90,6 @@ const TasquesGrid: React.FC = () => {
             resourceName="expedientTascaResource"
             columns={columns}
             paginationActive
-            height={5}
             filter={`expedient.id:${id}`}
             titleDisabled
             perspectives={["RESPONSABLES_RESUM"]}

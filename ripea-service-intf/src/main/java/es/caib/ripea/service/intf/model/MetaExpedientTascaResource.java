@@ -2,17 +2,11 @@ package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**

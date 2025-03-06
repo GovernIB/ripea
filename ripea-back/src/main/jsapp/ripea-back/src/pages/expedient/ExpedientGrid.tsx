@@ -16,13 +16,13 @@ const ExpedientGridForm = () => {
     const formContext = useFormContext();
     const {data} = formContext;
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        {!data?.id && <GridFormField xs={12} name="metaExpedient"/>}
+        <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor" disabled={!!data?.id} /*filter={''}*//>
         <GridFormField xs={12} name="sequencia" disabled/>
         <GridFormField xs={12} name="any"/>
         <GridFormField xs={12} name="prioritat" required/>
-        { data?.prioritat!='B_NORMAL' && <GridFormField xs={12} name="prioritatMotiu" required/>}
+        <GridFormField xs={12} name="prioritatMotiu" hidden={data?.prioritat=='B_NORMAL'} required/>
     </Grid>
 }
 
@@ -127,32 +127,102 @@ const ExpedientGrid: React.FC = () => {
                 return <CommentDialog entity={params?.row}/>;
             }
         },
-        {
-            field: 'numSeguidors',
-            headerName: '',
-            sortable: false,
-            disableColumnMenu: true,
-            flex: 0.5,
-            renderCell: (params: any)=> {
-                return (
-                    <IconButton aria-label="people" color={"inherit"} /*variant="contained"*/>
-                        <Badge badgeContent={params.row.numSeguidors} color="secondary">
-                            <Icon>people</Icon>
-                        </Badge>
-                    </IconButton>);
-            }
-        },
-        {
-            field: 'id',
-            headerName: '',
-            sortable: false,
-            disableColumnMenu: true,
-            flex: 1,
-            renderCell: (params: any) => {
-                return <ExpedientActionButton entity={params?.row}/>;
-            }
-        },
     ];
+    const actions = [
+        // {
+        //     title: "",
+        //     icon: "forum",
+        // },
+        {
+            title: "",
+            icon: "people",
+        },
+        ////
+
+        {
+            title: "Gestionar",
+            icon: "folder",
+            linkTo: "/contingut/{{id}}",
+            showInMenu: true,
+        },
+        {
+            title: "Seguir",
+            icon: "person_add",
+            showInMenu: true,
+        },
+        {
+            title: "Modificar...",
+            icon: "edit",
+            showInMenu: true,
+        },
+        {
+            title: "Coger",
+            icon: "lock",
+            showInMenu: true,
+        },
+        {
+            title: "Liberar",
+            icon: "lock_open",
+            showInMenu: true,
+        },
+        {
+            title: "Cambiar prioridad...",
+            icon: "",
+            showInMenu: true,
+        },
+        {
+            title: "Cambiar estado...",
+            icon: "",
+            showInMenu: true,
+        },
+        {
+            title: "Relacionar...",
+            icon: "link",
+            showInMenu: true,
+        },
+        {
+            title: "Cerrar...",
+            icon: "check",
+            showInMenu: true,
+        },
+        {
+            title: "Borrar",
+            icon: "delete",
+            showInMenu: true,
+        },
+        {
+            title: "Histórico de acciones",
+            icon: "list",
+            showInMenu: true,
+        },
+        {
+            title: "Descargar documentos...",
+            icon: "download",
+            showInMenu: true,
+        },
+        {
+            title: "Exportar indice PDF...",
+            icon: "format_list_numbered",
+            showInMenu: true,
+        },
+        {
+            title: "Indice PDF y exportación EIN...",
+            icon: "format_list_numbered",
+            showInMenu: true,
+            disabled: true,
+        },
+        {
+            title: "Información archivo",
+            icon: "info",
+            showInMenu: true,
+            disabled: true,
+        },
+        {
+            title: "Sincronizar estado con archivo",
+            icon: "autorenew",
+            showInMenu: true,
+        },
+    ]
 
     return <GridPage>
         <div style={{border: '1px solid #e3e3e3'}}>
@@ -175,6 +245,7 @@ const ExpedientGrid: React.FC = () => {
                 popupEditFormContent={<ExpedientGridForm/>}
                 // readOnly
                 onRowDoubleClick={(prop)=>navigate(`/contingut/${prop?.id}`)}
+                rowAdditionalActions={actions}
             />
         </div>
     </GridPage>

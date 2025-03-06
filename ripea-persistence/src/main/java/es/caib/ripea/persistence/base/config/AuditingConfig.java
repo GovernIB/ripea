@@ -26,11 +26,12 @@ public class AuditingConfig {
 	@Bean
 	public AuditorAware<String> auditorProvider() {
 		return () -> {
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (authentication != null && authentication.isAuthenticated()) {
-				return Optional.of(authentication.getName());
-			}
-			return Optional.ofNullable(defaultAuditor);
+//			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//			if (authentication != null && authentication.isAuthenticated()) {
+//				return Optional.of(authentication.getName());
+//			}
+//			return Optional.ofNullable(defaultAuditor);
+            return Optional.of("rip_admin");
 		};
 	}
 

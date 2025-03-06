@@ -61,6 +61,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             ExpedientResource resource,
             Map<String, AnswerRequiredException.AnswerValue> answers) {
         entity.setCodi(entity.getMetaExpedient().getCodi());
+
+        /** TODO: cambiar (ExpedientHelper.calcularNumero()) */
+        entity.setNumero(entity.getCodi() + "/" + entity.getSequencia() + "/" + entity.getAny());
+
         entity.setEntitat(entity.getMetaExpedient().getEntitat());
         entity.setEstat(ExpedientEstatEnumDto.OBERT);
         entity.setTipus(ContingutTipusEnumDto.EXPEDIENT);

@@ -78,7 +78,6 @@ const AnotacionsGrid: React.FC = () => {
             resourceName="expedientPeticioResource"
             columns={columns}
             paginationActive
-            height={5}
             filter={`expedient.id:${id}`}
             titleDisabled
             readOnly

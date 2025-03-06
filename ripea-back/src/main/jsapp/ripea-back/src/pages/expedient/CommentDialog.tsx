@@ -1,6 +1,6 @@
 import {Dialog} from "reactlib";
 import {useState} from "react";
-import {Button, Icon} from "@mui/material";
+import {Icon, Badge, IconButton} from "@mui/material";
 
 const CommentDialog = (props:any) => {
     const { entity } = props
@@ -11,7 +11,12 @@ const CommentDialog = (props:any) => {
     };
 
     return <>
-        <Button variant="outlined" sx={{borderRadius: 1}} color={"inherit"} onClick={()=>setOpen(true)}><Icon>forum</Icon>{entity?.numComentaris}</Button>
+        <IconButton aria-label="forum" color={"inherit"} onClick={()=>setOpen(true)} /*variant="outlined" sx={{borderRadius: 1}}*/>
+            <Badge badgeContent={entity?.numComentaris} color="secondary">
+                <Icon>forum</Icon>
+            </Badge>
+        </IconButton>
+
         <Dialog
             open={open}
             closeCallback={handleClose}

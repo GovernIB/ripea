@@ -22,7 +22,7 @@ import lombok.Setter;
 public class InteressatResource extends BaseAuditableResource<Long> {
 
 	@NotNull
-	protected InteressatTipusEnum tipus;
+	protected InteressatTipusEnum tipus = InteressatTipusEnum.InteressatPersonaFisicaEntity;
 	
 	@Size(max = 30)
 	protected String nom;
@@ -39,7 +39,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected Boolean ambOficinaSir;
 	
 	@NotNull
-	protected InteressatDocumentTipusEnumDto documentTipus;
+	protected InteressatDocumentTipusEnumDto documentTipus = InteressatDocumentTipusEnumDto.NIF;
 	@NotNull
 	@Size(max = 17)
 	protected String documentNum;
@@ -59,7 +59,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected String telefon;
 	@Size(max = 160)
 	protected String observacions;
-	protected InteressatIdiomaEnumDto preferenciaIdioma;
+	protected InteressatIdiomaEnumDto preferenciaIdioma = InteressatIdiomaEnumDto.CA;
 	@NotNull
 	protected boolean notificacioAutoritzat;
 	@NotNull

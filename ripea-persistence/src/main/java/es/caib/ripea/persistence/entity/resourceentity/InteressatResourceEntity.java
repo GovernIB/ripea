@@ -2,17 +2,7 @@ package es.caib.ripea.persistence.entity.resourceentity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -93,6 +83,9 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 	protected Date arxiuIntentData;
 	@Column(name = "arxiu_reintents")
 	protected int arxiuReintents;
+
+    @Version
+    private long version = 0;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(

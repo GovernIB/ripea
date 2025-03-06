@@ -5,14 +5,12 @@ import {
 import React, {useState} from "react";
 import {useParams} from "react-router-dom";
 import ContingutIcon from "./ContingutIcon.tsx";
+import {FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon} from "@mui/material";
 
 const DocumentsGrid: React.FC = () => {
     const { id } = useParams();
     const [expand, setExpand] = useState<boolean>(true);
-    const [vista, setVista] = useState<string>();
-    const handleChange = (event) => {
-        setVista(event.target.value);
-    };
+    const [vista, setVista] = useState<string>("carpeta");
 
     const columns = [
         {
@@ -53,7 +51,7 @@ const DocumentsGrid: React.FC = () => {
             readOnly
             treeData
             getTreeDataPath={(row)=>{
-                console.log(row);
+                // console.log(row);
                 switch (vista){
                     case "estat":return [`${row.estat}`,`${row.nom}`];
                     case "tipus":return [`${row.metaNode?.description}`,`${row.nom}`];
@@ -62,7 +60,32 @@ const DocumentsGrid: React.FC = () => {
             }}
             // checkboxSelection
             isGroupExpandedByDefault={()=>expand}
+            toolbarAdditionalRow={<Grid display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"space-between"} pb={1}>
+                <Grid item xs={2}>
+                    <FormControlLabel control={<Checkbox
+                        checked={expand}
+                        onChange={(event) => setExpand(event.target.checked)}
 
+                        icon={<Icon>arrow_right</Icon>}
+                        checkedIcon={<Icon>arrow_drop_down</Icon>}
+                    />} label={expand ?"Contraer" :"Expandir"} />
+                </Grid>
+
+                <Grid item xs={3}>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Tipo de vista</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            value={vista}
+                            onChange={(event)=>setVista(event.target.value)}
+                        >
+                            <MenuItem value={"estat"}>Vista por estado</MenuItem>
+                            <MenuItem value={"tipus"}>Vista por tipo documento</MenuItem>
+                            <MenuItem value={"carpeta"} selected>Vista por carpeta</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+            </Grid>}
         />
     </GridPage>
 }

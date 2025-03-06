@@ -1,11 +1,11 @@
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
+import {useParams} from 'react-router-dom';
 import {
     BasePage,
     useResourceApiService,
 } from 'reactlib';
 import React, {useState} from "react";
-import {Box, Typography, Card, CardContent, Grid, Icon} from '@mui/material';
+import {Box, Typography, Card, CardContent, Grid, Icon, IconButton} from '@mui/material';
 import {formatDate} from '../../util/dateUtils';
 import TabComponent from "../../components/TabComponent";
 import InteressatsGrid from "./detall/InteressatsGrid.tsx";
@@ -13,6 +13,7 @@ import DocumentsGrid from "./detall/DocumentsGrid.tsx";
 import TasquesGrid from "./detall/TasquesGrid.tsx";
 import AnotacionsGrid from "./detall/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
+import CommentDialog from "./CommentDialog.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -45,48 +46,77 @@ const Expedient: React.FC = () => {
             value: "contingut",
             label: t('page.contingut.tabs.contingut'),
             content: <DocumentsGrid/>,
+            badge: expedient?.numContingut,
         },
         {
             value: "dades",
             label: t('page.contingut.tabs.dades'),
             content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
+            badge: expedient?.numDades,
         },
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
             content: <InteressatsGrid/>,
+            badge: expedient?.numInteressats,
         },
         {
             value: "remeses",
             label: t('page.contingut.tabs.remeses'),
             content: <Typography>{t('page.contingut.tabs.remeses')}</Typography>,
+            badge: expedient?.numRemeses,
         },
         {
             value: "publicacions",
             label: t('page.contingut.tabs.publicacions'),
             content: <Typography>{t('page.contingut.tabs.publicacions')}</Typography>,
+            badge: expedient?.numPublicacions,
         },
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
             content: <AnotacionsGrid/>,
+            badge: expedient?.numAnotacions,
         },
         {
             value: "versions",
             label: t('page.contingut.tabs.versions'),
             content: <Typography>{t('page.contingut.tabs.versions')}</Typography>,
+            badge: expedient?.numVersions,
         },
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
             content: <TasquesGrid/>,
+            badge: expedient?.numTasques,
         },
     ]
-    if(expedient) {
-        return <BasePage>
-            <div style={border}>
-            <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', p: 1 }}>
-                <Typography variant="h5"><Icon>folder</Icon> {expedient.nom}</Typography>
+
+    return expedient && <BasePage>
+        <div style={border}>
+            <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', p: 1}}>
+                <Grid container sx={{
+                    direction: "row",
+                    columnSpacing:1,
+                    rowSpacing:1,
+                    justifyContent:"space-between",
+                    alignItems:"center"
+                }} >
+                    <Grid item xs={7}><Typography variant="h5"><Icon>folder</Icon> {expedient.nom}</Typography></Grid>
+                    <Grid item xs={4}>
+                    <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}}>
+                        {(expedient?.agafatPer)
+                                ? <>Expediente cogido por: {expedient?.agafatPer?.description}
+                                    <IconButton aria-label="lock_open" color={"inherit"}>
+                                        <Icon>lock_open</Icon>
+                                    </IconButton></>
+                                : <IconButton aria-label="lock" color={"inherit"}>
+                                    <Icon>lock</Icon>
+                                </IconButton>
+                        }
+                    </Typography>
+                    </Grid>
+                </Grid>
             </Box>
 
             <Grid container direction={"row"} sx={{ p: 1, alignItems: "stretch" }}>
@@ -120,12 +150,12 @@ const Expedient: React.FC = () => {
                         aria-label="scrollable force tabs"
                         tabs={tabs}
                         variant="scrollable"
+                        headerAdditionalData={[<CommentDialog entity={expedient}/>]}
                     />
                 </Grid>
             </Grid>
-            </div>
-        </BasePage>;
-    }
+        </div>
+    </BasePage>;
 }
 
 export default Expedient;
