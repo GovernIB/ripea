@@ -15,7 +15,7 @@ type MuiFormProps = FormProps & {
     hiddenSaveButton?: boolean;
     hiddenDeleteButton?: boolean;
     componentProps?: any;
-};
+}
 
 const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
     const {
@@ -85,7 +85,13 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
         {!hiddenToolbar && <Toolbar
             title={title ?? resourceName}
             elementsWithPositions={toolbarNodes}
-            upperToolbar />}
+            upperToolbar
+            sx={{
+                position: 'sticky',
+                top: '64px',
+                zIndex: 10,
+            }}
+        />}
         <Box sx={innerBoxStyles}>{children}</Box>
     </Box>;
 }

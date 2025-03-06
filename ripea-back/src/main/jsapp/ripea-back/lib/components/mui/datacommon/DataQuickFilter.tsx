@@ -4,21 +4,21 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 
-type GridQuickFilterProps = {
+type DataQuickFilterProps = {
     value: string;
     onChange: (value: string) => void
 } & any;
 
-export const useGridQuickFilter = (initialValue?: string, otherProps?: any): { value: string, component: React.ReactElement } => {
+export const useDataQuickFilter = (initialValue?: string, otherProps?: any): { value: string, component: React.ReactElement } => {
     const [value, setValue] = React.useState(initialValue ?? '');
-    const component = <GridQuickFilter
+    const component = <DataQuickFilter
         value={value}
         onChange={setValue}
         {...otherProps} />;
     return { value, component }
 }
 
-const GridQuickFilter: React.FC<GridQuickFilterProps> = (props) => {
+const DataQuickFilter: React.FC<DataQuickFilterProps> = (props) => {
     const {
         value,
         onChange,
@@ -45,4 +45,4 @@ const GridQuickFilter: React.FC<GridQuickFilterProps> = (props) => {
         {...otherProps} />;
 }
 
-export default GridQuickFilter;
+export default DataQuickFilter;

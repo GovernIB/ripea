@@ -60,7 +60,7 @@ const InteressatsGrid: React.FC = () => {
             titleDisabled
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
-            popupEditFormAdditionalData={{
+            formAdditionalData={{
                 expedient: {
                     id: id
                 },

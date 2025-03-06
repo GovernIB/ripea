@@ -2,22 +2,27 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '../Toolbar';
 import { toToolbarIcon } from '../ToolbarIcon';
-import { ReactElementWithPosition } from '../../../util/reactNodePosition';
+import {
+    ReactElementWithPosition,
+    joinReactElementsWithPositionWithReactElementsWithPositions
+} from '../../../util/reactNodePosition';
 import { useBaseAppContext } from '../../BaseAppContext';
 
-export type GridToolbarType = 'default' | 'upper' | 'hidden';
+export type DataToolbarType = 'default' | 'upper' | 'hidden';
 
-type GridToolbarProps = {
+type DataToolbarProps = {
     title?: string;
+    subtitle?: string;
     elementsWithPositions?: ReactElementWithPosition[];
     upperToolbar?: boolean;
     error?: any;
 };
 
-export const useToolbar = (
+export const useDataToolbar = (
     title: string,
     titleDisabled: boolean,
-    toolbarType: GridToolbarType,
+    subtitle: string | undefined,
+    toolbarType: DataToolbarType,
     apiCurrentError: any,
     quickFilterComponent: React.ReactElement,
     doRefresh: () => void,
@@ -29,39 +34,44 @@ export const useToolbar = (
     const { t } = useBaseAppContext();
     const isUpperToolbarType = toolbarType === 'upper';
     const isHiddenToolbarType = toolbarType === 'hidden';
-    const toolbarNodes: ReactElementWithPosition[] = [];
+    const elementsWithPosition: ReactElementWithPosition[] = [];
     const toolbarNodesPosition = 2;
-    toolbarNodes.push(...(toolbarElementsWithPositions ?? []));
-    !toolbarHideExport && toolbarNodes.push({
+    !toolbarHideExport && elementsWithPosition.push({
         position: toolbarNodesPosition,
         element: toToolbarIcon('file_download', {
-            title: t('grid.export.title'),
+            title: t('datacommon.export.title'),
             onClick: () => doExport?.(undefined, true),
         }),
     });
-    !toolbarHideRefresh && toolbarNodes.push({
+    !toolbarHideRefresh && elementsWithPosition.push({
         position: toolbarNodesPosition,
         element: toToolbarIcon('refresh', {
-            title: t('grid.refresh.title'),
+            title: t('datacommon.refresh.title'),
             onClick: () => doRefresh(),
         }),
     });
-    !toolbarHideQuickFilter && toolbarNodes.push({
+    !toolbarHideQuickFilter && elementsWithPosition.push({
         position: toolbarNodesPosition,
         element: quickFilterComponent
     });
+    const joinedElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
+            2,
+            elementsWithPosition,
+            toolbarElementsWithPositions);
     const toolbarElementProps = {
         title: !titleDisabled ? title : undefined,
+        subtitle,
         upperToolbar: isUpperToolbarType,
-        elementsWithPositions: toolbarNodes,
+        elementsWithPositions: joinedElementsWithPositions,
         error: apiCurrentError ?? undefined,
     };
-    return !isHiddenToolbarType ? <GridToolbar {...toolbarElementProps} /> : null;
+    return !isHiddenToolbarType ? <DataToolbar {...toolbarElementProps} /> : null;
 }
 
-const GridToolbar: React.FC<GridToolbarProps> = (props) => {
+const DataToolbar: React.FC<DataToolbarProps> = (props) => {
     const {
         title,
+        subtitle,
         elementsWithPositions: elementsWithPositionsProp,
         upperToolbar,
         error,
@@ -94,8 +104,8 @@ const GridToolbar: React.FC<GridToolbarProps> = (props) => {
     !errorShown && elementsWithPositions.push(...(elementsWithPositionsProp ?? []));
     return <Box sx={{ p: 0 }}>
         <Toolbar
-            title={error && errorShown ? t('grid.error.toolbar') : title}
-            subtitle={error && errorShown && error?.message}
+            title={error && errorShown ? t('datacommon.toolbar.error') : title}
+            subtitle={error && errorShown ? error?.message : subtitle}
             elementsWithPositions={elementsWithPositions}
             upperToolbar={upperToolbar}
             error={error}
@@ -103,4 +113,4 @@ const GridToolbar: React.FC<GridToolbarProps> = (props) => {
     </Box>;
 }
 
-export default GridToolbar;
+export default DataToolbar;

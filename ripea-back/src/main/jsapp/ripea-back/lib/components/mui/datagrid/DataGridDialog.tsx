@@ -1,7 +1,7 @@
 import React from 'react';
 import { GridColDef, GridRowParams } from '@mui/x-data-grid-pro';
 import Dialog, { DialogProps } from '../Dialog';
-import MuiGrid from './MuiGrid';
+import MuiGrid from './MuiDataGrid';
 
 type DataGridDialogProps = DialogProps & {
     resourceName: string;
@@ -15,7 +15,7 @@ export type DataGridDialogShowFn = (title: string | null, height?: number | null
 
 export type UseDataGridDialogFn = (resourceName: string, columns: GridColDef[], resourceFieldName?: string) => [DataGridDialogShowFn, React.ReactElement];
 
-export const useGridDialog: UseDataGridDialogFn = (resourceName: string, columns: GridColDef[], resourceFieldName?: string) => {
+export const useDataGridDialog: UseDataGridDialogFn = (resourceName: string, columns: GridColDef[], resourceFieldName?: string) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
     const [height, setHeight] = React.useState<number | undefined | null>();

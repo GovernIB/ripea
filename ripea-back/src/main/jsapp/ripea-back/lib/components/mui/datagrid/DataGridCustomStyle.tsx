@@ -3,7 +3,7 @@ import { DataGridPro as DataGrid, gridClasses } from '@mui/x-data-grid-pro';
 
 const ODD_OPACITY = 0.2;
 
-const GridCustomStyle = styled(DataGrid)(({ theme }) => ({
+const DataGridCustomStyle = styled(DataGrid)(({ theme }) => ({
     [`& .${gridClasses.row}.even`]: {
         backgroundColor: theme.palette.grey[200],
         '&:hover': {
@@ -51,4 +51,4 @@ const GridCustomStyle = styled(DataGrid)(({ theme }) => ({
     // },
 }));
 
-export default GridCustomStyle;
+export default DataGridCustomStyle;

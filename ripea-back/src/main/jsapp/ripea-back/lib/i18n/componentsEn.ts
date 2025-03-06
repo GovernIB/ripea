@@ -14,9 +14,9 @@ const componentsEn = {
             message: 'Server connection lost',
         }
     },
-    grid: {
-        refresh: {
-            title: 'Refresh',
+    datacommon: {
+        details: {
+            title: 'Details',
         },
         create: {
             title: 'Create',
@@ -27,12 +27,22 @@ const componentsEn = {
         delete: {
             title: 'Delete',
             single: {
-                title: 'Delete item',
+                title: 'Delete',
                 confirm: 'Are you sure you want to delete this item (this action can\'t be undone)?',
                 success: 'Deleted items',
                 error: 'Error deleting items',
             },
         },
+        export: {
+            title: 'Export',
+        },
+        refresh: {
+            title: 'Refresh',
+        },
+        toolbar: {
+            error: 'An error has occurred',
+        },
+        noRows: 'No data',
     },
     form: {
         goBack: {
@@ -75,6 +85,16 @@ const componentsEn = {
                 true: 'Yes',
                 false: 'No',
             },
+        },
+        dialog: {
+            create: 'Create',
+            update: 'Update',
+        },
+    },
+    grid: {
+        selection: {
+            one: '1 selected row ',
+            multiple: '{{count}} selected rows',
         },
     },
     buttons: {

@@ -2,59 +2,65 @@ import React from 'react';
 import Icon from '@mui/material/Icon';
 import { GridActionsCellItem } from '@mui/x-data-grid-pro';
 import { useBaseAppContext } from '../../BaseAppContext';
-import { useGridContext } from './GridContext';
 
-type GridActionItemProps = {
+type DataGridActionItemProps = {
     id: any;
     title?: string;
+    row?: any;
     icon?: string;
-    link?: string;
-    onClick?: (id: any, event: React.MouseEventHandler<HTMLLIElement>) => void;
+    linkTo?: string;
+    linkState?: any;
+    onClick?: (id: any, row: any, event: React.MouseEvent) => void;
     showInMenu?: boolean;
     disabled?: boolean;
 };
 
-export const toGridActionItem = (
+export const toDataGridActionItem = (
     id: any,
     title: string,
+    row?: any,
     icon?: string,
-    link?: string,
-    onClick?: (id: any, event: React.MouseEventHandler<HTMLLIElement>) => void,
+    linkTo?: string,
+    linkState?: any,
+    onClick?: (id: any, event: React.MouseEvent) => void,
     showInMenu?: boolean,
     disabled?: boolean): React.ReactElement => {
-    return <GridActionItem
+    return <DataGridActionItem
         id={id}
         title={title}
+        row={row}
         icon={icon}
-        link={link}
+        linkTo={linkTo}
+        linkState={linkState}
         onClick={onClick}
         showInMenu={showInMenu}
         disabled={disabled} />;
 }
 
-const GridActionItem: React.FC<GridActionItemProps> = (props) => {
+const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
     const {
         id,
         title,
+        row,
         icon,
-        link,
+        linkTo,
+        linkState,
         onClick,
         showInMenu,
         disabled,
     } = props;
     const { getLinkComponent } = useBaseAppContext();
-    const { findArgs } = useGridContext();
     const additionalProps: any = showInMenu ? { showInMenu: true } : {};
-    link && (additionalProps['component'] = getLinkComponent());
-    link && (additionalProps['to'] = link);
-    link && (additionalProps['state'] = { findArgs });
+    linkTo && (additionalProps['component'] = getLinkComponent());
+    linkTo && (additionalProps['to'] = linkTo);
+    linkState && (additionalProps['state'] = linkState);
     return <GridActionsCellItem
         label={title}
         title={!showInMenu ? title : undefined}
         icon={icon ? <Icon>{icon}</Icon> : undefined}
-        onClick={(event: React.MouseEventHandler<HTMLLIElement>) => onClick?.(id, event)}
+        onClick={event => onClick?.(id, row, event)}
         disabled={disabled}
         {...additionalProps} />;
 }
 
-export default GridActionItem;
+export default DataGridActionItem;

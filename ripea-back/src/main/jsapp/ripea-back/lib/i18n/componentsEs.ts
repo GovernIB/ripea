@@ -14,25 +14,35 @@ const componentsEs = {
             message: 'Sin conexión con el servidor',
         }
     },
-    grid: {
-        refresh: {
-            title: 'Refrescar',
+    datacommon: {
+        details: {
+            title: 'Details',
         },
         create: {
-            title: 'Crear',
+            title: 'Create',
         },
         update: {
-            title: 'Modificar',
+            title: 'Update',
         },
         delete: {
-            title: 'Borrar',
+            title: 'Delete',
             single: {
-                title: 'Borrar elemento',
-                confirm: '¿Está seguro de que quiere borrar este elemento (esta acción no se puede deshacer)?',
-                success: 'Elemento borrado',
-                error: 'Error borrando elementos',
+                title: 'Delete',
+                confirm: 'Are you sure you want to delete this item (this action can\'t be undone)?',
+                success: 'Deleted items',
+                error: 'Error deleting items',
             },
         },
+        export: {
+            title: 'Export',
+        },
+        refresh: {
+            title: 'Refresh',
+        },
+        toolbar: {
+            error: 'An error has occurred',
+        },
+        noRows: 'No data',
     },
     form: {
         goBack: {
@@ -75,6 +85,16 @@ const componentsEs = {
                 true: 'Si',
                 false: 'No',
             },
+        },
+        dialog: {
+            create: 'Crear',
+            update: 'Modificar',
+        },
+    },
+    grid: {
+        selection: {
+            one: '1 selected row ',
+            multiple: '{{count}} selected rows',
         },
     },
     buttons: {

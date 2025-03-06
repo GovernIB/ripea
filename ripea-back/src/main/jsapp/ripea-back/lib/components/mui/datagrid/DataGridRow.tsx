@@ -3,11 +3,11 @@ import Box from '@mui/material/Box';
 import { GridRow as MuiGridRow } from '@mui/x-data-grid';
 import { useBaseAppContext } from '../../BaseAppContext';
 
-type GridRowProps = any & {
+type DataGridRowProps = any & {
     cursorPointer?: boolean;
 };
 
-const GridRow: React.FC<GridRowProps> = (props) => {
+const DataGridRow: React.FC<DataGridRowProps> = (props) => {
     const {
         linkTo,
         cursorPointer,
@@ -29,4 +29,4 @@ const GridRow: React.FC<GridRowProps> = (props) => {
         }}>{row}</Box> : row;
 }
 
-export default GridRow;
+export default DataGridRow;

@@ -11,7 +11,7 @@ import { FormFieldCustomProps } from '../../form/FormField';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useResourceApiContext } from '../../ResourceApiContext';
 import { useDebounce } from '../../../util/useDebounce';
-import { useGridDialog } from '../grid/GridDialog';
+import { useDataGridDialog } from '../datagrid/DataGridDialog';
 import { useFormFieldCommon } from './FormFieldText';
 
 const DEFAULT_PAGE_SIZE = 5;
@@ -66,7 +66,7 @@ const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
         apiRef,
         dialogComponentProps
     } = props;
-    const [gridDialogShow, gridDialogComponent] = useGridDialog(resourceName, columns, field.name);
+    const [gridDialogShow, gridDialogComponent] = useDataGridDialog(resourceName, columns, field.name);
     const show = () => {
         return gridDialogShow(
             title,

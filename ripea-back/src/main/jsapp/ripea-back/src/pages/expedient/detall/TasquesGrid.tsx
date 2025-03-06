@@ -95,7 +95,7 @@ const TasquesGrid: React.FC = () => {
             perspectives={["RESPONSABLES_RESUM"]}
             popupEditCreateActive
             popupEditFormContent={<TasquesGridForm/>}
-            popupEditFormAdditionalData={{
+            formAdditionalData={{
                 expedient: {
                     id: id
                 },

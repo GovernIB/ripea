@@ -14,9 +14,9 @@ const componentsCa = {
             message: 'Sense connexió amb el servidor',
         }
     },
-    grid: {
-        refresh: {
-            title: 'Refrescar',
+    datacommon: {
+        details: {
+            title: 'Detalls',
         },
         create: {
             title: 'Crear',
@@ -27,16 +27,28 @@ const componentsCa = {
         delete: {
             title: 'Esborrar',
             single: {
-                title: 'Esborrar element',
+                title: 'Esborrar',
                 confirm: 'Estau segur que voleu esborrar aquest element (aquesta acció no es pot desfer)?',
                 success: 'Element esborrat',
                 error: 'Error esborrant element',
             },
         },
-        error: {
-            toolbar: 'S\'ha produit un error',
+        export: {
+            title: 'Exportar',
+        },
+        refresh: {
+            title: 'Refrescar',
+        },
+        toolbar: {
+            error: 'S\'ha produit un error',
         },
         noRows: 'Sense dades',
+    },
+    grid: {
+        selection: {
+            one: '1 fila seleccionada',
+            multiple: '{{count}} files seleccionades',
+        },
     },
     form: {
         goBack: {
@@ -80,6 +92,10 @@ const componentsCa = {
                 false: 'No',
             },
         },
+        dialog: {
+            create: 'Crear',
+            update: 'Modificar',
+        },
     },
     buttons: {
         answerRequired: {
@@ -101,9 +117,6 @@ const componentsCa = {
         report: {
             generate: 'Generar',
             cancel: 'Cancel·lar',
-        },
-        close: {
-            close: 'Tancar'
         },
         misc: {
             retry: 'Tornar a provar',

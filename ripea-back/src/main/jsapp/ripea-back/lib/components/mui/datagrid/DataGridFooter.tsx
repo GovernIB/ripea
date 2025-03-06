@@ -15,22 +15,22 @@ import {
 import Pagination from '@mui/material/Pagination';
 import { useBaseAppContext } from '../../BaseAppContext';
 
-type GridFooterSelectionProps = {
+type DataGridFooterSelectionProps = {
     setRowSelectionModel: (rowSelectionModel: GridRowSelectionModel) => void;
 };
 
-type GridFooterPaginationProps = {
+type DataGridFooterPaginationProps = {
     pageInfo: any;
 };
 
-type GridFooterProps = {
+type DataGridFooterProps = {
     selectionActive: boolean;
     paginationActive: boolean;
     pageInfo: any;
     setRowSelectionModel: (rowSelectionModel: GridRowSelectionModel) => void;
 };
 
-const GridFooterSelection: React.FC<GridFooterSelectionProps> = (props) => {
+const DataGridFooterSelection: React.FC<DataGridFooterSelectionProps> = (props) => {
     const { setRowSelectionModel } = props;
     const { t } = useBaseAppContext();
     const apiRef = useGridApiContext();
@@ -47,7 +47,7 @@ const GridFooterSelection: React.FC<GridFooterSelectionProps> = (props) => {
     </Box>;
 }
 
-const GridFooterPagination: React.FC<GridFooterPaginationProps> = (props) => {
+const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) => {
     const { pageInfo } = props;
     const apiRef = useGridApiContext();
     const page = useGridSelector(apiRef, gridPageSelector);
@@ -68,7 +68,7 @@ const GridFooterPagination: React.FC<GridFooterPaginationProps> = (props) => {
     </Box>;
 }
 
-const GridFooter: React.FC<GridFooterProps> = (props) => {
+const DataGridFooter: React.FC<DataGridFooterProps> = (props) => {
     const {
         selectionActive,
         setRowSelectionModel,
@@ -77,9 +77,9 @@ const GridFooter: React.FC<GridFooterProps> = (props) => {
     } = props;
     const showFooter = selectionActive || paginationActive;
     return showFooter ? <GridFooterContainer>
-        <GridFooterSelection setRowSelectionModel={setRowSelectionModel} />
+        <DataGridFooterSelection setRowSelectionModel={setRowSelectionModel} />
         {paginationActive && <GridFooterPagination pageInfo={pageInfo} />}
     </GridFooterContainer> : null;
 }
 
-export default GridFooter;
+export default DataGridFooter;

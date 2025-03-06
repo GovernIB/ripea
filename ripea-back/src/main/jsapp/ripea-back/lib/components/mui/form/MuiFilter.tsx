@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Filter, { FilterProps } from '../../form/Filter';
-import { useOptionalGridContext } from '../grid/GridContext';
+import { useOptionalGridContext } from '../datagrid/DataGridContext';
 
 type MuiFilterProps = FilterProps & {
     componentProps?: any;
