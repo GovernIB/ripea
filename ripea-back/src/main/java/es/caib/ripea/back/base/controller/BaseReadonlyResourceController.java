@@ -1098,15 +1098,18 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				currentFieldName = fieldName;
 			}
 			Field currentField = ReflectionUtils.findField(resourceClass, currentFieldName);
-			if (currentField != null && ResourceReference.class.isAssignableFrom(currentField.getType())) {
-				Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(currentField);
-				if (fieldName.contains(".")) {
-					return findReferenceFieldAndClass(
-							referencedResourceClass,
-							fieldName.substring(currentFieldName.length() + 1));
-				} else {
-					return Optional.of(
-							new FieldAndClass(currentField, referencedResourceClass));
+			if (currentField != null) {
+				Class<?> currentFieldType = TypeUtil.getFieldTypeMultipleAware(currentField);
+				if (ResourceReference.class.isAssignableFrom(currentFieldType)) {
+					Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(currentField);
+					if (fieldName.contains(".")) {
+						return findReferenceFieldAndClass(
+								referencedResourceClass,
+								fieldName.substring(currentFieldName.length() + 1));
+					} else {
+						return Optional.of(
+								new FieldAndClass(currentField, referencedResourceClass));
+					}
 				}
 			}
 		}

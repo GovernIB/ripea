@@ -13,7 +13,7 @@ const TasquesGridForm = () => {
         <GridFormField xs={12} name="metaExpedientTasca"/>
         <GridFormField xs={12} name="metaExpedientTasca.descripcio" readOnly disabled/>
         <GridFormField xs={12} name="responsableActual"/>
-        <GridFormField xs={12} name="observadors"/>
+        <GridFormField xs={12} name="observadors" multiple/>
         <GridFormField xs={6} name="duracio"/>
         <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}}/>
         <GridFormField xs={12} name="titol"/>

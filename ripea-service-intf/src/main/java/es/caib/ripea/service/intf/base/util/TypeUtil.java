@@ -78,6 +78,14 @@ public class TypeUtil {
 		}
 	}
 
+	public static Class<?> getFieldTypeMultipleAware(Field field) {
+		Class<?> fieldType = field.getType();
+		if (TypeUtil.isMultipleFieldType(field)) {
+			fieldType = TypeUtil.getMultipleFieldType(field);
+		}
+		return fieldType;
+	}
+
 	public static boolean isArrayFieldType(Field field) {
 		return field.getType().isArray();
 	}

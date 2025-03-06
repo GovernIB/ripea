@@ -189,26 +189,18 @@ public class HalFormsConfig {
 		}
 	}
 
-	private Class<?> getFieldTypeMultipleAware(Field field) {
-		Class<?> fieldType = field.getType();
-		if (TypeUtil.isMultipleFieldType(field)) {
-			fieldType = TypeUtil.getMultipleFieldType(field);
-		}
-		return fieldType;
-	}
-
 	private boolean isEnumTypeMultipleAware(Field field) {
-		Class<?> fieldType = getFieldTypeMultipleAware(field);
+		Class<?> fieldType = TypeUtil.getFieldTypeMultipleAware(field);
 		return fieldType != null && fieldType.isEnum();
 	}
 
 	private boolean isResourceReferenceTypeMultipleAware(Field field) {
-		Class<?> fieldType = getFieldTypeMultipleAware(field);
+		Class<?> fieldType = TypeUtil.getFieldTypeMultipleAware(field);
 		return fieldType != null && ResourceReference.class.isAssignableFrom(fieldType);
 	}
 
 	private FieldOption[] getInlineOptionsEnumConstants(Field field) {
-		Class<?> fieldType = getFieldTypeMultipleAware(field);
+		Class<?> fieldType = TypeUtil.getFieldTypeMultipleAware(field);
 		Object[] enumConstants = fieldType.getEnumConstants();
 		return Arrays.stream(enumConstants).
 				map(e -> new FieldOption(
