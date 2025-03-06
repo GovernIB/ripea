@@ -1098,6 +1098,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
 						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null,
 						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
+						filtre.isPermisDirecteActive(),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				MetaExpedientDto.class,
 				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
@@ -1153,6 +1154,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Utils.getNullIfEmpty(candidateMetaExpIds),
 			filtre.getRevisioEstat() == null,
 			filtre.getRevisioEstat(),
+			filtre.isPermisDirecteActive(),
 			paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));	
 	}
 	

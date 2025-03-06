@@ -769,7 +769,7 @@ public class EntityComprovarHelper {
 				false,
 				null);
 	}
-	public ExpedientEntity comprovarExpedientPermisWrite(Long expedientId) {
+	public ExpedientEntity comprovarExpedientPermisWrite(Long expedientId, boolean llancarExcepcio) {
 		return comprovarExpedient(
 				expedientId,
 				false,
@@ -777,7 +777,8 @@ public class EntityComprovarHelper {
 				true,
 				false,
 				false,
-				null);
+				null,
+				llancarExcepcio);
 	}
 	public ExpedientEntity comprovarExpedientPermisCreate(Long expedientId) {
 		return comprovarExpedient(
@@ -789,7 +790,7 @@ public class EntityComprovarHelper {
 				false,
 				null);
 	}
-	public ExpedientEntity comprovarExpedientPermisDelete(Long expedientId) {
+	public ExpedientEntity comprovarExpedientPermisDelete(Long expedientId, boolean llancarExcepcio) {
 		return comprovarExpedient(
 				expedientId,
 				false,
@@ -797,7 +798,8 @@ public class EntityComprovarHelper {
 				false,
 				false,
 				true,
-				null);
+				null,
+				llancarExcepcio);
 	}
 
 	public ExpedientEntity comprovarExpedient(
@@ -808,6 +810,26 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete,
 			String rolActual) {
+		return comprovarExpedient(
+				expedientId,
+				comprovarAgafatPerUsuariActual,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete,
+				rolActual,
+				true);
+	}
+	
+	public ExpedientEntity comprovarExpedient(
+			Long expedientId,
+			boolean comprovarAgafatPerUsuariActual,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete,
+			String rolActual,
+			boolean llancarExcepcio) {
 
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
@@ -842,31 +864,30 @@ public class EntityComprovarHelper {
 				comprovarPermisRead = false;
 			}
 		}
-		
 
 		if (comprovarPermisRead) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.READ,
-					"READ", true);
+					"READ", llancarExcepcio);
 		}
 		if (comprovarPermisWrite) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.WRITE,
-					"WRITE", true);
+					"WRITE", llancarExcepcio);
 		}
 		if (comprovarPermisCreate) {
-		comprovarPermisExpedient(
-				expedientId,
-				ExtendedPermission.CREATE,
-				"CREATE", true);
+			comprovarPermisExpedient(
+					expedientId,
+					ExtendedPermission.CREATE,
+					"CREATE", llancarExcepcio);
 		}
 		if (comprovarPermisDelete) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.DELETE,
-					"DELETE", true);
+					"DELETE", llancarExcepcio);
 		}
 		
 		return expedient;
@@ -1351,10 +1372,18 @@ public class EntityComprovarHelper {
 				logger.info("comprovarPermisExpedient: El usuari no es administrador de la entitat. Continuam comprovant nivells més baixos.");
 			
 			//https://github.com/GovernIB/ripea/issues/1633 Procediments que requereixen un permís directe
-			if (expedient.getMetaExpedient().isPermisDirecte() && !isGrantedPermisProcediment(procedimentId, permission)) {
+			// - Sobre el MetaExpedient si NO es comú
+			// - Sobre el MetaExpedientOrgan si es comú
+			if (expedient.getMetaExpedient().isPermisDirecte() && 
+				!isGrantedPermisProcediment(procedimentId, permission) &&
+				!isGrantedPermisProcedimentOrgan(procedimentId, expedient.getOrganGestor().getId(), permission)) {
 				if (cacheHelper.mostrarLogsPermisos())
 					logger.info("comprovarPermisExpedient: El procediment requereix assignar permís directe i el usuari ni cap dels seus rols té permis de "+permissionName+" sobre el procediment "+procedimentId);
-				throw new PermissionDeniedException(expedient.getMetaExpedient().getClass(), procedimentId, permissionName, "El procediment requereix assignar permís directe.");
+				if (throwException) {
+					throw new PermissionDeniedException(expedient.getMetaExpedient().getClass(), procedimentId, permissionName, "El procediment requereix assignar permís directe.");
+				} else {
+					return false;
+				}
 			}
 			
 			if (!isAdminOrgan(organId)) {

@@ -3,10 +3,8 @@
  */
 package es.caib.ripea.core.repository;
 
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,8 +12,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Collection;
-import java.util.List;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -72,6 +72,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:permisDirecte = false or me.permisDirecte=true)" +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
 			"and (:esNullRevisioEstat = true or me.revisioEstat IN (:revisioEstats)) ")
@@ -91,6 +92,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("comuns") boolean comuns,
 			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
 			@Param("revisioEstats") MetaExpedientRevisioEstatEnumDto[] revisioEstats,
+			@Param("permisDirecte") boolean permisDirecte,
 			Pageable pageable);
 
 	@Query( "from " +
@@ -102,6 +104,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
+			"and (:permisDirecte = false or me.permisDirecte=true)" +
 			"and me.id in (:ids)" + 
 			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	Page<MetaExpedientEntity> findByOrganGestor(
@@ -119,6 +122,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("ids") List<Long> ids,
 			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
 			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
+			@Param("permisDirecte") boolean permisDirecte,
 			Pageable pageable);
 
 	@Query( "select distinct me " +

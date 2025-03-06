@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.Validator;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.RequestContext;
+import org.springframework.web.util.WebUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -98,6 +101,7 @@ public class MetaExpedientController extends BaseAdminController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "MetaExpedientController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_IMPORT_TEMPORAL = "MetaExpedientController.session.import.temporal";
+	private static final String COOKIE_PERMIS_DIRECTE = "permis_directe";
 
 	@Autowired private MetaExpedientService metaExpedientService;
 	@Autowired private AplicacioService aplicacioService;
@@ -105,7 +109,11 @@ public class MetaExpedientController extends BaseAdminController {
 	@Autowired private Validator validator;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(HttpServletRequest request, Model model) {
+	public String get(
+			@CookieValue(value = COOKIE_PERMIS_DIRECTE, defaultValue = "false") boolean permisDirecte,
+			HttpServletRequest request,
+			Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
@@ -115,6 +123,9 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isRolDissenyadorOrgan", RolHelper.isRolActualDissenyadorOrgan(request));
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
+		
+		model.addAttribute("nomCookiePermisDirecte", COOKIE_PERMIS_DIRECTE);
+		model.addAttribute("permisDirecteActive", permisDirecte);
 		
 		if (isRolAdmin) {
 			boolean revisioActiva = metaExpedientService.isRevisioActiva();
@@ -1183,6 +1194,10 @@ public class MetaExpedientController extends BaseAdminController {
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
 		}
+		
+		Cookie cookie = WebUtils.getCookie(request, COOKIE_PERMIS_DIRECTE);
+		filtreCommand.setPermisDirecteActive(cookie != null && "true".equals(cookie.getValue()));
+		
 		return filtreCommand;
 	}
 

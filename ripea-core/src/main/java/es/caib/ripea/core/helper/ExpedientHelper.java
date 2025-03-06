@@ -109,6 +109,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
@@ -190,6 +191,8 @@ public class ExpedientHelper {
 	private ExpedientHelper2 expedientHelper2;
 	@Autowired
 	private OrganGestorCacheHelper organGestorCacheHelper;
+	@Autowired
+	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -1747,8 +1750,7 @@ public class ExpedientHelper {
 				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findOne(organActual).getCodi());
 			}
 			
-			//A no ser que el procediment estigui marcat com a permis directe, en tal cas has de tenir permisos al procediment, no al organ.
-			//Pero no li podem passar tota la llista de procediments, sino nomes els dels organs que té permís
+			//Permisos que s'han donat a un procediment NO comú
 			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaNodeEntity.class,
 					ExtendedPermission.READ));
@@ -1762,6 +1764,26 @@ public class ExpedientHelper {
 					}
 				}
 			}
+			
+			List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+			if (meComuns!=null && meComuns.size()>0) {
+				//Permisos que s'han donat a un procediment comú (indicant OG)
+				List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
+						MetaExpedientOrganGestorEntity.class,
+						ExtendedPermission.READ));
+				
+				for (Long metaExpComId: meComuns) {
+					MetaExpedientEntity mExcom = metaExpedientRepository.findOne(metaExpComId);
+
+					if (!mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
+						aux.add(metaExpComId);
+					}
+				}
+			}
+			
+//			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+//					MetaExpedientOrganGestorEntity.class,
+//					ExtendedPermission.READ));
 			
 			if (aux.size()>0) {
 				idsMetaExpedientsPermesos = aux;
@@ -1813,6 +1835,23 @@ public class ExpedientHelper {
         }
 		
 		return permisosPerExpedientsDto;
+	}
+	
+	private boolean permisMetaExpOrgan(
+			List<Long> permisMetaOrganGestor,
+			Long mExComuId,
+			List<Long> idsOrgansPermesos) {
+		for (Long permisMetaOGId: permisMetaOrganGestor) {
+			MetaExpedientOrganGestorEntity meOgEn = metaExpedientOrganGestorRepository.findOne(permisMetaOGId);
+			if (meOgEn!=null && meOgEn.getMetaExpedient()!=null && meOgEn.getMetaExpedient().getId().equals(mExComuId)) {
+				for (Long idOrganPermes: idsOrgansPermesos) {
+					if (meOgEn.getOrganGestor()!=null && meOgEn.getOrganGestor().getId().equals(idOrganPermes)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	private BigDecimal crearFilesCarpetaActual(

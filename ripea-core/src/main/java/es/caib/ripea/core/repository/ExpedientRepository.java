@@ -85,7 +85,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
 			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
-			// - Per admin: es compleix la primera condicio = No filtra
+			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
 			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
 					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
@@ -94,7 +94,12 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos3)))" +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
-			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
+			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " + //Organ gestor del filtre
+			"and (:esNullIdsOrgansPermesos = true " +
+			"			or e.organGestor.id in (:idsOrgansPermesos0)" +
+			"			or e.organGestor.id in (:idsOrgansPermesos1)" +
+			"			or e.organGestor.id in (:idsOrgansPermesos2)" +
+			"			or e.organGestor.id in (:idsOrgansPermesos3)) " +			
 			"and (:esNullNumero = true or lower(e.numero) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
