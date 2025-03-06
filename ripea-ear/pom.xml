@@ -8,6 +8,11 @@
 	</parent>
 	<artifactId>ripea-ear</artifactId>
 	<packaging>ear</packaging>
+	<properties>
+		<docker.base.image>${project.parent.artifactId}</docker.base.image>
+		<docker.jboss.userhome>/home/jboss</docker.jboss.userhome>
+		<docker.jboss.dir>jboss-eap-7.2</docker.jboss.dir>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -39,30 +44,121 @@
 			<artifactId>ripea-plugin-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>es.caib.ripea</groupId>
+			<artifactId>ripea-custom-hal-forms</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- Per a solucionar "NoClassDefFoundError: org/springframework/http/server/reactive/ServletServerHttpResponse$ResponseBodyProcessor"
 			(https://developer.jboss.org/thread/276373?start=15&tstart=0) -->
 		<dependency>
 			<groupId>org.reactivestreams</groupId>
 			<artifactId>reactive-streams</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.33.0</version>
+				<version>0.42.1</version>
 				<configuration>
 					<verbose>true</verbose>
 					<images>
 						<image>
-							<name>280421/%g</name>
+							<name>${docker.base.image}</name>
 							<alias>${project.parent.artifactId}</alias>
 							<build>
-								<assembly>
-									<descriptorRef>artifact</descriptorRef>
-								</assembly>
-								<dockerFile>Dockerfile</dockerFile>
+								<from>280421/jboss-eap-caib-7.2</from>
+								<maintainer>limit@limit.es</maintainer>
+								<ports>
+									<port>8080</port>
+								</ports>
+								<assemblies>
+									<assembly>
+										<name>copy_jboss_config</name>
+										<inline>
+											<fileSets>
+												<fileSet>
+													<directory>src/main/docker/jboss</directory>
+													<outputDirectory>config</outputDirectory>
+												</fileSet>
+											</fileSets>
+										</inline>
+										<targetDir>$JBOSS_USERHOME</targetDir>
+										<user>jboss:nogroup</user>
+									</assembly>
+									<assembly>
+										<name>copy_properties</name>
+										<inline>
+											<fileSets>
+												<fileSet>
+													<directory>src/main/docker/properties</directory>
+													<outputDirectory>${project.parent.artifactId}</outputDirectory>
+												</fileSet>
+											</fileSets>
+										</inline>
+										<targetDir>$JBOSS_USERHOME/apps</targetDir>
+										<user>jboss:nogroup</user>
+									</assembly>
+									<assembly>
+										<name>copy_keystores</name>
+										<inline>
+											<fileSets>
+												<fileSet>
+													<directory>src/main/docker/keystores</directory>
+													<outputDirectory>keystores</outputDirectory>
+												</fileSet>
+											</fileSets>
+										</inline>
+										<targetDir>$JBOSS_USERHOME</targetDir>
+										<user>jboss:nogroup</user>
+									</assembly>
+									<assembly>
+										<name>copy_transformers</name>
+										<inline>
+											<fileSets>
+												<fileSet>
+													<directory>src/main/docker/transformers</directory>
+													<outputDirectory>/opt/transformers</outputDirectory>
+													<includes>
+														<include>**/*</include>
+													</includes>
+												</fileSet>
+											</fileSets>
+										</inline>
+										<targetDir>/</targetDir>
+										<user>jboss:nogroup</user>
+									</assembly>
+
+									<assembly>
+										<descriptorRef>artifact</descriptorRef>
+										<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
+										<user>jboss:nogroup</user>
+									</assembly>
+								</assemblies>
+								<runCmds>
+									<run>mkdir -p /opt/webapps/ripea</run>
+									<run>chmod 755 /opt/webapps/ripea</run>
+									<run>chmod a+x $JBOSS_USERHOME/config/jboss_config.sh</run>
+									<run>dos2unix $JBOSS_USERHOME/config/jboss_config.sh</run>
+									<run>sed -i 's~#!/bin/sh~#!/bin/sh\n$JBOSS_USERHOME/config/jboss_config.sh~' $JBOSS_HOME/bin/standalone.sh</run>
+								</runCmds>
 								<tags>
 									<tag>latest</tag>
 									<tag>${project.version}</tag>
@@ -112,7 +208,6 @@
 							<bundleFileName>ripea-api-interna.war</bundleFileName>
 						</webModule>
 					</modules>
-					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -1,29 +1,5 @@
 package es.caib.ripea.service.service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.MultiHashMap;
-import org.apache.commons.collections.MultiMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
@@ -69,6 +45,29 @@ import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
@@ -380,8 +379,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
 
 			// Distinció entre divisió i (substitució o fusió)
-			MultiMap splitMap = new MultiHashMap();
-			MultiMap mergeOrSubstMap = new MultiHashMap();
+			MultiValuedMap splitMap = new ArrayListValuedHashMap();
+			MultiValuedMap mergeOrSubstMap = new ArrayListValuedHashMap();
 
 			for (UnitatOrganitzativaDto vigentObsolete : unitatsVigentObsoleteDto) {
 				// Comprovam que no estigui extingida
@@ -428,8 +427,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Distinció entre substitució i fusió
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
-			MultiMap mergeMap = new MultiHashMap();
-			MultiMap substMap = new MultiHashMap();
+			MultiValuedMap mergeMap = new ArrayListValuedHashMap();
+			MultiValuedMap substMap = new ArrayListValuedHashMap();
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
 				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap
 						.get(mergeOrSubstKey);
@@ -487,7 +486,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	
 	@SuppressWarnings("unchecked")
 	private boolean isAlreadyAddedToMap(
-			MultiMap mergeMap,
+			MultiValuedMap mergeMap,
 			UnitatOrganitzativaDto key,
 			UnitatOrganitzativaDto value) {
 

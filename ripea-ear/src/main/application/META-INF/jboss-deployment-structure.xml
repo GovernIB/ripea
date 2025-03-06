@@ -1,10 +1,89 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<module name="deployment.ripea-service-intf" >
+		<resources>
+			<resource-root path="ripea-service-intf-*.jar" />
+		</resources>
+	</module>
+	<module name="deployment.ripea-back-libs">
+<!--		<module-alias name="deployment.ripea-back-libs"/>-->
+		<resources>
+			<resource-root path="data-spring-data-*.jar"/>
+			<resource-root path="hateoas-spring-hateoas-*.jar"/>
+			<resource-root path="jackson-*.jar"/>
+			<resource-root path="jakarta.activation-api-*.jar"/>
+			<resource-root path="jakarta.annotation-api-*.jar"/>
+			<resource-root path="jakarta.validation-api-*.jar"/>
+			<resource-root path="jakarta.xml-*.jar"/>
+			<resource-root path="jul-to-slf4j-*.jar"/>
+			<resource-root path="log4j-*.jar"/>
+			<resource-root path="logback-*.jar"/>
+			<resource-root path="ripea-custom-hal-forms-*.jar"/>
+			<resource-root path="slf4j-api-*.jar"/>
+			<resource-root path="snakeyaml-*.jar"/>
+			<resource-root path="springdoc-openapi-*.jar"/>
+			<resource-root path="spring-aop-*.jar"/>
+			<resource-root path="spring-beans-*.jar"/>
+			<resource-root path="spring-boot-2*.jar"/>
+			<resource-root path="spring-boot-autoconfigure-*.jar"/>
+			<resource-root path="spring-boot-starter-2-*.jar"/>
+			<resource-root path="spring-boot-starter-oauth2-*.jar"/>
+			<resource-root path="spring-boot-starter-hateoas-*.jar"/>
+			<resource-root path="spring-boot-starter-json-*.jar"/>
+			<resource-root path="spring-boot-starter-logging-*.jar"/>
+			<resource-root path="spring-boot-starter-security-*.jar"/>
+			<resource-root path="spring-boot-starter-web-*.jar"/>
+			<resource-root path="spring-boot-starter-websocket-*.jar"/>
+			<resource-root path="spring-boot-starter-mail-*.jar"/>
+			<resource-root path="spring-context-*.jar"/>
+			<resource-root path="spring-core-*.jar"/>
+			<resource-root path="spring-data-*.jar"/>
+			<resource-root path="spring-expression-*.jar"/>
+			<resource-root path="spring-hateoas-*.jar"/>
+			<resource-root path="spring-jcl-*.jar"/>
+			<resource-root path="spring-security-config-*.jar"/>
+			<resource-root path="spring-security-core-*.jar"/>
+			<resource-root path="spring-security-web-*.jar"/>
+			<resource-root path="spring-tx-*.jar"/>
+			<resource-root path="spring-web-*.jar"/>
+			<resource-root path="spring-webmvc-*.jar"/>
+			<resource-root path="swagger-*.jar" />
+			<resource-root path="webjars-locator-core-*.jar"/>
+		</resources>
+	</module>
 	<deployment>
 		<dependencies>
 			<module name="org.keycloak.keycloak-core" export="true"/>
+			<module name="io.undertow.core" export="true"/>
+			<module name="io.undertow.servlet" export="true"/>
 			<module name="io.undertow.websocket" export="true"/>
+			<module name="deployment.ripea-back-libs" export="true"/>
 		</dependencies>
 	</deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+
+	<sub-deployment name="ripea-back.war">
+		<exclude-subsystems>
+			<subsystem name="jsf"/>
+		</exclude-subsystems>
+		<exclusions>
+			<module name="ripea.ear"/>
+		</exclusions>
+		<dependencies>
+			<module name="deployment.ripea-back-libs"/>
+			<module name="deployment.ripea-service-intf"/>
+		</dependencies>
+	</sub-deployment>
+	<sub-deployment name="ripea-api-interna.war">
+		<exclude-subsystems>
+			<subsystem name="jsf"/>
+		</exclude-subsystems>
+		<exclusions>
+			<module name="ripea.ear"/>
+		</exclusions>
+		<dependencies>
+			<module name="deployment.ripea-back-libs"/>
+			<module name="deployment.ripea-service-intf"/>
+		</dependencies>
+	</sub-deployment>
 </jboss-deployment-structure>

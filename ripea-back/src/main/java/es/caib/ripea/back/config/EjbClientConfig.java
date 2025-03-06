@@ -3,13 +3,20 @@
  */
 package es.caib.ripea.back.config;
 
+import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Configuració d'accés als services de Spring mitjançant EJBs.
@@ -233,7 +240,37 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(URLInstruccioService.class);
 	}
 
-	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
+	// TODO: Prova a veure si funciona:
+	@Bean
+	@ConditionalOnWarDeployment
+	public static BeanFactoryPostProcessor dynamicEjbProxyPostProcessor(ConfigurableApplicationContext context) {
+		return beanFactory -> {
+			Map<String, Object> controllers = context.getBeansWithAnnotation(RestController.class);
+			controllers.values().forEach(controller -> {
+				Arrays.stream(controller.getClass().getDeclaredFields())
+						.filter(field -> ReadonlyResourceService.class.isAssignableFrom(field.getType()))
+						.forEach(field -> {
+							String serviceName = field.getType().getSimpleName();
+							String beanName = Character.toLowerCase(serviceName.charAt(0)) + serviceName.substring(1);
+
+							log.info("Dynamic EJB. Trying to create EJB for serviceName " + serviceName + " and BeanName " + beanName);
+							if (!beanFactory.containsBean(beanName)) {
+								LocalStatelessSessionProxyFactoryBean factoryBean = getLocalEjbFactoyBean(field.getType());
+								beanFactory.registerSingleton(beanName, factoryBean);
+							}
+						});
+			});
+		};
+	}
+
+//	private LocalStatelessSessionProxyFactoryBean getLocalEjbProxyFactory(Class<?> serviceType) {
+//		LocalStatelessSessionProxyFactoryBean factoryBean = new LocalStatelessSessionProxyFactoryBean();
+//		factoryBean.setBusinessInterface(serviceType);
+//		factoryBean.setJndiName(EJB_JNDI_PREFIX + serviceType.getSimpleName() + EJB_JNDI_SUFFIX);
+//		return factoryBean;
+//	}
+
+	private static LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
 		String jndiName = jndiServiceName(serviceClass, false);
 		log.info("Creating EJB proxy for " + serviceClass.getSimpleName() + " with JNDI name " + jndiName);
 		LocalStatelessSessionProxyFactoryBean factoryBean = new LocalStatelessSessionProxyFactoryBean();
@@ -243,7 +280,7 @@ public class EjbClientConfig {
 		return factoryBean;
 	}
 
-	private String jndiServiceName(Class<?> serviceClass, boolean addServiceClassName) {
+	private static String jndiServiceName(Class<?> serviceClass, boolean addServiceClassName) {
 		return EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX + (addServiceClassName ? "!" + serviceClass.getName() : "");
 	}
 
