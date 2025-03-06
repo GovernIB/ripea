@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
@@ -75,11 +76,13 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 *            si no es troba el camp del recurs.
 	 * @throws FieldArtifactNotFoundException
 	 *            si el camp no té cap artefacte de descàrrega associat.
+	 * @throws IOException
+	 *             si es produeix algun error de E/S al descarregar l'arxiu.
 	 */
 	DownloadableFile fieldDownload(
 			ID id,
 			String fieldName,
-			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException;
+			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException, IOException;
 
 	/**
 	 * Retorna la llista d'artefactes del tipus especificat als quals l'usuari te accés.

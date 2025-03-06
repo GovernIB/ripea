@@ -263,14 +263,14 @@ public class HalFormsConfig {
 	private Link getFindLinkWithSelfRel(
 			Class<?> resourceControllerClass,
 			ResourceConfigArtifact artifact,
-			String fieldName) {
+			String resourceFieldName) {
 		Class<ReadonlyResourceController> readonlyResourceControllerClass = (Class<ReadonlyResourceController>)resourceControllerClass;
 		boolean isMutableResourceController = MutableResourceController.class.isAssignableFrom(resourceControllerClass);
 		if (artifact == null) {
 			if (isMutableResourceController) {
 				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)resourceControllerClass;
 				return linkTo(methodOn(mutableResourceControllerClass).fieldOptionsFind(
-						fieldName,
+						resourceFieldName,
 						null,
 						null,
 						null,
@@ -284,7 +284,7 @@ public class HalFormsConfig {
 				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)resourceControllerClass;
 				return linkTo(methodOn(mutableResourceControllerClass).artifactActionFieldOptionsFind(
 						artifact.code(),
-						fieldName,
+						resourceFieldName,
 						null,
 						null,
 						null,
@@ -296,7 +296,7 @@ public class HalFormsConfig {
 		} else if (artifact.type() == ResourceArtifactType.REPORT) {
 			return linkTo(methodOn(readonlyResourceControllerClass).artifactReportFieldOptionsFind(
 					artifact.code(),
-					fieldName,
+					resourceFieldName,
 					null,
 					null,
 					null,
@@ -305,7 +305,7 @@ public class HalFormsConfig {
 		} else if (artifact.type() == ResourceArtifactType.FILTER) {
 			return linkTo(methodOn(readonlyResourceControllerClass).artifactFilterFieldOptionsFind(
 					artifact.code(),
-					fieldName,
+					resourceFieldName,
 					null,
 					null,
 					null,

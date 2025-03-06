@@ -666,6 +666,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Map<String, Object> expandMap = new HashMap<>();
 		expandMap.put("perspective", perspective);
 		ls.add(selfLink.expand(expandMap));
+		try {
+			Link fieldDownloadLink = linkTo(methodOn(getClass()).fieldDownload(id, null)).withRel("fieldDownload");
+			ls.add(fieldDownloadLink);
+		} catch (IOException ignored) {}
 		return ls;
 	}
 

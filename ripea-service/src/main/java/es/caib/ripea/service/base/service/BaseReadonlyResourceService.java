@@ -24,6 +24,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -127,7 +128,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public DownloadableFile fieldDownload(
 			ID id,
 			String fieldName,
-			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException {
+			OutputStream out) throws ResourceNotFoundException, ResourceFieldNotFoundException, FieldArtifactNotFoundException, IOException {
 		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
 		if (field != null) {
 			FieldDownloader<E> fieldDownloader = fieldDownloaderMap.get(fieldName);
@@ -891,11 +892,13 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		 *            el nom del camp del recurs.
 		 * @param out
 		 *            stream a on posar el fitxer generat.
+		 * @throws IOException
+		 *             si es produeix algun error de E/S al descarregar l'arxiu.
 		 */
 		DownloadableFile download(
 				E entity,
 				String fieldName,
-				OutputStream out);
+				OutputStream out) throws IOException;
 	}
 
 }
