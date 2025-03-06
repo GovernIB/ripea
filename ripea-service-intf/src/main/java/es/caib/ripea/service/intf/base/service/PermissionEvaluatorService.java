@@ -20,7 +20,8 @@ public interface PermissionEvaluatorService extends PermissionEvaluator {
 		ARTIFACT,
 		ACTION,
 		REPORT,
-		OPTIONS
+		OPTIONS,
+		FIELDDOWNLOAD
 	}
 
 }

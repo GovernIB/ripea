@@ -64,6 +64,7 @@ public class PermissionEvaluatorService implements es.caib.ripea.service.intf.ba
 				case FIND:
 				case ARTIFACT:
 				case REPORT:
+				case FIELDDOWNLOAD:
 					return (BasePermission)BasePermission.READ;
 				case UPDATE:
 				case PATCH:

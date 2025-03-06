@@ -208,7 +208,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/{id}/fields/{fieldName}/download")
 	@Operation(summary = "Descàrrega de l'arxiu associat a un camp del recurs")
-	@PreAuthorize("hasPermission(#id, this.getResourceClassName(), this.getOperation('FIELDDOWNLOAD'))")
+	@PreAuthorize("hasPermission(#id, this.getResourceClass().getName(), this.getOperation('FIELDDOWNLOAD'))")
 	public ResponseEntity<InputStreamResource> fieldDownload(
 			@PathVariable
 			@Parameter(description = "Identificador del recurs")
