@@ -12,8 +12,8 @@ const InteressatsGridForm = () => {
         <GridFormField xs={12} name="tipus" required/>
         <GridFormField xs={12} name="documentTipus" required/>
         <GridFormField xs={12} name="documentNum"/>
-        <GridFormField xs={12} name="nom" required/>
-        <GridFormField xs={6} name="llinatge1" required/>
+        <GridFormField xs={12} name="nom"/>
+        <GridFormField xs={6} name="llinatge1"/>
         <GridFormField xs={6} name="llinatge2"/>
         <GridFormField xs={6} name="pais"/>
         <GridFormField xs={6} name="provincia"/>

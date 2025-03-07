@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -35,8 +36,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
             if (entity.getPare()!=null){
-                resource.setParentPath(getPath(entity));
-                resource.setTreePath(resource.getParentPath().stream().map(ParentPath::getNom).collect(Collectors.toList()));
+                List<ParentPath> parentPaths = getPath(entity).stream()
+                        .filter((a)-> !Objects.equals(a.getId(), entity.getExpedient().getId()))
+                        .collect(Collectors.toList());
+                parentPaths.forEach(
+                        (a)->setTreePath(a, parentPaths)
+                );
+
+                resource.setParentPath(parentPaths);
+                resource.setTreePath(parentPaths.stream()
+                        .map(ParentPath::getNom)
+                        .collect(Collectors.toList()));
             }
         }
 
@@ -53,6 +63,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 path.add(pathEntry);
                 getPathPare(entity.getPare(), path);
             }
+        }
+        public void setTreePath(ParentPath entity, List<ParentPath> path){
+            Boolean notFound = true;
+            int arrayIndex = 0;
+            List<String> result = new ArrayList<>();
+            while (notFound && path.size()>arrayIndex){
+                result.add(path.get(arrayIndex).getNom());
+                notFound = !Objects.equals(entity.getId(), path.get(arrayIndex).getId());
+                arrayIndex++;
+            }
+            entity.setTreePath(result);
         }
     }
 }

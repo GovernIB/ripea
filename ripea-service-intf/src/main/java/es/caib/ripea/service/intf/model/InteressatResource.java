@@ -23,9 +23,10 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 
 	@NotNull
 	protected InteressatTipusEnum tipus = InteressatTipusEnum.InteressatPersonaFisicaEntity;
-	
+    @NotNull
 	@Size(max = 30)
 	protected String nom;
+    @NotNull
 	@Size(max = 30)
 	protected String llinatge1;
 	@Size(max = 30)

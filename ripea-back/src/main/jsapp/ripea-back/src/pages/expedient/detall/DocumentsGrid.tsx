@@ -1,6 +1,6 @@
 import {
     GridPage,
-    MuiGrid,
+    MuiGrid, useMuiDataGridApiRef,
 } from 'reactlib';
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -10,7 +10,9 @@ import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Chec
 const DocumentsGrid: React.FC = () => {
     const { id } = useParams();
     const [expand, setExpand] = useState<boolean>(true);
+    const [treeView, setTreeView] = useState<boolean>(true);
     const [vista, setVista] = useState<string>("carpeta");
+    const dataGridApiRef = useMuiDataGridApiRef()
 
     const columns = [
         {
@@ -26,7 +28,7 @@ const DocumentsGrid: React.FC = () => {
         },
         {
             field: 'metaNode',
-            flex: 1,
+            flex: 0.5,
             valueFormatter: (value: any) => {
                 return value?.description;
             }
@@ -49,36 +51,46 @@ const DocumentsGrid: React.FC = () => {
             perspectives={["PATH"]}
             titleDisabled
             readOnly
-            treeData
+            disableColumnSorting
+            disableColumnMenu
+            apiRef={dataGridApiRef}
+            // checkboxSelection
+            treeData={treeView}
             treeDataAdditionalRows={(_rows) => {
-                //console.log('>>> additionalRows', rows)
-                return [{
-                    id: 927,
-                    tipus: 'EXPEDIENT',
-                    createdBy: 'rip_admin',
-                    createdDate: '2025-02-20T15:36:04.445',
-                    parentPath: [{ nom: 'Prova 20250220 1535' }]
-                }];
+                const additionalRows :any[] = [];
+
+                if(_rows!=null && vista == "carpeta") {
+                    for (const row of _rows) {
+                        const aditionalRow = row.parentPath
+                            .filter((a: any) => a.id != row.id)
+                            .filter((a: any) => !additionalRows.map((b)=>b.id).includes(a.id))
+                            .map((a: any) =>{a.group="A";return a})
+                        additionalRows.push(...aditionalRow);
+                    }
+                    setTreeView(additionalRows.length > 0)
+                }else {
+                    setTreeView(true)
+                }
+                // console.log('>>> additionalRows', additionalRows)
+                return additionalRows;
             }}
-            getTreeDataPath={(row) => {
-                //console.log('>>> getTreeDataPath', row, row.parentPath.map((a: any) => a.nom));
+            getTreeDataPath={(row) :string[] => {
                 switch (vista) {
                     case "estat": return [`${row.estat}`, `${row.nom}`];
                     case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
-                    default: return row.parentPath.map((a: any) => a.nom);
+                    default: return row.treePath;
                 }
             }}
-            // checkboxSelection
             isGroupExpandedByDefault={() => expand}
             toolbarAdditionalRow={<Grid display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"space-between"} pb={1}>
                 <Grid item xs={2}>
-                    <FormControlLabel control={<Checkbox
+                    {treeView && <FormControlLabel control={<Checkbox
                         checked={expand}
                         onChange={(event) => setExpand(event.target.checked)}
 
                         icon={<Icon>arrow_right</Icon>}
                         checkedIcon={<Icon>arrow_drop_down</Icon>}
-                    />} label={expand ? "Contraer" : "Expandir"} />
+                    />} label={expand ? "Contraer" : "Expandir"} />}
                 </Grid>
 
                 <Grid item xs={3}>
@@ -87,7 +99,10 @@ const DocumentsGrid: React.FC = () => {
                         <Select
                             labelId="demo-simple-select-label"
                             value={vista}
-                            onChange={(event) => setVista(event.target.value)}
+                            onChange={(event) => {
+                                setVista(event.target.value)
+                                dataGridApiRef.current.refresh()
+                            }}
                         >
                             <MenuItem value={"estat"}>Vista por estado</MenuItem>
                             <MenuItem value={"tipus"}>Vista por tipo documento</MenuItem>

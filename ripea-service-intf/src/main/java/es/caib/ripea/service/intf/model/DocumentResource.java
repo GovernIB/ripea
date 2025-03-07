@@ -1,7 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -133,7 +132,7 @@ public class DocumentResource extends NodeResource {
         private LocalDateTime createdDate;
         private ContingutTipusEnumDto tipus;
 
-//        private ParentPath parentPath;
+        public List<String> treePath;
 
         public ParentPath(Long id, String nom, String createdBy, LocalDateTime createdDate, ContingutTipusEnumDto tipus) {
             this.id = id;
