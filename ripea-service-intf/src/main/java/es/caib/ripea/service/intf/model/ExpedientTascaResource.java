@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -56,11 +57,15 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private Integer duracio;
 //    @SuppressWarnings("unused")
 //    private String duracioFormat;
+    @NotNull
     private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     private String responsablesStr;
 
+    @NotNull
     private ResourceReference<ExpedientResource, Long> expedient;
+    @NotNull
     private ResourceReference<MetaExpedientTascaResource, Long> metaExpedientTasca;
+    @NotNull
     private ResourceReference<UsuariResource, String> responsableActual;
     private ResourceReference<UsuariResource, String> delegat;
 

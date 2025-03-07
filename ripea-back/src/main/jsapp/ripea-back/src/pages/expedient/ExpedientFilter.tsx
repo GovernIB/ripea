@@ -3,7 +3,7 @@ import {
     useFilterApiRef,
 } from 'reactlib';
 import {Button, Grid, Icon} from "@mui/material";
-import {formatDate, formatIso} from '../../util/dateUtils';
+import {formatIso} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 
@@ -12,7 +12,7 @@ const ExpedientFilter = (props:any) => {
     const filterRef = useFilterApiRef();
 
     const springFilterBuilder = (data: any) :string => {
-        let filterStr :string = '';console.log(data, formatDate(data.dataCreacioInici, "DD-MM-YYTHH:mm:ss"))
+        let filterStr :string = '';
         filterStr += builder.and(
             builder.like("numero", data?.numero),
             builder.like("nom", data.nom),
@@ -69,24 +69,24 @@ const ExpedientFilter = (props:any) => {
             // initOnChangeRequest
     >
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <GridFormField xs={2} name="numero" />
-            <GridFormField xs={4} name="nom" />
-            <GridFormField xs={3} name="estat" />
-            <GridFormField xs={3} name="interessat" />
-            <GridFormField xs={3} name="organGestor" />
-            <GridFormField xs={3} name="metaExpedient" />
-            <GridFormField xs={3} name="dataCreacioInici" />
-            <GridFormField xs={3} name="dataCreacioFinal" />
+            <GridFormField xs={2} name="numero"/>
+            <GridFormField xs={4} name="nom"/>
+            <GridFormField xs={3} name="estat"/>
+            <GridFormField xs={3} name="interessat"/>
+            <GridFormField xs={3} name="organGestor"/>
+            <GridFormField xs={3} name="metaExpedient"/>
+            <GridFormField xs={3} name="dataCreacioInici"/>
+            <GridFormField xs={3} name="dataCreacioFinal"/>
 
-            <GridFormField xs={2} name="numeroRegistre" />
-            <GridFormField xs={3} name="grup" />
-            <GridFormField xs={3} name="agafatPer" />
+            <GridFormField xs={2} name="numeroRegistre"/>
+            <GridFormField xs={3} name="grup"/>
+            <GridFormField xs={3} name="agafatPer"/>
 
-            <GridFormField xs={2} name="agafat" />
-            <GridFormField xs={2} name="pendentFirmar" />
+            <GridFormField xs={2} name="agafat"/>
+            <GridFormField xs={2} name="pendentFirmar"/>
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-                <Button onClick={netejar}><Icon>eraser</Icon> Netejar</Button>
+                <Button onClick={netejar}><Icon>eraser</Icon>Netejar</Button>
                 <Button onClick={cercar} variant="contained" sx={{borderRadius: 1}}><Icon>filter_alt</Icon> Cercar</Button>
             </Grid>
         </Grid>

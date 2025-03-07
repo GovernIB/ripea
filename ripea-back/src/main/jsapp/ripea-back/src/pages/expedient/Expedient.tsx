@@ -38,7 +38,7 @@ const Expedient: React.FC = () => {
         appGetOne(id).then((app) => setExpedient(app))
     }
 
-    const border= { border: '1px solid #e3e3e3', borderRadius: 1 };
+    const border= { border: '1px solid #e3e3e3', borderRadius: 10 };
     const backgroundColor= { backgroundColor: '#f5f5f5' };
 
     const tabs = [
@@ -94,7 +94,7 @@ const Expedient: React.FC = () => {
 
     return expedient && <BasePage>
         <div style={border}>
-            <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', p: 1}}>
+            <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', borderTopRightRadius: 10, borderTopLeftRadius: 10, p: 1}}>
                 <Grid container sx={{
                     direction: "row",
                     columnSpacing:1,
@@ -102,20 +102,18 @@ const Expedient: React.FC = () => {
                     justifyContent:"space-between",
                     alignItems:"center"
                 }} >
-                    <Grid item xs={7}><Typography variant="h5"><Icon>folder</Icon> {expedient.nom}</Typography></Grid>
-                    <Grid item xs={4}>
-                    <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}}>
-                        {(expedient?.agafatPer)
-                                ? <>Expediente cogido por: {expedient?.agafatPer?.description}
-                                    <IconButton aria-label="lock_open" color={"inherit"}>
-                                        <Icon>lock_open</Icon>
-                                    </IconButton></>
-                                : <IconButton aria-label="lock" color={"inherit"}>
-                                    <Icon>lock</Icon>
-                                </IconButton>
-                        }
-                    </Typography>
+                    <Grid item xs={7}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                        <Icon>folder</Icon>{expedient.nom}</Typography>
                     </Grid>
+                    {expedient?.agafatPer && <Grid item xs={4} >
+                        <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1}>
+                            Expediente cogido por: {expedient?.agafatPer?.description}
+
+                                <IconButton aria-label="lock_open" color={"inherit"}>
+                                    <Icon>lock_open</Icon>
+                                </IconButton>
+                        </Typography>
+                    </Grid>}
                 </Grid>
             </Box>
 

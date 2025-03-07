@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {
     GridPage,
     MuiGrid,
+    useFormContext,
 } from 'reactlib';
 import {Box, Typography, Icon, Grid} from "@mui/material";
 import {formatDate} from '../../util/dateUtils';
@@ -9,7 +10,6 @@ import {useNavigate} from "react-router-dom";
 import CommentDialog from "./CommentDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
-import {useFormContext} from "../../../lib/components/form/FormContext.tsx";
 
 const ExpedientGridForm = () => {
     const formContext = useFormContext();
@@ -33,7 +33,7 @@ const ExpedientGrid: React.FC = () => {
     const columns = [
         {
             field: 'numero',
-            flex: 0.5,
+            flex: 1,
         },
         {
             field: 'nom',
