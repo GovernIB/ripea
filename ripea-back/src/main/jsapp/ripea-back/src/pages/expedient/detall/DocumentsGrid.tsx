@@ -2,10 +2,10 @@ import {
     GridPage,
     MuiGrid,
 } from 'reactlib';
-import React, {useState} from "react";
-import {useParams} from "react-router-dom";
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import ContingutIcon from "./ContingutIcon.tsx";
-import {FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon} from "@mui/material";
+import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon } from "@mui/material";
 
 const DocumentsGrid: React.FC = () => {
     const { id } = useParams();
@@ -16,7 +16,7 @@ const DocumentsGrid: React.FC = () => {
         {
             field: 'nom',
             flex: 0.5,
-            renderCell:(params: any)=>{
+            renderCell: (params: any) => {
                 return <ContingutIcon entity={params?.row}>{params?.row.nom}</ContingutIcon>
             }
         },
@@ -50,16 +50,26 @@ const DocumentsGrid: React.FC = () => {
             titleDisabled
             readOnly
             treeData
-            getTreeDataPath={(row)=>{
-                // console.log(row);
-                switch (vista){
-                    case "estat":return [`${row.estat}`,`${row.nom}`];
-                    case "tipus":return [`${row.metaNode?.description}`,`${row.nom}`];
-                    default:return row.parentPath.map((a:any)=>a.nom);
+            treeDataAdditionalRows={(_rows) => {
+                //console.log('>>> additionalRows', rows)
+                return [{
+                    id: 927,
+                    tipus: 'EXPEDIENT',
+                    createdBy: 'rip_admin',
+                    createdDate: '2025-02-20T15:36:04.445',
+                    parentPath: [{ nom: 'Prova 20250220 1535' }]
+                }];
+            }}
+            getTreeDataPath={(row) => {
+                //console.log('>>> getTreeDataPath', row, row.parentPath.map((a: any) => a.nom));
+                switch (vista) {
+                    case "estat": return [`${row.estat}`, `${row.nom}`];
+                    case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
+                    default: return row.parentPath.map((a: any) => a.nom);
                 }
             }}
             // checkboxSelection
-            isGroupExpandedByDefault={()=>expand}
+            isGroupExpandedByDefault={() => expand}
             toolbarAdditionalRow={<Grid display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"space-between"} pb={1}>
                 <Grid item xs={2}>
                     <FormControlLabel control={<Checkbox
@@ -68,7 +78,7 @@ const DocumentsGrid: React.FC = () => {
 
                         icon={<Icon>arrow_right</Icon>}
                         checkedIcon={<Icon>arrow_drop_down</Icon>}
-                    />} label={expand ?"Contraer" :"Expandir"} />
+                    />} label={expand ? "Contraer" : "Expandir"} />
                 </Grid>
 
                 <Grid item xs={3}>
@@ -77,7 +87,7 @@ const DocumentsGrid: React.FC = () => {
                         <Select
                             labelId="demo-simple-select-label"
                             value={vista}
-                            onChange={(event)=>setVista(event.target.value)}
+                            onChange={(event) => setVista(event.target.value)}
                         >
                             <MenuItem value={"estat"}>Vista por estado</MenuItem>
                             <MenuItem value={"tipus"}>Vista por tipo documento</MenuItem>

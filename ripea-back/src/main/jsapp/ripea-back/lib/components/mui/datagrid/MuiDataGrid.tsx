@@ -70,6 +70,7 @@ export type MuiDataGridProps = {
     namedQueries?: string[];
     perspectives?: string[];
     formAdditionalData?: ((row: any, action: string) => any) | any;
+    treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
     toolbarType?: DataToolbarType;
     toolbarHideRefresh?: true;
     toolbarHideQuickFilter?: true;
@@ -244,6 +245,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         staticFilter,
         namedQueries,
         perspectives,
+        treeDataAdditionalRows,
         formAdditionalData,
         toolbarType = 'default',
         toolbarHideRefresh,
@@ -278,10 +280,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const logConsole = useLogConsole(LOG_PREFIX);
     const apiRef = React.useRef<MuiDataGridApi>();
     const datagridApiRef = useMuiDatagridApiRef();
+    const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows ? typeof treeDataAdditionalRows === 'function' : false;
     const [internalSortModel, setInternalSortModel] = React.useState<GridSortModel>(sortModel ?? []);
     const [internalFilter, setInternalFilter] = React.useState<string | undefined>(filterProp);
     const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>();
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>();
+    const [additionalRows, setAdditionalRows] = React.useState<any[]>(!treeDataAdditionalRowsIsFunction ? [] : treeDataAdditionalRows as any[]);
     const {
         currentFields: apiCurrentFields,
         currentActions: apiCurrentActions,
@@ -329,6 +333,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
     React.useEffect(() => {
         onRowsChange?.(rows);
+        if (treeDataAdditionalRowsIsFunction) {
+            setAdditionalRows((treeDataAdditionalRows as ((rows: any[]) => any[]))(rows));
+        }
     }, [rows]);
     React.useEffect(() => {
         setInternalFilter(filterProp);
@@ -428,7 +435,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const stripedProps: any = striped ? {
         getRowClassName: (params: GridRowClassNameParams) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
     } : null;
-    const processedRows = [...rows];
+    const processedRows = [...additionalRows, ...rows];
     const content = <>
         {toolbar}
         {toolbarAdditionalRow ? <Box sx={{ ...gridMargins, mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
