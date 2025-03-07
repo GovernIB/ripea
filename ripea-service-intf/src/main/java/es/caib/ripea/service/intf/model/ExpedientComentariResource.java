@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Getter
@@ -18,7 +19,9 @@ import java.util.Date;
 public class ExpedientComentariResource extends BaseAuditableResource<Long> {
 
 //    private Long id;
-//    private ExpedientDto expedient;
+    @NotNull
     private String text;
+    @NotNull
+    private ResourceReference<ExpedientResource, Long> expedient;
 
 }
