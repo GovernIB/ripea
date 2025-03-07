@@ -41,7 +41,6 @@ import java.util.jar.Manifest;
 		LiquibaseAutoConfiguration.class,
 		FreeMarkerAutoConfiguration.class,
 		WebSocketServletAutoConfiguration.class
-//		JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan(
 		basePackages = { BaseConfig.BASE_PACKAGE },
@@ -56,10 +55,10 @@ import java.util.jar.Manifest;
 @PropertySource(
 		ignoreResourceNotFound = true,
 		value = { "classpath:application.properties" })
-public class RipeaBackApp extends SpringBootServletInitializer {
+public class RipeaApiInternaApp extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RipeaBackApp.class, args);
+		SpringApplication.run(RipeaApiInternaApp.class, args);
 	}
 
 	@Override

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<server>
-    <mbean code="org.jboss.varia.property.SystemPropertiesService" name="jboss:type=Service,name=RipeaSystemProperties">
-       <attribute name="URLList">${fitxer_propietats}</attribute>
-    </mbean>
-</server>

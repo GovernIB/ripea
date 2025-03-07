@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -26,5 +26,5 @@ public interface MetaExpedientComentariRepository extends JpaRepository<MetaExpe
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);	
 	
 	
-	public List<MetaExpedientComentariEntity> findByEmailEnviatFalseAndCreatedDateGreaterThan(Date createdDate);
+	public List<MetaExpedientComentariEntity> findByEmailEnviatFalseAndCreatedDateGreaterThan(LocalDateTime createdDate);
 }

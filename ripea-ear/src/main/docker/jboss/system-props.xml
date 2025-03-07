@@ -1,0 +1,5 @@
+<system-properties>
+    <property name="es.caib.ripea.properties" value="/home/jboss/apps/ripea/jboss.properties"/>
+    <property name="es.caib.ripea.system.properties" value="/home/jboss/apps/ripea/jboss_system.properties"/>
+    <property name="com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager" value="true"/>
+</system-properties>
