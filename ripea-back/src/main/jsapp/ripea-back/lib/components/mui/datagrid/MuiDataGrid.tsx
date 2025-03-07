@@ -278,7 +278,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         ...otherProps
     } = props;
     const logConsole = useLogConsole(LOG_PREFIX);
-    const apiRef = React.useRef<MuiDataGridApi>();
     const datagridApiRef = useMuiDatagridApiRef();
     const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows ? typeof treeDataAdditionalRows === 'function' : false;
     const [internalSortModel, setInternalSortModel] = React.useState<GridSortModel>(sortModel ?? []);
@@ -396,15 +395,17 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupCreate,
         popupUpdate,
         otherProps.rowModesModel);
-    apiRef.current = {
+    const apiRef = React.useRef<MuiDataGridApi>({
         refresh,
         popupCreate,
         popupUpdate,
         setFilter: (filter) => setInternalFilter(filter ?? undefined),
-    };
+    });
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;
+            apiRefProp.current.popupCreate = popupCreate;
+            apiRefProp.current.popupUpdate = popupUpdate;
             apiRefProp.current.setFilter = (filter) => setInternalFilter(filter ?? undefined);
         } else {
             logConsole.warn('apiRef prop must be initialized with an empty object');
