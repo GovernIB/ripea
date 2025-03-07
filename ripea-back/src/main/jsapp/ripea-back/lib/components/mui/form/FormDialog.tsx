@@ -1,20 +1,21 @@
 import React from 'react';
 import { DialogButton } from '../../BaseAppContext';
 import { useFormDialogButtons } from '../../AppButtons';
-import Dialog, { DialogProps } from '../Dialog';
-import Form from './MuiForm';
 import { FormApi } from '../../form/FormContext';
+import Dialog, { DialogProps } from '../Dialog';
+import MuiForm from './MuiForm';
 
 type FormDialogProps = DialogProps & {
     resourceName: string;
     id?: any;
+    additionalData?: any;
     apiRef?: React.MutableRefObject<FormApi>;
     formComponentProps?: any;
     noForm?: boolean;
 };
 
 export type FormDialogSubmitFn = (data?: any) => Promise<React.ReactElement | undefined>;
-export type FormDialogShowFn = (title: string | null, id: any, componentProps?: any) => Promise<string>;
+export type FormDialogShowFn = (title: string | null, id: any, additionalData?: any, componentProps?: any) => Promise<any>;
 export type UseFormDialogFn = (
     resourceName: string,
     formContent: React.ReactNode,
@@ -33,17 +34,19 @@ export const useFormDialog: UseFormDialogFn = (
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
     const [id, setId] = React.useState<any>();
+    const [additionalData, setAdditionalData] = React.useState<any>();
     const [componentProps, setComponentProps] = React.useState<any>();
     const [resolveFn, setResolveFn] = React.useState<(value?: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value: any) => void>();
     const [submitReturnedContent, setSubmitReturnedContent] = React.useState<React.ReactNode | undefined>();
-    const dialogShow = (title: string | null, id: any, componentProps?: any) => {
+    const show = (title: string | null, id: any, additionalData?: any, componentProps?: any) => {
         setTitle(title);
         setId(id);
+        setAdditionalData(additionalData);
         setComponentProps(componentProps);
         setOpen(true);
         setSubmitReturnedContent(undefined);
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             setResolveFn(() => resolve);
             setRejectFn(() => reject);
         });
@@ -85,6 +88,7 @@ export const useFormDialog: UseFormDialogFn = (
     const dialogComponent = <FormDialog
         resourceName={resourceName}
         id={id}
+        additionalData={additionalData}
         apiRef={formApiRef}
         open={open}
         buttonCallback={buttonCallback}
@@ -96,13 +100,14 @@ export const useFormDialog: UseFormDialogFn = (
         noForm={submitReturnedContent != null}>
         {submitReturnedContent ?? formContent}
     </FormDialog>;
-    return [dialogShow, dialogComponent];
+    return [show, dialogComponent];
 }
 
 export const FormDialog: React.FC<FormDialogProps> = (props) => {
     const {
         resourceName,
         id,
+        additionalData,
         apiRef,
         formComponentProps,
         noForm,
@@ -110,14 +115,15 @@ export const FormDialog: React.FC<FormDialogProps> = (props) => {
         ...otherProps
     } = props;
     return <Dialog {...otherProps}>
-        {noForm ? children : <Form
+        {noForm ? children : <MuiForm
             {...formComponentProps}
             resourceName={resourceName}
             id={id}
+            additionalData={additionalData}
             apiRef={apiRef}
             hiddenToolbar>
             {children}
-        </Form>}
+        </MuiForm>}
     </Dialog>;
 }
 
