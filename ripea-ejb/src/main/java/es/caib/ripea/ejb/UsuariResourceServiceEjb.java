@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
@@ -22,4 +23,8 @@ public class UsuariResourceServiceEjb extends AbstractServiceEjb<UsuariResourceS
 		return delegateService.reportGenerate(code, params);
 	}
 
+	@Override
+	public <P extends Serializable> Serializable actionExec(String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
+		return delegateService.actionExec(code, params);
+	}
 }

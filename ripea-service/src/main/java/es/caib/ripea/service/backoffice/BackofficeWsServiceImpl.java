@@ -22,7 +22,7 @@ import java.util.List;
 		name = "Backoffice",
 		serviceName = "BackofficeService",
 		portName = "BackofficeServicePort",
-		endpointInterface = "es.caib.ripea.core.api.service.ws.BackofficeWsServiceBean",
+		endpointInterface = "es.caib.distribucio.ws.backoffice.Backoffice",
 		targetNamespace = "http://www.caib.es/distribucio/ws/backoffice")
 public class BackofficeWsServiceImpl implements Backoffice {
 

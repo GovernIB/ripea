@@ -30,7 +30,7 @@ import java.util.Map;
 		serviceName = "MCGDwsService",
 		portName = "MCGDwsServicePort",
 		targetNamespace = "http://www.indra.es/portafirmasmcgdws/mcgdws",
-		endpointInterface = "es.caib.ripea.core.service.ws.callback.MCGDws")
+		endpointInterface = "es.caib.ripea.service.intf.service.ws.callback.MCGDws")
 public class MCGDwsImpl implements MCGDws {
 
 	@Resource
