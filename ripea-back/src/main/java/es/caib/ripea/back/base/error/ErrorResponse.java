@@ -4,6 +4,7 @@
 package es.caib.ripea.back.base.error;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -29,6 +30,7 @@ public class ErrorResponse {
 	protected final String title;
 	protected String stackTrace;
 	protected List<ValidationError> validationErrors;
+	protected AnswerRequiredException.AnswerRequiredError answerRequiredError;
 
 	@Getter
 	@Setter
