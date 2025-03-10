@@ -1,6 +1,7 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -98,4 +99,7 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 			name = "representant_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "interessat_repres_fk"))
 	protected InteressatResourceEntity representant;
+
+    @OneToMany(mappedBy = "representant", cascade = {CascadeType.DETACH}, fetch = FetchType.LAZY)
+    protected List<InteressatResourceEntity> representats;
 }

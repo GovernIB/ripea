@@ -1,11 +1,13 @@
 import {
     GridPage,
+    MuiFormDialog,
     MuiGrid,
 } from 'reactlib';
 import {useParams} from "react-router-dom";
 import {Grid} from "@mui/material";
 import React from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
+import {DataFormDialogApi} from "../../../../lib/components/mui/datacommon/DataFormDialog.tsx";
 
 const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -29,6 +31,21 @@ const InteressatsGridForm = () => {
 
 const InteressatsGrid: React.FC = () => {
     const { id } = useParams();
+    const formApiRef = React.useRef<DataFormDialogApi>()
+
+    const createRepresentent = (rowId:any) => {
+        formApiRef.current?.show(undefined, {
+            expedient: {
+                id: id
+            },
+            representat:{
+                id: rowId
+            }
+        })
+    }
+    const updateRepresentent = (rowId:any, row:any) => {
+        formApiRef.current?.show(row?.representant?.id, row?.representant)
+    }
 
     const columns = [
         {
@@ -51,12 +68,28 @@ const InteressatsGrid: React.FC = () => {
             }
         },
     ];
+    const actions = [
+        {
+            title: "Añadir Representante",
+            icon: "add",
+            showInMenu: true,
+            onClick: createRepresentent
+        },
+        {
+            title: "Modificar Representante",
+            icon: "edit",
+            showInMenu: true,
+            onClick: updateRepresentent,
+            disabled: (row:any) => !row?.representant,
+        },
+    ];
+
     return <GridPage>
         <MuiGrid
             resourceName="interessatResource"
             columns={columns}
             paginationActive
-            filter={`expedient.id:${id}`}
+            filter={`expedient.id:${id} AND representats is empty`}
             titleDisabled
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
@@ -65,8 +98,17 @@ const InteressatsGrid: React.FC = () => {
                     id: id
                 },
             }}
+            rowAdditionalActions={actions}
             // readOnly
         />
+
+        <MuiFormDialog
+            resourceName={"interessatResource"}
+            title={`Representante`}
+            apiRef={formApiRef}
+        >
+            <InteressatsGridForm/>
+        </MuiFormDialog>
     </GridPage>
 }
 

@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
@@ -14,6 +15,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
@@ -43,6 +45,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected InteressatDocumentTipusEnumDto documentTipus = InteressatDocumentTipusEnumDto.NIF;
 	@NotNull
 	@Size(max = 17)
+    @ResourceField(onChangeActive = true)
 	protected String documentNum;
 	@Size(max = 4)
 	protected String pais;
@@ -75,7 +78,10 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	@NotNull
 	private ResourceReference<ExpedientResource, Long> expedient;
 	private ResourceReference<InteressatResource, Long> representant;
-	
+
+    @Transient
+	private ResourceReference<InteressatResource, Long> representat;
+
 	public String getNomComplet() {
 		switch (this.tipus) {
 		case InteressatPersonaFisicaEntity:

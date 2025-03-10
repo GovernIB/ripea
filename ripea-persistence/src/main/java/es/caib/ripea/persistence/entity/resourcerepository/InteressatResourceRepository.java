@@ -5,8 +5,11 @@ import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InteressatResourceRepository extends BaseRepository<InteressatResourceEntity, Long> {
     List<InteressatResourceEntity> findByExpedient(ExpedientResourceEntity expedient);
     List<InteressatResourceEntity> findByExpedientId(Long expedientId);
+
+    Optional<InteressatResourceEntity> findByDocumentNum(String documentNum);
 }
