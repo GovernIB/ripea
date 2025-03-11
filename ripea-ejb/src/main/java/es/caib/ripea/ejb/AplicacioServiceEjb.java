@@ -20,6 +20,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
 		delegateService.actualitzarEntiatThreadLocal(entitat);
 	}
@@ -108,16 +109,19 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public String propertyFindByNom(String nom) {
 		return delegateService.propertyFindByNom(nom);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<UsuariDto> findUsuariAmbTextDades(String text) {
 		return delegateService.findUsuariAmbTextDades(text);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public UsuariDto findUsuariCarrecAmbCodiDades(String codi) {
 		return delegateService.findUsuariCarrecAmbCodiDades(codi);
 	}
@@ -185,6 +189,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
     }
 
     @Override
+    @RolesAllowed("**")
 	public boolean mostrarLogsRendiment() {
 		return delegateService.mostrarLogsRendiment();
 	}

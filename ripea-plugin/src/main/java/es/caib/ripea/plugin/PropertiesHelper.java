@@ -7,20 +7,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * This class is used to take properties value from properties file
  * It is used by Plugins
  * In Tomcat we take properties manually from tomcat properties file specified in APPSERV_PROPS_PATH (ripea.properties)
  * In Jboss properties are loaded to System automatically from jboss properties (jboss-service.xml)
- * 
  */
 public class PropertiesHelper extends Properties {
 
-	private static final String APPSERV_PROPS_PATH = "es.caib.ripea.properties.path";
-
+	private static final String APPSERV_PROPS_PATH = "es.caib.ripea.system.properties";
 	private static PropertiesHelper instance = null;
-
 	
 	private PropertiesHelper(Properties defaults) {
 		super(defaults);

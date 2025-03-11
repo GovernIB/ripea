@@ -6242,32 +6242,28 @@ public class PluginHelper {
 		if (dadesUsuariPlugin != null) {
 			return dadesUsuariPlugin;
 		}
+		
 		String pluginClass = getPropertyPluginDadesUsuari();
-		if (Strings.isNullOrEmpty(
-				pluginClass)) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS,
-					"No està configurada la classe per al plugin de dades d'usuari");
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "No està configurada la classe per al plugin de dades d'usuari");
 		}
+		
 		try {
-			Class<?> clazz = Class.forName(
-					pluginClass);
+			Class<?> clazz = Class.forName( pluginClass);
+			Properties props = configHelper.getGroupPropertiesrGeneral(IntegracioHelper.INTCODI_USUARIS);
 			dadesUsuariPlugin = (DadesUsuariPlugin) clazz.getDeclaredConstructor(
 					String.class,
-					Properties.class).newInstance(
-							"es.caib.ripea.plugin.dades.usuari.",
-							PropertiesHelper.getProperties());
+					Properties.class).newInstance("es.caib.ripea.plugin.dades.usuari.", props);
 			return dadesUsuariPlugin;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS,
-					"Error al crear la instància del plugin de dades d'usuari", ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "Error al crear la instància del plugin de dades d'usuari", ex);
 		}
 	}
 
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
 
 		String entitatCodi = configHelper.getEntitatActualCodi();
-		if (StringUtils.isEmpty(
-				entitatCodi)) {
+		if (StringUtils.isEmpty(entitatCodi)) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
 		UnitatsOrganitzativesPlugin plugin = unitatsOrganitzativesPlugins.get(
@@ -7194,17 +7190,10 @@ public class PluginHelper {
 
 	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
 
-	private synchronized void loadPluginProperties(
-			String codeProperties) {
-		if (!propertiesLoaded.containsKey(
-				codeProperties)
-				|| !propertiesLoaded.get(
-						codeProperties)) {
-			propertiesLoaded.put(
-					codeProperties,
-					true);
-			Properties pluginProps = configHelper.getPropertiesByGroup(
-					codeProperties);
+	private synchronized void loadPluginProperties(String codeProperties) {
+		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
+			propertiesLoaded.put(codeProperties, true);
+			Properties pluginProps = configHelper.getPropertiesByGroup(codeProperties);
 			for (Map.Entry<Object, Object> entry : pluginProps.entrySet()) {
 				String value = entry.getValue() == null ? "" : (String) entry.getValue();
 				PropertiesHelper.getProperties().setProperty(

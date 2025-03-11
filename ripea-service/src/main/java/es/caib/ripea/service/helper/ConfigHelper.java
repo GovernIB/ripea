@@ -7,6 +7,7 @@ import es.caib.ripea.persistence.entity.config.ConfigGroupEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.config.ConfigGroupRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
@@ -322,6 +323,24 @@ public class ConfigHelper {
     }
     
     @Transactional(readOnly = true)
+    public Properties getGroupPropertiesrGeneral(String groupCode) {
+        Properties properties = new Properties();
+        List<ConfigEntity> configsGeneral = configRepository.findByEntitatCodiIsNullAndGroupCode(groupCode);
+        for (ConfigEntity configGeneral: configsGeneral) {
+        	String propVal = null;
+        	if (configGeneral.isJbossProperty() || configGeneral.getValue()==null) {
+        		propVal = PropertiesHelper.getProperties().getProperty(configGeneral.getKey());        		
+        	} else {
+        		propVal = configGeneral.getValue();
+        	}
+        	if (propVal!=null) {
+        		properties.put(configGeneral.getKey(), propVal);
+        	}
+        }
+        return properties;
+    }
+    
+    @Transactional(readOnly = true)
     public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
 
         Properties properties = new Properties();
@@ -348,25 +367,19 @@ public class ConfigHelper {
         }
         return properties;
     }
-    
-  
 
     @Transactional(readOnly = true)
     public String getEntitatActualCodi() {
-
         return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
     }
     
     @Transactional(readOnly = true)
     public String getOrganActualCodi() {
-
         return organCodi != null ? organCodi.get() : null;
     }
 
-
     @Transactional(readOnly = true)
     public String getValueEntitatOrGeneral(String entitatCodi, String keyGeneral) {
-
         String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
         ConfigEntity configEntitat = configRepository.findById(keyEntitat).orElse(null);
         String value = getValue(configEntitat);
