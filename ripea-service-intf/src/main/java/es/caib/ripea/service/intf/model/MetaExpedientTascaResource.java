@@ -2,6 +2,8 @@ package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +40,9 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     private Long estatIdFinalitzarTasca;
     private String estatNomFinalitzarTasca;
     private String estatColorFinalitzarTasca;
+
+    private ResourceReference<ExpedientEstatResource, Long> estatCrearTasca;
+    private ResourceReference<ExpedientEstatResource, Long> estatFinalitzarTasca;
+    private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 
 }

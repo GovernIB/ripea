@@ -80,6 +80,9 @@ export type MuiDataGridProps = {
     rowLink?: string;
     rowDetailLink?: string;
     rowUpdateLink?: string;
+    rowHideUpdateButton?: boolean;
+    rowHideDeleteButton?: boolean;
+    rowHideDetailsButton?: boolean;
     rowActionsColumnProps?: any;
     rowAdditionalActions?: DataCommonAdditionalAction[];
     popupEditActive?: boolean;
@@ -256,6 +259,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowLink,
         rowDetailLink,
         rowUpdateLink,
+        rowHideUpdateButton,
+        rowHideDeleteButton,
+        rowHideDetailsButton,
         rowActionsColumnProps,
         rowAdditionalActions = [],
         popupEditActive,
@@ -352,6 +358,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarCreateLink,
         rowDetailLink,
         rowUpdateLink,
+        rowHideUpdateButton,
+        rowHideDeleteButton,
+        rowHideDetailsButton,
         popupEditActive,
         popupEditCreateActive,
         popupEditUpdateActive,

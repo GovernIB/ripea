@@ -8,6 +8,7 @@ import { ResourceApiFormFieldDefault } from './form/FormFieldDefault';
 import {
     BaseAppContext,
     MessageDialogShowFn,
+    DialogButton,
     TemporalMessageShowFn,
     TemporalMessageSeverity,
     RouterNavigateFunction,
@@ -65,9 +66,13 @@ const useDialog = () => {
     const setMessageDialogShow = (fn: MessageDialogShowFn) => {
         dialogShowFn.current = fn;
     }
-    const messageDialogShow: MessageDialogShowFn = (title: string | null, message: string, componentProps?: any) => {
+    const messageDialogShow: MessageDialogShowFn = (
+        title: string | null,
+        message: string,
+        dialogButtons?: DialogButton[],
+        componentProps?: any) => {
         if (dialogShowFn.current) {
-            return dialogShowFn.current(title, message, componentProps);
+            return dialogShowFn.current(title, message, dialogButtons, componentProps);
         } else {
             console.warn('Dialog component not configured in BaseApp');
             return new Promise((_resolve, reject) => reject());

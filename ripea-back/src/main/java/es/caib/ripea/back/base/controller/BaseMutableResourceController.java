@@ -613,7 +613,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 		if (requestAttributes instanceof ServletRequestAttributes) {
 			HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
-			Map<String, AnswerRequiredException.AnswerValue> answers = null;
+			Map<String, AnswerRequiredException.AnswerValue> answers = new HashMap<>();
 			if (requestAnswers != null) {
 				Map<String, AnswerRequiredException.AnswerValue> answersFromRequest = requestAnswers.entrySet().stream().
 						collect(Collectors.toMap(
@@ -648,9 +648,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 											return new AnswerRequiredException.AnswerValue(e.getValue().toString());
 										}
 									}));
-					if (answers == null) {
-						answers = new HashMap<>();
-					}
 					answers.putAll(answersFromHeader);
 				} catch (JsonProcessingException ex) {
 					log.warn("Error al parsejar la capçalera {}", httpHeaderAnswers, ex);

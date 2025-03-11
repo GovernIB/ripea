@@ -82,6 +82,9 @@ export const useDataCommonEditable = (
     toolbarCreateLink: string | undefined,
     rowDetailLink: string | undefined,
     rowUpdateLink: string | undefined,
+    rowHideUpdateButton: boolean | undefined,
+    rowHideDeleteButton: boolean | undefined,
+    rowHideDetailsButton: boolean | undefined,
     popupEditActive: boolean | undefined,
     popupEditCreateActive: boolean | undefined,
     popupEditUpdateActive: boolean | undefined,
@@ -154,21 +157,22 @@ export const useDataCommonEditable = (
         onClick: !toolbarCreateLink ? popupCreate : undefined,
     }) : undefined;
     const rowEditActions: DataCommonAdditionalAction[] = [];
-    !readOnly && rowEditActions.push({
+    !readOnly && !rowHideUpdateButton && rowEditActions.push({
         title: t('datacommon.update.title'),
         rowApiLink: 'update',
         icon: 'edit',
         linkTo: rowUpdateLink,
         linkState: rowUpdateLink != null && formAdditionalData != null ? { additionalData: formAdditionalData } : undefined,
         popupUpdateOnClick: rowUpdateLink == null,
-    }, {
+    });
+    !readOnly && !rowHideDeleteButton && rowEditActions.push({
         title: t('datacommon.delete.title'),
         rowApiLink: 'delete',
         icon: 'delete',
         onClick: doDelete,
         showInMenu: true,
     });
-    rowDetailLink && rowEditActions.push({
+    rowDetailLink && !rowHideDetailsButton && rowEditActions.push({
         title: t('datacommon.details.title'),
         rowApiLink: readOnly ? undefined : '!update',
         icon: 'info',

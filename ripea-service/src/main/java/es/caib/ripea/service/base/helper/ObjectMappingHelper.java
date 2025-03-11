@@ -84,10 +84,9 @@ public class ObjectMappingHelper {
 					Field targetField = ReflectionUtils.findField(target.getClass(), sourceField.getName());
 					if (targetField != null) {
 						if (isSimpleType(sourceField.getType())) {
-							ReflectionUtils.makeAccessible(targetField);
-							ReflectionUtils.setField(
-									targetField,
+							setFieldValue(
 									target,
+									targetField,
 									sourceField.get(source));
 						} else if (ResourceEntity.class.isAssignableFrom(sourceField.getType()) && ResourceReference.class.isAssignableFrom(targetField.getType())) {
 							ResourceEntity<?, ?> entity = (ResourceEntity<?, ?>)sourceField.get(source);
@@ -95,16 +94,14 @@ public class ObjectMappingHelper {
 							if (entity != null) {
 								resourceReference = toResourceReference(entity);
 							}
-							ReflectionUtils.makeAccessible(targetField);
-							ReflectionUtils.setField(
-									targetField,
+							setFieldValue(
 									target,
+									targetField,
 									resourceReference);
 						} else {
-							ReflectionUtils.makeAccessible(targetField);
-							ReflectionUtils.setField(
-									targetField,
+							setFieldValue(
 									target,
+									targetField,
 									null);
 						}
 					}
@@ -251,7 +248,7 @@ public class ObjectMappingHelper {
 	private Object getFieldValue(
 			Object object,
 			String fieldName) throws NoSuchFieldException {
-		String getMethodName = methodNameFromField(fieldName, "get");
+		String getMethodName = methodNameFromFieldName(fieldName, "get");
 		Method method = ReflectionUtils.findMethod(object.getClass(), getMethodName);
 		if (method != null) {
 			return ReflectionUtils.invokeMethod(method, object);
@@ -262,12 +259,29 @@ public class ObjectMappingHelper {
 		}
 	}
 
+	private void setFieldValue(
+			Object object,
+			Field field,
+			Object value) {
+		String setMethodName = methodNameFromFieldName(field.getName(), "set");
+		Method method = ReflectionUtils.findMethod(object.getClass(), setMethodName, field.getType());
+		if (method != null) {
+			ReflectionUtils.invokeMethod(method, object, value);
+		} else {
+			ReflectionUtils.makeAccessible(field);
+			ReflectionUtils.setField(
+					field,
+					object,
+					value);
+		}
+	}
+
 	private boolean isStaticFinal(Field field) {
 		int modifiers = field.getModifiers();
 		return Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
 	}
 
-	private String methodNameFromField(String fieldName, String prefix) {
+	private String methodNameFromFieldName(String fieldName, String prefix) {
 		return prefix + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 	}
 

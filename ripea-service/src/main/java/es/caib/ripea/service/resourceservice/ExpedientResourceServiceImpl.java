@@ -51,7 +51,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setNumSeguidors(entity.getSeguidors().size());
-        resource.setNumInteressats(entity.getInteressats().size());
+        resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
         resource.setNumTasques(entity.getTasques().size());
     }
 

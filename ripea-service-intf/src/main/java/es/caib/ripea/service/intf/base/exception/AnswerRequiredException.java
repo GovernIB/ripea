@@ -88,7 +88,7 @@ public class AnswerRequiredException extends RuntimeException {
 		this.stringAnswerFieldActive = stringAnswerFieldActive;
 	}
 
-	public AnswerRequiredError toAnswerRequiredResponse() {
+	public AnswerRequiredError toAnswerRequiredError() {
 		return new AnswerRequiredError(
 				answerCode,
 				question,

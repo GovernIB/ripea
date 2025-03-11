@@ -11,5 +11,5 @@ public interface InteressatResourceRepository extends BaseRepository<InteressatR
     List<InteressatResourceEntity> findByExpedient(ExpedientResourceEntity expedient);
     List<InteressatResourceEntity> findByExpedientId(Long expedientId);
 
-    Optional<InteressatResourceEntity> findByDocumentNum(String documentNum);
+    Optional<InteressatResourceEntity> findByExpedientIdAndDocumentNum(Long expedientId, String documentNum);
 }

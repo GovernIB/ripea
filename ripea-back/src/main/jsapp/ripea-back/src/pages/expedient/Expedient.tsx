@@ -40,6 +40,7 @@ const Expedient: React.FC = () => {
 
     const border= { border: '1px solid #e3e3e3', borderRadius: 10 };
     const backgroundColor= { backgroundColor: '#f5f5f5' };
+    const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
 
     const tabs = [
         {
@@ -57,8 +58,8 @@ const Expedient: React.FC = () => {
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
-            content: <InteressatsGrid/>,
-            badge: expedient?.numInteressats,
+            content: <InteressatsGrid id={expedient?.id} onRowCountChange={setNumInteressats}/>,
+            badge: numInteressats ?? expedient?.numInteressats,
         },
         {
             value: "remeses",
@@ -148,7 +149,7 @@ const Expedient: React.FC = () => {
                         aria-label="scrollable force tabs"
                         tabs={tabs}
                         variant="scrollable"
-                        headerAdditionalData={[<CommentDialog entity={expedient}/>]}
+                        headerAdditionalData={<CommentDialog entity={expedient}/>}
                     />
                 </Grid>
             </Grid>

@@ -6,7 +6,7 @@ import {DataFormDialogApi} from "../../../lib/components/mui/datacommon/DataForm
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="text" required/>
+        <GridFormField xs={12} name="text"/>
     </Grid>
 }
 

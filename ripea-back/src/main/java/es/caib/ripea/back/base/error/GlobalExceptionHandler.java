@@ -141,6 +141,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 	}
 
+	@ExceptionHandler(AnswerRequiredException.class)
+	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+	public ResponseEntity<Object> handleOnChangeAnswerRequiredException(
+			AnswerRequiredException ex,
+			WebRequest request) {
+		return buildOnChangeAnswerRequiredErrorResponse(
+				ex,
+				ex.getMessage(),
+				HttpStatus.UNPROCESSABLE_ENTITY,
+				request,
+				ex.toAnswerRequiredError());
+	}
+
 	@ExceptionHandler(ResourceNotCreatedException.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<Object> handleResourceNotCreatedException(
@@ -257,14 +270,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return toErrorResponseEntity(httpStatus, errorResponse);
 	}
 
-	private ResponseEntity<Object> buildExternalSystemErrorResponse(
+	private ResponseEntity<Object> buildOnChangeAnswerRequiredErrorResponse(
 			Exception ex,
 			String message,
 			HttpStatus httpStatus,
-			Throwable traceException) {
+			WebRequest request,
+			AnswerRequiredException.AnswerRequiredError answerRequiredError) {
 		ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
-		if (printStackTrace && traceException != null) {
-			errorResponse.setStackTrace(ExceptionUtils.getStackTrace(traceException));
+		errorResponse.setAnswerRequiredError(answerRequiredError);
+		if (printStackTrace && isTraceOn(request)) {
+			errorResponse.setStackTrace(ExceptionUtils.getStackTrace(ex));
 		}
 		return toErrorResponseEntity(httpStatus, errorResponse);
 	}

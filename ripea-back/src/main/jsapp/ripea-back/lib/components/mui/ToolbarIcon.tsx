@@ -8,6 +8,7 @@ import { useBaseAppContext } from '../BaseAppContext';
 type ToolbarIconParams = {
     title?: string;
     linkTo?: string;
+    linkState?: any;
     badge?: React.ReactNode;
     onClick?: React.MouseEventHandler<HTMLButtonElement>;
     disabled?: boolean;
