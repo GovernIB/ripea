@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {
     GridPage,
-    MuiGrid,
-    useFormContext,
+    MuiGrid, useBaseAppContext,
+    useFormContext, useMuiDataGridApiRef, useResourceApiService,
 } from 'reactlib';
 import {Box, Typography, Icon, Grid} from "@mui/material";
 import {formatDate} from '../../util/dateUtils';
@@ -10,6 +10,9 @@ import {useNavigate} from "react-router-dom";
 import CommentDialog from "./CommentDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
+import {DataFormDialogApi} from "../../../lib/components/mui/datacommon/DataFormDialog.tsx";
+import CambiarPrioritat from "./actions/CambiarPrioritat.tsx";
+import CambiarEstado from "./actions/CambiarEstado.tsx";
 
 const ExpedientGridForm = () => {
     const formContext = useFormContext();
@@ -29,6 +32,12 @@ const ExpedientGrid: React.FC = () => {
     // const { t } = useTranslation();
     let navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState("");
+
+    const {
+        patch: apiPatch,
+    } = useResourceApiService('expedientResource');
+    const apiRef = useMuiDataGridApiRef()
+    const {temporalMessageShow} = useBaseAppContext();
 
     const columns = [
         {
@@ -150,29 +159,61 @@ const ExpedientGrid: React.FC = () => {
             showInMenu: true,
         },
         {
-            title: "Modificar...",
-            icon: "edit",
-            showInMenu: true,
-        },
-        {
             title: "Coger",
             icon: "lock",
             showInMenu: true,
+            onClick: (id: any):void => {
+                apiPatch(id, {
+                    data: {
+                        agafatPer: {
+                            // TODO: change user from session
+                            id: "rip_admin"
+                        },
+                    }
+                })
+                    .then(() => {
+                        apiRef?.current?.refresh?.();
+                        temporalMessageShow(null, '', 'success');
+                    })
+            }
         },
         {
             title: "Liberar",
             icon: "lock_open",
             showInMenu: true,
+            onClick: (id: any):void => {
+                apiPatch(id, {
+                    data: {
+                        agafatPer: null,
+                    }
+                })
+                    .then(() => {
+                        apiRef?.current?.refresh?.();
+                        temporalMessageShow(null, '', 'success');
+                    })
+            }
         },
         {
             title: "Cambiar prioridad...",
             icon: "",
             showInMenu: true,
+            onClick: (id:any)=>{
+                cambiarPrioridad?.current?.show(id)
+                    .then(()=>{
+                        apiRef?.current?.refresh?.()
+                    })
+            }
         },
         {
             title: "Cambiar estado...",
             icon: "",
             showInMenu: true,
+            onClick: (id:any)=>{
+                cambiarEstado?.current?.show(id)
+                    .then(()=>{
+                        apiRef?.current?.refresh?.()
+                    })
+            }
         },
         {
             title: "Relacionar...",
@@ -182,11 +223,6 @@ const ExpedientGrid: React.FC = () => {
         {
             title: "Cerrar...",
             icon: "check",
-            showInMenu: true,
-        },
-        {
-            title: "Borrar",
-            icon: "delete",
             showInMenu: true,
         },
         {
@@ -222,6 +258,8 @@ const ExpedientGrid: React.FC = () => {
             showInMenu: true,
         },
     ]
+    const cambiarPrioridad = React.useRef<DataFormDialogApi>()
+    const cambiarEstado = React.useRef<DataFormDialogApi>()
 
     return <GridPage>
         <div style={{border: '1px solid #e3e3e3'}}>
@@ -240,12 +278,15 @@ const ExpedientGrid: React.FC = () => {
                 perspectives={["INTERESSATS_RESUM"]}
                 titleDisabled
                 popupEditCreateActive
-                popupEditFormDialogTitle={"Crear nuevo expediente"}
+                apiRef={apiRef}
+                // popupEditFormDialogTitle={"Crear nuevo expediente"}
                 popupEditFormContent={<ExpedientGridForm/>}
-                // readOnly
-                onRowDoubleClick={(prop)=>navigate(`/contingut/${prop?.id}`)}
+                onRowDoubleClick={(row)=>navigate(`/contingut/${row?.id}`)}
                 rowAdditionalActions={actions}
             />
+
+            <CambiarPrioritat apiRef={cambiarPrioridad}/>
+            <CambiarEstado apiRef={cambiarEstado}/>
         </div>
     </GridPage>
 }
