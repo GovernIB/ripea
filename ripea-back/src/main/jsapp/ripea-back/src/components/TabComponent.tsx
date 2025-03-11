@@ -57,7 +57,7 @@ const TabComponent: React.FC<TabComponentProps> = (props :TabComponentProps) => 
                     <Badge badgeContent={badge} color={badgeColor} sx={{px: 1}}>{label}</Badge>}/>
             })}
 
-            {...headerAdditionalData}
+            {headerAdditionalData}
         </Tabs>
 
         {tabs.map((tab) =>

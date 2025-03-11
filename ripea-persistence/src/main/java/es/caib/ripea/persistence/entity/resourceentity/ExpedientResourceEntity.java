@@ -1,6 +1,5 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
-import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -73,7 +72,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	@OneToMany(
 			mappedBy = "expedient",
 			fetch = FetchType.LAZY,
-			orphanRemoval = true)
+            cascade = {CascadeType.REMOVE}
+//			orphanRemoval = true
+    )
 	protected List<InteressatResourceEntity> interessats = new ArrayList<InteressatResourceEntity>();
 	@ManyToMany(
 			cascade = {
