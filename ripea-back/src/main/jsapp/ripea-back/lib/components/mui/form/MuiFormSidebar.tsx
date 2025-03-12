@@ -37,7 +37,7 @@ export const MuiFormSidebar: React.FC<FormSidebarProps> = (props) => {
     } = props;
     const { t } = useBaseAppContext();
     const formDialogButtons = useFormDialogButtons();
-    const drawerRef = React.useRef<any>();
+    const drawerRef = React.useRef<any>(null);
     const formApiRef = React.useRef<FormApi | any>({});
     const [open, setOpen] = React.useState<boolean>(false);
     const [id, setId] = React.useState<any>();

@@ -17,7 +17,7 @@ export type TemporalMessageShowFn = (
 
 export type DialogVariant = 'text' | 'outlined' | 'contained';
 export type ContentDialogShowFn = (title: string | null, content: React.ReactElement, dialogButtons?: DialogButton[], componentProps?: any) => Promise<any>;
-export type MessageDialogShowFn = (title: string | null, message: string, dialogButtons?: DialogButton[], componentProps?: any) => Promise<string>;
+export type MessageDialogShowFn = (title: string | null, message: string | React.ReactElement, dialogButtons?: DialogButton[], componentProps?: any) => Promise<string>;
 export type DialogButton = {
     value: any;
     text: string;
