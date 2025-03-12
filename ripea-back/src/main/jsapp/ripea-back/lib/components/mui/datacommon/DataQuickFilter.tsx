@@ -24,23 +24,21 @@ const DataQuickFilter: React.FC<DataQuickFilterProps> = (props) => {
         onChange,
         ...otherProps
     } = props;
-    const quickFilterRef = React.useRef<HTMLInputElement>();
     return <TextField
         size="small"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        InputProps={{
-            endAdornment: <>
-                {value &&
-                    <InputAdornment position="end"><IconButton onClick={() => onChange('')}>
-                        <Icon fontSize="small">clear</Icon></IconButton>
-                    </InputAdornment>
-                }
-                <InputAdornment position="end"><Icon>search</Icon></InputAdornment>
-            </>,
-        }}
-        inputProps={{
-            ref: quickFilterRef
+        slotProps={{
+            input: {
+                endAdornment: <>
+                    {value &&
+                        <InputAdornment position="end"><IconButton size="small" onClick={() => onChange('')}>
+                            <Icon fontSize="inherit">clear</Icon></IconButton>
+                        </InputAdornment>
+                    }
+                    <InputAdornment position="end"><Icon>search</Icon></InputAdornment>
+                </>,
+            }
         }}
         {...otherProps} />;
 }

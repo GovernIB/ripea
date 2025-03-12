@@ -133,8 +133,10 @@ const rowActionsToGridActionsCellItems = (
         const actionLinkTo = (typeof action.linkTo === 'function') ? action.linkTo?.(params.row) : action.linkTo?.replace('{{id}}', '' + params.id);
         const actionLinkState = (typeof action.linkState === 'function') ? action.linkState?.(params.row) : action.linkState;
         const actionOnClick = action.popupCreateOnClick ? () => popupCreate(params.row) : (action.popupUpdateOnClick ? () => popupUpdate(params.id, params.row) : action.onClick);
+        const showInMenu = (typeof action.showInMenu === 'function') ? action.showInMenu(params.row) : action.showInMenu;
         const disabled = forceDisabled || ((typeof action.disabled === 'function') ? action.disabled(params.row) : action.disabled);
-        showAction && actions.push(
+        const hidden = (typeof action.hidden === 'function') ? action.hidden(params.row) : action.hidden;
+        showAction && !hidden && actions.push(
             toDataGridActionItem(
                 params.id,
                 action.title ?? (isLinkAction ? link?.title : isLinkAction),
@@ -143,7 +145,7 @@ const rowActionsToGridActionsCellItems = (
                 actionLinkTo,
                 actionLinkState,
                 actionOnClick,
-                action.showInMenu,
+                showInMenu,
                 disabled));
     });
     return actions;

@@ -83,7 +83,7 @@ export const useMessageDialog: (() => [MessageDialogShowFn, React.ReactElement])
     const [showContentDialog, dialogComponent] = useContentDialog(dialogButtons);
     const showDialog: MessageDialogShowFn = (
         title: string | null,
-        message: string,
+        message: string | React.ReactElement,
         dialogButtons?: DialogButton[],
         componentProps?: any) => {
         const content = message ? <DialogContentText>{message}</DialogContentText> : <></>;
