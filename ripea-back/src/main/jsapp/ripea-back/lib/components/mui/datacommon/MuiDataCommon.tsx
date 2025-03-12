@@ -23,8 +23,9 @@ export type DataCommonAdditionalAction = {
     onClick?: (id: any, event: React.MouseEvent) => void;
     popupCreateOnClick?: boolean;
     popupUpdateOnClick?: boolean;
-    showInMenu?: boolean;
+    showInMenu?: ((row: any) => boolean) | boolean;
     disabled?: ((row: any) => boolean) | boolean;
+    hidden?: ((row: any) => boolean) | boolean;
 };
 
 export const useApiDataCommon = (
