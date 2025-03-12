@@ -7,7 +7,7 @@ import {
     useBaseAppContext
 } from 'reactlib';
 
-export const useCommonActions = (refresh: () => void) => {
+export const useCommonActions = (refresh?: () => void) => {
     const { temporalMessageShow } = useBaseAppContext();
     const {
         patch: apiPatch,
