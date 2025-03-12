@@ -10,6 +10,7 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,12 +30,16 @@ import java.util.List;
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_COUNT),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class)
 		})
 public class ExpedientResource extends NodeResource {
 
+	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
@@ -110,17 +115,18 @@ public class ExpedientResource extends NodeResource {
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
-    private List<InteressatResource> interessats;
-    private int numComentaris;
-    private int numSeguidors;
-    private int numContingut;
-    private int numDades;
-    private int numInteressats;
-    private int numRemeses;
-    private int numPublicacions;
-    private int numAnotacions;
-    private int numVersions;
-    private int numTasques;
+    @Transient private List<InteressatResource> interessats;
+    @Transient private int numComentaris;
+    @Transient private int numSeguidors;
+    @Transient private int numContingut;
+    @Transient private int numDades;
+    @Transient private int numInteressats;
+    @Transient private int numRemeses;
+    @Transient private int numPublicacions;
+    @Transient private int numAnotacions;
+    @Transient private int numVersions;
+    @Transient private int numTasques;
+    @Transient private boolean disableOrganGestor = false;
     public String getTipusStr() {
         return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
     }

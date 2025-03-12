@@ -19,7 +19,7 @@ const ExpedientGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id} />
         <GridFormField xs={12} name="nom" />
-        <GridFormField xs={12} name="organGestor" disabled={!!data?.id} /*filter={''}*/ />
+        <GridFormField xs={12} name="organGestor" disabled={!!data?.id || data?.disableOrganGestor} /*filter={''}*/ />
         <GridFormField xs={12} name="sequencia" disabled />
         <GridFormField xs={12} name="any" />
         <GridFormField xs={12} name="prioritat" required />

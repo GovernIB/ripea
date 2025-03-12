@@ -122,6 +122,8 @@ public class DocumentResource extends NodeResource {
     private List<ParentPath> parentPath;
     @Transient
     public List<String> treePath;
+    @Transient
+    public ResourceReference<MetaDocumentResource, Long> metaDocument;
 
     @Getter
     @Setter

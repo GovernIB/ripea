@@ -41,18 +41,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @PostConstruct
     public void init() {
+        register("COUNT", new CountPerspectiveApplicator());
         register("INTERESSATS_RESUM", new InteressatsPerspectiveApplicator());
         register("metaExpedient", new MetaExpedientOnchangeLogicProcessor());
         register("any", new AnyOnchangeLogicProcessor());
-    }
-
-
-    @Override
-    protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
-        resource.setNumComentaris(entity.getComentaris().size());
-        resource.setNumSeguidors(entity.getSeguidors().size());
-        resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
-        resource.setNumTasques(entity.getTasques().size());
     }
 
     @Override
@@ -100,6 +92,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         );
     }
 
+    private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResource, ExpedientResourceEntity> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            resource.setNumComentaris(entity.getComentaris().size());
+            resource.setNumSeguidors(entity.getSeguidors().size());
+            resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
+            resource.setNumTasques(entity.getTasques().size());
+        }
+    }
+
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResource, ExpedientResourceEntity> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -131,6 +133,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                             objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
                     if (metaExpedientResource.getOrganGestor() != null) {
                         target.setOrganGestor(metaExpedientResource.getOrganGestor());
+                        target.setDisableOrganGestor(true);
                         if (previous.getAny() != null) {
                             Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
                                     .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());

@@ -1,6 +1,7 @@
 import {
     GridPage,
     MuiFormDialog,
+    MuiFormDialogApi,
     MuiGrid,
     useBaseAppContext,
     useConfirmDialogButtons,
@@ -10,7 +11,6 @@ import {
 import {Grid} from "@mui/material";
 import React from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {DataFormDialogApi} from "../../../../lib/components/mui/datacommon/DataFormDialog.tsx";
 
 const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -39,7 +39,7 @@ interface DetailGridProps {
 
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {id, onRowCountChange} = props
-    const formApiRef = React.useRef<DataFormDialogApi>()
+    const formApiRef = React.useRef<MuiFormDialogApi>();
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};

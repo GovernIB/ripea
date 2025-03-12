@@ -35,19 +35,20 @@ const Expedient: React.FC = () => {
     } = useResourceApiService('expedientResource');
     const [expedient, setExpedient] = useState<any>();
     if (appApiIsReady && !expedient) {
-        appGetOne(id).then((app) => setExpedient(app))
+        appGetOne(id, {perspectives: ['COUNT']}).then((app) => setExpedient(app))
     }
 
     const border= { border: '1px solid #e3e3e3', borderRadius: 10 };
     const backgroundColor= { backgroundColor: '#f5f5f5' };
+    const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
 
     const tabs = [
         {
             value: "contingut",
             label: t('page.contingut.tabs.contingut'),
-            content: <DocumentsGrid/>,
-            badge: expedient?.numContingut,
+            content: <DocumentsGrid id={id} onRowCountChange={setNumContingut}/>,
+            badge: numContingut ?? expedient?.numContingut,
         },
         {
             value: "dades",
@@ -58,7 +59,7 @@ const Expedient: React.FC = () => {
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
-            content: <InteressatsGrid id={expedient?.id} onRowCountChange={setNumInteressats}/>,
+            content: <InteressatsGrid id={id} onRowCountChange={setNumInteressats}/>,
             badge: numInteressats ?? expedient?.numInteressats,
         },
         {
