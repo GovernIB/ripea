@@ -80,7 +80,7 @@ export const FormFieldFile: React.FC<FormFieldFileProps> = (props) => {
         <Icon fontSize="inherit">clear</Icon>
     </IconButton> : undefined;
     const downloadButtonActive = id != null && apiIsReady && value != null && !value.content && onFileDownload != null;
-    const downloadEndAdornment = id != null && apiIsReady && value != null && !value.content ? <IconButton size="small" onClick={handleDownloadButtonClick}>
+    const downloadEndAdornment = downloadButtonActive ? <IconButton size="small" onClick={handleDownloadButtonClick}>
         <Icon fontSize="inherit">file_download</Icon>
     </IconButton> : undefined;
     const endAdornment = <>
