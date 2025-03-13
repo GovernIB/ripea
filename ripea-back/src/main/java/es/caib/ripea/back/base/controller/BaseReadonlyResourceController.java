@@ -1123,7 +1123,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	private String fieldOptionsProcessedFilterWithFieldAnnotation(Field field, String filterFromRequest) {
 		String processedFilter = filterFromRequest;
 		ResourceField resourceFieldAnnotation = field.getAnnotation(ResourceField.class);
-		if (resourceFieldAnnotation != null && resourceFieldAnnotation.springFilter().isEmpty()) {
+		if (resourceFieldAnnotation != null && !resourceFieldAnnotation.springFilter().isEmpty()) {
 			String springFilter = resourceFieldAnnotation.springFilter();
 			if (springFilter.startsWith("#{") && springFilter.endsWith("}")) {
 				String expressionToParse = springFilter.substring(2, springFilter.length() - 1);
