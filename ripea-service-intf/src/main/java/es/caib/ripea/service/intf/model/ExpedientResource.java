@@ -3,6 +3,7 @@ package es.caib.ripea.service.intf.model;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -109,6 +110,9 @@ public class ExpedientResource extends NodeResource {
 	private String sistraUnitatAdministrativa;
 	@Size(max = 100)
 	private String sistraClau;
+
+	@NotNull
+	private FileReference adjunt = new FileReference("bon_dia.pdf", null, "application/pdf", 1024);
 
 	// Prioritat
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;

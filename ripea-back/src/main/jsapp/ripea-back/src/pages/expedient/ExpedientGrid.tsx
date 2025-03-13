@@ -24,6 +24,7 @@ const ExpedientGridForm = () => {
         <GridFormField xs={12} name="any" />
         <GridFormField xs={12} name="prioritat" required />
         <GridFormField xs={12} name="prioritatMotiu" hidden={data?.prioritat == 'B_NORMAL'} required />
+        <GridFormField xs={12} name="adjunt" type="file" />
     </Grid>
 }
 

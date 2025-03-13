@@ -4,6 +4,7 @@ import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.util.TypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Component;
@@ -92,30 +93,27 @@ public class ResourceEntityMappingHelper {
 			Map<String, Persistable<?>> referencedEntities) {
 		List<String> processedFieldNames = new ArrayList<>();
 		// Actualitza els camps de l'entitat que son de tipus Persistable o byte[]
-		ReflectionUtils.doWithFields(entity.getClass(), new ReflectionUtils.FieldCallback() {
-			@Override
-			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-				// Es modifica el valor de cada camp de l'entitat que és de tipus de Persistable
-				// amb la referencia especificada al resource.
-				if (Persistable.class.isAssignableFrom(field.getType()) && referencedEntities != null) {
-					Persistable<?> referencedEntity = referencedEntities.get(field.getName());
-					String setMethodName = "set" + getMethodSuffixFromField(field);
-					Method setMethod = ReflectionUtils.findMethod(
-							entity.getClass(),
-							setMethodName,
-							field.getType());
-					if (setMethod != null) {
-						ReflectionUtils.invokeMethod(
-								setMethod,
-								entity,
-								referencedEntity);
-					}
-					processedFieldNames.add(field.getName());
+		ReflectionUtils.doWithFields(entity.getClass(), field -> {
+			// Es modifica el valor de cada camp de l'entitat que és de tipus de Persistable
+			// amb la referencia especificada al resource.
+			if (Persistable.class.isAssignableFrom(field.getType()) && referencedEntities != null) {
+				Persistable<?> referencedEntity = referencedEntities.get(field.getName());
+				String setMethodName = "set" + TypeUtil.getMethodSuffixFromField(field);
+				Method setMethod = ReflectionUtils.findMethod(
+						entity.getClass(),
+						setMethodName,
+						field.getType());
+				if (setMethod != null) {
+					ReflectionUtils.invokeMethod(
+							setMethod,
+							entity,
+							referencedEntity);
 				}
-				if (FileReference.class.isAssignableFrom(field.getType()) || byte[].class.isAssignableFrom(field.getType())) {
-					setFileReferenceFieldValue(field, entity);
-					processedFieldNames.add(field.getName());
-				}
+				processedFieldNames.add(field.getName());
+			}
+			if (FileReference.class.isAssignableFrom(field.getType())) {
+				setFileReferenceFieldValue(field, entity);
+				processedFieldNames.add(field.getName());
 			}
 		});
 		// Actualitza els demés camps de l'entitat
@@ -157,7 +155,7 @@ public class ResourceEntityMappingHelper {
 	private void setFileReferenceFieldValue(Field field, Object target) {
 		// Només es modifica el valor dels camps de tipus byte[] (arxius adjunts) si
 		// el valor del camp al recurs és null o si te una llargada major que 0.
-		String methodSuffix = getMethodSuffixFromField(field);
+		String methodSuffix = TypeUtil.getMethodSuffixFromField(field);
 		String getMethodName = "get" + methodSuffix;
 		Method getMethod = ReflectionUtils.findMethod(target.getClass(), getMethodName);
 		if (getMethod != null) {
@@ -182,10 +180,6 @@ public class ResourceEntityMappingHelper {
 				}
 			}
 		}
-	}
-
-	private String getMethodSuffixFromField(Field field) {
-		return field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 	}
 
 }

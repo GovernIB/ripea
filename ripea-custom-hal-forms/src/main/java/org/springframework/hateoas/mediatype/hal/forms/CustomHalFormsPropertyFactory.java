@@ -96,7 +96,7 @@ class CustomHalFormsPropertyFactory {
 					inputType = "checkbox";
 				} else if (Duration.class.isAssignableFrom(resolvedType)) {
 					inputType = null;
-				} else if (FileReference.class.equals(resolvedType.getComponentType()) || (resolvedType.isArray() && byte.class.equals(resolvedType.getComponentType()))) {
+				} else if (FileReference.class.equals(resolvedType.getComponentType())) {
 					inputType = "file";
 				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
 					inputType = "search";

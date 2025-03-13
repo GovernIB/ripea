@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.*;
@@ -58,6 +59,10 @@ public class TypeUtil {
 			}
 		}
 		return referencedClass;
+	}
+
+	public static String getMethodSuffixFromField(Field field) {
+		return field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 	}
 
 	public static boolean isNotNullField(Field field) {
@@ -115,6 +120,30 @@ public class TypeUtil {
 			}
 		} else {
 			return null;
+		}
+	}
+
+	public static <C> C getFieldOrGetterValue(Field field, Object target) {
+		String methodSuffix = getMethodSuffixFromField(field);
+		String getMethodName = "get" + methodSuffix;
+		Method getMethod = ReflectionUtils.findMethod(target.getClass(), getMethodName);
+		if (getMethod != null) {
+			return (C)ReflectionUtils.invokeMethod(getMethod, target);
+		} else {
+			field.setAccessible(true);
+			return (C)ReflectionUtils.getField(field, target);
+		}
+	}
+
+	public static void setFieldOrSetterValue(Field field, Object target, Object value) {
+		String methodSuffix = getMethodSuffixFromField(field);
+		String setMethodName = "set" + methodSuffix;
+		Method setMethod = ReflectionUtils.findMethod(target.getClass(), setMethodName);
+		if (setMethod != null) {
+			ReflectionUtils.invokeMethod(setMethod, target, value);
+		} else {
+			field.setAccessible(true);
+			ReflectionUtils.setField(field, target, value);
 		}
 	}
 
