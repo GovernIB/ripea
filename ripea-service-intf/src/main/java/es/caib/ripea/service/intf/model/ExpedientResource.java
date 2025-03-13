@@ -44,8 +44,8 @@ public class ExpedientResource extends NodeResource {
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
-//	@NotNull
-	private ExpedientEstatEnumDto estat;
+	@NotNull
+	private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
 //	@NotNull
 	@Size(max = 46)
 	private String ntiClasificacionSia;	
@@ -92,9 +92,9 @@ public class ExpedientResource extends NodeResource {
 	private String registresImportats;
 
 	// NTI
-//	@NotNull
+	@NotNull
 	@Size(max = 5)
-	private String ntiVersion;
+	private String ntiVersion = "1.0";
 //	@NotNull
 	@Size(max = 52)
 	private String ntiIdentificador;

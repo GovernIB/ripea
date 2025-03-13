@@ -47,7 +47,7 @@ const Expedient: React.FC = () => {
         {
             value: "contingut",
             label: t('page.contingut.tabs.contingut'),
-            content: <DocumentsGrid id={id} onRowCountChange={setNumContingut}/>,
+            content: <DocumentsGrid id={id} entity={expedient} onRowCountChange={setNumContingut}/>,
             badge: numContingut ?? expedient?.numContingut,
         },
         {

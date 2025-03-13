@@ -1,6 +1,6 @@
 import {
     GridPage,
-    MuiGrid, useFormContext,
+    MuiGrid,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import React, { useState } from "react";
@@ -8,16 +8,21 @@ import ContingutIcon from "./ContingutIcon.tsx";
 import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon } from "@mui/material";
 import {useContingutActions} from "../actions/ContingutActions.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
+import * as builder from '../../../util/springFilterUtils';
 
 const DocumentsGridForm = (props:any) => {
     const {expedient} = props;
-    const formContext = useFormContext();
-    const { data } = formContext;
+
+    const metaDocumentFilter :string = builder.and(
+        builder.eq("metaExpedient.id", expedient?.metaExpedient?.id),
+        builder.eq("actiu", true),
+    );
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument"/>
+        <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="data" disabled required/>
+        <GridFormField xs={12} name="dataCaptura" disabled required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
         {/*<GridFormField xs={12} name="fitxer" required/>*/}
@@ -81,7 +86,7 @@ const DocumentsGrid: React.FC = (props:any) => {
                 expedient: {
                     id: id
                 },
-                data: new Date(),
+                dataCaptura: Date.now(),
             }}
             disableColumnSorting
             disableColumnMenu
@@ -96,12 +101,10 @@ const DocumentsGrid: React.FC = (props:any) => {
                 if(_rows!=null && vista == "carpeta") {
                     for (const row of _rows) {
                         const aditionalRow = row.parentPath
-                            .filter((a: any) => a.id != row.id)
-                            .filter((a: any) => !additionalRows.map((b)=>b.id).includes(a.id))
-                            .map((a: any) =>{a.group="A";return a})
-                        additionalRows.push(...aditionalRow);
+                            ?.filter((a: any) => a.id != row.id && !additionalRows.map((b)=>b.id).includes(a.id))
+                        aditionalRow && additionalRows.push(...aditionalRow);
                     }
-                    setTreeView(additionalRows.length > 0)
+                    setTreeView(additionalRows?.length > 0)
                 }else {
                     setTreeView(true)
                 }

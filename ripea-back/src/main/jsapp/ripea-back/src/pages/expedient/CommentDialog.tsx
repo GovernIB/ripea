@@ -1,6 +1,6 @@
 import {MuiFormDialog, useResourceApiService} from "reactlib";
 import React, {useState} from "react";
-import {Icon, Badge, IconButton, Grid} from "@mui/material";
+import {Badge, Grid, Icon, IconButton} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {DataFormDialogApi} from "../../../lib/components/mui/datacommon/DataFormDialog.tsx";
 
@@ -11,12 +11,25 @@ const CommentForm = () => {
 }
 
 const CommentDialog = (props:any) => {
-    const { entity } = props
+    const { entity } = props;
+    const {numComm, handleOpen, dialog} = useCommentDialog(entity);
 
+    return <>
+        <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen} /*variant="outlined" sx={{borderRadius: 1}}*/>
+            <Badge badgeContent={numComm} color="primary">
+                <Icon>forum</Icon>
+            </Badge>
+        </IconButton>
+        {dialog}
+    </>
+}
+
+const useCommentDialog = (row:any) => {
     const {
         isReady: appApiIsReady,
         find: findAll,
     } = useResourceApiService('expedientComentariResource');
+    const [entity] = useState<any>(row);
     const [comentarios, setComentarios] = useState<any[]>();
     const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
 
@@ -25,10 +38,10 @@ const CommentDialog = (props:any) => {
     const otherComment = {...comment, bgcolor: '#e0e0e0'}
     const formApiRef = React.useRef<DataFormDialogApi>()
 
-    const open = () => {
+    const handleOpen = () => {
         if (appApiIsReady){
             findAll({
-                filter: `expedient.id:${entity.id}`,
+                filter: `expedient.id:${entity?.id}`,
                 includeLinksInRows: true,
                 page: 0,
                 size: 0,
@@ -42,18 +55,15 @@ const CommentDialog = (props:any) => {
 
         formApiRef.current?.show(undefined, {
             expedient: {
-                id: entity.id
+                id: entity?.id
             },
         })
+            .then(() => {
+                setNumComm(numComm + 1);
+            })
     }
 
-    return <>
-        <IconButton aria-label="forum" color={"inherit"} onClick={open} /*variant="outlined" sx={{borderRadius: 1}}*/>
-            <Badge badgeContent={numComm} color="primary">
-                <Icon>forum</Icon>
-            </Badge>
-        </IconButton>
-
+    const dialog =
         <MuiFormDialog
             resourceName={"expedientComentariResource"}
             title={`Comentarios del expediente: ${entity?.nom}`}
@@ -78,6 +88,11 @@ const CommentDialog = (props:any) => {
             </Grid>
             <CommentForm/>
         </MuiFormDialog>
-    </>
+
+    return {
+        numComm,
+        handleOpen,
+        dialog
+    }
 }
 export default CommentDialog;

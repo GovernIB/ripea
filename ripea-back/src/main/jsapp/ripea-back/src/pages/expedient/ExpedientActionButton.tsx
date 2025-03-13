@@ -23,7 +23,7 @@ const ExpedientActionButton = (props:{entity:any}) => {
         }}
     >
         {commonActionsActions.map((action) =>
-            action?.showInMenu && <MenuItem onClick={()=>action?.onClick?.(entity.id)} key={action.title} disabled={action?.disabled || action?.disabled?.(entity)}>
+            action?.showInMenu && <MenuItem onClick={()=>action?.onClick?.(entity.id)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(entity)}>
                 {action.icon && <Icon>{action.icon}</Icon>}{action.title}
             </MenuItem>
         )}

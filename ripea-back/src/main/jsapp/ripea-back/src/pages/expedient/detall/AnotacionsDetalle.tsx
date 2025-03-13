@@ -1,13 +1,23 @@
-import {
-    BasePage,
-} from 'reactlib';
+import {Dialog} from 'reactlib';
 import {Typography} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
+import {useState} from "react";
 
-const AnotacionsDetalle = (props:any) => {
+const useAnotacionsDetalle = () => {
     const { t } = useTranslation();
-    const { entity } = props;
+
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+
+    const handleOpen = (row:any) => {
+        setEntity(row);
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     const tabs = [
         {
@@ -36,15 +46,40 @@ const AnotacionsDetalle = (props:any) => {
             content: <Typography>{t('page.anotacio.tabs.annexos')}</Typography>,
         },
     ]
-    return <BasePage>
-        <TabComponent
-            indicatorColor={"primary"}
-            textColor={"primary"}
-            aria-label="scrollable force tabs"
-            tabs={tabs}
-            variant="scrollable"
-        />
-    </BasePage>
+
+    const dialog =
+        <Dialog
+            open={open}
+            closeCallback={handleClose}
+            title={"Detalles de la anotación de registro"}
+            componentProps={{ fullWidth: true, maxWidth: 'xl' }}
+            buttons={[
+                {
+                    value: 'close',
+                    text: 'Close'
+                },
+            ]}
+            buttonCallback={(value :any) :void=>{
+                console.log(value);
+                if (value=='close') {
+                    handleClose();
+                }
+            }}
+        >
+            <TabComponent
+                indicatorColor={"primary"}
+                textColor={"primary"}
+                aria-label="scrollable force tabs"
+                tabs={tabs}
+                variant="scrollable"
+            />
+        </Dialog>
+
+    return {
+        handleOpen,
+        handleClose,
+        dialog
+    }
 }
 
-export default AnotacionsDetalle;
+export default useAnotacionsDetalle;
