@@ -114,7 +114,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private class MetaExpedientOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
         @Override
-        public void processOnChangeLogic(
+        public void onChange(
                 ExpedientResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -154,7 +154,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private class AnyOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
         @Override
-        public void processOnChangeLogic(
+        public void onChange(
                 ExpedientResource previous,
                 String fieldName,
                 Object fieldValue,

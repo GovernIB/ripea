@@ -1,20 +1,20 @@
 package es.caib.ripea.service.resourceservice;
 
+import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
-import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
-import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -68,7 +68,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         public static final String NOT_REPRESENT_HIMSELF = "NOT_REPRESENT_HIMSELF";
 
         @Override
-        public void processOnChangeLogic(
+        public void onChange(
                 InteressatResource previous,
                 String fieldName,
                 Object fieldValue,
