@@ -2,6 +2,7 @@ package es.caib.ripea.service.base.helper;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
@@ -37,7 +38,7 @@ public class ResourceEntityMappingHelper {
 		if (builderMethod != null) {
 			Object builderInstance = ReflectionUtils.invokeMethod(builderMethod, null);
 			Class<?> builderReturnType = builderMethod.getReturnType();
-			boolean builderMethodCalled = callBuilderMethodForResource(
+			callBuilderMethodForResource(
 					resource,
 					entityClass,
 					builderInstance,
@@ -96,10 +97,9 @@ public class ResourceEntityMappingHelper {
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				// Es modifica el valor de cada camp de l'entitat que és de tipus de Persistable
 				// amb la referencia especificada al resource.
-				String methodSuffix = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 				if (Persistable.class.isAssignableFrom(field.getType()) && referencedEntities != null) {
 					Persistable<?> referencedEntity = referencedEntities.get(field.getName());
-					String setMethodName = "set" + methodSuffix;
+					String setMethodName = "set" + getMethodSuffixFromField(field);
 					Method setMethod = ReflectionUtils.findMethod(
 							entity.getClass(),
 							setMethodName,
@@ -112,27 +112,8 @@ public class ResourceEntityMappingHelper {
 					}
 					processedFieldNames.add(field.getName());
 				}
-				if (byte[].class.isAssignableFrom(field.getType())) {
-					// Només es modifica el valor dels camps de tipus byte[] (arxius adjunts) si
-					// el valor del camp al recurs és null o si te una llargada major que 0.
-					String getMethodName = "get" + methodSuffix;
-					Method getMethod = ReflectionUtils.findMethod(resource.getClass(), getMethodName);
-					if (getMethod != null) {
-						byte[] fileValue = (byte[])ReflectionUtils.invokeMethod(getMethod, resource);
-						String setMethodName = "set" + methodSuffix;
-						Method setMethod = ReflectionUtils.findMethod(
-								entity.getClass(),
-								setMethodName,
-								byte[].class);
-						if (setMethod != null) {
-							if (fileValue == null || fileValue.length != 0) {
-								ReflectionUtils.invokeMethod(
-										setMethod,
-										entity,
-										fileValue);
-							}
-						}
-					}
+				if (FileReference.class.isAssignableFrom(field.getType()) || byte[].class.isAssignableFrom(field.getType())) {
+					setFileReferenceFieldValue(field, entity);
 					processedFieldNames.add(field.getName());
 				}
 			}
@@ -171,6 +152,40 @@ public class ResourceEntityMappingHelper {
 			builderMethodCalled = true;
 		}
 		return builderMethodCalled;
+	}
+
+	private void setFileReferenceFieldValue(Field field, Object target) {
+		// Només es modifica el valor dels camps de tipus byte[] (arxius adjunts) si
+		// el valor del camp al recurs és null o si te una llargada major que 0.
+		String methodSuffix = getMethodSuffixFromField(field);
+		String getMethodName = "get" + methodSuffix;
+		Method getMethod = ReflectionUtils.findMethod(target.getClass(), getMethodName);
+		if (getMethod != null) {
+			String setMethodName = "set" + methodSuffix;
+			Method setMethod = ReflectionUtils.findMethod(
+					target.getClass(),
+					setMethodName,
+					byte[].class);
+			if (setMethod != null) {
+				byte[] fileValue = null;
+				if (FileReference.class.isAssignableFrom(field.getType())) {
+					FileReference fileReference = (FileReference)ReflectionUtils.invokeMethod(getMethod, target);
+					if (fileReference != null) fileValue = fileReference.getContent();
+				} else {
+					fileValue = (byte[])ReflectionUtils.invokeMethod(getMethod, target);
+				}
+				if (fileValue == null || fileValue.length != 0) {
+					ReflectionUtils.invokeMethod(
+							setMethod,
+							target,
+							fileValue);
+				}
+			}
+		}
+	}
+
+	private String getMethodSuffixFromField(Field field) {
+		return field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 	}
 
 }

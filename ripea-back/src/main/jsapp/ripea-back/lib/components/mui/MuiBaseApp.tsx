@@ -21,6 +21,7 @@ import { FormFieldReference } from './form/FormFieldReference';
 import { FormFieldText } from './form/FormFieldText';
 import { FormFieldTime } from './form/FormFieldTime';
 import { FormFieldRange } from './form/FormFieldRange';
+import { FormFieldFile } from './form/FormFieldFile';
 
 export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
     title?: string | React.ReactElement;
@@ -82,6 +83,9 @@ const baseFormFieldComponents = [{
 }, {
     type: 'range',
     component: FormFieldRange,
+}, {
+    type: 'file',
+    component: FormFieldFile,
 }];
 
 const MuiComponentsConfigurer: React.FC = () => {

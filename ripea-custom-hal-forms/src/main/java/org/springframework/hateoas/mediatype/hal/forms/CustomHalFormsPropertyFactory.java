@@ -18,6 +18,7 @@
 // S'ha afegit el mètode GET a ENTITY_ALTERING_METHODS per a que aquest mètode inclogui properties a la resposta
 package org.springframework.hateoas.mediatype.hal.forms;
 
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
@@ -95,7 +96,7 @@ class CustomHalFormsPropertyFactory {
 					inputType = "checkbox";
 				} else if (Duration.class.isAssignableFrom(resolvedType)) {
 					inputType = null;
-				} else if (resolvedType.isArray() && byte.class.equals(resolvedType.getComponentType())) {
+				} else if (FileReference.class.equals(resolvedType.getComponentType()) || (resolvedType.isArray() && byte.class.equals(resolvedType.getComponentType()))) {
 					inputType = "file";
 				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
 					inputType = "search";
