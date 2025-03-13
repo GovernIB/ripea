@@ -9,17 +9,20 @@ import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "fitxerNom" },
         descriptionField = "fitxerNom",
@@ -33,12 +36,11 @@ public class DocumentResource extends NodeResource {
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
 
 	@NotNull
-	private DocumentTipusEnumDto documentTipus;
-	@NotNull
+	private DocumentTipusEnumDto documentTipus = DocumentTipusEnumDto.DIGITAL;
 	private DocumentEstatEnumDto estat;
 	@Size(max = 255)
 	private String ubicacio;
-	@NotNull
+//	@NotNull
 	private Date data;
 	@NotNull
 	private Date dataCaptura;
@@ -56,21 +58,20 @@ public class DocumentResource extends NodeResource {
 	@Size(max = 32)
 	private String versioDarrera;
 	@NotNull
-	private int versioCount;
+	private int versioCount = 0;
 	@NotNull
 	@Size(max = 5)
-	private String ntiVersion;
-	@NotNull
+	private String ntiVersion = "1.0";
 	@Size(max = 48)
 	private String ntiIdentificador;
-	@NotNull
+//	@NotNull
 	@Size(max = 9)
 	private String ntiOrgano;
 	@NotNull
 	private NtiOrigenEnumDto ntiOrigen;
 	@NotNull
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-	@NotNull
+//	@NotNull
 	@Size(max = 4)
 	private String ntiTipoDocumental;
 	@Size(max = 48)
@@ -122,7 +123,9 @@ public class DocumentResource extends NodeResource {
     private List<ParentPath> parentPath;
     @Transient
     public List<String> treePath;
+    @NotNull
     @Transient
+    @ResourceField(onChangeActive = true)
     public ResourceReference<MetaDocumentResource, Long> metaDocument;
 
     @Getter

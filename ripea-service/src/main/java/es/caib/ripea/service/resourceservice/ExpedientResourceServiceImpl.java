@@ -48,20 +48,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     @Override
+    protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
+        resource.setNumComentaris(entity.getComentaris().size());
+        resource.setNumSeguidors(entity.getSeguidors().size());
+    }
+
+    @Override
     protected void beforeCreateSave(
             ExpedientResourceEntity entity,
             ExpedientResource resource,
             Map<String, AnswerRequiredException.AnswerValue> answers) {
+        entity.setMetaNode(entity.getMetaExpedient());
+
         entity.setCodi(entity.getMetaExpedient().getCodi());
 
         /** TODO: cambiar (ExpedientHelper.calcularNumero()) */
         entity.setNumero(entity.getCodi() + "/" + entity.getSequencia() + "/" + entity.getAny());
 
         entity.setEntitat(entity.getMetaExpedient().getEntitat());
-        entity.setEstat(ExpedientEstatEnumDto.OBERT);
         entity.setTipus(ContingutTipusEnumDto.EXPEDIENT);
         entity.setNtiIdentificador(Long.toString(System.currentTimeMillis()));
-        entity.setNtiVersion("1.0");
         entity.setNtiOrgano(entity.getMetaExpedient().getEntitat().getUnitatArrel());
         entity.setNtiFechaApertura(new Date());
         entity.setNtiClasificacionSia(entity.getMetaExpedient().getClassificacio());
@@ -92,11 +98,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         );
     }
 
+    @Override
+    protected void beforeUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        entity.setMetaNode(entity.getMetaExpedient());
+    }
+
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResource, ExpedientResourceEntity> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            resource.setNumComentaris(entity.getComentaris().size());
-            resource.setNumSeguidors(entity.getSeguidors().size());
             resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
             resource.setNumTasques(entity.getTasques().size());
         }

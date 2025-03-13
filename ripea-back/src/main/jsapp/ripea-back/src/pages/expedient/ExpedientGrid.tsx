@@ -162,6 +162,7 @@ const ExpedientGrid: React.FC = () => {
                 popupEditFormContent={<ExpedientGridForm />}
                 onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
                 rowAdditionalActions={commonActionsActions}
+                rowHideDeleteButton
             />
 
             {commonActionsComponents}

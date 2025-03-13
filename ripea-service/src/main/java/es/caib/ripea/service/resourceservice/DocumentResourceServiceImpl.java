@@ -1,17 +1,18 @@
 package es.caib.ripea.service.resourceservice;
 
-import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaNodeResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaNodeResourceRepository;
+import es.caib.ripea.persistence.entity.resourceentity.*;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
@@ -32,32 +33,42 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
-    private final MetaNodeResourceRepository metaNodeResourceRepository;
+    private final MetaDocumentResourceRepository metaDocumentResourceRepository;
 
     @PostConstruct
     public void init() {
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
+        register(DocumentResource.Fields.metaDocument, new MetaDocumentOnchangeLogicProcessor());
     }
 
     @Override
     protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        Optional<MetaNodeResourceEntity> optionalResource=metaNodeResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalResource.ifPresent(entity::setMetaNode);
+        Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
+        optionalDocumentResource.ifPresent(entity::setMetaNode);
+        optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> entity.setNtiTipoDocumental(metaDocumentResourceEntity.getNtiTipoDocumental())));
+
+        entity.setEstat(entity.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT);
+        entity.setTipus(ContingutTipusEnumDto.DOCUMENT);
+//        entity.setValidacioFirmaCorrecte(true);
+        entity.setData(new Date());
+        // TODO: revisar
+        entity.setPare(entity.getExpedient());
+        entity.setEntitat(entity.getMetaNode().getEntitat());
+        entity.setNtiIdentificador(Long.toString(System.currentTimeMillis()));
+        entity.setNtiOrgano(entity.getExpedient().getNtiOrgano());
+        entity.setExpedientEstatAdditional(entity.getExpedient().getEstatAdditional());
     }
 
     @Override
     protected void beforeUpdateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
-        Optional<MetaNodeResourceEntity> optionalResource=metaNodeResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalResource.ifPresent(entity::setMetaNode);
+        Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
+        optionalDocumentResource.ifPresent(entity::setMetaNode);
     }
 
     @Override
     protected void afterConversion(DocumentResourceEntity entity, DocumentResource resource) {
         if(entity.getMetaNode()!=null) {
-            ResourceReference<MetaDocumentResource, Long> metaDocument = new ResourceReference<>();
-            metaDocument.setId(entity.getMetaNode().getId());
-            metaDocument.setDescription(entity.getMetaNode().getNom());
-            resource.setMetaDocument(metaDocument);
+            resource.setMetaDocument(ResourceReference.toResourceReference(entity.getMetaNode().getId(), entity.getMetaNode().getNom()));
         }
     }
 
@@ -103,6 +114,30 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 arrayIndex++;
             }
             entity.setTreePath(result);
+        }
+    }
+
+    private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
+        @Override
+        public void processOnChangeLogic(
+                DocumentResource previous,
+                String fieldName,
+                Object fieldValue,
+                Map<String, AnswerRequiredException.AnswerValue> answers,
+                String[] previousFieldNames,
+                DocumentResource target) {
+
+            if (fieldValue != null) {
+                ResourceReference<MetaDocumentResource, Long> resourceReference = (ResourceReference<MetaDocumentResource, Long>) fieldValue;
+                Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resourceReference.getId());
+                optionalDocumentResource.ifPresent(metaDocumentResourceEntity -> {
+                    target.setNtiOrigen(metaDocumentResourceEntity.getNtiOrigen());
+                    target.setNtiEstadoElaboracion(metaDocumentResourceEntity.getNtiEstadoElaboracion());
+                });
+            } else {
+                target.setNtiOrigen(null);
+                target.setNtiEstadoElaboracion(null);
+            }
         }
     }
 }

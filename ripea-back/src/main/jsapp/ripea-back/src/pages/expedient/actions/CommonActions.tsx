@@ -4,16 +4,24 @@ import CambiarPrioritat from './CambiarPrioritat';
 import {
     MuiFormDialogApi,
     useResourceApiService,
-    useBaseAppContext
+    useBaseAppContext, useConfirmDialogButtons
 } from 'reactlib';
+import useInformacioArxiu from "../detall/InformacioArxiu.tsx";
 
 export const useCommonActions = (refresh?: () => void) => {
-    const { temporalMessageShow } = useBaseAppContext();
     const {
         patch: apiPatch,
+        delette: apiDelete
     } = useResourceApiService('expedientResource');
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
     const cambiarPrioridadApiRef = React.useRef<MuiFormDialogApi>();
     const cambiarEstadoApiRef = React.useRef<MuiFormDialogApi>();
+
+    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu();
+
     const actions = [
         // {
         //     title: "",
@@ -89,7 +97,10 @@ export const useCommonActions = (refresh?: () => void) => {
                 cambiarEstadoApiRef.current?.show(id)?.then(() => {
                     refresh?.()
                 })
-            }
+            },
+            disabled: (row:any) => {
+                return row?.estat != "OBERT"
+            },
         },
         {
             title: "Relacionar...",
@@ -100,6 +111,36 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Cerrar...",
             icon: "check",
             showInMenu: true,
+            disabled: (row:any) => {
+                return row?.estat != "OBERT"
+            },
+        },
+        {
+            title: "Borrar",
+            icon: "delete",
+            showInMenu: true,
+            onClick: (rowId:any) => {
+                messageDialogShow(
+                    'Title',
+                    'Message',
+                    confirmDialogButtons,
+                    confirmDialogComponentProps)
+                    .then((value: any) => {
+                        if (value) {
+                            apiDelete(rowId)
+                                .then(() => {
+                                    refresh?.();
+                                    temporalMessageShow(null, 'Elemento borrado', 'success');
+                                })
+                                .catch((error) => {
+                                    temporalMessageShow('Error', error.message, 'error');
+                                });
+                        }
+                    });
+            },
+            disabled: (row:any) => {
+                return row?.estat == "TANCAT"
+            },
         },
         {
             title: "Histórico de acciones",
@@ -126,7 +167,9 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Información archivo",
             icon: "info",
             showInMenu: true,
-            disabled: true,
+            onClick: (id:number,row:any)=>{
+                arxiuhandleOpen(row)
+            }
         },
         {
             title: "Sincronizar estado con archivo",
@@ -137,6 +180,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const components = <>
         <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
         <CambiarEstado apiRef={cambiarEstadoApiRef} />
+        {arxiuDialog}
     </>;
     return {
         actions,
