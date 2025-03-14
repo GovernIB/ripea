@@ -54,7 +54,15 @@ public class DocumentResource extends NodeResource {
 	@Size(max = 256)
 	private String fitxerContentType;
 	private Long fitxerTamany;
-//	private byte[] fitxerContingut;
+	private byte[] fitxerContingut;
+    @NotNull
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference adjunt;
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference firmaAdjunt;
+
 	@Size(max = 32)
 	private String versioDarrera;
 	@NotNull
@@ -116,10 +124,9 @@ public class DocumentResource extends NodeResource {
 	private String validacioFirmaErrorMsg;
 	private ArxiuEstatEnumDto annexArxiuEstat;
 	private ArxiuEstatEnumDto arxiuEstat;
+    @NotNull
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
-
-	private FileReference adjunt;
 
     @Transient
     private List<ParentPath> parentPath;
@@ -129,6 +136,10 @@ public class DocumentResource extends NodeResource {
     @Transient
     @ResourceField(onChangeActive = true)
     public ResourceReference<MetaDocumentResource, Long> metaDocument;
+
+    @Transient
+    @ResourceField(onChangeActive = true)
+    public Boolean hasFirma;
 
     @Getter
     @Setter

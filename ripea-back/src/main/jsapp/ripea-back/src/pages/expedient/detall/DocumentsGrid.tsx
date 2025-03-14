@@ -1,6 +1,7 @@
 import {
     GridPage,
     MuiGrid,
+    useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import React, { useState } from "react";
@@ -12,6 +13,8 @@ import * as builder from '../../../util/springFilterUtils';
 
 const DocumentsGridForm = (props:any) => {
     const {expedient} = props;
+    const formContext = useFormContext();
+    const { data } = formContext;
 
     const metaDocumentFilter :string = builder.and(
         builder.eq("metaExpedient.id", expedient?.metaExpedient?.id),
@@ -22,10 +25,13 @@ const DocumentsGridForm = (props:any) => {
         <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="dataCaptura" disabled required/>
+        <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
-        {/*<GridFormField xs={12} name="fitxer" required/>*/}
+        <GridFormField xs={12} name="adjunt" type="file" required/>
+        {!!data.adjunt && <GridFormField xs={6} name="hasFirma" disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>}
+        {!!data.adjunt && <GridFormField xs={6} name="documentFirmaTipus" disabled/>}
+        {data.documentFirmaTipus=="FIRMA_SEPARADA" && <GridFormField xs={12} name="firmaAdjunt" type="file" required/>}
     </Grid>
 }
 

@@ -16,6 +16,6 @@ public class FileReference {
 	protected final String name;
 	protected final byte[] content;
 	protected final String contentType;
-	protected final int contentLength;
+	protected final Long contentLength;
 
 }
