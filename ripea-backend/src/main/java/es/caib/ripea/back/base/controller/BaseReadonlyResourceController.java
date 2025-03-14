@@ -115,6 +115,8 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseReadonlyResourceController<R extends Resource<? extends Serializable>, ID extends Serializable>
 		implements ReadonlyResourceController<R, ID> {
 
+	protected static final HttpMethod FAKE_DEFAULT_TEMPLATE_HTTP_METHOD = HttpMethod.OPTIONS;
+
 	@Autowired
 	protected ReadonlyResourceService<R, ID> readonlyResourceService;
 	@Autowired
@@ -133,7 +135,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/{id}")
 	@Operation(summary = "Consulta la informació d'un recurs")
-	@PreAuthorize("hasPermission(#resourceId, this.getResourceClass().getName(), this.getOperation('GET_ONE'))")
+	@PreAuthorize("this.isPublic() or hasPermission(#resourceId, this.getResourceClass().getName(), this.getOperation('GET_ONE'))")
 	public ResponseEntity<EntityModel<R>> getOne(
 			@PathVariable
 			@Parameter(description = "Identificador del recurs")
@@ -159,7 +161,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping
 	@Operation(summary = "Consulta paginada de recursos")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
 	public ResponseEntity<PagedModel<EntityModel<R>>> find(
 			@RequestParam(value = "quickFilter", required = false)
 			@Parameter(description = "Filtre ràpid (text)")
@@ -239,7 +241,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/{id}/fields/{fieldName}/download")
 	@Operation(summary = "Descàrrega de l'arxiu associat a un camp del recurs")
-	@PreAuthorize("hasPermission(#id, this.getResourceClass().getName(), this.getOperation('FIELDDOWNLOAD'))")
+	@PreAuthorize("this.isPublic() or hasPermission(#id, this.getResourceClass().getName(), this.getOperation('FIELDDOWNLOAD'))")
 	public ResponseEntity<InputStreamResource> fieldDownload(
 			@PathVariable
 			@Parameter(description = "Identificador del recurs")
@@ -265,11 +267,12 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping("/artifacts")
 	@Operation(summary = "Llista d'artefactes relacionats amb aquest servei")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
 	public ResponseEntity<CollectionModel<EntityModel<ResourceArtifact>>> artifacts() {
+		log.debug("Consulta dels artefactes disponibles pel recurs");
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		List<EntityModel<ResourceArtifact>> artifactsAsEntities = artifacts.stream().
-				map(a -> EntityModel.of(a, buildSingleArtifactSelfLink(a))).
+				map(a -> EntityModel.of(a, buildSingleArtifactLinks(a))).
 				collect(Collectors.toList());
 		return ResponseEntity.ok(
 				CollectionModel.of(
@@ -280,7 +283,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping("/artifacts/{type}/{code}")
 	@Operation(summary = "Informació d'un artefacte")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
 	public ResponseEntity<EntityModel<ResourceArtifact>> artifactGetOne(
 			@PathVariable
 			@Parameter(description = "Tipus de l'artefacte")
@@ -288,17 +291,38 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@PathVariable
 			@Parameter(description = "Codi de l'artefacte")
 			String code) {
+		log.debug("Detalls d'un artefacte del recurs (type={}, code={})", type, code);
 		ResourceArtifact artifact = getReadonlyResourceService().artifactGetOne(type, code);
 		return ResponseEntity.ok(
-				EntityModel.of(
-						artifact,
-						linkTo(methodOn(getClass()).artifactGetOne(type, code)).withSelfRel()));
+				EntityModel.of(artifact, buildSingleArtifactLinks(artifact)));
+	}
+
+	@Override
+	@PostMapping("/artifacts/{type}/{code}/validate")
+	@Operation(summary = "Validació del formulari d'un artefacte")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public ResponseEntity<?> artifactValidate(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
+		getArtifactParamsAsObjectWithFormClass(
+				type,
+				code,
+				params,
+				bindingResult);
+		return ResponseEntity.ok().build();
 	}
 
 	@Override
 	@PostMapping("/artifacts/report/{code}")
-	@Operation(summary = "Generació d'un informe associat a un recurs")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
+	@Operation(summary = "Generació de l'informe associat al recurs")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
 	public ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -306,6 +330,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestBody(required = false)
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Generació de l'informe associat al recurs (code={}, params={})", code, params);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
 				ResourceArtifactType.REPORT,
 				code,
@@ -325,7 +350,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/artifacts/report/{code}/fields/{fieldName}/options")
 	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari de l'informe")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
 	public <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactReportFieldOptionsFind(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -385,7 +410,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/artifacts/report/{code}/fields/{fieldName}/options/{id}")
 	@Operation(summary = "Consulta d'una de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari de l'informe")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
 	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactReportFieldOptionsGetOne(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -422,7 +447,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/artifacts/filter/{code}/fields/{fieldName}/options")
 	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari del filtre")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
 	public <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactFilterFieldOptionsFind(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -482,7 +507,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Override
 	@GetMapping(value = "/artifacts/filter/{code}/fields/{fieldName}/options/{id}")
 	@Operation(summary = "Consulta d'una de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari del filtre")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
 	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactFilterFieldOptionsGetOne(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -524,6 +549,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					0);
 		}
 		return resourceClass;
+	}
+
+	public boolean isPublic() {
+		return false;
 	}
 
 	public PermissionEvaluatorService.RestApiOperation getOperation(String operationName) {
@@ -816,31 +845,24 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ls;
 	}
 
-	protected Link selfLinkWithDefaultProperties(Link selfLink, boolean showProperties) {
+	protected Link selfLinkWithDefaultProperties(Link selfLink, boolean withProperties) {
 		// Aquest mètode proporciona modifica el Link self afegint una Affordance que
 		// es mostrarà a dins els _templates de HAL FORMS amb el nom "default".
-
-		// La idea és que si es fa la petició al servei sense cap paràmetre es retorni
-		// una llista dels camps del recurs (i que es pugui utilitzar per mostrar, per
-		// exemple, les columnes del grid). Si la petició es fa amb paràmetres només
-		// s'afegirà aquest Affordance per a que aparegui com a "default" i així les
-		// demés Affordances (create, update, patch, ...) apareguin amb el nom que toca.
-
-		// Seria ideal poder utilitzar el mètode HTTP GET per a retornar la informació
-		// dels camps del recurs, però la class HalFormsTemplateBuilder filtra el mètode
-		// GET evitant que surti als _templates. Per això hem utilitzat el mètode PUT
-		// (per posar-ne algun) per quan volem que surtin els properties i el mètode
-		// OPTIONS per quan volem ocultar-los.
-		// https://github.com/spring-projects/spring-hateoas/issues/1683
-
 		// Hem modificat les classes HalFormsTemplateBuilder i HalFormsPropertyFactory
 		// per a que mostrin als templates les Affordances amb mètode GET amb les seves
 		// properties.
-		return Affordances.of(selfLink).
-				afford(showProperties ? HttpMethod.GET : HttpMethod.OPTIONS).
-				withInputAndOutput(getResourceClass()).
-				withName("default").
-				toLink();
+		if (withProperties) {
+			return Affordances.of(selfLink).
+					afford(HttpMethod.GET).
+					withInputAndOutput(getResourceClass()).
+					withName("default").
+					toLink();
+		} else {
+			return Affordances.of(selfLink).
+					afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
+					withName("default").
+					toLink();
+		}
 	}
 
 	protected Link buildFindLink(
@@ -927,8 +949,24 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ls.toArray(new Link[0]);
 	}
 
-	protected Link buildSingleArtifactSelfLink(ResourceArtifact artifact) {
-		return linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel();
+	@SneakyThrows
+	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
+		if (artifact.getFormClass() != null) {
+			Link validateLink = Affordances.
+					of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withSelfRel()).
+					afford(HttpMethod.POST).
+					withInputAndOutput(artifact.getFormClass()).
+					withName("validate").
+					toLink();
+			return new Link[] {
+					validateLink,
+					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
+			};
+		} else {
+			return new Link[] {
+					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
+			};
+		}
 	}
 
 	private Link buildFilterLinkWithAffordances(ResourceArtifact artifact) {
@@ -1154,7 +1192,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	private String fieldOptionsProcessedFilterWithFieldAnnotation(Field field, String filterFromRequest) {
 		String processedFilter = filterFromRequest;
 		ResourceField resourceFieldAnnotation = field.getAnnotation(ResourceField.class);
-		if (resourceFieldAnnotation != null && resourceFieldAnnotation.springFilter().isEmpty()) {
+		if (resourceFieldAnnotation != null && !resourceFieldAnnotation.springFilter().isEmpty()) {
 			String springFilter = resourceFieldAnnotation.springFilter();
 			if (springFilter.startsWith("#{") && springFilter.endsWith("}")) {
 				String expressionToParse = springFilter.substring(2, springFilter.length() - 1);

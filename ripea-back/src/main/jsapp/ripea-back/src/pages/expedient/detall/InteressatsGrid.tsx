@@ -2,15 +2,12 @@ import {
     GridPage,
     MuiFormDialog,
     MuiGrid,
-    useBaseAppContext,
-    useConfirmDialogButtons,
     useMuiDataGridApiRef,
-    useResourceApiService,
 } from 'reactlib';
 import {Grid} from "@mui/material";
 import React from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {DataFormDialogApi} from "../../../../lib/components/mui/datacommon/DataFormDialog.tsx";
+import useInteressatActions from "../actions/InteressatActions.tsx";
 
 const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -39,111 +36,8 @@ interface DetailGridProps {
 
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {id, onRowCountChange} = props
-    const formApiRef = React.useRef<DataFormDialogApi>()
-    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
-    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
-
-    const {
-        delette: apiDelete,
-        patch: apiPatch,
-        getOne
-    } = useResourceApiService('interessatResource');
     const apiRef = useMuiDataGridApiRef()
-
-    const createRepresentent = (rowId: any) => {
-        formApiRef.current?.show(undefined, {
-            expedient: {
-                id: id
-            },
-            representat: {
-                id: rowId
-            },
-            esRepresentant: true,
-        })
-            .then(() => {
-                apiRef?.current?.refresh?.();
-                temporalMessageShow(null, 'Elemento creado', 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const updateRepresentent = (rowId: any, row: any) => {
-        formApiRef.current?.show(row?.representant?.id)
-            .then(() => {
-                apiRef?.current?.refresh?.();
-                temporalMessageShow(null, 'Elemento modificado', 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const deleteRepresentent = (rowId: any, row: any) => {
-        getOne(row?.representant?.id)
-            .then((representant) => {
-                if (representant?.esRepresentant) {
-                    messageDialogShow(
-                        'Title',
-                        'Message',
-                        confirmDialogButtons,
-                        confirmDialogComponentProps)
-                        .then((value: any) => {
-                            if (value) {
-                                apiDelete(representant?.id)
-                                    .then(() => {
-                                        apiRef?.current?.refresh?.();
-                                        temporalMessageShow(null, 'Elemento borrado', 'success');
-                                    })
-                                    .catch((error) => {
-                                        temporalMessageShow('Error', error.message, 'error');
-                                    });
-                            }
-                        });
-                } else {
-                    apiPatch(rowId, {
-                        data: {
-                            representant: null,
-                        }
-                    })
-                        .then(() => {
-                            apiRef?.current?.refresh?.();
-                            temporalMessageShow(null, 'Elemento borrado', 'success');
-                        })
-                }
-            })
-    }
-    const deleteInteressat = (rowId: any, row: any) => {
-        if (row?.hasRepresentats) {
-            apiPatch(rowId, {
-                data: {
-                    esRepresentant: true,
-                }
-            })
-                .then(() => {
-                    apiRef?.current?.refresh?.();
-                    temporalMessageShow(null, 'Elemento borrado', 'success');
-                })
-        } else {
-            messageDialogShow(
-                'Title',
-                'Message',
-                confirmDialogButtons,
-                confirmDialogComponentProps)
-                .then((value: any) => {
-                    if (value) {
-                        apiDelete(rowId)
-                            .then(() => {
-                                apiRef?.current?.refresh?.();
-                                temporalMessageShow(null, 'Elemento borrado', 'success');
-                            })
-                            .catch((error) => {
-                                temporalMessageShow('Error', error.message, 'error');
-                            });
-                    }
-                });
-        }
-    }
+    const {actions, formApiRef} = useInteressatActions(id, apiRef?.current?.refresh)
 
     const columns = [
         {
@@ -164,35 +58,6 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             valueFormatter: (value: any) => {
                 return value?.description;
             }
-        },
-    ];
-    const actions = [
-        {
-            title: "Borrar Interesado",
-            icon: "delete",
-            showInMenu: true,
-            onClick: deleteInteressat,
-        },
-        {
-            title: "Añadir Representante",
-            icon: "add",
-            showInMenu: true,
-            onClick: createRepresentent,
-            disabled: (row: any) => row?.representant,
-        },
-        {
-            title: "Modificar Representante",
-            icon: "edit",
-            showInMenu: true,
-            onClick: updateRepresentent,
-            disabled: (row: any) => !row?.representant,
-        },
-        {
-            title: "Borrar Representante",
-            icon: "delete",
-            showInMenu: true,
-            onClick: deleteRepresentent,
-            disabled: (row: any) => !row?.representant,
         },
     ];
 

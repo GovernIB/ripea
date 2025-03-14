@@ -1,18 +1,48 @@
 import {
     GridPage,
-    MuiGrid, useMuiDataGridApiRef,
+    MuiGrid,
+    useMuiDataGridApiRef,
 } from 'reactlib';
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 import ContingutIcon from "./ContingutIcon.tsx";
 import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon } from "@mui/material";
+import {useContingutActions} from "../actions/ContingutActions.tsx";
+import GridFormField from "../../../components/GridFormField.tsx";
+import * as builder from '../../../util/springFilterUtils';
 
-const DocumentsGrid: React.FC = () => {
-    const { id } = useParams();
+const DocumentsGridForm = (props:any) => {
+    const {expedient} = props;
+
+    const metaDocumentFilter :string = builder.and(
+        builder.eq("metaExpedient.id", expedient?.metaExpedient?.id),
+        builder.eq("actiu", true),
+    );
+
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
+        <GridFormField xs={12} name="nom"/>
+        <GridFormField xs={12} name="descripcio"/>
+        <GridFormField xs={12} name="dataCaptura" disabled required/>
+        <GridFormField xs={12} name="ntiOrigen" required/>
+        <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
+        {/*<GridFormField xs={12} name="fitxer" required/>*/}
+    </Grid>
+}
+
+const DocumentsGrid: React.FC = (props:any) => {
+    const {id, entity, onRowCountChange} = props;
     const [expand, setExpand] = useState<boolean>(true);
     const [treeView, setTreeView] = useState<boolean>(true);
     const [vista, setVista] = useState<string>("carpeta");
     const dataGridApiRef = useMuiDataGridApiRef()
+
+    const refresh = () => {
+        dataGridApiRef?.current?.refresh?.();
+    }
+    const {
+        actions: commonActionsActions,
+        components: commonActionsComponents
+    } = useContingutActions(refresh);
 
     const columns = [
         {
@@ -27,7 +57,7 @@ const DocumentsGrid: React.FC = () => {
             flex: 0.5,
         },
         {
-            field: 'metaNode',
+            field: 'metaDocument',
             flex: 0.5,
             valueFormatter: (value: any) => {
                 return value?.description;
@@ -50,10 +80,19 @@ const DocumentsGrid: React.FC = () => {
             filter={`expedient.id:${id}`}
             perspectives={["PATH"]}
             titleDisabled
-            readOnly
+            popupEditCreateActive
+            popupEditFormContent={<DocumentsGridForm expedient={entity}/>}
+            formAdditionalData={{
+                expedient: {
+                    id: id
+                },
+                dataCaptura: Date.now(),
+            }}
             disableColumnSorting
             disableColumnMenu
             apiRef={dataGridApiRef}
+            rowAdditionalActions={commonActionsActions}
+            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.filter((a)=>a.tipus=="DOCUMENT").length)}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {
@@ -62,12 +101,10 @@ const DocumentsGrid: React.FC = () => {
                 if(_rows!=null && vista == "carpeta") {
                     for (const row of _rows) {
                         const aditionalRow = row.parentPath
-                            .filter((a: any) => a.id != row.id)
-                            .filter((a: any) => !additionalRows.map((b)=>b.id).includes(a.id))
-                            .map((a: any) =>{a.group="A";return a})
-                        additionalRows.push(...aditionalRow);
+                            ?.filter((a: any) => a.id != row.id && !additionalRows.map((b)=>b.id).includes(a.id))
+                        aditionalRow && additionalRows.push(...aditionalRow);
                     }
-                    setTreeView(additionalRows.length > 0)
+                    setTreeView(additionalRows?.length > 0)
                 }else {
                     setTreeView(true)
                 }
@@ -112,6 +149,7 @@ const DocumentsGrid: React.FC = () => {
                 </Grid>
             </Grid>}
         />
+        {commonActionsComponents}
     </GridPage>
 }
 

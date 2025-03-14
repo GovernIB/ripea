@@ -32,6 +32,7 @@ type ResourceApiMethods = {
     artifacts: (args: ResourceApiRequestArgs) => Promise<ResourceApiArtifact[]>;
     action: (args: ResourceApiActionArgs) => Promise<any>;
     report: (args: ResourceApiReportArgs) => Promise<any[]>;
+    fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
 }
 
 export type ResourceApiService = {
@@ -127,6 +128,10 @@ export type ResourceApiReportArgs = ResourceApiRequestArgs & {
     //outputFormat?: 'PDF' | 'XLS' | 'CSV' | 'ODS' | 'XLSX' | 'ODT' | 'RTF' | 'DOCX' | 'PPTX';
 };
 
+export type ResourceApiFieldArgs = ResourceApiRequestArgs & {
+    fieldName: string;
+};
+
 export type ResourceApiProviderProps = React.PropsWithChildren & {
     apiUrl: string;
     defaultLanguage?: string;
@@ -151,6 +156,24 @@ export const processStateLinks = (links?: Links) => {
 }
 export const processStateActions = (actions?: Action[]) => {
     return actions?.reduce((acc: any, curr: Action) => (acc[curr.name ?? ''] = curr, acc), {});
+}
+
+const stateToBlobResponse = (state: State) => {
+    const contentDispositionHeader = state.headers.get('content-disposition');
+    const fileNameIndex = contentDispositionHeader?.indexOf('filename=') ?? -1;
+    const fileName = fileNameIndex !== -1 ? contentDispositionHeader?.substring(fileNameIndex + 'filename='.length) : undefined;
+    if (typeof state.data === 'string') {
+        const contentType = state.headers.get('content-type') ?? 'text/plain';
+        return {
+            blob: new Blob([state.data], { type: contentType }),
+            fileName: fileName ?? 'unknown',
+        };
+    } else {
+        return {
+            blob: state.data,
+            fileName: fileName ?? 'unknown',
+        };
+    }
 }
 
 // Clone of Ketting's Action.submit() function (https://github.com/badgateway/ketting/blob/version-7.x/src/action.ts#L109)
@@ -585,6 +608,20 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 catch(reject);
         });
     }, [request]);
+    const fieldDownload = React.useCallback((id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {
+        const requestArgs = {
+            ...args,
+            data: { fieldName: args.fieldName },
+            refresh: args?.refresh ?? true,
+        };
+        return new Promise((resolve, reject) => {
+            request('fieldDownload', id, requestArgs).
+                then((state: State) => {
+                    resolve(stateToBlobResponse(state));
+                }).
+                catch(reject);
+        });
+    }, [request]);
     return {
         find,
         getOne,
@@ -596,6 +633,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
         artifacts,
         action,
         report,
+        fieldDownload,
     };
 }
 

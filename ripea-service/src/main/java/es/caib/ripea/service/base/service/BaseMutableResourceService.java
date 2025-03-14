@@ -6,11 +6,13 @@ import es.caib.ripea.service.base.helper.ResourceReferenceToEntityHelper;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.*;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.base.util.StringUtil;
+import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
@@ -44,6 +46,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	private final Map<String, ActionExecutor<?, ?>> actionExecutorMap = new HashMap<>();
 	private final Map<String, OnChangeLogicProcessor<R>> onChangeLogicProcessorMap = new HashMap<>();
+	private final Map<String, FieldFileManager<E>> fieldFileManagerMap = new HashMap<>();
 
 	@Override
 	public R newResourceInstance() {
@@ -82,6 +85,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				true,
 				false);
 		E saved = saveFlushAndRefresh(entity);
+		fieldFilesSave(resource, saved);
 		afterCreateSave(saved, resource, answers, anyOrderChanged);
 		entityRepository.detach(saved);
 		R response = resourceEntityMappingHelper.entityToResource(saved, getResourceClass());
@@ -115,6 +119,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 					reorderPreviousParentId,
 					true,
 					false);
+			fieldFilesSave(resource, saved);
 			afterUpdateSave(saved, resource, answers, anyOrderChanged);
 		} else {
 			saved = entity;
@@ -140,6 +145,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				null,
 				true,
 				true);
+		fieldFilesDelete(entity);
 		entityRepository.flush();
 		afterDelete(entity, answers);
 	}
@@ -214,6 +220,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			return null;
 		}
 		return resource.getId();
+	}
+
+	@Override
+	protected R entityToResource(E entity) {
+		R resource = super.entityToResource(entity);
+		fieldFilesRead(resource, entity);
+		return resource;
 	}
 
 	protected void completeResource(R resource) {}
@@ -394,6 +407,12 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		onChangeLogicProcessorMap.put(fieldName, logicProcessor);
 	}
 
+	protected void register(
+			String fieldName,
+			FieldFileManager<E> fieldFileManager) {
+		fieldFileManagerMap.put(fieldName, fieldFileManager);
+	}
+
 	private Map<String, Object> onChangeLogicProcessRecursive(
 			R previous,
 			String fieldName,
@@ -415,7 +434,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		});
 		R target = (R)factory.getProxy();
 		if (onChangeLogicProcessorMap.get(fieldName) != null) {
-			onChangeLogicProcessorMap.get(fieldName).processOnChangeLogic(
+			onChangeLogicProcessorMap.get(fieldName).onChange(
 					previous,
 					fieldName,
 					fieldValue,
@@ -499,35 +518,81 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		return saved;
 	}
 
+	private void fieldFilesRead(R resource, E entity) {
+		ReflectionUtils.doWithFields(resource.getClass(), field -> {
+			FieldFileManager<E> fieldFileManager = fieldFileManagerMap.get(field.getName());
+			if (fieldFileManager != null) {
+				FileReference fileReference = fieldFileManager.read(entity, field.getName());
+				TypeUtil.setFieldOrSetterValue(field, resource, fileReference);
+			}
+		}, field -> FileReference.class.isAssignableFrom(TypeUtil.getFieldTypeMultipleAware(field)));
+	}
+
+	private void fieldFilesSave(R resource, E entity) {
+		ReflectionUtils.doWithFields(resource.getClass(), field -> {
+			FieldFileManager<E> fieldFileManager = fieldFileManagerMap.get(field.getName());
+			if (fieldFileManager != null) {
+				fieldFileManager.save(
+						entity,
+						field.getName(),
+						TypeUtil.getFieldOrGetterValue(field, resource));
+			}
+		}, field -> FileReference.class.isAssignableFrom(TypeUtil.getFieldTypeMultipleAware(field)));
+	}
+
+	private void fieldFilesDelete(E entity) {
+		ReflectionUtils.doWithFields(getResourceClass(), field -> {
+			FieldFileManager<E> fieldFileManager = fieldFileManagerMap.get(field.getName());
+			if (fieldFileManager != null) {
+				fieldFileManager.delete(
+						entity,
+						field.getName());
+			}
+		}, field -> FileReference.class.isAssignableFrom(TypeUtil.getFieldTypeMultipleAware(field)));
+	}
+
 	/**
-	 * Interfície a implementar pels processadors de lògica onChange.
+	 * Interfície a implementar per a gestionar els arxius associats a un camp del recurs.
 	 *
-	 * @param <R> classe del recurs.
+	 * @param <E> classe de l'entitat.
 	 */
-	public interface OnChangeLogicProcessor<R extends Serializable> {
+	public interface FieldFileManager<E extends ResourceEntity<?, ?>> {
 		/**
-		 * Processa la lògica onChange d'un camp.
+		 * Lògica per a retornar la informació de l'arxiu.
 		 *
-		 * @param previous
-		 *            el recurs amb els valors previs a la modificació.
+		 * @param entity
+		 *            l'entitat amb els valors previs a la modificació.
 		 * @param fieldName
-		 *            el nom del camp modificat.
-		 * @param fieldValue
-		 *            el valor del camp modificat.
-		 * @param answers
-		 *            les respostes associades a la petició actual.
-		 * @param previousFieldNames
-		 *            la llista de camps canviats amb anterioritat a l'actual petició onChange.
-		 * @param target
-		 *            el recurs emmagatzemat a base de dades.
+		 *            el nom del camp de l'entitat.
 		 */
-		void processOnChangeLogic(
-				R previous,
+		FileReference read(
+				E entity,
+				String fieldName);
+		/**
+		 * Lògica per a emmagatzemar l'arxiu associat al camp.
+		 *
+		 * @param entity
+		 *            l'entitat amb els valors previs a la modificació.
+		 * @param fieldName
+		 *            el nom del camp de l'entitat.
+		 * @param fileReference
+		 *            la informació de l'arxiu adjunt.
+		 */
+		void save(
+				E entity,
 				String fieldName,
-				Object fieldValue,
-				Map<String, AnswerRequiredException.AnswerValue> answers,
-				String[] previousFieldNames,
-				R target);
+				FileReference fileReference);
+		/**
+		 * Lògica per a esborrar l'arxiu associat al camp.
+		 *
+		 * @param entity
+		 *            l'entitat amb els valors previs a la modificació.
+		 * @param fieldName
+		 *            el nom del camp de l'entitat.
+		 */
+		void delete(
+				E entity,
+				String fieldName);
 	}
 
 	/**

@@ -68,7 +68,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		beforeGetOne(perspectives);
 		E entity = getEntity(id, perspectives);
 		beforeConversion(entity);
-		R response = resourceEntityMappingHelper.entityToResource(entity, getResourceClass());
+		R response = entityToResource(entity);
 		afterConversion(entity, response);
 		if (perspectives != null) {
 			applyPerspectives(entity, response, perspectives);
@@ -161,11 +161,11 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 		if (type == null || type == ResourceArtifactType.REPORT) {
 			artifacts.addAll(
-					reportDataGeneratorMap.entrySet().stream().
-							map(rdge -> new ResourceArtifact(
+					reportDataGeneratorMap.keySet().stream().
+							map(reportDataGenerator -> new ResourceArtifact(
 									ResourceArtifactType.REPORT,
-									rdge.getKey(),
-									artifactGetFormClass(ResourceArtifactType.REPORT, rdge.getKey()))).
+									reportDataGenerator,
+									artifactGetFormClass(ResourceArtifactType.REPORT, reportDataGenerator))).
 							collect(Collectors.toList()));
 		}
 		if (type == null || type == ResourceArtifactType.FILTER) {
@@ -284,6 +284,14 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return resultat;
 	}
 
+	protected R entityToResource(E entity) {
+		return resourceEntityMappingHelper.entityToResource(entity, getResourceClass());
+	}
+
+	protected List<R> entitiesToResources(List<E> entities) {
+		return entities.stream().map(this::entityToResource).collect(Collectors.toList());
+	}
+
 	protected void applyPerspectives(
 			List<E> entities,
 			List<R> resources,
@@ -376,7 +384,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	private String buildSpringFilterForQuickFilter(
+	protected String buildSpringFilterForQuickFilter(
 			Class<? extends Resource<?>> resourceClass,
 			String prefix,
 			String quickFilter) {
@@ -408,12 +416,6 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			}
 		}
 		return null;
-	}
-
-	protected List<R> entitiesToResources(List<E> entities) {
-		return entities.stream().
-				map(e -> resourceEntityMappingHelper.entityToResource(e, getResourceClass())).
-				collect(Collectors.toList());
 	}
 
 	protected List<SortedField> getResourceDefaultSortFields(Class<?> resourceClass) {
@@ -807,7 +809,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 *
 	 * @param <R> classe del recurs suportat.
 	 */
-	public interface PerspectiveApplicator <R extends Resource<?>, E extends ResourceEntity<R, ?>> {
+	public interface PerspectiveApplicator<R extends Resource<?>, E extends ResourceEntity<R, ?>> {
 		/**
 		 * Aplica la perspectiva a múltiples recursos. Es pot sobreescriure o deixar sense implementar.
 		 * Si es deixa sense implementar s'aplicarà la perspectiva a cada recurs per separat.
@@ -847,6 +849,37 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	/**
+	 * Interfície a implementar pels processadors de lògica onChange.
+	 *
+	 * @param <R> classe del recurs.
+	 */
+	public interface OnChangeLogicProcessor<R extends Serializable> {
+		/**
+		 * Processa la lògica onChange d'un camp.
+		 *
+		 * @param previous
+		 *            el recurs amb els valors previs a la modificació.
+		 * @param fieldName
+		 *            el nom del camp modificat.
+		 * @param fieldValue
+		 *            el valor del camp modificat.
+		 * @param answers
+		 *            les respostes associades a la petició actual.
+		 * @param previousFieldNames
+		 *            la llista de camps canviats amb anterioritat a l'actual petició onChange.
+		 * @param target
+		 *            el recurs emmagatzemat a base de dades.
+		 */
+		void onChange(
+				R previous,
+				String fieldName,
+				Object fieldValue,
+				Map<String, AnswerRequiredException.AnswerValue> answers,
+				String[] previousFieldNames,
+				R target);
+	}
+
+	/**
 	 * Interfície a implementar pels artefactes encarregats de generar dades pels informes.
 	 *
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
@@ -874,22 +907,22 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 *
 	 * @param <R> classe del recurs que representa el filtre.
 	 */
-	public interface FilterProcessor <R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<R> {
+	public interface FilterProcessor<R extends Serializable> extends OnChangeLogicProcessor<R> {
 	}
 
 	/**
 	 * Interfície a implementar per a retornar els arxius associats a un camp.
 	 *
-	 * @param <E> classe del recurs.
+	 * @param <E> classe de l'entitat.
 	 */
-	public interface FieldDownloader <E extends ResourceEntity<?, ?>> {
+	public interface FieldDownloader<E extends ResourceEntity<?, ?>> {
 		/**
 		 * Retorna l'arxiu associat.
 		 *
 		 * @param entity
-		 *            el recurs amb els valors previs a la modificació.
+		 *            l'entitat amb els valors previs a la modificació.
 		 * @param fieldName
-		 *            el nom del camp del recurs.
+		 *            el nom del camp de l'entitat.
 		 * @param out
 		 *            stream a on posar el fitxer generat.
 		 * @throws IOException

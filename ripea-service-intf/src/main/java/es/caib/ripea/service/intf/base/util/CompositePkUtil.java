@@ -54,7 +54,11 @@ public class CompositePkUtil implements ApplicationContextAware {
 	}
 
 	public boolean isCompositePkClass(Class<?> clazz) {
-		return !(String.class.isAssignableFrom(clazz) ||
+		// TODO potser seria millor obligar a que totes les claus primàries estenguessin d'una interfície comuna
+		// TODO per a fer aquesta comprovació
+		return !(
+				Serializable.class.isAssignableFrom(clazz) ||
+				String.class.isAssignableFrom(clazz) ||
 				Number.class.isAssignableFrom(clazz) ||
 				UUID.class.isAssignableFrom(clazz));
 	}

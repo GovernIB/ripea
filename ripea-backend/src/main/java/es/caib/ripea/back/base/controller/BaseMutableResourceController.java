@@ -90,7 +90,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@PostMapping
 	@Operation(summary = "Crea un nou recurs")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('CREATE'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('CREATE'))")
 	public ResponseEntity<EntityModel<R>> create(
 			@RequestBody
 			@Validated({ Resource.OnCreate.class, Default.class })
@@ -118,7 +118,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@PutMapping(value = "/{id}")
 	@Operation(summary = "Modifica tots els camps d'un recurs")
-	@PreAuthorize("hasPermission(#id, this.getResourceClass().getName(), this.getOperation('UPDATE'))")
+	@PreAuthorize("this.isPublic() or hasPermission(#id, this.getResourceClass().getName(), this.getOperation('UPDATE'))")
 	public ResponseEntity<EntityModel<R>> update(
 			@PathVariable
 			@Parameter(description = "Identificador del recurs")
@@ -160,7 +160,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@PatchMapping(value = "/{id}")
 	@Operation(summary = "Modifica parcialment un recurs")
-	@PreAuthorize("hasPermission(#id, this.getResourceClass().getName(), this.getOperation('PATCH'))")
+	@PreAuthorize("this.isPublic() or hasPermission(#id, this.getResourceClass().getName(), this.getOperation('PATCH'))")
 	public ResponseEntity<EntityModel<R>> patch(
 			@PathVariable
 			@Parameter(description = "Identificador del recurs")
@@ -198,7 +198,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@DeleteMapping(value = "/{id}")
 	@Operation(summary = "Esborra un recurs")
-	@PreAuthorize("hasPermission(#id, this.getResourceClass().getName(), this.getOperation('DELETE'))")
+	@PreAuthorize("this.isPublic() or hasPermission(#id, this.getResourceClass().getName(), this.getOperation('DELETE'))")
 	public ResponseEntity<?> delete(
 			@PathVariable
 			@Parameter(description = "Identificador del recurs")
@@ -213,7 +213,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@PatchMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Processa els canvis en els camps del recurs")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ONCHANGE'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ONCHANGE'))")
 	public ResponseEntity<String> onChange(
 			@RequestBody @Valid
 			final OnChangeEvent onChangeEvent) throws JsonProcessingException {
@@ -251,7 +251,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@GetMapping(value = "/fields/{fieldName}/options")
 	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
 	public <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> fieldOptionsFind(
 			@PathVariable
 			@Parameter(description = "Nom del camp")
@@ -305,7 +305,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@GetMapping(value = "/fields/{fieldName}/options/{id}")
 	@Operation(summary = "Consulta d'una de les opcions disponibles per a emplenar un camp de tipus ResourceReferencee")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
 	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> fieldOptionsGetOne(
 			@PathVariable
 			@Parameter(description = "Nom del camp")
@@ -336,7 +336,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@PostMapping("/artifacts/action/{code}")
 	@Operation(summary = "Execució d'una acció associada a un recurs")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
 	public ResponseEntity<?> artifactActionExec(
 			@PathVariable
 			@Parameter(description = "Codi de l'acció")
@@ -356,7 +356,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@GetMapping(value = "/artifacts/action/{code}/fields/{fieldName}/options")
 	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari de l'acció")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
 	public <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactActionFieldOptionsFind(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -416,7 +416,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@Override
 	@GetMapping(value = "/artifacts/action/{code}/fields/{fieldName}/options/{id}")
 	@Operation(summary = "Consulta d'una de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany al formulari de l'acció")
-	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ACTION'))")
 	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactActionFieldOptionsGetOne(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
@@ -475,7 +475,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		if (selfLink != null) {
 			if (resourcePermissions.isWriteGranted()) {
 				ConfigurableAffordance affordance = Affordances.of(selfLink).
-						afford(HttpMethod.OPTIONS).
+						afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
 						withName("default").
 						andAfford(HttpMethod.PUT).
 						withInputAndOutput(getResourceClass()).
@@ -493,7 +493,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				links.set(
 						links.indexOf(selfLink),
 						Affordances.of(selfLink).
-								afford(HttpMethod.OPTIONS).
+								afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
 								withName("default").
 								andAfford(HttpMethod.DELETE).
 								withName("delete").

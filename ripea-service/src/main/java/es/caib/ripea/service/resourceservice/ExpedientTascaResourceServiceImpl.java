@@ -51,7 +51,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
     private class DuracioOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
-        public void processOnChangeLogic(
+        public void onChange(
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -74,7 +74,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
     private class DataLimitOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
-        public void processOnChangeLogic(
+        public void onChange(
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
