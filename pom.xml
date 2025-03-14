@@ -29,7 +29,8 @@
 		<module>ripea-ear</module>
 		<module>ripea-plugin</module>
 		<module>ripea-plugin-impl</module>
-        <module>ripea-custom-hal-forms</module>
+        <module>ripea-backend</module>
+<!--        <module>ripea-spring-bom</module>-->
     </modules>
 	<dependencyManagement>
 		<dependencies>
@@ -43,6 +44,16 @@
 				<artifactId>springdoc-openapi-ui</artifactId>
 				<version>1.7.0</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-hateoas</artifactId>
+				<version>1.7.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-security</artifactId>
+				<version>1.7.0</version>
+			</dependency>			
 			<dependency>
 				<groupId>org.fundaciobit.pluginsib.arxiu</groupId>
 				<artifactId>pluginsib-arxiu-caib</artifactId>

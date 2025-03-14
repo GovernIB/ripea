@@ -3,20 +3,60 @@
  */
 package es.caib.ripea.back.config;
 
-import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.service.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.Map;
+import es.caib.ripea.service.intf.base.service.ResourceApiService;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientComentariResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
+import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
+import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientTascaResourceService;
+import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
+import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
+import es.caib.ripea.service.intf.service.AlertaService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.AvisService;
+import es.caib.ripea.service.intf.service.CarpetaService;
+import es.caib.ripea.service.intf.service.ConfigService;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.service.DadesExternesService;
+import es.caib.ripea.service.intf.service.DigitalitzacioService;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.DominiService;
+import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.ExecucioMassivaService;
+import es.caib.ripea.service.intf.service.ExpedientEstatService;
+import es.caib.ripea.service.intf.service.ExpedientInteressatService;
+import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
+import es.caib.ripea.service.intf.service.GrupService;
+import es.caib.ripea.service.intf.service.HistoricService;
+import es.caib.ripea.service.intf.service.ImportacioService;
+import es.caib.ripea.service.intf.service.MetaDadaService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.MonitorTasquesService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.service.PinbalServeiService;
+import es.caib.ripea.service.intf.service.PortafirmesFluxService;
+import es.caib.ripea.service.intf.service.SegonPlaService;
+import es.caib.ripea.service.intf.service.SeguimentService;
+import es.caib.ripea.service.intf.service.TipusDocumentalService;
+import es.caib.ripea.service.intf.service.URLInstruccioService;
+import es.caib.ripea.service.intf.service.UnitatOrganitzativaService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configuració d'accés als services de Spring mitjançant EJBs.
@@ -239,9 +279,133 @@ public class EjbClientConfig {
 	public LocalStatelessSessionProxyFactoryBean urlInstruccioService() {
 		return getLocalEjbFactoyBean(URLInstruccioService.class);
 	}
+	
+	//INICI BEANS RESOURCES
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean documentResourceService() {
+		return getLocalEjbFactoyBean(DocumentResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean expedientComentariResourceService() {
+		return getLocalEjbFactoyBean(ExpedientComentariResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean expedientPeticioResourceService() {
+		return getLocalEjbFactoyBean(ExpedientPeticioResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean expedientResourceService() {
+		return getLocalEjbFactoyBean(ExpedientResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean expedientTascaResourceService() {
+		return getLocalEjbFactoyBean(ExpedientTascaResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean grupResourceService() {
+		return getLocalEjbFactoyBean(GrupResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean interessatResourceService() {
+		return getLocalEjbFactoyBean(InteressatResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean metaExpedientResourceService() {
+		return getLocalEjbFactoyBean(MetaExpedientResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean metaExpedientTascaResourceService() {
+		return getLocalEjbFactoyBean(MetaExpedientTascaResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean organGestorResourceService() {
+		return getLocalEjbFactoyBean(OrganGestorResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean usuariResourceService() {
+		return getLocalEjbFactoyBean(UsuariResourceService.class);
+	}
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean resourceApiService() {
+		return getLocalEjbFactoyBean(ResourceApiService.class);
+	}
+	
+	/*
+	@Bean
+	@ConditionalOnWarDeployment
+	public static BeanFactoryPostProcessor configurarEJBsDinamicament() {
+		return beanFactory -> {
+	        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+	        scanner.addIncludeFilter(new AssignableTypeFilter(Object.class)); // Inclou totes les classes
+	
+	        Set<BeanDefinition> beanDefinitions = scanner.findCandidateComponents("es.caib.ripea.back.resourcecontroller");
+	        for (BeanDefinition beanDefinition : beanDefinitions) {
+	            String className = beanDefinition.getBeanClassName();
+	            try {
+	                Class<?> controllerClass = Class.forName(className);
+	
+	                // Verificar que sigui una classe que estenem de Controller (o similar)
+	                //if (Controller.class.isAssignableFrom(controllerClass)) {
+	
+	                    Object controllerInstance = controllerClass.getConstructor().newInstance();
+	                    
+	                    Arrays.stream(controllerClass.getSuperclass().getSuperclass().getDeclaredFields())
+	                            .filter(field -> ReadonlyResourceService.class.isAssignableFrom(field.getType()))
+	                            .forEach(field -> {
+	                                String serviceName = field.getType().getSimpleName();
+	                                String beanName = Character.toLowerCase(serviceName.charAt(0)) + serviceName.substring(1);
+	
+	                                System.out.println("Dynamic EJB. Trying to create EJB for serviceName " + serviceName + " and BeanName " + beanName);
+	
+	                                if (!beanFactory.containsBean(beanName)) {
+	                                    try {
+	                                        field.setAccessible(true); // Important per accedir a camps privats
+	                                        LocalStatelessSessionProxyFactoryBean factoryBean = getLocalEjbFactoyBean(field.getType());
+	                                        beanFactory.registerSingleton(beanName, factoryBean.getObject());
+	                                        field.set(controllerInstance, beanFactory.getBean(beanName));
+	
+	                                    } catch (Exception e) {
+	                                        // Gestiona les excepcions adequadament
+	                                        System.err.println("Error al crear l'EJB: " + e.getMessage());
+	                                    }
+	                                }
+	                            });
+	               // }
+	            } catch (Exception e) {
+	                // Gestiona les excepcions adequadament
+	                System.err.println("Error al processar la classe: " + className + ": " + e.getMessage());
+	            }
+	        }
+		};
+    }
+*/
 
 	// TODO: Prova a veure si funciona:
-	@Bean
+	/*@Bean
 	@ConditionalOnWarDeployment
 	public static BeanFactoryPostProcessor dynamicEjbProxyPostProcessor(ConfigurableApplicationContext context) {
 		return beanFactory -> {
@@ -261,7 +425,7 @@ public class EjbClientConfig {
 						});
 			});
 		};
-	}
+	}*/
 
 //	private LocalStatelessSessionProxyFactoryBean getLocalEjbProxyFactory(Class<?> serviceType) {
 //		LocalStatelessSessionProxyFactoryBean factoryBean = new LocalStatelessSessionProxyFactoryBean();

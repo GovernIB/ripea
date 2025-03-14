@@ -12,10 +12,6 @@
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-		</dependency>
-		<dependency>
 			<artifactId>portafib-callback-beans</artifactId>
 			<groupId>es.caib.portafib</groupId>
 		</dependency>
@@ -43,8 +39,9 @@
 			<id>ide</id>
 			<dependencies>
 				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-web</artifactId>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-backend</artifactId>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.tomcat.embed</groupId>
@@ -70,7 +67,7 @@
 									<Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
 									<Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
 								</manifestEntries>
-							</archive>
+							</archive>						
 						</configuration>
 					</plugin>
 				</plugins>
@@ -80,7 +77,29 @@
 			<id>jboss</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
-			</activation>		
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-backend</artifactId>
+					<version>${project.version}</version>
+					<exclusions>
+						<exclusion>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-starter-tomcat</artifactId>
+						</exclusion>
+					</exclusions>					
+				</dependency>
+				<dependency>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-webmvc</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-jasper</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
 			<build>
 				<plugins>
 					<plugin>

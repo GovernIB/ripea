@@ -16,22 +16,6 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-client</artifactId>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
-<!--		</dependency>-->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-common</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-core</artifactId>
 		</dependency>
@@ -46,10 +30,6 @@
 		<dependency>
 			<groupId>javax.ejb</groupId>
 			<artifactId>javax.ejb-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -101,11 +81,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-service-intf</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -280,16 +255,9 @@
 			<id>ide</id>
 			<dependencies>
 				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-web</artifactId>
-				</dependency>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-validation</artifactId>
-				</dependency>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-hateoas</artifactId>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-backend</artifactId>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.tomcat.embed</groupId>
@@ -298,11 +266,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-service</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>es.caib.ripea</groupId>
-					<artifactId>ripea-custom-hal-forms</artifactId>
 					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
@@ -340,43 +303,30 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>es.caib.ripea</groupId>
-					<artifactId>ripea-custom-hal-forms</artifactId>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>ripea-backend</artifactId>
 					<version>${project.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-hateoas</artifactId>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-webmvc</artifactId>
-				</dependency>
-
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-web</artifactId>
 					<exclusions>
 						<exclusion>
 							<groupId>org.springframework.boot</groupId>
 							<artifactId>spring-boot-starter-tomcat</artifactId>
 						</exclusion>
-					</exclusions>
+					</exclusions>			
 				</dependency>
 				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-validation</artifactId>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-webmvc</artifactId>
+					<exclusions>						
+						<exclusion>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-context</artifactId>
+						</exclusion>
+					</exclusions>					
 				</dependency>
 				<dependency>
 					<groupId>org.apache.tomcat.embed</groupId>
 					<artifactId>tomcat-embed-jasper</artifactId>
 					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-actuator</artifactId>
 				</dependency>
 			</dependencies>
 			<build>

@@ -32,36 +32,22 @@
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
-		<!-- Dependències pels wars de tipus skinny
-		     (https://maven.apache.org/plugins/maven-war-plugin/examples/skinny-wars.html) -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-service-intf</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>es.caib.ripea</groupId>
-			<artifactId>ripea-custom-hal-forms</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- Per a solucionar "NoClassDefFoundError: org/springframework/http/server/reactive/ServletServerHttpResponse$ResponseBodyProcessor"
-			(https://developer.jboss.org/thread/276373?start=15&tstart=0) -->
 		<dependency>
 			<groupId>org.reactivestreams</groupId>
 			<artifactId>reactive-streams</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>ripea-backend</artifactId>
+			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-el</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -69,7 +55,6 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
-
 	</dependencies>
 	<build>
 		<plugins>
@@ -179,6 +164,7 @@
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>
+					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory>
 					<finalName>ripea</finalName>
 					<archive>
 						<manifestEntries>

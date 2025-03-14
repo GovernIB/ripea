@@ -1,5 +1,6 @@
 package es.caib.ripea.api.interna.config;
 
+import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,12 @@ public class EjbClientApiIntConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean historicService() {
 		return getLocalEjbFactoyBean(HistoricService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean resourceApiService() {
+		return getLocalEjbFactoyBean(ResourceApiService.class);
 	}
 	
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {

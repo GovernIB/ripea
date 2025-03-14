@@ -3,6 +3,8 @@ package es.caib.ripea.ejb;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.ejb.Stateless;
+
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
@@ -10,6 +12,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
 import lombok.experimental.Delegate;
 
+@Stateless
 public class GrupResourceServiceEjb extends AbstractServiceEjb<GrupResourceService> implements GrupResourceService {
 
 	@Delegate private GrupResourceService delegateService;

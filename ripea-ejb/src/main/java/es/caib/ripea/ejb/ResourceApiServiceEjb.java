@@ -3,6 +3,7 @@ package es.caib.ripea.ejb;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
@@ -12,6 +13,7 @@ import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@PermitAll
 public class ResourceApiServiceEjb extends AbstractServiceEjb<ResourceApiService> implements ResourceApiService {
 
 	@Delegate private ResourceApiService delegateService;
