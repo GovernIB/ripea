@@ -8,6 +8,7 @@ type TabProps = {
     content: any;
     badge?: string;
     badgeColor?: 'primary' | 'secondary' | 'default' | 'error' | 'info' | 'success' | 'warning' | undefined;
+    hidden?: boolean;
 };
 type TabComponentProps = {
     tabs: TabProps[];
@@ -50,7 +51,7 @@ const TabComponent: React.FC<TabComponentProps> = (props :TabComponentProps) => 
             {...other}
             sx={{px: 1}}
         >
-            {tabs.map((tab) => {
+            {tabs.filter((tab)=>!tab.hidden).map((tab) => {
                 const {value, label , content, badge, badgeColor= 'primary'} = tab;
 
                 return <Tab value={value} content={content} key={"tab-" + value} label={

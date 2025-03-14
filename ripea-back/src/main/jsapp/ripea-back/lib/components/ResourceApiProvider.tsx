@@ -677,13 +677,15 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
         indexState != null && resourceName != null && getPromiseFromStateLink(indexState, resourceName, args, true).
             then((response: State) => {
                 setCurrentState(response);
-                const processedFields = response.action().fields?.map(f => {
-                    return f.name.endsWith('*') ? {
-                        ...f,
-                        name: f.name.slice(0, -1),
-                        onChangeActive: true,
-                    } : f;
-                });
+                const processedFields = response.action().fields?.
+                    filter(f => f != null).
+                    map(f => {
+                        return f.name.endsWith('*') ? {
+                            ...f,
+                            name: f.name.slice(0, -1),
+                            onChangeActive: true,
+                        } : f;
+                    });
                 setCurrentFields(processedFields);
                 setIsCurrentLoading(false);
                 !isCurrentLoaded && setIsCurrentLoaded(true);

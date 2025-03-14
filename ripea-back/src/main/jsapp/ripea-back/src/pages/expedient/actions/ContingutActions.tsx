@@ -14,7 +14,7 @@ export const useContingutActions = (refresh?: () => void) => {
     const cambiarEstadoApiRef = React.useRef<MuiFormDialogApi>();
 
     const {handleOpen: detallhandleOpen, dialog: detallDialog} = useDocumentDetall();
-    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu();
+    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("archivo");
 
     const actions = [
         {
