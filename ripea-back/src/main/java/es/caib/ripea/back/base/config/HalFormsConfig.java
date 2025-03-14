@@ -50,9 +50,12 @@ public class HalFormsConfig {
 
 	@Bean
 	HalFormsConfiguration halFormsConfiguration() {
-		Set<Class<ReadonlyResourceController>> resourceControllerClasses = resourceControllers.stream().
-				map(rc -> (Class<ReadonlyResourceController>)rc.getClass()).
-				collect(Collectors.toSet());
+		Set<Class<ReadonlyResourceController>> resourceControllerClasses = null;
+		if (resourceControllers != null) {
+			resourceControllerClasses = resourceControllers.stream().
+					map(rc -> (Class<ReadonlyResourceController>)rc.getClass()).
+					collect(Collectors.toSet());
+		}
 		return createHalFormsConfiguration(resourceControllerClasses);
 	}
 

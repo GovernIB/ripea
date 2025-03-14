@@ -238,9 +238,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@Operation(summary = "Llista d'artefactes relacionats amb aquest servei")
 	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
 	public ResponseEntity<CollectionModel<EntityModel<ResourceArtifact>>> artifacts() {
+		log.debug("Consulta dels artefactes disponibles pel recurs");
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		List<EntityModel<ResourceArtifact>> artifactsAsEntities = artifacts.stream().
-				map(a -> EntityModel.of(a, buildSingleArtifactSelfLink(a))).
+				map(a -> EntityModel.of(a, buildSingleArtifactLinks(a))).
 				collect(Collectors.toList());
 		return ResponseEntity.ok(
 				CollectionModel.of(
@@ -259,16 +260,37 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@PathVariable
 			@Parameter(description = "Codi de l'artefacte")
 			String code) {
+		log.debug("Detalls d'un artefacte del recurs (type={}, code={})", type, code);
 		ResourceArtifact artifact = getReadonlyResourceService().artifactGetOne(type, code);
 		return ResponseEntity.ok(
-				EntityModel.of(
-						artifact,
-						linkTo(methodOn(getClass()).artifactGetOne(type, code)).withSelfRel()));
+				EntityModel.of(artifact, buildSingleArtifactLinks(artifact)));
+	}
+
+	@Override
+	@PostMapping("/artifacts/{type}/{code}/validate")
+	@Operation(summary = "Validació del formulari d'un artefacte")
+	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public ResponseEntity<?> artifactValidate(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
+		getArtifactParamsAsObjectWithFormClass(
+				type,
+				code,
+				params,
+				bindingResult);
+		return ResponseEntity.ok().build();
 	}
 
 	@Override
 	@PostMapping("/artifacts/report/{code}")
-	@Operation(summary = "Generació d'un informe associat a un recurs")
+	@Operation(summary = "Generació de l'informe associat al recurs")
 	@PreAuthorize("hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
 	public ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
 			@PathVariable
@@ -277,6 +299,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestBody(required = false)
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Generació de l'informe associat al recurs (code={}, params={})", code, params);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
 				ResourceArtifactType.REPORT,
 				code,
@@ -891,8 +914,24 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ls.toArray(new Link[0]);
 	}
 
-	protected Link buildSingleArtifactSelfLink(ResourceArtifact artifact) {
-		return linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel();
+	@SneakyThrows
+	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
+		if (artifact.getFormClass() != null) {
+			Link validateLink = Affordances.
+					of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withSelfRel()).
+					afford(HttpMethod.POST).
+					withInputAndOutput(artifact.getFormClass()).
+					withName("validate").
+					toLink();
+			return new Link[] {
+					validateLink,
+					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
+			};
+		} else {
+			return new Link[] {
+					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
+			};
+		}
 	}
 
 	private Link buildFilterLinkWithAffordances(ResourceArtifact artifact) {

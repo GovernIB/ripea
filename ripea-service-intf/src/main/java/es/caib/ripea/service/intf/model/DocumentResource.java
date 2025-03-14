@@ -1,15 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
@@ -18,6 +12,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -118,6 +118,8 @@ public class DocumentResource extends NodeResource {
 	private ArxiuEstatEnumDto arxiuEstat;
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
+
+	private FileReference adjunt;
 
     @Transient
     private List<ParentPath> parentPath;

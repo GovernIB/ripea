@@ -98,6 +98,31 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String code) throws ArtifactNotFoundException;
 
 	/**
+	 * Valida el formulari associat a un artefacte.
+	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param params
+	 *            el contingut del formular a validar.
+	 * @param bindingResult
+	 *            instància de BindingResult per a poder validar el formulari.
+	 * @return HTTP 200 si tot ha anat be.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'artefacte amb el codi especificat.
+	 * @throws JsonProcessingException
+	 *             si es produeix algun error al extreure els paràmetres.
+	 * @throws MethodArgumentNotValidException
+	 *             si es troben errors de validació en els paràmetres.
+	 */
+	ResponseEntity<?> artifactValidate(
+			final ResourceArtifactType type,
+			final String code,
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
+
+	/**
 	 * Generació d'un informe associat al recurs.
 	 *
 	 * @param code
