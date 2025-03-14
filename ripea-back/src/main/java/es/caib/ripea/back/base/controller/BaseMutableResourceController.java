@@ -475,7 +475,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		if (selfLink != null) {
 			if (resourcePermissions.isWriteGranted()) {
 				ConfigurableAffordance affordance = Affordances.of(selfLink).
-						afford(HttpMethod.OPTIONS).
+						afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
 						withName("default").
 						andAfford(HttpMethod.PUT).
 						withInputAndOutput(getResourceClass()).
@@ -493,7 +493,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				links.set(
 						links.indexOf(selfLink),
 						Affordances.of(selfLink).
-								afford(HttpMethod.OPTIONS).
+								afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
 								withName("default").
 								andAfford(HttpMethod.DELETE).
 								withName("delete").

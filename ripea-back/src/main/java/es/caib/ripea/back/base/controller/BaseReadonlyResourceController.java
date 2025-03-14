@@ -84,6 +84,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public abstract class BaseReadonlyResourceController<R extends Resource<? extends Serializable>, ID extends Serializable>
 		implements ReadonlyResourceController<R, ID> {
 
+	protected static final HttpMethod FAKE_DEFAULT_TEMPLATE_HTTP_METHOD = HttpMethod.OPTIONS;
+
 	@Autowired
 	protected ReadonlyResourceService<R, ID> readonlyResourceService;
 	@Autowired
@@ -785,31 +787,24 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ls;
 	}
 
-	protected Link selfLinkWithDefaultProperties(Link selfLink, boolean showProperties) {
+	protected Link selfLinkWithDefaultProperties(Link selfLink, boolean withProperties) {
 		// Aquest mètode proporciona modifica el Link self afegint una Affordance que
 		// es mostrarà a dins els _templates de HAL FORMS amb el nom "default".
-
-		// La idea és que si es fa la petició al servei sense cap paràmetre es retorni
-		// una llista dels camps del recurs (i que es pugui utilitzar per mostrar, per
-		// exemple, les columnes del grid). Si la petició es fa amb paràmetres només
-		// s'afegirà aquest Affordance per a que aparegui com a "default" i així les
-		// demés Affordances (create, update, patch, ...) apareguin amb el nom que toca.
-
-		// Seria ideal poder utilitzar el mètode HTTP GET per a retornar la informació
-		// dels camps del recurs, però la class HalFormsTemplateBuilder filtra el mètode
-		// GET evitant que surti als _templates. Per això hem utilitzat el mètode PUT
-		// (per posar-ne algun) per quan volem que surtin els properties i el mètode
-		// OPTIONS per quan volem ocultar-los.
-		// https://github.com/spring-projects/spring-hateoas/issues/1683
-
 		// Hem modificat les classes HalFormsTemplateBuilder i HalFormsPropertyFactory
 		// per a que mostrin als templates les Affordances amb mètode GET amb les seves
 		// properties.
-		return Affordances.of(selfLink).
-				afford(showProperties ? HttpMethod.GET : HttpMethod.OPTIONS).
-				withInputAndOutput(getResourceClass()).
-				withName("default").
-				toLink();
+		if (withProperties) {
+			return Affordances.of(selfLink).
+					afford(HttpMethod.GET).
+					withInputAndOutput(getResourceClass()).
+					withName("default").
+					toLink();
+		} else {
+			return Affordances.of(selfLink).
+					afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
+					withName("default").
+					toLink();
+		}
 	}
 
 	protected Link buildFindLink(
