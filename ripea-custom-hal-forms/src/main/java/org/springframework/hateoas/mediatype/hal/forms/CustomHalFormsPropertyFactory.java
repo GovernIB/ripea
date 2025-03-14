@@ -97,8 +97,7 @@ class CustomHalFormsPropertyFactory {
 				} else if (Duration.class.isAssignableFrom(resolvedType)) {
 					inputType = null;
 				} else if (FileReference.class.equals(resolvedType)) {
-					// TODO si descomentam la següent línia ens peta la part de react per culpa de ketting
-					// inputType = "file";
+					inputType = "file";
 				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
 					inputType = "search";
 				} else {

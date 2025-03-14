@@ -18,7 +18,7 @@ booleanNullAsFalse
 export const processType = (field?: any, forcedType?: any) => {
     const processedType = forcedType ?? field?.type;
     if (processedType != null) {
-        if (processedType === 'select') {
+        if (processedType === 'search') {
             return field?.dataSource != null ? 'reference' : 'enum';
         } else {
             return processedType;
