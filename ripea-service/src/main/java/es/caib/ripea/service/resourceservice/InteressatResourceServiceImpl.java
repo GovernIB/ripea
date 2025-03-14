@@ -84,7 +84,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                             (previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatResourceEntity.getId()))
                             || (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatResourceEntity.getId()))
                     ){
-                        throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, "interessatResourceEntity");
+                        throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, "Un interesado no puede representarse a si mismo");
                     }
 
 //                    if (!Objects.equals(interessatResourceEntity.getId(), previous.getId())) {

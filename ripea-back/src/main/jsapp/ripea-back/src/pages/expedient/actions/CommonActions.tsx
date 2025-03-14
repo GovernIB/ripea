@@ -20,7 +20,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const cambiarPrioridadApiRef = React.useRef<MuiFormDialogApi>();
     const cambiarEstadoApiRef = React.useRef<MuiFormDialogApi>();
 
-    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu();
+    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("expediente");
 
     const actions = [
         // {
