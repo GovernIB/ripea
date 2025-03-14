@@ -119,7 +119,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
-        public void processOnChangeLogic(
+        public void onChange(
                 DocumentResource previous,
                 String fieldName,
                 Object fieldValue,
