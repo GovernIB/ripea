@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 the original author or authors.
+ * Copyright 2021-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 // S'ha afegit l'opció d'emplenar el camp value
+// S'ha afegit el mètode GET a ENTITY_ALTERING_METHODS
 // S'ha afegit la configuració del camp multiple
-// S'ha afegit el mètode GET a ENTITY_ALTERING_METHODS per a que aquest mètode inclogui properties a la resposta
+// S'ha afegit la configuració dels camps amb onChange actiu
 package org.springframework.hateoas.mediatype.hal.forms;
 
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.base.util.HalFormsUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
@@ -46,9 +48,9 @@ import static org.springframework.http.HttpMethod.*;
  * @since 1.3
  * @soundtrack The Chicks - March March (Gaslighter)
  */
-class CustomHalFormsPropertyFactory {
+public class CustomHalFormsPropertyFactory {
 
-	private static final Set<HttpMethod> ENTITY_ALTERING_METHODS = EnumSet.of(GET, POST, PUT, PATCH);
+	private static final Set<HttpMethod> ENTITY_ALTERING_METHODS = Set.of(GET, POST, PUT, PATCH);
 
 	private final HalFormsConfiguration configuration;
 	private final MessageResolver resolver;
@@ -89,13 +91,13 @@ class CustomHalFormsPropertyFactory {
 
 			String inputType = metadata.getInputType();
 
-			Class<?> resolvedType = payload.getPropertyMetadata(metadata.getName()).get().getType().resolve();
+			Class<?> resolvedType = metadata.getType().resolve();
 			if (resolvedType != null) {
 				if (boolean.class.isAssignableFrom(resolvedType) || Boolean.class.isAssignableFrom(resolvedType)) {
 					inputType = "checkbox";
 				} else if (Duration.class.isAssignableFrom(resolvedType)) {
 					inputType = null;
-				} else if (resolvedType.isArray() && byte.class.equals(resolvedType.getComponentType())) {
+				} else if (FileReference.class.equals(resolvedType)) {
 					inputType = "file";
 				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
 					inputType = "search";
@@ -186,7 +188,7 @@ class CustomHalFormsPropertyFactory {
 	}
 
 	private HalFormsProperty i18n(HalFormsProperty property, MessageSourceResolvable metadata,
-								  Function<String, HalFormsProperty> application) {
+	                              Function<String, HalFormsProperty> application) {
 
 		String resolved = resolver.resolve(metadata);
 
@@ -209,7 +211,7 @@ class CustomHalFormsPropertyFactory {
 		}
 
 		public static Function<String, I18nedPropertyMetadata> factory(InputPayloadMetadata metadata,
-																	   HalFormsProperty property) {
+		                                                               HalFormsProperty property) {
 			return suffix -> new I18nedPropertyMetadata("%s.".concat(suffix), metadata, property);
 		}
 
