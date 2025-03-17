@@ -4,18 +4,14 @@ import es.caib.ripea.persistence.base.entity.ReorderableEntity;
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.base.helper.ResourceReferenceToEntityHelper;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.*;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
-import es.caib.ripea.service.intf.base.util.StringUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.lang.Nullable;
@@ -39,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class BaseMutableResourceService<R extends Resource<ID>, ID extends Serializable, E extends ResourceEntity<R, ID>>
 		extends BaseReadonlyResourceService<R, ID, E>
-		implements MutableResourceService<R, ID> {
+		implements MutableResourceService<R, ID>, BaseReadonlyResourceService.OnChangeLogicProcessor<R> {
 
 	@Autowired
 	private ResourceReferenceToEntityHelper resourceReferenceToEntityHelper;
@@ -157,12 +153,18 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				fieldName,
 				fieldValue,
 				answers);
-		return onChangeLogicProcessRecursive(
-				previous,
-				fieldName,
-				fieldValue,
-				answers,
-				new String[0]);
+		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
+		if (field != null) {
+			return onChangeLogicProcessRecursive(
+					previous,
+					fieldName,
+					fieldValue,
+					null,
+					this,
+					answers);
+		} else {
+			throw new ResourceFieldNotFoundException(getResourceClass(), fieldName);
+		}
 	}
 
 	@Override
@@ -238,7 +240,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected void beforeDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {}
 	protected void afterDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 
-	protected void processOnChangeLogic(
+	public void onChange(
 			R previous,
 			String fieldName,
 			Object fieldValue,
@@ -415,106 +417,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			String fieldName,
 			FieldFileManager<E> fieldFileManager) {
 		fieldFileManagerMap.put(fieldName, fieldFileManager);
-	}
-
-	private Map<String, Object> onChangeLogicProcessRecursive(
-			Object previous,
-			String fieldName,
-			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			String[] previousFieldNames) {
-		Map<String, Object> changesToReturn = null;
-		Object newInstance = newClassInstance(previous.getClass());
-		if (newInstance != null) {
-			Map<String, Object> changes = new HashMap<>();
-			ProxyFactory factory = new ProxyFactory(newInstance);
-			factory.setProxyTargetClass(true);
-			factory.addAdvice((MethodInterceptor) invocation -> {
-				String methodName = invocation.getMethod().getName();
-				Object[] arguments = invocation.getArguments();
-				if (methodName.startsWith("set") && arguments.length > 0) {
-					changes.put(
-							StringUtil.decapitalize(methodName.substring("set".length())),
-							arguments[0]);
-				}
-				return invocation.proceed();
-			});
-			Object target = factory.getProxy();
-			processOnChangeLogic(
-					(R)previous,
-					fieldName,
-					fieldValue,
-					answers,
-					previousFieldNames,
-					(R)target);
-			if (!changes.isEmpty()) {
-				changesToReturn = new HashMap<>(changes);
-				for (String changedFieldName : changes.keySet()) {
-					Field changedField = ReflectionUtils.findField(previous.getClass(), changedFieldName);
-					if (changedField != null) {
-						ResourceField fieldAnnotation = changedField.getAnnotation(ResourceField.class);
-						if (fieldAnnotation != null && fieldAnnotation.onChangeActive()) {
-							Object previousWithChanges = cloneObjectWithFieldsMap(
-									previous,
-									fieldName,
-									fieldValue,
-									changes,
-									changedFieldName);
-							List<String> previousFieldNamesWithChangedFieldName = new ArrayList<>(Arrays.asList(previousFieldNames));
-							previousFieldNamesWithChangedFieldName.add(fieldName);
-							Map<String, Object> changesPerField = onChangeLogicProcessRecursive(
-									previousWithChanges,
-									changedFieldName,
-									changes.get(changedFieldName),
-									answers,
-									previousFieldNamesWithChangedFieldName.toArray(new String[0]));
-							if (changesPerField != null) {
-								changesToReturn.putAll(changesPerField);
-							}
-						}
-					}
-				}
-			}
-		}
-		return changesToReturn;
-	}
-
-	private Object cloneObjectWithFieldsMap(
-			Object resource,
-			String fieldName,
-			Object fieldValue,
-			Map<String, Object> fields,
-			String excludeField) {
-		Object clonedResource = objectMappingHelper.clone(resource);
-		try {
-			Field field = resource.getClass().getDeclaredField(fieldName);
-			ReflectionUtils.makeAccessible(field);
-			ReflectionUtils.setField(field, clonedResource, fieldValue);
-		} catch (Exception ex) {
-			log.error("Processing onChange request: couldn't find field {} on resource {}",
-					fieldName,
-					resource.getClass().getName(),
-					ex);
-		}
-		fields.forEach((k, v) -> {
-			if (!k.equals(excludeField)) {
-				Field field = ReflectionUtils.findField(resource.getClass(), k);
-				if (field != null) {
-					ReflectionUtils.makeAccessible(field);
-					ReflectionUtils.setField(field, clonedResource, v);
-				}
-			}
-		});
-		return clonedResource;
-	}
-
-	public <C> C newClassInstance(Class<C> clazz) {
-		try {
-			return clazz.getDeclaredConstructor().newInstance();
-		} catch (Exception ex) {
-			log.error("Couldn't create new resource instance (resourceClass={})", getResourceClass(), ex);
-			return null;
-		}
 	}
 
 	private E saveFlushAndRefresh(E entity) {
