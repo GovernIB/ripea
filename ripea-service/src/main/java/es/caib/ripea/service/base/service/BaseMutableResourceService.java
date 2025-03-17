@@ -453,7 +453,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		if (!changes.isEmpty()) {
 			Map<String, Object> changesToReturn = new HashMap<>(changes);
 			for (String changedFieldName: changes.keySet()) {
-				Field changedField = ReflectionUtils.findField(getResourceClass(), changedFieldName);
+				Field changedField = ReflectionUtils.findField(previous.getClass(), changedFieldName);
 				if (changedField != null) {
 					ResourceField fieldAnnotation = changedField.getAnnotation(ResourceField.class);
 					if (fieldAnnotation != null && fieldAnnotation.onChangeActive()) {
