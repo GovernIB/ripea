@@ -4,12 +4,12 @@ import {
 } from 'reactlib';
 import {useParams} from "react-router-dom";
 import {Button, Icon} from "@mui/material";
-import useAnotacionsDetalle from "./AnotacionsDetalle.tsx";
+import useAnotacioDetail from "./details/AnotacioDetail.tsx";
 
 const AnotacionsGrid: React.FC = () => {
     const { id } = useParams();
 
-    const {handleOpen, dialog} = useAnotacionsDetalle();
+    const {handleOpen, dialog} = useAnotacioDetail();
 
     const columns = [
         {

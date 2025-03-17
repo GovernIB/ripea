@@ -88,12 +88,12 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
 //	@Column(name = "comentari", length = 1024)
 //	private String comentari;
 
-//    @OneToMany(
-//            mappedBy = "expedientTasca",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true)
-//    @OrderBy("createdDate")
-//    private List<ExpedientTascaComentariEntity> comentaris = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "expedientTasca",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @OrderBy("createdDate")
+    private List<ExpedientTascaComentariResourceEntity> comentaris = new ArrayList<>();
 
     @Column(name = "titol", length = 255)
     private String titol;

@@ -1,19 +1,13 @@
-import React from 'react';
-import CambiarEstado from './CambiarEstado';
-import CambiarPrioritat from './CambiarPrioritat';
-import {MuiFormDialogApi} from 'reactlib';
-import useDocumentDetall from "../detall/DocumentDetall.tsx";
-import useInformacioArxiu from "../detall/InformacioArxiu.tsx";
+import useDocumentDetail from "./DocumentDetail.tsx";
+import useInformacioArxiu from "../../expedient/actions/InformacioArxiu.tsx";
 
 export const useContingutActions = (refresh?: () => void) => {
     // const { temporalMessageShow } = useBaseAppContext();
     // const {
     //     patch: apiPatch,
     // } = useResourceApiService('expedientResource');
-    const cambiarPrioridadApiRef = React.useRef<MuiFormDialogApi>();
-    const cambiarEstadoApiRef = React.useRef<MuiFormDialogApi>();
 
-    const {handleOpen: detallhandleOpen, dialog: detallDialog} = useDocumentDetall();
+    const {handleOpen: detallhandleOpen, dialog: detallDialog} = useDocumentDetail();
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("archivo");
 
     const actions = [
@@ -21,9 +15,7 @@ export const useContingutActions = (refresh?: () => void) => {
             title: "Detalles",
             icon: "folder",
             showInMenu: true,
-            onClick: (id:number,row:any)=>{
-                detallhandleOpen(row)
-            }
+            onClick: detallhandleOpen
         },
         {
             title: "Mover...",
@@ -65,9 +57,7 @@ export const useContingutActions = (refresh?: () => void) => {
             title: "Información archivo",
             icon: "info",
             showInMenu: true,
-            onClick: (id:number,row:any)=>{
-                arxiuhandleOpen(row)
-            }
+            onClick: arxiuhandleOpen
         },
         {
             title: "Exportación EIN...",
@@ -77,8 +67,6 @@ export const useContingutActions = (refresh?: () => void) => {
         },
     ]
     const components = <>
-        <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
-        <CambiarEstado apiRef={cambiarEstadoApiRef} />
         {detallDialog}
         {arxiuDialog}
     </>;

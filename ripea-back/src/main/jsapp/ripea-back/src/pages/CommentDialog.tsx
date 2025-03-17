@@ -1,8 +1,8 @@
 import {MuiFormDialog, useResourceApiService} from "reactlib";
 import React, {useState} from "react";
 import {Badge, Grid, Icon, IconButton} from "@mui/material";
-import GridFormField from "../../components/GridFormField.tsx";
-import {DataFormDialogApi} from "../../../lib/components/mui/datacommon/DataFormDialog.tsx";
+import GridFormField from "../components/GridFormField.tsx";
+import {DataFormDialogApi} from "../../lib/components/mui/datacommon/DataFormDialog.tsx";
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -11,24 +11,51 @@ const CommentForm = () => {
 }
 
 const CommentDialog = (props:any) => {
+    const { numComm, handleOpen } = props;
+
+    return <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
+        <Badge badgeContent={numComm} color="primary">
+            <Icon>forum</Icon>
+        </Badge>
+    </IconButton>
+}
+
+export const ExpedientCommentDialog = (props:any) => {
     const { entity } = props;
-    const {numComm, handleOpen, dialog} = useCommentDialog(entity);
+    const {numComm, handleOpen, dialog} = useCommentDialog({
+        row: entity,
+        title: `Comentarios del expediente: ${entity?.nom}`,
+        resourceName: 'expedientComentariResource',
+        resourceReference: 'expedient',
+    });
 
     return <>
-        <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen} /*variant="outlined" sx={{borderRadius: 1}}*/>
-            <Badge badgeContent={numComm} color="primary">
-                <Icon>forum</Icon>
-            </Badge>
-        </IconButton>
+        <CommentDialog numComm={numComm} handleOpen={handleOpen}/>
         {dialog}
     </>
 }
 
-const useCommentDialog = (row:any) => {
+export const TascaCommentDialog = (props:any) => {
+    const { entity } = props;
+    const {numComm, handleOpen, dialog} = useCommentDialog({
+        row: entity,
+        title: `Comentarios de la tarea: ${entity?.titol}`,
+        resourceName: 'expedientTascaComentariResource',
+        resourceReference: 'expedientTasca',
+    });
+
+    return <>
+        <CommentDialog numComm={numComm} handleOpen={handleOpen}/>
+        {dialog}
+    </>
+}
+
+const useCommentDialog = (props:any) => {
+    const { row, title, resourceName, resourceReference } = props;
     const {
         isReady: appApiIsReady,
         find: findAll,
-    } = useResourceApiService('expedientComentariResource');
+    } = useResourceApiService(resourceName);
     const [entity] = useState<any>(row);
     const [comentarios, setComentarios] = useState<any[]>();
     const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
@@ -41,7 +68,7 @@ const useCommentDialog = (row:any) => {
     const handleOpen = () => {
         if (appApiIsReady){
             findAll({
-                filter: `expedient.id:${entity?.id}`,
+                filter: `${resourceReference}.id:${entity?.id}`,
                 includeLinksInRows: true,
                 page: 0,
                 size: 0,
@@ -54,7 +81,7 @@ const useCommentDialog = (row:any) => {
         }
 
         formApiRef.current?.show(undefined, {
-            expedient: {
+            [`${resourceReference}`]: {
                 id: entity?.id
             },
         })
@@ -65,8 +92,8 @@ const useCommentDialog = (row:any) => {
 
     const dialog =
         <MuiFormDialog
-            resourceName={"expedientComentariResource"}
-            title={`Comentarios del expediente: ${entity?.nom}`}
+            resourceName={resourceName}
+            title={title}
             apiRef={formApiRef}
         >
             <Grid
@@ -95,4 +122,3 @@ const useCommentDialog = (row:any) => {
         dialog
     }
 }
-export default CommentDialog;
