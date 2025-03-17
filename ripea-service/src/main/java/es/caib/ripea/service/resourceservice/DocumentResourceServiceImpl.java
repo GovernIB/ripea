@@ -7,10 +7,7 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +46,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @Override
     protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalDocumentResource.ifPresent(entity::setMetaNode);
-        optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> entity.setNtiTipoDocumental(metaDocumentResourceEntity.getNtiTipoDocumental())));
+        beforeSave(entity, resource, answers);
 
         entity.setEstat(entity.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT);
         entity.setTipus(ContingutTipusEnumDto.DOCUMENT);
@@ -66,8 +61,19 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @Override
     protected void beforeUpdateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
+        beforeSave(entity, resource, answers);
+    }
+
+    private void beforeSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
         Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalDocumentResource.ifPresent(entity::setMetaNode);
+        optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> {
+            entity.setMetaNode(metaDocumentResourceEntity);
+            entity.setNtiTipoDocumental(metaDocumentResourceEntity.getNtiTipoDocumental());
+        }));
+
+        if (resource.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA){
+            /* TODO: (PluginHelper.gestioDocumentalCreate) */
+        }
     }
 
     @Override

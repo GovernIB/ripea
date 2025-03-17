@@ -1,6 +1,6 @@
 import Moment from "moment/moment";
 
-export const formatDate = (date: string, format: string = 'DD/MM/YY HH:mm:ss'): string | null => {
+export const formatDate = (date: string, format: string = 'DD/MM/Y HH:mm:ss'): string | null => {
     return date ? Moment(date).format(format) : null;
 }
 

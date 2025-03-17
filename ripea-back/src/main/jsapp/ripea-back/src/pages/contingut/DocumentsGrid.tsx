@@ -5,11 +5,11 @@ import {
     useMuiDataGridApiRef,
 } from 'reactlib';
 import React, { useState } from "react";
-import ContingutIcon from "./ContingutIcon.tsx";
+import ContingutIcon from "./details/ContingutIcon.tsx";
 import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon } from "@mui/material";
-import {useContingutActions} from "../actions/ContingutActions.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
-import * as builder from '../../../util/springFilterUtils';
+import {useContingutActions} from "./details/ContingutActions.tsx";
+import GridFormField from "../../components/GridFormField.tsx";
+import * as builder from '../../util/springFilterUtils.ts';
 
 const DocumentsGridForm = (props:any) => {
     const {expedient} = props;
@@ -98,7 +98,7 @@ const DocumentsGrid: React.FC = (props:any) => {
             disableColumnMenu
             apiRef={dataGridApiRef}
             rowAdditionalActions={commonActionsActions}
-            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.filter((a)=>a.tipus=="DOCUMENT").length)}
+            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.filter((a)=>a?.tipus=="DOCUMENT").length)}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {

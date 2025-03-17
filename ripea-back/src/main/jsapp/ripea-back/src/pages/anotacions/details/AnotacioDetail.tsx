@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {useState} from "react";
 
-const useAnotacionsDetalle = () => {
+const useAnotacioDetail = () => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
@@ -82,4 +82,4 @@ const useAnotacionsDetalle = () => {
     }
 }
 
-export default useAnotacionsDetalle;
+export default useAnotacioDetail;

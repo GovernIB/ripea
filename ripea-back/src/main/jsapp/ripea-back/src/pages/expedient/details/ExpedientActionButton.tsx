@@ -1,6 +1,6 @@
 import { Icon, MenuItem } from "@mui/material";
-import MenuButton from "../../components/MenuButton.tsx";
-import {useCommonActions} from "./actions/CommonActions.tsx";
+import MenuButton from "../../../components/MenuButton.tsx";
+import {useCommonActions} from "./CommonActions.tsx";
 
 const ExpedientActionButton = (props:{entity:any}) => {
     const {entity} = props;
@@ -23,7 +23,7 @@ const ExpedientActionButton = (props:{entity:any}) => {
         }}
     >
         {commonActionsActions.map((action) =>
-            action?.showInMenu && <MenuItem onClick={()=>action?.onClick?.(entity.id)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(entity)}>
+            action?.showInMenu && <MenuItem onClick={()=>action?.onClick?.(entity.id, entity)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(entity)}>
                 {action.icon && <Icon>{action.icon}</Icon>}{action.title}
             </MenuItem>
         )}

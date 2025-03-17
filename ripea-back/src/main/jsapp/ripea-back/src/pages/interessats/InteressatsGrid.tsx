@@ -6,8 +6,8 @@ import {
 } from 'reactlib';
 import {Grid} from "@mui/material";
 import React from "react";
-import GridFormField from "../../../components/GridFormField.tsx";
-import useInteressatActions from "../actions/InteressatActions.tsx";
+import GridFormField from "../../components/GridFormField.tsx";
+import useInteressatActions from "./details/InteressatActions.tsx";
 
 const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
