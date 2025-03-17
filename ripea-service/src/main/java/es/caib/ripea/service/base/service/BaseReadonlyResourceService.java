@@ -742,13 +742,17 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				if (filterFieldPrefix != null) {
 					springFilter.append(filterFieldPrefix);
 				}
+				springFilter.append("lower(");
 				springFilter.append(fieldName);
-				springFilter.append("~~");
+				springFilter.append(")");
+				springFilter.append("~");
+				springFilter.append("lower(");
 				springFilter.append("'");
-				springFilter.append("*");
+				springFilter.append("%");
 				springFilter.append(cleanReservedFilterCharacters(quickFilter));
-				springFilter.append("*");
+				springFilter.append("%");
 				springFilter.append("'");
+				springFilter.append(")");
 			}
 			return springFilter.toString();
 		} else {

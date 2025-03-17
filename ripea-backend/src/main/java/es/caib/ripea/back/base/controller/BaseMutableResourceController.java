@@ -38,10 +38,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
@@ -93,9 +91,15 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('CREATE'))")
 	public ResponseEntity<EntityModel<R>> create(
 			@RequestBody
-			@Validated({ Resource.OnCreate.class, Default.class })
-			final R resource) {
+			final R resource,
+			BindingResult bindingResult) throws MethodArgumentNotValidException {
 		log.debug("Creant recurs (resource={})", resource);
+		validateResource(
+				resource,
+				bindingResult,
+				0,
+				Resource.OnCreate.class,
+				Default.class);
 		R created = getMutableResourceService().create(
 				resource,
 				getAnswersFromHeaderOrRequest(null));
@@ -128,33 +132,26 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			BindingResult bindingResult) throws MethodArgumentNotValidException {
 		log.debug("Modificant recurs (id={}, resource={})", id, resource);
 		updateResourceIdAndPk(id, resource);
-		validator.validate(
+		validateResource(
 				resource,
 				bindingResult,
+				1,
 				Resource.OnUpdate.class,
 				Default.class);
-		if (bindingResult.hasErrors()) {
-			throw new MethodArgumentNotValidException(
-					new MethodParameter(
-							new Object() {}.getClass().getEnclosingMethod(),
-							2),
-					bindingResult);
-		} else {
-			R updated = getMutableResourceService().update(
-					id,
-					resource,
-					getAnswersFromHeaderOrRequest(null));
-			return ResponseEntity.ok(
-					toEntityModel(
-							updated,
-							buildSingleResourceLinks(
-									updated.getId(),
-									null,
-									null,
-									resourceApiService.permissionsCurrentUser(
-											getResourceClass(),
-											id)).toArray(new Link[0])));
-		}
+		R updated = getMutableResourceService().update(
+				id,
+				resource,
+				getAnswersFromHeaderOrRequest(null));
+		return ResponseEntity.ok(
+				toEntityModel(
+						updated,
+						buildSingleResourceLinks(
+								updated.getId(),
+								null,
+								null,
+								resourceApiService.permissionsCurrentUser(
+										getResourceClass(),
+										id)).toArray(new Link[0])));
 	}
 
 	@Override
@@ -175,8 +172,8 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				JsonUtil.getInstance().fromJsonToMap(jsonNode, getResourceClass()));
 		validateResource(
 				resource,
-				1,
 				bindingResult,
+				1,
 				Resource.OnUpdate.class,
 				Default.class);
 		R updated = getMutableResourceService().update(
@@ -572,20 +569,18 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 
 	protected <T extends Resource<?>> void validateResource(
 			T resource,
-			int paramIndex,
 			BindingResult bindingResult,
+			int paramIndex,
 			Object... validationHints) throws MethodArgumentNotValidException {
-		BindingResult resourceBindingResult = new BeanPropertyBindingResult(resource, bindingResult.getObjectName());
 		Object[] finalValidationHints = validationHints;
 		if (validationHints == null || validationHints.length == 0) {
 			finalValidationHints = new Object[] { Default.class };
 		}
 		validator.validate(
 				resource,
-				resourceBindingResult,
+				bindingResult,
 				finalValidationHints);
-		if (resourceBindingResult.hasErrors()) {
-			bindingResult.addAllErrors(resourceBindingResult);
+		if (bindingResult.hasErrors()) {
 			throw new MethodArgumentNotValidException(
 					new MethodParameter(
 							new Object() {}.getClass().getEnclosingMethod(),

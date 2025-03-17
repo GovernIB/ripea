@@ -30,10 +30,15 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 	 *
 	 * @param resource
 	 *            informació del recurs.
+	 * @param bindingResult
+	 *            instància de BindingResult per a validar l'element.
 	 * @return el recurs creat.
+	 * @throws MethodArgumentNotValidException
+	 *            si s'envia una creació errònia o no permesa.
 	 */
 	ResponseEntity<EntityModel<R>> create(
-			final R resource);
+			final R resource,
+			BindingResult bindingResult) throws MethodArgumentNotValidException;
 
 	/**
 	 * Modifica un recurs existent amb la informació especificada.
