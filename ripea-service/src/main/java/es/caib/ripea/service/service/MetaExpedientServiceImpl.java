@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +70,7 @@ import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PaginacioHelper.ConverterParam;
 import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
@@ -1199,7 +1201,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		List<GrupEntity> grups = metaExpedientRepository.getOne(metaExpedientId).getGrups();
 		if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN")) {
-			permisosHelper.filterGrantedAny(grups, GrupEntity.class, new Permission[] {ExtendedPermission.READ});
+			permisosHelper.filterGrantedAny(
+					grups,
+					new ObjectIdentifierExtractor<GrupEntity>() {
+						public Long getObjectIdentifier(GrupEntity entitat) {
+							return entitat.getId();
+						}
+					},
+					GrupEntity.class,
+					new Permission[] {ExtendedPermission.READ},
+					SecurityContextHolder.getContext().getAuthentication());
 		}
 		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}

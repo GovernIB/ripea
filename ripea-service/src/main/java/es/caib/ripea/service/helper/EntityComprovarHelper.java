@@ -51,6 +51,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.NodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -313,10 +314,6 @@ public class EntityComprovarHelper {
 		}
 		return metaNode;
 	}
-	
-	
-	
-
 
 	public MetaExpedientEntity comprovarMetaExpedient(EntitatEntity entitat, Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
@@ -340,7 +337,6 @@ public class EntityComprovarHelper {
 		}
 		return metaExpedient;
 	}
-	
 	
 	public MetaExpedientEntity comprovarMetaExpedient(Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
@@ -1063,13 +1059,22 @@ public class EntityComprovarHelper {
 		boolean isAdminOrgan = false;
 		
 		if (organGestorId != null) {
-			OrganGestorEntity organGestorEntity = organGestorRepository.getOne(organGestorId);
-			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
-			permisosHelper.filterGrantedAny(
-					organsGestors,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION });
-			isAdminOrgan = Utils.isNotEmpty(organsGestors);
+			OrganGestorEntity organGestorEntity = organGestorRepository.findById(organGestorId).orElse(null);
+			if (organGestorEntity!=null) {
+//				organGestorEntity = HibernateHelper.deproxy(organGestorEntity);
+				List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
+				permisosHelper.filterGrantedAny(
+						organsGestors,
+						new ObjectIdentifierExtractor<OrganGestorEntity>() {
+							public Long getObjectIdentifier(OrganGestorEntity entitat) {
+								return entitat.getId();
+							}
+						},
+						OrganGestorEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						SecurityContextHolder.getContext().getAuthentication());
+				isAdminOrgan = Utils.isNotEmpty(organsGestors);
+			}
 		}
 		return isAdminOrgan;
 	}
@@ -1103,8 +1108,14 @@ public class EntityComprovarHelper {
 			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
 			permisosHelper.filterGrantedAny(
 					organsGestors,
+					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+						public Long getObjectIdentifier(OrganGestorEntity entitat) {
+							return entitat.getId();
+						}
+					},					
 					OrganGestorEntity.class,
-					new Permission[] { permission});
+					new Permission[] { permission},
+					SecurityContextHolder.getContext().getAuthentication());
 			grantedOrgan = Utils.isNotEmpty(organsGestors);
 		}
 
