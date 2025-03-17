@@ -12,6 +12,7 @@ import java.util.Locale;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@PreAuthorize("isAuthenticated()")
 public interface OrganGestorService {
 
 	/**

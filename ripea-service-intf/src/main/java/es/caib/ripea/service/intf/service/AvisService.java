@@ -15,31 +15,22 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@PreAuthorize("isAuthenticated()")
 public interface AvisService {
 
-	@PreAuthorize("isAuthenticated()")
 	AvisDto create(AvisDto avis);
 
-	@PreAuthorize("isAuthenticated()")
 	AvisDto update(AvisDto avis);
 
-	@PreAuthorize("isAuthenticated()")
 	AvisDto updateActiva(Long id, boolean activa);
 
-	@PreAuthorize("isAuthenticated()")
 	AvisDto delete(Long id);
 
-	@PreAuthorize("isAuthenticated()")
 	AvisDto findById(Long id);
 
-	@PreAuthorize("isAuthenticated()")
 	PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams);
 
-	@PreAuthorize("isAuthenticated()")
 	List<AvisDto> findActive();
 
-	@PreAuthorize("isAuthenticated()")
 	List<AvisDto> findActiveAdmin(Long entitatId);
-
-
 }

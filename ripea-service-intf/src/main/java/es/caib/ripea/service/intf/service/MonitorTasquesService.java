@@ -4,10 +4,10 @@ import es.caib.ripea.service.intf.dto.MonitorTascaInfo;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 
-
+@PreAuthorize("isAuthenticated()")
 public interface MonitorTasquesService {
-	
 
 	public MonitorTascaInfo addTasca(String codiTasca);
 

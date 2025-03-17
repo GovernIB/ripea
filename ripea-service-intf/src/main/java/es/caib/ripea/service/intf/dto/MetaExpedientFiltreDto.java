@@ -10,9 +10,8 @@ public class MetaExpedientFiltreDto {
 	private String classificacio;
 	private Long organGestorId;
 	private MetaExpedientActiuEnumDto actiu;
-
+	private boolean permisDirecteActive;
 	private MetaExpedientAmbitEnumDto ambit;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	private MetaExpedientRevisioEstatEnumDto[] revisioEstats;
-
 }

@@ -64,6 +64,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:permisDirecte = false or me.permisDirecte=true)" +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
 			"and (:esNullRevisioEstat = true or me.revisioEstat IN (:revisioEstats)) ")
@@ -83,6 +84,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("comuns") boolean comuns,
 			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
 			@Param("revisioEstats") MetaExpedientRevisioEstatEnumDto[] revisioEstats,
+			@Param("permisDirecte") boolean permisDirecte,
 			Pageable pageable);
 
 	@Query( "from " +
@@ -94,6 +96,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
+			"and (:permisDirecte = false or me.permisDirecte=true)" +
 			"and me.id in (:ids)" + 
 			"and (:esNullRevisioEstat = true or me.revisioEstat = :revisioEstat) ")
 	Page<MetaExpedientEntity> findByOrganGestor(
@@ -111,6 +114,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("ids") List<Long> ids,
 			@Param("esNullRevisioEstat") boolean esNullRevisioEstat,
 			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat,
+			@Param("permisDirecte") boolean permisDirecte,
 			Pageable pageable);
 
 	@Query( "select distinct me " +

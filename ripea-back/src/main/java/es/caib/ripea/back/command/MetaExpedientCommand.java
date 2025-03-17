@@ -53,7 +53,7 @@ public class MetaExpedientCommand {
 	private Long organGestorId;
 
 	private boolean notificacioActiva;
-
+	private boolean permisDirecte = false;
 	private boolean permetMetadocsGenerals;
 
 	private Long pareId;
@@ -212,6 +212,9 @@ public class MetaExpedientCommand {
 	public void setInteressatObligatori(boolean interessatObligatori) {
 		this.interessatObligatori = interessatObligatori;
 	}
-
+	public void setPermisDirecte(
+			boolean permisDirecte) {
+		this.permisDirecte = permisDirecte;
+	}
 	
 }

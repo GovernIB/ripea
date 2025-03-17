@@ -15,6 +15,7 @@ public class PermisosPerExpedientsDto  {
 
 	List<Long> idsMetaExpedientsPermesos;
 	List<Long> idsOrgansPermesos;
+	List<Long> idsOrganActualAndDescendents;
 	List<Long> idsMetaExpedientOrganPairsPermesos;
 	List<Long> idsOrgansAmbProcedimentsComunsPermesos;
 	List<Long> idsProcedimentsComuns;
@@ -22,6 +23,7 @@ public class PermisosPerExpedientsDto  {
 
 	private List<List<Long>> idsMetaExpedientsPermesosSplit;
 	private List<List<Long>> idsOrgansPermesosSplit;
+	private List<List<Long>> idsOrganActualAndDescendentsSplit;
 	private List<List<Long>> idsMetaExpedientOrganPairsPermesosSplit;
 	private List<List<Long>> idsOrgansAmbProcedimentsComunsPermesosSplit;
 	private List<List<Long>> idsProcedimentsComunsSplit;
@@ -31,6 +33,9 @@ public class PermisosPerExpedientsDto  {
 	}
 	public List<Long> getIdsOrgansPermesos() {
 		return Utils.getNullIfEmpty(idsOrgansPermesos);
+	}
+	public List<Long> getIdsOrganActualAndDescendents() {
+		return Utils.getNullIfEmpty(idsOrganActualAndDescendents);
 	}
 	public List<Long> getIdsMetaExpedientOrganPairsPermesos() {
 		return Utils.getNullIfEmpty(idsMetaExpedientOrganPairsPermesos);
@@ -61,6 +66,11 @@ public class PermisosPerExpedientsDto  {
 		return getList(this.idsOrgansPermesosSplit, index);
 	}
 
+	public void setIdsOrganActualAndDescendents(List<Long> idsOrganActualAndDescendents) {
+		this.idsOrganActualAndDescendents = idsOrganActualAndDescendents;
+		this.idsOrganActualAndDescendentsSplit = listSplit(idsOrganActualAndDescendents);
+	}
+	
 	public void setIdsMetaExpedientOrganPairsPermesos(List<Long> idsMetaExpedientOrganPairsPermesos) {
 		this.idsMetaExpedientOrganPairsPermesos = idsMetaExpedientOrganPairsPermesos;
 		this.idsMetaExpedientOrganPairsPermesosSplit = listSplit(idsMetaExpedientOrganPairsPermesos);

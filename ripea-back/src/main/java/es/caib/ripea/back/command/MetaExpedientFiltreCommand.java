@@ -17,7 +17,7 @@ public class MetaExpedientFiltreCommand {
 	private MetaExpedientActiuEnumDto actiu;
 	private MetaExpedientAmbitEnumDto ambit;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
-	
+	private boolean permisDirecteActive;
 
 	public MetaExpedientFiltreDto asDto() {
 		return ConversioTipusHelper.convertir(
@@ -46,5 +46,8 @@ public class MetaExpedientFiltreCommand {
 	public void setRevisioEstat(MetaExpedientRevisioEstatEnumDto revisioEstat) {
 		this.revisioEstat = revisioEstat;
 	}
-	
+	public void setPermisDirecteActive(
+			boolean permisDirecteActive) {
+		this.permisDirecteActive = permisDirecteActive;
+	}
 }

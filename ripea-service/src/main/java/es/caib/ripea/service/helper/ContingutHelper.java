@@ -396,7 +396,11 @@ public class ContingutHelper {
 		setExpedientBasicProperties(dto, expedient);
 
 		if (params.isAmbPermisos()) {
-			setExpedientPermisos(dto, expedient.getId());
+			setExpedientPermisos(
+					dto,
+					expedient.getId(),
+					false //boolean indicant si hem de llançar excepció
+			);
 		}
 		setExpedientSeguidor(dto, expedient);
 		setExpedientEstatErrors(dto, expedient);
@@ -447,17 +451,17 @@ public class ContingutHelper {
         dto.setPrioritatMotiu(expedient.getPrioritatMotiu());
 	}
 
-	private void setExpedientPermisos(ExpedientDto dto, Long expedientId) {
+	private void setExpedientPermisos(ExpedientDto dto, Long expedientId, boolean llancarExcepcio) {
 		long t1 = System.currentTimeMillis();
 		try {
 			dto.setUsuariActualWrite(false);
-			entityComprovarHelper.comprovarExpedientPermisWrite(expedientId);
+			entityComprovarHelper.comprovarExpedientPermisWrite(expedientId, llancarExcepcio);
 			dto.setUsuariActualWrite(true);
 		} catch (PermissionDeniedException ex) {}
 
 		try {
 			dto.setUsuariActualDelete(false);
-			entityComprovarHelper.comprovarExpedientPermisDelete(expedientId);
+			entityComprovarHelper.comprovarExpedientPermisDelete(expedientId, llancarExcepcio);
 			dto.setUsuariActualDelete(true);
 		} catch (PermissionDeniedException ex) {}
 		logMsg("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t1) + " ms");

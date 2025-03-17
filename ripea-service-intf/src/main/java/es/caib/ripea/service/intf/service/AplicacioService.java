@@ -15,6 +15,7 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@PreAuthorize("isAuthenticated()")
 public interface AplicacioService {
 
 	void actualitzarEntiatThreadLocal(EntitatDto entitat);

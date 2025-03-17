@@ -1767,7 +1767,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					permisosPerExpedients.getIdsGrupsPermesos() == null,
 					permisosPerExpedients.getIdsGrupsPermesos(),
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
 					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
@@ -1854,7 +1855,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					permisosPerExpedients.getIdsGrupsPermesos() == null,
 					permisosPerExpedients.getIdsGrupsPermesos(),
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
 					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",

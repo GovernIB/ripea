@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.io.IOException;
 import java.util.List;
 
+@PreAuthorize("isAuthenticated()")
 public interface ExpedientTascaService {
 
 	public ExpedientTascaDto findOne(

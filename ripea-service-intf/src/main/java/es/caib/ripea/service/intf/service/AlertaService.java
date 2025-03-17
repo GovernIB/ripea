@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@PreAuthorize("isAuthenticated()")
 public interface AlertaService {
 
 	/**
@@ -69,7 +70,6 @@ public interface AlertaService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina d'Alertes.
 	 */
-	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<AlertaDto> findPaginat(PaginacioParamsDto paginacioParams);
 
 }

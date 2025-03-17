@@ -145,7 +145,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private MetaDadaHelper metaDadaHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
-//	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
 
 	@Transactional
 	@Override
@@ -178,7 +177,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(),
-				metaExpedient.isInteressatObligatori()).
+				metaExpedient.isInteressatObligatori(),
+				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
 				expressioNumero(metaExpedient.getExpressioNumero()).
 				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
@@ -230,7 +230,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(), 
 				metaExpedient.getTipusClassificacio(),
-				metaExpedient.isInteressatObligatori());
+				metaExpedient.isInteressatObligatori(),
+				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():metaExpedientEntity.isPermisDirecte());
 		
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -311,7 +312,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				procedimentImportat.isGestioAmbGrupsActiva(),
-				procedimentImportat.isInteressatObligatori()).
+				procedimentImportat.isInteressatObligatori(),
+				false).
 				expressioNumero(procedimentImportat.getExpressioNumero()).
 				tipusClassificacio(procedimentImportat.getTipusClassificacio()).build();
 		
@@ -437,7 +439,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorEntity,
 				procedimentImportat.isGestioAmbGrupsActiva(),
 				procedimentImportat.getTipusClassificacio(),
-				procedimentImportat.isInteressatObligatori());
+				procedimentImportat.isInteressatObligatori(),
+				false);
 		
 		Long metaExpedientEntityId = metaExpedientEntity.getId();
 
@@ -1084,6 +1087,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
 						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null,
 						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
+						filtre.isPermisDirecteActive(),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				MetaExpedientDto.class,
 				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
@@ -1134,11 +1138,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			filtre.getActiu() == null,
 			filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 			filtre.getOrganGestorId() == null,
-			filtre.getOrganGestorId() != null ? organGestorRepository.getOne(
-					filtre.getOrganGestorId()) : null,
+			filtre.getOrganGestorId() != null ? organGestorRepository.getOne(filtre.getOrganGestorId()) : null,
 			Utils.getNullIfEmpty(candidateMetaExpIds),
 			filtre.getRevisioEstat() == null,
 			filtre.getRevisioEstat(),
+			filtre.isPermisDirecteActive(),
 			paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));	
 	}
 	
