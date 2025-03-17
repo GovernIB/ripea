@@ -118,8 +118,8 @@ public class ExpedientTascaServiceEjb extends AbstractServiceEjb<ExpedientTascaS
 				contingutId);
 	}
 
-
 	@Override
+	@RolesAllowed("**")
 	public ExpedientTascaDto canviarTascaEstat(
 			Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
@@ -131,6 +131,9 @@ public class ExpedientTascaServiceEjb extends AbstractServiceEjb<ExpedientTascaS
 				motiu, 
 				rolActual);
 	}
+	
+	@Override
+	@RolesAllowed("**")
 	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
 			List<String> responsablesCodi) {
 		return delegateService.updateResponsables(
@@ -139,16 +142,19 @@ public class ExpedientTascaServiceEjb extends AbstractServiceEjb<ExpedientTascaS
 	}
 		
 	@Override
+	@RolesAllowed("**")
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId) {
 		return delegateService.findAmbEntitat(entitatId);
 	}
 
     @Override
+    @RolesAllowed("**")
     public boolean publicarComentariPerExpedientTasca(Long entitatId, Long expedientTascaId, String text, String rolActual) {
         return delegateService.publicarComentariPerExpedientTasca(entitatId, expedientTascaId, text, rolActual);
     }
 
 	@Override
+	@RolesAllowed("**")
 	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId) {
 		return delegateService.findComentarisPerTasca(entitatId, expedientTascaId);
 	}
@@ -160,6 +166,7 @@ public class ExpedientTascaServiceEjb extends AbstractServiceEjb<ExpedientTascaS
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ExpedientTascaDto updateDataLimit(ExpedientTascaDto expedientTascaDto) {
 		return delegateService.updateDataLimit(expedientTascaDto);
 	}

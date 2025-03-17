@@ -267,9 +267,6 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId);
 
-	// For testing:
-	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper);
-	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
 			Long entitatId,

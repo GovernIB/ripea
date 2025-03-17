@@ -268,6 +268,12 @@
 					<artifactId>ripea-service</artifactId>
 					<version>${project.version}</version>
 				</dependency>
+<!--				<dependency>-->
+<!--		        	<groupId>org.springframework.boot</groupId>-->
+<!--		        	<artifactId>spring-boot-devtools</artifactId>-->
+<!--				    <optional>true</optional>-->
+<!--				    <scope>provided</scope>            	-->
+<!--		    	</dependency>					-->
 			</dependencies>
 			<build>
 				<plugins>

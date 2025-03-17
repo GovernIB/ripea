@@ -64,6 +64,7 @@ public class MetaDadaServiceEjb extends AbstractServiceEjb<MetaDadaService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void moveUp(
 			Long entitatId,
 			Long metaNodeId,
@@ -75,6 +76,7 @@ public class MetaDadaServiceEjb extends AbstractServiceEjb<MetaDadaService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void moveDown(
 			Long entitatId,
 			Long metaNodeId,
@@ -86,6 +88,7 @@ public class MetaDadaServiceEjb extends AbstractServiceEjb<MetaDadaService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void moveTo(
 			Long entitatId,
 			Long metaNodeId,
@@ -175,5 +178,4 @@ public class MetaDadaServiceEjb extends AbstractServiceEjb<MetaDadaService> impl
 				entitatId,
 				nodeId);
 	}
-
 }

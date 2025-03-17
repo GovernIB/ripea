@@ -158,12 +158,6 @@ public class DocumentEnviamentServiceEjb extends AbstractServiceEjb<DocumentEnvi
 				documentId);
 	}
 
-//	@Override
-//	public void notificacioActualitzarEstat() {
-//		delegate.notificacioActualitzarEstat();
-//	}
-
-
 	@Override
 	@RolesAllowed("**")
 	public int enviamentsCount(

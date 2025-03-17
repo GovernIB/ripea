@@ -24,24 +24,28 @@ public class AlertaServiceEjb extends AbstractServiceEjb<AlertaService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public AlertaDto create(
 			AlertaDto alerta) {
 		return delegateService.create(alerta);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public AlertaDto update(
 			AlertaDto alerta) throws NotFoundException {
 		return delegateService.update(alerta);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public AlertaDto delete(
 			Long id) throws NotFoundException {
 		return delegateService.delete(id);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public AlertaDto find(
 			Long id) {
 		return delegateService.find(id);

@@ -223,10 +223,6 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 				resultEnum);
 	}
 
-
-
-
-
 	@Override
 	@RolesAllowed("**")
 	public ArxiuDetallDto getArxiuDetall(
@@ -293,7 +289,6 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 				recursiu);
 	}
 
-
 	@Override
 	@RolesAllowed("**")
 	public void order(
@@ -304,18 +299,15 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 		delegateService.order(entitatId, contingutId, orderedElements);
 	}
 
-
 	@Override
+	@RolesAllowed("**")
 	public PaginaDto<DocumentDto> findDocumentsPerCopiarCsv(Long entitatId, ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
 		return delegateService.findDocumentsPerCopiarCsv(entitatId, filtre, paginacioParams, rolActual);
 	}
-
-
-	// Mètodes per evitar errors al tenir continguts orfes en base de dades
-	// ////////////////////////////////////////////////////////////////////
-
+	
     @Override
+    @RolesAllowed("**")
     public Boolean netejaContingutsOrfes() {
         return delegateService.netejaContingutsOrfes();
     }
@@ -327,12 +319,14 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
     }
 
 	@Override
+	@RolesAllowed("**")
 	public boolean isExpedient(
 			Long contingutId) {
 		return delegateService.isExpedient(contingutId);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ContingutDto findAmbIdUser(
 			Long entitatId,
 			Long contingutId,
@@ -356,6 +350,7 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
 		return delegateService.findAmbIdUserPerMoureCopiarVincular(entitatId, contingutId);
 	}
@@ -389,7 +384,6 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 	public boolean isDeleted(Long contingutId) {
 		return delegateService.isDeleted(contingutId);
 	}
-
 	
 	@Override
 	@RolesAllowed("**")
@@ -404,7 +398,6 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 				paginacioParams,
 				rolActual);
 	}
-
 	
 	@Override
 	@RolesAllowed("**")
@@ -434,5 +427,4 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 				rolActual,
 				resultEnum);
 	}
-
 }

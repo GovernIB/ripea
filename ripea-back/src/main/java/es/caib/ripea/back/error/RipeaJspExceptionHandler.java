@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Límit Tecnologies
  */
 @Slf4j
-@ControllerAdvice(basePackageClasses = { ExpedientController.class })
+@ControllerAdvice(basePackages = {"es.caib.ripea.back.controller"})
 public class RipeaJspExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
@@ -109,7 +109,6 @@ public class RipeaJspExceptionHandler {
 	public ModelAndView handleAllUncaughtException(
 			Throwable ex,
 			HttpServletRequest request) {
-		org.keycloak.representations.AccessTokenResponse a;
 		log.error("Error al processar la petició HTTP al recurs " + request.getRequestURI(), ex);
 		ModelAndView model = new ModelAndView("util/error");
 		ErrorObject errorObject = new ErrorObject(

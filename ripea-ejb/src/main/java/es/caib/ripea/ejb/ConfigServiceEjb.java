@@ -54,6 +54,7 @@ public class ConfigServiceEjb extends AbstractServiceEjb<ConfigService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public String getConfigValue(String configKey) throws NotDefinedConfigException {
 		return delegateService.getConfigValue(configKey);
 	}
@@ -65,11 +66,13 @@ public class ConfigServiceEjb extends AbstractServiceEjb<ConfigService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void actualitzarPropietatsJBossBdd() {
 		delegateService.actualitzarPropietatsJBossBdd();
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public void configurableEntitat(
 			String key,
 			boolean value) {
@@ -79,6 +82,7 @@ public class ConfigServiceEjb extends AbstractServiceEjb<ConfigService> implemen
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public void configurableOrgan(
 			String key,
 			boolean value) {

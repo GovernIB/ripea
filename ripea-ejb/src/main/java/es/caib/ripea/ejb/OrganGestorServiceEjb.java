@@ -92,6 +92,7 @@ public class OrganGestorServiceEjb extends AbstractServiceEjb<OrganGestorService
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi) {
 		return delegateService.getProgresActualitzacio(entitatCodi);
 	}
@@ -224,6 +225,7 @@ public class OrganGestorServiceEjb extends AbstractServiceEjb<OrganGestorService
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
 		return delegateService.findOrgansSuperiorByEntitat(entitatId);
 	}
@@ -236,12 +238,6 @@ public class OrganGestorServiceEjb extends AbstractServiceEjb<OrganGestorService
 		return delegateService.findOrgansArbreAmbFiltre(
 				entitatId,
 				filtre);
-	}
-
-
-	@Override
-	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper) {
-		delegateService.setServicesForSynctest(metaExpedientHelper, pluginHelper);
 	}
 
 	@Override

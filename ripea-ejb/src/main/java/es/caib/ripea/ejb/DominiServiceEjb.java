@@ -2,6 +2,7 @@ package es.caib.ripea.ejb;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
@@ -25,6 +26,7 @@ public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DominiDto create(
 			Long entitatId, 
 			DominiDto tipusDocumental) throws NotFoundException {
@@ -34,6 +36,7 @@ public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DominiDto update(
 			Long entitatId, 
 			DominiDto tipusDocumental) throws NotFoundException {
@@ -43,6 +46,7 @@ public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DominiDto delete(
 			Long entitatId, 
 			Long id) throws NotFoundException {
@@ -52,6 +56,7 @@ public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DominiDto findById(
 			Long entitatId, 
 			Long id) throws NotFoundException {
@@ -61,6 +66,7 @@ public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public PaginaDto<DominiDto> findByEntitatPaginat(
 			Long entitatId,
 			PaginacioParamsDto paginacioParams)
@@ -71,35 +77,41 @@ public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implemen
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<DominiDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegateService.findByEntitat(entitatId);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DominiDto findByCodiAndEntitat(String codi, Long entitatId) throws NotFoundException {
 		return delegateService.findByCodiAndEntitat(codi, entitatId);
 
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ResultatDominiDto getResultDomini(Long entitatId, DominiDto domini, String filter, int page, int resultCount)
 			throws NotFoundException {
 		return delegateService.getResultDomini(entitatId, domini, filter, page, resultCount);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ResultatConsultaDto getSelectedDomini(Long entitatId, DominiDto domini, String dadaValor)
 			throws NotFoundException {
 		return delegateService.getSelectedDomini(entitatId, domini, dadaValor);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<DominiDto> findByMetaNodePermisLecturaAndTipusDomini(Long entitatId, MetaExpedientDto metaExpedient) {
 		return delegateService.findByMetaNodePermisLecturaAndTipusDomini(entitatId, metaExpedient);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void evictDominiCache() {
 		delegateService.evictDominiCache();
 	}

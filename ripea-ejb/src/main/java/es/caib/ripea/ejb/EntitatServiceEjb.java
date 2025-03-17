@@ -130,6 +130,7 @@ public class EntitatServiceEjb extends AbstractServiceEjb<EntitatService> implem
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public byte[] getLogo() throws NoSuchFileException, IOException {
 		return delegateService.getLogo();
 	}

@@ -2,6 +2,7 @@ package es.caib.ripea.ejb;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
@@ -26,6 +27,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public GrupDto create(
 			Long entitatId, 
 			GrupDto tipusDocumental) throws NotFoundException {
@@ -35,6 +37,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public GrupDto update(
 			Long entitatId, 
 			GrupDto tipusDocumental) throws NotFoundException {
@@ -44,6 +47,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public GrupDto delete(
 			Long entitatId, 
 			Long id) throws NotFoundException {
@@ -53,6 +57,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public GrupDto findById(
 			Long id) throws NotFoundException {
 		return delegateService.findById(
@@ -60,6 +65,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public ResultDto<GrupDto> findByEntitat(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -78,6 +84,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
 			Long metaExpedientId, 
@@ -92,6 +99,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void relacionarAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId, 
@@ -107,6 +115,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void desvincularAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId) {
@@ -117,12 +126,14 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<PermisDto> findPermisos(
 			Long id) {
 		return delegateService.findPermisos(id);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void updatePermis(
 			Long id,
 			PermisDto permis) {
@@ -130,6 +141,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void deletePermis(
 			Long id,
 			Long permisId) {
@@ -137,6 +149,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
     
 	@Override
+	@RolesAllowed("**")
 	public boolean checkIfAlreadyExistsWithCodi(
 			Long entitatId,
 			String codi, 
@@ -148,6 +161,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
     
 	@Override
+	@RolesAllowed("**")
 	public void marcarPerDefecte(
 			Long entitatId,
 			Long procedimentId,
@@ -159,6 +173,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
@@ -170,6 +185,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void esborrarPerDefecte(
 			Long entitatId,
 			Long procedimentId,
@@ -181,6 +197,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<GrupDto> findGrups(
 			Long entitatId,
 			Long organGestorId,
@@ -192,11 +209,13 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public GrupDto findGrupById(Long grupId) {
 		return delegateService.findGrupById(grupId);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public GrupDto findGrupByExpedientPeticioAndProcedimentId(
 			Long expedientPeticioId,
 			Long procedimentId) {
@@ -206,6 +225,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
 			Long entitatId,
 			String rolActual,
@@ -217,6 +237,7 @@ public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements G
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public boolean checkIfHasGrupPerDefecte(Long procedimentId) {
 		return delegateService.checkIfHasGrupPerDefecte(procedimentId);
 	}

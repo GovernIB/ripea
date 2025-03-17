@@ -38,6 +38,7 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void testEmailsAgrupats() {
 		delegateService.testEmailsAgrupats();
 	}
@@ -55,32 +56,38 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	}
 
     @Override
+    @RolesAllowed("**")
     public void actualitzarProcediments() {
         delegateService.actualitzarProcediments();
     }
 
     @Override
+    @RolesAllowed("**")
     public void consultaCanvisOrganigrama() {
         delegateService.consultaCanvisOrganigrama();
     }
     
 	@Override
+	@RolesAllowed("**")
 	public void reintentarCanviEstatDistribucio() {
 		delegateService.reintentarCanviEstatDistribucio();
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void enviarEmailPerComentariMetaExpedient() {
 		delegateService.enviarEmailPerComentariMetaExpedient();
 		
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void restartSchedulledTasks(String taskCodi) {
 		delegateService.restartSchedulledTasks(taskCodi);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void tancarExpedientsArxiu() {
 		delegateService.tancarExpedientsArxiu();
 	}
