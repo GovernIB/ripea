@@ -323,7 +323,7 @@ public class ConfigHelper {
     }
     
     @Transactional(readOnly = true)
-    public Properties getGroupPropertiesrGeneral(String groupCode) {
+    public Properties getGroupPropertiesGeneral(String groupCode) {
         Properties properties = new Properties();
         List<ConfigEntity> configsGeneral = configRepository.findByEntitatCodiIsNullAndGroupCode(groupCode);
         for (ConfigEntity configGeneral: configsGeneral) {

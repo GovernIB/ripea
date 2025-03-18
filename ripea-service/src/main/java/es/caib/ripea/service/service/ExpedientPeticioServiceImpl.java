@@ -47,15 +47,14 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.persistence.repository.RegistreRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DateHelper;
-import es.caib.ripea.service.helper.DistribucioHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
-import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -110,7 +109,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private GrupRepository grupRepository;
-	@Autowired private DistribucioHelper distribucioHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -460,7 +458,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 
 		try {
-			distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId,
+			pluginHelper.canviEstatAnotacio(anotacioRegistreId,
 					Estat.REBUTJADA,
 					observacions);
 			expedientPeticioEntity.setEstatCanviatDistribucio(true);

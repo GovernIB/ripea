@@ -22,7 +22,7 @@ public class AnotacioDistribucioHelper {
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
-	@Autowired private DistribucioHelper distribucioHelper;
+	@Autowired private PluginHelper pluginHelper;
 
 	public void consultarIGuardarAnotacioPeticioPendent(
 			Long expedientPeticioId,
@@ -53,7 +53,7 @@ public class AnotacioDistribucioHelper {
 					logger.info("anotacioGuardar consulta start (" + identificador + ", " + expedientPeticioId + ")");
 				
 				// obtain anotació from DISTRIBUCIO
-				AnotacioRegistreEntrada registre = distribucioHelper.getBackofficeIntegracioRestClient().consulta(anotacioRegistreId);
+				AnotacioRegistreEntrada registre = pluginHelper.consultaAnotacio(anotacioRegistreId);
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar consulta end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t2) + " ms");
@@ -80,7 +80,7 @@ public class AnotacioDistribucioHelper {
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
 
 				try {
-					distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
+					pluginHelper.canviEstatAnotacio(
 							anotacioRegistreId,
 							Estat.REBUDA,
 							"");
@@ -133,7 +133,7 @@ public class AnotacioDistribucioHelper {
 									3600));
 
 					// change state of anotació in DISTRIBUCIO to BACK_ERROR
-					distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
+					pluginHelper.canviEstatAnotacio(
 							anotacioRegistreId,
 							Estat.ERROR,
 							StringUtils.abbreviate(

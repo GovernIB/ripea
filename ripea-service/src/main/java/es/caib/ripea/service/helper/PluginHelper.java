@@ -37,6 +37,8 @@ import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -47,6 +49,9 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
 
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
 import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
 import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
@@ -75,6 +80,7 @@ import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
@@ -83,6 +89,7 @@ import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
@@ -98,6 +105,7 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
+import es.caib.ripea.plugin.distribucio.DistribucioPlugin;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
@@ -230,6 +238,7 @@ public class PluginHelper {
 	private Map<String, ProcedimentPlugin> procedimentPlugins = new HashMap<>();
 	private Map<String, FirmaWebPlugin> firmaSimpleWebPlugins = new HashMap<>();
 	private Map<String, SummarizePlugin> summarizePlugins = new HashMap<>();
+	private Map<String, DistribucioPlugin> distribucioPlugins = new HashMap<>();
 
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private IntegracioHelper integracioHelper;
@@ -245,6 +254,7 @@ public class PluginHelper {
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -5379,6 +5389,76 @@ public class PluginHelper {
 		}
 	}
 
+	public AnotacioRegistreEntrada consultaAnotacio(AnotacioRegistreId anotacioRegistreId) {
+		
+		String accioDescripcio = "Consulta les dades d'una anotació";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("clauAcces", anotacioRegistreId.getClauAcces());
+		accioParams.put("identificador", anotacioRegistreId.getIndetificador());
+		DistribucioPlugin distribucioPlugin = getDistribucioPlugin();
+		long t0 = System.currentTimeMillis();
+		
+		try {
+			
+			AnotacioRegistreEntrada resultat = distribucioPlugin.consulta(anotacioRegistreId);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DISTRIBUCIO,
+					accioDescripcio,
+					distribucioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return resultat;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al consulta les dades d'una anotació.";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DISTRIBUCIO,
+					accioDescripcio,
+					distribucioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
+		}
+	}
+	
+	public void canviEstatAnotacio(AnotacioRegistreId anotacioRegistreId, Estat estat, String obs) {
+		
+		String accioDescripcio = "Canvi estat d'una anotació";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("clauAcces", anotacioRegistreId.getClauAcces());
+		accioParams.put("identificador", anotacioRegistreId.getIndetificador());
+		accioParams.put("estat", estat.toString());
+		accioParams.put("observacions", obs);
+		DistribucioPlugin distribucioPlugin = getDistribucioPlugin();
+		long t0 = System.currentTimeMillis();
+		
+		try {
+			distribucioPlugin.canviEstat(anotacioRegistreId, estat, obs);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_DISTRIBUCIO,
+					accioDescripcio,
+					distribucioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al canviar estat d'una anotació.";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_DISTRIBUCIO,
+					accioDescripcio,
+					distribucioPlugin.getEndpointURL(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
+		}
+	}
+	
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(
 			UnitatOrganitzativa unitatOrganitzativa,
 			List<UnitatOrganitzativa> unitatsOrganitzatives,
@@ -6250,7 +6330,7 @@ public class PluginHelper {
 		
 		try {
 			Class<?> clazz = Class.forName( pluginClass);
-			Properties props = configHelper.getGroupPropertiesrGeneral(IntegracioHelper.INTCODI_USUARIS);
+			Properties props = configHelper.getGroupPropertiesGeneral(IntegracioHelper.INTCODI_USUARIS);
 			dadesUsuariPlugin = (DadesUsuariPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance("es.caib.ripea.plugin.dades.usuari.", props);
@@ -6635,6 +6715,45 @@ public class PluginHelper {
 		}
 		String organCodi = configHelper.getOrganActualCodi();
 		return getDadesExternesPlugin(entitatCodi, organCodi);
+	}
+	
+	private DistribucioPlugin getDistribucioPlugin() {
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			entitatCodi = "_BACKGROUND_";
+		}
+		String organCodi = configHelper.getOrganActualCodi();
+		return getDistribucioPlugin(entitatCodi, organCodi);
+	}
+	
+	private DistribucioPlugin getDistribucioPlugin(String entitatCodi, String organCodi) {
+
+		DistribucioPlugin plugin = distribucioPlugins.get(entitatCodi);
+		if (plugin != null) { return plugin; }
+		
+		String pluginClass = getPropertyPluginDistribucioClass();
+		
+		if (StringUtils.isEmpty(pluginClass)) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, "No està configurada la classe per al plugin de distribucio");
+		}
+		
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			
+			Properties props = null;
+			if (entitatCodi==null || entitatCodi.equals("_BACKGROUND_")) {
+				props = configHelper.getGroupPropertiesGeneral(IntegracioHelper.INTCODI_DISTRIBUCIO);
+			} else {
+				props = configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_DISTRIBUCIO, entitatCodi);
+			}
+			
+			plugin = (DistribucioPlugin) clazz.getDeclaredConstructor(String.class, Properties.class).newInstance(ConfigDto.prefix + ".", props);
+			distribucioPlugins.put(entitatCodi,plugin);
+			return plugin;
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, "Error al crear la instància del plugin de consulta de distribucio", ex);
+		}
 	}
 	
 	private DadesExternesPlugin getDadesExternesPlugin(String entitatCodi, String organCodi) {
@@ -7380,6 +7499,10 @@ public class PluginHelper {
 	private String getPropertyPluginViaFirma() {
 		return configHelper.getConfig(PropertyConfig.VIAFIRMA_PLUGIN_CLASS);
 	}
+	
+	private String getPropertyPluginDistribucioClass() {
+		return configHelper.getConfig(PropertyConfig.DISTRIBUCIO_PLUGIN_CLASS);
+	}
 
 	public boolean getPropertyArxiuMetadadesAddicionalsActiu() {
 		return configHelper.getAsBoolean(PropertyConfig.ARXIU_PLUGIN_METADADES_ADICIONALS);
@@ -7639,7 +7762,34 @@ public class PluginHelper {
 			}
 		} catch (Exception ex) {
 			return ex.getMessage();
-		}		
+		}	
+	}
+	
+	public String distribucioDiagnostic(DiagnosticFiltreDto filtre) {
+		try {
+			DistribucioPlugin dP = getDistribucioPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
+			
+			Pageable pageable = PageRequest.of(0, 1);
+			List<ExpedientPeticioEntity> epe = expedientPeticioRepository.findLastAnotacioRebuda(pageable).getContent();
+			
+			if (epe!=null && epe.size()>0) {
+				AnotacioRegistreId ar = new AnotacioRegistreId();
+				ar.setClauAcces(epe.get(0).getClauAcces());
+				ar.setIndetificador(epe.get(0).getIdentificador());
+				
+				AnotacioRegistreEntrada resultat = dP.consulta(ar);
+				
+				if (resultat!=null && resultat.getIdentificador()!=null) {
+					return null;
+				} else {
+					return "La consulta no ha retornat cap anotació.";
+				}
+			} else {
+				return "No hi ha dades de cap anotació per consultar.";
+			}
+		} catch (Exception ex) {
+			return ex.getMessage();
+		}	
 	}
 	
 	//Els fitxers han de estar a la ruta src/main/resources/es/caib/ripea/core

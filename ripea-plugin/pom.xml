@@ -15,6 +15,10 @@
 			<artifactId>spring-boot-starter-json</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>es.caib.distribucio</groupId>
+			<artifactId>distribucio-rest-client</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>

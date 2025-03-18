@@ -1,11 +1,8 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,12 +10,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 
 @Component
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 
+	@Query(	"select d from ExpedientPeticioEntity d order by data_alta desc")
+	Page<ExpedientPeticioEntity> findLastAnotacioRebuda(Pageable pageable);
+	
 	@Query("select peticio.registre.id from ExpedientPeticioEntity peticio where peticio.id = :id")
 	Long getRegistreId(@Param("id") Long id);
 

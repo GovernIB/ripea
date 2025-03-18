@@ -32,7 +32,7 @@ public class OrganGestorServiceEjb extends AbstractServiceEjb<OrganGestorService
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("**")
 	public List<OrganGestorDto> findAll() {
 		return delegateService.findAll();
 	}
