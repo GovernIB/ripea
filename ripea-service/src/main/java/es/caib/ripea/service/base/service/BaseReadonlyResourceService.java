@@ -234,7 +234,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			Class<P> formClass = (Class<P>)artifact.getFormClass();
 			Field field = ReflectionUtils.findField(formClass, fieldName);
 			if (field != null) {
-				return onChangeLogicProcessRecursive(
+				return onChangeProcessRecursiveLogic(
 						previous,
 						fieldName,
 						fieldValue,
@@ -481,7 +481,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
-	protected <P extends Serializable> Map<String, Object> onChangeLogicProcessRecursive(
+	protected <P extends Serializable> Map<String, Object> onChangeProcessRecursiveLogic(
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -532,7 +532,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 								previousFieldNamesWithChangedFieldName.addAll(Arrays.asList(previousFieldNames));
 							}
 							previousFieldNamesWithChangedFieldName.add(fieldName);
-							Map<String, Object> changesPerField = onChangeLogicProcessRecursive(
+							Map<String, Object> changesPerField = onChangeProcessRecursiveLogic(
 									previousWithChanges,
 									changedFieldName,
 									changes.get(changedFieldName),

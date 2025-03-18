@@ -155,7 +155,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				answers);
 		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
 		if (field != null) {
-			return onChangeLogicProcessRecursive(
+			return onChangeProcessRecursiveLogic(
 					previous,
 					fieldName,
 					fieldValue,
@@ -219,11 +219,11 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		List<ResourceArtifact> artifacts = new ArrayList<>(super.artifactFindAll(type));
 		if (type == null || type == ResourceArtifactType.ACTION) {
 			artifacts.addAll(
-					actionExecutorMap.entrySet().stream().
-							map(r -> new ResourceArtifact(
+					actionExecutorMap.keySet().stream().
+							map(actionExecutor -> new ResourceArtifact(
 									ResourceArtifactType.ACTION,
-									r.getKey(),
-									artifactGetFormClass(ResourceArtifactType.ACTION, r.getKey()))).
+									actionExecutor,
+									artifactGetFormClass(ResourceArtifactType.ACTION, actionExecutor))).
 							collect(Collectors.toList()));
 		}
 		return artifacts;
