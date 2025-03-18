@@ -12,6 +12,8 @@ import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -53,7 +55,7 @@ import es.caib.ripea.service.helper.DistribucioHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
-import es.caib.ripea.service.helper.ExpedientPeticioHelper0;
+import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -105,7 +107,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
-	@Autowired private ExpedientPeticioHelper0 expedientPeticioHelper0;
+	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private DistribucioHelper distribucioHelper;
@@ -282,7 +284,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	public void comunicadaReprocessar(Long expedientPeticioId) throws Throwable {
 
 		synchronized (SynchronizationHelper.get0To99Lock(expedientPeticioId, SynchronizationHelper.locksAnnotacions)) {
-			expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);
+			anotacioDistribucioHelper.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);
 		}
 	}
 
@@ -935,4 +937,42 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return Long.valueOf(configHelper.getConfig(PropertyConfig.PERIODE_ACTUALITZACIO_ANOTACIO_PENDENT, "150"));
 	}
 
+
+	@Override
+	@Transactional
+	public void crearExpedientPeticion(List<es.caib.distribucio.ws.backoffice.AnotacioRegistreId> anotacioRegistreIds) {
+		
+		if (anotacioRegistreIds!=null) {
+		
+			for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : anotacioRegistreIds) {
+	
+				long t3 = System.currentTimeMillis();
+				
+				try {
+				
+					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+						logger.info("Comunicant anotació start: " + anotacioRegistreId.getIndetificador());
+						
+					Long peticioId = expedientPeticioRepository.findIdByIdentificador(anotacioRegistreId.getIndetificador());
+					
+					if (peticioId == null) {
+						expedientPeticioHelper.crearExpedientPeticion(anotacioRegistreId);
+					} else {
+						synchronized (SynchronizationHelper.get0To99Lock(peticioId, SynchronizationHelper.locksAnnotacions)) {
+							expedientPeticioHelper.resetExpedientPeticion(peticioId);
+						}
+					}
+					
+					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+						logger.info("Comunicant anotació end: " + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms");
+				
+				} catch (Throwable e) {
+					logger.error("Error comunicant anotació:" + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms", e);
+					throw e;
+				}
+			}
+		}
+	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
 }

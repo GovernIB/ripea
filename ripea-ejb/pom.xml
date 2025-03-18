@@ -10,6 +10,12 @@
 	</parent>
 	<artifactId>ripea-ejb</artifactId>
 	<dependencies>
+<!--		<dependency>-->
+<!--		    <groupId>org.jboss.eap</groupId>-->
+<!--		    <artifactId>wildfly-ejb3</artifactId>-->
+<!--		    <version>7.2.0.GA-redhat-00005</version>-->
+<!--		    <scope>provided</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
@@ -22,10 +28,10 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-acl</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>es.caib.portafib</groupId>
-			<artifactId>portafib-ws-callback-api</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>es.caib.portafib</groupId>-->
+<!--			<artifactId>portafib-ws-callback-api</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>

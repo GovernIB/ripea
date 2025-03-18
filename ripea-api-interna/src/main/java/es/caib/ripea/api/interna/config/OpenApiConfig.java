@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.api.interna.config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -16,11 +13,6 @@ import java.io.IOException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-/**
- * Configuració de Springdoc OpenAPI.
- * 
- * @author Limit Tecnologies
- */
 @Slf4j
 @Configuration("apiInternaOpenApiConfig")
 @SecurityScheme(
@@ -47,5 +39,4 @@ public class OpenApiConfig {
 				version(version));
 		return openapi;
 	}
-
 }

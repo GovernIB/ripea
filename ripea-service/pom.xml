@@ -99,10 +99,10 @@
 			<groupId>es.caib.portafib</groupId>
 			<artifactId>portafib-ws-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>es.caib.portafib</groupId>
-			<artifactId>portafib-ws-callback-api</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>es.caib.portafib</groupId>-->
+<!--			<artifactId>portafib-ws-callback-api</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
 			<artifactId>orika-core</artifactId>

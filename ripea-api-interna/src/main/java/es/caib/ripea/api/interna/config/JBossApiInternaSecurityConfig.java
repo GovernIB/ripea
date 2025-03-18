@@ -1,14 +1,17 @@
-/**
- * 
- */
-package es.caib.ripea.back.config;
+package es.caib.ripea.api.interna.config;
 
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTParser;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken.Access;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,10 +44,13 @@ import org.springframework.security.web.authentication.preauth.j2ee.J2eePreAuthe
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.time.Instant;
-import java.util.*;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
+
+import es.caib.ripea.service.intf.config.BaseConfig;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configuració de Spring Security per a desplegar l'aplicació sobre JBoss.
@@ -55,7 +61,7 @@ import java.util.*;
 @Configuration
 @EnableWebSecurity
 @ConditionalOnWarDeployment
-public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
+public class JBossApiInternaSecurityConfig extends BaseApiInternaSecurityConfig {
 
 	@Value("${es.caib.ripea.security.mappableRoles:" +
 			BaseConfig.ROLE_SUPER + "," +
@@ -67,8 +73,14 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 			BaseConfig.ROLE_REVISIO + "," +
 			BaseConfig.ROLE_USER + "}")
 	private String mappableRoles;
+	
 	@Value("${es.caib.ripea.security.nameAttributeKey:preferred_username}")
 	private String nameAttributeKey;
+	
+	/** En el cas de les APIs REST els rols solen estar en el resource access a nivell de client i depén de la configuració de la publicació al JBoss. Si es vol
+	 * agafar del client amb un resource access concret s'ha d'informar la següent propietat. */
+	@Value("${es.caib.ripea.security.resourceAcces.api-interna:#{null}}")
+	private String resourceAccess;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -83,9 +95,6 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 				permitAll(false));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll().
-//				requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER).
-//				requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN).
-//				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).
 				anyRequest().authenticated();
 		http.headers().frameOptions().sameOrigin();
 		http.csrf().disable();
@@ -131,6 +140,7 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 	@Bean
 	public AuthenticationDetailsSource<HttpServletRequest, PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails> authenticationDetailsSource() {
 		J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource authenticationDetailsSource = new J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource() {
+			
 			@Override
 			public PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails buildDetails(HttpServletRequest context) {
 				Collection<String> j2eeUserRoles = getUserRoles(context);
@@ -140,14 +150,30 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 				logger.debug("Roles from ServletRequest for " + context.getUserPrincipal().getName() + ": " + j2eeUserRoles);
 				PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails result;
 				if (context.getUserPrincipal() instanceof KeycloakPrincipal) {
+					logger.debug("Info from KeycloakPrincipal " + context.getUserPrincipal());
 					KeycloakPrincipal<?> keycloakPrincipal = ((KeycloakPrincipal<?>)context.getUserPrincipal());
 					keycloakPrincipal.getKeycloakSecurityContext().getIdTokenString();
 					Set<String> roles = new HashSet<>();
 					roles.addAll(j2eeUserRoles);
-					Access realmAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getRealmAccess();
-					if (realmAccess != null && realmAccess.getRoles() != null) {
-						logger.debug("Keycloak token realm roles: " + realmAccess.getRoles());
-						realmAccess.getRoles().stream().map(r -> ROLE_PREFIX + r).forEach(roles::add);
+					if (getResourceAccess() == null) {
+						// Rols a nivell de realm
+						Access realmAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getRealmAccess();
+						if (realmAccess != null && realmAccess.getRoles() != null) {
+							logger.debug("Keycloak token realm roles: " + realmAccess.getRoles());
+							realmAccess.getRoles().stream().map(r -> ROLE_PREFIX + r).forEach(roles::add);
+						}
+					} else {
+						// Rols a nivell de client
+						Map<String, Access> resourceAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getResourceAccess();
+						if (resourceAccess != null) {
+							Access access = resourceAccess.get(getResourceAccess());
+							logger.debug("Keycloak token resource roles for resource " + getResourceAccess() + ": " + access + " and roles " + (access != null ? access.getRoles() : "(null)"));
+							if (access != null && access.getRoles() != null) {
+								access.getRoles().stream().map(r -> ROLE_PREFIX + r).forEach(roles::add);
+							} else {
+								logger.error("No s'ha trobat informació de rols pel recurs " + getResourceAccess() + ". Altres resources: " + resourceAccess.keySet() + ".");
+							}
+						}
 					}
 					logger.debug("Creating WebAuthenticationDetails for " + keycloakPrincipal.getName() + " with roles " + roles);
 					result = new PreauthOidcWebAuthenticationDetails(
@@ -163,6 +189,7 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 				return result;
 			}
 		};
+		
 		SimpleMappableAttributesRetriever mappableAttributesRetriever = new SimpleMappableAttributesRetriever();
 		mappableAttributesRetriever.setMappableAttributes(new HashSet<>(Arrays.asList(mappableRoles.split(","))));
 		authenticationDetailsSource.setMappableRolesRetriever(mappableAttributesRetriever);
@@ -242,6 +269,10 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 		public String getName() {
 			return getUsername();
 		}
+	}
+
+	protected String getResourceAccess() {
+		return resourceAccess;
 	}
 
 }

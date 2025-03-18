@@ -265,6 +265,11 @@
 			<name>Viavansi Maven Repository</name>
 			<url>http://repositorio.viavansi.com/repo</url>
 		</repository>
+		<repository>
+			<id>redhat-repo</id>
+			<name>Redhat GA Repository</name>
+			<url>https://maven.repository.redhat.com/ga/</url>
+		</repository>		
 	</repositories>
 	<build>
 		<plugins>
