@@ -1,87 +1,14 @@
 package es.caib.ripea.back.base.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.MonthDay;
-import java.time.YearMonth;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.groups.Default;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.TemplateVariable;
-import org.springframework.hateoas.TemplateVariable.VariableType;
-import org.springframework.hateoas.TemplateVariables;
-import org.springframework.hateoas.UriTemplate;
-import org.springframework.hateoas.mediatype.Affordances;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.SmartValidator;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import es.caib.ripea.back.base.config.WebMvcBaseConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.ArtifactFormNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
-import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
@@ -97,6 +24,48 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.hateoas.*;
+import org.springframework.hateoas.TemplateVariable.VariableType;
+import org.springframework.hateoas.mediatype.Affordances;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.SmartValidator;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.groups.Default;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * <p>Classe base pels controladors de l'API REST que conté els mètodes
@@ -953,7 +922,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
 		if (artifact.getFormClass() != null) {
 			Link validateLink = Affordances.
-					of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withSelfRel()).
+					of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("validate")).
 					afford(HttpMethod.POST).
 					withInputAndOutput(artifact.getFormClass()).
 					withName("validate").
