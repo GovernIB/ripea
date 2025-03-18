@@ -350,7 +350,6 @@ export const Form: React.FC<FormProps> = (props) => {
                 setFields(apiCurrentFields);
             } else if (resourceTypeCode != null) {
                 apiArtifacts({}).then((artifacts: any[]) => {
-                    console.log('>>> artifacts', artifacts)
                     const artifact = artifacts.find((a: any) => a.type === resourceType.toUpperCase() && a.code === resourceTypeCode);
                     if (artifact != null) {
                         if (artifact.formClassActive) {
