@@ -215,7 +215,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		throw new ArtifactNotFoundException(getResourceClass(), type, code);
 	}
 
-	// TODO
+	@Override
+	@Transactional(readOnly = true)
 	public <P extends Serializable> Map<String, Object> artifactOnChange(
 			ResourceArtifactType type,
 			String code,
@@ -238,7 +239,20 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 						fieldName,
 						fieldValue,
 						null,
-						null,
+						(previous1,
+						 fieldName1,
+						 fieldValue1,
+						 answers1,
+						 previousFieldNames,
+						 target) -> internalArtifactOnChange(
+								type,
+								code,
+								previous1,
+								fieldName1,
+								fieldValue1,
+								answers1,
+								previousFieldNames,
+								target),
 						answers);
 			} else {
 				throw new ResourceFieldNotFoundException(formClass, fieldName);
@@ -491,13 +505,15 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				return invocation.proceed();
 			});
 			P target = (P)factory.getProxy();
-			onChangeLogicProcessor.onChange(
-					previous,
-					fieldName,
-					fieldValue,
-					answers,
-					previousFieldNames,
-					target);
+			if (onChangeLogicProcessor != null) {
+				onChangeLogicProcessor.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldNames,
+						target);
+			}
 			if (!changes.isEmpty()) {
 				changesToReturn = new HashMap<>(changes);
 				for (String changedFieldName : changes.keySet()) {
@@ -630,6 +646,40 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					2);
 		}
 		return entityClass;
+	}
+
+	protected <P extends Serializable> void internalArtifactOnChange(
+			ResourceArtifactType type,
+			String code,
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			String[] previousFieldsChanged,
+			P target) {
+		if (type == ResourceArtifactType.REPORT) {
+			ReportDataGenerator<P, ?> reportDataGenerator = (ReportDataGenerator<P, ?>)reportDataGeneratorMap.get(code);
+			if (reportDataGenerator != null) {
+				reportDataGenerator.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldsChanged,
+						target);
+			}
+		} else if (type == ResourceArtifactType.FILTER) {
+			FilterProcessor<P> filterProcessor = (FilterProcessor<P>)filterProcessorMap.get(code);
+			if (filterProcessor != null) {
+				filterProcessor.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldsChanged,
+						target);
+			}
+		}
 	}
 
 	protected void register(
@@ -1032,7 +1082,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
 	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<R> {
+	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
 		/**
 		 * Genera les dades per l'informe.
 		 *

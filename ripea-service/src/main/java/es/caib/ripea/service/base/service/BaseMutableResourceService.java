@@ -147,7 +147,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			R previous,
 			String fieldName,
 			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers) throws AnswerRequiredException {
+			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceFieldNotFoundException, AnswerRequiredException {
 		log.debug("Processing onChange event (previous={}, fieldName={}, fieldValue={}, answers={})",
 				previous,
 				fieldName,
@@ -164,6 +164,39 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 					answers);
 		} else {
 			throw new ResourceFieldNotFoundException(getResourceClass(), fieldName);
+		}
+	}
+
+	@Override
+	protected <P extends Serializable> void internalArtifactOnChange(
+			ResourceArtifactType type,
+			String code,
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			String[] previousFieldsChanged,
+			P target) {
+		super.internalArtifactOnChange(
+				type,
+				code,
+				previous,
+				fieldName,
+				fieldValue,
+				answers,
+				previousFieldsChanged,
+				target);
+		if (type == ResourceArtifactType.ACTION) {
+			ActionExecutor<P, ?> actionExecutor = (ActionExecutor<P, ?>)actionExecutorMap.get(code);
+			if (actionExecutor != null) {
+				actionExecutor.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldsChanged,
+						target);
+			}
 		}
 	}
 
