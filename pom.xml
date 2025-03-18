@@ -27,8 +27,8 @@
 		<module>ripea-back</module>
 		<module>ripea-api-interna</module>
 		<module>ripea-ear</module>
+		<module>ripea-plugin-intf</module>
 		<module>ripea-plugin</module>
-		<module>ripea-plugin-impl</module>
         <module>ripea-backend</module>
 <!--        <module>ripea-spring-bom</module>-->
     </modules>

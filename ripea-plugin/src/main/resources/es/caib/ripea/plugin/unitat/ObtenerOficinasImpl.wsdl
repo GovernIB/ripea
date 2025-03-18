@@ -1,0 +1,107 @@
+<wsdl:definitions xmlns:ns1="http://schemas.xmlsoap.org/wsdl/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.caib.es/dir3caib" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ObtenerOficinasService" targetNamespace="http://www.caib.es/dir3caib">
+<wsdl:types>
+<xs:schema xmlns:tns="http://www.caib.es/dir3caib" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" targetNamespace="http://www.caib.es/dir3caib" version="1.0">
+<xs:element name="obtenerArbolOficinas" type="tns:obtenerArbolOficinas"/>
+<xs:element name="obtenerArbolOficinasResponse" type="tns:obtenerArbolOficinasResponse"/>
+<xs:element name="obtenerOficina" type="tns:obtenerOficina"/>
+<xs:element name="obtenerOficinaResponse" type="tns:obtenerOficinaResponse"/>
+<xs:complexType name="obtenerArbolOficinas">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+<xs:element minOccurs="0" name="arg1" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="obtenerArbolOficinasResponse">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:oficinaTF"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="oficinaTF">
+<xs:sequence>
+<xs:element minOccurs="0" name="codOfiResponsable" type="xs:string"/>
+<xs:element minOccurs="0" name="codUoResponsable" type="xs:string"/>
+<xs:element minOccurs="0" name="codigo" type="xs:string"/>
+<xs:element minOccurs="0" name="denominacion" type="xs:string"/>
+<xs:element minOccurs="0" name="estado" type="xs:string"/>
+<xs:element minOccurs="0" name="nivelAdministracion" type="xs:long"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="organizativasOfi" nillable="true" type="tns:relacionOrganizativaOfiTF"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="sirOfi" nillable="true" type="tns:relacionSirOfiTF"/>
+<xs:element minOccurs="0" name="tipoOficina" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="relacionOrganizativaOfiTF">
+<xs:sequence>
+<xs:element minOccurs="0" name="estado" type="xs:string"/>
+<xs:element minOccurs="0" name="oficina" type="xs:string"/>
+<xs:element minOccurs="0" name="unidad" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="relacionSirOfiTF">
+<xs:sequence>
+<xs:element minOccurs="0" name="estado" type="xs:string"/>
+<xs:element minOccurs="0" name="oficina" type="xs:string"/>
+<xs:element minOccurs="0" name="unidad" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="obtenerOficina">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+<xs:element minOccurs="0" name="arg1" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="obtenerOficinaResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:oficinaTF"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+</wsdl:types>
+<wsdl:message name="obtenerOficinaResponse">
+<wsdl:part element="tns:obtenerOficinaResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="obtenerOficina">
+<wsdl:part element="tns:obtenerOficina" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="obtenerArbolOficinas">
+<wsdl:part element="tns:obtenerArbolOficinas" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="obtenerArbolOficinasResponse">
+<wsdl:part element="tns:obtenerArbolOficinasResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:portType name="ObtenerOficinas">
+<wsdl:operation name="obtenerArbolOficinas">
+<wsdl:input message="tns:obtenerArbolOficinas" name="obtenerArbolOficinas"></wsdl:input>
+<wsdl:output message="tns:obtenerArbolOficinasResponse" name="obtenerArbolOficinasResponse"></wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="obtenerOficina">
+<wsdl:input message="tns:obtenerOficina" name="obtenerOficina"></wsdl:input>
+<wsdl:output message="tns:obtenerOficinaResponse" name="obtenerOficinaResponse"></wsdl:output>
+</wsdl:operation>
+</wsdl:portType>
+<wsdl:binding name="ObtenerOficinasServiceSoapBinding" type="tns:ObtenerOficinas">
+<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="obtenerArbolOficinas">
+<soap:operation soapAction="" style="document"/>
+<wsdl:input name="obtenerArbolOficinas">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="obtenerArbolOficinasResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="obtenerOficina">
+<soap:operation soapAction="" style="document"/>
+<wsdl:input name="obtenerOficina">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="obtenerOficinaResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:service name="ObtenerOficinasService">
+<wsdl:port binding="tns:ObtenerOficinasServiceSoapBinding" name="ObtenerOficinas">
+<soap:address location="http://10.215.9.158:48080/dir3caib/ws/ObtenerOficinasImpl"/>
+</wsdl:port>
+</wsdl:service>
+</wsdl:definitions>

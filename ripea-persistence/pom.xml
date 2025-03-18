@@ -44,7 +44,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin</artifactId>
+			<artifactId>ripea-plugin-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

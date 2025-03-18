@@ -207,7 +207,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin-impl</artifactId>
+			<artifactId>ripea-plugin-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

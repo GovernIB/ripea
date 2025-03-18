@@ -121,4 +121,12 @@ public class ExpedientComentariResourceServiceEjb extends AbstractServiceEjb<Exp
 			throws ArtifactNotFoundException, ReportGenerationException {
 		return reportGenerate(code, params);
 	}
+
+	@Override
+	@RolesAllowed("**")
+	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
+			P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
+			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
+		return artifactOnChange(type, code, previous, fieldName, fieldValue, answers);
+	}
 }
