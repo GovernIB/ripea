@@ -527,15 +527,11 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 const resourceApiArtifacts: ResourceApiArtifact[] = embeddedArtifacts.map((a: any) => {
                     const actionRel = getActionRelFromArtifact(a);
                     const fields = a.formClassActive ? state.action(actionRel)?.fields as any[] : undefined;
-                    const mappedFields = fields?.map(f => ({
-                        ...f,
-                        type: f.type === 'search' ? 'select' : f.type
-                    }));
                     return {
                         type: a.type,
                         code: a.code,
                         formClassActive: a.formClassActive,
-                        fields: mappedFields
+                        fields,
                     };
                 });
                 resolve(resourceApiArtifacts);

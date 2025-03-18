@@ -81,12 +81,11 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException, ResourceNotDeletedException, AnswerRequiredException;
 
 	/**
-	 * Processament en el backend dels canvis en els camps dels recursos que
-	 * es generen al front.
-	 * En aquest mètode no es faran modificacions al recurs sinó que
-	 * únicament es processaran els canvis fets en el front. Aquests
-	 * canvis es poden propagar com a canvis en altres camps, del
-	 * recurs, que es retornaran com a resposta.
+	 * Processament en el backend dels canvis en els camps dels recursos.
+	 * En aquest mètode no es faran modificacions al recurs sinó que únicament
+	 * es processaran els canvis fets en el front. Aquests canvis es poden
+	 * propagar com a canvis en altres camps, del recurs, que es retornaran com
+	 * a resposta.
 	 *
 	 * @param previous
 	 *            informació del recurs abans del canvi.
@@ -97,6 +96,8 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	 * @param answers
 	 *            respostes a les preguntes formulades en el front.
 	 * @return un map amb els canvis resultants de processar la petició.
+	 * @throws ResourceFieldNotFoundException
+	 *            si no es troba el camp especificat.
 	 * @throws AnswerRequiredException
 	 *            si es requereix alguna resposta addicional de l'usuari.
 	 */
@@ -104,7 +105,7 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 			R previous,
 			String fieldName,
 			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers) throws AnswerRequiredException;
+			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceFieldNotFoundException, AnswerRequiredException;
 
 	/**
 	 * Executa l'acció amb el codi especificat.

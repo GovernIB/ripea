@@ -7,13 +7,17 @@ import es.caib.ripea.service.base.helper.ResourceEntityMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.*;
 import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
+import es.caib.ripea.service.intf.base.util.StringUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -55,7 +59,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	private Class<R> resourceClass;
 	private Class<E> entityClass;
 	private final Map<String, ReportDataGenerator<?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
-	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>();
+	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>(); // TODO
 	private final Map<String, PerspectiveApplicator<R, E>> perspectiveApplicatorMap = new HashMap<>();
 	private final Map<String, FieldDownloader<E>> fieldDownloaderMap = new HashMap<>();
 
@@ -209,6 +213,54 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			}
 		}
 		throw new ArtifactNotFoundException(getResourceClass(), type, code);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public <P extends Serializable> Map<String, Object> artifactOnChange(
+			ResourceArtifactType type,
+			String code,
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers) throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
+		log.debug("Processing onChange event (previous={}, fieldName={}, fieldValue={}, answers={})",
+				previous,
+				fieldName,
+				fieldValue,
+				answers);
+		ResourceArtifact artifact = artifactGetOne(type, code);
+		if (artifact.getFormClass() != null) {
+			Class<P> formClass = (Class<P>)artifact.getFormClass();
+			Field field = ReflectionUtils.findField(formClass, fieldName);
+			if (field != null) {
+				return onChangeProcessRecursiveLogic(
+						previous,
+						fieldName,
+						fieldValue,
+						null,
+						(previous1,
+						 fieldName1,
+						 fieldValue1,
+						 answers1,
+						 previousFieldNames,
+						 target) -> internalArtifactOnChange(
+								type,
+								code,
+								previous1,
+								fieldName1,
+								fieldValue1,
+								answers1,
+								previousFieldNames,
+								target),
+						answers);
+			} else {
+				throw new ResourceFieldNotFoundException(formClass, fieldName);
+			}
+		} else {
+			log.warn("Couldn't find form class for artifact (resourceClass={}, type={}, code={})", getResourceClass(), type, code);
+			return new HashMap<>();
+		}
 	}
 
 	@Override
@@ -429,6 +481,113 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	protected <P extends Serializable> Map<String, Object> onChangeProcessRecursiveLogic(
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			String[] previousFieldNames,
+			OnChangeLogicProcessor<P> onChangeLogicProcessor,
+			Map<String, AnswerRequiredException.AnswerValue> answers) {
+		Map<String, Object> changesToReturn = null;
+		P newInstance = (P)newClassInstance(previous.getClass());
+		if (newInstance != null) {
+			Map<String, Object> changes = new HashMap<>();
+			ProxyFactory factory = new ProxyFactory(newInstance);
+			factory.setProxyTargetClass(true);
+			factory.addAdvice((MethodInterceptor) invocation -> {
+				String methodName = invocation.getMethod().getName();
+				Object[] arguments = invocation.getArguments();
+				if (methodName.startsWith("set") && arguments.length > 0) {
+					changes.put(
+							StringUtil.decapitalize(methodName.substring("set".length())),
+							arguments[0]);
+				}
+				return invocation.proceed();
+			});
+			P target = (P)factory.getProxy();
+			if (onChangeLogicProcessor != null) {
+				onChangeLogicProcessor.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldNames,
+						target);
+			}
+			if (!changes.isEmpty()) {
+				changesToReturn = new HashMap<>(changes);
+				for (String changedFieldName : changes.keySet()) {
+					Field changedField = ReflectionUtils.findField(previous.getClass(), changedFieldName);
+					if (changedField != null) {
+						ResourceField fieldAnnotation = changedField.getAnnotation(ResourceField.class);
+						if (fieldAnnotation != null && fieldAnnotation.onChangeActive()) {
+							P previousWithChanges = (P)cloneObjectWithFieldsMap(
+									previous,
+									fieldName,
+									fieldValue,
+									changes,
+									changedFieldName);
+							List<String> previousFieldNamesWithChangedFieldName = new ArrayList<>();
+							if (previousFieldNames != null) {
+								previousFieldNamesWithChangedFieldName.addAll(Arrays.asList(previousFieldNames));
+							}
+							previousFieldNamesWithChangedFieldName.add(fieldName);
+							Map<String, Object> changesPerField = onChangeProcessRecursiveLogic(
+									previousWithChanges,
+									changedFieldName,
+									changes.get(changedFieldName),
+									previousFieldNamesWithChangedFieldName.toArray(new String[0]),
+									onChangeLogicProcessor,
+									answers);
+							if (changesPerField != null) {
+								changesToReturn.putAll(changesPerField);
+							}
+						}
+					}
+				}
+			}
+		}
+		return changesToReturn;
+	}
+
+	protected Object cloneObjectWithFieldsMap(
+			Object resource,
+			String fieldName,
+			Object fieldValue,
+			Map<String, Object> fields,
+			String excludeField) {
+		Object clonedResource = objectMappingHelper.clone(resource);
+		try {
+			Field field = resource.getClass().getDeclaredField(fieldName);
+			ReflectionUtils.makeAccessible(field);
+			ReflectionUtils.setField(field, clonedResource, fieldValue);
+		} catch (Exception ex) {
+			log.error("Processing onChange request: couldn't find field {} on resource {}",
+					fieldName,
+					resource.getClass().getName(),
+					ex);
+		}
+		fields.forEach((k, v) -> {
+			if (!k.equals(excludeField)) {
+				Field field = ReflectionUtils.findField(resource.getClass(), k);
+				if (field != null) {
+					ReflectionUtils.makeAccessible(field);
+					ReflectionUtils.setField(field, clonedResource, v);
+				}
+			}
+		});
+		return clonedResource;
+	}
+
+	protected <C> C newClassInstance(Class<C> clazz) {
+		try {
+			return clazz.getDeclaredConstructor().newInstance();
+		} catch (Exception ex) {
+			log.error("Couldn't create new resource instance (resourceClass={})", getResourceClass(), ex);
+			return null;
+		}
+	}
+
 	protected String additionalSpringFilter(
 			String currentSpringFilter,
 			String[] namedQueries) {
@@ -487,6 +646,40 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					2);
 		}
 		return entityClass;
+	}
+
+	protected <P extends Serializable> void internalArtifactOnChange(
+			ResourceArtifactType type,
+			String code,
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			String[] previousFieldsChanged,
+			P target) {
+		if (type == ResourceArtifactType.REPORT) {
+			ReportDataGenerator<P, ?> reportDataGenerator = (ReportDataGenerator<P, ?>)reportDataGeneratorMap.get(code);
+			if (reportDataGenerator != null) {
+				reportDataGenerator.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldsChanged,
+						target);
+			}
+		} else if (type == ResourceArtifactType.FILTER) {
+			FilterProcessor<P> filterProcessor = (FilterProcessor<P>)filterProcessorMap.get(code);
+			if (filterProcessor != null) {
+				filterProcessor.onChange(
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldsChanged,
+						target);
+			}
+		}
 	}
 
 	protected void register(
@@ -742,13 +935,17 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				if (filterFieldPrefix != null) {
 					springFilter.append(filterFieldPrefix);
 				}
+				springFilter.append("lower(");
 				springFilter.append(fieldName);
-				springFilter.append("~~");
+				springFilter.append(")");
+				springFilter.append("~");
+				springFilter.append("lower(");
 				springFilter.append("'");
-				springFilter.append("*");
+				springFilter.append("%");
 				springFilter.append(cleanReservedFilterCharacters(quickFilter));
-				springFilter.append("*");
+				springFilter.append("%");
 				springFilter.append("'");
+				springFilter.append(")");
 			}
 			return springFilter.toString();
 		} else {
@@ -885,7 +1082,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
 	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<R> {
+	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
 		/**
 		 * Genera les dades per l'informe.
 		 *

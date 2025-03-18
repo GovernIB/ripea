@@ -1,12 +1,12 @@
 import React from 'react';
-import CambiarEstado from './CambiarEstado';
-import CambiarPrioritat from './CambiarPrioritat';
+import CambiarEstat from '../actions/CambiarEstat.tsx';
+import CambiarPrioritat from '../actions/CambiarPrioritat.tsx';
 import {
     MuiFormDialogApi,
     useResourceApiService,
     useBaseAppContext, useConfirmDialogButtons
 } from 'reactlib';
-import useInformacioArxiu from "../detall/InformacioArxiu.tsx";
+import useInformacioArxiu from "../actions/InformacioArxiu.tsx";
 
 export const useCommonActions = (refresh?: () => void) => {
     const {
@@ -167,9 +167,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Información archivo",
             icon: "info",
             showInMenu: true,
-            onClick: (id:number,row:any)=>{
-                arxiuhandleOpen(row)
-            }
+            onClick: arxiuhandleOpen
         },
         {
             title: "Sincronizar estado con archivo",
@@ -179,7 +177,7 @@ export const useCommonActions = (refresh?: () => void) => {
     ]
     const components = <>
         <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
-        <CambiarEstado apiRef={cambiarEstadoApiRef} />
+        <CambiarEstat apiRef={cambiarEstadoApiRef} />
         {arxiuDialog}
     </>;
     return {

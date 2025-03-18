@@ -8,10 +8,10 @@ import {
 import { Box, Typography, Icon, Grid } from "@mui/material";
 import { formatDate } from '../../util/dateUtils';
 import { useNavigate } from "react-router-dom";
-import CommentDialog from "./CommentDialog.tsx";
+import { ExpedientCommentDialog as CommentDialog} from "../CommentDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
-import { useCommonActions } from "./actions/CommonActions.tsx";
+import { useCommonActions } from "./details/CommonActions.tsx";
 
 const ExpedientGridForm = () => {
     const formContext = useFormContext();

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Mètodes a implementar pels serveis que gestionen un recurs en mode només lectura.
@@ -105,6 +106,39 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 *             si no es troba l'artefacte amb el tipus i el codi especificat.
 	 */
 	ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException;
+
+	/**
+	 * Processament en el backend dels canvis en els camps del formulari associats
+	 * a un artefacte.
+	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param previous
+	 *            informació del recurs abans del canvi.
+	 * @param fieldName
+	 *            nom del camp que s'ha canviat.
+	 * @param fieldValue
+	 *            el valor del camp que s'ha canviat.
+	 * @param answers
+	 *            respostes a les preguntes formulades en el front.
+	 * @return un map amb els canvis resultants de processar la petició.
+	 * @param <P> la classe del formulari associat a l'artefacte.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'artefacte amb el tipus i el codi especificat.
+	 * @throws ResourceFieldNotFoundException
+	 *            si no es troba el camp especificat.
+	 * @throws AnswerRequiredException
+	 *            si es requereix alguna resposta addicional de l'usuari.
+	 */
+	<P extends Serializable> Map<String, Object> artifactOnChange(
+			ResourceArtifactType type,
+			String code,
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers) throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException;
 
 	/**
 	 * Genera l'informe amb el codi especificat.

@@ -351,8 +351,12 @@ export const Form: React.FC<FormProps> = (props) => {
             } else if (resourceTypeCode != null) {
                 apiArtifacts({}).then((artifacts: any[]) => {
                     const artifact = artifacts.find((a: any) => a.type === resourceType.toUpperCase() && a.code === resourceTypeCode);
-                    if (artifact.formClassActive) {
-                        setFields(artifact.fields);
+                    if (artifact != null) {
+                        if (artifact.formClassActive) {
+                            setFields(artifact.fields);
+                        }
+                    } else {
+                        console.warn('Couldn\'t find artifact (type=' + resourceType + ', code=' + resourceTypeCode + ')');
                     }
                 });
             }

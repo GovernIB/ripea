@@ -27,7 +27,7 @@ const InformacionExpediente = (props:any) => {
             <InformacionData title={"Fecha apertura"}>{formatDate(entity?.createdDate)}</InformacionData>
             <InformacionData title={"Clasificación"}>{entity?.ntiClasificacionSia}</InformacionData>
             <InformacionData title={"Estado"}>{entity?.estat}</InformacionData>
-            <InformacionData title={"Interesados"}>{entity?.interessats.map((interessat:any)=>interessat?.documentNum).join(', ')}</InformacionData>
+            <InformacionData title={"Interesados"}>{entity?.interessats?.map((interessat:any)=>interessat?.documentNum).join(', ')}</InformacionData>
         </Grid>
     </BasePage>
 }
@@ -68,8 +68,8 @@ const useInformacioArxiu = (tipo:string) => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (row:any) => {
-        console.log(row)
+    const handleOpen = (id:any, row:any) => {
+        console.log(id, row)
         setEntity(row);
         setOpen(true);
     }

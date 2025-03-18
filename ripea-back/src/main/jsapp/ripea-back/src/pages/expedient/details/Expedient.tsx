@@ -6,14 +6,14 @@ import {
 } from 'reactlib';
 import React, {useState} from "react";
 import {Box, Typography, Card, CardContent, Grid, Icon, IconButton} from '@mui/material';
-import {formatDate} from '../../util/dateUtils';
-import TabComponent from "../../components/TabComponent";
-import InteressatsGrid from "./detall/InteressatsGrid.tsx";
-import DocumentsGrid from "./detall/DocumentsGrid.tsx";
-import TasquesGrid from "./detall/TasquesGrid.tsx";
-import AnotacionsGrid from "./detall/AnotacionsGrid.tsx";
+import {formatDate} from '../../../util/dateUtils.ts';
+import TabComponent from "../../../components/TabComponent.tsx";
+import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
+import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
+import TasquesGrid from "../../tasca/TasquesGrid.tsx";
+import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
-import CommentDialog from "./CommentDialog.tsx";
+import { ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -42,6 +42,7 @@ const Expedient: React.FC = () => {
     const backgroundColor= { backgroundColor: '#f5f5f5' };
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
+    const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
 
     const tabs = [
         {
@@ -89,8 +90,8 @@ const Expedient: React.FC = () => {
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
-            content: <TasquesGrid/>,
-            badge: expedient?.numTasques,
+            content: <TasquesGrid id={id} entity={expedient} onRowCountChange={setNumTasques}/>,
+            badge: numTasques ?? expedient?.numTasques,
         },
     ]
 
@@ -107,7 +108,7 @@ const Expedient: React.FC = () => {
                     <Grid item xs={7}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
                         <Icon>folder</Icon>{expedient.nom}</Typography>
                     </Grid>
-                    {expedient?.agafatPer && <Grid item xs={4} >
+                    {expedient?.agafatPer && <Grid item xs={4}>
                         <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1}>
                             Expediente cogido por: {expedient?.agafatPer?.description}
 

@@ -5,10 +5,10 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceR
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,17 +39,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     public void init() {
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.Fields.metaDocument, new MetaDocumentOnchangeLogicProcessor());
+        register(DocumentResource.Fields.adjunt, new AdjuntOnchangeLogicProcessor());
+        register(DocumentResource.Fields.firmaAdjunt, new FirmaAdjuntOnchangeLogicProcessor());
+        register(DocumentResource.Fields.hasFirma, new HasFirmaOnchangeLogicProcessor());
     }
 
     @Override
     protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalDocumentResource.ifPresent(entity::setMetaNode);
-        optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> entity.setNtiTipoDocumental(metaDocumentResourceEntity.getNtiTipoDocumental())));
+        beforeSave(entity, resource, answers);
 
         entity.setEstat(entity.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT);
         entity.setTipus(ContingutTipusEnumDto.DOCUMENT);
-//        entity.setValidacioFirmaCorrecte(true);
         entity.setData(new Date());
         // TODO: revisar
         entity.setPare(entity.getExpedient());
@@ -61,8 +61,19 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @Override
     protected void beforeUpdateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
+        beforeSave(entity, resource, answers);
+    }
+
+    private void beforeSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
         Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalDocumentResource.ifPresent(entity::setMetaNode);
+        optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> {
+            entity.setMetaNode(metaDocumentResourceEntity);
+            entity.setNtiTipoDocumental(metaDocumentResourceEntity.getNtiTipoDocumental());
+        }));
+
+        if (resource.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA){
+            /* TODO: (PluginHelper.gestioDocumentalCreate) */
+        }
     }
 
     @Override
@@ -70,6 +81,19 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         if(entity.getMetaNode()!=null) {
             resource.setMetaDocument(ResourceReference.toResourceReference(entity.getMetaNode().getId(), entity.getMetaNode().getNom()));
         }
+        resource.setAdjunt(new FileReference(
+                entity.getFitxerNom(),
+                entity.getFitxerContingut(),
+                entity.getFitxerContentType(),
+                entity.getFitxerTamany()
+        ));
+        resource.setFirmaAdjunt(new FileReference(
+                entity.getNomFitxerFirmat(),
+                null,
+                null,
+                null
+        ));
+        resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResource, DocumentResourceEntity> {
@@ -137,6 +161,88 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             } else {
                 target.setNtiOrigen(null);
                 target.setNtiEstadoElaboracion(null);
+            }
+        }
+    }
+    private class AdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
+
+        private static final String ERROR_SIGNATURE_VALIDATION= "ERROR_SIGNATURE_VALIDATION";
+
+        @Override
+        public void onChange(
+                DocumentResource previous,
+                String fieldName,
+                Object fieldValue,
+                Map<String, AnswerRequiredException.AnswerValue> answers,
+                String[] previousFieldNames,
+                DocumentResource target) {
+
+            if (fieldValue != null) {
+                FileReference adjunt = (FileReference) fieldValue;
+
+                target.setFitxerNom(adjunt.getName());
+                target.setFitxerContingut(adjunt.getContent());
+                target.setFitxerTamany(adjunt.getContentLength());
+                target.setFitxerContentType(adjunt.getContentType());
+
+                // TODO: cambiar (DocumentService.checkIfSignedAttached())
+                SignatureInfoDto signatureInfoDto = new SignatureInfoDto(false);
+
+                target.setHasFirma(signatureInfoDto.isSigned());
+                target.setValidacioFirmaCorrecte(!signatureInfoDto.isError());
+                target.setValidacioFirmaErrorMsg(signatureInfoDto.getErrorMsg());
+
+                if (signatureInfoDto.isSigned()) {
+//                    target.setNtiTipoFirma();
+                    target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+
+                    if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
+                        throw new AnswerRequiredException(InteressatResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
+                    }
+                }
+            } else {
+                target.setFitxerNom(null);
+                target.setFitxerContingut(null);
+                target.setFitxerTamany(null);
+                target.setFitxerContentType(null);
+                target.setValidacioFirmaCorrecte(false);
+                target.setValidacioFirmaErrorMsg("");
+                target.setHasFirma(false);
+            }
+        }
+    }
+    private class FirmaAdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
+        @Override
+        public void onChange(
+                DocumentResource previous,
+                String fieldName,
+                Object fieldValue,
+                Map<String, AnswerRequiredException.AnswerValue> answers,
+                String[] previousFieldNames,
+                DocumentResource target) {
+
+            if (fieldValue != null) {
+                FileReference adjunt = (FileReference) fieldValue;
+                target.setNomFitxerFirmat(adjunt.getName());
+            } else {
+                target.setNomFitxerFirmat(null);
+            }
+        }
+    }
+    private class HasFirmaOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
+        @Override
+        public void onChange(
+                DocumentResource previous,
+                String fieldName,
+                Object fieldValue,
+                Map<String, AnswerRequiredException.AnswerValue> answers,
+                String[] previousFieldNames,
+                DocumentResource target) {
+
+            if (target.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA){
+                target.setDocumentFirmaTipus((fieldValue != null && (Boolean) fieldValue)
+                        ?DocumentFirmaTipusEnumDto.FIRMA_SEPARADA
+                        :DocumentFirmaTipusEnumDto.SENSE_FIRMA);
             }
         }
     }

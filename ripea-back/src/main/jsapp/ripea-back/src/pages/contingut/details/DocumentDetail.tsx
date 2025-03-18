@@ -36,11 +36,12 @@ const Versiones = () => {
     return <Typography>Versiones</Typography>;
 }
 
-const useDocumentDetall = () => {
+const useDocumentDetail = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (row:any) => {
+    const handleOpen = (id:any, row:any) => {
+        console.log(id, row);
         setEntity(row);
         setOpen(true);
     }
@@ -98,4 +99,4 @@ const useDocumentDetall = () => {
         dialog
     }
 }
-export default useDocumentDetall;
+export default useDocumentDetail;

@@ -11,6 +11,8 @@ import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -19,6 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "id, titol" },
         descriptionField = "titol",
@@ -31,19 +34,15 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
 
-//    private Long id;
+//    @NotNull
     private Date dataInici;
     private Date dataFi;
-    private TascaEstatEnumDto estat;
-//    private Long metaExpedientTascaId;
+    @NotNull
+    private TascaEstatEnumDto estat = TascaEstatEnumDto.PENDENT;
     private String motiuRebuig;
     @ResourceField(onChangeActive = true)
     private Date dataLimit;
-//    @SuppressWarnings("unused")
-//    private String dataLimitString;
     private boolean shouldNotifyAboutDeadline;
-//    @SuppressWarnings("unused")
-//    private boolean dataLimitExpirada;
     private String comentari;
     private long numComentaris;
 
@@ -55,15 +54,17 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private String observacions;
     @ResourceField(onChangeActive = true)
     private Integer duracio;
-//    @SuppressWarnings("unused")
-//    private String duracioFormat;
     @NotNull
     private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     private String responsablesStr;
 
+    @Transient
+    private String metaExpedientTascaDescription;
+
     @NotNull
     private ResourceReference<ExpedientResource, Long> expedient;
     @NotNull
+    @ResourceField(onChangeActive = true)
     private ResourceReference<MetaExpedientTascaResource, Long> metaExpedientTasca;
     @NotNull
     private ResourceReference<UsuariResource, String> responsableActual;

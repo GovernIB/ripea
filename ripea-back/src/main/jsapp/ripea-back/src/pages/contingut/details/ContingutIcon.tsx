@@ -5,7 +5,7 @@ const ContingutIcon = (props:any) => {
 
     // console.log(entity)
     const extension = entity?.fitxerNom ?entity?.fitxerNom.split('.').reverse()[0] :null;
-    return <Grid justifyContent={"center"}>
+    return <Grid>
         {entity?.expedient && entity?.estat == 'OBERT' && <Icon>O</Icon>}
         {entity?.expedient && entity?.estat != 'OBERT' && <Icon>T</Icon>}
 
