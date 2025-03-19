@@ -164,7 +164,7 @@ export const useActionReportLogic = (
     });
     const handleButtonClick = () => {
         if (hasForm) {
-            const formDialogTitle = action != null ? 'Action ' + action : 'Report ' + report;
+            const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
             formDialogShow(
                 formDialogTitle,
                 id,

@@ -553,13 +553,15 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const action = React.useCallback((id: any, args?: ResourceApiActionArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts').
-                then((state: State) => {
-                    if (args?.code != null) {
-                        const actionRel = 'exec_' + args.code;
-                        const actionLink = state.links.get(actionRel);
-                        if (actionLink != null) {
-                            request(actionRel, null, { ...args }, state).
+            if (args?.code != null) {
+                request('artifacts').
+                    then((state: State) => {
+                        const artifactState = state.getEmbedded().find(e => e.data.type === 'ACTION' && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const actionRel = 'exec_' + args.code;
+                            const actionLink = artifactState.links.get(actionRel);
+                            if (actionLink != null) {
+                                request(actionRel, id, { ...args }, artifactState).
                                 then((state: State) => {
                                     const result = state.data;
                                     resolve(result);
@@ -574,28 +576,33 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                                         then(resolve).
                                         catch(reject);
                                 });
+                            } else {
+                                reject('Link ' + actionRel + ' not found in action ' + args.code + ' links');
+                            }
                         } else {
                             reject('Action ' + args.code + ' not found in artifacts');
                         }
-                    } else {
-                        reject('Action code not specified')
-                    }
-                }).
-                catch(reject);
+                    }).
+                    catch(reject);
+            } else {
+                reject('Action code not specified')
+            }
         });
     }, [request]);
     const report = React.useCallback((id: any, args?: ResourceApiReportArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts').
-                then((state: State) => {
-                    if (args?.code != null) {
-                        const reportRel = 'generate_' + args.code;
-                        const reportLink = state.links.get(reportRel);
-                        if (reportLink != null) {
-                            request(reportRel, null, { ...args }, state).
+            if (args?.code != null) {
+                request('artifacts').
+                    then((state: State) => {
+                        const artifactState = state.getEmbedded().find(e => e.data.type === 'REPORT' && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const reportRel = 'generate_' + args.code;
+                            const reportLink = artifactState.links.get(reportRel);
+                            if (reportLink != null) {
+                                request(reportRel, id, { ...args }, artifactState).
                                 then((state: State) => {
-                                    const items = state.getEmbedded().map(e => e.data);
-                                    resolve(items);
+                                    const result = state.data;
+                                    resolve(result);
                                 }).
                                 catch((error: ResourceApiError) => {
                                     processAnswerRequiredError(
@@ -607,14 +614,17 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                                         then(resolve).
                                         catch(reject);
                                 });
+                            } else {
+                                reject('Link ' + reportRel + ' not found in report ' + args.code + ' links');
+                            }
                         } else {
                             reject('Report ' + args.code + ' not found in artifacts');
                         }
-                    } else {
-                        reject('Report code not specified')
-                    }
-                }).
-                catch(reject);
+                    }).
+                    catch(reject);
+            } else {
+                reject('Report code not specified')
+            }
         });
     }, [request]);
     const fieldDownload = React.useCallback((id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {
