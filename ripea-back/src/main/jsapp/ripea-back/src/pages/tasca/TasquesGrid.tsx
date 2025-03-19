@@ -1,6 +1,8 @@
 import {
     GridPage,
-    MuiGrid, useMuiDataGridApiRef,
+    MuiGrid,
+    MuiActionReportButton,
+    useMuiDataGridApiRef,
 } from 'reactlib';
 import {formatDate} from "../../util/dateUtils.ts";
 import {Grid} from "@mui/material";
@@ -98,6 +100,7 @@ const TasquesGrid: React.FC = (props:any) => {
     const {actions, components} = useTascaActions(apiRef?.current?.refresh);
 
     return <GridPage>
+        <MuiActionReportButton resourceName="expedientTascaResource" action="ACTION_CHANGE_ESTAT" />
         <MuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"

@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Filter, { FilterProps } from '../../form/Filter';
-import { useOptionalGridContext } from '../datagrid/DataGridContext';
+import { useOptionalDataGridContext } from '../datagrid/DataGridContext';
 
 type MuiFilterProps = FilterProps & {
     componentProps?: any;
@@ -14,7 +14,7 @@ export const MuiFilter: React.FC<MuiFilterProps> = (props) => {
         children,
         ...otherProps
     } = props;
-    const gridContext = useOptionalGridContext();
+    const gridContext = useOptionalDataGridContext();
     const handleSpringFilterChange = (filter: string | undefined) => {
         if (gridContext != null) {
             gridContext.apiRef.current?.setFilter(filter);

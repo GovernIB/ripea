@@ -28,7 +28,7 @@ export const useDataGridContext = () => {
     return context;
 }
 
-export const useOptionalGridContext = (): DataGridContextType | undefined => {
+export const useOptionalDataGridContext = (): DataGridContextType | undefined => {
     return React.useContext(DataGridContext);
 }
 

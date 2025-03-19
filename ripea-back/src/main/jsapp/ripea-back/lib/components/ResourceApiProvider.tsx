@@ -29,9 +29,9 @@ type ResourceApiMethods = {
     patch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     delette: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
     onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<void>;
-    artifacts: (args: ResourceApiRequestArgs) => Promise<ResourceApiArtifact[]>;
-    action: (args: ResourceApiActionArgs) => Promise<any>;
-    report: (args: ResourceApiReportArgs) => Promise<any[]>;
+    artifacts: (args: ResourceApiArtifactsArgs) => Promise<ResourceApiArtifact[]>;
+    action: (id: any, args: ResourceApiActionArgs) => Promise<any>;
+    report: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
 }
 
@@ -117,6 +117,10 @@ export type ResourceApiOnChangeArgs = ResourceApiRequestArgs & {
     action?: string;
     report?: string;
     filter?: string;
+};
+
+export type ResourceApiArtifactsArgs = ResourceApiRequestArgs & {
+    includeLinks?: boolean;
 };
 
 export type ResourceApiActionArgs = ResourceApiRequestArgs & {
@@ -511,10 +515,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 });
         });
     }, [request]);
-    const artifacts = React.useCallback((args?: ResourceApiRequestArgs): Promise<ResourceApiArtifact[]> => {
+    const artifacts = React.useCallback((args?: ResourceApiArtifactsArgs): Promise<ResourceApiArtifact[]> => {
         return new Promise((resolve, reject) => {
             request('artifacts', null, { ...args }).then((state: State) => {
-                const embeddedArtifacts = state.getEmbedded().map((e: any) => e.data);
                 const getActionRelFromArtifact = (artifact: any) => {
                     if (artifact?.type === 'ACTION') {
                         return 'exec_' + artifact.code;
@@ -524,21 +527,31 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                         return 'filter_' + artifact.code;
                     }
                 }
-                const resourceApiArtifacts: ResourceApiArtifact[] = embeddedArtifacts.map((a: any) => {
-                    const actionRel = getActionRelFromArtifact(a);
-                    const fields = a.formClassActive ? state.action(actionRel)?.fields as any[] : undefined;
-                    return {
-                        type: a.type,
-                        code: a.code,
-                        formClassActive: a.formClassActive,
+                const artifacts = state.getEmbedded().map((e: any) => {
+                    const data = e.data;
+                    const actionRel = getActionRelFromArtifact(data);
+                    const fields = data.formClassActive ? e.action(actionRel)?.fields as any[] : undefined;
+                    const artifact = {
+                        type: data.type,
+                        code: data.code,
+                        formClassActive: data.formClassActive,
                         fields,
                     };
+                    if (args?.includeLinks) {
+                        return {
+                            ...artifact,
+                            '_links': processStateLinks(e.links),
+                            '_actions': processStateActions(e.actions())
+                        };
+                    } else {
+                        return artifact;
+                    }
                 });
-                resolve(resourceApiArtifacts);
+                resolve(artifacts);
             }).catch(reject);
         });
     }, [request]);
-    const action = React.useCallback((args?: ResourceApiActionArgs): Promise<any[]> => {
+    const action = React.useCallback((id: any, args?: ResourceApiActionArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             request('artifacts').
                 then((state: State) => {
@@ -571,7 +584,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 catch(reject);
         });
     }, [request]);
-    const report = React.useCallback((args?: ResourceApiReportArgs): Promise<any[]> => {
+    const report = React.useCallback((id: any, args?: ResourceApiReportArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             request('artifacts').
                 then((state: State) => {

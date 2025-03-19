@@ -23,6 +23,7 @@ export { DataFormDialog as MuiFormDialog } from './components/mui/datacommon/Dat
 export { MuiFormSidebar } from './components/mui/form/MuiFormSidebar';
 export { MuiFormTabs, MuiFormTabContent } from './components/mui/form/MuiFormTabs';
 export { MuiFilter } from './components/mui/form/MuiFilter';
+export { ActionReportButton as MuiActionReportButton } from './components/mui/ActionReportButton';
 
 export { FormField } from './components/form/FormField';
 export { FormIsolatedField } from './components/form/FormIsolatedField';
