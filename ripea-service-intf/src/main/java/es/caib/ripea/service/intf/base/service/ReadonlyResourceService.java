@@ -147,8 +147,6 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 *            identificació del recurs (pot ser null si l'informe no es genera sobre un recurs determinat).
 	 * @param code
 	 *            el codi de l'informe.
-	 * @param code
-	 *            el codi de l'informe.
 	 * @param params
 	 *            els paràmetres necessaris per a generar l'informe.
 	 * @return les dades de l'informe.
