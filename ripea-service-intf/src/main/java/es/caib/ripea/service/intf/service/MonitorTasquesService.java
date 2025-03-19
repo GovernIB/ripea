@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-@PreAuthorize("isAuthenticated()")
+//@PreAuthorize("isAuthenticated()")
 public interface MonitorTasquesService {
 
 	public MonitorTascaInfo addTasca(String codiTasca);

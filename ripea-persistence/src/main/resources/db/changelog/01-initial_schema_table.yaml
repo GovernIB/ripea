@@ -2721,10 +2721,10 @@ databaseChangeLog:
               nullable: false
             name: PERMET_METADOCS_GENERALS
             type: BOOLEAN
-		- column:
-			defaultValue: 0
-		    name: PERMIS_DIRECTE
-		    type: BOOLEAN
+        - column:
+            defaultValue: 0
+            name: PERMIS_DIRECTE
+            type: BOOLEAN
         - column:
             name: ORGAN_GESTOR_ID
             type: BIGINT
