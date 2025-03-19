@@ -29,21 +29,23 @@ public class OrganGestorResourceServiceEjb extends AbstractServiceEjb<OrganGesto
 
 	@Override
 	@RolesAllowed("**")
-	public <P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException {
-		return delegateService.reportGenerate(code, params);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public <P extends Serializable> Serializable actionExec(String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
-		return delegateService.actionExec(code, params);
-	}
-
-	@Override
-	@RolesAllowed("**")
 	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
 			P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
 			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
 		return delegateService.artifactOnChange(type, code, previous, fieldName, fieldValue, answers);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params)
+			throws ArtifactNotFoundException, ActionExecutionException {
+		return delegateService.artifactActionExec(id, code, params);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public <P extends Serializable> List<?> artifactReportGenerate(Long id, String code, P params)
+			throws ArtifactNotFoundException, ReportGenerationException {
+		return delegateService.artifactReportGenerate(id, code, params);
 	}
 }

@@ -70,12 +70,6 @@ public class ExpedientTascaComentariResourceServiceEjb extends AbstractServiceEj
 	}
 
 	@Override
-	public <P extends Serializable> Serializable actionExec(String code, P params)
-			throws ArtifactNotFoundException, ActionExecutionException {
-		return delegateService.actionExec(code, params);
-	}
-
-	@Override
 	public ExpedientTascaComentariResource getOne(Long id, String[] perspectives) throws ResourceNotFoundException {
 		return delegateService.getOne(id, perspectives);
 	}
@@ -110,13 +104,19 @@ public class ExpedientTascaComentariResourceServiceEjb extends AbstractServiceEj
 	}
 
 	@Override
-	public <P extends Serializable> List<?> reportGenerate(String code, P params)
-			throws ArtifactNotFoundException, ReportGenerationException {
-		return delegateService.reportGenerate(code, params);
+	protected void setDelegateService(ExpedientTascaComentariResourceService delegateService) {
+		this.delegateService = delegateService;
 	}
 
 	@Override
-	protected void setDelegateService(ExpedientTascaComentariResourceService delegateService) {
-		this.delegateService = delegateService;
+	public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params)
+			throws ArtifactNotFoundException, ActionExecutionException {
+		return delegateService.artifactActionExec(id, code, params);
+	}
+
+	@Override
+	public <P extends Serializable> List<?> artifactReportGenerate(Long id, String code, P params)
+			throws ArtifactNotFoundException, ReportGenerationException {
+		return delegateService.artifactReportGenerate(id, code, params);
 	}
 }
