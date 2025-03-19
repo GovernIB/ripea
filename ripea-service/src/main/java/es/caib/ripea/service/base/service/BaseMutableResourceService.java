@@ -220,10 +220,11 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		if (type == null || type == ResourceArtifactType.ACTION) {
 			artifacts.addAll(
 					actionExecutorMap.keySet().stream().
-							map(actionExecutor -> new ResourceArtifact(
+							map(code -> new ResourceArtifact(
 									ResourceArtifactType.ACTION,
-									actionExecutor,
-									artifactGetFormClass(ResourceArtifactType.ACTION, actionExecutor))).
+									code,
+									artifactRequiresId(ResourceArtifactType.ACTION, code),
+									artifactGetFormClass(ResourceArtifactType.ACTION, code))).
 							collect(Collectors.toList()));
 		}
 		return artifacts;
@@ -239,7 +240,8 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				return new ResourceArtifact(
 						ResourceArtifactType.ACTION,
 						code,
-						artifactGetFormClass(type, code));
+						artifactRequiresId(ResourceArtifactType.ACTION, code),
+						artifactGetFormClass(ResourceArtifactType.ACTION, code));
 			}
 		}
 		return super.artifactGetOne(type, code);

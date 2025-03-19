@@ -22,6 +22,7 @@ public @interface ResourceConfigArtifact {
 
 	ResourceArtifactType type();
 	String code();
+	boolean requiresId() default false;
 	Class<? extends Serializable> formClass() default Serializable.class;
 
 }

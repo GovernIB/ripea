@@ -17,6 +17,7 @@ public class ResourceArtifact {
 
 	private ResourceArtifactType type;
 	private String code;
+	private Boolean requiresId;
 	@JsonIgnore
 	private Class<?> formClass;
 

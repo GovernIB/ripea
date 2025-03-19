@@ -160,16 +160,18 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 							map(pa -> new ResourceArtifact(
 									ResourceArtifactType.PERSPECTIVE,
 									pa,
+									null,
 									null)).
 							collect(Collectors.toList()));
 		}
 		if (type == null || type == ResourceArtifactType.REPORT) {
 			artifacts.addAll(
 					reportDataGeneratorMap.keySet().stream().
-							map(reportDataGenerator -> new ResourceArtifact(
+							map(code -> new ResourceArtifact(
 									ResourceArtifactType.REPORT,
-									reportDataGenerator,
-									artifactGetFormClass(ResourceArtifactType.REPORT, reportDataGenerator))).
+									code,
+									artifactRequiresId(ResourceArtifactType.REPORT, code),
+									artifactGetFormClass(ResourceArtifactType.REPORT, code))).
 							collect(Collectors.toList()));
 		}
 		if (type == null || type == ResourceArtifactType.FILTER) {
@@ -178,6 +180,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 							map(f -> new ResourceArtifact(
 									ResourceArtifactType.FILTER,
 									f.code(),
+									null,
 									artifactGetFormClass(ResourceArtifactType.FILTER, f.code()))).
 							collect(Collectors.toList()));
 		}
@@ -194,6 +197,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				return new ResourceArtifact(
 						ResourceArtifactType.PERSPECTIVE,
 						code,
+						null,
 						null);
 			}
 		} else if (type == ResourceArtifactType.REPORT) {
@@ -202,14 +206,16 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				return new ResourceArtifact(
 						ResourceArtifactType.REPORT,
 						code,
-						artifactGetFormClass(type, code));
+						artifactRequiresId(ResourceArtifactType.REPORT, code),
+						artifactGetFormClass(ResourceArtifactType.REPORT, code));
 			}
 		} else if (type == ResourceArtifactType.FILTER) {
 			if (artifactIsPresentInResourceConfig(type, code)) {
 				return new ResourceArtifact(
 						ResourceArtifactType.FILTER,
 						code,
-						artifactGetFormClass(type, code));
+						null,
+						artifactGetFormClass(ResourceArtifactType.FILTER, code));
 			}
 		}
 		throw new ArtifactNotFoundException(getResourceClass(), type, code);
@@ -725,6 +731,19 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String fieldName,
 			FieldDownloader<E> fieldDownloader) {
 		fieldDownloaderMap.put(fieldName, fieldDownloader);
+	}
+
+	protected Boolean artifactRequiresId(ResourceArtifactType type, String code) {
+		ResourceConfig resourceConfig = getResourceClass().getAnnotation(ResourceConfig.class);
+		if (resourceConfig != null && (type == ResourceArtifactType.ACTION || type == ResourceArtifactType.REPORT)) {
+			Optional<ResourceConfigArtifact> artifact = Arrays.stream(resourceConfig.artifacts()).
+					filter(a -> a.type() == type && a.code().equals(code)).
+					findFirst();
+			if (artifact.isPresent()) {
+				return artifact.get().requiresId();
+			}
+		}
+		return null;
 	}
 
 	protected Class<? extends Serializable> artifactGetFormClass(ResourceArtifactType type, String code) {

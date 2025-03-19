@@ -279,7 +279,26 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			final String code,
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
+		return artifactValidate(null, type, code, params, bindingResult);
+	}
+
+	@Override
+	@PostMapping("/{id}/artifacts/{type}/{code}/validate")
+	@Operation(summary = "Validació del formulari d'un artefacte amb id")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public ResponseEntity<?> artifactValidate(
+			@PathVariable(required = false)
+			@Parameter(description = "Identificador del recurs")
+			final ID id,
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Validació del formulari d'un artefacte (id={}, type={}, code={}, params={})", id, type, code, params);
 		getArtifactParamsAsObjectWithFormClass(
 				type,
 				code,
@@ -921,12 +940,22 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@SneakyThrows
 	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
 		if (artifact.getFormClass() != null) {
-			Link validateLink = Affordances.
-					of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("validate")).
-					afford(HttpMethod.POST).
-					withInputAndOutput(artifact.getFormClass()).
-					withName("validate").
-					toLink();
+			Link validateLink;
+			if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
+				validateLink = Affordances.
+						of(linkTo(methodOn(getClass()).artifactValidate(null, artifact.getType(), artifact.getCode(), null, null)).withRel("validate")).
+						afford(HttpMethod.POST).
+						withInputAndOutput(artifact.getFormClass()).
+						withName("validate").
+						toLink();
+			} else {
+				validateLink = Affordances.
+						of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("validate")).
+						afford(HttpMethod.POST).
+						withInputAndOutput(artifact.getFormClass()).
+						withName("validate").
+						toLink();
+			}
 			return new Link[] {
 					validateLink,
 					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
