@@ -1,6 +1,7 @@
-import {MuiFormDialog, useFormContext} from "reactlib";
+import {MuiFormDialog, MuiFormDialogApi, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
+import {useRef} from "react";
 
 const CambiarPrioritatForm = () => {
     const formContext = useFormContext();
@@ -12,7 +13,7 @@ const CambiarPrioritatForm = () => {
     </Grid>
 }
 
-const CambiarPrioritat = (props: { apiRef:any }) => {
+export const CambiarPrioritat = (props: { apiRef:any }) => {
     const { apiRef } = props;
 
     return <MuiFormDialog
@@ -23,4 +24,16 @@ const CambiarPrioritat = (props: { apiRef:any }) => {
         <CambiarPrioritatForm/>
     </MuiFormDialog>
 }
-export default CambiarPrioritat;
+
+const useCambiarPrioritat = () => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const hanldeShow = (id:any) => {
+        return apiRef.current?.show?.(id)
+    }
+
+    return {
+        hanldeShow,
+        content: <CambiarPrioritat apiRef={apiRef}/>
+    }
+}
+export default useCambiarPrioritat;

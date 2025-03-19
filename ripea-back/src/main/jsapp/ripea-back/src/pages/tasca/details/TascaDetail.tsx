@@ -6,8 +6,8 @@ import {formatDate} from "../../../util/dateUtils.ts";
 const ContenidoData = (props:any) => {
     const {title, children} = props;
     return <>
-        <Grid item xs={6}><Typography variant={"h6"}>{title}</Typography></Grid>
-        <Grid item xs={6}>{children}</Grid>
+        <Grid item xs={6}><Typography variant={"subtitle2"}>{title}</Typography></Grid>
+        <Grid item xs={6}><Typography variant={"body2"}>{children}</Typography></Grid>
     </>
 }
 
@@ -30,7 +30,7 @@ const useTascaDetail = () => {
             open={open}
             closeCallback={handleClose}
             title={"Detalles de la tarea"}
-            componentProps={{ fullWidth: true, maxWidth: 'xl'}}
+            // componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {
                     value: 'close',
@@ -51,7 +51,9 @@ const useTascaDetail = () => {
                 <ContenidoData title={"Responsables"}>{entity?.responsablesStr}</ContenidoData>
                 <ContenidoData title={"Responsable actual"}>{entity?.responsableActual?.description}</ContenidoData>
                 <ContenidoData title={"Delegado"}>{entity?.delegat?.description}</ContenidoData>
-                <ContenidoData title={"Observadores"}>{/*entity?.observadors*/}</ContenidoData>
+                <ContenidoData title={"Observadores"}>
+                    {entity?.observadors?.map?.((obs:any)=>`${obs.description}\n`)}
+                </ContenidoData>
                 <ContenidoData title={"Fecha inicio"}>{formatDate(entity?.dataInici)}</ContenidoData>
                 <ContenidoData title={"Duración"}>{entity?.duracio}</ContenidoData>
                 <ContenidoData title={"Fecha limite"}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>

@@ -10,7 +10,8 @@ const useAnotacioDetail = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (row:any) => {
+    const handleOpen = (rowId:any, row:any) => {
+        console.log(rowId, row);
         setEntity(row);
         setOpen(true);
     }
@@ -60,7 +61,6 @@ const useAnotacioDetail = () => {
                 },
             ]}
             buttonCallback={(value :any) :void=>{
-                console.log(value);
                 if (value=='close') {
                     handleClose();
                 }

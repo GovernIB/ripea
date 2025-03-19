@@ -1,12 +1,12 @@
-import React from 'react';
-import CambiarEstat from '../actions/CambiarEstat.tsx';
-import CambiarPrioritat from '../actions/CambiarPrioritat.tsx';
 import {
-    MuiFormDialogApi,
     useResourceApiService,
-    useBaseAppContext, useConfirmDialogButtons
+    useBaseAppContext,
+    useConfirmDialogButtons
 } from 'reactlib';
 import useInformacioArxiu from "../actions/InformacioArxiu.tsx";
+import useAssignar from "../actions/Assignar.tsx";
+import useCambiarEstat from "../actions/CambiarEstat.tsx";
+import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 
 export const useCommonActions = (refresh?: () => void) => {
     const {
@@ -17,18 +17,14 @@ export const useCommonActions = (refresh?: () => void) => {
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
-    const cambiarPrioridadApiRef = React.useRef<MuiFormDialogApi>();
-    const cambiarEstadoApiRef = React.useRef<MuiFormDialogApi>();
-
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("expediente");
+    const {hanldeShow: hanldeAssignar, content: assignarContent} = useAssignar();
+    const {hanldeShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat();
+    const {hanldeShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat();
 
     const actions = [
-        // {
-        //     title: "",
-        //     icon: "forum",
-        // },
         {
-            title: "",
+            title: "Seguidores",
             icon: "people",
         },
         ////
@@ -43,6 +39,26 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Seguir",
             icon: "person_add",
             showInMenu: true,
+            // hidden: // si el usuario actual es seguidor
+        },
+        // {
+        //     title: "Dejar de seguir",
+        //     icon: "person_remove",
+        //     showInMenu: true,
+        //     // hidden: // si el usuario actual no es seguidor
+        // },
+        {
+            title: "Assignar",
+            icon: "person",
+            showInMenu: true,
+            onClick: (id:any) => {
+                hanldeAssignar(id)
+                    ?.then(() => {
+                        refresh?.();
+                        temporalMessageShow(null, '', 'success');
+                    })
+            }
+            // hidden: // si el usuario actual no admin o organo
         },
         {
             title: "Coger",
@@ -84,9 +100,11 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "",
             showInMenu: true,
             onClick: (id: any) => {
-                cambiarPrioridadApiRef.current?.show(id)?.then(() => {
-                    refresh?.()
-                })
+                hanldeCambiarPrioridad(id)
+                    ?.then(() => {
+                        refresh?.()
+                        temporalMessageShow(null, '', 'success');
+                    })
             }
         },
         {
@@ -94,9 +112,11 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "",
             showInMenu: true,
             onClick: (id: any) => {
-                cambiarEstadoApiRef.current?.show(id)?.then(() => {
-                    refresh?.()
-                })
+                hanldeCambiarEstado(id)
+                    ?.then(() => {
+                        refresh?.()
+                        temporalMessageShow(null, '', 'success');
+                    })
             },
             disabled: (row:any) => {
                 return row?.estat != "OBERT"
@@ -176,9 +196,10 @@ export const useCommonActions = (refresh?: () => void) => {
         },
     ]
     const components = <>
-        <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
-        <CambiarEstat apiRef={cambiarEstadoApiRef} />
+        {cambiarPrioridadContent}
+        {cambiarEstadoContent}
         {arxiuDialog}
+        {assignarContent}
     </>;
     return {
         actions,

@@ -1,15 +1,13 @@
 import {
     GridPage,
-    MuiGrid,
+    MuiGrid, useMuiDataGridApiRef,
 } from 'reactlib';
 import {useParams} from "react-router-dom";
-import {Button, Icon} from "@mui/material";
-import useAnotacioDetail from "./details/AnotacioDetail.tsx";
+import useAnotacioActions from "./details/AnotacioActions.tsx";
 
 const AnotacionsGrid: React.FC = () => {
     const { id } = useParams();
-
-    const {handleOpen, dialog} = useAnotacioDetail();
+    const apiRef = useMuiDataGridApiRef()
 
     const columns = [
         {
@@ -32,25 +30,20 @@ const AnotacionsGrid: React.FC = () => {
             headerName: 'Destino',
             flex: 0.5,
         },
-        {
-            field: 'id',
-            headerName: '',
-            flex: 0.5,
-            renderCell: (params: any) => {
-                return <Button onClick={()=>handleOpen(params.row)}><Icon>info</Icon>Detalle</Button>;
-            }
-        },
     ];
+    const {actions, components} = useAnotacioActions(apiRef?.current?.refresh);
+
     return <GridPage>
         <MuiGrid
             resourceName="expedientPeticioResource"
             columns={columns}
+            rowAdditionalActions={actions}
             paginationActive
             filter={`expedient.id:${id}`}
             titleDisabled
             readOnly
         />
-        {dialog}
+        {components}
     </GridPage>
 }
 

@@ -1,21 +1,28 @@
 package es.caib.ripea.service.resourceservice;
 
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaComentariResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -23,6 +30,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de tasques.
@@ -34,18 +42,27 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService {
 
+    private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
+    private final UsuariResourceRepository usuariResourceRepository;
 
 	@PostConstruct
 	public void init() {
-		register("RESPONSABLES_RESUM", new ResponsablesPerspectiveApplicator());
+		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
         register(ExpedientTascaResource.Fields.metaExpedientTasca, new MetaExpedientTascaOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
+        register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
+        register(ExpedientTascaResource.ACTION_REABRIR_CODE, new ReobrirActionExecutor());
 	}
 
     @Override
     protected void beforeCreateSave(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        List<String> ids = resource.getObservadors().stream()
+                .map(ResourceReference::getId)
+                .collect(Collectors.toList());
+        List<UsuariResourceEntity> entidades = usuariResourceRepository.findAllById(ids);
+        entity.setObservadors(entidades);
         entity.setDataInici(new Date());
     }
 
@@ -53,6 +70,14 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     protected void afterConversion(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setMetaExpedientTascaDescription(entity.getMetaExpedientTasca().getDescripcio());
+
+        resource.setObservadors(entity.getObservadors()
+                .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
+                .collect(Collectors.toList()));
+
+        String user = SecurityContextHolder.getContext().getAuthentication().getName();
+        resource.setUsuariActualResponsable(Objects.equals(resource.getResponsableActual().getId(), user));
+        resource.setUsuariActualDelegat(resource.getDelegat() != null && Objects.equals(resource.getDelegat().getId(), user));
     }
 
 	private class ResponsablesPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
@@ -146,6 +171,63 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                     target.setDuracio(null);
                 }
             }
+        }
+    }
+
+    private void changeEstat(ExpedientTascaResourceEntity entity, TascaEstatEnumDto estat){
+        switch (estat){
+            case INICIADA:
+//                    SecurityContextHolder.getContext().getAuthentication().getName()
+//                    resource.setResponsableActual(ResourceReference.toResourceReference());
+                break;
+            case AGAFADA:
+                break;
+            case PENDENT:
+                break;
+            case FINALITZADA:
+                entity.getExpedient().setEstatAdditional(entity.getMetaExpedientTasca().getEstatFinalitzarTasca());
+            case REBUTJADA:
+            case CANCELLADA:
+                entity.setDelegat(null);
+                break;
+        }
+
+        entity.setEstat(estat);
+    }
+
+    private class ChangeEstatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeEstatForm, ExpedientTascaResource> {
+
+        @Override
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangeEstatForm params) throws ActionExecutionException {
+            changeEstat(entity, params.getEstat());
+            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+        }
+
+        @Override
+        public void onChange(ExpedientTascaResource.ChangeEstatForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatForm target) {
+
+        }
+    }
+
+    private class ReobrirActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ReobrirForm, ExpedientTascaResource> {
+
+        @Override
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ReobrirForm params) throws ActionExecutionException {
+            if (params.getMotiu() != null) {
+                ExpedientTascaComentariResourceEntity expedientTascaComentariResourceEntity = new ExpedientTascaComentariResourceEntity();
+                expedientTascaComentariResourceEntity.setText(params.getMotiu());
+                entity.getComentaris().add(expedientTascaComentariResourceEntity);
+            }
+
+            changeEstat(entity, TascaEstatEnumDto.PENDENT);
+            usuariResourceRepository.findById(params.getResponsableActual().getId()).ifPresent(entity::setResponsableActual);
+            expedientTascaResourceRepository.save(entity);
+            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+        }
+
+        @Override
+        public void onChange(ExpedientTascaResource.ReobrirForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirForm target) {
+
         }
     }
 }

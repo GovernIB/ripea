@@ -2,13 +2,14 @@ import {MuiFormDialog} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 
-const ReassignarForm = () => {
+const ReobrirForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="responsableActual" required/>
+        <GridFormField xs={12} name="responsable" required/>
+        <GridFormField xs={12} name="motiu"/>
     </Grid>
 }
 
-const Reassignar = (props: { apiRef:any }) => {
+const Reobrir = (props: { apiRef:any }) => {
     const { apiRef } = props;
 
     return <MuiFormDialog
@@ -16,7 +17,7 @@ const Reassignar = (props: { apiRef:any }) => {
         title={`Reasignar tarea`}
         apiRef={apiRef}
     >
-        <ReassignarForm/>
+        <ReobrirForm/>
     </MuiFormDialog>
 }
-export default Reassignar;
+export default Reobrir;

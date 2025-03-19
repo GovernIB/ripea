@@ -3,26 +3,25 @@ import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 
-const CambiarEstatForm = () => {
+const AssignarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom" readOnly/>
-        <GridFormField xs={12} name="estat" required/>
+        <GridFormField xs={12} name="agafatPer" required/>
     </Grid>
 }
 
-export const CambiarEstat = (props: { apiRef:any }) => {
+export const Assignar = (props: { apiRef:any }) => {
     const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientResource"}
-        title={`Modificar estado del expediente`}
+        title={`Assignar expediente a usuario`}
         apiRef={apiRef}
     >
-        <CambiarEstatForm/>
+        <AssignarForm/>
     </MuiFormDialog>
 }
 
-const useCambiarEstat = () => {
+const useAssignar = () => {
     const apiRef = useRef<MuiFormDialogApi>();
     const hanldeShow = (id:any) => {
         return apiRef.current?.show?.(id)
@@ -30,7 +29,8 @@ const useCambiarEstat = () => {
 
     return {
         hanldeShow,
-        content: <CambiarEstat apiRef={apiRef}/>
+        content: <Assignar apiRef={apiRef}/>
     }
 }
-export default useCambiarEstat;
+
+export default useAssignar;

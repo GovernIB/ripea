@@ -115,9 +115,9 @@ const TasquesGrid: React.FC = (props:any) => {
                 },
             }}
             rowAdditionalActions={actions}
+            disableColumnMenu
             rowHideUpdateButton
-            rowHideDeleteButton
-            // readOnly
+            // rowHideDeleteButton
         />
         {components}
     </GridPage>
