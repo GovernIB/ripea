@@ -151,7 +151,7 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
 
 	/**
-	 * Generació d'un informe associat al recurs.
+	 * Generació d'un informe associat a un recurs.
 	 *
 	 * @param code
 	 *            codi de l'informe a generar.
@@ -168,6 +168,31 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	 *             si es troben errors de validació en els paràmetres.
 	 */
 	ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+			final String code,
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
+
+	/**
+	 * Generació d'un informe associat a un recurs.
+	 *
+	 * @param id
+	 *            id de l'element sobre el qual es vol generar l'informe.
+	 * @param code
+	 *            codi de l'informe a generar.
+	 * @param params
+	 *            paràmetres per a generar l'informe.
+	 * @param bindingResult
+	 *            instància de BindingResult per a poder validar els paràmetres.
+	 * @return les dades de l'informe.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'informe amb el codi especificat.
+	 * @throws JsonProcessingException
+	 *             si es produeix algun error al extreure els paràmetres.
+	 * @throws MethodArgumentNotValidException
+	 *             si es troben errors de validació en els paràmetres.
+	 */
+	ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+			final ID id,
 			final String code,
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;

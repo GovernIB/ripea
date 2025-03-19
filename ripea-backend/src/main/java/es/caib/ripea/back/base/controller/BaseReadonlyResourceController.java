@@ -307,9 +307,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ResponseEntity.ok().build();
 	}
 
+
 	@Override
 	@PostMapping("/artifacts/report/{code}")
-	@Operation(summary = "Generació de l'informe associat al recurs")
+	@Operation(summary = "Generació de l'informe associat a un recurs")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
 	public ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
 			@PathVariable
@@ -318,17 +319,39 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestBody(required = false)
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		log.debug("Generació de l'informe associat al recurs (code={}, params={})", code, params);
+		return artifactReportGenerate(null, code, params, bindingResult);
+	}
+
+	@Override
+	@PostMapping("/{id}/artifacts/report/{code}")
+	@Operation(summary = "Generació de l'informe associat a un recurs amb id")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
+	public ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+			@PathVariable(required = false)
+			@Parameter(description = "Identificador del recurs")
+			final ID id,
+			@PathVariable
+			@Parameter(description = "Codi de l'informe")
+			final String code,
+			@RequestBody(required = false)
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Generació de l'informe associat al recurs (id={}, code={}, params={})", id, code, params);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
 				ResourceArtifactType.REPORT,
 				code,
 				params,
 				bindingResult);
-		List<?> items = getReadonlyResourceService().reportGenerate(code, paramsObject);
+		List<?> items = getReadonlyResourceService().artifactReportGenerate(id, code, paramsObject);
 		List<EntityModel<?>> itemsAsEntities = items.stream().
 				map(i -> EntityModel.of(i, buildReportItemLink(code, items.indexOf(i)))).
 				collect(Collectors.toList());
-		Link reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(code, null, null)).withSelfRel();
+		Link reportLink;
+		if (id != null) {
+			reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(id, code, null, null)).withSelfRel();
+		} else {
+			reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(code, null, null)).withSelfRel();
+		}
 		return ResponseEntity.ok(
 				CollectionModel.of(
 						itemsAsEntities,

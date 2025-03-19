@@ -55,7 +55,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         resource.setMetaExpedientTascaDescription(entity.getMetaExpedientTasca().getDescripcio());
     }
 
-	private class ResponsablesPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResource, ExpedientTascaResourceEntity> {
+	private class ResponsablesPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
 		@Override
 		public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
 			if (entity.getResponsables() != null && !entity.getResponsables().isEmpty()) {

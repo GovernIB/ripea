@@ -341,12 +341,33 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@RequestBody(required = false)
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		return artifactActionExec(null, code, params, bindingResult);
+	}
+
+	@Override
+	@PostMapping("/{id}/artifacts/action/{code}")
+	@Operation(summary = "Execució d'una acció associada a un recurs amb id")
+	@PreAuthorize("this.isPublic() or hasPermission(#id, this.getResourceClass().getName(), this.getOperation('ACTION'))")
+	public ResponseEntity<?> artifactActionExec(
+			@PathVariable(required = false)
+			@Parameter(description = "Identificador del recurs")
+			final ID id,
+			@PathVariable
+			@Parameter(description = "Codi de l'acció")
+			final String code,
+			@RequestBody(required = false)
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Executant acció (id={}, code={}, params={})",
+				id,
+				code,
+				params);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
 				ResourceArtifactType.ACTION,
 				code,
 				params,
 				bindingResult);
-		Object result = getMutableResourceService().actionExec(code, paramsObject);
+		Serializable result = getMutableResourceService().artifactActionExec(id, code, paramsObject);
 		return ResponseEntity.ok(result);
 	}
 

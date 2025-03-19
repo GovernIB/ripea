@@ -10,7 +10,6 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -103,7 +102,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         entity.setMetaNode(entity.getMetaExpedient());
     }
 
-    private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResource, ExpedientResourceEntity> {
+    private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
@@ -111,7 +110,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
-    private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResource, ExpedientResourceEntity> {
+    private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             List<InteressatResource> interessats = entity.getInteressats().stream()

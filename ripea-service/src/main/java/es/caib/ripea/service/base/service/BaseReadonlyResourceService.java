@@ -58,9 +58,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	private Class<R> resourceClass;
 	private Class<E> entityClass;
-	private final Map<String, ReportDataGenerator<?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
+	private final Map<String, ReportDataGenerator<E, ?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
 	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>(); // TODO
-	private final Map<String, PerspectiveApplicator<R, E>> perspectiveApplicatorMap = new HashMap<>();
+	private final Map<String, PerspectiveApplicator<E, R>> perspectiveApplicatorMap = new HashMap<>();
 	private final Map<String, FieldDownloader<E>> fieldDownloaderMap = new HashMap<>();
 
 	@Override
@@ -201,7 +201,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 						null);
 			}
 		} else if (type == ResourceArtifactType.REPORT) {
-			ReportDataGenerator<?, ?> reportDataGenerator = reportDataGeneratorMap.get(code);
+			ReportDataGenerator<E, ?, ?> reportDataGenerator = reportDataGeneratorMap.get(code);
 			if (reportDataGenerator != null) {
 				return new ResourceArtifact(
 						ResourceArtifactType.REPORT,
@@ -271,11 +271,18 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public <P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException {
-		log.debug("Generating report (code={}, params={})", code, params);
-		ReportDataGenerator<P, ?> generator = (ReportDataGenerator<P, ?>)reportDataGeneratorMap.get(code);
+	public <P extends Serializable> List<?> artifactReportGenerate(
+			ID id,
+			String code,
+			P params) throws ArtifactNotFoundException, ReportGenerationException {
+		log.debug("Generating report (id={}, code={}, params={})", id, code, params);
+		ReportDataGenerator<E, P, ?> generator = (ReportDataGenerator<E, P, ?>)reportDataGeneratorMap.get(code);
 		if (generator != null) {
-			return generator.generate(code, params);
+			E entity = null;
+			if (id != null) {
+				entity = getEntity(id, null);
+			}
+			return generator.generate(code, entity, params);
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.REPORT, code);
 		}
@@ -355,7 +362,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			List<R> resources,
 			String[] perspectives) throws ArtifactNotFoundException {
 		Arrays.stream(perspectives).forEach(p -> {
-			PerspectiveApplicator<R, E> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
 			if (perspectiveApplicator != null) {
 				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
 				if (!modified) {
@@ -377,7 +384,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			R resource,
 			String[] perspectives) {
 		Arrays.stream(perspectives).forEach(p -> {
-			PerspectiveApplicator<R, E> perspectiveApplicator = perspectiveApplicatorMap.get(p);
+			PerspectiveApplicator<E, R> perspectiveApplicator = perspectiveApplicatorMap.get(p);
 			if (perspectiveApplicator != null) {
 				perspectiveApplicator.applySingle(p, entity, resource);
 			} else {
@@ -664,7 +671,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String[] previousFieldsChanged,
 			P target) {
 		if (type == ResourceArtifactType.REPORT) {
-			ReportDataGenerator<P, ?> reportDataGenerator = (ReportDataGenerator<P, ?>)reportDataGeneratorMap.get(code);
+			ReportDataGenerator<E, P, ?> reportDataGenerator = (ReportDataGenerator<E, P, ?>)reportDataGeneratorMap.get(code);
 			if (reportDataGenerator != null) {
 				reportDataGenerator.onChange(
 						previous,
@@ -690,7 +697,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	protected void register(
 			String reportCode,
-			ReportDataGenerator<?, ?> reportGenerator) {
+			ReportDataGenerator<E, ?, ?> reportGenerator) {
 		if (artifactIsPresentInResourceConfig(ResourceArtifactType.REPORT, reportCode)) {
 			reportDataGeneratorMap.put(reportCode, reportGenerator);
 		} else {
@@ -716,7 +723,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	protected void register(
 			String perspectiveCode,
-			PerspectiveApplicator<R, E> perspectiveApplicator) {
+			PerspectiveApplicator<E, R> perspectiveApplicator) {
 		if (artifactIsPresentInResourceConfig(ResourceArtifactType.PERSPECTIVE, perspectiveCode)) {
 			perspectiveApplicatorMap.put(perspectiveCode, perspectiveApplicator);
 		} else {
@@ -1023,9 +1030,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	/**
 	 * Interfície a implementar pels artefactes encarregats d'aplicar perspectives als recursos.
 	 *
-	 * @param <R> classe del recurs suportat.
+	 * @param <E> classe de l'entitat a la qual està associada aquesta perspectiva.
+	 * @param <R> classe del recurs al qual està associada aquesta perspectiva.
 	 */
-	public interface PerspectiveApplicator<R extends Resource<?>, E extends ResourceEntity<R, ?>> {
+	public interface PerspectiveApplicator<E extends ResourceEntity<R, ?>, R extends Resource<?>> {
 		/**
 		 * Aplica la perspectiva a múltiples recursos. Es pot sobreescriure o deixar sense implementar.
 		 * Si es deixa sense implementar s'aplicarà la perspectiva a cada recurs per separat.
@@ -1098,15 +1106,19 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	/**
 	 * Interfície a implementar pels artefactes encarregats de generar dades pels informes.
 	 *
+	 * @param <E> classe de l'entitat a la que està associada l'informe.
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
 	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportDataGenerator<P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
+	public interface ReportDataGenerator<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
 		/**
 		 * Genera les dades per l'informe.
 		 *
 		 * @param code
 		 *            el codi de l'informe.
+		 * @param entity
+		 *            entitat sobre la que es genera l'informe (pot ser null si l'acció no s'executa sobre una entitat
+		 *            en concret).
 		 * @param params
 		 *            els paràmetres per a la generació.
 		 * @return la llista amb les dades generades.
@@ -1115,6 +1127,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		 */
 		List<R> generate(
 				String code,
+				E entity,
 				P params) throws ReportGenerationException;
 	}
 

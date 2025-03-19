@@ -110,6 +110,8 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	/**
 	 * Executa l'acció amb el codi especificat.
 	 *
+	 * @param id
+	 *            identificació del recurs (pot ser null si l'acció no s'executa sobre un recurs determinat).
 	 * @param code
 	 *            el codi de l'acció.
 	 * @param params
@@ -121,6 +123,9 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	 * @throws ActionExecutionException
 	 *             si es produeix algun error executant l'acció.
 	 */
-	<P extends Serializable> Serializable actionExec(String code, P params) throws ArtifactNotFoundException, ActionExecutionException;
+	<P extends Serializable> Serializable artifactActionExec(
+			ID id,
+			String code,
+			P params) throws ArtifactNotFoundException, ActionExecutionException;
 
 }

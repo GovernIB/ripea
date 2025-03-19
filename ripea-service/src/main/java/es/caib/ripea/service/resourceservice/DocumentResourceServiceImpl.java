@@ -96,7 +96,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
 
-    private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResource, DocumentResourceEntity> {
+    private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
             if (entity.getPare()!=null){

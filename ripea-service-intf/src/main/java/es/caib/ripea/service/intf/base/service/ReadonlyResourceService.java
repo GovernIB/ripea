@@ -143,17 +143,24 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	/**
 	 * Genera l'informe amb el codi especificat.
 	 *
+	 * @param id
+	 *            identificació del recurs (pot ser null si l'informe no es genera sobre un recurs determinat).
+	 * @param code
+	 *            el codi de l'informe.
 	 * @param code
 	 *            el codi de l'informe.
 	 * @param params
 	 *            els paràmetres necessaris per a generar l'informe.
-	 * @return les dades de l'informe
+	 * @return les dades de l'informe.
 	 * @param <P> el tipus dels paràmetres.
 	 * @throws ArtifactNotFoundException
 	 *             si no es troba l'informe amb el codi especificat.
 	 * @throws ReportGenerationException
 	 *             si es produeix algun error generant l'informe.
 	 */
-	<P extends Serializable> List<?> reportGenerate(String code, P params) throws ArtifactNotFoundException, ReportGenerationException;
+	<P extends Serializable> List<?> artifactReportGenerate(
+			ID id,
+			String code,
+			P params) throws ArtifactNotFoundException, ReportGenerationException;
 
 }

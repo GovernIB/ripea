@@ -40,7 +40,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	@Autowired
 	private ResourceReferenceToEntityHelper resourceReferenceToEntityHelper;
 
-	private final Map<String, ActionExecutor<?, ?>> actionExecutorMap = new HashMap<>();
+	private final Map<String, ActionExecutor<E, ?, ?>> actionExecutorMap = new HashMap<>();
 	private final Map<String, OnChangeLogicProcessor<R>> onChangeLogicProcessorMap = new HashMap<>();
 	private final Map<String, FieldFileManager<E>> fieldFileManagerMap = new HashMap<>();
 
@@ -187,7 +187,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				previousFieldsChanged,
 				target);
 		if (type == ResourceArtifactType.ACTION) {
-			ActionExecutor<P, ?> actionExecutor = (ActionExecutor<P, ?>)actionExecutorMap.get(code);
+			ActionExecutor<E, P, ?> actionExecutor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
 			if (actionExecutor != null) {
 				actionExecutor.onChange(
 						previous,
@@ -202,11 +202,15 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional
-	public <P extends Serializable> Serializable actionExec(String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
-		log.debug("Executing action (code={}, params={})", code, params);
-		ActionExecutor<P, ?> executor = (ActionExecutor<P, ?>)actionExecutorMap.get(code);
+	public <P extends Serializable> Serializable artifactActionExec(ID id, String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
+		log.debug("Executing action (id={}, code={}, params={})", id, code, params);
+		ActionExecutor<E, P, ?> executor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
 		if (executor != null) {
-			return executor.exec(code, params);
+			E entity = null;
+			if (id != null) {
+				entity = getEntity(id, null);
+			}
+			return executor.exec(code, entity, params);
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.ACTION, code);
 		}
@@ -235,7 +239,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
 		log.debug("Querying artifact form class (type={}, code={})", type, code);
 		if (type == ResourceArtifactType.ACTION) {
-			ActionExecutor<?, ?> generator = actionExecutorMap.get(code);
+			ActionExecutor<E, ?, ?> generator = actionExecutorMap.get(code);
 			if (generator != null) {
 				return new ResourceArtifact(
 						ResourceArtifactType.ACTION,
@@ -431,7 +435,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	protected void register(
 			String actionCode,
-			ActionExecutor<?, ?> actionExecutor) {
+			ActionExecutor<E, ?, ?> actionExecutor) {
 		if (artifactIsPresentInResourceConfig(ResourceArtifactType.ACTION, actionCode)) {
 			actionExecutorMap.put(actionCode, actionExecutor);
 		} else {
@@ -540,22 +544,26 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	/**
 	 * Interfície a implementar pels artefactes encarregats d'executar accions.
 	 *
+	 * @param <E> classe de l'entitat a la que està associada l'acció.
 	 * @param <P> classe dels paràmetres necessaris per a executar l'acció.
 	 * @param <R> classe de la resposta retornada com a resultat.
 	 */
-	public interface ActionExecutor<P extends Serializable, R extends Serializable> extends OnChangeLogicProcessor<P> {
+	public interface ActionExecutor<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable> extends OnChangeLogicProcessor<P> {
 		/**
 		 * Executa l'acció.
 		 *
 		 * @param code
 		 *            el codi de l'acció.
+		 * @param entity
+		 *            entitat sobre la que s'executa l'acció (pot ser null si l'acció no s'executa sobre una entitat en
+		 *            concret).
 		 * @param params
 		 *            els paràmetres per a l'execució.
 		 * @return el resultat de l'execució (pot ser null).
 		 * @throws ActionExecutionException
 		 *             si es produeix algun error generant les dades.
 		 */
-		R exec(String code, P params) throws ActionExecutionException;
+		R exec(String code, E entity, P params) throws ActionExecutionException;
 	}
 
 }

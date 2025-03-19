@@ -5,15 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.model.OnChangeEvent;
 import es.caib.ripea.service.intf.base.model.Resource;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.Serializable;
 
@@ -155,7 +152,7 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 			final String[] perspectives);
 
 	/**
-	 * Execució d'una acció associada al recurs.
+	 * Execució d'una acció associada a un recurs.
 	 *
 	 * @param code
 	 *            codi de l'acció a executar.
@@ -172,10 +169,32 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 	 *             si es troben errors de validació en els paràmetres.
 	 */
 	ResponseEntity<?> artifactActionExec(
-			@PathVariable
-			@Parameter(description = "Codi de l'acció")
 			final String code,
-			@RequestBody(required = false)
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
+
+	/**
+	 * Execució d'una acció associada a un recurs amb id.
+	 *
+	 * @param id
+	 *            id del recurs sobre el que s'ha d'executar l'acció.
+	 * @param code
+	 *            codi de l'acció a executar.
+	 * @param params
+	 *            paràmetres per a executar l'acció.
+	 * @param bindingResult
+	 *            instància de BindingResult per a poder validar els paràmetres.
+	 * @return el resultat de l'execució.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'informe amb el codi especificat.
+	 * @throws JsonProcessingException
+	 *             si es produeix algun error al extreure els paràmetres.
+	 * @throws MethodArgumentNotValidException
+	 *             si es troben errors de validació en els paràmetres.
+	 */
+	ResponseEntity<?> artifactActionExec(
+			final ID id,
+			final String code,
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
 
