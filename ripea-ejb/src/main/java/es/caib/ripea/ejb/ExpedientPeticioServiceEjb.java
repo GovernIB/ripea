@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
+import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
@@ -37,6 +38,12 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 		this.delegateService = delegateService;
 	}
 
+	@Override
+	@RolesAllowed("IPA_BSTWS")
+	public void crearExpedientPeticion(List<AnotacioRegistreId> anotacioRegistreIds) {
+		delegateService.crearExpedientPeticion(anotacioRegistreIds);
+	}
+	
 	@Override
 	@RolesAllowed("**")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(

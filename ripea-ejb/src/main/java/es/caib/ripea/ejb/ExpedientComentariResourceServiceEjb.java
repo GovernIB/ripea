@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import org.springframework.data.domain.Page;
@@ -41,17 +42,20 @@ public class ExpedientComentariResourceServiceEjb extends AbstractServiceEjb<Exp
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public ExpedientComentariResource newResourceInstance() {
 		return newResourceInstance();
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ExpedientComentariResource create(ExpedientComentariResource resource, Map<String, AnswerValue> answers)
 			throws ResourceAlreadyExistsException, ResourceNotCreatedException, AnswerRequiredException {
 		return create(resource, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ExpedientComentariResource update(Long id, ExpedientComentariResource resource,
 			Map<String, AnswerValue> answers)
 			throws ResourceNotFoundException, ResourceNotUpdatedException, AnswerRequiredException {
@@ -59,53 +63,70 @@ public class ExpedientComentariResourceServiceEjb extends AbstractServiceEjb<Exp
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void delete(Long id, Map<String, AnswerValue> answers)
 			throws ResourceNotFoundException, ResourceNotDeletedException, AnswerRequiredException {
 		delete(id, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public Map<String, Object> onChange(ExpedientComentariResource previous, String fieldName, Object fieldValue,
 			Map<String, AnswerValue> answers) throws AnswerRequiredException {
 		return onChange(previous, fieldName, fieldValue, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public <P extends Serializable> Serializable actionExec(String code, P params)
 			throws ArtifactNotFoundException, ActionExecutionException {
 		return actionExec(code, params);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ExpedientComentariResource getOne(Long id, String[] perspectives) throws ResourceNotFoundException {
 		return getOne(id, perspectives);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public Page<ExpedientComentariResource> findPage(String quickFilter, String filter, String[] namedQueries,
 			String[] perspectives, Pageable pageable) {
 		return findPage(quickFilter, filter, namedQueries, perspectives, pageable);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DownloadableFile fieldDownload(Long id, String fieldName, OutputStream out) throws ResourceNotFoundException,
 			ResourceFieldNotFoundException, FieldArtifactNotFoundException, IOException {
 		return fieldDownload(id, fieldName, out);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<ResourceArtifact> artifactFindAll(ResourceArtifactType type) {
 		return artifactFindAll(type);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
 		return artifactGetOne(type, code);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public <P extends Serializable> List<?> reportGenerate(String code, P params)
 			throws ArtifactNotFoundException, ReportGenerationException {
 		return reportGenerate(code, params);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
+			P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
+			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
+		return artifactOnChange(type, code, previous, fieldName, fieldValue, answers);
 	}
 }

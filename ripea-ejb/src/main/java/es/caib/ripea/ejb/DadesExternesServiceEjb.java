@@ -45,6 +45,7 @@ public class DadesExternesServiceEjb extends AbstractServiceEjb<DadesExternesSer
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public List<ProvinciaDto> findProvinciesPerComunitat(String comunitatCodi) {
 		return delegateService.findProvinciesPerComunitat(comunitatCodi);
 	}

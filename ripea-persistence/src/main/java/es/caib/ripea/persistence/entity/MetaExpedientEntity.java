@@ -42,10 +42,11 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     private String expressioNumero;
     @Column(name = "not_activa", nullable = false)
     private boolean notificacioActiva;
-
     @Column(name = "PERMET_METADOCS_GENERALS", nullable = false)
     private boolean permetMetadocsGenerals;
-
+    @Column(name = "PERMIS_DIRECTE")
+    private boolean permisDirecte = false;
+    
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "pare_id")
     @ForeignKey(name = BaseConfig.DB_PREFIX + "pare_metaexp_fk")
@@ -160,7 +161,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			OrganGestorEntity organGestor,
 			boolean gestioAmbGrupsActiva, 
 			TipusClassificacioEnumDto tipusClassificacio,
-			boolean interessatObligatori) {
+			boolean interessatObligatori,
+			boolean permisDirecte) {
         super.update(codi, nom, descripcio);
         this.classificacio = classificacio;
         this.serieDocumental = serieDocumental;
@@ -173,7 +175,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
         this.tipusClassificacio = tipusClassificacio;
         this.interessatObligatori = interessatObligatori;
-
+        this.permisDirecte = permisDirecte;
     }
 	
 	
@@ -205,7 +207,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			MetaExpedientEntity pare,
 			OrganGestorEntity organGestor,
 			boolean gestioAmbGrupsActiva,
-			boolean interessatObligatori) {
+			boolean interessatObligatori,
+			boolean permisDirecte) {
 		return new Builder(
 				codi,
 				nom,
@@ -218,7 +221,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				permetMetadocsGenerals,
 				organGestor,
 				gestioAmbGrupsActiva,
-				interessatObligatori);
+				interessatObligatori,
+				permisDirecte);
 	}
 
     public static class Builder {
@@ -236,7 +240,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				boolean permetMetadocsGenerals,
 				OrganGestorEntity organGestor,
 				boolean gestioAmbGrupsActiva,
-				boolean interessatObligatori) {
+				boolean interessatObligatori,
+				boolean permisDirecte) {
             built = new MetaExpedientEntity();
             built.codi = codi;
             built.nom = nom!=null?nom.trim():null;
@@ -253,6 +258,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.organGestor = organGestor;
             built.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
             built.interessatObligatori = interessatObligatori;
+            built.permisDirecte = permisDirecte;
         }
 
         public Builder expressioNumero(String expressioNumero) {
@@ -326,7 +332,12 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			GrupEntity grupPerDefecte) {
 		this.grupPerDefecte = grupPerDefecte;
 	}
+    
+	public void setPermisDirecte(
+			boolean permisDirecte) {
+		this.permisDirecte = permisDirecte;
+	}
 
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = -2299453443943600172L;
-
 }

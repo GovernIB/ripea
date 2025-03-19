@@ -65,7 +65,6 @@ public class ExpedientPeticioHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private PluginHelper pluginHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
-	@Autowired private DistribucioHelper distribucioHelper;
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
@@ -103,6 +102,7 @@ public class ExpedientPeticioHelper {
 		}
 	}
 
+	
 
 	public void canviEstatExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
 
@@ -374,14 +374,17 @@ public class ExpedientPeticioHelper {
 				estat = Estat.REBUTJADA;
 				break;
 			}
+			
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Canviant estat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
-			distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, estat, observacions);
+			
+			pluginHelper.canviEstatAnotacio(anotacio, estat, observacions);
+			
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Estat canviat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
+			
 			pendent.setEstatCanviatDistribucio(true);
-			
-			
+
 		} catch (Exception ex) {
 			logger.error("Error al reintentar canvi estat a Distribució de anotacio amb id " + pendent.getId(), ex);
 			exception = ex;

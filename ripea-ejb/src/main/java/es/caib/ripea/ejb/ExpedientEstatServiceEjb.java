@@ -107,7 +107,4 @@ public class ExpedientEstatServiceEjb extends AbstractServiceEjb<ExpedientEstatS
 				rolActual,
 				resultEnum);
 	}
-
-
-
 }

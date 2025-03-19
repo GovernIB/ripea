@@ -124,7 +124,6 @@ public class CacheHelper {
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
 		permisosHelper.filterGrantedAny(
 				entitats,
@@ -137,7 +136,7 @@ public class CacheHelper {
 				new Permission[] {
 					ExtendedPermission.READ,
 					ExtendedPermission.ADMINISTRATION},
-				auth);
+				SecurityContextHolder.getContext().getAuthentication());
 		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				ExtendedPermission.ADMINISTRATION);

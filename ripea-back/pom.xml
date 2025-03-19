@@ -16,10 +16,6 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>opensymphony</groupId>
 			<artifactId>sitemesh</artifactId>
 		</dependency>
@@ -84,7 +80,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin</artifactId>
+			<artifactId>ripea-plugin-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- WEBJARS -->
@@ -268,6 +264,12 @@
 					<artifactId>ripea-service</artifactId>
 					<version>${project.version}</version>
 				</dependency>
+<!--				<dependency>-->
+<!--		        	<groupId>org.springframework.boot</groupId>-->
+<!--		        	<artifactId>spring-boot-devtools</artifactId>-->
+<!--				    <optional>true</optional>-->
+<!--				    <scope>provided</scope>            	-->
+<!--		    	</dependency>					-->
 			</dependencies>
 			<build>
 				<plugins>

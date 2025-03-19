@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public interface ProcessosInicialsRepository extends JpaRepository<ProcesosInicialsEntity, String> {
+public interface ProcessosInicialsRepository extends JpaRepository<ProcesosInicialsEntity, Long> {
 
     List<ProcesosInicialsEntity> findProcesosInicialsEntityByInitTrue();
 

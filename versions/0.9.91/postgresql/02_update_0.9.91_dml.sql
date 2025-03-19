@@ -1,2 +1,0 @@
--- 934
-insert into ipa_exp_tasca_comment (id, exp_tasca_id, text, createdby_codi, createddate) select nextval('ipa_hibernate_seq'), id, comentari, createdby_codi, createddate from ipa_expedient_tasca where comentari is not null;

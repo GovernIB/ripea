@@ -17,6 +17,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@PreAuthorize("isAuthenticated()")
 public interface ContingutService {
 
 

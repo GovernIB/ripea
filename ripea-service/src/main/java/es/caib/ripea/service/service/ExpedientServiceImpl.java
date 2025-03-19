@@ -80,7 +80,6 @@ import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.CsvHelper;
 import es.caib.ripea.service.helper.DateHelper;
-import es.caib.ripea.service.helper.DistribucioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
@@ -163,7 +162,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private EmailHelper emailHelper;
-	@Autowired private DistribucioHelper distribucioHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -389,7 +387,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 		try {
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			distribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
+			pluginHelper.canviEstatAnotacio(anotacioRegistreId, Estat.PROCESSADA, "");
 			expedientPeticioEntity.setEstatCanviatDistribucio(true);
 			// change state of expedient peticion to processat and notificat to DISTRIBUCIO
 			expedientPeticioHelper.canviEstatExpedientPeticioNewTransaction(
@@ -1767,7 +1765,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					permisosPerExpedients.getIdsGrupsPermesos() == null,
 					permisosPerExpedients.getIdsGrupsPermesos(),
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
 					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
@@ -1854,7 +1853,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					permisosPerExpedients.getIdsGrupsPermesos() == null,
 					permisosPerExpedients.getIdsGrupsPermesos(),
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_SUPER"), //No aplica filtre permis directe procediment
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"), //No aplica filtre grups
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
 					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",

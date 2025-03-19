@@ -51,6 +51,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.NodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -313,10 +314,6 @@ public class EntityComprovarHelper {
 		}
 		return metaNode;
 	}
-	
-	
-	
-
 
 	public MetaExpedientEntity comprovarMetaExpedient(EntitatEntity entitat, Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
@@ -340,7 +337,6 @@ public class EntityComprovarHelper {
 		}
 		return metaExpedient;
 	}
-	
 	
 	public MetaExpedientEntity comprovarMetaExpedient(Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
@@ -735,7 +731,7 @@ public class EntityComprovarHelper {
 				false,
 				null);
 	}
-	public ExpedientEntity comprovarExpedientPermisWrite(Long expedientId) {
+	public ExpedientEntity comprovarExpedientPermisWrite(Long expedientId, boolean llancarExcepcio) {
 		return comprovarExpedient(
 				expedientId,
 				false,
@@ -743,7 +739,8 @@ public class EntityComprovarHelper {
 				true,
 				false,
 				false,
-				null);
+				null,
+				llancarExcepcio);
 	}
 	public ExpedientEntity comprovarExpedientPermisCreate(Long expedientId) {
 		return comprovarExpedient(
@@ -755,7 +752,7 @@ public class EntityComprovarHelper {
 				false,
 				null);
 	}
-	public ExpedientEntity comprovarExpedientPermisDelete(Long expedientId) {
+	public ExpedientEntity comprovarExpedientPermisDelete(Long expedientId, boolean llancarExcepcio) {
 		return comprovarExpedient(
 				expedientId,
 				false,
@@ -763,7 +760,27 @@ public class EntityComprovarHelper {
 				false,
 				false,
 				true,
-				null);
+				null,
+				llancarExcepcio);
+	}
+	
+	public ExpedientEntity comprovarExpedient(
+			Long expedientId,
+			boolean comprovarAgafatPerUsuariActual,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete,
+			String rolActual) {
+		return comprovarExpedient(
+				expedientId,
+				comprovarAgafatPerUsuariActual,
+				comprovarPermisRead,
+				comprovarPermisWrite,
+				comprovarPermisCreate,
+				comprovarPermisDelete,
+				rolActual,
+				true);
 	}
 
 	public ExpedientEntity comprovarExpedient(
@@ -773,7 +790,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete,
-			String rolActual) {
+			String rolActual,
+			boolean llancarExcepcio) {
 
 		ExpedientEntity expedient = expedientRepository.findById(expedientId).orElse(null);
 		if (expedient == null) {
@@ -814,25 +832,25 @@ public class EntityComprovarHelper {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.READ,
-					"READ", true);
+					"READ", llancarExcepcio);
 		}
 		if (comprovarPermisWrite) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.WRITE,
-					"WRITE", true);
+					"WRITE", llancarExcepcio);
 		}
 		if (comprovarPermisCreate) {
 		comprovarPermisExpedient(
 				expedientId,
 				ExtendedPermission.CREATE,
-				"CREATE", true);
+				"CREATE", llancarExcepcio);
 		}
 		if (comprovarPermisDelete) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.DELETE,
-					"DELETE", true);
+					"DELETE", llancarExcepcio);
 		}
 		
 		return expedient;
@@ -1041,13 +1059,22 @@ public class EntityComprovarHelper {
 		boolean isAdminOrgan = false;
 		
 		if (organGestorId != null) {
-			OrganGestorEntity organGestorEntity = organGestorRepository.getOne(organGestorId);
-			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
-			permisosHelper.filterGrantedAny(
-					organsGestors,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION });
-			isAdminOrgan = Utils.isNotEmpty(organsGestors);
+			OrganGestorEntity organGestorEntity = organGestorRepository.findById(organGestorId).orElse(null);
+			if (organGestorEntity!=null) {
+//				organGestorEntity = HibernateHelper.deproxy(organGestorEntity);
+				List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
+				permisosHelper.filterGrantedAny(
+						organsGestors,
+						new ObjectIdentifierExtractor<OrganGestorEntity>() {
+							public Long getObjectIdentifier(OrganGestorEntity entitat) {
+								return entitat.getId();
+							}
+						},
+						OrganGestorEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						SecurityContextHolder.getContext().getAuthentication());
+				isAdminOrgan = Utils.isNotEmpty(organsGestors);
+			}
 		}
 		return isAdminOrgan;
 	}
@@ -1081,8 +1108,14 @@ public class EntityComprovarHelper {
 			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
 			permisosHelper.filterGrantedAny(
 					organsGestors,
+					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+						public Long getObjectIdentifier(OrganGestorEntity entitat) {
+							return entitat.getId();
+						}
+					},					
 					OrganGestorEntity.class,
-					new Permission[] { permission});
+					new Permission[] { permission},
+					SecurityContextHolder.getContext().getAuthentication());
 			grantedOrgan = Utils.isNotEmpty(organsGestors);
 		}
 
@@ -1304,65 +1337,105 @@ public class EntityComprovarHelper {
 			String permissionName, 
 			boolean throwException) {
 
-		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		ExpedientEntity expedient = expedientRepository.findById(expedientId).get();
 		Long procedimentId = expedient.getMetaExpedient().getId();
 		Long organId = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
-
+		Authentication authObject = SecurityContextHolder.getContext().getAuthentication();
 		if (cacheHelper.mostrarLogsPermisos())
-			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", user=" + SecurityContextHolder.getContext().getAuthentication().getName());
+			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", user=" + authObject.getName() + ", roles="+authObject.getAuthorities());
 		
 		if (!isAdminEntitat(procedimentId)) {
 
+			if (cacheHelper.mostrarLogsPermisos())
+				logger.info("comprovarPermisExpedient: El usuari no es administrador de la entitat. Continuam comprovant nivells més baixos.");
+			
+			//https://github.com/GovernIB/ripea/issues/1633 Procediments que requereixen un permís directe
+			// - Sobre el MetaExpedient si NO es comú
+			// - Sobre el MetaExpedientOrgan si es comú
+			if (expedient.getMetaExpedient().isPermisDirecte() && 
+				!isGrantedPermisProcediment(procedimentId, permission) &&
+				!isGrantedPermisProcedimentOrgan(procedimentId, expedient.getOrganGestor().getId(), permission)) {
+				if (cacheHelper.mostrarLogsPermisos())
+					logger.info("comprovarPermisExpedient: El procediment requereix assignar permís directe i el usuari ni cap dels seus rols té permis de "+permissionName+" sobre el procediment "+procedimentId);
+				if (throwException) {
+					throw new PermissionDeniedException(expedient.getMetaExpedient().getClass(), procedimentId, permissionName, "El procediment requereix assignar permís directe.");
+				} else {
+					return false;
+				}
+			}
+			
 			if (!isAdminOrgan(organId)) {
 
-				if (!isGrantedPermisProcediment(
-						procedimentId,
-						permission)) {
+				if (cacheHelper.mostrarLogsPermisos())
+					logger.info("comprovarPermisExpedient: El usuari no es administrador de l'organ. Continuam comprovant permisos a nivell de Procediment.");
+				
+				if (!isGrantedPermisProcediment(procedimentId, permission)) {
 
-					if (!isGrantedPermisOrgan(
-							expedient.getOrganGestor().getId(),
-							permission)) {
+					if (cacheHelper.mostrarLogsPermisos())
+						logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis de "+permissionName+" sobre el procediment "+procedimentId);
+					
+					if (!isGrantedPermisOrgan(expedient.getOrganGestor().getId(), permission)) {
 
-						if (!isGrantedPermisProcedimentOrgan(
-								procedimentId,
-								organId,
-								permission)) {
+						if (cacheHelper.mostrarLogsPermisos())
+							logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis de "+permissionName+" sobre el OG del expedient "+expedient.getOrganGestor().getId());
+						
+						if (!isGrantedPermisProcedimentOrgan(procedimentId, organId, permission)) {
 
-							if (!isGrantedPermisProcedimentsComuns(
-									procedimentId,
-									organId,
-									permission)) {
+							if (cacheHelper.mostrarLogsPermisos())
+								logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis de "+permissionName+" sobre el procediment["+procedimentId+"]-organ["+organId+"] (Proc. Comuns).");
+							
+							if (!isGrantedPermisProcedimentsComuns(procedimentId, organId, permission)) {
+								
+								if (cacheHelper.mostrarLogsPermisos())
+									logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis de procediments comuns sobre el procediment["+procedimentId+"]-organ["+organId+"] (Proc. Comuns).");
+								
 								if (throwException) {
-									throw new PermissionDeniedException(
-											expedient.getId(),
-											expedient.getClass(),
-											permissionName);
+									throw new PermissionDeniedException(expedient.getId(), expedient.getClass(), permissionName);
 								} else {
 									return false;
 								}
 							}
+						} else {
+							if (cacheHelper.mostrarLogsPermisos())
+								logger.info("comprovarPermisExpedient: El usuari o algún dels seus rols té permis "+permissionName+" sobre el procediment["+procedimentId+"]-organ["+organId+"] (Proc. Comuns).");
 						}
+					} else {
+						if (cacheHelper.mostrarLogsPermisos())
+							logger.info("comprovarPermisExpedient: El usuari o algún dels seus rols té permis "+permissionName+" sobre el OG del expedient "+expedient.getOrganGestor().getId());
 					}
+				} else {
+					if (cacheHelper.mostrarLogsPermisos())
+						logger.info("comprovarPermisExpedient: El usuari o algún dels seus rols té permis "+permissionName+" sobre el procediment "+procedimentId);
 				}
 
-				GrupEntity grup = expedientRepository.getOne(expedientId).getGrup();
+				GrupEntity grup = expedientRepository.findById(expedientId).get().getGrup();
 				if (grup != null) {
-					boolean grantedGrup = permisosHelper.isGrantedAll(
-							grup.getId(),
-							GrupEntity.class,
-							new Permission[] { ExtendedPermission.READ });
+					boolean grantedGrup = permisosHelper.isGrantedAll(grup.getId(), GrupEntity.class, new Permission[] { ExtendedPermission.READ });
 					if (!grantedGrup) {
+						
+						if (cacheHelper.mostrarLogsPermisos())
+							logger.info("comprovarPermisExpedient: El usuari ni cap dels seus rols té permis de lectura sobre el grup "+grup.getId()+".");
+						
 						if (throwException) {
-							throw new PermissionDeniedException(
-									grup.getId(),
-									grup.getClass(),
-									"GRUP");
+							throw new PermissionDeniedException(grup.getId(), grup.getClass(), "GRUP");
 						} else {
 							return false;
 						}						
+					} else {
+						if (cacheHelper.mostrarLogsPermisos())
+							logger.info("comprovarPermisExpedient: El usuari o algún dels seus rols té permis de lectura sobre el grup "+grup.getId()+".");
 					}
+				} else {
+					if (cacheHelper.mostrarLogsPermisos())
+						logger.info("comprovarPermisExpedient: El expedient no es troba a cap grup.");				
 				}
+			} else {
+				if (cacheHelper.mostrarLogsPermisos())
+					logger.info("comprovarPermisExpedient: El usuari és administrador de l'organ.");				
 			}
+		} else {
+			if (cacheHelper.mostrarLogsPermisos())
+				logger.info("comprovarPermisExpedient: El usuari és administrador de la entitat.");
 		}
 		return true;
 	}

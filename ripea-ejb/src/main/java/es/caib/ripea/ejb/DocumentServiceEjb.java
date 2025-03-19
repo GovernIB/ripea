@@ -202,6 +202,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public Exception portafirmesCallback(
 			long documentId,
 			PortafirmesCallbackEstatEnumDto estat,
@@ -283,6 +284,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public Exception viaFirmaCallback(
 			String messageCode,
 			ViaFirmaCallbackEstatEnumDto estat) {
@@ -362,12 +364,14 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void notificacioActualitzarEstat(String identificador,
 			String referencia) {
 		delegateService.notificacioActualitzarEstat(identificador, referencia);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
 		return delegateService.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatId);
 	}
@@ -519,6 +523,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void portafirmesCallbackIntegracioOk(
 			String descripcio,
 			Map<String, String> parametres) {
@@ -529,6 +534,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void portafirmesCallbackIntegracioError(
 			String descripcio,
 			Map<String, String> parametres,

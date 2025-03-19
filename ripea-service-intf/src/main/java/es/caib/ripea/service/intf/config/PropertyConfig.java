@@ -187,7 +187,9 @@ public class PropertyConfig {
 	public static final String VIAFIRMA_PLUGIN_ENDPOINT_NAME		= "es.caib.ripea.plugin.viafirma.endpointName";
 	public static final String VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED	= "es.caib.ripea.plugin.viafirma.caib.dispositius.enabled";
 	
+	public static final String DISTRIBUCIO_PLUGIN_CLASS				= "es.caib.ripea.distribucio.backofficeIntegracio.class";
 	public static final String DISTRIBUCIO_PLUGIN_URL				= "es.caib.ripea.distribucio.backofficeIntegracio.ws.url";
+	public static final String DISTRIBUCIO_PLUGIN_ENDPOINT			= "es.caib.ripea.distribucio.backofficeIntegracio.endpointName";
 	public static final String DISTRIBUCIO_PLUGIN_USR				= "es.caib.ripea.distribucio.backofficeIntegracio.ws.username";
 	public static final String DISTRIBUCIO_PLUGIN_PAS				= "es.caib.ripea.distribucio.backofficeIntegracio.ws.password";
 	

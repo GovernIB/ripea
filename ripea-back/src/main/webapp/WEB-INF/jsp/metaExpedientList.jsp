@@ -44,7 +44,23 @@
 	}
 </style>
 <script type="text/javascript">
-	$(function() {
+
+	var permisDirecteActive = '${permisDirecteActive}' === 'true';
+
+	$(document).ready(function() {
+
+		$('#permisDirecteBtn').click(function() {
+			debugger;
+			permisDirecteActive = !$(this).hasClass('active');
+			// Modifica el formulari
+			$('#permisDirecteActive').val(permisDirecteActive);
+			$(this).blur();
+			// Estableix el valor de la cookie
+			setCookie("${nomCookiePermisDirecte}", permisDirecteActive);
+			// Amaga la columna i refresca la taula
+			$('#metaexpedients').webutilDatatable('refresh');
+		});
+		
 	    $("form input").keypress(function (e) {
 	        if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
 	            $("#metaExpedientFiltreForm").submit()
@@ -62,6 +78,15 @@
         $('#metaexpedients').DataTable().ajax.reload();
     	webutilRefreshMissatges();
 	}
+    
+
+    function setCookie(cname,cvalue) {
+    	var exdays = 30;
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires=" + d.toGMTString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }    
 	</script>
 </head>
 <body>
@@ -125,12 +150,19 @@
 			</div>	
 		</div>
 		
+		<rip:inputHidden name="permisDirecteActive"/>
+		
 		<div class="row">	
 			<c:if test="${isRevisioActiva}">	
 				<div class="col-md-4">
 					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
 				</div>
 			</c:if>
+			<div class="col-md-4">
+				<button id="permisDirecteBtn" class="btn btn-default <c:if test="${permisDirecteActive}">active</c:if>" data-toggle="button">
+					<span class="fa fa-hand-o-down"></span> <spring:message code="metaexpedient.list.filtre.camp.permisDir"/>
+				</button>
+			</div>			
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -182,6 +214,12 @@
 					<spring:message code="metaexpedient.list.columna.comu"/>
 					<script id="cellComuTemplate" type="text/x-jsrender">
 						{{if comu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="permisDirecte" data-template="#cellpermisDirecteTemplate" width="1%">
+					<spring:message code="metaexpedient.form.camp.permisDirecte"/>
+					<script id="cellpermisDirecteTemplate" type="text/x-jsrender">
+						{{if permisDirecte}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="gestioAmbGrupsActiva" data-template="#cellGrupTemplate" width="1%">

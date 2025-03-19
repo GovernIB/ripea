@@ -25,7 +25,7 @@ import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientHelper2;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
-import es.caib.ripea.service.helper.ExpedientPeticioHelper0;
+import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
@@ -85,7 +85,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
 	@Autowired private SchedulingConfig schedulingConfig;
 	@Autowired private DocumentRepository documentRepository;
-	@Autowired private ExpedientPeticioHelper0 expedientPeticioHelper0;
+	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
 
     /*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -108,7 +108,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		if (Utils.isNotEmpty(peticionsId)) {
 			for (Long peticionId : peticionsId) {
 				synchronized (SynchronizationHelper.get0To99Lock(peticionId, SynchronizationHelper.locksAnnotacions)) {
-					expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(peticionId, false);
+					anotacioDistribucioHelper.consultarIGuardarAnotacioPeticioPendent(peticionId, false);
 				}
 			}
 		}

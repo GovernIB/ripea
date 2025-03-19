@@ -74,6 +74,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void excepcioSave(Throwable exception) {
 		delegateService.excepcioSave(exception);
 	}
@@ -91,6 +92,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<String> permisosFindRolsDistinctAll() {
 		return delegateService.permisosFindRolsDistinctAll();
 	}

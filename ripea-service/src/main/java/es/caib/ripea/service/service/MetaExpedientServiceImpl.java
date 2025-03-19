@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +70,7 @@ import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PaginacioHelper.ConverterParam;
 import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
@@ -145,7 +147,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Autowired private MetaDadaHelper metaDadaHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
-//	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
 
 	@Transactional
 	@Override
@@ -178,7 +179,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(),
-				metaExpedient.isInteressatObligatori()).
+				metaExpedient.isInteressatObligatori(),
+				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():false).
 				expressioNumero(metaExpedient.getExpressioNumero()).
 				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
@@ -230,7 +232,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva(), 
 				metaExpedient.getTipusClassificacio(),
-				metaExpedient.isInteressatObligatori());
+				metaExpedient.isInteressatObligatori(),
+				rolActual.equals("IPA_ADMIN")?metaExpedient.isPermisDirecte():metaExpedientEntity.isPermisDirecte());
 		
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -311,7 +314,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.getOne(organGestorId),
 				procedimentImportat.isGestioAmbGrupsActiva(),
-				procedimentImportat.isInteressatObligatori()).
+				procedimentImportat.isInteressatObligatori(),
+				false).
 				expressioNumero(procedimentImportat.getExpressioNumero()).
 				tipusClassificacio(procedimentImportat.getTipusClassificacio()).build();
 		
@@ -437,7 +441,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				organGestorEntity,
 				procedimentImportat.isGestioAmbGrupsActiva(),
 				procedimentImportat.getTipusClassificacio(),
-				procedimentImportat.isInteressatObligatori());
+				procedimentImportat.isInteressatObligatori(),
+				false);
 		
 		Long metaExpedientEntityId = metaExpedientEntity.getId();
 
@@ -1084,6 +1089,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
 						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null,
 						filtre.getRevisioEstats()==null || filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
+						filtre.isPermisDirecteActive(),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				MetaExpedientDto.class,
 				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
@@ -1134,11 +1140,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			filtre.getActiu() == null,
 			filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 			filtre.getOrganGestorId() == null,
-			filtre.getOrganGestorId() != null ? organGestorRepository.getOne(
-					filtre.getOrganGestorId()) : null,
+			filtre.getOrganGestorId() != null ? organGestorRepository.getOne(filtre.getOrganGestorId()) : null,
 			Utils.getNullIfEmpty(candidateMetaExpIds),
 			filtre.getRevisioEstat() == null,
 			filtre.getRevisioEstat(),
+			filtre.isPermisDirecteActive(),
 			paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));	
 	}
 	
@@ -1195,7 +1201,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		List<GrupEntity> grups = metaExpedientRepository.getOne(metaExpedientId).getGrups();
 		if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN")) {
-			permisosHelper.filterGrantedAny(grups, GrupEntity.class, new Permission[] {ExtendedPermission.READ});
+			permisosHelper.filterGrantedAny(
+					grups,
+					new ObjectIdentifierExtractor<GrupEntity>() {
+						public Long getObjectIdentifier(GrupEntity entitat) {
+							return entitat.getId();
+						}
+					},
+					GrupEntity.class,
+					new Permission[] {ExtendedPermission.READ},
+					SecurityContextHolder.getContext().getAuthentication());
 		}
 		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}

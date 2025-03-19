@@ -27,8 +27,8 @@
 		<module>ripea-back</module>
 		<module>ripea-api-interna</module>
 		<module>ripea-ear</module>
+		<module>ripea-plugin-intf</module>
 		<module>ripea-plugin</module>
-		<module>ripea-plugin-impl</module>
         <module>ripea-backend</module>
 <!--        <module>ripea-spring-bom</module>-->
     </modules>
@@ -265,6 +265,11 @@
 			<name>Viavansi Maven Repository</name>
 			<url>http://repositorio.viavansi.com/repo</url>
 		</repository>
+		<repository>
+			<id>redhat-repo</id>
+			<name>Redhat GA Repository</name>
+			<url>https://maven.repository.redhat.com/ga/</url>
+		</repository>		
 	</repositories>
 	<build>
 		<plugins>

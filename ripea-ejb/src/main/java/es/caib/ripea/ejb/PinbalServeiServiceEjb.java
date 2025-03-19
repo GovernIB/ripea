@@ -42,13 +42,13 @@ public class PinbalServeiServiceEjb extends AbstractServiceEjb<PinbalServeiServi
 	}
 
 	@Override
-	@PreAuthorize("isAuthenticated()")
+	@RolesAllowed("**")
 	public List<PinbalServeiDto> findActius() {
 		return delegateService.findActius();
 	}
 	
 	@Override
-	@PreAuthorize("isAuthenticated()")
+	@RolesAllowed("**")
 	public List<PinbalServeiDto> findAll() {
 		return delegateService.findAll();
 	}

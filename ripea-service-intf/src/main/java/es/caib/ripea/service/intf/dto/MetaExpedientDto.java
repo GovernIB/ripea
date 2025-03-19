@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,11 +7,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Informació d'un MetaExpedient.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Getter @Setter
 @SuppressWarnings("serial")
 public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Serializable {
@@ -33,26 +25,20 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     private List<MetaDocumentDto> metaDocuments;
     private boolean permetMetadocsGenerals;
     private OrganGestorDto organGestor;
-    
     private boolean gestioAmbGrupsActiva;
-    
+    private boolean permisDirecte = false;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	private String revisioComentari;
 	private long numComentaris;
-	
 	private boolean crearReglaDistribucio;
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
 	private String crearReglaDistribucioError;
 	private CrearReglaResponseDto crearReglaResponse;
-
     private boolean organNoSincronitzat;
-    
     private OrganEstatEnumDto organEstat;
     private TipusTransicioEnumDto organTipusTransicio;
     private List<OrganGestorDto> organsNous;
-    
     private boolean procedimentComu;
-	
     private boolean interessatObligatori;
     
     public String getCodiSiaINom() {
@@ -112,16 +98,4 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
             return false;
         return true;
     }
-    
-//	@Data
-//	public class MetaExpedientFiltreDto {
-//
-//		private String codi;
-//		private String nom;
-//		private Long organGestorId;
-//		private Boolean veureTots = true;
-//		private MetaExpedientActiuEnumDto actiu;
-//
-//	}
-
 }

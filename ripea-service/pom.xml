@@ -99,10 +99,10 @@
 			<groupId>es.caib.portafib</groupId>
 			<artifactId>portafib-ws-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>es.caib.portafib</groupId>
-			<artifactId>portafib-ws-callback-api</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>es.caib.portafib</groupId>-->
+<!--			<artifactId>portafib-ws-callback-api</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
 			<artifactId>orika-core</artifactId>
@@ -207,7 +207,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin-impl</artifactId>
+			<artifactId>ripea-plugin-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

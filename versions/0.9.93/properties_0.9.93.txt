@@ -1,5 +1,0 @@
-# 937
-es.caib.ripea.distribucio.regla.ws.url=http://SERVER:PORT/distribucio
-es.caib.ripea.distribucio.regla.ws.username=DIST_USER
-es.caib.ripea.distribucio.regla.ws.password=DIST_PASS
-# es.caib.ripea.distribucio.regla.ws.codi.backoffice=BACK_CODI <-- DB property

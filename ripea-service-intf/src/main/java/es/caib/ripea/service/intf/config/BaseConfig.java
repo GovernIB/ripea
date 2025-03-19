@@ -26,6 +26,9 @@ public class BaseConfig {
 	public static final String ROLE_BSTWS = "IPA_BSTWS";
 	public static final String ROLE_API_HIST = "IPA_API_HIST";
 	public static final String ROLE_REVISIO = "IPA_REVISIO";
+	
+	public static final String ROLE_DISTRIBUCIO = "DIS_BSTWS";
+	
 	public static final String ROLE_USER = "tothom";
 
 }

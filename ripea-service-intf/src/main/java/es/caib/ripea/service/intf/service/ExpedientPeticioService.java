@@ -1,13 +1,33 @@
 package es.caib.ripea.service.intf.service;
 
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MassiuAnnexProcesarFiltreDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientSelectDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.RegistreAnnexDto;
+import es.caib.ripea.service.intf.dto.RegistreDto;
+import es.caib.ripea.service.intf.dto.ResultDto;
+import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+
+@PreAuthorize("isAuthenticated()")
 public interface ExpedientPeticioService {
 
+	@PreAuthorize("hasRole('IPA_BSTWS')")
+	public void crearExpedientPeticion(List<AnotacioRegistreId> anotacioRegistreIds);
+	
 	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,

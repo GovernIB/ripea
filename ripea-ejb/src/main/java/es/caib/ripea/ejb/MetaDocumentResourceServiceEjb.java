@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import org.springframework.data.domain.Page;
@@ -41,70 +42,90 @@ public class MetaDocumentResourceServiceEjb extends AbstractServiceEjb<MetaDocum
 	}
 	
 	@Override
+	@RolesAllowed("**")
 	public MetaDocumentResource newResourceInstance() {
-		return newResourceInstance();
+		return delegateService.newResourceInstance();
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public MetaDocumentResource create(MetaDocumentResource resource, Map<String, AnswerValue> answers)
 			throws ResourceAlreadyExistsException, ResourceNotCreatedException, AnswerRequiredException {
-		return create(resource, answers);
+		return delegateService.create(resource, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public MetaDocumentResource update(Long id, MetaDocumentResource resource, Map<String, AnswerValue> answers)
 			throws ResourceNotFoundException, ResourceNotUpdatedException, AnswerRequiredException {
-		return update(id, resource, answers);
+		return delegateService.update(id, resource, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public void delete(Long id, Map<String, AnswerValue> answers)
 			throws ResourceNotFoundException, ResourceNotDeletedException, AnswerRequiredException {
-		delete(id, answers);
+		delegateService.delete(id, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public Map<String, Object> onChange(MetaDocumentResource previous, String fieldName, Object fieldValue,
 			Map<String, AnswerValue> answers) throws AnswerRequiredException {
-		return onChange(previous, fieldName, fieldValue, answers);
+		return delegateService.onChange(previous, fieldName, fieldValue, answers);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public <P extends Serializable> Serializable actionExec(String code, P params)
 			throws ArtifactNotFoundException, ActionExecutionException {
-		return actionExec(code, params);
+		return delegateService.actionExec(code, params);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public MetaDocumentResource getOne(Long id, String[] perspectives) throws ResourceNotFoundException {
-		return getOne(id, perspectives);
+		return delegateService.getOne(id, perspectives);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public Page<MetaDocumentResource> findPage(String quickFilter, String filter, String[] namedQueries,
 			String[] perspectives, Pageable pageable) {
-		return findPage(quickFilter, filter, namedQueries, perspectives, pageable);
+		return delegateService.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public DownloadableFile fieldDownload(Long id, String fieldName, OutputStream out) throws ResourceNotFoundException,
 			ResourceFieldNotFoundException, FieldArtifactNotFoundException, IOException {
-		return fieldDownload(id, fieldName, out);
+		return delegateService.fieldDownload(id, fieldName, out);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<ResourceArtifact> artifactFindAll(ResourceArtifactType type) {
-		return artifactFindAll(type);
+		return delegateService.artifactFindAll(type);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ResourceArtifact artifactGetOne(ResourceArtifactType type, String code) throws ArtifactNotFoundException {
-		return artifactGetOne(type, code);
+		return delegateService.artifactGetOne(type, code);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public <P extends Serializable> List<?> reportGenerate(String code, P params)
 			throws ArtifactNotFoundException, ReportGenerationException {
-		return reportGenerate(code, params);
+		return delegateService.reportGenerate(code, params);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
+			P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
+			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
+		return delegateService.artifactOnChange(type, code, previous, fieldName, fieldValue, answers);
 	}
 }

@@ -23,10 +23,6 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>es.caib.distribucio</groupId>
-			<artifactId>distribucio-rest-client</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<exclusions>
@@ -48,7 +44,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>ripea-plugin</artifactId>
+			<artifactId>ripea-plugin-intf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

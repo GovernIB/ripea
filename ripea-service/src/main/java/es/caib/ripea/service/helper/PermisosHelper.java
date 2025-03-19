@@ -134,25 +134,6 @@ public class PermisosHelper {
 				new Permission[] { permission });
 	}
 
-	public void filterGrantedAny(
-			Collection<?> objects,
-			Class<?> clazz,
-			Permission[] permissions) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAny(
-				objects,
-				new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
-					@Override
-					public Serializable getObjectIdentifier(
-							AbstractPersistable<Serializable> entitat) {
-						return entitat.getId();
-					}
-				},
-				clazz,
-				permissions,
-				auth);
-	}
-
 	/**
 	 * Obté els identificadors de tots els objectes de la classe especificada sobre
 	 * els quals l'usuari actual té permisos
@@ -249,32 +230,6 @@ public class PermisosHelper {
 				it.remove();
 			} else if (!isGrantedAny(objectIdentifier, clazz, permissions, auth))
 				it.remove();
-		}
-	}
-	
-	public void filterGrantedAny(
-			Collection<?> objects,
-			Class<?> clazz,
-			Permission[] permissions,
-			String usuariCodi) {
-		
-		if (usuariCodi == null) {
-			filterGrantedAny(
-					objects,
-					clazz,
-					permissions);
-		} else {
-			filterGrantedAny(
-					objects,
-					new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
-						@Override
-						public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
-							return entitat.getId();
-						}
-					},
-					clazz,
-					permissions,
-					usuariCodi);
 		}
 	}
 	

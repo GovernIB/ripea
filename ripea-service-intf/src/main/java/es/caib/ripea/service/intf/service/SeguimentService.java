@@ -3,9 +3,8 @@ package es.caib.ripea.service.intf.service;
 import es.caib.ripea.service.intf.dto.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-
+@PreAuthorize("isAuthenticated()")
 public interface SeguimentService {
-
 
 	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(

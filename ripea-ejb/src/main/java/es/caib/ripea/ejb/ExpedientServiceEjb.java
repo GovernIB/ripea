@@ -237,6 +237,7 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<ExpedientDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId, String rolActual, Long organActualId) {
@@ -247,6 +248,7 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
 		return delegateService.publicarComentariPerExpedient(
 				entitatId,
@@ -256,6 +258,7 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId) {
 		return delegateService.findComentarisPerContingut(
 				entitatId,
@@ -263,11 +266,13 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public boolean hasWritePermission(Long expedientId) {
 		return delegateService.hasWritePermission(expedientId);
 	}
 
 	@Override
+	@RolesAllowed("**")
 	public ExpedientDto update(
 			Long entitatId,
 			Long id,
@@ -284,6 +289,7 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 
 
 	@Override
+	@RolesAllowed("**")
 	public Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long metaDocumentId, 
@@ -423,8 +429,6 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 			Long entitatId) {
 		return delegateService.hasReadPermissionsAny(rolActual, entitatId);
 	}
-	
-
 	
 	@Override
 	@RolesAllowed("**")
