@@ -1,6 +1,7 @@
-import {useRef} from "react";
+import { useRef } from "react";
 import {
     MuiFormDialogApi,
+    FormField,
     useResourceApiService,
     useMuiActionReportLogic
 } from "reactlib";
@@ -27,19 +28,25 @@ const useTascaActions = (refresh?: () => void) => {
     const reobrirApiRef = useRef<MuiFormDialogApi>();
     const cambiarPrioridadApiRef = useRef<MuiFormDialogApi>();
     const cambiarFechaLimiteApiRef = useRef<MuiFormDialogApi>();
-    const {handleOpen, dialog} = useTascaDetail();
+    const { handleOpen, dialog } = useTascaDetail();
 
-    const disableResponsable = (row: any):boolean => {
+    const disableResponsable = (row: any): boolean => {
         return !row?.usuariActualResponsable && !row?.usuariActualDelegat;
     }
-    const hideByEstat= (row: any):boolean => {
+    const hideByEstat = (row: any): boolean => {
         return row?.estat == 'CANCELLADA' || row?.estat == 'FINALITZADA' || row?.estat == 'REBUTJADA';
     }
 
     const {
         formDialogComponent: actionChangeEstatDialogComponent,
         handleButtonClick: actionChangeEstatHandleButtonClick,
-    } = useMuiActionReportLogic('expedientTascaResource', 'ACTION_CHANGE_ESTAT');
+    } = useMuiActionReportLogic(
+        'expedientTascaResource',
+        'ACTION_CHANGE_ESTAT',
+        undefined,
+        undefined,
+        null,
+        <FormField name="estat" />);
 
     const actions = [
         {
@@ -60,7 +67,7 @@ const useTascaActions = (refresh?: () => void) => {
             icon: "play_arrow",
             showInMenu: true,
             action: 'ACTION_CHANGE_ESTAT',
-            onClick: (rowId: any)=> {
+            onClick: (rowId: any) => {
                 /*apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
                     id:rowId, estat: 'INICIADA'
                 }})
@@ -70,7 +77,7 @@ const useTascaActions = (refresh?: () => void) => {
                 actionChangeEstatHandleButtonClick(rowId);
             },
             // disabled: disableResponsable,
-            hidden: (row: any):boolean => row?.estat != 'PENDENT',
+            hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
         {
             title: "Rechazar",
@@ -85,17 +92,19 @@ const useTascaActions = (refresh?: () => void) => {
             //         })
             // },
             disabled: disableResponsable,
-            hidden: (row: any):boolean => row?.estat != 'PENDENT',
+            hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
         {
             title: "Cancelar",
             icon: "close",
             showInMenu: true,
-            onClick: (rowId: any)=> {
-                apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
-                        id:rowId, estat: 'CANCELLADA'
-                }})
-                    .then(()=>{
+            onClick: (rowId: any) => {
+                apiAction(null, {
+                    code: 'ACTION_CHANGE_ESTAT', data: {
+                        id: rowId, estat: 'CANCELLADA'
+                    }
+                })
+                    .then(() => {
                         refresh?.()
                     })
             },
@@ -106,11 +115,13 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Finalizar",
             icon: "check",
             showInMenu: true,
-            onClick: (rowId: any)=> {
-                apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
-                        id:rowId, estat: 'FINALITZADA'
-                    }})
-                    .then(()=>{
+            onClick: (rowId: any) => {
+                apiAction(null, {
+                    code: 'ACTION_CHANGE_ESTAT', data: {
+                        id: rowId, estat: 'FINALITZADA'
+                    }
+                })
+                    .then(() => {
                         refresh?.()
                     })
             },
@@ -123,7 +134,7 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: (rowId: any) => {
                 reassignarApiRef.current?.show(rowId)
-                    .then(()=>{
+                    .then(() => {
                         refresh?.()
                     })
             },
@@ -135,11 +146,11 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: (rowId: any) => {
                 delegarApiRef.current?.show(rowId)
-                    .then(()=>{
+                    .then(() => {
                         refresh?.()
                     })
             },
-            hidden: (row: any):boolean => row?.delegat!=null || hideByEstat(row),
+            hidden: (row: any): boolean => row?.delegat != null || hideByEstat(row),
         },
         {
             title: "Retomar",
@@ -154,7 +165,7 @@ const useTascaActions = (refresh?: () => void) => {
             //             refresh?.()
             //         })
             // },
-            hidden: (row: any):boolean => row?.delegat==null || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: "Modificar fecha limite...",
@@ -162,7 +173,7 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: (rowId: any) => {
                 cambiarFechaLimiteApiRef.current?.show(rowId)
-                    .then(()=>{
+                    .then(() => {
                         refresh?.()
                     })
             },
@@ -174,7 +185,7 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: (rowId: any) => {
                 cambiarPrioridadApiRef.current?.show(rowId)
-                    .then(()=>{
+                    .then(() => {
                         refresh?.()
                     })
             },
@@ -190,17 +201,17 @@ const useTascaActions = (refresh?: () => void) => {
             //             refresh?.()
             //         })
             // },
-            hidden: (row:any):boolean => row?.estat != 'FINALITZADA',
+            hidden: (row: any): boolean => row?.estat != 'FINALITZADA',
         },
     ];
 
     const components = <>
-        <Rebutjar apiRef={rebutjarApiRef}/>
-        <Reassignar apiRef={reassignarApiRef}/>
-        <Delegar apiRef={delegarApiRef}/>
-        <Reobrir apiRef={reobrirApiRef}/>
-        <CambiarDataLimit apiRef={cambiarFechaLimiteApiRef}/>
-        <CambiarPrioritat apiRef={cambiarPrioridadApiRef}/>
+        <Rebutjar apiRef={rebutjarApiRef} />
+        <Reassignar apiRef={reassignarApiRef} />
+        <Delegar apiRef={delegarApiRef} />
+        <Reobrir apiRef={reobrirApiRef} />
+        <CambiarDataLimit apiRef={cambiarFechaLimiteApiRef} />
+        <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
         {dialog}
         {actionChangeEstatDialogComponent}
     </>;
