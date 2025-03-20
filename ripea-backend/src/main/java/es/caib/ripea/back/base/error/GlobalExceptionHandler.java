@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Límit Tecnologies
  */
 @Slf4j
-@ControllerAdvice
+@ControllerAdvice(basePackages = {"es.caib.ripea.back.base.controller"})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	public static final String REQUEST_PARAM_TRACE = "trace";

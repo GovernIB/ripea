@@ -131,7 +131,7 @@
 				</li>
 			</c:if>
 		</c:if>
-		<c:if test="${(potModificar) || (contingut.carpeta && isCreacioCarpetesActiva)}">
+		<c:if test="${potModificar || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
 				<%---- Canviar prioritat... ----%>
 <%-- 				<li><a href="<c:url value="/expedient/${contingut.id}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li> --%>

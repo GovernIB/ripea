@@ -1,10 +1,13 @@
 package es.caib.ripea.service.helper;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -42,8 +45,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private GrupRepository grupRepository;
 
+	private static final String APPSERV_PROPS_PATH = "es.caib.ripea.system.properties";
     public static int counter = 0;
-
     private Authentication auth;
 
     @Synchronized
@@ -84,12 +87,29 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                     }
                     applicationHelper.setProcessAsProcessed(proces.getId());
                 }
-                
-                // ===================================================== EXECUTE PROCESS ON EVERY STARTUP OF APPLICATION ==================================
+
+        		Properties properties = new Properties();
+        		String rutaPropertiesJboss = System.getProperty(APPSERV_PROPS_PATH);
+        		if (rutaPropertiesJboss!=null && !"".equals(rutaPropertiesJboss)) {
+	                try (FileInputStream inputStream = new FileInputStream(rutaPropertiesJboss)) {
+	                    // Cargar el archivo de propiedades
+	                    properties.load(inputStream);
+	
+	                    // Configurar cada propiedad en el sistema
+	                    properties.forEach((key, value) -> {
+	                        String keyStr = key.toString();
+	                        String valueStr = value.toString();
+	                        System.setProperty(keyStr, valueStr);
+	                        log.info("Propietat carregada al sistema: "+keyStr);
+	                    });
+	
+	                } catch (IOException e) {
+	                	log.error("Error al cargar el archivo de propiedades: " + e.getMessage());
+	                }
+        		}
+
                 configService.crearPropietatsConfigPerEntitats();
                 configService.actualitzarPropietatsJBossBdd();
-
-                
                 
             } catch (Exception ex) {
                 log.error("Errror executant els processos inicials", ex);
@@ -98,9 +118,6 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			
 		}
     }
-    
-
-    
 
     private void addCustomAuthentication() {
 
@@ -121,27 +138,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private void restoreAuthentication() {
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
-    
-    
 
 	public void generateMissingHistorics() {
     	
 		try {
 			
 	    	log.info("Generating missing logs. Start");
-	    	
-//			Date day = DateHelper.getDay(21, 11, 2021);
-//			computeData(day, HistoricTipusEnumDto.DIARI);
-//	
-//			Date month = DateHelper.getMonth(11, 2022);	
-//			computeData(month, HistoricTipusEnumDto.MENSUAL);
-	    	
-	    	
-//	    	delete from ipa_hist_expedient;
-//	    	delete from ipa_hist_exp_interessat;
-//	    	delete from ipa_hist_exp_usuari;
-//	    	delete from ipa_historic;
-	    	
 
 	    	// generating historics for days 15/06/2022 - 13/09/2022
 			Date day_15_06_2022 = DateHelper.getDay(15, 6, 2022);
@@ -156,7 +158,6 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 					historicHelper.computeData(date, HistoricTipusEnumDto.DIARI);
 				}
 			}
-			
 			
 			// generating historics for months 06/2022 - 08/2022
 			Date month_06_2022 = DateHelper.getMonth(6, 2022);
@@ -173,14 +174,11 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 				}
 			}
 			
-			
 	    	log.info("Generating missing logs. End");
 		} catch (Exception e) {
 			log.error("Error on generating missing logs", e);
 		}
-		
     }
-    
 	
     private void organsDescarregarNomCatala(){
     	try {
@@ -207,7 +205,6 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			log.error("Error al afegir permisos als grups", e);
 		}
     }
-	
     
     private void generateNumeroAllExpedients(){
     	
@@ -225,7 +222,6 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 				} catch (Exception e) {
 					log.error("Error al generar numero expedient: " + id);
 				}
-				
 			}
 		}
     }
