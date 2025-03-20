@@ -48,7 +48,7 @@ Insert into IPA_CONFIG_GROUP (CODE,PARENT_CODE,POSITION,DESCRIPTION) values ('VA
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('1','GENERAL','es.caib.ripea.app.data.dir','C:/_LOT_/RIPEA/FILES','Path dels fitxers de l’aplicació','1','TEXT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','EMAIL','es.caib.ripea.email.remitent','josepg@limit.es','Remitent dels correus electrònics (correu electrònic)','2','TEXT','0','1','0','1','0');
+('1','EMAIL','es.caib.ripea.email.remitent','ripea@limit.es','Remitent dels correus electrònics (correu electrònic)','2','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('1','GENERAL','es.caib.ripea.base.url','http://localhost:8080/ripea','Especificar la URL base de l''aplicació','2','TEXT','0','0','0','0','0');
 
@@ -347,15 +347,15 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 ('0','FIRMA_VIAFIRMA','es.caib.ripea.plugin.viafirma.caib.dispositius.enabled','false','Dispositius viafirma actius','15','BOOL','1','0','0','1','0');
 
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.class','es.caib.ripea.plugin.distribucio.DistribucioPlugin','Classe del plugin','1','TEXT','0','0','0','0','0');
+('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.class','es.caib.ripea.plugin.distribucio.DistribucioPlugin','Classe del plugin','1','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.ws.url',null,'Url del plugin','1','TEXT','0','0','0','0','0');
+('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.ws.url',null,'Url del plugin','1','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.endpointName',null,'Nom del endpoint del plugin de distribucio','1','TEXT','0','0','0','0','0');
+('0','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.endpointName',null,'Nom del endpoint del plugin de distribucio','1','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.ws.username',null,'Usuari del plugin','2','TEXT','0','0','0','0','0');
+('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.ws.username',null,'Usuari del plugin','2','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.ws.password',null,'Constrasenya del plugin','3','PASSWORD','0','0','0','0','0');
+('1','DISTRIBUCIO','es.caib.ripea.distribucio.backofficeIntegracio.ws.password',null,'Constrasenya del plugin','3','PASSWORD','0','0','0','1','0');
 
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','DIGITALITZACIO','es.caib.ripea.plugin.digitalitzacio.class','es.caib.ripea.plugin.caib.digitalitzacio.DigitalitzacioPluginDigitalIB','Classe del plugin','1','DIGITALITZACIO_CLASS','0','1','0','1','0');
@@ -560,4 +560,5 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 ('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents','5','Nombre de reintents de guardar documents en arxiu','4','INT','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','SCHEDULLED','es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats','5','Nombre de reintents de guardar interessats en arxiu','5','INT','0','0','0','0','0');
-
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
+('0','CONTINGUT','es.caib.ripea.document.deteccio.firma.automatica','true','Detectar de forma automátia la firma dels documents','26','BOOL','0','1','0','1','0');
