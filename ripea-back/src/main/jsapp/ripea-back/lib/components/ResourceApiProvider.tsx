@@ -561,7 +561,6 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                             const actionRel = 'exec_' + args.code;
                             const actionLink = artifactState.links.get(actionRel);
                             if (actionLink != null) {
-                                console.log('>>> actionLink', actionRel, actionLink)
                                 request(actionRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
                                     then((state: State) => {
                                         const result = state.data;
