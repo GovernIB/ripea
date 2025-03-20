@@ -1,37 +1,38 @@
 import {
     GridPage,
-    MuiGrid, useMuiDataGridApiRef,
+    MuiGrid,
+    useMuiDataGridApiRef,
 } from 'reactlib';
-import {formatDate} from "../../util/dateUtils.ts";
-import {Grid} from "@mui/material";
+import { formatDate } from "../../util/dateUtils.ts";
+import { Grid } from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import React from "react";
 import * as builder from "../../util/springFilterUtils.ts";
-import {TascaCommentDialog as CommentDialog} from "../CommentDialog.tsx";
+import { TascaCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import useTascaActions from "./details/TascaActions.tsx";
 
-const TasquesGridForm = (props:any) => {
-    const {expedient} = props;
+const TasquesGridForm = (props: any) => {
+    const { expedient } = props;
 
-    const metaTascaFilter :string = builder.and(
+    const metaTascaFilter: string = builder.and(
         builder.eq("metaExpedient.id", expedient?.metaExpedient?.id),
         builder.eq("activa", true),
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter}/>
-        <GridFormField xs={12} name="metaExpedientTascaDescription" readOnly disabled/>
-        <GridFormField xs={12} name="responsableActual"/>
-        <GridFormField xs={12} name="observadors" multiple/>
-        <GridFormField xs={6} name="duracio"/>
-        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}}/>
-        <GridFormField xs={12} name="titol"/>
-        <GridFormField xs={12} name="observacions" type={"textarea"}/>
-        <GridFormField xs={12} name="prioritat" required/>
+        <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter} />
+        <GridFormField xs={12} name="metaExpedientTascaDescription" readOnly disabled />
+        <GridFormField xs={12} name="responsableActual" />
+        <GridFormField xs={12} name="observadors" multiple />
+        <GridFormField xs={6} name="duracio" />
+        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{ disablePast: true }} />
+        <GridFormField xs={12} name="titol" />
+        <GridFormField xs={12} name="observacions" type={"textarea"} />
+        <GridFormField xs={12} name="prioritat" required />
     </Grid>
 }
 
-const TasquesGrid: React.FC = (props:any) => {
+const TasquesGrid: React.FC = (props: any) => {
     const { id, entity, onRowCountChange } = props;
     const apiRef = useMuiDataGridApiRef()
 
@@ -91,33 +92,34 @@ const TasquesGrid: React.FC = (props:any) => {
             disableColumnMenu: true,
             flex: 0.25,
             renderCell: (params: any) => {
-                return <CommentDialog entity={params?.row}/>;
+                return <CommentDialog entity={params?.row} />;
             }
         },
     ];
-    const {actions, components} = useTascaActions(apiRef?.current?.refresh);
+    const { actions, components } = useTascaActions(apiRef?.current?.refresh);
 
     return <GridPage>
         <MuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
+            // resourceFieldName
             columns={columns}
             paginationActive
             filter={`expedient.id:${id}`}
             titleDisabled
             perspectives={["RESPONSABLES_RESUM"]}
-            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.length)}
+            onRowsChange={(rows) => onRowCountChange?.(rows.length)}
             popupEditCreateActive
-            popupEditFormContent={<TasquesGridForm expedient={entity}/>}
+            popupEditFormContent={<TasquesGridForm expedient={entity} />}
             formAdditionalData={{
                 expedient: {
                     id: id
                 },
             }}
             rowAdditionalActions={actions}
+            disableColumnMenu
             rowHideUpdateButton
-            rowHideDeleteButton
-            // readOnly
+        // rowHideDeleteButton
         />
         {components}
     </GridPage>

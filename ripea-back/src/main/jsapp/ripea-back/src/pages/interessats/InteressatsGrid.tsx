@@ -1,6 +1,5 @@
 import {
     GridPage,
-    MuiFormDialog,
     MuiGrid,
     useMuiDataGridApiRef,
 } from 'reactlib';
@@ -9,7 +8,7 @@ import React from "react";
 import GridFormField from "../../components/GridFormField.tsx";
 import useInteressatActions from "./details/InteressatActions.tsx";
 
-const InteressatsGridForm = () => {
+export const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus" required/>
         <GridFormField xs={12} name="documentTipus" required/>
@@ -37,7 +36,7 @@ interface DetailGridProps {
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {id, onRowCountChange} = props
     const apiRef = useMuiDataGridApiRef()
-    const {actions, formApiRef} = useInteressatActions(id, apiRef?.current?.refresh)
+    const {actions, components} = useInteressatActions(apiRef?.current?.refresh)
 
     const columns = [
         {
@@ -80,17 +79,11 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 },
             }}
             rowAdditionalActions={actions}
-            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.length)}
+            onRowsChange={(rows) => onRowCountChange?.(rows.length)}
             rowHideDeleteButton
         />
 
-        <MuiFormDialog
-            resourceName={"interessatResource"}
-            title={`Representante`}
-            apiRef={formApiRef}
-        >
-            <InteressatsGridForm/>
-        </MuiFormDialog>
+        {components}
     </GridPage>
 }
 

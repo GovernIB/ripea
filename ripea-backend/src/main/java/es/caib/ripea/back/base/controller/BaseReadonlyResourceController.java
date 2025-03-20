@@ -950,18 +950,14 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		List<Link> ls = new ArrayList<>();
 		Link selfLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
 		ls.add(selfLinkWithDefaultProperties(selfLink, false));
-		artifacts.forEach(a -> {
-			if (ResourceArtifactType.FILTER == a.getType()) {
-				ls.add(buildFilterLinkWithAffordances(a));
-			} else if (ResourceArtifactType.REPORT == a.getType()) {
-				ls.add(buildReportLinkWithAffordances(a));
-			}
-		});
 		return ls.toArray(new Link[0]);
 	}
 
 	@SneakyThrows
 	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
+		List<Link> links = new ArrayList<>();
+		Link selfLink = linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel();
+		links.add(selfLink);
 		if (artifact.getFormClass() != null) {
 			Link validateLink;
 			if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
@@ -979,15 +975,15 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						withName("validate").
 						toLink();
 			}
-			return new Link[] {
-					validateLink,
-					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
-			};
-		} else {
-			return new Link[] {
-					linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel()
-			};
+			links.add(validateLink);
 		}
+		if (artifact.getType() == ResourceArtifactType.FILTER) {
+			links.add(buildFilterLinkWithAffordances(artifact));
+		}
+		if (artifact.getType() == ResourceArtifactType.REPORT) {
+			links.add(buildReportLinkWithAffordances(artifact));
+		}
+		return links.toArray(new Link[0]);
 	}
 
 	private Link buildFilterLinkWithAffordances(ResourceArtifact artifact) {
@@ -1009,22 +1005,27 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 
 	@SneakyThrows
 	private Link buildReportLink(ResourceArtifact artifact) {
-		Link reportLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
-		return Link.of(reportLink.toUri() + "/report/" + artifact.getCode()).withSelfRel();
+		String rel = "generate_" + artifact.getCode();
+		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
+			Link reportLink = linkTo(methodOn(getClass()).getOne(null, null)).withRel(rel);
+			return Link.of(reportLink.toUri() + "/artifacts/report/" + artifact.getCode()).withSelfRel();
+		} else {
+			Link reportLink = linkTo(methodOn(getClass()).artifacts()).withRel(rel);
+			return Link.of(reportLink.toUri() + "/report/" + artifact.getCode()).withRel(rel);
+		}
 	}
 	private Link buildReportLinkWithAffordances(ResourceArtifact artifact) {
-		String rel = "generate_" + artifact.getCode();
-		Link reportLink = buildReportLink(artifact).withRel(rel);
+		Link reportLink = buildReportLink(artifact);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(reportLink).
 					afford(HttpMethod.POST).
 					withInputAndOutput(artifact.getFormClass()).
-					withName(rel).
+					withName(reportLink.getRel().value()).
 					toLink();
 		} else {
 			return Affordances.of(reportLink).
 					afford(HttpMethod.POST).
-					withName(rel).
+					withName(reportLink.getRel().value()).
 					toLink();
 		}
 	}

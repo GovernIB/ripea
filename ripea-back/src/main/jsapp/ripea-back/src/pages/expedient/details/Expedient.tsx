@@ -13,7 +13,7 @@ import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import TasquesGrid from "../../tasca/TasquesGrid.tsx";
 import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
-import { ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
+import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -44,6 +44,10 @@ const Expedient: React.FC = () => {
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
 
+    const isExperientOrCarpeta=(row:any)=>{
+        return row?.tipus=="EXPEDIENT" || row?.tipus=="CARPETA"
+    }
+
     const tabs = [
         {
             value: "contingut",
@@ -56,42 +60,49 @@ const Expedient: React.FC = () => {
             label: t('page.contingut.tabs.dades'),
             content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
             badge: expedient?.numDades,
+            hidden: expedient?.numDades == 0,
         },
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
             content: <InteressatsGrid id={id} onRowCountChange={setNumInteressats}/>,
             badge: numInteressats ?? expedient?.numInteressats,
+            hidden: !isExperientOrCarpeta(expedient),
         },
         {
             value: "remeses",
             label: t('page.contingut.tabs.remeses'),
             content: <Typography>{t('page.contingut.tabs.remeses')}</Typography>,
             badge: expedient?.numRemeses,
+            hidden: !isExperientOrCarpeta(expedient) || expedient?.numRemeses == 0,
         },
         {
             value: "publicacions",
             label: t('page.contingut.tabs.publicacions'),
             content: <Typography>{t('page.contingut.tabs.publicacions')}</Typography>,
             badge: expedient?.numPublicacions,
+            hidden: !isExperientOrCarpeta(expedient) || expedient?.numPublicacions == 0,
         },
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
             content: <AnotacionsGrid/>,
             badge: expedient?.numAnotacions,
+            hidden: !isExperientOrCarpeta(expedient) || expedient?.numAnotacions == 0,
         },
         {
             value: "versions",
             label: t('page.contingut.tabs.versions'),
             content: <Typography>{t('page.contingut.tabs.versions')}</Typography>,
             badge: expedient?.numVersions,
+            hidden: expedient?.tipus != "DOCUMENT" || expedient?.numVersions == 0,
         },
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
             content: <TasquesGrid id={id} entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
+            hidden: !isExperientOrCarpeta(expedient),
         },
     ]
 

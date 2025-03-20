@@ -48,8 +48,9 @@ export const timestampToIsoDateTime = (timestamp: number): string => {
     return timestampToIsoDate(timestamp) + 'T' + timeFormatLocale(timestamp);
 }
 
-export const isoDateToDate = (isoDate: string): Date => {
-    const isoDateParts = isoDate.split('-');
+export const isoDateToDate = (isoDate: string): Date | undefined => {
+    const isoDateParts = isoDate?.split('-');
+    if (isoDateParts != null) {
         return new Date(
             parseInt(isoDateParts[0]),
             parseInt(isoDateParts[1]) - 1,
@@ -57,9 +58,12 @@ export const isoDateToDate = (isoDate: string): Date => {
             0,
             0,
             0);
+    } else {
+        return undefined;
+    }
 }
 
-export const isoDateTimeToTimestamp = (isoDateTime: string): number => {
+export const isoDateTimeToDate = (isoDateTime: string): Date | undefined => {
     if (isoDateTime.includes('T')) {
         const isoDateTimeParts = isoDateTime.split('T');
         const isoDateParts = isoDateTimeParts[0].split('-');
@@ -70,9 +74,8 @@ export const isoDateTimeToTimestamp = (isoDateTime: string): number => {
             parseInt(isoDateParts[2]),
             parseInt(isoTimeParts[0]),
             parseInt(isoTimeParts[1]),
-            parseInt(isoTimeParts[2])).getTime();
+            parseInt(isoTimeParts[2]));
     } else {
-        return isoDateToDate(isoDateTime).getTime();
+        return isoDateToDate(isoDateTime);
     }
-    
 }

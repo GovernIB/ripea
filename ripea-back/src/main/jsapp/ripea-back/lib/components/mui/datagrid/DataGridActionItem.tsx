@@ -10,10 +10,12 @@ type DataGridActionItemProps = {
     icon?: string;
     linkTo?: string;
     linkState?: any;
-    onClick?: (id: any, row: any, event: React.MouseEvent) => void;
+    onClick?: DataGridActionItemOnClickFn;
     showInMenu?: boolean;
     disabled?: boolean;
 };
+
+export type DataGridActionItemOnClickFn = (id: any, row: any, event: React.MouseEvent) => void;
 
 export const toDataGridActionItem = (
     id: any,
@@ -22,7 +24,7 @@ export const toDataGridActionItem = (
     icon?: string,
     linkTo?: string,
     linkState?: any,
-    onClick?: (id: any, event: React.MouseEvent) => void,
+    onClick?: DataGridActionItemOnClickFn,
     showInMenu?: boolean,
     disabled?: boolean): React.ReactElement => {
     return <DataGridActionItem

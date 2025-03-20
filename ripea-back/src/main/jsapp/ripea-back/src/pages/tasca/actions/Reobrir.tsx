@@ -3,32 +3,33 @@ import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 
-const CambiarPrioritatForm = () => {
+const ReobrirForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={6} name="titol" disabled/>
-        <GridFormField xs={6} name="metaExpedientTasca" readOnly disabled/>
-        <GridFormField xs={12} name="prioritat" required/>
+        <GridFormField xs={12} name="responsable" required/>
+        <GridFormField xs={12} name="motiu"/>
     </Grid>
 }
 
-const CambiarPrioritat = (props: { apiRef:any }) => {
+const Reobrir = (props: { apiRef:any }) => {
     const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientTascaResource"}
-        title={`Modificar prioridad de la tarea`}
+        title={`Reasignar tarea`}
         apiRef={apiRef}
     >
-        <CambiarPrioritatForm/>
+        <ReobrirForm/>
     </MuiFormDialog>
 }
 
-const useCambiarPrioritat = (refresh?: () => void) => {
+const useReobrir = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) => {
-        return apiRef.current?.show?.(id)
+        // TODO: change
+        // apiAction(id,{code:'ACTION_REABRIR'})
+        return apiRef.current?.show?.(id, {data:{estat: 'PENDENT'}})
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
@@ -40,7 +41,7 @@ const useCambiarPrioritat = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <CambiarPrioritat apiRef={apiRef}/>
+        content: <Reobrir apiRef={apiRef}/>
     }
 }
-export default useCambiarPrioritat;
+export default useReobrir;

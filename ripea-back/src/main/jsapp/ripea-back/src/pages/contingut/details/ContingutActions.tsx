@@ -5,7 +5,8 @@ export const useContingutActions = (refresh?: () => void) => {
     // const { temporalMessageShow } = useBaseAppContext();
     // const {
     //     patch: apiPatch,
-    // } = useResourceApiService('expedientResource');
+    //     fieldDownload: apiDownload
+    // } = useResourceApiService('documentResource');
 
     const {handleOpen: detallhandleOpen, dialog: detallDialog} = useDocumentDetail();
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("archivo");
@@ -26,6 +27,7 @@ export const useContingutActions = (refresh?: () => void) => {
             title: "Descargar",
             icon: "download",
             showInMenu: true,
+            // onClick: (id:any)=>apiDownload(id,{fieldName: ''})
         },
         {
             title: "Visualizar",

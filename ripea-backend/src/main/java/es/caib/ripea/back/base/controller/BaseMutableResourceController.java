@@ -577,15 +577,12 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 
 	@Override
-	protected Link[] buildArtifactsLinks(List<ResourceArtifact> artifacts) {
-		List<Link> ls = new ArrayList<>(
-				Arrays.asList(super.buildArtifactsLinks(artifacts)));
-		artifacts.forEach(a -> {
-			if (ResourceArtifactType.ACTION == a.getType()) {
-				ls.add(buildActionLinkWithAffordances(a));
-			}
-		});
-		return ls.toArray(new Link[0]);
+	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
+		List<Link> links = new ArrayList<>(Arrays.asList(super.buildSingleArtifactLinks(artifact)));
+		if (artifact.getType() == ResourceArtifactType.ACTION) {
+			links.add(buildActionLinkWithAffordances(artifact));
+		}
+		return links.toArray(new Link[0]);
 	}
 
 	protected <T extends Resource<?>> void validateResource(
@@ -695,22 +692,27 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 
 	@SneakyThrows
 	private Link buildActionLink(ResourceArtifact artifact) {
-		Link actionLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
-		return Link.of(actionLink.toUri() + "/action/" + artifact.getCode()).withSelfRel();
+		String rel = "exec_" + artifact.getCode();
+		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
+			Link reportLink = linkTo(methodOn(getClass()).getOne(null, null)).withRel(rel);
+			return Link.of(reportLink.toUri() + "/artifacts/action/" + artifact.getCode()).withSelfRel();
+		} else {
+			Link reportLink = linkTo(methodOn(getClass()).artifacts()).withRel(rel);
+			return Link.of(reportLink.toUri() + "/action/" + artifact.getCode()).withRel(rel);
+		}
 	}
 	private Link buildActionLinkWithAffordances(ResourceArtifact artifact) {
-		String rel = "exec_" + artifact.getCode();
-		Link actionLink = buildActionLink(artifact).withRel(rel);
+		Link actionLink = buildActionLink(artifact);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(actionLink).
 					afford(HttpMethod.POST).
 					withInputAndOutput(artifact.getFormClass()).
-					withName(rel).
+					withName(actionLink.getRel().value()).
 					toLink();
 		} else {
 			return Affordances.of(actionLink).
 					afford(HttpMethod.POST).
-					withName(rel).
+					withName(actionLink.getRel().value()).
 					toLink();
 		}
 	}

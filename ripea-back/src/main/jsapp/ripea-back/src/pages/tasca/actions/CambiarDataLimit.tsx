@@ -1,6 +1,7 @@
-import {MuiFormDialog} from "reactlib";
+import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
+import {useRef} from "react";
 
 const CambiarFechaLimiteForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -21,4 +22,25 @@ const CambiarDataLimit = (props: { apiRef:any }) => {
         <CambiarFechaLimiteForm/>
     </MuiFormDialog>
 }
-export default CambiarDataLimit;
+
+const useCambiarDataLimit = (refresh?: () => void) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (id:any) => {
+        return apiRef.current?.show?.(id)
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+
+    return {
+        handleShow,
+        content: <CambiarDataLimit apiRef={apiRef}/>
+    }
+}
+export default useCambiarDataLimit;

@@ -1,12 +1,12 @@
-import React from 'react';
-import CambiarEstat from '../actions/CambiarEstat.tsx';
-import CambiarPrioritat from '../actions/CambiarPrioritat.tsx';
 import {
-    MuiFormDialogApi,
     useResourceApiService,
-    useBaseAppContext, useConfirmDialogButtons
+    useBaseAppContext,
+    useConfirmDialogButtons
 } from 'reactlib';
 import useInformacioArxiu from "../actions/InformacioArxiu.tsx";
+import useAssignar from "../actions/Assignar.tsx";
+import useCambiarEstat from "../actions/CambiarEstat.tsx";
+import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 
 export const useCommonActions = (refresh?: () => void) => {
     const {
@@ -17,18 +17,14 @@ export const useCommonActions = (refresh?: () => void) => {
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
-    const cambiarPrioridadApiRef = React.useRef<MuiFormDialogApi>();
-    const cambiarEstadoApiRef = React.useRef<MuiFormDialogApi>();
-
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("expediente");
+    const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
+    const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
+    const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
 
     const actions = [
-        // {
-        //     title: "",
-        //     icon: "forum",
-        // },
         {
-            title: "",
+            title: "Seguidores",
             icon: "people",
         },
         ////
@@ -43,6 +39,20 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Seguir",
             icon: "person_add",
             showInMenu: true,
+            // hidden: // si el usuario actual es seguidor
+        },
+        // {
+        //     title: "Dejar de seguir",
+        //     icon: "person_remove",
+        //     showInMenu: true,
+        //     // hidden: // si el usuario actual no es seguidor
+        // },
+        {
+            title: "Assignar",
+            icon: "person",
+            showInMenu: true,
+            onClick: hanldeAssignar,
+            // hidden: // si el usuario actual no admin o organo
         },
         {
             title: "Coger",
@@ -83,24 +93,14 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Cambiar prioridad...",
             icon: "",
             showInMenu: true,
-            onClick: (id: any) => {
-                cambiarPrioridadApiRef.current?.show(id)?.then(() => {
-                    refresh?.()
-                })
-            }
+            onClick: hanldeCambiarPrioridad
         },
         {
             title: "Cambiar estado...",
             icon: "",
             showInMenu: true,
-            onClick: (id: any) => {
-                cambiarEstadoApiRef.current?.show(id)?.then(() => {
-                    refresh?.()
-                })
-            },
-            disabled: (row:any) => {
-                return row?.estat != "OBERT"
-            },
+            onClick: hanldeCambiarEstado,
+            disabled: (row:any) => row?.estat != "OBERT",
         },
         {
             title: "Relacionar...",
@@ -111,9 +111,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Cerrar...",
             icon: "check",
             showInMenu: true,
-            disabled: (row:any) => {
-                return row?.estat != "OBERT"
-            },
+            disabled: (row:any) => row?.estat != "OBERT",
         },
         {
             title: "Borrar",
@@ -138,9 +136,7 @@ export const useCommonActions = (refresh?: () => void) => {
                         }
                     });
             },
-            disabled: (row:any) => {
-                return row?.estat == "TANCAT"
-            },
+            disabled: (row:any) => row?.estat == "TANCAT",
         },
         {
             title: "Histórico de acciones",
@@ -176,9 +172,10 @@ export const useCommonActions = (refresh?: () => void) => {
         },
     ]
     const components = <>
-        <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
-        <CambiarEstat apiRef={cambiarEstadoApiRef} />
+        {cambiarPrioridadContent}
+        {cambiarEstadoContent}
         {arxiuDialog}
+        {assignarContent}
     </>;
     return {
         actions,

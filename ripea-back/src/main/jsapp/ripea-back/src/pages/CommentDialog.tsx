@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import {Badge, Grid, Icon, IconButton} from "@mui/material";
 import GridFormField from "../components/GridFormField.tsx";
 import {DataFormDialogApi} from "../../lib/components/mui/datacommon/DataFormDialog.tsx";
+import {useTranslation} from "react-i18next";
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -22,9 +23,10 @@ const CommentDialog = (props:any) => {
 
 export const ExpedientCommentDialog = (props:any) => {
     const { entity } = props;
+    const { t } = useTranslation();
     const {numComm, handleOpen, dialog} = useCommentDialog({
         row: entity,
-        title: `Comentarios del expediente: ${entity?.nom}`,
+        title: `${t('page.comment.expedient')}: ${entity?.nom}`,
         resourceName: 'expedientComentariResource',
         resourceReference: 'expedient',
     });
@@ -37,9 +39,10 @@ export const ExpedientCommentDialog = (props:any) => {
 
 export const TascaCommentDialog = (props:any) => {
     const { entity } = props;
+    const { t } = useTranslation();
     const {numComm, handleOpen, dialog} = useCommentDialog({
         row: entity,
-        title: `Comentarios de la tarea: ${entity?.titol}`,
+        title: `${t('page.comment.tasca')}: ${entity?.titol}`,
         resourceName: 'expedientTascaComentariResource',
         resourceReference: 'expedientTasca',
     });
@@ -81,7 +84,7 @@ const useCommentDialog = (props:any) => {
         }
 
         formApiRef.current?.show(undefined, {
-            [`${resourceReference}`]: {
+            [resourceReference]: {
                 id: entity?.id
             },
         })

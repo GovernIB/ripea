@@ -29,9 +29,9 @@ type ResourceApiMethods = {
     patch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     delette: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
     onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<void>;
-    artifacts: (args: ResourceApiRequestArgs) => Promise<ResourceApiArtifact[]>;
-    action: (args: ResourceApiActionArgs) => Promise<any>;
-    report: (args: ResourceApiReportArgs) => Promise<any[]>;
+    artifacts: (args: ResourceApiArtifactsArgs) => Promise<ResourceApiArtifact[]>;
+    action: (id: any, args: ResourceApiActionArgs) => Promise<any>;
+    report: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
 }
 
@@ -117,6 +117,10 @@ export type ResourceApiOnChangeArgs = ResourceApiRequestArgs & {
     action?: string;
     report?: string;
     filter?: string;
+};
+
+export type ResourceApiArtifactsArgs = ResourceApiRequestArgs & {
+    includeLinks?: boolean;
 };
 
 export type ResourceApiActionArgs = ResourceApiRequestArgs & {
@@ -511,10 +515,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 });
         });
     }, [request]);
-    const artifacts = React.useCallback((args?: ResourceApiRequestArgs): Promise<ResourceApiArtifact[]> => {
+    const artifacts = React.useCallback((args?: ResourceApiArtifactsArgs): Promise<ResourceApiArtifact[]> => {
         return new Promise((resolve, reject) => {
             request('artifacts', null, { ...args }).then((state: State) => {
-                const embeddedArtifacts = state.getEmbedded().map((e: any) => e.data);
                 const getActionRelFromArtifact = (artifact: any) => {
                     if (artifact?.type === 'ACTION') {
                         return 'exec_' + artifact.code;
@@ -524,84 +527,104 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                         return 'filter_' + artifact.code;
                     }
                 }
-                const resourceApiArtifacts: ResourceApiArtifact[] = embeddedArtifacts.map((a: any) => {
-                    const actionRel = getActionRelFromArtifact(a);
-                    const fields = a.formClassActive ? state.action(actionRel)?.fields as any[] : undefined;
-                    return {
-                        type: a.type,
-                        code: a.code,
-                        formClassActive: a.formClassActive,
+                const artifacts = state.getEmbedded().map((e: any) => {
+                    const data = e.data;
+                    const actionRel = getActionRelFromArtifact(data);
+                    const fields = data.formClassActive ? e.action(actionRel)?.fields as any[] : undefined;
+                    const artifact = {
+                        type: data.type,
+                        code: data.code,
+                        formClassActive: data.formClassActive,
                         fields,
                     };
+                    if (args?.includeLinks) {
+                        return {
+                            ...artifact,
+                            '_links': processStateLinks(e.links),
+                            '_actions': processStateActions(e.actions())
+                        };
+                    } else {
+                        return artifact;
+                    }
                 });
-                resolve(resourceApiArtifacts);
+                resolve(artifacts);
             }).catch(reject);
         });
     }, [request]);
-    const action = React.useCallback((args?: ResourceApiActionArgs): Promise<any[]> => {
+    const action = React.useCallback((id: any, args?: ResourceApiActionArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts').
-                then((state: State) => {
-                    if (args?.code != null) {
-                        const actionRel = 'exec_' + args.code;
-                        const actionLink = state.links.get(actionRel);
-                        if (actionLink != null) {
-                            request(actionRel, null, { ...args }, state).
-                                then((state: State) => {
-                                    const result = state.data;
-                                    resolve(result);
-                                }).
-                                catch((error: ResourceApiError) => {
-                                    processAnswerRequiredError(
-                                        error,
-                                        null,
-                                        args,
-                                        onChange,
-                                        getOpenAnswerRequiredDialog()).
-                                        then(resolve).
-                                        catch(reject);
-                                });
+            if (args?.code != null) {
+                request('artifacts').
+                    then((state: State) => {
+                        const artifactState = state.getEmbedded().find(e => e.data.type === 'ACTION' && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const actionRel = 'exec_' + args.code;
+                            const actionLink = artifactState.links.get(actionRel);
+                            if (actionLink != null) {
+                                request(actionRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
+                                    then((state: State) => {
+                                        const result = state.data;
+                                        resolve(result);
+                                    }).
+                                    catch((error: ResourceApiError) => {
+                                        processAnswerRequiredError(
+                                            error,
+                                            null,
+                                            args,
+                                            onChange,
+                                            getOpenAnswerRequiredDialog()).
+                                            then(resolve).
+                                            catch(reject);
+                                    });
+                            } else {
+                                reject('Link ' + actionRel + ' not found in action ' + args.code + ' links');
+                            }
                         } else {
                             reject('Action ' + args.code + ' not found in artifacts');
                         }
-                    } else {
-                        reject('Action code not specified')
-                    }
-                }).
-                catch(reject);
+                    }).
+                    catch(reject);
+            } else {
+                reject('Action code not specified')
+            }
         });
     }, [request]);
-    const report = React.useCallback((args?: ResourceApiReportArgs): Promise<any[]> => {
+    const report = React.useCallback((id: any, args?: ResourceApiReportArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts').
-                then((state: State) => {
-                    if (args?.code != null) {
-                        const reportRel = 'generate_' + args.code;
-                        const reportLink = state.links.get(reportRel);
-                        if (reportLink != null) {
-                            request(reportRel, null, { ...args }, state).
-                                then((state: State) => {
-                                    const items = state.getEmbedded().map(e => e.data);
-                                    resolve(items);
-                                }).
-                                catch((error: ResourceApiError) => {
-                                    processAnswerRequiredError(
-                                        error,
-                                        null,
-                                        args,
-                                        onChange,
-                                        getOpenAnswerRequiredDialog()).
-                                        then(resolve).
-                                        catch(reject);
-                                });
+            if (args?.code != null) {
+                request('artifacts').
+                    then((state: State) => {
+                        const artifactState = state.getEmbedded().find(e => e.data.type === 'REPORT' && e.data.code === args.code);
+                        if (artifactState != null) {
+                            const reportRel = 'generate_' + args.code;
+                            const reportLink = artifactState.links.get(reportRel);
+                            if (reportLink != null) {
+                                request(reportRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
+                                    then((state: State) => {
+                                        const result = state.data;
+                                        resolve(result);
+                                    }).
+                                    catch((error: ResourceApiError) => {
+                                        processAnswerRequiredError(
+                                            error,
+                                            null,
+                                            args,
+                                            onChange,
+                                            getOpenAnswerRequiredDialog()).
+                                            then(resolve).
+                                            catch(reject);
+                                    });
+                            } else {
+                                reject('Link ' + reportRel + ' not found in report ' + args.code + ' links');
+                            }
                         } else {
                             reject('Report ' + args.code + ' not found in artifacts');
                         }
-                    } else {
-                        reject('Report code not specified')
-                    }
-                }).
-                catch(reject);
+                    }).
+                    catch(reject);
+            } else {
+                reject('Report code not specified')
+            }
         });
     }, [request]);
     const fieldDownload = React.useCallback((id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {

@@ -14,31 +14,37 @@ export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 
 export type DataCommonAdditionalAction = {
     title?: string;
-    rowApiLink?: string;
-    rowApiAction?: string;
-    rowApiReport?: string;
     icon?: string;
-    linkTo?: ((row: any) => string) | string;
-    linkState?: ((row: any) => any) | any;
-    onClick?: (id: any, event: React.MouseEvent) => void;
-    popupCreateOnClick?: boolean;
-    popupUpdateOnClick?: boolean;
     showInMenu?: ((row: any) => boolean) | boolean;
     disabled?: ((row: any) => boolean) | boolean;
     hidden?: ((row: any) => boolean) | boolean;
+    linkTo?: ((row: any) => string) | string;
+    linkState?: ((row: any) => any) | any;
+    rowLink?: string;
+    action?: string;
+    report?: string;
+    clickShowCreateDialog?: boolean;
+    clickShowUpdateDialog?: boolean;
+    onClick?: (id: any, row: any, event: React.MouseEvent) => void;
 };
+
+export type DataCommonShowCreateDialogFn = (row?: any) => void;
+export type DataCommonShowUpdateDialogFn = (id: any, row?: any) => void;
 
 export const useApiDataCommon = (
     resourceName: string,
     findArgs?: DataCommonFindArgs,
     quickFilterInitialValue?: string,
-    quickFilterProps?: any) => {
+    quickFilterProps?: any,
+    getArtifacts?: boolean) => {
     const [loading, setLoading] = React.useState<boolean>(false);
     const [rows, setRows] = React.useState<any[]>([]);
     const [pageInfo, setPageInfo] = React.useState<any>();
+    const [artifacts, setArtifacts] = React.useState<any[]>();
     const {
         isReady: apiIsReady,
         find: apiFind,
+        artifacts: apiArtifacts,
     } = useResourceApiService(resourceName);
     const {
         value: quickFilterValue,
@@ -67,10 +73,22 @@ export const useApiDataCommon = (
         quickFilterValue,
         findArgs,
     ]);
+    React.useEffect(() => {
+        if (getArtifacts) {
+            if (apiIsReady) {
+                apiArtifacts({}).then(artifacts => {
+                    setArtifacts(artifacts);
+                });
+            }
+        } else {
+            artifacts != null && setArtifacts(undefined);
+        }
+    }, [apiIsReady, getArtifacts]);
     return {
         loading,
         rows,
         pageInfo,
+        artifacts,
         refresh,
         quickFilterComponent,
     };
@@ -106,7 +124,7 @@ export const useDataCommonEditable = (
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
     const isPopupEditCreate = popupEditActive || popupEditCreateActive;
     const isPopupEditUpdate = popupEditActive || popupEditUpdateActive;
-    const popupCreate = (row?: any) => {
+    const showCreateDialog: DataCommonShowCreateDialogFn = (row?: any) => {
         dataDialogPopupApiRef.current?.show(
             undefined,
             (typeof formAdditionalData === 'function') ? formAdditionalData(row, 'create') : formAdditionalData).
@@ -117,7 +135,7 @@ export const useDataCommonEditable = (
                 // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
             });
     }
-    const popupUpdate = (id: any, row?: any) => {
+    const showUpdateDialog: DataCommonShowUpdateDialogFn = (id: any, row?: any) => {
         dataDialogPopupApiRef.current?.show(
             id,
             (typeof formAdditionalData === 'function') ? formAdditionalData(row, 'update') : formAdditionalData).
@@ -155,31 +173,31 @@ export const useDataCommonEditable = (
         title: t('datacommon.create.title'),
         linkTo: toolbarCreateLink,
         linkState: formAdditionalData ? { additionalData: formAdditionalData } : undefined,
-        onClick: !toolbarCreateLink ? popupCreate : undefined,
+        onClick: !toolbarCreateLink ? showCreateDialog : undefined,
     }) : undefined;
     const rowEditActions: DataCommonAdditionalAction[] = [];
     !readOnly && !rowHideUpdateButton && rowEditActions.push({
         title: t('datacommon.update.title'),
-        rowApiLink: 'update',
+        rowLink: 'update',
         icon: 'edit',
         linkTo: rowUpdateLink,
         linkState: rowUpdateLink != null && formAdditionalData != null ? { additionalData: formAdditionalData } : undefined,
-        popupUpdateOnClick: rowUpdateLink == null,
+        clickShowUpdateDialog: rowUpdateLink == null,
     });
     !readOnly && !rowHideDeleteButton && rowEditActions.push({
         title: t('datacommon.delete.title'),
-        rowApiLink: 'delete',
         icon: 'delete',
         onClick: doDelete,
         showInMenu: true,
+        rowLink: 'delete',
     });
     rowDetailLink && !rowHideDetailsButton && rowEditActions.push({
         title: t('datacommon.details.title'),
-        rowApiLink: readOnly ? undefined : '!update',
         icon: 'info',
         linkTo: rowDetailLink,
+        rowLink: readOnly ? undefined : '!update',
     });
-    const popupDialog = !readOnly && (isPopupEditCreate || isPopupEditUpdate) ? <DataFormDialog
+    const formDialogComponent = !readOnly && (isPopupEditCreate || isPopupEditUpdate) ? <DataFormDialog
         resourceName={resourceName}
         title={popupEditFormDialogTitle}
         resourceTitle={popupEditFormDialogResourceTitle}
@@ -190,8 +208,8 @@ export const useDataCommonEditable = (
     return {
         toolbarAddElement,
         rowEditActions,
-        popupDialog,
-        popupCreate,
-        popupUpdate,
+        formDialogComponent,
+        showCreateDialog,
+        showUpdateDialog,
     };
 }

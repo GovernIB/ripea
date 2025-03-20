@@ -25,11 +25,13 @@ import {
 } from '../../../util/reactNodePosition';
 import { useResourceApiContext } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
-import { toDataGridActionItem } from './DataGridActionItem';
+import { toDataGridActionItem, DataGridActionItemOnClickFn } from './DataGridActionItem';
 import {
     useApiDataCommon,
     useDataCommonEditable,
-    DataCommonAdditionalAction
+    DataCommonAdditionalAction,
+    DataCommonShowCreateDialogFn,
+    DataCommonShowUpdateDialogFn,
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar, DataToolbarType } from '../datacommon/DataToolbar';
 import DataGridRow from './DataGridRow';
@@ -103,48 +105,70 @@ export type MuiDataGridProps = {
     debug?: boolean;
 } & Omit<DataGridProps, 'apiRef'>;
 
-const rowActionLink = (
-    action: DataCommonAdditionalAction,
-    rowLinks: any): any => {
-    const rowLinkName = action.rowApiLink ? action.rowApiLink : (
-        action.rowApiAction ? 'EXEC_' + action.rowApiAction : (
-            action.rowApiReport ? 'GENERATE_' + action.rowApiReport : null));
-    const isNegative = rowLinkName && rowLinkName.startsWith('!');
-    if (isNegative) {
-        const linkPresent = rowLinks?.[rowLinkName.substring(1)] != null;
-        return linkPresent ? null : {};
+const rowLinkFind = (rowLink: string | undefined, rowLinks: any[] | undefined) => {
+    if (rowLink != null) {
+        const isNegative = rowLink != null && rowLink.startsWith('!');
+        return isNegative ? rowLinks?.[(rowLink.substring(1) as any)] : rowLinks?.[(rowLink as any)];
+    }
+}
+const rowLinkShowCheck = (rowLink: string | undefined, rowLinks: any[] | undefined) => {
+    const found = rowLinkFind(rowLink, rowLinks);
+    if (found) {
+        const isNegative = rowLink != null && rowLink.startsWith('!');
+        return isNegative ? found == null : found != null;
     } else {
-        return rowLinkName ? rowLinks?.[rowLinkName] : null;
+        return true;
+    }
+}
+const rowArtifactShowCheck = (action: string | undefined, report: string | undefined, artifacts: any[] | undefined) => {
+    if (action != null) {
+        return artifacts?.find(a => a.type === 'ACTION' && a.code === action) != null;
+    } else if (report != null) {
+        return artifacts?.find(a => a.type === 'REPORT' && a.code === report) != null;
+    } else {
+        return true;
+    }
+}
+const getRowActionOnClick = (
+    rowAction: DataCommonAdditionalAction,
+    showCreateDialog: DataCommonShowCreateDialogFn,
+    showUpdateDialog: DataCommonShowUpdateDialogFn): DataGridActionItemOnClickFn | undefined => {
+    if (rowAction.clickShowCreateDialog) {
+        return (_id, row) => showCreateDialog(row);
+    } else if (rowAction.clickShowUpdateDialog) {
+        return (id, row) => showUpdateDialog(id, row);
+    } else {
+        return rowAction.onClick;
     }
 }
 
 const rowActionsToGridActionsCellItems = (
-    params: GridRowParams,
     rowActions: DataCommonAdditionalAction[],
-    popupCreate: (row?: any) => void,
-    popupUpdate: (id: any, row?: any) => void,
+    params: GridRowParams,
+    showCreateDialog: DataCommonShowCreateDialogFn,
+    showUpdateDialog: DataCommonShowUpdateDialogFn,
+    artifacts: any[] | undefined,
     forceDisabled?: boolean): React.ReactElement[] => {
-    const rowLinks = params.row['_actions'];
     const actions: React.ReactElement[] = [];
-    rowActions.forEach((action: DataCommonAdditionalAction) => {
-        const isLinkAction = action.rowApiLink || action.rowApiAction || action.rowApiReport;
-        const link = isLinkAction ? rowActionLink(action, rowLinks) : null;
-        const showAction = isLinkAction ? link != null : true;
-        const actionLinkTo = (typeof action.linkTo === 'function') ? action.linkTo?.(params.row) : action.linkTo?.replace('{{id}}', '' + params.id);
-        const actionLinkState = (typeof action.linkState === 'function') ? action.linkState?.(params.row) : action.linkState;
-        const actionOnClick = action.popupCreateOnClick ? () => popupCreate(params.row) : (action.popupUpdateOnClick ? () => popupUpdate(params.id, params.row) : action.onClick);
-        const showInMenu = (typeof action.showInMenu === 'function') ? action.showInMenu(params.row) : action.showInMenu;
-        const disabled = forceDisabled || ((typeof action.disabled === 'function') ? action.disabled(params.row) : action.disabled);
-        const hidden = (typeof action.hidden === 'function') ? action.hidden(params.row) : action.hidden;
-        showAction && !hidden && actions.push(
+    rowActions.forEach((rowAction: DataCommonAdditionalAction) => {
+        const rowLink = rowLinkFind(rowAction.rowLink, params.row['_actions']);
+        const rowLinkShow = rowLinkShowCheck(rowAction.rowLink, params.row['_actions']);
+        const rowArtifactShow = rowArtifactShowCheck(rowAction.action, rowAction.report, artifacts);
+        const rowActionLinkTo = (typeof rowAction.linkTo === 'function') ? rowAction.linkTo?.(params.row) : rowAction.linkTo?.replace('{{id}}', '' + params.id);
+        const rowActionLinkState = (typeof rowAction.linkState === 'function') ? rowAction.linkState?.(params.row) : rowAction.linkState;
+        const rowActionOnClick = getRowActionOnClick(rowAction, showCreateDialog, showUpdateDialog);
+        const showInMenu = (typeof rowAction.showInMenu === 'function') ? rowAction.showInMenu(params.row) : rowAction.showInMenu;
+        const disabled = forceDisabled || ((typeof rowAction.disabled === 'function') ? rowAction.disabled(params.row) : rowAction.disabled);
+        const hidden = (typeof rowAction.hidden === 'function') ? rowAction.hidden(params.row) : rowAction.hidden;
+        rowLinkShow && rowArtifactShow && !hidden && actions.push(
             toDataGridActionItem(
                 params.id,
-                action.title ?? (isLinkAction ? link?.title : isLinkAction),
+                rowAction.title ?? (rowLink != null ? rowLink?.title : rowAction),
                 params.row,
-                action.icon,
-                actionLinkTo,
-                actionLinkState,
-                actionOnClick,
+                rowAction.icon,
+                rowActionLinkTo,
+                rowActionLinkState,
+                rowActionOnClick,
                 showInMenu,
                 disabled));
     });
@@ -157,8 +181,9 @@ const useGridColumns = (
     rowActions: DataCommonAdditionalAction[],
     rowEditActions: DataCommonAdditionalAction[],
     fields: any[] | undefined,
-    popupCreate: (row?: any) => void,
-    popupUpdate: (id: any, row?: any) => void,
+    showCreateDialog: DataCommonShowCreateDialogFn,
+    showUpdateDialog: DataCommonShowUpdateDialogFn,
+    artifacts: any[] | undefined,
     rowModesModel?: GridRowModesModel) => {
     const { currentLanguage } = useResourceApiContext();
     const processedColumns = React.useMemo(() => {
@@ -207,17 +232,18 @@ const useGridColumns = (
                     const anyRowInEditMode = rowModesModel && Object.keys(rowModesModel).filter(m => rowModesModel[m].mode === GridRowModes.Edit).length > 0;
                     const isEditMode = rowModesModel && rowModesModel[params.id]?.mode === GridRowModes.Edit;
                     return rowActionsToGridActionsCellItems(
-                        params,
                         isEditMode ? rowEditActions : rowActions,
-                        popupCreate,
-                        popupUpdate,
+                        params,
+                        showCreateDialog,
+                        showUpdateDialog,
+                        artifacts,
                         anyRowInEditMode && !isEditMode);
                 },
                 ...rowActionsColumnProps,
             });
         }
         return processedColumns;
-    }, [columns, fields, rowModesModel]);
+    }, [columns, fields, rowModesModel, artifacts]);
     return processedColumns;
 }
 
@@ -287,6 +313,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     } = props;
     const logConsole = useLogConsole(LOG_PREFIX);
     const datagridApiRef = useMuiDatagridApiRef();
+    const anyArtifactRowAction = rowAdditionalActions?.find(a => a.action != null || a.report != null) != null;
     const treeDataAdditionalRowsIsFunction = treeDataAdditionalRows ? typeof treeDataAdditionalRows === 'function' : false;
     const [internalSortModel, setInternalSortModel] = React.useState<GridSortModel>(sortModel ?? []);
     const [internalFilter, setInternalFilter] = React.useState<string | undefined>(filterProp);
@@ -329,13 +356,15 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         loading,
         rows,
         pageInfo,
+        artifacts,
         refresh,
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
         findArgs,
         quickFilterInitialValue,
-        { fullWidth: quickFilterFullWidth, sx: { ml: quickFilterFullWidth ? 0 : 1 } });
+        { fullWidth: quickFilterFullWidth, sx: { ml: quickFilterFullWidth ? 0 : 1 } },
+        anyArtifactRowAction);
     const isUpperToolbarType = toolbarType === 'upper';
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
     React.useEffect(() => {
@@ -350,9 +379,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const {
         toolbarAddElement,
         rowEditActions,
-        popupDialog,
-        popupCreate,
-        popupUpdate,
+        formDialogComponent,
+        showCreateDialog,
+        showUpdateDialog,
     } = useDataCommonEditable(
         resourceName,
         readOnly ?? false,
@@ -403,20 +432,21 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         [...rowAdditionalActions, ...rowEditActions],
         rowEditActions,
         apiCurrentFields,
-        popupCreate,
-        popupUpdate,
+        showCreateDialog,
+        showUpdateDialog,
+        artifacts,
         otherProps.rowModesModel);
     const apiRef = React.useRef<MuiDataGridApi>({
         refresh,
-        popupCreate,
-        popupUpdate,
+        showCreateDialog,
+        showUpdateDialog,
         setFilter: (filter) => setInternalFilter(filter ?? undefined),
     });
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.refresh = refresh;
-            apiRefProp.current.popupCreate = popupCreate;
-            apiRefProp.current.popupUpdate = popupUpdate;
+            apiRefProp.current.showCreateDialog = showCreateDialog;
+            apiRefProp.current.showUpdateDialog = showUpdateDialog;
             apiRefProp.current.setFilter = (filter) => setInternalFilter(filter ?? undefined);
         } else {
             logConsole.warn('apiRef prop must be initialized with an empty object');
@@ -451,7 +481,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const content = <>
         {toolbar}
         {toolbarAdditionalRow ? <Box sx={{ ...gridMargins, mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
-        {popupDialog}
+        {formDialogComponent}
         <DataGridCustomStyle
             {...otherProps}
             loading={loading}

@@ -1,26 +1,27 @@
-import {useRef} from "react";
 import {
-    MuiFormDialogApi,
+    MuiFormDialog, MuiFormDialogApi,
     useBaseAppContext,
     useConfirmDialogButtons,
     useResourceApiService
 } from "reactlib";
+import {InteressatsGridForm} from "../InteressatsGrid.tsx";
+import {useRef} from "react";
 
-const useInteressatActions = (expedientId:number, refresh?: () => void) => {
+const useInteressatActions = (refresh?: () => void) => {
     const {
         delette: apiDelete,
         patch: apiPatch,
         getOne
     } = useResourceApiService('interessatResource');
-    const formApiRef = useRef<MuiFormDialogApi>();
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+    const apiRef = useRef<MuiFormDialogApi>();
 
-    const createRepresentent = (rowId: any) => {
-        formApiRef.current?.show(undefined, {
+    const createRepresentent = (rowId: any, row:any) => {
+        apiRef.current?.show(undefined, {
             expedient: {
-                id: expedientId
+                id: row?.expedient?.id
             },
             representat: {
                 id: rowId
@@ -36,7 +37,7 @@ const useInteressatActions = (expedientId:number, refresh?: () => void) => {
             });
     }
     const updateRepresentent = (rowId: any, row: any) => {
-        formApiRef.current?.show(row?.representant?.id)
+        apiRef.current?.show(row?.representant?.id)
             .then(() => {
                 refresh?.();
                 temporalMessageShow(null, 'Elemento modificado', 'success');
@@ -141,9 +142,18 @@ const useInteressatActions = (expedientId:number, refresh?: () => void) => {
         },
     ];
 
+    const components=
+        <MuiFormDialog
+            resourceName={"interessatResource"}
+            title={`Representante`}
+            apiRef={apiRef}
+        >
+            <InteressatsGridForm/>
+        </MuiFormDialog>;
+
     return {
         actions,
-        formApiRef,
+        components,
     }
 }
 export default useInteressatActions;

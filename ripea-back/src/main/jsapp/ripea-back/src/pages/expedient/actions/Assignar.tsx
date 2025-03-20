@@ -3,27 +3,25 @@ import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 
-const CambiarPrioritatForm = () => {
+const AssignarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={6} name="titol" disabled/>
-        <GridFormField xs={6} name="metaExpedientTasca" readOnly disabled/>
-        <GridFormField xs={12} name="prioritat" required/>
+        <GridFormField xs={12} name="agafatPer" required/>
     </Grid>
 }
 
-const CambiarPrioritat = (props: { apiRef:any }) => {
+export const Assignar = (props: { apiRef:any }) => {
     const { apiRef } = props;
 
     return <MuiFormDialog
-        resourceName={"expedientTascaResource"}
-        title={`Modificar prioridad de la tarea`}
+        resourceName={"expedientResource"}
+        title={`Assignar expediente a usuario`}
         apiRef={apiRef}
     >
-        <CambiarPrioritatForm/>
+        <AssignarForm/>
     </MuiFormDialog>
 }
 
-const useCambiarPrioritat = (refresh?: () => void) => {
+const useAssignar = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -40,7 +38,8 @@ const useCambiarPrioritat = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <CambiarPrioritat apiRef={apiRef}/>
+        content: <Assignar apiRef={apiRef}/>
     }
 }
-export default useCambiarPrioritat;
+
+export default useAssignar;
