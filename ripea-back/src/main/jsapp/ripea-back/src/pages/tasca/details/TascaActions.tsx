@@ -9,8 +9,10 @@ import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
+import {useTranslation} from "react-i18next";
 
 const useTascaActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const {
         action: apiAction
     } = useResourceApiService('expedientTascaResource');
@@ -40,20 +42,20 @@ const useTascaActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: "Detalle",
+            title: t('page.tasca.acciones.detall'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,
         },
         {
-            title: "Tramitar",
+            title: t('page.tasca.acciones.tramitar'),
             icon: "folder",
             showInMenu: true,
             disabled: disableResponsable,
             hidden: hideByEstat,
         },
         {
-            title: "Iniciar",
+            title: t('page.tasca.acciones.iniciar'),
             icon: "play_arrow",
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'INICIADA'),
@@ -61,7 +63,7 @@ const useTascaActions = (refresh?: () => void) => {
             hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
         {
-            title: "Rechazar",
+            title: t('page.tasca.acciones.rebutjar'),
             icon: "reply",
             showInMenu: true,
             onClick: handleRebutjar,
@@ -69,7 +71,7 @@ const useTascaActions = (refresh?: () => void) => {
             hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
         {
-            title: "Cancelar",
+            title: t('page.tasca.acciones.cancel'),
             icon: "close",
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'CANCELLADA'),
@@ -77,7 +79,7 @@ const useTascaActions = (refresh?: () => void) => {
             hidden: hideByEstat,
         },
         {
-            title: "Finalizar",
+            title: t('page.tasca.acciones.finalitzar'),
             icon: "check",
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'FINALITZADA'),
@@ -85,42 +87,42 @@ const useTascaActions = (refresh?: () => void) => {
             hidden: hideByEstat,
         },
         {
-            title: "Reasignar",
+            title: t('page.tasca.acciones.reassignar'),
             icon: "person",
             showInMenu: true,
             onClick: handleReassignar,
             hidden: hideByEstat,
         },
         {
-            title: "Delegar",
+            title: t('page.tasca.acciones.delegar'),
             icon: "turn_right",
             showInMenu: true,
             onClick: handleDelegar,
             hidden: (row: any): boolean => row?.delegat != null || hideByEstat(row),
         },
         {
-            title: "Retomar",
+            title: t('page.tasca.acciones.retomar'),
             icon: "close",
             showInMenu: true,
             onClick: handleRetomar,
             hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
-            title: "Modificar fecha limite...",
+            title: t('page.tasca.acciones.upDataLimit'),
             icon: "info",
             showInMenu: true,
             onClick: handleCambiarDataLimit,
             hidden: hideByEstat,
         },
         {
-            title: "Cambiar prioridad...",
+            title: t('page.tasca.acciones.upPrioritat'),
             icon: "schedule",
             showInMenu: true,
             onClick: handleCambiarPrioritat,
             hidden: hideByEstat,
         },
         {
-            title: "Reabrir",
+            title: t('page.tasca.acciones.reobrir'),
             icon: "undo",
             showInMenu: true,
             onClick: handleReobrir,

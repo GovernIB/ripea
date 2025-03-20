@@ -1,7 +1,9 @@
 import useDocumentDetail from "./DocumentDetail.tsx";
 import useInformacioArxiu from "../../expedient/actions/InformacioArxiu.tsx";
+import {useTranslation} from "react-i18next";
 
 export const useContingutActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
     // const { temporalMessageShow } = useBaseAppContext();
     // const {
     //     patch: apiPatch,
@@ -13,56 +15,56 @@ export const useContingutActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: "Detalles",
+            title: t('page.document.acciones.detall'),
             icon: "folder",
             showInMenu: true,
             onClick: detallhandleOpen
         },
         {
-            title: "Mover...",
+            title: t('page.document.acciones.move'),
             icon: "open_with",
             showInMenu: true,
         },
         {
-            title: "Descargar",
+            title: t('common.download'),
             icon: "download",
             showInMenu: true,
             // onClick: (id:any)=>apiDownload(id,{fieldName: ''})
         },
         {
-            title: "Visualizar",
+            title: t('page.document.acciones.view'),
             icon: "search",
             showInMenu: true,
             disabled: true,
         },
         {
-            title: "Enviar a portafirmas...",
+            title: t('page.document.acciones.portafirmes'),
             icon: "mail",
             showInMenu: true,
         },
         {
-            title: "Firma desde el navegador...",
+            title: t('page.document.acciones.firmar'),
             icon: "edit_document",
             showInMenu: true,
         },
         {
-            title: "Enviar via email...",
+            title: t('page.document.acciones.mail'),
             icon: "mail",
             showInMenu: true,
         },
         {
-            title: "Histórico de acciones",
+            title: t('page.document.acciones.history'),
             icon: "list",
             showInMenu: true,
         },
         {
-            title: "Información archivo",
+            title: t('page.document.acciones.infoArxiu'),
             icon: "info",
             showInMenu: true,
             onClick: arxiuhandleOpen
         },
         {
-            title: "Exportación EIN...",
+            title: t('page.document.acciones.export'),
             icon: "download",
             showInMenu: true,
             disabled: true,

@@ -2,6 +2,7 @@ import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {useTranslation} from "react-i18next";
 
 const ReassignarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -10,11 +11,12 @@ const ReassignarForm = () => {
 }
 
 const Reassignar = (props: { apiRef:any }) => {
+    const { t } = useTranslation();
     const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientTascaResource"}
-        title={`Reasignar tarea`}
+        title={t('page.tasca.action.reassignar')}
         apiRef={apiRef}
     >
         <ReassignarForm/>

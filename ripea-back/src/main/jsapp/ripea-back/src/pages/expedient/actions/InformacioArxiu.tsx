@@ -3,6 +3,7 @@ import {BasePage, Dialog} from "reactlib";
 import {useState} from "react";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import {useTranslation} from "react-i18next";
 
 const InformacionData = (props:any) => {
     const {title, children, hxs, bsx} = props;
@@ -13,45 +14,47 @@ const InformacionData = (props:any) => {
 }
 
 const InformacionExpediente = (props:any) => {
+    const { t } = useTranslation();
     const {entity} = props;
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <InformacionData title={"Identificador archivo"}>{entity?.arxiuUuid}</InformacionData>
-            <InformacionData title={"Nombre del archivo"}>{entity?.nom}</InformacionData>
-            <InformacionData title={"Serie documental"}> </InformacionData>
+            <InformacionData title={t('page.arxiu.detall.arxiuUuid')}>{entity?.arxiuUuid}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.fitxerNom')}>{entity?.nom}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.serie')}> </InformacionData>
 
-            <InformacionData title={"Metadatos ENI"}/>
-            <InformacionData title={"Versión"}> </InformacionData>
-            <InformacionData title={"Identificador"}>{entity?.ntiIdentificador}</InformacionData>
-            <InformacionData title={"Órgano"}>{entity?.organGestor?.description}</InformacionData>
-            <InformacionData title={"Fecha apertura"}>{formatDate(entity?.createdDate)}</InformacionData>
-            <InformacionData title={"Clasificación"}>{entity?.ntiClasificacionSia}</InformacionData>
-            <InformacionData title={"Estado"}>{entity?.estat}</InformacionData>
-            <InformacionData title={"Interesados"}>{entity?.interessats?.map((interessat:any)=>interessat?.documentNum).join(', ')}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.metadata')}/>
+            <InformacionData title={t('page.arxiu.detall.versions')}> </InformacionData>
+            <InformacionData title={t('page.arxiu.detall.identificador')}>{entity?.ntiIdentificador}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.organ')}>{entity?.organGestor?.description}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.dataApertura')}>{formatDate(entity?.createdDate)}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.clasificacion')}>{entity?.ntiClasificacionSia}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.estat')}>{entity?.estat}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.interessats')}>{entity?.interessats?.map((interessat:any)=>interessat?.documentNum).join(', ')}</InformacionData>
         </Grid>
     </BasePage>
 }
 const InformacionDocumento = (props:any) => {
+    const { t } = useTranslation();
     const {entity} = props;
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <InformacionData title={"Identificador archivo"}>{entity?.arxiuUuid}</InformacionData>
-            <InformacionData title={"Nombre del archivo"}>{entity?.adjunt?.name}</InformacionData>
-            <InformacionData title={"Serie documental"}> </InformacionData>
-            <InformacionData title={"Estado del archivo"}>{entity?.arxiuEstat}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.arxiuUuid')}>{entity?.arxiuUuid}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.fitxerNom')}>{entity?.fitxerNom}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.serie')}> </InformacionData>
+            <InformacionData title={t('page.arxiu.detall.arxiuEstat')}>{entity?.arxiuEstat}</InformacionData>
 
-            <InformacionData title={"Contenido documento"}/>
-            <InformacionData title={"Tipo MIME"}>{entity?.fitxerContentType}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.document')}/>
+            <InformacionData title={t('page.arxiu.detall.fitxerContentType')}>{entity?.fitxerContentType}</InformacionData>
 
-            <InformacionData title={"Metadatos ENI"}/>
-            <InformacionData title={"Versión"}> </InformacionData>
-            <InformacionData title={"Identificador"}>{entity?.ntiIdentificador}</InformacionData>
-            <InformacionData title={"Órgano"}>{entity?.ntiOrgano} - {entity?.entitat?.description}</InformacionData>
-            <InformacionData title={"Fecha captura"}>{entity?.dataCaptura}</InformacionData>
-            <InformacionData title={"Origen"}>{entity?.ntiOrigen}</InformacionData>
-            <InformacionData title={"Estado elaboración"}>{entity?.ntiEstadoElaboracion}</InformacionData>
-            <InformacionData title={"Tipo documental NTI"}>{entity?.ntiTipoDocumental}</InformacionData>
-            <InformacionData title={"Formato nombre"}>{entity?.fitxerNom.split('.').reverse()[0]}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.metadata')}/>
+            <InformacionData title={t('page.arxiu.detall.versions')}> </InformacionData>
+            <InformacionData title={t('page.arxiu.detall.identificador')}>{entity?.ntiIdentificador}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.organ')}>{entity?.ntiOrgano} - {entity?.entitat?.description}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.dataCaptura')}>{entity?.dataCaptura}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.origen')}>{entity?.ntiOrigen}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.estadoElaboracion')}>{entity?.ntiEstadoElaboracion}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</InformacionData>
+            <InformacionData title={t('page.arxiu.detall.format')}>{entity?.fitxerNom.split('.').reverse()[0]}</InformacionData>
         </Grid>
     </BasePage>
 }
@@ -65,6 +68,7 @@ const Hijos = () => {
 }
 
 const useInformacioArxiu = (tipo:string) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
@@ -81,21 +85,21 @@ const useInformacioArxiu = (tipo:string) => {
     const tabs = [
         {
             value: "resum",
-            label: 'Información',
+            label: t('page.arxiu.tabs.resum'),
             content: tipo=="expediente"
                 ?<InformacionExpediente entity={entity}/>
                 :<InformacionDocumento entity={entity}/>,
         },
         {
             value: "fills",
-            label: 'Hijos',
+            label: t('page.arxiu.tabs.fills'),
             content: <Hijos/>,
             // badge: entity?.,
             hidden: entity?.tipus == "DOCUMENT",
         },
         {
-            value: "estat",
-            label: 'Metadatos',
+            value: "data",
+            label: t('page.arxiu.tabs.data'),
             content: <Metadatos/>,
             // badge: entity?.,
         },
@@ -105,12 +109,13 @@ const useInformacioArxiu = (tipo:string) => {
         <Dialog
             open={open}
             closeCallback={handleClose}
-            title={`Información obtenida del archivo`}
+            title={t('page.arxiu.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {
                     value: 'close',
-                    text: 'Cerrar',
+                    text: t('common.close'),
+                    icon: 'close',
                 },
             ]}
             buttonCallback={(value :any) :void=>{

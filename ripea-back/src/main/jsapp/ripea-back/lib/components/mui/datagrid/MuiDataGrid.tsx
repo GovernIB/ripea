@@ -74,6 +74,7 @@ export type MuiDataGridProps = {
     formAdditionalData?: ((row: any, action: string) => any) | any;
     treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
     toolbarType?: DataToolbarType;
+    toolbarHide?: true;
     toolbarHideRefresh?: true;
     toolbarHideQuickFilter?: true;
     toolbarCreateLink?: string;
@@ -279,6 +280,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         formAdditionalData,
         treeDataAdditionalRows,
         toolbarType = 'default',
+        toolbarHide,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
         toolbarCreateLink,
@@ -479,7 +481,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     } : null;
     const processedRows = [...additionalRows, ...rows];
     const content = <>
-        {toolbar}
+        {!toolbarHide && toolbar}
         {toolbarAdditionalRow ? <Box sx={{ ...gridMargins, mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
         {formDialogComponent}
         <DataGridCustomStyle
@@ -505,7 +507,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             }}
             autoHeight={autoHeight}
             sx={{
-                height: autoHeight ? 'auto' : height,
+                height: autoHeight ? 'auto' : undefined,
                 ...gridMargins,
                 ...sx,
             }} />
@@ -525,7 +527,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         apiRef,
     };
     return <DataGridContext.Provider value={context}>
-        {autoHeight || height ? content : <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...virtualScrollerStyles }}>
+        {autoHeight ? content : <Box sx={{ display: 'flex', flexDirection: 'column', height: height ? height : '100%', ...virtualScrollerStyles }}>
             {content}
         </Box>}
     </DataGridContext.Provider>;

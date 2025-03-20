@@ -1007,11 +1007,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	private Link buildReportLink(ResourceArtifact artifact) {
 		String rel = "generate_" + artifact.getCode();
 		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-			Link reportLink = linkTo(methodOn(getClass()).getOne(null, null)).withRel(rel);
-			return Link.of(reportLink.toUri() + "/artifacts/report/" + artifact.getCode()).withSelfRel();
+			return linkTo(methodOn(getClass()).artifactReportGenerate(null, artifact.getCode(), null, null)).withRel(rel);
 		} else {
-			Link reportLink = linkTo(methodOn(getClass()).artifacts()).withRel(rel);
-			return Link.of(reportLink.toUri() + "/report/" + artifact.getCode()).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactReportGenerate(artifact.getCode(), null, null)).withRel(rel);
 		}
 	}
 	private Link buildReportLinkWithAffordances(ResourceArtifact artifact) {
@@ -1032,7 +1030,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@SneakyThrows
 	private Link buildReportItemLink(String code, int index) {
 		Link reportLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
-		return Link.of(reportLink.toUri().toString() + "/report/" + code + "/item/" + index).withSelfRel();
+		return Link.of(reportLink.toUri() + "/report/" + code + "/item/" + index).withSelfRel();
 	}
 
 	private List<Link> buildOptionsLinks(

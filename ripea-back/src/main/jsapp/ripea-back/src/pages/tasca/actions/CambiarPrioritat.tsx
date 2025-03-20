@@ -2,6 +2,7 @@ import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {useTranslation} from "react-i18next";
 
 const CambiarPrioritatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -12,11 +13,12 @@ const CambiarPrioritatForm = () => {
 }
 
 const CambiarPrioritat = (props: { apiRef:any }) => {
+    const { t } = useTranslation();
     const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientTascaResource"}
-        title={`Modificar prioridad de la tarea`}
+        title={t('page.tasca.action.changePrioritat')}
         apiRef={apiRef}
     >
         <CambiarPrioritatForm/>

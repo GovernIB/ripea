@@ -6,8 +6,10 @@ import {
 } from "reactlib";
 import {InteressatsGridForm} from "../InteressatsGrid.tsx";
 import {useRef} from "react";
+import {useTranslation} from "react-i18next";
 
 const useInteressatActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const {
         delette: apiDelete,
         patch: apiPatch,
@@ -50,8 +52,8 @@ const useInteressatActions = (refresh?: () => void) => {
         getOne(row?.representant?.id)
             .then((representant) => {
                 messageDialogShow(
-                    'Title',
-                    'Message',
+                    t('page.interessat.dialog.deleteRepTitle'),
+                    t('page.interessat.dialog.deleteRepMessage'),
                     confirmDialogButtons,
                     confirmDialogComponentProps)
                     .then((value: any) => {
@@ -82,8 +84,8 @@ const useInteressatActions = (refresh?: () => void) => {
     }
     const deleteInteressat = (rowId: any, row: any) => {
         messageDialogShow(
-            'Title',
-            'Message',
+            t('page.interessat.dialog.deleteTitle'),
+            t('page.interessat.dialog.deleteMessage'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -114,27 +116,27 @@ const useInteressatActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: "Borrar Interesado",
+            title: t('page.interessat.actions.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteInteressat,
         },
         {
-            title: "Añadir Representante",
+            title: t('page.interessat.actions.createRep'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
             disabled: (row: any) => row?.representant,
         },
         {
-            title: "Modificar Representante",
+            title: t('page.interessat.actions.updateRep'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
             disabled: (row: any) => !row?.representant,
         },
         {
-            title: "Borrar Representante",
+            title: t('page.interessat.actions.deleteRep'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,
@@ -145,7 +147,7 @@ const useInteressatActions = (refresh?: () => void) => {
     const components=
         <MuiFormDialog
             resourceName={"interessatResource"}
-            title={`Representante`}
+            title={t('page.interessat.rep')}
             apiRef={apiRef}
         >
             <InteressatsGridForm/>

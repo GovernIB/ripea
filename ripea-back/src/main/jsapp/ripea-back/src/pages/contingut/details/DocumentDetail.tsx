@@ -3,6 +3,7 @@ import {BasePage, Dialog} from "reactlib";
 import {useState} from "react";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import {useTranslation} from "react-i18next";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
@@ -14,20 +15,21 @@ const ContenidoData = (props:any) => {
 
 const Contenido = (props:any) => {
     const {entity} = props;
+    const { t } = useTranslation();
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={"Nom del fitxer"}>{entity?.fitxerNom}</ContenidoData>
-            <ContenidoData title={"Tipus de contingut"}>{entity?.fitxerContentType}</ContenidoData>
-            <ContenidoData title={"Tipus de document"}>{entity?.metaDocument?.description}</ContenidoData>
-            <ContenidoData title={"Data de creació"}>{formatDate(entity?.createdDate)}</ContenidoData>
-            <ContenidoData title={"Estat"}>{entity?.estat}</ContenidoData>
-            <ContenidoData title={"Data de captura"}>{formatDate(entity?.dataCaptura)}</ContenidoData>
-            <ContenidoData title={"Orígen"}>{entity?.ntiOrigen}</ContenidoData>
-            <ContenidoData title={"Tipus documental NTI"}>{entity?.ntiTipoDocumental}</ContenidoData>
-            <ContenidoData title={"Estat d'elaboració"}>{entity?.ntiEstadoElaboracion}</ContenidoData>
-            <ContenidoData title={"CSV"}>{entity?.ntiCsv}</ContenidoData>
-            <ContenidoData title={"Regulació del CSV"}>{entity?.ntiCsvRegulacion}</ContenidoData>
-            <ContenidoData title={"Tipus de firma"}>{entity?.ntiTipoFirma}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.estat')}>{entity?.estat}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.origen')}>{entity?.ntiOrigen}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{entity?.ntiEstadoElaboracion}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.csv')}>{entity?.ntiCsv}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.csvRegulacion')}>{entity?.ntiCsvRegulacion}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma}</ContenidoData>
         </Grid>
     </BasePage>
 }
@@ -37,6 +39,7 @@ const Versiones = () => {
 }
 
 const useDocumentDetail = () => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
@@ -52,13 +55,13 @@ const useDocumentDetail = () => {
 
     const tabs = [
         {
-            value: "resum",
-            label: 'Contenido',
+            value: 'resum',
+            label: t('page.document.tabs.resum'),
             content: <Contenido entity={entity}/>,
         },
         {
-            value: "estat",
-            label: 'Versiones',
+            value: "version",
+            label: t('page.document.tabs.version'),
             content: <Versiones/>,
             badge: entity?.versioCount,
         },
@@ -73,7 +76,7 @@ const useDocumentDetail = () => {
             buttons={[
                 {
                     value: 'download',
-                    text: 'Descargar',
+                    text: t('common.download'),
                     icon: 'download'
                 },
             ]}
