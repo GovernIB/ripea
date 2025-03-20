@@ -1,15 +1,19 @@
 const translationEs = {
     common: {
-        salut: "Salud",
-        app: "Aplicaciones",
+        close: "Cerrar",
+        delete: "Borrar",
+        action: "Acción",
+        expand: "Expandir",
+        contract: "Contraer",
+        download: "Descargar",
     },
     page: {
-        comment:{
-            expedient: 'Comentarios del expediente:',
-            tasca: 'Comentarios de la tarea',
+        comment: {
+            expedient: "Comentarios del expediente",
+            tasca: "Comentarios de la tarea",
         },
-        contingut:{
-            detalle:{
+        contingut: {
+            detalle: {
                 numero: "Numero",
                 titol: "Titulo",
                 metaExpedient: "Tipo",
@@ -19,7 +23,7 @@ const translationEs = {
                 prioritat: "Prioridad",
                 clasificacio: "Clasificación",
             },
-            tabs:{
+            tabs: {
                 contingut: "Contenido",
                 dades: "Datos",
                 interessats: "Interesados",
@@ -30,13 +34,172 @@ const translationEs = {
                 tasques: "Tareas",
             }
         },
-        anotacio:{
-            tabs:{
-                resum: 'Resumen',
-                estat: 'Estado',
-                registre: 'Información registro',
-                interessats: 'Interesados',
-                annexos: 'Annexos',
+        anotacio: {
+            tabs: {
+                resum: "Resumen",
+                estat: "Estado",
+                registre: "Información registro",
+                interessats: "Interesados",
+                annexos: "Annexos",
+            },
+        },
+        tasca: {
+            title: "Tarea",
+            detall: {
+                title: "Detalles de la tarea",
+                metaExpedientTasca: "Tipo de tarea",
+                metaExpedientTascaDescription: "Descripción tipo de tarea",
+                createdBy: "Creada por",
+                responsablesStr: "Responsables",
+                responsableActual: "Responsable actual",
+                delegat: "Delegado",
+                observadors: "Observadores",
+                dataInici: "Fecha inicio",
+                duracio: "Duración",
+                dataLimit: "Fecha limite",
+                estat: "Estado",
+                prioritat: "Prioridad",
+            },
+            acciones: {
+                detall: "Detalle",
+                tramitar: "Tramitar",
+                iniciar: "Iniciar",
+                rebutjar: "Rechazar",
+                cancel: "Cancelar",
+                finalitzar: "Finalizar",
+                reassignar: "Reasignar",
+                delegar: "Delegar",
+                retomar: "Retomar",
+                upDataLimit: "Modificar fecha limite...",
+                upPrioritat: "Cambiar prioridad...",
+                reobrir: "Reabrir",
+            },
+            action: {
+                retomar: "Retomar tarea",
+                reobrir: "Reabrir tarea",
+                rebutjar: "Rechazar tarea",
+                reassignar: "Reassignar tarea",
+                delegar: "Delegar tarea",
+                changePrioritat: "Modificar prioridad de la tarea",
+                changeDataLimit: "Cambiar fecha limite",
+            },
+        },
+        interessat: {
+            title: "Interesado",
+            rep: "Representante",
+            actions: {
+                delete: "Borrar Interesado",
+                createRep: "Añadir Representante",
+                updateRep: "Modificar Representante",
+                deleteRep: "Borrar Representante",
+            },
+            dialog: {
+                deleteTitle: "Borrar interesado",
+                deleteMessage: "Esta seguro de que quiere seguir con esta acción?",
+                deleteRepTitle: "Borrar Representante",
+                deleteRepMessage: "Esta seguro de que quiere seguir con esta acción?",
+            }
+        },
+        expedient: {
+            title: "Expediente",
+            filter: {
+                title: "Buscador de expedientes"
+            },
+            detall: {
+                agafatPer: "Cogido por",
+            },
+            acciones: {
+                detall: "Gestionar",
+                follow: "Seguir",
+                unfollow: "Dejar de seguir",
+                assignar: "Assignar",
+                agafar: "Coger",
+                lliberar: "Liberar",
+                upPrioritat: "Cambiar prioridad...",
+                upEstat: "Cambiar estado...",
+                relacio: "Relacionar...",
+                close: "Cerrar...",
+                history: "Histórico de acciones",
+                download: "Descargar documentos...",
+                exportPDF: "Exportar indice PDF...",
+                exportEIN: "Indice PDF y exportación EIN...",
+                infoArxiu: "Información archivo",
+                sincronitzar: "Sincronizar estado con archivo",
+            },
+            action: {
+                changePrioritat: "Modificar prioridad del expediente",
+                changeEstat: "Modificar estado del expediente",
+                assignar: "Assignar expediente a usuario",
+            },
+        },
+        arxiu: {
+            detall: {
+                title: "Información obtenida del archivo",
+                arxiuUuid: "Identificador archivo",
+                fitxerNom: "Nombre del archivo",
+                serie: "Serie documental",
+                arxiuEstat: "Estado del archivo",
+                document: "Contenido documento",
+                fitxerContentType: "Tipo MIME",
+                metadata: "Metadatos ENI",
+                versions: "Versión",
+                identificador: "Identificador",
+                organ: "Órgano",
+                dataCaptura: "Fecha captura",
+                dataApertura: "Fecha apertura",
+                origen: "Origen",
+                estadoElaboracion: "Estado elaboración",
+                tipoDocumental: "Tipo documental NTI",
+                format: "Formato nombre",
+                clasificacion: "Clasificació",
+                estat: "Estado",
+                interessats: "Interesados",
+            },
+            tabs: {
+                resum: "Información",
+                fills: "Hijos",
+                data: "Metadatos",
+            },
+        },
+        document: {
+            title: "Documento",
+            view: {
+                title: "Tipo de vista",
+                estat: "Vista por estado",
+                tipus: "Vista por tipo documento",
+                carpeta: "Vista por carpeta",
+            },
+            tabs: {
+                resum: "Contenido",
+                version: "Versiones",
+            },
+            detall: {
+                fitxerNom: "Nom del fitxer",
+                fitxerContentType: "Tipus de contingut",
+                metaDocument: "Tipus de document",
+                createdDate: "Data de creació",
+                estat: "Estat",
+                dataCaptura: "Data de captura",
+                origen: "Orígen",
+                tipoDocumental: "Tipus documental NTI",
+                estadoElaboracion: "Estat d'elaboració",
+                csv: "CSV",
+                csvRegulacion: "Regulació del CSV",
+                tipoFirma: "Tipus de firma",
+            },
+            acciones: {
+                detall: "Detalles",
+                move: "Mover...",
+                view: "Visualizar",
+                portafirmes: "Enviar a portafirmas...",
+                firmar: "Firma desde el navegador...",
+                mail: "Enviar via email...",
+                history: "Histórico de acciones",
+                infoArxiu: "Información archivo",
+                export: "Exportación EIN...",
+            },
+            action: {
+
             },
         },
         notFound: "No encontrado",

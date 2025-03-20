@@ -1,9 +1,11 @@
 import { Icon, MenuItem } from "@mui/material";
 import MenuButton from "../../../components/MenuButton.tsx";
 import {useCommonActions} from "./CommonActions.tsx";
+import {useTranslation} from "react-i18next";
 
 const ExpedientActionButton = (props:{entity:any}) => {
     const {entity} = props;
+    const { t } = useTranslation();
 
     const {
         actions: commonActionsActions,
@@ -12,7 +14,7 @@ const ExpedientActionButton = (props:{entity:any}) => {
 
     return <MenuButton
         id={entity?.id}
-        buttonLabel={"Acción"}
+        buttonLabel={t('common.action')}
         buttonProps={{
             startIcon:<Icon>settings</Icon>,
             endIcon:<Icon>keyboard_arrow_down</Icon>,

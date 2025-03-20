@@ -6,9 +6,9 @@ import {Button, Grid, Icon} from "@mui/material";
 import {formatIso} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
+import {useState} from "react";
 
-const ExpedientFilter = (props:any) => {
-    const { onSpringFilterChange } = props
+const useExpedientFilter = () => {
     const filterRef = useFilterApiRef();
 
     const springFilterBuilder = (data: any) :string => {
@@ -57,7 +57,14 @@ const ExpedientFilter = (props:any) => {
     const netejar = ()=> {
         filterRef.current.clear()
     }
-    return <MuiFilter
+
+    const [springFilter, setSpringFilter] = useState(
+        springFilterBuilder({
+            estat: 'OBERT',
+            dataCreacioInici: new Date(),
+        })
+    );
+    const content = <MuiFilter
             resourceName="expedientResource"
             code="EXPEDIENT_FILTER"
             springFilterBuilder={springFilterBuilder}
@@ -66,7 +73,7 @@ const ExpedientFilter = (props:any) => {
                 sx: {m: 3, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: 1}
             }}
             apiRef={filterRef}
-            onSpringFilterChange={onSpringFilterChange}
+            onSpringFilterChange={(value?:string)=>value && setSpringFilter(value)}
             buttonControlled
             // initOnChangeRequest
     >
@@ -93,6 +100,11 @@ const ExpedientFilter = (props:any) => {
             </Grid>
         </Grid>
     </MuiFilter>
+
+    return {
+        springFilter,
+        content
+    }
 }
 
-export default ExpedientFilter;
+export default useExpedientFilter;

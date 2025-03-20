@@ -1,34 +1,209 @@
-const translationEs = {
+const translationEn = {
     common: {
-        salut: "Health",
-        app: "Applications",
+        close: "Close",
+        delete: "Delete",
+        action: "Action",
+        expand: "Expand",
+        contract: "Collapse",
+        download: "Download",
     },
     page: {
-        contingut:{
-            detalle:{
+        comment: {
+            expedient: "Expedient comments",
+            tasca: "Task comments",
+        },
+        contingut: {
+            detalle: {
                 numero: "Number",
                 titol: "Title",
                 metaExpedient: "Type",
                 organGestor: "Managing body",
                 fechaApertura: "Opening date",
-                estat: "State",
+                estat: "Status",
                 prioritat: "Priority",
                 clasificacio: "Classification",
             },
-            tabs:{
+            tabs: {
                 contingut: "Content",
                 dades: "Data",
-                interessats: "Interested parties",
-                remeses: "Shipments",
+                interessats: "Stakeholders",
+                remeses: "Remittances",
                 publicacions: "Publications",
                 anotacions: "Annotations",
                 versions: "Versions",
                 tasques: "Tasks",
             }
         },
+        anotacio: {
+            tabs: {
+                resum: "Summary",
+                estat: "Status",
+                registre: "Registry information",
+                interessats: "Stakeholders",
+                annexos: "Annexes",
+            },
+        },
+        tasca: {
+            title: "Task",
+            detall: {
+                title: "Task details",
+                metaExpedientTasca: "Task type",
+                metaExpedientTascaDescription: "Task type description",
+                createdBy: "Created by",
+                responsablesStr: "Responsible parties",
+                responsableActual: "Current responsible",
+                delegat: "Delegate",
+                observadors: "Observers",
+                dataInici: "Start date",
+                duracio: "Duration",
+                dataLimit: "Deadline",
+                estat: "Status",
+                prioritat: "Priority",
+            },
+            acciones: {
+                detall: "Details",
+                tramitar: "Process",
+                iniciar: "Start",
+                rebutjar: "Reject",
+                cancel: "Cancel",
+                finalitzar: "Finish",
+                reassignar: "Reassign",
+                delegar: "Delegate",
+                retomar: "Resume",
+                upDataLimit: "Modify deadline...",
+                upPrioritat: "Change priority...",
+                reobrir: "Reopen",
+            },
+            action: {
+                retomar: "Resume task",
+                reobrir: "Reopen task",
+                rebutjar: "Reject task",
+                reassignar: "Reassign task",
+                delegar: "Delegate task",
+                changePrioritat: "Modify task priority",
+                changeDataLimit: "Change deadline",
+            },
+        },
+        interessat: {
+            title: "Stakeholder",
+            rep: "Representative",
+            actions: {
+                delete: "Delete Stakeholder",
+                createRep: "Add Representative",
+                updateRep: "Edit Representative",
+                deleteRep: "Delete Representative",
+            },
+            dialog: {
+                deleteTitle: "Delete stakeholder",
+                deleteMessage: "Are you sure you want to continue with this action?",
+                deleteRepTitle: "Delete Representative",
+                deleteRepMessage: "Are you sure you want to continue with this action?",
+            }
+        },
+        expedient: {
+            title: "Expedient",
+            filter: {
+                title: "Expedient search"
+            },
+            detall: {
+                agafatPer: "Taken by",
+            },
+            acciones: {
+                detall: "Manage",
+                follow: "Follow",
+                unfollow: "Unfollow",
+                assignar: "Assign",
+                agafar: "Take",
+                lliberar: "Release",
+                upPrioritat: "Change priority...",
+                upEstat: "Change status...",
+                relacio: "Relate...",
+                close: "Close...",
+                history: "Action history",
+                download: "Download documents...",
+                exportPDF: "Export PDF index...",
+                exportEIN: "PDF index and EIN export...",
+                infoArxiu: "Archive information",
+                sincronitzar: "Synchronize status with archive",
+            },
+            action: {
+                changePrioritat: "Modify expedient priority",
+                changeEstat: "Modify expedient status",
+                assignar: "Assign expedient to user",
+            },
+        },
+        arxiu: {
+            detall: {
+                title: "Information retrieved from the archive",
+                arxiuUuid: "Archive identifier",
+                fitxerNom: "File name",
+                serie: "Documentary series",
+                arxiuEstat: "Archive status",
+                document: "Document content",
+                fitxerContentType: "MIME type",
+                metadata: "ENI metadata",
+                versions: "Version",
+                identificador: "Identifier",
+                organ: "Organ",
+                dataCaptura: "Capture date",
+                dataApertura: "Opening date",
+                origen: "Origin",
+                estadoElaboracion: "Elaboration status",
+                tipoDocumental: "NTI documentary type",
+                format: "Format name",
+                clasificacion: "Classification",
+                estat: "Status",
+                interessats: "Stakeholders",
+            },
+            tabs: {
+                resum: "Information",
+                fills: "Children",
+                data: "Metadata",
+            },
+        },
+        document: {
+            title: "Document",
+            view: {
+                title: "View type",
+                estat: "View by status",
+                tipus: "View by document type",
+                carpeta: "View by folder",
+            },
+            tabs: {
+                resum: "Content",
+                version: "Versions",
+            },
+            detall: {
+                fitxerNom: "File name",
+                fitxerContentType: "Content type",
+                metaDocument: "Document type",
+                createdDate: "Creation date",
+                estat: "Status",
+                dataCaptura: "Capture date",
+                origen: "Origin",
+                tipoDocumental: "NTI documentary type",
+                estadoElaboracion: "Elaboration status",
+                csv: "CSV",
+                csvRegulacion: "CSV regulation",
+                tipoFirma: "Signature type",
+            },
+            acciones: {
+                detall: "Details",
+                move: "Move...",
+                view: "View",
+                portafirmes: "Send to signature portal...",
+                firmar: "Sign from the browser...",
+                mail: "Send via email...",
+                history: "Action history",
+                infoArxiu: "Archive information",
+                export: "EIN export...",
+            },
+            action: {
+
+            },
+        },
         notFound: "Not found",
     }
-
 };
 
-export default translationEs;
+export default translationEn;

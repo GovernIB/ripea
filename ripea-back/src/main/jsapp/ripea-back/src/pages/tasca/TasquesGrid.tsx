@@ -10,6 +10,7 @@ import React from "react";
 import * as builder from "../../util/springFilterUtils.ts";
 import { TascaCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import useTascaActions from "./details/TascaActions.tsx";
+import {useTranslation} from "react-i18next";
 
 const TasquesGridForm = (props: any) => {
     const { expedient } = props;
@@ -35,6 +36,7 @@ const TasquesGridForm = (props: any) => {
 const TasquesGrid: React.FC = (props: any) => {
     const { id, entity, onRowCountChange } = props;
     const apiRef = useMuiDataGridApiRef()
+    const { t } = useTranslation();
 
     const columns = [
         {
@@ -102,7 +104,7 @@ const TasquesGrid: React.FC = (props: any) => {
         <MuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
-            // resourceFieldName
+            popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={columns}
             paginationActive
             filter={`expedient.id:${id}`}

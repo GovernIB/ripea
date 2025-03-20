@@ -2,6 +2,7 @@ import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {useTranslation} from "react-i18next";
 
 const CambiarPrioritatForm = () => {
     const formContext = useFormContext();
@@ -14,11 +15,12 @@ const CambiarPrioritatForm = () => {
 }
 
 export const CambiarPrioritat = (props: { apiRef:any }) => {
+    const { t } = useTranslation();
     const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientResource"}
-        title={`Modificar prioridad del expediente`}
+        title={t('page.expedient.action.changePrioritat')}
         apiRef={apiRef}
     >
         <CambiarPrioritatForm/>
