@@ -1,16 +1,25 @@
 package es.caib.ripea.back.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.back.command.*;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
-import es.caib.ripea.service.intf.service.*;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +29,64 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.back.command.ExpedientPeticioAcceptarCommand;
+import es.caib.ripea.back.command.ExpedientPeticioFiltreCommand;
+import es.caib.ripea.back.command.ExpedientPeticioModificarCommand;
+import es.caib.ripea.back.command.ExpedientPeticioRebutjarCommand;
+import es.caib.ripea.back.command.RegistreAnnexCommand;
+import es.caib.ripea.back.command.RegistreInteressatsCommand;
+import es.caib.ripea.back.helper.AnotacionsPendentsHelper;
+import es.caib.ripea.back.helper.ConversioTipusHelper;
+import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.EnumHelper;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.RegistreAnnexDto;
+import es.caib.ripea.service.intf.dto.RegistreDto;
+import es.caib.ripea.service.intf.dto.RegistreInteressatDto;
+import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.service.GrupService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Controlador per al llistat d'expedients peticions.
@@ -1073,10 +1132,16 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
 	public void descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
 		try {
+
 			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, true);
-			response.setContentType("application/pdf");
-			response.setHeader("Content-Disposition", "inline; filename=\""+fitxer.getNom()+"\"");
+			String fileNameTractat = URLEncoder.encode(fitxer.getNom(), "UTF-8").replace("+", " ");
+			
+			response.setHeader("Content-Disposition", "inline; filename=\""+fileNameTractat+"\"");
 			response.getOutputStream().write(fitxer.getContingut());
+			response.setHeader("X-Frame-Options", "ALLOW"); //Permet carregar la resposta en un Iframe
+			response.setContentLength(fitxer.getContingut().length);
+			response.setContentType("application/pdf");
+			
 		} catch (Exception e) {
 			logger.error("Errol al descarregarBase64", e);
 		}

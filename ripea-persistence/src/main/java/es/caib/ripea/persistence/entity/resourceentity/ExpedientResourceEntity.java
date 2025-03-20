@@ -4,6 +4,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
