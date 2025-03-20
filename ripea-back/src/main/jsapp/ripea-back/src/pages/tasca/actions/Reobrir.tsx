@@ -1,6 +1,7 @@
-import {MuiFormDialog} from "reactlib";
+import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
+import {useRef} from "react";
 
 const ReobrirForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -20,4 +21,27 @@ const Reobrir = (props: { apiRef:any }) => {
         <ReobrirForm/>
     </MuiFormDialog>
 }
-export default Reobrir;
+
+const useReobrir = (refresh?: () => void) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (id:any) => {
+        // TODO: change
+        // apiAction(id,{code:'ACTION_REABRIR'})
+        return apiRef.current?.show?.(id, {data:{estat: 'PENDENT'}})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+
+    return {
+        handleShow,
+        content: <Reobrir apiRef={apiRef}/>
+    }
+}
+export default useReobrir;

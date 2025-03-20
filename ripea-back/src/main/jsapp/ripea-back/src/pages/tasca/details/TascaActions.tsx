@@ -1,33 +1,27 @@
-import { useRef } from "react";
 import {
-    MuiFormDialogApi,
-    FormField,
     useResourceApiService,
-    useMuiActionReportLogic
 } from "reactlib";
 import useTascaDetail from "./TascaDetail.tsx";
-import CambiarPrioritat from "../actions/CambiarPrioritat.tsx";
-import CambiarDataLimit from "../actions/CambiarDataLimit.tsx";
-import Delegar from "../actions/Delegar.tsx";
-import Reassignar from "../actions/Reassignar.tsx";
-import Rebutjar from "../actions/Rebutjar.tsx";
-import Reobrir from "../actions/Reobrir.tsx";
+import useRebutjar from "../actions/Rebutjar.tsx";
+import useReassignar from "../actions/Reassignar.tsx";
+import useDelegar from "../actions/Delegar.tsx";
+import useReobrir from "../actions/Reobrir.tsx";
+import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
+import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
+import useRetomar from "../actions/Retomar.tsx";
 
 const useTascaActions = (refresh?: () => void) => {
     const {
         action: apiAction
     } = useResourceApiService('expedientTascaResource');
 
-    // const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    // const confirmDialogButtons = useConfirmDialogButtons();
-    // const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
-
-    const rebutjarApiRef = useRef<MuiFormDialogApi>();
-    const reassignarApiRef = useRef<MuiFormDialogApi>();
-    const delegarApiRef = useRef<MuiFormDialogApi>();
-    const reobrirApiRef = useRef<MuiFormDialogApi>();
-    const cambiarPrioridadApiRef = useRef<MuiFormDialogApi>();
-    const cambiarFechaLimiteApiRef = useRef<MuiFormDialogApi>();
+    const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
+    const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
+    const {handleShow: handleDelegar, content: delegarContent} = useDelegar(refresh);
+    const {handleShow: handleReobrir, content: reobrirContent} = useReobrir(refresh);
+    const {handleShow: handleCambiarDataLimit, content: cambiarDataLimitContent} = useCambiarDataLimit(refresh);
+    const {handleShow: handleCambiarPrioritat, content: cambiarPrioritatContent} = useCambiarPrioritat(refresh);
+    const {handleShow: handleRetomar, content: retomarContent} = useRetomar(refresh);
     const { handleOpen, dialog } = useTascaDetail();
 
     const disableResponsable = (row: any): boolean => {
@@ -37,16 +31,12 @@ const useTascaActions = (refresh?: () => void) => {
         return row?.estat == 'CANCELLADA' || row?.estat == 'FINALITZADA' || row?.estat == 'REBUTJADA';
     }
 
-    const {
-        formDialogComponent: actionChangeEstatDialogComponent,
-        handleButtonClick: actionChangeEstatHandleButtonClick,
-    } = useMuiActionReportLogic(
-        'expedientTascaResource',
-        'ACTION_CHANGE_ESTAT',
-        undefined,
-        undefined,
-        null,
-        <FormField name="estat" />);
+    const changeEstat = (id:any, estat:string) => {
+        return apiAction(id,{code:'ACTION_CHANGE_ESTAT', data:{estat}})
+            .then(()=>{
+                refresh?.()
+            })
+    }
 
     const actions = [
         {
@@ -66,15 +56,7 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Iniciar",
             icon: "play_arrow",
             showInMenu: true,
-            action: 'ACTION_CHANGE_ESTAT',
-            onClick: (rowId: any) => {
-                apiAction(rowId, { code: 'ACTION_CHANGE_ESTAT', data: { id: rowId, estat: 'INICIADA' } }).
-                    then(() => {
-                        console.log('>>> OK')
-                        refresh?.();
-                    })
-                //actionChangeEstatHandleButtonClick(rowId);
-            },
+            onClick: (id: any)=> changeEstat(id,'INICIADA'),
             // disabled: disableResponsable,
             hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
@@ -82,14 +64,7 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Rechazar",
             icon: "reply",
             showInMenu: true,
-            // onClick: (rowId: any)=> {
-            //     rebutjarApiRef.current?.show(rowId,{data: {
-            //             estat: 'REBUTJADA',
-            //         }})
-            //         .then(()=>{
-            //             refresh?.()
-            //         })
-            // },
+            onClick: handleRebutjar,
             disabled: disableResponsable,
             hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
@@ -97,16 +72,7 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Cancelar",
             icon: "close",
             showInMenu: true,
-            onClick: (rowId: any) => {
-                apiAction(null, {
-                    code: 'ACTION_CHANGE_ESTAT', data: {
-                        id: rowId, estat: 'CANCELLADA'
-                    }
-                })
-                    .then(() => {
-                        refresh?.()
-                    })
-            },
+            onClick: (id: any)=> changeEstat(id,'CANCELLADA'),
             disabled: disableResponsable,
             hidden: hideByEstat,
         },
@@ -114,16 +80,7 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Finalizar",
             icon: "check",
             showInMenu: true,
-            onClick: (rowId: any) => {
-                apiAction(null, {
-                    code: 'ACTION_CHANGE_ESTAT', data: {
-                        id: rowId, estat: 'FINALITZADA'
-                    }
-                })
-                    .then(() => {
-                        refresh?.()
-                    })
-            },
+            onClick: (id: any)=> changeEstat(id,'FINALITZADA'),
             disabled: disableResponsable,
             hidden: hideByEstat,
         },
@@ -131,88 +88,55 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Reasignar",
             icon: "person",
             showInMenu: true,
-            onClick: (rowId: any) => {
-                reassignarApiRef.current?.show(rowId)
-                    .then(() => {
-                        refresh?.()
-                    })
-            },
+            onClick: handleReassignar,
             hidden: hideByEstat,
         },
         {
             title: "Delegar",
             icon: "turn_right",
             showInMenu: true,
-            onClick: (rowId: any) => {
-                delegarApiRef.current?.show(rowId)
-                    .then(() => {
-                        refresh?.()
-                    })
-            },
+            onClick: handleDelegar,
             hidden: (row: any): boolean => row?.delegat != null || hideByEstat(row),
         },
         {
             title: "Retomar",
             icon: "close",
             showInMenu: true,
-            // onClick: (rowId: any)=> {
-            //     apiPatch(rowId,{data: {
-            //             delegat: null,
-            //             comentari: null,
-            //         }})
-            //         .then(()=>{
-            //             refresh?.()
-            //         })
-            // },
+            onClick: handleRetomar,
             hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: "Modificar fecha limite...",
             icon: "info",
             showInMenu: true,
-            onClick: (rowId: any) => {
-                cambiarFechaLimiteApiRef.current?.show(rowId)
-                    .then(() => {
-                        refresh?.()
-                    })
-            },
+            onClick: handleCambiarDataLimit,
             hidden: hideByEstat,
         },
         {
             title: "Cambiar prioridad...",
             icon: "schedule",
             showInMenu: true,
-            onClick: (rowId: any) => {
-                cambiarPrioridadApiRef.current?.show(rowId)
-                    .then(() => {
-                        refresh?.()
-                    })
-            },
+            onClick: handleCambiarPrioritat,
             hidden: hideByEstat,
         },
         {
             title: "Reabrir",
             icon: "undo",
             showInMenu: true,
-            // onClick: (rowId: any) => {
-            //     reobrirApiRef.current?.show(rowId)
-            //         .then(()=>{
-            //             refresh?.()
-            //         })
-            // },
+            onClick: handleReobrir,
             hidden: (row: any): boolean => row?.estat != 'FINALITZADA',
         },
     ];
 
     const components = <>
-        <Rebutjar apiRef={rebutjarApiRef} />
-        <Reassignar apiRef={reassignarApiRef} />
-        <Delegar apiRef={delegarApiRef} />
-        <Reobrir apiRef={reobrirApiRef} />
-        <CambiarDataLimit apiRef={cambiarFechaLimiteApiRef} />
-        <CambiarPrioritat apiRef={cambiarPrioridadApiRef} />
+        {rebutjarContent}
+        {reassignarContent}
+        {delegarContent}
+        {reobrirContent}
+        {cambiarPrioritatContent}
+        {cambiarDataLimitContent}
+        {retomarContent}
         {dialog}
-        {actionChangeEstatDialogComponent}
     </>;
 
     return {

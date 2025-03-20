@@ -1,8 +1,6 @@
 import {
     GridPage,
     MuiGrid,
-    MuiActionReportButton,
-    FormField,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import { formatDate } from "../../util/dateUtils.ts";
@@ -101,19 +99,16 @@ const TasquesGrid: React.FC = (props: any) => {
     const { actions, components } = useTascaActions(apiRef?.current?.refresh);
 
     return <GridPage>
-        <MuiActionReportButton
-            resourceName="expedientTascaResource"
-            action="ACTION_CHANGE_ESTAT"
-            formDialogContent={<FormField name="estat" />}/>
         <MuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
+            // resourceFieldName
             columns={columns}
             paginationActive
             filter={`expedient.id:${id}`}
             titleDisabled
             perspectives={["RESPONSABLES_RESUM"]}
-            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.length)}
+            onRowsChange={(rows) => onRowCountChange?.(rows.length)}
             popupEditCreateActive
             popupEditFormContent={<TasquesGridForm expedient={entity} />}
             formAdditionalData={{

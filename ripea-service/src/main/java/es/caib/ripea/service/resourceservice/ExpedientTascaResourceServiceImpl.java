@@ -54,6 +54,8 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
         register(ExpedientTascaResource.ACTION_REABRIR_CODE, new ReobrirActionExecutor());
+        register(ExpedientTascaResource.ACTION_REBUTJAR_CODE, new RebutjarActionExecutor());
+        register(ExpedientTascaResource.ACTION_RETOMAR_CODE, new RetomarActionExecutor());
 	}
 
     @Override
@@ -80,6 +82,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         resource.setUsuariActualDelegat(resource.getDelegat() != null && Objects.equals(resource.getDelegat().getId(), user));
     }
 
+    // PerspectiveApplicator
 	private class ResponsablesPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
 		@Override
 		public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
@@ -93,6 +96,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 		}
 	}
 
+    // OnChangeLogicProcessor
     private class MetaExpedientTascaOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
@@ -174,6 +178,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
     }
 
+    // ActionExecutor
     private void changeEstat(ExpedientTascaResourceEntity entity, TascaEstatEnumDto estat){
         switch (estat){
             case INICIADA:
@@ -195,24 +200,39 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         entity.setEstat(estat);
     }
 
-    private class ChangeEstatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeEstatForm, ExpedientTascaResource> {
+    private class ChangeEstatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeEstatFormAction, ExpedientTascaResource> {
 
         @Override
-        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangeEstatForm params) throws ActionExecutionException {
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangeEstatFormAction params) throws ActionExecutionException {
             changeEstat(entity, params.getEstat());
+            expedientTascaResourceRepository.save(entity);
             return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ChangeEstatForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatForm target) {
+        public void onChange(ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {
 
         }
     }
-
-    private class ReobrirActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ReobrirForm, ExpedientTascaResource> {
+    private class RebutjarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.RebutjarFormAction, ExpedientTascaResource> {
 
         @Override
-        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ReobrirForm params) throws ActionExecutionException {
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.RebutjarFormAction params) throws ActionExecutionException {
+            changeEstat(entity, params.getEstat());
+            entity.setMotiuRebuig(params.getMotiuRebuig());
+            expedientTascaResourceRepository.save(entity);
+            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+        }
+
+        @Override
+        public void onChange(ExpedientTascaResource.RebutjarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.RebutjarFormAction target) {
+
+        }
+    }
+    private class ReobrirActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ReobrirFormAction, ExpedientTascaResource> {
+
+        @Override
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ReobrirFormAction params) throws ActionExecutionException {
             if (params.getMotiu() != null) {
                 ExpedientTascaComentariResourceEntity expedientTascaComentariResourceEntity = new ExpedientTascaComentariResourceEntity();
                 expedientTascaComentariResourceEntity.setText(params.getMotiu());
@@ -220,13 +240,35 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
             }
 
             changeEstat(entity, TascaEstatEnumDto.PENDENT);
-            usuariResourceRepository.findById(params.getResponsableActual().getId()).ifPresent(entity::setResponsableActual);
+            usuariResourceRepository.findById(params.getResponsableActual().getId())
+                    .ifPresent(entity::setResponsableActual);
             expedientTascaResourceRepository.save(entity);
             return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ReobrirForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirForm target) {
+        public void onChange(ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
+
+        }
+    }
+    private class RetomarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.RetomarFormAction, ExpedientTascaResource> {
+
+        @Override
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.RetomarFormAction params) throws ActionExecutionException {
+            if (params.getMotiu() != null) {
+                ExpedientTascaComentariResourceEntity expedientTascaComentariResourceEntity = new ExpedientTascaComentariResourceEntity();
+                expedientTascaComentariResourceEntity.setText(params.getMotiu());
+                entity.getComentaris().add(expedientTascaComentariResourceEntity);
+            }
+
+            changeEstat(entity, TascaEstatEnumDto.PENDENT);
+            entity.setDelegat(null);
+            expedientTascaResourceRepository.save(entity);
+            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+        }
+
+        @Override
+        public void onChange(ExpedientTascaResource.RetomarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.RetomarFormAction target) {
 
         }
     }

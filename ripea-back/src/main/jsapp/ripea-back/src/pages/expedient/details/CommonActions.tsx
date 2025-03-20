@@ -18,9 +18,9 @@ export const useCommonActions = (refresh?: () => void) => {
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("expediente");
-    const {hanldeShow: hanldeAssignar, content: assignarContent} = useAssignar();
-    const {hanldeShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat();
-    const {hanldeShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat();
+    const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
+    const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
+    const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
 
     const actions = [
         {
@@ -51,13 +51,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Assignar",
             icon: "person",
             showInMenu: true,
-            onClick: (id:any) => {
-                hanldeAssignar(id)
-                    ?.then(() => {
-                        refresh?.();
-                        temporalMessageShow(null, '', 'success');
-                    })
-            }
+            onClick: hanldeAssignar,
             // hidden: // si el usuario actual no admin o organo
         },
         {
@@ -99,28 +93,14 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Cambiar prioridad...",
             icon: "",
             showInMenu: true,
-            onClick: (id: any) => {
-                hanldeCambiarPrioridad(id)
-                    ?.then(() => {
-                        refresh?.()
-                        temporalMessageShow(null, '', 'success');
-                    })
-            }
+            onClick: hanldeCambiarPrioridad
         },
         {
             title: "Cambiar estado...",
             icon: "",
             showInMenu: true,
-            onClick: (id: any) => {
-                hanldeCambiarEstado(id)
-                    ?.then(() => {
-                        refresh?.()
-                        temporalMessageShow(null, '', 'success');
-                    })
-            },
-            disabled: (row:any) => {
-                return row?.estat != "OBERT"
-            },
+            onClick: hanldeCambiarEstado,
+            disabled: (row:any) => row?.estat != "OBERT",
         },
         {
             title: "Relacionar...",
@@ -131,9 +111,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: "Cerrar...",
             icon: "check",
             showInMenu: true,
-            disabled: (row:any) => {
-                return row?.estat != "OBERT"
-            },
+            disabled: (row:any) => row?.estat != "OBERT",
         },
         {
             title: "Borrar",
@@ -158,9 +136,7 @@ export const useCommonActions = (refresh?: () => void) => {
                         }
                     });
             },
-            disabled: (row:any) => {
-                return row?.estat == "TANCAT"
-            },
+            disabled: (row:any) => row?.estat == "TANCAT",
         },
         {
             title: "Histórico de acciones",

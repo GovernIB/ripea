@@ -34,18 +34,31 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REABRIR_CODE,
-                        formClass = ExpedientTascaResource.ReobrirForm.class),
+                        formClass = ExpedientTascaResource.ReobrirFormAction.class,
+                        requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE,
-                        requiresId = true,
-                        formClass = ExpedientTascaResource.ChangeEstatForm.class),
+                        formClass = ExpedientTascaResource.ChangeEstatFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientTascaResource.ACTION_REBUTJAR_CODE,
+                        formClass = ExpedientTascaResource.RebutjarFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientTascaResource.ACTION_RETOMAR_CODE,
+                        formClass = ExpedientTascaResource.RetomarFormAction.class,
+                        requiresId = true),
         })
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
     public static final String ACTION_CHANGE_ESTAT_CODE = "ACTION_CHANGE_ESTAT";
     public static final String ACTION_REABRIR_CODE = "ACTION_REABRIR";
+    public static final String ACTION_REBUTJAR_CODE = "ACTION_REBUTJAR";
+    public static final String ACTION_RETOMAR_CODE = "ACTION_RETOMAR";
 
 //    @NotNull
     private Date dataInici;
@@ -87,16 +100,30 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     @Getter
     @Setter
-    public static class ChangeEstatForm implements Serializable {
+    public static class ChangeEstatFormAction implements Serializable {
         @NotNull
         private TascaEstatEnumDto estat;
     }
 
     @Getter
     @Setter
-    public static class ReobrirForm implements Serializable {
+    public static class ReobrirFormAction implements Serializable {
         @NotNull
         private ResourceReference<UsuariResource, String> responsableActual;
         private String motiu;
+    }
+
+    @Getter
+    @Setter
+    public static class RetomarFormAction implements Serializable {
+        private String motiu;
+    }
+
+    @Getter
+    @Setter
+    public static class RebutjarFormAction implements Serializable {
+        @NotNull
+        private TascaEstatEnumDto estat;
+        private String motiuRebuig;
     }
 }

@@ -4,6 +4,10 @@ const translationEs = {
         app: "Aplicaciones",
     },
     page: {
+        comment:{
+            expedient: 'Comentarios del expediente:',
+            tasca: 'Comentarios de la tarea',
+        },
         contingut:{
             detalle:{
                 numero: "Numero",

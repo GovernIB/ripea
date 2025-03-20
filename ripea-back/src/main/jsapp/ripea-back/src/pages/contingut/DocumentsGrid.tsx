@@ -98,7 +98,7 @@ const DocumentsGrid: React.FC = (props:any) => {
             disableColumnMenu
             apiRef={dataGridApiRef}
             rowAdditionalActions={commonActionsActions}
-            onRowsChange={(rows) => onRowCountChange && onRowCountChange(rows.filter((a)=>a?.tipus=="DOCUMENT").length)}
+            onRowsChange={(rows) => onRowCountChange?.(rows.filter((a)=>a?.tipus=="DOCUMENT").length)}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {

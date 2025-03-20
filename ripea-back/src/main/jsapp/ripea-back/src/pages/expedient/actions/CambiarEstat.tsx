@@ -1,4 +1,4 @@
-import {MuiFormDialog, MuiFormDialogApi} from "reactlib";
+import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
@@ -22,14 +22,23 @@ export const CambiarEstat = (props: { apiRef:any }) => {
     </MuiFormDialog>
 }
 
-const useCambiarEstat = () => {
+const useCambiarEstat = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
-    const hanldeShow = (id:any) => {
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (id:any) => {
         return apiRef.current?.show?.(id)
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow('Error', error.message, 'error');
+            });
     }
 
     return {
-        hanldeShow,
+        handleShow,
         content: <CambiarEstat apiRef={apiRef}/>
     }
 }

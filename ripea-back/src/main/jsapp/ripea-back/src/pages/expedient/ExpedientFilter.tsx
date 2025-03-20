@@ -27,6 +27,8 @@ const ExpedientFilter = (props:any) => {
             ),
             builder.eq("organGestor.id", data.organGestor?.id),
             builder.eq("metaExpedient.id", data.metaExpedient?.id),
+
+            // TODO: validation dataCreacioInici < dataCreacioFinal
             builder.between("createdDate", `'${formatIso(data.dataCreacioInici)}'`, `'${formatIso(data.dataCreacioFinal)}'`),
 
             builder.like("registresImportats", data.numeroRegistre),
