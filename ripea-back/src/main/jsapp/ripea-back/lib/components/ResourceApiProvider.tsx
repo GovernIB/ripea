@@ -561,21 +561,22 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                             const actionRel = 'exec_' + args.code;
                             const actionLink = artifactState.links.get(actionRel);
                             if (actionLink != null) {
-                                request(actionRel, id, { ...args }, artifactState).
-                                then((state: State) => {
-                                    const result = state.data;
-                                    resolve(result);
-                                }).
-                                catch((error: ResourceApiError) => {
-                                    processAnswerRequiredError(
-                                        error,
-                                        null,
-                                        args,
-                                        onChange,
-                                        getOpenAnswerRequiredDialog()).
-                                        then(resolve).
-                                        catch(reject);
-                                });
+                                console.log('>>> actionLink', actionRel, actionLink)
+                                request(actionRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
+                                    then((state: State) => {
+                                        const result = state.data;
+                                        resolve(result);
+                                    }).
+                                    catch((error: ResourceApiError) => {
+                                        processAnswerRequiredError(
+                                            error,
+                                            null,
+                                            args,
+                                            onChange,
+                                            getOpenAnswerRequiredDialog()).
+                                            then(resolve).
+                                            catch(reject);
+                                    });
                             } else {
                                 reject('Link ' + actionRel + ' not found in action ' + args.code + ' links');
                             }
@@ -599,21 +600,21 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                             const reportRel = 'generate_' + args.code;
                             const reportLink = artifactState.links.get(reportRel);
                             if (reportLink != null) {
-                                request(reportRel, id, { ...args }, artifactState).
-                                then((state: State) => {
-                                    const result = state.data;
-                                    resolve(result);
-                                }).
-                                catch((error: ResourceApiError) => {
-                                    processAnswerRequiredError(
-                                        error,
-                                        null,
-                                        args,
-                                        onChange,
-                                        getOpenAnswerRequiredDialog()).
-                                        then(resolve).
-                                        catch(reject);
-                                });
+                                request(reportRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
+                                    then((state: State) => {
+                                        const result = state.data;
+                                        resolve(result);
+                                    }).
+                                    catch((error: ResourceApiError) => {
+                                        processAnswerRequiredError(
+                                            error,
+                                            null,
+                                            args,
+                                            onChange,
+                                            getOpenAnswerRequiredDialog()).
+                                            then(resolve).
+                                            catch(reject);
+                                    });
                             } else {
                                 reject('Link ' + reportRel + ' not found in report ' + args.code + ' links');
                             }

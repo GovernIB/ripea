@@ -38,6 +38,7 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE,
+                        requiresId = true,
                         formClass = ExpedientTascaResource.ChangeEstatForm.class),
         })
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {

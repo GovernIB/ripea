@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import Badge from '@mui/material/Badge';
-import { useFormDialog } from './form/FormDialog';
+import { useFormDialog, FormDialogSubmitFn } from './form/FormDialog';
 import {
     useActionDialogButtons,
     useReportDialogButtons,
@@ -11,8 +11,6 @@ import {
 } from '../AppButtons';
 import { useBaseAppContext } from '../BaseAppContext';
 import { useResourceApiService } from '../ResourceApiProvider';
-
-import { FormDialogSubmitFn } from './form/FormDialog';
 
 export type ActionReportCustomButton = {
     disabled?: boolean;

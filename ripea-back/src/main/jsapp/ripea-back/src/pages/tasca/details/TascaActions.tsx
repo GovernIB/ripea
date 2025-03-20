@@ -68,13 +68,12 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             action: 'ACTION_CHANGE_ESTAT',
             onClick: (rowId: any) => {
-                /*apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
-                    id:rowId, estat: 'INICIADA'
-                }})
-                    .then(()=>{
-                        refresh?.()
-                    })*/
-                actionChangeEstatHandleButtonClick(rowId);
+                apiAction(rowId, { code: 'ACTION_CHANGE_ESTAT', data: { id: rowId, estat: 'INICIADA' } }).
+                    then(() => {
+                        console.log('>>> OK')
+                        refresh?.();
+                    })
+                //actionChangeEstatHandleButtonClick(rowId);
             },
             // disabled: disableResponsable,
             hidden: (row: any): boolean => row?.estat != 'PENDENT',
