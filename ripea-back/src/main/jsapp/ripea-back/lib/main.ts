@@ -23,7 +23,7 @@ export { DataFormDialog as MuiFormDialog } from './components/mui/datacommon/Dat
 export { MuiFormSidebar } from './components/mui/form/MuiFormSidebar';
 export { MuiFormTabs, MuiFormTabContent } from './components/mui/form/MuiFormTabs';
 export { MuiFilter } from './components/mui/form/MuiFilter';
-export { ActionReportButton as MuiActionReportButton } from './components/mui/ActionReportButton';
+export { ActionReportButton as MuiActionReportButton, useActionReportLogic as useMuiActionReportLogic } from './components/mui/ActionReportButton';
 
 export { FormField } from './components/form/FormField';
 export { FormIsolatedField } from './components/form/FormIsolatedField';
@@ -38,7 +38,7 @@ export { TextAvatar, IconAvatar } from './components/mui/Avatars';
 
 export { envVar } from './util/envVars';
 export { numberFormat, numberFormatCurrency } from './util/numberFormat';
-export { dateFormatLocale, timeFormatLocale } from './util/dateFormat';
+export { dateFormatLocale, timeFormatLocale, isoDateToDate, isoDateTimeToDate } from './util/dateFormat';
 export { parseIsoDuration } from './util/durationFormat';
 export { toolbarBackgroundStyle } from './util/toolbar';
 

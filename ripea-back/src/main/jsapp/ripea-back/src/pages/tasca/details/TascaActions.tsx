@@ -1,6 +1,8 @@
 import {useRef} from "react";
 import {
-    MuiFormDialogApi, useResourceApiService,
+    MuiFormDialogApi,
+    useResourceApiService,
+    useMuiActionReportLogic
 } from "reactlib";
 import useTascaDetail from "./TascaDetail.tsx";
 import CambiarPrioritat from "../actions/CambiarPrioritat.tsx";
@@ -34,6 +36,11 @@ const useTascaActions = (refresh?: () => void) => {
         return row?.estat == 'CANCELLADA' || row?.estat == 'FINALITZADA' || row?.estat == 'REBUTJADA';
     }
 
+    const {
+        formDialogComponent: actionChangeEstatDialogComponent,
+        handleButtonClick: actionChangeEstatHandleButtonClick,
+    } = useMuiActionReportLogic('expedientTascaResource', 'ACTION_CHANGE_ESTAT');
+
     const actions = [
         {
             title: "Detalle",
@@ -52,13 +59,15 @@ const useTascaActions = (refresh?: () => void) => {
             title: "Iniciar",
             icon: "play_arrow",
             showInMenu: true,
+            action: 'ACTION_CHANGE_ESTAT',
             onClick: (rowId: any)=> {
-                apiAction({code:'ACTION_CHANGE_ESTAT', data:{
+                /*apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
                     id:rowId, estat: 'INICIADA'
                 }})
                     .then(()=>{
                         refresh?.()
-                    })
+                    })*/
+                actionChangeEstatHandleButtonClick(rowId);
             },
             // disabled: disableResponsable,
             hidden: (row: any):boolean => row?.estat != 'PENDENT',
@@ -83,7 +92,7 @@ const useTascaActions = (refresh?: () => void) => {
             icon: "close",
             showInMenu: true,
             onClick: (rowId: any)=> {
-                apiAction({code:'ACTION_CHANGE_ESTAT', data:{
+                apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
                         id:rowId, estat: 'CANCELLADA'
                 }})
                     .then(()=>{
@@ -98,7 +107,7 @@ const useTascaActions = (refresh?: () => void) => {
             icon: "check",
             showInMenu: true,
             onClick: (rowId: any)=> {
-                apiAction({code:'ACTION_CHANGE_ESTAT', data:{
+                apiAction(null, {code:'ACTION_CHANGE_ESTAT', data:{
                         id:rowId, estat: 'FINALITZADA'
                     }})
                     .then(()=>{
@@ -193,6 +202,7 @@ const useTascaActions = (refresh?: () => void) => {
         <CambiarDataLimit apiRef={cambiarFechaLimiteApiRef}/>
         <CambiarPrioritat apiRef={cambiarPrioridadApiRef}/>
         {dialog}
+        {actionChangeEstatDialogComponent}
     </>;
 
     return {

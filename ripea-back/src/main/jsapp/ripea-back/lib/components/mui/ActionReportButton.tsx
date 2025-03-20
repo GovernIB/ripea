@@ -4,14 +4,12 @@ import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import Badge from '@mui/material/Badge';
 import { useFormDialog } from './form/FormDialog';
-import { useOptionalDataGridContext } from './datagrid/DataGridContext';
 import {
     useActionDialogButtons,
     useReportDialogButtons,
     useConfirmDialogButtons,
 } from '../AppButtons';
 import { useBaseAppContext } from '../BaseAppContext';
-import { useOptionalFormContext } from '../form/FormContext';
 import { useResourceApiService } from '../ResourceApiProvider';
 
 import { FormDialogSubmitFn } from './form/FormDialog';
@@ -26,20 +24,17 @@ export type ActionReportCustomButton = {
 type IconCustomButtonProps = ActionReportCustomButton & React.PropsWithChildren;
 type TextCustomButtonProps = ActionReportCustomButton & React.PropsWithChildren;
 
-type ReportOutputFormatType = 'PDF' | 'XLS' | 'CSV' | 'ODS' | 'XLSX' | 'ODT' | 'RTF' | 'DOCX' | 'PPTX';
-
 export type ActionReportButtonProps = {
+    resourceName: string;
     action?: string;
     report?: string;
-    reportOutputFormat?: ReportOutputFormatType;
-    resourceName?: string;
     id?: any;
-    idFromGridRows?: boolean;
-    execWithMultipleGridRows?: boolean;
     icon?: any;
     title?: string;
+    confirm?: boolean;
+    disabled?: boolean;
+    selectedCount?: number;
     buttonComponent?: React.FC<ActionReportCustomButton>;
-    confirmDisabled?: boolean;
     formAdditionalData?: any;
     formDialogContent?: React.ReactElement;
     formDialogComponentProps?: any;
@@ -89,14 +84,10 @@ const TextCustomButton: React.FC<TextCustomButtonProps> = (props) => {
 }
 
 export const useActionReportLogic = (
+    resourceName: string,
     action?: string,
     report?: string,
-    reportOutputFormat?: ReportOutputFormatType,
-    resourceName?: string,
-    id?: any,
-    idFromGridRows?: boolean,
-    execWithMultipleGridRows?: boolean,
-    confirmDisabled?: boolean,
+    confirm?: boolean,
     formAdditionalData?: any,
     formDialogContent?: React.ReactElement,
     formDialogComponentProps?: any,
@@ -104,18 +95,6 @@ export const useActionReportLogic = (
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void) => {
     const { t, messageDialogShow } = useBaseAppContext();
-    const {
-        resourceName: gridResourceName,
-        loading: gridLoading,
-        rows: gridRows,
-        selection: gridSelection,
-    } = useOptionalDataGridContext() ?? {};
-    const {
-        resourceName: formResourceName,
-        id: formId,
-    } = useOptionalFormContext() ?? {};
-    const realId = id ?? formId;
-    const realResourceName = resourceName ?? gridResourceName ?? formResourceName;
     const actionDialogButtons = useActionDialogButtons();
     const reportDialogButtons = useReportDialogButtons();
     const confirmDialogButtons = useConfirmDialogButtons();
@@ -124,14 +103,11 @@ export const useActionReportLogic = (
         artifacts: apiArtifacts,
         action: apiAction,
         report: apiReport,
-    } = useResourceApiService(realResourceName);
-    const execAction: FormDialogSubmitFn = (data?: any) => new Promise((resolve, reject) => {
+    } = useResourceApiService(resourceName);
+    const execAction: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (action != null) {
-            const requestArgs = {
-                code: action,
-                data
-            };
-            apiAction(realId, requestArgs).then((result: any) => {
+            const requestArgs = { code: action, data };
+            apiAction(id, requestArgs).then((result: any) => {
                 onSuccess?.(result);
                 resolve(formDialogResultProcessor?.(result));
             }).catch(error => {
@@ -142,16 +118,10 @@ export const useActionReportLogic = (
             console.error('Couldn\'t exec action without code');
         }
     });
-    const generateReport: FormDialogSubmitFn = (data?: any) => new Promise((resolve, reject) => {
+    const generateReport: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (report != null) {
-            const requestArgs = {
-                code: report,
-                urlData: {
-                    outputFormat: reportOutputFormat
-                },
-                data
-            };
-            apiReport(realId, requestArgs).then((result) => {
+            const requestArgs = { code: report, data };
+            apiReport(id, requestArgs).then((result) => {
                 onSuccess?.(result);
                 resolve(formDialogResultProcessor?.(result));
             }).catch(error => {
@@ -162,16 +132,16 @@ export const useActionReportLogic = (
             console.error('Couldn\'t generate report without code');
         }
     });
-    const handleButtonClick = () => {
+    const handleButtonClick = (id: any) => {
         if (hasForm) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
             formDialogShow(
                 formDialogTitle,
-                id,
+                null,
                 formAdditionalData,
                 formDialogComponentProps ?? { fullWidth: true, maxWidth: 'md' });
         } else if (action != null) {
-            if (!confirmDisabled) {
+            if (confirm) {
                 const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
                 messageDialogShow(
                     t('actionReport.confirm.title'),
@@ -180,18 +150,18 @@ export const useActionReportLogic = (
                     confirmDialogComponentProps).
                     then((value: any) => {
                         if (value) {
-                            execAction();
+                            execAction(id);
                         }
                     });
             } else {
-                execAction();
+                execAction(id);
             }
         } else if (report != null) {
             generateReport();
         }
     }
     const [formDialogShow, formDialogComponent] = useFormDialog(
-        realResourceName ?? '', // TODO Hem hagut d'afegir el '' per a evitar el warning
+        resourceName,
         formDialogContent,
         { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report },
         action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
@@ -200,18 +170,13 @@ export const useActionReportLogic = (
     const [apiLink, setApiLink] = React.useState<any>();
     const initialized = artifact != null;
     const hasForm = artifact != null && artifact.formClassActive;
-    const selectedCount = execWithMultipleGridRows ? (gridSelection ? gridSelection.length : null) : null;
-    const disabled = idFromGridRows ? ((selectedCount ?? 0) === 0) : false;
     React.useEffect(() => {
-        if (realResourceName == null) {
-            console.error('[ActionReportButton] No resourceName in parent context and empty resourceName prop');
-        }
         if (action == null && report == null) {
             console.error('[ActionReportButton] No action or report prop specified');
         }
     }, []);
     React.useEffect(() => {
-        if (realResourceName != null && (action != null || report != null) && apiIsReady) {
+        if (resourceName != null && (action != null || report != null) && apiIsReady) {
             apiArtifacts({ includeLinks: true }).then(artifacts => {
                 const artifactType = action != null ? 'ACTION' : 'REPORT';
                 const artifactCode = action ?? report;
@@ -227,12 +192,10 @@ export const useActionReportLogic = (
         } else {
             setApiLink(undefined);
         }
-    }, [apiIsReady, realId, gridLoading, gridRows]);
+    }, [apiIsReady]);
     return {
         initialized,
-        disabled,
         apiLink,
-        selectedCount,
         formDialogComponent,
         handleButtonClick
     }
@@ -240,17 +203,16 @@ export const useActionReportLogic = (
 
 export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => {
     const {
+        resourceName,
         action,
         report,
-        reportOutputFormat,
-        resourceName,
         id,
-        idFromGridRows,
-        execWithMultipleGridRows,
         icon,
         title,
+        confirm,
+        disabled,
+        selectedCount,
         buttonComponent: buttonComponentProp,
-        confirmDisabled,
         formAdditionalData,
         formDialogContent,
         formDialogComponentProps,
@@ -262,20 +224,14 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
     } = props;
     const {
         initialized,
-        disabled,
         apiLink,
-        selectedCount,
         formDialogComponent,
         handleButtonClick,
     } = useActionReportLogic(
+        resourceName,
         action,
         report,
-        reportOutputFormat,
-        resourceName,
-        id,
-        idFromGridRows,
-        execWithMultipleGridRows,
-        confirmDisabled,
+        confirm,
         formAdditionalData,
         formDialogContent,
         formDialogComponentProps,
@@ -291,7 +247,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
     const button = <ButtonComponent
         disabled={disabled}
         onClick={() => {
-            handleButtonClick();
+            handleButtonClick(id);
             onClickFromComponentProps?.();
         }}
         title={buttonTitle}

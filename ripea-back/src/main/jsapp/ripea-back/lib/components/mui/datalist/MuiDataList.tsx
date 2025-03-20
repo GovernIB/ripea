@@ -90,7 +90,7 @@ const ListItemSecondaryActions: React.FC<any> = (props) => {
         row,
         rowAdditionalActions,
         rowEditActions,
-        popupUpdate
+        showUpdateDialog
     } = props;
     const rowActions: DataCommonAdditionalAction[] = [...rowAdditionalActions, ...rowEditActions];
     const noMenuRowActions = rowActions.filter(a => !a.showInMenu);
@@ -101,10 +101,10 @@ const ListItemSecondaryActions: React.FC<any> = (props) => {
         setAnchorEl(event.currentTarget);
     }
     const handleRowActionClick = (rowAction: DataCommonAdditionalAction, row: any, event: React.MouseEvent) => {
-        if (rowAction.popupUpdateOnClick) {
-            popupUpdate(row.id, row);
+        if (rowAction.clickShowUpdateDialog) {
+            showUpdateDialog(row.id, row);
         } else {
-            rowAction.onClick?.(row.id, event);
+            rowAction.onClick?.(row.id, row, event);
         }
     }
     const moreMenuIcon = showInMenuRowActions.length > 0 ? <>
@@ -189,9 +189,9 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const {
         toolbarAddElement,
         rowEditActions,
-        popupDialog,
-        popupCreate: _popupCreate,
-        popupUpdate,
+        formDialogComponent,
+        showCreateDialog: _showCreateDialog,
+        showUpdateDialog,
     } = useDataCommonEditable(
         resourceName,
         readOnly ?? false,
@@ -238,7 +238,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     return <>
         {toolbar}
         {toolbarAdditionalRow ? <Box sx={{ mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
-        {popupDialog}
+        {formDialogComponent}
         {rows?.length ? <List
             disablePadding
             sx={{ border: '1px solid ' + theme.palette.divider, borderRadius: '4px' }}>
@@ -261,7 +261,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
                         row={r}
                         rowAdditionalActions={rowAdditionalActions}
                         rowEditActions={rowEditActions}
-                        popupUpdate={popupUpdate} />}
+                        showUpdateDialog={showUpdateDialog} />}
                     disablePadding
                     sx={i > 0 ? { borderTop: '1px solid #E0E0E0' } : undefined}>
                     <ListItemButton>
