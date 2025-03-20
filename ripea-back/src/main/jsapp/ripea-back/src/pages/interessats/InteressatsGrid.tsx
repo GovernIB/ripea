@@ -7,6 +7,7 @@ import {Grid} from "@mui/material";
 import React from "react";
 import GridFormField from "../../components/GridFormField.tsx";
 import useInteressatActions from "./details/InteressatActions.tsx";
+import {useTranslation} from "react-i18next";
 
 export const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -35,6 +36,7 @@ interface DetailGridProps {
 
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {id, onRowCountChange} = props
+    const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef()
     const {actions, components} = useInteressatActions(apiRef?.current?.refresh)
 
@@ -63,6 +65,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     return <GridPage>
         <MuiGrid
             resourceName="interessatResource"
+            popupEditFormDialogResourceTitle={t('page.interessat.title')}
             columns={columns}
             paginationActive
             apiRef={apiRef}

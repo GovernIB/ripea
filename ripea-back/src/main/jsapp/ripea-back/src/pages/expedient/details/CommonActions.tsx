@@ -7,8 +7,10 @@ import useInformacioArxiu from "../actions/InformacioArxiu.tsx";
 import useAssignar from "../actions/Assignar.tsx";
 import useCambiarEstat from "../actions/CambiarEstat.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
+import {useTranslation} from "react-i18next";
 
 export const useCommonActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const {
         patch: apiPatch,
         delette: apiDelete
@@ -30,32 +32,32 @@ export const useCommonActions = (refresh?: () => void) => {
         ////
 
         {
-            title: "Gestionar",
+            title: t('page.expedient.acciones.detall'),
             icon: "folder",
             linkTo: "/contingut/{{id}}",
             showInMenu: true,
         },
         {
-            title: "Seguir",
+            title: t('page.expedient.acciones.follow'),
             icon: "person_add",
             showInMenu: true,
             // hidden: // si el usuario actual es seguidor
         },
-        // {
-        //     title: "Dejar de seguir",
-        //     icon: "person_remove",
-        //     showInMenu: true,
-        //     // hidden: // si el usuario actual no es seguidor
-        // },
         {
-            title: "Assignar",
+            title: t('page.expedient.acciones.unfollow'),
+            icon: "person_remove",
+            showInMenu: true,
+            hidden: true,// si el usuario actual no es seguidor
+        },
+        {
+            title: t('page.expedient.acciones.assignar'),
             icon: "person",
             showInMenu: true,
             onClick: hanldeAssignar,
             // hidden: // si el usuario actual no admin o organo
         },
         {
-            title: "Coger",
+            title: t('page.expedient.acciones.agafar'),
             icon: "lock",
             showInMenu: true,
             onClick: (id: any): void => {
@@ -74,7 +76,7 @@ export const useCommonActions = (refresh?: () => void) => {
             }
         },
         {
-            title: "Liberar",
+            title: t('page.expedient.acciones.lliberar'),
             icon: "lock_open",
             showInMenu: true,
             onClick: (id: any): void => {
@@ -90,31 +92,31 @@ export const useCommonActions = (refresh?: () => void) => {
             }
         },
         {
-            title: "Cambiar prioridad...",
+            title: t('page.expedient.acciones.upPrioritat'),
             icon: "",
             showInMenu: true,
             onClick: hanldeCambiarPrioridad
         },
         {
-            title: "Cambiar estado...",
+            title: t('page.expedient.acciones.upEstat'),
             icon: "",
             showInMenu: true,
             onClick: hanldeCambiarEstado,
             disabled: (row:any) => row?.estat != "OBERT",
         },
         {
-            title: "Relacionar...",
+            title: t('page.expedient.acciones.relacio'),
             icon: "link",
             showInMenu: true,
         },
         {
-            title: "Cerrar...",
+            title: t('page.expedient.acciones.close'),
             icon: "check",
             showInMenu: true,
             disabled: (row:any) => row?.estat != "OBERT",
         },
         {
-            title: "Borrar",
+            title: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: (rowId:any) => {
@@ -139,34 +141,34 @@ export const useCommonActions = (refresh?: () => void) => {
             disabled: (row:any) => row?.estat == "TANCAT",
         },
         {
-            title: "Histórico de acciones",
+            title: t('page.expedient.acciones.history'),
             icon: "list",
             showInMenu: true,
         },
         {
-            title: "Descargar documentos...",
+            title: t('page.expedient.acciones.download'),
             icon: "download",
             showInMenu: true,
         },
         {
-            title: "Exportar indice PDF...",
+            title: t('page.expedient.acciones.exportPDF'),
             icon: "format_list_numbered",
             showInMenu: true,
         },
         {
-            title: "Indice PDF y exportación EIN...",
+            title: t('page.expedient.acciones.exportEIN'),
             icon: "format_list_numbered",
             showInMenu: true,
             disabled: true,
         },
         {
-            title: "Información archivo",
+            title: t('page.expedient.acciones.infoArxiu'),
             icon: "info",
             showInMenu: true,
             onClick: arxiuhandleOpen
         },
         {
-            title: "Sincronizar estado con archivo",
+            title: t('page.expedient.acciones.sincronitzar'),
             icon: "autorenew",
             showInMenu: true,
         },

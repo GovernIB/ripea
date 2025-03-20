@@ -10,6 +10,7 @@ import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Chec
 import {useContingutActions} from "./details/ContingutActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
+import {useTranslation} from "react-i18next";
 
 const DocumentsGridForm = (props:any) => {
     const {expedient} = props;
@@ -29,14 +30,15 @@ const DocumentsGridForm = (props:any) => {
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
         <GridFormField xs={12} name="adjunt" type="file" required/>
-        {!!data.adjunt && <GridFormField xs={6} name="hasFirma" disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>}
-        {!!data.adjunt && <GridFormField xs={6} name="documentFirmaTipus" disabled/>}
-        {data.documentFirmaTipus=="FIRMA_SEPARADA" && <GridFormField xs={12} name="firmaAdjunt" type="file" required/>}
+        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>
+        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled/>
+        <GridFormField xs={12} name="firmaAdjunt" type="file" hidden={data.documentFirmaTipus!="FIRMA_SEPARADA"} required/>
     </Grid>
 }
 
 const DocumentsGrid: React.FC = (props:any) => {
     const {id, entity, onRowCountChange} = props;
+    const { t } = useTranslation();
     const [expand, setExpand] = useState<boolean>(true);
     const [treeView, setTreeView] = useState<boolean>(true);
     const [vista, setVista] = useState<string>("carpeta");
@@ -81,6 +83,7 @@ const DocumentsGrid: React.FC = (props:any) => {
     return <GridPage>
         <MuiGrid
             resourceName="documentResource"
+            popupEditFormDialogResourceTitle={t('page.document.title')}
             columns={columns}
             paginationActive
             filter={`expedient.id:${id}`}
@@ -130,15 +133,14 @@ const DocumentsGrid: React.FC = (props:any) => {
                     {treeView && <FormControlLabel control={<Checkbox
                         checked={expand}
                         onChange={(event) => setExpand(event.target.checked)}
-
                         icon={<Icon>arrow_right</Icon>}
                         checkedIcon={<Icon>arrow_drop_down</Icon>}
-                    />} label={expand ? "Contraer" : "Expandir"} />}
+                    />} label={expand ? t("common.contract") : t("common.expand")} />}
                 </Grid>
 
                 <Grid item xs={3}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Tipo de vista</InputLabel>
+                        <InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             value={vista}
@@ -147,9 +149,9 @@ const DocumentsGrid: React.FC = (props:any) => {
                                 dataGridApiRef.current.refresh()
                             }}
                         >
-                            <MenuItem value={"estat"}>Vista por estado</MenuItem>
-                            <MenuItem value={"tipus"}>Vista por tipo documento</MenuItem>
-                            <MenuItem value={"carpeta"} selected>Vista por carpeta</MenuItem>
+                            <MenuItem value={"estat"}>{t('page.document.view.estat')}</MenuItem>
+                            <MenuItem value={"tipus"}>{t('page.document.view.tipus')}</MenuItem>
+                            <MenuItem value={"carpeta"} selected>{t('page.document.view.carpeta')}</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>

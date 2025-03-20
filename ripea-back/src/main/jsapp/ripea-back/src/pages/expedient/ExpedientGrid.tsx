@@ -12,6 +12,8 @@ import { ExpedientCommentDialog as CommentDialog} from "../CommentDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import { useCommonActions } from "./details/CommonActions.tsx";
+import {useTranslation} from "react-i18next";
+import useExpedientFilter from "./ExpedientFilter.tsx";
 
 const ExpedientGridForm = () => {
     const formContext = useFormContext();
@@ -28,9 +30,8 @@ const ExpedientGridForm = () => {
 }
 
 const ExpedientGrid: React.FC = () => {
-    // const { t } = useTranslation();
+    const { t } = useTranslation();
     let navigate = useNavigate();
-    const [springFilter, setSpringFilter] = useState("");
 
     const apiRef = useMuiDataGridApiRef()
     const refresh = () => {
@@ -138,18 +139,20 @@ const ExpedientGrid: React.FC = () => {
             }
         },
     ];
-    
+
+    const { springFilter, content } = useExpedientFilter();
 
     return <GridPage>
         <div style={{ border: '1px solid #e3e3e3' }}>
             <Box sx={{ backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3', p: 1 }}>
-                <Typography variant="h5">Buscador de expedientes</Typography>
+                <Typography variant="h5">{t('page.expedient.filter.title')}</Typography>
             </Box>
 
-            <ExpedientFilter onSpringFilterChange={setSpringFilter} />
+            {content}
 
             <MuiGrid
                 resourceName="expedientResource"
+                popupEditFormDialogResourceTitle={t('page.expedient.title')}
                 columns={columns}
                 paginationActive
                 filter={springFilter}

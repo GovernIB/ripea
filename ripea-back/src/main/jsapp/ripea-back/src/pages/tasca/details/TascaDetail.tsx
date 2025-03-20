@@ -2,6 +2,7 @@ import {Grid, Typography} from "@mui/material";
 import {Dialog} from "reactlib";
 import {useState} from "react";
 import {formatDate} from "../../../util/dateUtils.ts";
+import {useTranslation} from "react-i18next";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
@@ -14,6 +15,7 @@ const ContenidoData = (props:any) => {
 const useTascaDetail = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
+    const { t } = useTranslation();
 
     const handleOpen = (id:any, row:any) => {
         console.log(id, row)
@@ -29,12 +31,12 @@ const useTascaDetail = () => {
         <Dialog
             open={open}
             closeCallback={handleClose}
-            title={"Detalles de la tarea"}
+            title={t('page.tasca.detall.title')}
             // componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {
                     value: 'close',
-                    text: 'Cerrar',
+                    text: t('common.close'),
                     icon: 'close'
                 },
             ]}
@@ -45,20 +47,20 @@ const useTascaDetail = () => {
             }}
         >
             <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <ContenidoData title={"Tipo de tarea"}>{entity?.metaExpedientTasca?.description}</ContenidoData>
-                <ContenidoData title={"Descripción tipo de tarea"}>{entity?.metaExpedientTascaDescription}</ContenidoData>
-                <ContenidoData title={"Creada por"}>{entity?.createdBy}</ContenidoData>
-                <ContenidoData title={"Responsables"}>{entity?.responsablesStr}</ContenidoData>
-                <ContenidoData title={"Responsable actual"}>{entity?.responsableActual?.description}</ContenidoData>
-                <ContenidoData title={"Delegado"}>{entity?.delegat?.description}</ContenidoData>
-                <ContenidoData title={"Observadores"}>
+                <ContenidoData title={t('page.tasca.detall.metaExpedientTasca')}>{entity?.metaExpedientTasca?.description}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.metaExpedientTascaDescription')}>{entity?.metaExpedientTascaDescription}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.createdBy')}>{entity?.createdBy}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.responsablesStr')}>{entity?.responsablesStr}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.responsableActual')}>{entity?.responsableActual?.description}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.delegat')}>{entity?.delegat?.description}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.observadors')}>
                     {entity?.observadors?.map?.((obs:any)=>`${obs.description}\n`)}
                 </ContenidoData>
-                <ContenidoData title={"Fecha inicio"}>{formatDate(entity?.dataInici)}</ContenidoData>
-                <ContenidoData title={"Duración"}>{entity?.duracio}</ContenidoData>
-                <ContenidoData title={"Fecha limite"}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>
-                <ContenidoData title={"Estado"}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={"Prioridad"}>{entity?.prioritat}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.dataInici')}>{formatDate(entity?.dataInici)}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.duracio')}>{entity?.duracio}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.dataLimit')}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.estat')}>{entity?.estat}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.prioritat')}>{entity?.prioritat}</ContenidoData>
             </Grid>
         </Dialog>
 

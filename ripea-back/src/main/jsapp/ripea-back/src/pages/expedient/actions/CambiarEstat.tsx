@@ -2,6 +2,7 @@ import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {useTranslation} from "react-i18next";
 
 const CambiarEstatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -11,11 +12,12 @@ const CambiarEstatForm = () => {
 }
 
 export const CambiarEstat = (props: { apiRef:any }) => {
+    const { t } = useTranslation();
     const { apiRef } = props;
 
     return <MuiFormDialog
         resourceName={"expedientResource"}
-        title={`Modificar estado del expediente`}
+        title={t('page.expedient.action.changeEstat')}
         apiRef={apiRef}
     >
         <CambiarEstatForm/>

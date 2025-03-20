@@ -121,7 +121,7 @@ const Expedient: React.FC = () => {
                     </Grid>
                     {expedient?.agafatPer && <Grid item xs={4}>
                         <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1}>
-                            Expediente cogido por: {expedient?.agafatPer?.description}
+                            {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
 
                                 <IconButton aria-label="lock_open" color={"inherit"}>
                                     <Icon>lock_open</Icon>
