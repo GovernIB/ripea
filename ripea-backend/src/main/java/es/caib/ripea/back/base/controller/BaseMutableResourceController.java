@@ -694,11 +694,9 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	private Link buildActionLink(ResourceArtifact artifact) {
 		String rel = "exec_" + artifact.getCode();
 		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-			Link reportLink = linkTo(methodOn(getClass()).getOne(null, null)).withRel(rel);
-			return Link.of(reportLink.toUri() + "/artifacts/action/" + artifact.getCode()).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactActionExec(null, artifact.getCode(), null, null)).withRel(rel);
 		} else {
-			Link reportLink = linkTo(methodOn(getClass()).artifacts()).withRel(rel);
-			return Link.of(reportLink.toUri() + "/action/" + artifact.getCode()).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactActionExec(artifact.getCode(), null, null)).withRel(rel);
 		}
 	}
 	private Link buildActionLinkWithAffordances(ResourceArtifact artifact) {
