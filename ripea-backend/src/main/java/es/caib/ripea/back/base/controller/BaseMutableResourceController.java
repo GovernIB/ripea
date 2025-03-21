@@ -55,6 +55,7 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -574,6 +575,28 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			}
 		}
 		return links;
+	}
+
+	@Override
+	protected List<Link> buildSingleResourceArtifactLinks(Serializable id) {
+		List<Link> superLinks = super.buildSingleResourceArtifactLinks(id);
+		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
+		List<Link> links = artifacts.stream().
+				filter(a -> a.getType() == ResourceArtifactType.ACTION && a.getRequiresId() != null && a.getRequiresId()).
+				map(this::buildActionLinkWithAffordances).
+				collect(Collectors.toList());
+		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
+	}
+
+	@Override
+	protected List<Link> buildResourceCollectionArtifactLinks() {
+		List<Link> superLinks = super.buildResourceCollectionArtifactLinks();
+		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
+		List<Link> links = artifacts.stream().
+				filter(a -> a.getType() == ResourceArtifactType.ACTION && (a.getRequiresId() == null || !a.getRequiresId())).
+				map(this::buildActionLinkWithAffordances).
+				collect(Collectors.toList());
+		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
 	}
 
 	@Override

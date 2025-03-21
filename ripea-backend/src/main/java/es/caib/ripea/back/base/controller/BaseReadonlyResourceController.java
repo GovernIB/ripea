@@ -737,10 +737,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Map<String, Object> expandMap = new HashMap<>();
 		expandMap.put("perspective", perspective);
 		ls.add(selfLink.expand(expandMap));
-		try {
-			Link fieldDownloadLink = linkTo(methodOn(getClass()).fieldDownload(id, null)).withRel("fieldDownload");
-			ls.add(fieldDownloadLink);
-		} catch (IOException ignored) {}
+		ls.add(buildFieldDownloadLink(id));
+		ls.addAll(buildSingleResourceArtifactLinks(id));
 		return ls;
 	}
 
@@ -773,6 +771,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				String getOneLinkHref = getOneLink.getHref().replace("perspective", "perspective*");
 				ls.add(Link.of(UriTemplate.of(getOneLinkHref), "getOne"));
 				ls.add(linkTo(methodOn(getClass()).artifacts()).withRel("artifacts"));
+				ls.addAll(buildResourceCollectionArtifactLinks());
 			} else {
 				ls.add(selfLink);
 			}
@@ -946,6 +945,22 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				expand(expandMap);
 	}
 
+	protected List<Link> buildSingleResourceArtifactLinks(Serializable id) {
+		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
+		return artifacts.stream().
+				filter(a -> a.getType() == ResourceArtifactType.REPORT && a.getRequiresId() != null && a.getRequiresId()).
+				map(this::buildReportLinkWithAffordances).
+				collect(Collectors.toList());
+	}
+
+	protected List<Link> buildResourceCollectionArtifactLinks() {
+		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
+		return artifacts.stream().
+				filter(a -> a.getType() == ResourceArtifactType.REPORT && (a.getRequiresId() == null || !a.getRequiresId())).
+				map(this::buildReportLinkWithAffordances).
+				collect(Collectors.toList());
+	}
+
 	protected Link[] buildArtifactsLinks(List<ResourceArtifact> artifacts) {
 		List<Link> ls = new ArrayList<>();
 		Link selfLink = linkTo(methodOn(getClass()).artifacts()).withSelfRel();
@@ -1001,6 +1016,11 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					withName(rel).
 					toLink();
 		}
+	}
+
+	@SneakyThrows
+	private Link buildFieldDownloadLink(Serializable id) {
+		return linkTo(methodOn(getClass()).fieldDownload(id, null)).withRel("fieldDownload");
 	}
 
 	@SneakyThrows
