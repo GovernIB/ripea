@@ -9,7 +9,9 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
@@ -23,6 +25,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
 		quickFilterFields = { "numero", "nom" },
         descriptionField = "nom",
@@ -134,7 +137,8 @@ public class ExpedientResource extends NodeResource {
 
     @Getter
 	@Setter
-	@NoArgsConstructor
+	@RequiredArgsConstructor
+    @FieldNameConstants
 	public static class ExpedientFilterForm implements Serializable {
         private String numero;
         private String nom;
@@ -142,7 +146,9 @@ public class ExpedientResource extends NodeResource {
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+        @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioInici = LocalDateTime.now();
+        @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
 
         private String numeroRegistre;
