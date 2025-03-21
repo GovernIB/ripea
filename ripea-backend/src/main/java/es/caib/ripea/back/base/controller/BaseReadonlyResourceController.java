@@ -949,7 +949,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		return artifacts.stream().
 				filter(a -> a.getType() == ResourceArtifactType.REPORT && a.getRequiresId() != null && a.getRequiresId()).
-				map(this::buildReportLinkWithAffordances).
+				map(a -> buildReportLinkWithAffordances(a, id)).
 				collect(Collectors.toList());
 	}
 
@@ -957,7 +957,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		return artifacts.stream().
 				filter(a -> a.getType() == ResourceArtifactType.REPORT && (a.getRequiresId() == null || !a.getRequiresId())).
-				map(this::buildReportLinkWithAffordances).
+				map(a -> buildReportLinkWithAffordances(a, null)).
 				collect(Collectors.toList());
 	}
 
@@ -996,7 +996,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			links.add(buildFilterLinkWithAffordances(artifact));
 		}
 		if (artifact.getType() == ResourceArtifactType.REPORT) {
-			links.add(buildReportLinkWithAffordances(artifact));
+			links.add(buildReportLinkWithAffordances(artifact, null));
 		}
 		return links.toArray(new Link[0]);
 	}
@@ -1024,16 +1024,16 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	@SneakyThrows
-	private Link buildReportLink(ResourceArtifact artifact) {
+	private Link buildReportLink(ResourceArtifact artifact, Serializable id) {
 		String rel = "generate_" + artifact.getCode();
 		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-			return linkTo(methodOn(getClass()).artifactReportGenerate(null, artifact.getCode(), null, null)).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactReportGenerate(id, artifact.getCode(), null, null)).withRel(rel);
 		} else {
 			return linkTo(methodOn(getClass()).artifactReportGenerate(artifact.getCode(), null, null)).withRel(rel);
 		}
 	}
-	private Link buildReportLinkWithAffordances(ResourceArtifact artifact) {
-		Link reportLink = buildReportLink(artifact);
+	private Link buildReportLinkWithAffordances(ResourceArtifact artifact, Serializable id) {
+		Link reportLink = buildReportLink(artifact, id);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(reportLink).
 					afford(HttpMethod.POST).

@@ -583,7 +583,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		List<Link> links = artifacts.stream().
 				filter(a -> a.getType() == ResourceArtifactType.ACTION && a.getRequiresId() != null && a.getRequiresId()).
-				map(this::buildActionLinkWithAffordances).
+				map(a -> buildActionLinkWithAffordances(a, id)).
 				collect(Collectors.toList());
 		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
 	}
@@ -594,7 +594,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
 		List<Link> links = artifacts.stream().
 				filter(a -> a.getType() == ResourceArtifactType.ACTION && (a.getRequiresId() == null || !a.getRequiresId())).
-				map(this::buildActionLinkWithAffordances).
+				map(a -> buildActionLinkWithAffordances(a, null)).
 				collect(Collectors.toList());
 		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
 	}
@@ -603,7 +603,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
 		List<Link> links = new ArrayList<>(Arrays.asList(super.buildSingleArtifactLinks(artifact)));
 		if (artifact.getType() == ResourceArtifactType.ACTION) {
-			links.add(buildActionLinkWithAffordances(artifact));
+			links.add(buildActionLinkWithAffordances(artifact, null));
 		}
 		return links.toArray(new Link[0]);
 	}
@@ -714,16 +714,16 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 
 	@SneakyThrows
-	private Link buildActionLink(ResourceArtifact artifact) {
+	private Link buildActionLink(ResourceArtifact artifact, Serializable id) {
 		String rel = "exec_" + artifact.getCode();
 		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-			return linkTo(methodOn(getClass()).artifactActionExec(null, artifact.getCode(), null, null)).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactActionExec(id, artifact.getCode(), null, null)).withRel(rel);
 		} else {
 			return linkTo(methodOn(getClass()).artifactActionExec(artifact.getCode(), null, null)).withRel(rel);
 		}
 	}
-	private Link buildActionLinkWithAffordances(ResourceArtifact artifact) {
-		Link actionLink = buildActionLink(artifact);
+	private Link buildActionLinkWithAffordances(ResourceArtifact artifact, Serializable id) {
+		Link actionLink = buildActionLink(artifact, id);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(actionLink).
 					afford(HttpMethod.POST).
