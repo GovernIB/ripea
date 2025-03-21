@@ -133,11 +133,11 @@ export const useActionReportLogic = (
     const handleButtonClick = (id: any) => {
         if (hasForm) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
-            formDialogShow(
-                formDialogTitle,
-                null,
-                formAdditionalData,
-                formDialogComponentProps ?? { fullWidth: true, maxWidth: 'md' });
+            formDialogShow(null, {
+                title: formDialogTitle,
+                additionalData: formAdditionalData,
+                dialogComponentProps: formDialogComponentProps ?? { fullWidth: true, maxWidth: 'md' }
+            });
         } else if (action != null) {
             if (confirm) {
                 const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
@@ -160,10 +160,10 @@ export const useActionReportLogic = (
     }
     const [formDialogShow, formDialogComponent] = useFormDialog(
         resourceName,
-        formDialogContent,
-        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report },
         action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
-        action ? execAction : generateReport);
+        action ? execAction : generateReport,
+        formDialogContent,
+        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
     const [artifact, setArtifact] = React.useState<any>();
     const [apiLink, setApiLink] = React.useState<any>();
     const initialized = artifact != null;

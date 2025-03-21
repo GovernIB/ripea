@@ -551,77 +551,49 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
             }).catch(reject);
         });
     }, [request]);
-    const action = React.useCallback((id: any, args?: ResourceApiActionArgs): Promise<any[]> => {
+    const action = React.useCallback((id: any, args: ResourceApiActionArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             if (args?.code != null) {
-                request('artifacts').
+                const actionRel = 'exec_' + args.code;
+                request(actionRel, id, args).
                     then((state: State) => {
-                        const artifactState = state.getEmbedded().find(e => e.data.type === 'ACTION' && e.data.code === args.code);
-                        if (artifactState != null) {
-                            const actionRel = 'exec_' + args.code;
-                            const actionLink = artifactState.links.get(actionRel);
-                            if (actionLink != null) {
-                                request(actionRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
-                                    then((state: State) => {
-                                        const result = state.data;
-                                        resolve(result);
-                                    }).
-                                    catch((error: ResourceApiError) => {
-                                        processAnswerRequiredError(
-                                            error,
-                                            null,
-                                            args,
-                                            onChange,
-                                            getOpenAnswerRequiredDialog()).
-                                            then(resolve).
-                                            catch(reject);
-                                    });
-                            } else {
-                                reject('Link ' + actionRel + ' not found in action ' + args.code + ' links');
-                            }
-                        } else {
-                            reject('Action ' + args.code + ' not found in artifacts');
-                        }
+                        const result = state.data;
+                        resolve(result);
                     }).
-                    catch(reject);
+                    catch((error: ResourceApiError) => {
+                        processAnswerRequiredError(
+                            error,
+                            null,
+                            args,
+                            onChange,
+                            getOpenAnswerRequiredDialog()).
+                            then(resolve).
+                            catch(reject);
+                    });
             } else {
                 reject('Action code not specified')
             }
         });
     }, [request]);
-    const report = React.useCallback((id: any, args?: ResourceApiReportArgs): Promise<any[]> => {
+    const report = React.useCallback((id: any, args: ResourceApiReportArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             if (args?.code != null) {
-                request('artifacts').
+                const reportRel = 'generate_' + args.code;
+                request(reportRel, id, args).
                     then((state: State) => {
-                        const artifactState = state.getEmbedded().find(e => e.data.type === 'REPORT' && e.data.code === args.code);
-                        if (artifactState != null) {
-                            const reportRel = 'generate_' + args.code;
-                            const reportLink = artifactState.links.get(reportRel);
-                            if (reportLink != null) {
-                                request(reportRel, null, { ...args, data: { id, ...(args.data) } }, artifactState).
-                                    then((state: State) => {
-                                        const result = state.data;
-                                        resolve(result);
-                                    }).
-                                    catch((error: ResourceApiError) => {
-                                        processAnswerRequiredError(
-                                            error,
-                                            null,
-                                            args,
-                                            onChange,
-                                            getOpenAnswerRequiredDialog()).
-                                            then(resolve).
-                                            catch(reject);
-                                    });
-                            } else {
-                                reject('Link ' + reportRel + ' not found in report ' + args.code + ' links');
-                            }
-                        } else {
-                            reject('Report ' + args.code + ' not found in artifacts');
-                        }
+                        const result = state.data;
+                        resolve(result);
                     }).
-                    catch(reject);
+                    catch((error: ResourceApiError) => {
+                        processAnswerRequiredError(
+                            error,
+                            null,
+                            args,
+                            onChange,
+                            getOpenAnswerRequiredDialog()).
+                            then(resolve).
+                            catch(reject);
+                    });
             } else {
                 reject('Report code not specified')
             }

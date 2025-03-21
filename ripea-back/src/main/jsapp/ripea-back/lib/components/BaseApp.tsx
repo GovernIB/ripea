@@ -68,7 +68,7 @@ const useDialog = () => {
     }
     const messageDialogShow: MessageDialogShowFn = (
         title: string | null,
-        message: string,
+        message: string | React.ReactElement,
         dialogButtons?: DialogButton[],
         componentProps?: any) => {
         if (dialogShowFn.current) {
