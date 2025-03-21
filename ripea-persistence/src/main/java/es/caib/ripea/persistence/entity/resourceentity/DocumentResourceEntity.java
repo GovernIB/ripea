@@ -15,7 +15,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
@@ -25,6 +24,7 @@ import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

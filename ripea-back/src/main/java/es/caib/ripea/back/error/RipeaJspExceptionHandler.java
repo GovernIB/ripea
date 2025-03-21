@@ -1,23 +1,19 @@
-/**
- * 
- */
 package es.caib.ripea.back.error;
 
-import es.caib.ripea.back.controller.ExpedientController;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import lombok.extern.slf4j.Slf4j;
+import javax.ejb.EJBAccessException;
+import javax.ejb.EJBException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.ejb.EJBAccessException;
-import javax.ejb.EJBException;
-import javax.servlet.http.HttpServletRequest;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Tractament global de les excepcions en els controladors.
@@ -29,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 public class RipeaJspExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
+//	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ModelAndView handleNotFoundException(
 			NotFoundException ex) {
 		ModelAndView model = new ModelAndView("util/error");
@@ -43,7 +39,7 @@ public class RipeaJspExceptionHandler {
 	}
 
 	@ExceptionHandler(SistemaExternException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ModelAndView handleSistemaExternException(
 			SistemaExternException ex) {
 		ModelAndView model = new ModelAndView("util/error");
@@ -57,22 +53,10 @@ public class RipeaJspExceptionHandler {
 		return model;
 	}
 
-	/*@ExceptionHandler(MultipartException.class)
-	public final String handleMultipartException(
-			MultipartException ex,
-			HttpServletRequest request) {
-		log.error("Multipart Excepcion", ex);
-		if (ex.getCause().getMessage().contains("No queda espacio en el dispositivo")) {
-			return getModalControllerReturnValueError(request, null, "error.multipart.noQuedaEspacioEnElDispositivo", null, ex.getCause());
-		} else {
-			return getModalControllerReturnValueErrorMessageText(request, null, ex.getCause().getCause().getMessage(), ex.getCause().getCause());
-		}
-	}*/
-
 	@ExceptionHandler(value = { AccessDeniedException.class, EJBAccessException.class })
-	@ResponseStatus(HttpStatus.FORBIDDEN)
-	public ModelAndView handleAccessDeniedException(
-			Exception ex) {
+//	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ModelAndView handleAccessDeniedException(Exception ex) {
+		
 		ModelAndView model = new ModelAndView("util/error");
 		ErrorObject errorObject = new ErrorObject(
 				HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -90,7 +74,7 @@ public class RipeaJspExceptionHandler {
 	}
 
 	@ExceptionHandler(EJBException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ModelAndView handleEJBException(
 			EJBException ex,
 			HttpServletRequest request) {
@@ -105,8 +89,26 @@ public class RipeaJspExceptionHandler {
 	}
 
 	@ExceptionHandler(Exception.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ModelAndView handleAllUncaughtException(
+			Throwable ex,
+			HttpServletRequest request) {
+		log.error("Error al processar la petició HTTP al recurs " + request.getRequestURI(), ex);
+		ModelAndView model = new ModelAndView("util/error");
+		ErrorObject errorObject = new ErrorObject(
+				HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				ex.getMessage());
+		errorObject.setThrowable(ex);
+		errorObject.setStackTrace(ExceptionUtils.getStackTrace(ex));
+		errorObject.setRequestUri(request.getRequestURI());
+		errorObject.setExceptionMessage(ex.getMessage());
+		model.addObject("errorObject", errorObject);
+		return model;
+	}
+	
+	@ExceptionHandler(RuntimeException.class)
+//	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ModelAndView handleAllRuntimeException(
 			Throwable ex,
 			HttpServletRequest request) {
 		log.error("Error al processar la petició HTTP al recurs " + request.getRequestURI(), ex);

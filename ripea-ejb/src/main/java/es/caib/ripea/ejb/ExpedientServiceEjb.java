@@ -73,6 +73,9 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 				prioritat,
 				prioritatMotiu);
 	}
+	
+	@Override
+	@RolesAllowed("**")
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
 			String nom) {

@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CarpetaResourceEntity extends ContingutEntity implements ResourceEntity<CarpetaResource, Long> {
+public class CarpetaResourceEntity extends ContingutResourceEntity<CarpetaResource> implements ResourceEntity<CarpetaResource, Long> {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(

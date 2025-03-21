@@ -1,13 +1,14 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.CarpetaEntity;
-import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
+import java.util.List;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 
 @Component
 public interface CarpetaRepository extends JpaRepository<CarpetaEntity, Long> {
