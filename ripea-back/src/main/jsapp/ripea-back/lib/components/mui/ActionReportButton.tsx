@@ -86,9 +86,9 @@ export const useActionReportLogic = (
     action?: string,
     report?: string,
     confirm?: boolean,
-    formAdditionalData?: any,
+    formAdditionalDataArg?: any,
     formDialogContent?: React.ReactElement,
-    formDialogComponentProps?: any,
+    formDialogComponentPropsArg?: any,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void) => {
@@ -130,13 +130,13 @@ export const useActionReportLogic = (
             console.error('Couldn\'t generate report without code');
         }
     });
-    const handleButtonClick = (id: any) => {
+    const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
         if (hasForm) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
             formDialogShow(null, {
-                title: formDialogTitle,
-                additionalData: formAdditionalData,
-                dialogComponentProps: formDialogComponentProps ?? { fullWidth: true, maxWidth: 'md' }
+                title: dialogTitle ?? formDialogTitle,
+                additionalData: formAdditionalData ?? formAdditionalDataArg,
+                dialogComponentProps: formDialogComponentProps ?? formDialogComponentPropsArg ?? { fullWidth: true, maxWidth: 'md' }
             });
         } else if (action != null) {
             if (confirm) {
@@ -195,7 +195,8 @@ export const useActionReportLogic = (
         initialized,
         apiLink,
         formDialogComponent,
-        handleButtonClick
+        execAction,
+        generateReport: exec
     }
 }
 
@@ -224,7 +225,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         initialized,
         apiLink,
         formDialogComponent,
-        handleButtonClick,
+        execAction: handleButtonClick,
     } = useActionReportLogic(
         resourceName,
         action,
