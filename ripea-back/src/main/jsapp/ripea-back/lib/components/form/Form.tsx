@@ -5,6 +5,7 @@ import {
     useResourceApiService,
 } from '../ResourceApiProvider';
 import { useConfirmDialogButtons } from '../AppButtons';
+import { processApiFields } from '../../util/fields';
 import useLogConsole from '../../util/useLogConsole';
 import { useReducerWithActionMiddleware } from '../../util/useReducerWithActionMiddleware';
 import ResourceApiFormContext, {
@@ -353,7 +354,7 @@ export const Form: React.FC<FormProps> = (props) => {
                     const artifact = artifacts.find((a: any) => a.type === resourceType.toUpperCase() && a.code === resourceTypeCode);
                     if (artifact != null) {
                         if (artifact.formClassActive) {
-                            setFields(artifact.fields);
+                            setFields(processApiFields(artifact.fields));
                         }
                     } else {
                         console.warn('Couldn\'t find artifact (type=' + resourceType + ', code=' + resourceTypeCode + ')');

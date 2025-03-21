@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Informació sobre un artefacte d'un recurs.
  * 
@@ -19,7 +21,7 @@ public class ResourceArtifact {
 	private String code;
 	private Boolean requiresId;
 	@JsonIgnore
-	private Class<?> formClass;
+	private Class<? extends Serializable> formClass;
 
 	public boolean isFormClassActive() {
 		return formClass != null;

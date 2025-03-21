@@ -9,6 +9,7 @@ import {
     Link,
     Problem
 } from 'ketting';
+import { processApiFields } from '../util/fields';
 import useLogConsole, { LogConsoleType } from '../util/useLogConsole';
 import useControlledUncontrolledState from '../util/useControlledUncontrolledState';
 import { useOptionalAuthContext } from './AuthContext';
@@ -668,15 +669,7 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
         indexState != null && resourceName != null && getPromiseFromStateLink(indexState, resourceName, args, true).
             then((response: State) => {
                 setCurrentState(response);
-                const processedFields = response.action().fields?.
-                    filter(f => f != null).
-                    map(f => {
-                        return f.name.endsWith('*') ? {
-                            ...f,
-                            name: f.name.slice(0, -1),
-                            onChangeActive: true,
-                        } : f;
-                    });
+                const processedFields = processApiFields(response.action().fields);
                 setCurrentFields(processedFields);
                 setIsCurrentLoading(false);
                 !isCurrentLoaded && setIsCurrentLoaded(true);

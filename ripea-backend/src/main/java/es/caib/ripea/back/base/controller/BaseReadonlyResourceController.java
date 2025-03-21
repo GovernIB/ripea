@@ -1,10 +1,13 @@
 package es.caib.ripea.back.base.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.back.base.config.WebMvcBaseConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.ArtifactFormNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
@@ -18,6 +21,7 @@ import es.caib.ripea.service.intf.base.util.HttpRequestUtil;
 import es.caib.ripea.service.intf.base.util.JsonUtil;
 import es.caib.ripea.service.intf.base.util.RequestSessionUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
@@ -25,6 +29,8 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -48,9 +54,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.groups.Default;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -84,12 +94,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public abstract class BaseReadonlyResourceController<R extends Resource<? extends Serializable>, ID extends Serializable>
 		implements ReadonlyResourceController<R, ID> {
 
+	@Value("${" + PropertyConfig.HTTP_HEADER_ANSWERS + ":Bb-Answers}")
+	private String httpHeaderAnswers;
+
 	protected static final HttpMethod FAKE_DEFAULT_TEMPLATE_HTTP_METHOD = HttpMethod.OPTIONS;
 
 	@Autowired
 	protected ReadonlyResourceService<R, ID> readonlyResourceService;
 	@Autowired
 	protected ResourceApiService resourceApiService;
+	@Autowired
+	protected ObjectMapper objectMapper;
 	@Autowired
 	protected SmartValidator validator;
 
@@ -270,7 +285,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@PostMapping("/artifacts/{type}/{code}/validate")
 	@Operation(summary = "Validació del formulari d'un artefacte")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
-	public ResponseEntity<?> artifactValidate(
+	public ResponseEntity<?> artifactFormValidate(
 			@PathVariable
 			@Parameter(description = "Tipus de l'artefacte")
 			final ResourceArtifactType type,
@@ -279,34 +294,49 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			final String code,
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		return artifactValidate(null, type, code, params, bindingResult);
-	}
-
-	@Override
-	@PostMapping("/{id}/artifacts/{type}/{code}/validate")
-	@Operation(summary = "Validació del formulari d'un artefacte amb id")
-	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
-	public ResponseEntity<?> artifactValidate(
-			@PathVariable(required = false)
-			@Parameter(description = "Identificador del recurs")
-			final ID id,
-			@PathVariable
-			@Parameter(description = "Tipus de l'artefacte")
-			final ResourceArtifactType type,
-			@PathVariable
-			@Parameter(description = "Codi de l'artefacte")
-			final String code,
-			final JsonNode params,
-			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		log.debug("Validació del formulari d'un artefacte (id={}, type={}, code={}, params={})", id, type, code, params);
+		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
+		Class<?> formClass = getArtifactFormClass(type, code);
 		getArtifactParamsAsObjectWithFormClass(
-				type,
-				code,
+				formClass,
 				params,
 				bindingResult);
 		return ResponseEntity.ok().build();
 	}
 
+	@Override
+	@PatchMapping(value = "/artifacts/{type}/{code}/onChange", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Processa els canvis en els camps del formulari d'un artefacte")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public ResponseEntity<String> artifactFormOnChange(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@RequestBody @Valid
+			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException {
+		log.debug("Validació del formulari d'un artefacte (type={}, code={}, onChangeEvent={})", type, code, onChangeEvent);
+		Serializable previous = getOnChangePrevious(
+				onChangeEvent,
+				getArtifactFormClass(type, code));
+		Object fieldValue = getOnChangeFieldValue(onChangeEvent);
+		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
+		Map<String, Object> processat = getReadonlyResourceService().artifactOnChange(
+				type,
+				code,
+				previous,
+				onChangeEvent.getFieldName(),
+				fieldValue,
+				answers);
+		if (processat != null) {
+			String serialized = objectMapper.writeValueAsString(new BaseMutableResourceController.OnChangeForSerialization(processat));
+			String response = serialized.substring(serialized.indexOf("\":{") + 2, serialized.length() - 1);
+			return ResponseEntity.ok(response);
+		} else {
+			return ResponseEntity.ok("{}");
+		}
+	}
 
 	@Override
 	@PostMapping("/artifacts/report/{code}")
@@ -337,9 +367,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
 		log.debug("Generació de l'informe associat al recurs (id={}, code={}, params={})", id, code, params);
+		Class<?> formClass = getArtifactFormClass(ResourceArtifactType.REPORT, code);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
-				ResourceArtifactType.REPORT,
-				code,
+				formClass,
 				params,
 				bindingResult);
 		List<?> items = getReadonlyResourceService().artifactReportGenerate(id, code, paramsObject);
@@ -605,22 +635,102 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				links);
 	}
 
-	protected Serializable getArtifactParamsAsObjectWithFormClass(
+	protected Class<? extends Serializable> getArtifactFormClass(
 			ResourceArtifactType artifactType,
-			String code,
-			JsonNode params,
-			BindingResult bindingResult) throws JsonProcessingException, MethodArgumentNotValidException {
+			String code) {
 		ResourceArtifact artifact = getReadonlyResourceService().artifactGetOne(
 				artifactType,
 				code);
+		return artifact.isFormClassActive() ? artifact.getFormClass() : null;
+	}
+
+	protected Serializable getArtifactParamsAsObjectWithFormClass(
+			Class<?> formClass,
+			JsonNode params,
+			BindingResult bindingResult) throws JsonProcessingException, MethodArgumentNotValidException {
 		Serializable paramsObject = null;
-		if (artifact.isFormClassActive()) {
+		if (formClass != null) {
 			paramsObject = (Serializable)JsonUtil.getInstance().fromJsonToObjectWithType(
 					params,
-					artifact.getFormClass());
+					formClass);
 			validateResource(paramsObject, 1, bindingResult);
 		}
 		return paramsObject;
+	}
+
+	protected <P extends Serializable> P getOnChangePrevious(
+			OnChangeEvent onChangeEvent,
+			Class<P> resourceClass) throws JsonProcessingException {
+		P previous = null;
+		if (onChangeEvent.getPrevious() != null && resourceClass != null) {
+			previous = (P)ReflectUtils.newInstance(resourceClass);
+			JsonUtil.getInstance().fillResourceWithFieldsMap(
+					previous,
+					JsonUtil.getInstance().fromJsonToMap(onChangeEvent.getPrevious(), resourceClass),
+					null,
+					null);
+		}
+		return previous;
+	}
+
+	protected Object getOnChangeFieldValue(OnChangeEvent onChangeEvent) {
+		return JsonUtil.getInstance().fillResourceWithFieldsMap(
+				ReflectUtils.newInstance(resourceClass),
+				null,
+				onChangeEvent.getFieldName(),
+				onChangeEvent.getFieldValue());
+	}
+
+	protected Map<String, AnswerRequiredException.AnswerValue> getAnswersFromHeaderOrRequest(
+			Map<String, Object> requestAnswers) {
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		if (requestAttributes instanceof ServletRequestAttributes) {
+			HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
+			Map<String, AnswerRequiredException.AnswerValue> answers = new HashMap<>();
+			if (requestAnswers != null) {
+				Map<String, AnswerRequiredException.AnswerValue> answersFromRequest = requestAnswers.entrySet().stream().
+						collect(Collectors.toMap(
+								Map.Entry::getKey,
+								e -> {
+									if (e.getValue() == null) {
+										return new AnswerRequiredException.AnswerValue();
+									} else if (e.getValue() instanceof Boolean) {
+										return new AnswerRequiredException.AnswerValue((Boolean)e.getValue());
+									} else {
+										return new AnswerRequiredException.AnswerValue(e.getValue().toString());
+									}
+								}));
+				answers = new HashMap<>(answersFromRequest);
+			}
+			String headerAnswers = request.getHeader(httpHeaderAnswers);
+			if (headerAnswers != null) {
+				try {
+					JsonNode headerAnswersJson = objectMapper.readTree(headerAnswers);
+					Map<String, Object> headerAnswersMap = objectMapper.convertValue(
+							headerAnswersJson,
+							new TypeReference<>(){});
+					Map<String, AnswerRequiredException.AnswerValue> answersFromHeader = headerAnswersMap.entrySet().stream().
+							collect(Collectors.toMap(
+									Map.Entry::getKey,
+									e -> {
+										if (e.getValue() == null) {
+											return new AnswerRequiredException.AnswerValue();
+										} else if (e.getValue() instanceof Boolean) {
+											return new AnswerRequiredException.AnswerValue((Boolean)e.getValue());
+										} else {
+											return new AnswerRequiredException.AnswerValue(e.getValue().toString());
+										}
+									}));
+					answers.putAll(answersFromHeader);
+				} catch (JsonProcessingException ex) {
+					log.warn("Error al parsejar la capçalera {}", httpHeaderAnswers, ex);
+					return null;
+				}
+			}
+			return answers;
+		} else {
+			return null;
+		}
 	}
 
 	protected <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> fieldOptionsFind(
@@ -974,23 +1084,20 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Link selfLink = linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel();
 		links.add(selfLink);
 		if (artifact.getFormClass() != null) {
-			Link validateLink;
-			if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-				validateLink = Affordances.
-						of(linkTo(methodOn(getClass()).artifactValidate(null, artifact.getType(), artifact.getCode(), null, null)).withRel("validate")).
-						afford(HttpMethod.POST).
-						withInputAndOutput(artifact.getFormClass()).
-						withName("validate").
-						toLink();
-			} else {
-				validateLink = Affordances.
-						of(linkTo(methodOn(getClass()).artifactValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("validate")).
-						afford(HttpMethod.POST).
-						withInputAndOutput(artifact.getFormClass()).
-						withName("validate").
-						toLink();
-			}
-			links.add(validateLink);
+			Link formValidateLink = Affordances.
+					of(linkTo(methodOn(getClass()).artifactFormValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("formValidate")).
+					afford(HttpMethod.POST).
+					withInputAndOutput(artifact.getFormClass()).
+					withName("formValidate").
+					toLink();
+			links.add(formValidateLink);
+			Link onChangeLink = Affordances.
+					of(linkTo(methodOn(getClass()).artifactFormOnChange(artifact.getType(), artifact.getCode(), null)).withRel("onChange")).
+					afford(HttpMethod.PATCH).
+					withInputAndOutput(artifact.getFormClass()).
+					withName("onChange").
+					toLink();
+			links.add(onChangeLink);
 		}
 		if (artifact.getType() == ResourceArtifactType.FILTER) {
 			links.add(buildFilterLinkWithAffordances(artifact));
@@ -1002,7 +1109,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	private Link buildFilterLinkWithAffordances(ResourceArtifact artifact) {
-		String rel = "filter_" + artifact.getCode();
+		String rel = "filter";
 		Link findLink = buildFindLink(null).withRel(rel);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(findLink).
