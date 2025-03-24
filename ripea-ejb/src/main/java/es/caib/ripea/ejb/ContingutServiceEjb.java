@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.io.IOException;
@@ -29,6 +26,7 @@ import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut;
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -411,7 +409,6 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 		return delegateService.getBasicInfo(contingutId, checkPermissions);
 	}
 
-
 	@Override
 	@RolesAllowed("**")
 	public ResultDto<ContingutMassiuDto> findDocumentsPerFirmaSimpleWebMassiu(
@@ -426,5 +423,11 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 				paginacioParams,
 				rolActual,
 				resultEnum);
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public UsuariDto findUsuariCreacio(Long contingutId) {
+		return delegateService.findUsuariCreacio(contingutId);
 	}
 }

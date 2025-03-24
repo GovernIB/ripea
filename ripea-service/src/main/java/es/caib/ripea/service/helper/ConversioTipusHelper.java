@@ -59,6 +59,7 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.intf.dto.AlertaDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
@@ -110,6 +111,7 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 
@@ -187,32 +189,10 @@ public class ConversioTipusHelper {
 	      
 	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientDto.class).byDefault().register();
 	      
-	      mapperFactory.classMap(InteressatEntity.class, InteressatDto.class).byDefault().register();
-	      mapperFactory.classMap(InteressatPersonaFisicaEntity.class, InteressatPersonaFisicaDto.class)
-	      .use(InteressatEntity.class, InteressatDto.class)
-//	      .customize(new CustomMapper<InteressatPersonaFisicaEntity, InteressatDto>() {
-//	      		@Override
-//				public void mapAtoB(InteressatPersonaFisicaEntity source, InteressatDto target, MappingContext context) {
-//	      			target.setNom
-//	      		}
-//		      })
-	      .byDefault().register();
-	      mapperFactory.classMap(InteressatPersonaJuridicaEntity.class, InteressatPersonaJuridicaDto.class)
-	      .use(InteressatEntity.class, InteressatDto.class)
-//	      .customize(new CustomMapper<InteressatPersonaJuridicaEntity, InteressatDto>() {
-//	      		@Override
-//				public void mapAtoB(InteressatPersonaJuridicaEntity source, InteressatDto target, MappingContext context) {
-//	      		}
-//		      })
-	      .byDefault().register();
-	      mapperFactory.classMap(InteressatAdministracioEntity.class, InteressatAdministracioDto.class)
-	      .use(InteressatEntity.class, InteressatDto.class)
-//	      .customize(new CustomMapper<InteressatAdministracioEntity, InteressatDto>() {
-//	      		@Override
-//				public void mapAtoB(InteressatAdministracioEntity source, InteressatDto target, MappingContext context) {
-//	      		}
-//		      })
-	      .byDefault().register();
+	      mapperFactory
+			.classMap(DadesUsuari.class, UsuariDto.class)
+			.field("nomSencer", "nom")
+			.byDefault().register();
 	      
 	      mapperFactory.classMap(MetaExpedientComentariEntity.class, MetaExpedientComentariDto.class)
 	      .customize(new CustomMapper<MetaExpedientComentariEntity, MetaExpedientComentariDto>() {
@@ -327,17 +307,7 @@ public class ConversioTipusHelper {
 						target.setPrioritat(source.getPrioritat()!=null?source.getPrioritat():PrioritatEnumDto.B_NORMAL);
 						return target;
 					}
-				});
-		
-		
-		/*mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<InteressatEntity, InteressatDto>() {
-					public InteressatDto convert(InteressatEntity source, Type<? extends InteressatDto>destinationClass, MappingContext mappingContext) {
-						source = deproxyInteressatEntity(source);
-						return getInteressatDto(source);
-					}
-				});*/
-		
+				});		
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<MetaDadaEntity, MetaDadaDto>() {
@@ -579,8 +549,6 @@ public class ConversioTipusHelper {
 								}
 							}
 						target.setInteressatsResum(interessatsResum);
-						
-						
 						return target;
 					}
 				});
@@ -626,8 +594,6 @@ public class ConversioTipusHelper {
 							String enviamentDatatEstat  = source.getDocumentEnviamentInteressats().iterator().next().getEnviamentDatatEstat();
 							target.setEnviamentDatatEstat(enviamentDatatEstat);
 						}
-						
-						
 						
 						InteressatEntity destinatari = !source.getDocumentEnviamentInteressats().isEmpty() ? HibernateHelper.deproxy(source.getDocumentEnviamentInteressats().iterator().next().getInteressat()) : null;
 						String destinatariNom = "";
@@ -867,7 +833,6 @@ public class ConversioTipusHelper {
 					}
 				});
 		
-		
 	      mapperFactory.classMap(MetaDocumentEntity.class, MetaDocumentDto.class)
 	        .customize(new CustomMapper<MetaDocumentEntity,MetaDocumentDto>() {
 	            @Override
@@ -905,7 +870,6 @@ public class ConversioTipusHelper {
 	        .byDefault()
 	        .register();	
 	      
-	      
 	      mapperFactory.classMap(ConsultaPinbalEntity.class, SeguimentConsultaPinbalDto.class)
 	        .customize(new CustomMapper<ConsultaPinbalEntity, SeguimentConsultaPinbalDto>() {
 	            @Override
@@ -933,7 +897,6 @@ public class ConversioTipusHelper {
 	        })
 	        .byDefault()
 	        .register();
-		
       
 	      //if not excluded with the new version of orika 1.4.6 it gives: ma.glasnost.orika.MappingException: Encountered mapping of primitive to object (or vise-versa); sourceType=boolean, destinationType=ExpedientEntity
 	      mapperFactory.classMap(DocumentEntity.class, DocumentDto.class) 
@@ -970,6 +933,47 @@ public class ConversioTipusHelper {
 	      	.exclude("tasques")
 	        .byDefault()
 	        .register();
+	      
+	      mapperFactory.getConverterFactory().registerConverter(new CustomConverter<InteressatEntity, InteressatDto>() {
+	    	    @Override
+	    	    public InteressatDto convert(InteressatEntity source, Type<? extends InteressatDto> destinationType, MappingContext context) {
+	    	        /*if (source instanceof InteressatPersonaFisicaEntity) {
+	    	            return mapperFactory.getMapperFacade().map(source, InteressatPersonaFisicaDto.class);
+	    	        } else if (source instanceof InteressatPersonaJuridicaEntity) {
+	    	            return mapperFactory.getMapperFacade().map(source, InteressatPersonaJuridicaDto.class);
+	    	        } else if (source instanceof InteressatAdministracioEntity) {
+	    	            return mapperFactory.getMapperFacade().map(source, InteressatAdministracioDto.class);
+	    	        } else {
+	    	            throw new MappingException("No mapping defined for class: " + source.getClass());
+	    	        }*/
+	    	    	InteressatDto resultat = getInteressatDto(source);
+	    	    	return resultat;
+	    	    }
+	    	});
+	      
+	      mapperFactory.getConverterFactory().registerConverter(new CustomConverter<InteressatPersonaFisicaEntity, InteressatDto>() {
+	    	    @Override
+	    	    public InteressatDto convert(InteressatPersonaFisicaEntity source, Type<? extends InteressatDto> destinationType, MappingContext context) {
+	    	    	InteressatDto resultat = getInteressatDto(source);
+	    	    	return resultat;
+	    	    }
+	    	});
+	      
+	      mapperFactory.getConverterFactory().registerConverter(new CustomConverter<InteressatPersonaJuridicaEntity, InteressatDto>() {
+	    	    @Override
+	    	    public InteressatDto convert(InteressatPersonaJuridicaEntity source, Type<? extends InteressatDto> destinationType, MappingContext context) {
+	    	    	InteressatDto resultat = getInteressatDto(source);
+	    	    	return resultat;
+	    	    }
+	    	});
+	      
+	      mapperFactory.getConverterFactory().registerConverter(new CustomConverter<InteressatAdministracioEntity, InteressatDto>() {
+	    	    @Override
+	    	    public InteressatDto convert(InteressatAdministracioEntity source, Type<? extends InteressatDto> destinationType, MappingContext context) {
+	    	    	InteressatDto resultat = getInteressatDto(source);
+	    	    	return resultat;
+	    	    }
+	    	});
 	}
 
 	private static InteressatEntity deproxyInteressatEntity(InteressatEntity source) {

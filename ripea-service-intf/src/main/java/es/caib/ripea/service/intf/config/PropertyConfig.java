@@ -134,8 +134,8 @@ public class PropertyConfig {
 	public static final String CONVERSIO_PLUGIN_ENDPOINT_NAME	= "es.caib.ripea.plugin.conversio.endpointName";
 	
 	public static final String DADESEXT_PLUGIN_DIR3_CLASS		= "es.caib.ripea.plugin.dadesext.class";
-	public static final String DADESEXT_PLUGIN_DIR3_URL1		= "es.caib.ripea.plugin.dadesext.dir3.service.url";
-	public static final String DADESEXT_PLUGIN_DIR3_URL2		= "es.caib.ripea.plugin.dadesext.service.url";
+	public static final String DADESEXT_PLUGIN_DIR3_WS_URL		= "es.caib.ripea.plugin.dadesext.service.url";
+	public static final String DADESEXT_PLUGIN_DIR3_REST_URL	= "es.caib.ripea.plugin.dadesext.dir3.rest.url";
 	public static final String DADESEXT_PLUGIN_DIR3_ENDPOINT	= "es.caib.ripea.plugin.dadesext.endpointName";
 	
 	public static final String DADESEXT_PLUGIN_PINBAL_CLASS		= "es.caib.ripea.plugin.dadesextpinbal.class";

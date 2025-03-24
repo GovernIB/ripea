@@ -1,8 +1,19 @@
 package es.caib.ripea.plugin.caib.usuari;
 
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
-import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.NotFoundException;
+
+import org.fundaciobit.pluginsib.userinformation.RolesInfo;
+import org.fundaciobit.pluginsib.userinformation.SearchUsersResult;
 import org.fundaciobit.pluginsib.userinformation.UserInfo;
 import org.fundaciobit.pluginsib.userinformation.keycloak.KeyCloakUserInformationPlugin;
 import org.keycloak.admin.client.Keycloak;
@@ -15,9 +26,9 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.NotFoundException;
-import java.util.*;
-import java.util.stream.Collectors;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant el plugin de Keycloak. Les propietats necessàries són les següents a partir
@@ -82,13 +93,39 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 
 	@Override
 	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException {
-		return List.of();
+		LOGGER.debug("Consulta dels usuaris amb filtre (filtre=" + filtre + ")");
+		List<DadesUsuari> resultat = new ArrayList<DadesUsuari>();
+		try {
+			List<UserInfo> usuaris = internalSearchUsers(filtre);
+			if (usuaris != null && usuaris.size()>0) {
+				for (UserInfo ui: usuaris) {
+					resultat.add(toDadesUsuari(ui));
+				}
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException("Error al consultar els usuaris amb filtre (filtre=" + filtre + ")", ex);
+		}
+		return resultat;
 	}
+	
 
 	@Override
 	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
-		return List.of();
+		
+		List<String> resultat = new ArrayList<String>();
+		
+		try {
+			RolesInfo ri = getRolesByUsername(usuariCodi);
+			if (ri!=null && ri.getRoles()!=null) {
+				return Arrays.asList(ri.getRoles());
+			}
+		} catch (Exception ex) {
+			log.error("Error al consultar els rols del usuari "+usuariCodi, ex);
+		}
+		
+		return resultat;
 	}
+	
 
 	@Override
 	public String[] getUsernamesByRol(String rol) throws Exception {
@@ -143,6 +180,36 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			});
 		}
 		return users.values();
+	}
+	
+	private List<UserInfo> internalSearchUsers(String filter) {
+		List<UserInfo> usernamesFound = new ArrayList<UserInfo>();
+		try {
+			SearchUsersResult sur1 = this.getUsersByPartialNameOrPartialSurnames(filter);
+			if (sur1!=null && sur1.getUsers()!=null)
+				usernamesFound.addAll(sur1.getUsers());
+		} catch (Exception ex) {
+			log.warn("No s'han obtingut usuaris per nom parcial: " + filter);
+		}
+		try {
+			SearchUsersResult sur2 = this.getUsersByPartialUserName(filter);
+			if (sur2!=null && sur2.getUsers()!=null) {
+				for (UserInfo ui: sur2.getUsers()) {
+					boolean found = false;
+					for (UserInfo unf: usernamesFound) {
+						if (ui.getUsername().equals(unf.getUsername())) {
+							found = true;
+						}
+					}
+					if (!found) {
+						usernamesFound.add(ui);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			log.warn("No s'han obtingut usuaris per codi parcial: " + filter);
+		}
+		return usernamesFound;
 	}
 
 	private Set<UserRepresentation> getUsernamesByRolOfRealm(String rol) throws Exception {

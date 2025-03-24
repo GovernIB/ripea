@@ -279,9 +279,11 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 ('0','DISTRIBUCIO_REGLA','es.caib.ripea.distribucio.regla.autenticacio.basic','false','Client REST creació regles amb tipus autenticació BASIC','5','BOOL','0','1','0','1','0');
 
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('0','DADES_EXT','es.caib.ripea.plugin.dadesext.class','es.caib.ripea.plugin.caib.dadesext.DadesExternesPluginDir3','Classe del plugin','1','DADESEXT_CLASS','0','1','0','1','0');
+('0','DADES_EXT','es.caib.ripea.plugin.dadesext.class','es.caib.ripea.plugin.caib.dadesext.DadesExternesPluginDir3Rest','Classe del plugin','1','DADESEXT_CLASS','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
-('1','DADES_EXT','es.caib.ripea.plugin.dadesext.service.url','https://proves.caib.es/dir3caib','Url del plugin','2','TEXT','0','1','0','1','0');
+('1','DADES_EXT','es.caib.ripea.plugin.dadesext.service.url','https://proves.caib.es/dir3caib/ws/Dir3CaibObtenerCatalogos','Url del plugin','2','TEXT','0','1','0','1','0');
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
+('1','DADES_EXT','es.caib.ripea.plugin.dadesext.dir3.rest.url','https://proves.caib.es/dir3caib/rest/catalogo/','Url del plugin','2','TEXT','0','1','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values 
 ('0','DADES_EXT','es.caib.ripea.plugin.dadesext.endpointName','proves.caib.es DIR3','Nom del endpoint del plugin de dades externes (DIR3)','3','TEXT','0','0','0','1','0');
 
