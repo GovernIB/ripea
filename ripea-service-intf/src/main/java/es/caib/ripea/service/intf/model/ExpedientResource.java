@@ -9,7 +9,6 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
@@ -137,10 +136,9 @@ public class ExpedientResource extends NodeResource {
 
     @Getter
 	@Setter
-	@RequiredArgsConstructor
+    @NoArgsConstructor
     @FieldNameConstants
 	public static class ExpedientFilterForm implements Serializable {
-		@NotNull
         private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;

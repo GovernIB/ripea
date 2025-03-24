@@ -288,6 +288,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const validate = () => new Promise<any>((resolve, reject) => {
         if (resourceType != null) {
             if (resourceTypeCode != null) {
+                setFieldErrors(undefined);
                 apiArtifactFormValidate({ type: resourceType, code: resourceTypeCode, data }).
                     then(resolve).
                     catch((error: ResourceApiError) => {

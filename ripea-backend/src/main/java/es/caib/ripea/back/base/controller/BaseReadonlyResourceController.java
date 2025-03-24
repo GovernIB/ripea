@@ -326,6 +326,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@PathVariable
 			@Parameter(description = "Codi de l'artefacte")
 			final String code,
+			@RequestBody
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
 		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
