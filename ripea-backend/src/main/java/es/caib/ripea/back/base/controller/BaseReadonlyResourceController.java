@@ -1092,10 +1092,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					toLink();
 			links.add(formValidateLink);
 			Link onChangeLink = Affordances.
-					of(linkTo(methodOn(getClass()).artifactFormOnChange(artifact.getType(), artifact.getCode(), null)).withRel("onChange")).
+					of(linkTo(methodOn(getClass()).artifactFormOnChange(artifact.getType(), artifact.getCode(), null)).withRel("formOnChange")).
 					afford(HttpMethod.PATCH).
 					withInputAndOutput(artifact.getFormClass()).
-					withName("onChange").
+					withName("formOnChange").
 					toLink();
 			links.add(onChangeLink);
 		}
@@ -1105,22 +1105,24 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		if (artifact.getType() == ResourceArtifactType.REPORT) {
 			links.add(buildReportLinkWithAffordances(artifact, null));
 		}
+		// TODO no sé per què es creen templates addicionals amb els noms "artifactFormOnChange",
+		//  "artifactReportGenerate" i "artifactActionExec". Només haurien d'aparèixer "formValidate" i "formOnChange".
 		return links.toArray(new Link[0]);
 	}
 
 	private Link buildFilterLinkWithAffordances(ResourceArtifact artifact) {
-		String rel = "filter";
+		String rel = "filter_" + artifact.getCode();
 		Link findLink = buildFindLink(null).withRel(rel);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(findLink).
 					afford(HttpMethod.GET).
 					withInputAndOutput(artifact.getFormClass()).
-					withName(rel).
+					withName(findLink.getRel().value()).
 					toLink();
 		} else {
 			return Affordances.of(findLink).
 					afford(HttpMethod.GET).
-					withName(rel).
+					withName(findLink.getRel().value()).
 					toLink();
 		}
 	}

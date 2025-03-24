@@ -29,8 +29,10 @@ type ResourceApiMethods = {
     update: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     patch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     delette: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
-    onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<void>;
+    onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<any>;
     artifacts: (args: ResourceApiArtifactsArgs) => Promise<ResourceApiArtifact[]>;
+    artifactFormOnChange: (args: ResourceApiArtifactFormArgs) => Promise<any>;
+    artifactFormValidate: (args: ResourceApiArtifactFormArgs) => Promise<void>;
     action: (id: any, args: ResourceApiActionArgs) => Promise<any>;
     report: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
@@ -115,13 +117,15 @@ export type ResourceApiOnChangeArgs = ResourceApiRequestArgs & {
     fieldName?: string;
     fieldValue?: any;
     previous?: any;
-    action?: string;
-    report?: string;
-    filter?: string;
 };
 
 export type ResourceApiArtifactsArgs = ResourceApiRequestArgs & {
     includeLinks?: boolean;
+};
+
+export type ResourceApiArtifactFormArgs = ResourceApiRequestArgs & {
+    type: 'ACTION' | 'REPORT' | 'FILTER';
+    code: string;
 };
 
 export type ResourceApiActionArgs = ResourceApiRequestArgs & {
@@ -488,13 +492,11 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const onChange = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
         const onChangeData = {
-            type: args.action ? 'ACTION' : args.report ? 'REPORT' : args.filter ? 'FILTER' : undefined,
-            typeCode: args.action ?? args.report ?? args.filter,
             id,
             previous: args.previous,
             fieldName: args.fieldName,
             fieldValue: args.fieldValue,
-        }
+        };
         const requestArgs = {
             ...args,
             data: onChangeData,
@@ -550,6 +552,55 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 });
                 resolve(artifacts);
             }).catch(reject);
+        });
+    }, [request]);
+    const artifactFormOnChange = React.useCallback((args: ResourceApiArtifactFormArgs): Promise<any> => {
+        return new Promise((resolve, reject) => {
+            request('artifacts', null, { ...args }).
+                then((state: State) => {
+                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
+                    if (artifactState != null) {
+                        const onChangeLink = artifactState.links.get('formOnChange');
+                        if (onChangeLink != null) {
+                            request(onChangeLink, null, args, artifactState).
+                                then((state: State) => {
+                                    const result = state.data;
+                                    resolve(result);
+                                }).
+                                catch((error: ResourceApiError) => {
+                                    processAnswerRequiredError(
+                                        error,
+                                        null,
+                                        args,
+                                        artifactFormOnChange,
+                                        getOpenAnswerRequiredDialog()).
+                                        then(resolve).
+                                        catch(reject);
+                                });
+                        }
+                    }
+                }).
+                catch(reject);
+        });
+    }, [request]);
+    const artifactFormValidate = React.useCallback((args: ResourceApiArtifactFormArgs): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            request('artifacts', null, { ...args }).
+                then((state: State) => {
+                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
+                    if (artifactState != null) {
+                        const validateLink = artifactState.links.get('formValidate');
+                        if (validateLink != null) {
+                            request(validateLink, null, args, artifactState).
+                                then((state: State) => {
+                                    const result = state.data;
+                                    resolve(result);
+                                }).
+                                reject(reject);
+                        }
+                    }
+                }).
+                catch(reject);
         });
     }, [request]);
     const action = React.useCallback((id: any, args: ResourceApiActionArgs): Promise<any[]> => {
@@ -623,6 +674,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
         delette,
         onChange,
         artifacts,
+        artifactFormOnChange,
+        artifactFormValidate,
         action,
         report,
         fieldDownload,
