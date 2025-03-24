@@ -110,7 +110,9 @@ const DocumentsGrid: React.FC = (props:any) => {
                 if(_rows!=null && vista == "carpeta") {
                     for (const row of _rows) {
                         const aditionalRow = row.parentPath
-                            ?.filter((a: any) => a.id != row.id && !additionalRows.map((b)=>b.id).includes(a.id))
+                            ?.filter((a: any) => a.id != row.id
+                                && !additionalRows.map((b)=>b.id).includes(a.id)
+                                && !additionalRows.map((b)=>b.nom).includes(a.nom))
                         aditionalRow && additionalRows.push(...aditionalRow);
                     }
                     setTreeView(additionalRows?.length > 0)

@@ -40,10 +40,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @PostConstruct
     public void init() {
-        register("COUNT", new CountPerspectiveApplicator());
-        register("INTERESSATS_RESUM", new InteressatsPerspectiveApplicator());
-        register("metaExpedient", new MetaExpedientOnchangeLogicProcessor());
-        register("any", new AnyOnchangeLogicProcessor());
+        register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
+        register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
+        register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
     }
 
     @Override
@@ -102,6 +102,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         entity.setMetaNode(entity.getMetaExpedient());
     }
 
+    // PerspectiveApplicator
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -109,7 +110,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumTasques(entity.getTasques().size());
         }
     }
-
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -120,6 +120,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
+    // OnChangeLogicProcessor
     private class MetaExpedientOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
         @Override
         public void onChange(
@@ -159,7 +160,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
-
     private class AnyOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
         @Override
         public void onChange(

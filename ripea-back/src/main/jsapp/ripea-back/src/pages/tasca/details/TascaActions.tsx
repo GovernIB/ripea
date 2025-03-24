@@ -1,4 +1,5 @@
 import {
+    useBaseAppContext,
     useResourceApiService,
 } from "reactlib";
 import useTascaDetail from "./TascaDetail.tsx";
@@ -13,6 +14,8 @@ import {useTranslation} from "react-i18next";
 
 const useTascaActions = (refresh?: () => void) => {
     const { t } = useTranslation();
+    const {temporalMessageShow} = useBaseAppContext();
+
     const {
         action: apiAction
     } = useResourceApiService('expedientTascaResource');
@@ -34,10 +37,14 @@ const useTascaActions = (refresh?: () => void) => {
     }
 
     const changeEstat = (id:any, estat:string) => {
-        return apiAction(id,{code:'ACTION_CHANGE_ESTAT', data:{estat}})
-            .then(()=>{
+        apiAction(id,{code:'ACTION_CHANGE_ESTAT', data:{estat}})
+            .then(() => {
                 refresh?.()
+                temporalMessageShow(null, '', 'success');
             })
+            .catch((error) => {
+                temporalMessageShow('Error', error.message, 'error');
+            });
     }
 
     const actions = [

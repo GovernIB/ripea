@@ -30,13 +30,16 @@ const Expedient: React.FC = () => {
     const { id } = useParams();
 
     const {
-        isReady: appApiIsReady,
+        isReady: apiIsReady,
         getOne: appGetOne,
     } = useResourceApiService('expedientResource');
     const [expedient, setExpedient] = useState<any>();
-    if (appApiIsReady && !expedient) {
-        appGetOne(id, {perspectives: ['COUNT']}).then((app) => setExpedient(app))
-    }
+
+    React.useEffect(()=>{
+        if (apiIsReady) {
+            appGetOne(id, {perspectives: ['COUNT']}).then((app) => setExpedient(app))
+        }
+    },[apiIsReady])
 
     const border= { border: '1px solid #e3e3e3', borderRadius: 10 };
     const backgroundColor= { backgroundColor: '#f5f5f5' };

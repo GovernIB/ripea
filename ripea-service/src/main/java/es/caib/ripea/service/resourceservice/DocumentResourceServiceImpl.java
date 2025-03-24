@@ -2,14 +2,17 @@ package es.caib.ripea.service.resourceservice;
 
 import es.caib.ripea.persistence.entity.resourceentity.*;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
+    private final DocumentResourceHelper documentResourceHelper;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
 
     @PostConstruct
@@ -42,17 +46,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.Fields.adjunt, new AdjuntOnchangeLogicProcessor());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaAdjuntOnchangeLogicProcessor());
         register(DocumentResource.Fields.hasFirma, new HasFirmaOnchangeLogicProcessor());
+        register(DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE, new EnviarViaEmailActionExecutor());
     }
 
     @Override
     protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        entity.setPare(entity.getExpedient());
         beforeSave(entity, resource, answers);
 
         entity.setEstat(entity.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT);
         entity.setTipus(ContingutTipusEnumDto.DOCUMENT);
         entity.setData(new Date());
         // TODO: revisar
-        entity.setPare(entity.getExpedient());
         entity.setEntitat(entity.getMetaNode().getEntitat());
         entity.setNtiIdentificador(Long.toString(System.currentTimeMillis()));
         entity.setNtiOrgano(entity.getExpedient().getNtiOrgano());
@@ -74,6 +79,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         if (resource.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA){
             /* TODO: (PluginHelper.gestioDocumentalCreate) */
         }
+
+        entity.setFitxerNom(documentResourceHelper.getUniqueNameInPare(entity));
     }
 
     @Override
@@ -96,6 +103,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
 
+    // PerspectiveApplicator
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -141,6 +149,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
     }
 
+    // OnChangeLogicProcessor
     private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(
@@ -246,4 +255,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             }
         }
     }
+
+    // ActionExecutor
+    private class EnviarViaEmailActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarViaEmailFormAction, DocumentResource> {
+
+        @Override
+        public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarViaEmailFormAction params) throws ActionExecutionException {
+            // TODO: EnviarViaEmail
+            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        }
+
+        @Override
+        public void onChange(DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
+
+        }
+    }
+
 }
