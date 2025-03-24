@@ -86,9 +86,9 @@ export const useActionReportLogic = (
     action?: string,
     report?: string,
     confirm?: boolean,
-    formAdditionalData?: any,
+    formAdditionalDataArg?: any,
     formDialogContent?: React.ReactElement,
-    formDialogComponentProps?: any,
+    formDialogComponentPropsArg?: any,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void) => {
@@ -130,14 +130,14 @@ export const useActionReportLogic = (
             console.error('Couldn\'t generate report without code');
         }
     });
-    const handleButtonClick = (id: any) => {
+    const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
         if (hasForm) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
-            formDialogShow(
-                formDialogTitle,
-                null,
-                formAdditionalData,
-                formDialogComponentProps ?? { fullWidth: true, maxWidth: 'md' });
+            formDialogShow(null, {
+                title: dialogTitle ?? formDialogTitle,
+                additionalData: formAdditionalData ?? formAdditionalDataArg,
+                dialogComponentProps: formDialogComponentProps ?? formDialogComponentPropsArg ?? { fullWidth: true, maxWidth: 'md' }
+            });
         } else if (action != null) {
             if (confirm) {
                 const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
@@ -160,10 +160,10 @@ export const useActionReportLogic = (
     }
     const [formDialogShow, formDialogComponent] = useFormDialog(
         resourceName,
-        formDialogContent,
-        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report },
         action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
-        action ? execAction : generateReport);
+        action ? execAction : generateReport,
+        formDialogContent,
+        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
     const [artifact, setArtifact] = React.useState<any>();
     const [apiLink, setApiLink] = React.useState<any>();
     const initialized = artifact != null;
@@ -195,7 +195,8 @@ export const useActionReportLogic = (
         initialized,
         apiLink,
         formDialogComponent,
-        handleButtonClick
+        execAction,
+        generateReport: exec
     }
 }
 
@@ -224,7 +225,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         initialized,
         apiLink,
         formDialogComponent,
-        handleButtonClick,
+        execAction: handleButtonClick,
     } = useActionReportLogic(
         resourceName,
         action,

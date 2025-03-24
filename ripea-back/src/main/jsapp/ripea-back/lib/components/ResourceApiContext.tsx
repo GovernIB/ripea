@@ -12,6 +12,8 @@ export type ResourceApiUserSessionValuePair = {
     value: any;
 };
 
+export type ResourceType = 'ACTION' | 'REPORT' | 'FILTER';
+
 export type ResourceApiContextType = {
     isLoading: boolean;
     isReady: boolean;

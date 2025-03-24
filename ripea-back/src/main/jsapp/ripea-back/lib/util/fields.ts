@@ -67,3 +67,15 @@ export const formattedFieldValue = (value: any, field?: any, config?: any): stri
         return value;
     }
 }
+
+export const processApiFields = (fields: any[]) => {
+    return fields?.
+        filter(f => f != null).
+        map(f => {
+            return f.name.endsWith('*') ? {
+                ...f,
+                name: f.name.slice(0, -1),
+                onChangeActive: true,
+            } : f;
+        });
+}

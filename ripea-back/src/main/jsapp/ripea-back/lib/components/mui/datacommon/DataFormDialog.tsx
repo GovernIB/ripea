@@ -12,9 +12,9 @@ export type DataFormDialogProps = React.PropsWithChildren & {
     resourceTitle?: string;
     dialogButtons?: DialogButton[];
     dialogComponentProps?: any;
+    formComponentProps?: any;
     apiRef?: React.MutableRefObject<DataFormDialogApi | undefined>;
     formSubmit?: FormDialogSubmitFn;
-    formComponentProps?: any;
 };
 
 export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
@@ -24,23 +24,23 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         resourceTitle,
         dialogButtons,
         dialogComponentProps,
+        formComponentProps,
         apiRef,
         formSubmit,
-        formComponentProps,
         children
     } = props;
     const { t } = useBaseAppContext();
     const [formDialogShow, formDialogComponent] = useFormDialog(
         resourceName,
-        children,
-        formComponentProps,
         dialogButtons,
-        formSubmit);
-    const show = (id?: any, additionalData?: any) => formDialogShow(
-        titleProp ?? ((id != null ? t('form.dialog.update') : t('form.dialog.create')) + ' ' + (resourceTitle ?? resourceName)),
-        id,
+        formSubmit,
+        children,
+        formComponentProps);
+    const show = (id?: any, additionalData?: any) => formDialogShow(id, {
+        title: titleProp ?? ((id != null ? t('form.dialog.update') : t('form.dialog.create')) + ' ' + (resourceTitle ?? resourceName)),
         additionalData,
-        dialogComponentProps ?? { fullWidth: true, maxWidth: 'md' });
+        dialogComponentProps: dialogComponentProps ?? { fullWidth: true, maxWidth: 'md' }
+    });
     if (apiRef != null) {
         apiRef.current = { show };
     }

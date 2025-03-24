@@ -2,9 +2,7 @@ package es.caib.ripea.back.base.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ComponentNotFoundException;
@@ -15,7 +13,6 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.base.util.JsonUtil;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
@@ -23,8 +20,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,19 +37,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.groups.Default;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -77,11 +72,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		extends BaseReadonlyResourceController<R, ID>
 		implements MutableResourceController<R, ID> {
 
-	@Value("${" + PropertyConfig.HTTP_HEADER_ANSWERS + ":Bb-Answers}")
-	private String httpHeaderAnswers;
-
-	@Autowired
-	protected ObjectMapper objectMapper;
 	@Autowired
 	protected SmartValidator validator;
 
@@ -215,26 +205,13 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@RequestBody @Valid
 			final OnChangeEvent onChangeEvent) throws JsonProcessingException {
 		log.debug("Processant canvis en els camps del recurs (onChangeEvent={})", onChangeEvent);
-		Class<R> resourceClass = getResourceClass();
-		R previous = null;
-		if (onChangeEvent.getPrevious() != null) {
-			previous = (R)ReflectUtils.newInstance(resourceClass);
-			JsonUtil.getInstance().fillResourceWithFieldsMap(
-					previous,
-					JsonUtil.getInstance().fromJsonToMap(onChangeEvent.getPrevious(), resourceClass),
-					null,
-					null);
-		}
-		Object fieldValueObject = JsonUtil.getInstance().fillResourceWithFieldsMap(
-				ReflectUtils.newInstance(resourceClass),
-				null,
-				onChangeEvent.getFieldName(),
-				onChangeEvent.getFieldValue());
+		R previous = getOnChangePrevious(onChangeEvent, getResourceClass());
+		Object fieldValue = getOnChangeFieldValue(onChangeEvent, getResourceClass());
 		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
 		Map<String, Object> processat = getMutableResourceService().onChange(
 				previous,
 				onChangeEvent.getFieldName(),
-				fieldValueObject,
+				fieldValue,
 				answers);
 		if (processat != null) {
 			String serialized = objectMapper.writeValueAsString(new OnChangeForSerialization(processat));
@@ -362,9 +339,9 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				id,
 				code,
 				params);
+		Class<?> formClass = getArtifactFormClass(ResourceArtifactType.ACTION, code);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
-				ResourceArtifactType.ACTION,
-				code,
+				formClass,
 				params,
 				bindingResult);
 		Serializable result = getMutableResourceService().artifactActionExec(id, code, paramsObject);
@@ -577,10 +554,32 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 
 	@Override
+	protected List<Link> buildSingleResourceArtifactLinks(Serializable id) {
+		List<Link> superLinks = super.buildSingleResourceArtifactLinks(id);
+		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
+		List<Link> links = artifacts.stream().
+				filter(a -> a.getType() == ResourceArtifactType.ACTION && a.getRequiresId() != null && a.getRequiresId()).
+				map(a -> buildActionLinkWithAffordances(a, id)).
+				collect(Collectors.toList());
+		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
+	}
+
+	@Override
+	protected List<Link> buildResourceCollectionArtifactLinks() {
+		List<Link> superLinks = super.buildResourceCollectionArtifactLinks();
+		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
+		List<Link> links = artifacts.stream().
+				filter(a -> a.getType() == ResourceArtifactType.ACTION && (a.getRequiresId() == null || !a.getRequiresId())).
+				map(a -> buildActionLinkWithAffordances(a, null)).
+				collect(Collectors.toList());
+		return Stream.concat(superLinks.stream(), links.stream()).collect(Collectors.toList());
+	}
+
+	@Override
 	protected Link[] buildSingleArtifactLinks(ResourceArtifact artifact) {
 		List<Link> links = new ArrayList<>(Arrays.asList(super.buildSingleArtifactLinks(artifact)));
 		if (artifact.getType() == ResourceArtifactType.ACTION) {
-			links.add(buildActionLinkWithAffordances(artifact));
+			links.add(buildActionLinkWithAffordances(artifact, null));
 		}
 		return links.toArray(new Link[0]);
 	}
@@ -621,58 +620,6 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		}
 	}
 
-	protected Map<String, AnswerRequiredException.AnswerValue> getAnswersFromHeaderOrRequest(
-			Map<String, Object> requestAnswers) {
-		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-		if (requestAttributes instanceof ServletRequestAttributes) {
-			HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
-			Map<String, AnswerRequiredException.AnswerValue> answers = new HashMap<>();
-			if (requestAnswers != null) {
-				Map<String, AnswerRequiredException.AnswerValue> answersFromRequest = requestAnswers.entrySet().stream().
-						collect(Collectors.toMap(
-								Map.Entry::getKey,
-								e -> {
-									if (e.getValue() == null) {
-										return new AnswerRequiredException.AnswerValue();
-									} else if (e.getValue() instanceof Boolean) {
-										return new AnswerRequiredException.AnswerValue((Boolean)e.getValue());
-									} else {
-										return new AnswerRequiredException.AnswerValue(e.getValue().toString());
-									}
-								}));
-				answers = new HashMap<>(answersFromRequest);
-			}
-			String headerAnswers = request.getHeader(httpHeaderAnswers);
-			if (headerAnswers != null) {
-				try {
-					JsonNode headerAnswersJson = objectMapper.readTree(headerAnswers);
-					Map<String, Object> headerAnswersMap = objectMapper.convertValue(
-							headerAnswersJson,
-							new TypeReference<>(){});
-					Map<String, AnswerRequiredException.AnswerValue> answersFromHeader = headerAnswersMap.entrySet().stream().
-							collect(Collectors.toMap(
-									Map.Entry::getKey,
-									e -> {
-										if (e.getValue() == null) {
-											return new AnswerRequiredException.AnswerValue();
-										} else if (e.getValue() instanceof Boolean) {
-											return new AnswerRequiredException.AnswerValue((Boolean)e.getValue());
-										} else {
-											return new AnswerRequiredException.AnswerValue(e.getValue().toString());
-										}
-									}));
-					answers.putAll(answersFromHeader);
-				} catch (JsonProcessingException ex) {
-					log.warn("Error al parsejar la capçalera {}", httpHeaderAnswers, ex);
-					return null;
-				}
-			}
-			return answers;
-		} else {
-			return null;
-		}
-	}
-
 	private void updateResourceIdAndPk(
 			ID id,
 			R resource) {
@@ -691,16 +638,16 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 
 	@SneakyThrows
-	private Link buildActionLink(ResourceArtifact artifact) {
+	private Link buildActionLink(ResourceArtifact artifact, Serializable id) {
 		String rel = "exec_" + artifact.getCode();
 		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-			return linkTo(methodOn(getClass()).artifactActionExec(null, artifact.getCode(), null, null)).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactActionExec(id, artifact.getCode(), null, null)).withRel(rel);
 		} else {
 			return linkTo(methodOn(getClass()).artifactActionExec(artifact.getCode(), null, null)).withRel(rel);
 		}
 	}
-	private Link buildActionLinkWithAffordances(ResourceArtifact artifact) {
-		Link actionLink = buildActionLink(artifact);
+	private Link buildActionLinkWithAffordances(ResourceArtifact artifact, Serializable id) {
+		Link actionLink = buildActionLink(artifact, id);
 		if (artifact.getFormClass() != null) {
 			return Affordances.of(actionLink).
 					afford(HttpMethod.POST).

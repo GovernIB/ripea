@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.back.base.error;
 
-import java.lang.reflect.Field;
-import java.util.Objects;
-
+import es.caib.ripea.service.intf.base.exception.*;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,14 +25,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
-import es.caib.ripea.service.intf.base.exception.NotFoundException;
-import es.caib.ripea.service.intf.base.exception.ResourceAlreadyExistsException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * Tractament global de les excepcions en els controladors.
@@ -40,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Límit Tecnologies
  */
 @Slf4j
-@ControllerAdvice(basePackages = {"es.caib.ripea.back.base.controller"})
+@ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	public static final String REQUEST_PARAM_TRACE = "trace";

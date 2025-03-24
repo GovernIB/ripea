@@ -26,8 +26,10 @@ public class MetaExpedientTascaResourceEntity extends BaseAuditableEntity<MetaEx
     private String nom;
     @Column(name = "descripcio", length = 1024, nullable = false)
     private String descripcio;
-    @Column(name = "responsable", length = 64)
-    private String responsable;
+
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "responsable")
+    protected UsuariResourceEntity responsable;
     @Column(name = "activa", nullable = false)
     private boolean activa;
     @Temporal(TemporalType.DATE)

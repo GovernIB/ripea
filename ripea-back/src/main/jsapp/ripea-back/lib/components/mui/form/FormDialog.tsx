@@ -10,40 +10,54 @@ type FormDialogProps = DialogProps & {
     id?: any;
     additionalData?: any;
     apiRef?: React.MutableRefObject<FormApi>;
+    dialogComponentProps?: any;
     formComponentProps?: any;
     noForm?: boolean;
 };
 
 export type FormDialogSubmitFn = (data?: any) => Promise<React.ReactElement | undefined>;
-export type FormDialogShowFn = (title: string | null, id: any, additionalData?: any, componentProps?: any) => Promise<any>;
+export type FormDialogShowArgs = {
+    title?: string;
+    additionalData?: any;
+    formContent?: React.ReactNode;
+    dialogComponentProps?: any;
+    formComponentProps?: any;
+};
+export type FormDialogShowFn = (id: any, args?: FormDialogShowArgs) => Promise<any>;
 export type UseFormDialogFn = (
     resourceName: string,
-    formContent: React.ReactNode,
-    formComponentProps?: any,
     dialogButtons?: DialogButton[],
-    submit?: FormDialogSubmitFn) => [FormDialogShowFn, React.ReactElement];
+    customSubmit?: FormDialogSubmitFn,
+    defaultFormContent?: React.ReactNode,
+    defaultDialogComponentProps?: any,
+    defaultFormComponentProps?: any) => [FormDialogShowFn, React.ReactElement];
 
 export const useFormDialog: UseFormDialogFn = (
     resourceName: string,
-    formContent: React.ReactNode,
-    formComponentProps?: any,
     dialogButtons?: DialogButton[],
-    submit?: FormDialogSubmitFn) => {
+    customSubmit?: FormDialogSubmitFn,
+    defaultFormContent?: React.ReactNode,
+    defaultDialogComponentProps?: any,
+    defaultFormComponentProps?: any) => {
     const formApiRef = React.useRef<FormApi | any>({});
     const formDialogButtons = useFormDialogButtons();
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
     const [id, setId] = React.useState<any>();
     const [additionalData, setAdditionalData] = React.useState<any>();
-    const [componentProps, setComponentProps] = React.useState<any>();
+    const [dialogComponentProps, setDialogComponentProps] = React.useState<any>(defaultDialogComponentProps);
+    const [formComponentProps, setFormComponentProps] = React.useState<any>(defaultFormComponentProps);
     const [resolveFn, setResolveFn] = React.useState<(value?: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value: any) => void>();
+    const [formContent, setFormContent] = React.useState<React.ReactNode | undefined>(defaultFormContent);
     const [submitReturnedContent, setSubmitReturnedContent] = React.useState<React.ReactNode | undefined>();
-    const show = (title: string | null, id: any, additionalData?: any, componentProps?: any) => {
-        setTitle(title);
+    const show = (id: any, args?: FormDialogShowArgs) => {
         setId(id);
-        setAdditionalData(additionalData);
-        setComponentProps(componentProps);
+        setTitle(args?.title);
+        args?.formContent != null && setFormContent(formContent);
+        args?.additionalData != null && setAdditionalData(additionalData);
+        args?.dialogComponentProps != null && setDialogComponentProps(dialogComponentProps);
+        args?.formComponentProps != null && setFormComponentProps(formComponentProps);
         setOpen(true);
         setSubmitReturnedContent(undefined);
         return new Promise<any>((resolve, reject) => {
@@ -53,8 +67,8 @@ export const useFormDialog: UseFormDialogFn = (
     }
     const buttonCallback = (value: any) => {
         if (value) {
-            const isCustomSubmit = submit != null;
-            const result = isCustomSubmit ? submit(formApiRef.current.getData()) : formApiRef.current.save();
+            const isCustomSubmit = customSubmit != null;
+            const result = isCustomSubmit ? customSubmit(formApiRef.current.getData()) : formApiRef.current.save();
             result.then((value: any) => {
                 if (isCustomSubmit) {
                     // S'ha fet click al botó executar/generar i s'ha executat/generat correctament
@@ -95,7 +109,7 @@ export const useFormDialog: UseFormDialogFn = (
         closeCallback={closeCallback}
         title={title}
         buttons={dialogButtons ?? formDialogButtons}
-        componentProps={componentProps}
+        dialogComponentProps={dialogComponentProps}
         formComponentProps={formComponentProps}
         noForm={submitReturnedContent != null}>
         {submitReturnedContent ?? formContent}
@@ -109,12 +123,13 @@ export const FormDialog: React.FC<FormDialogProps> = (props) => {
         id,
         additionalData,
         apiRef,
+        dialogComponentProps,
         formComponentProps,
         noForm,
         children,
         ...otherProps
     } = props;
-    return <Dialog {...otherProps}>
+    return <Dialog componentProps={dialogComponentProps} {...otherProps}>
         {noForm ? children : <MuiForm
             {...formComponentProps}
             resourceName={resourceName}

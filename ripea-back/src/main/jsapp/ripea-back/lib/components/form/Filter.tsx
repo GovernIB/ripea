@@ -53,10 +53,14 @@ export const Filter: React.FC<FilterProps> = (props) => {
         formApiRefProp.current = formApiRef.current;
     }
     const filter = (data?: any) => {
-        const formData = data ?? formApiRef.current?.getData();
-        const springFilter = springFilterBuilder(formData);
-        onSpringFilterChange?.(springFilter);
-        onDataChange?.(formData);
+        formApiRef.current.validate().
+            then(() => {
+                const formData = data ?? formApiRef.current?.getData();
+                console.log('>>> filter', formData)
+                const springFilter = springFilterBuilder(formData);
+                onSpringFilterChange?.(springFilter);
+                onDataChange?.(formData);
+            });
     }
     const clear = () => {
         setNextDataChangeAsUncontrolled(true);
@@ -66,8 +70,8 @@ export const Filter: React.FC<FilterProps> = (props) => {
         if (nextDataChangeAsUncontrolled) {
             setNextDataChangeAsUncontrolled(false);
             filter(data);
-        } else {
-            !buttonControlled && filter(data);
+        } else if (!buttonControlled) {
+            filter(data);
         }
     }
     const fieldTypeMap = new Map<string, string>([
@@ -94,7 +98,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
     return <FilterContext.Provider value={context}>
         <Form
             resourceName={resourceName}
-            resourceType='filter'
+            resourceType='FILTER'
             resourceTypeCode={code}
             onDataChange={handleDataChange}
             fieldTypeMap={fieldTypeMap}

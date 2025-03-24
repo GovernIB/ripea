@@ -90,6 +90,9 @@ const componentsEn = {
             create: 'Create',
             update: 'Update',
         },
+        validate: {
+            error: 'Validation error',
+        },
     },
     grid: {
         selection: {

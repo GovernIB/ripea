@@ -15,6 +15,7 @@ import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -30,10 +31,16 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_PATH_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
+                        formClass = DocumentResource.EnviarViaEmailFormAction.class,
+                        requiresId = true),
         })
 public class DocumentResource extends NodeResource {
 
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
+    public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
 
 	@NotNull
 	private DocumentTipusEnumDto documentTipus = DocumentTipusEnumDto.DIGITAL;
@@ -159,5 +166,12 @@ public class DocumentResource extends NodeResource {
             this.createdDate = createdDate;
             this.tipus = tipus;
         }
+    }
+
+    @Getter
+    @Setter
+    public static class EnviarViaEmailFormAction implements Serializable {
+        private String email;
+        private List<ResourceReference<UsuariResource, String>> responsables;
     }
 }
