@@ -206,7 +206,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			final OnChangeEvent onChangeEvent) throws JsonProcessingException {
 		log.debug("Processant canvis en els camps del recurs (onChangeEvent={})", onChangeEvent);
 		R previous = getOnChangePrevious(onChangeEvent, getResourceClass());
-		Object fieldValue = getOnChangeFieldValue(onChangeEvent);
+		Object fieldValue = getOnChangeFieldValue(onChangeEvent, getResourceClass());
 		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
 		Map<String, Object> processat = getMutableResourceService().onChange(
 				previous,

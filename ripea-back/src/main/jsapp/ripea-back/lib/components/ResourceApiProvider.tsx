@@ -17,6 +17,7 @@ import ResourceApiContext, {
     useResourceApiContext,
     OpenAnswerRequiredDialogFn,
     ResourceApiUserSessionValuePair,
+    ResourceType,
 } from './ResourceApiContext';
 
 const LOG_PREFIX = 'RAPI';
@@ -31,7 +32,7 @@ type ResourceApiMethods = {
     delette: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
     onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<any>;
     artifacts: (args: ResourceApiArtifactsArgs) => Promise<ResourceApiArtifact[]>;
-    artifactFormOnChange: (args: ResourceApiArtifactFormArgs) => Promise<any>;
+    artifactFormOnChange: (args: ResourceApiArtifactOnChangeArgs) => Promise<any>;
     artifactFormValidate: (args: ResourceApiArtifactFormArgs) => Promise<void>;
     action: (id: any, args: ResourceApiActionArgs) => Promise<any>;
     report: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
@@ -102,7 +103,7 @@ export type ResourceApiBlobResponse = {
 };
 
 export type ResourceApiArtifact = {
-    type: 'ACTION' | 'REPORT' | 'FILTER';
+    type: ResourceType;
     code: string;
     formClassActive: boolean;
     fields?: any[];
@@ -124,9 +125,11 @@ export type ResourceApiArtifactsArgs = ResourceApiRequestArgs & {
 };
 
 export type ResourceApiArtifactFormArgs = ResourceApiRequestArgs & {
-    type: 'ACTION' | 'REPORT' | 'FILTER';
+    type: ResourceType;
     code: string;
 };
+
+export type ResourceApiArtifactOnChangeArgs = ResourceApiArtifactFormArgs & ResourceApiOnChangeArgs;
 
 export type ResourceApiActionArgs = ResourceApiRequestArgs & {
     code: string;
@@ -497,12 +500,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
             fieldName: args.fieldName,
             fieldValue: args.fieldValue,
         };
-        const requestArgs = {
-            ...args,
-            data: onChangeData,
-        };
         return new Promise((resolve, reject) => {
-            request('onChange', null, requestArgs).
+            request('onChange', null, { ...args, data: onChangeData }).
                 then((state: State) => {
                     resolve(state.data);
                 }).
@@ -554,7 +553,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
             }).catch(reject);
         });
     }, [request]);
-    const artifactFormOnChange = React.useCallback((args: ResourceApiArtifactFormArgs): Promise<any> => {
+    const artifactFormOnChange = React.useCallback((args: ResourceApiArtifactOnChangeArgs): Promise<any> => {
         return new Promise((resolve, reject) => {
             request('artifacts', null, { ...args }).
                 then((state: State) => {
@@ -562,7 +561,12 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     if (artifactState != null) {
                         const onChangeLink = artifactState.links.get('formOnChange');
                         if (onChangeLink != null) {
-                            request(onChangeLink, null, args, artifactState).
+                            const onChangeData = {
+                                previous: args.previous,
+                                fieldName: args.fieldName,
+                                fieldValue: args.fieldValue,
+                            };
+                            request(onChangeLink.rel, null, { ...args, data: onChangeData }, artifactState).
                                 then((state: State) => {
                                     const result = state.data;
                                     resolve(result);
@@ -591,12 +595,12 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     if (artifactState != null) {
                         const validateLink = artifactState.links.get('formValidate');
                         if (validateLink != null) {
-                            request(validateLink, null, args, artifactState).
+                            request(validateLink.rel, null, args, artifactState).
                                 then((state: State) => {
                                     const result = state.data;
                                     resolve(result);
                                 }).
-                                reject(reject);
+                                catch(reject);
                         }
                     }
                 }).

@@ -140,6 +140,7 @@ public class ExpedientResource extends NodeResource {
 	@RequiredArgsConstructor
     @FieldNameConstants
 	public static class ExpedientFilterForm implements Serializable {
+		@NotNull
         private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;

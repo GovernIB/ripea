@@ -96,6 +96,9 @@ const componentsCa = {
             create: 'Crear',
             update: 'Modificar',
         },
+        validate: {
+            error: 'Error de validació',
+        },
     },
     buttons: {
         answerRequired: {

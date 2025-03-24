@@ -282,6 +282,40 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	@Override
+	@PatchMapping(value = "/artifacts/{type}/{code}/onChange", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Processa els canvis en els camps del formulari d'un artefacte")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public ResponseEntity<String> artifactFormOnChange(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@RequestBody @Valid
+			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException {
+		log.debug("Validació del formulari d'un artefacte (type={}, code={}, onChangeEvent={})", type, code, onChangeEvent);
+		Class<? extends Serializable> artifactFormClass = getArtifactFormClass(type, code);
+		Serializable previous = getOnChangePrevious(onChangeEvent, artifactFormClass);
+		Object fieldValue = getOnChangeFieldValue(onChangeEvent, artifactFormClass);
+		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
+		Map<String, Object> processat = getReadonlyResourceService().artifactOnChange(
+				type,
+				code,
+				previous,
+				onChangeEvent.getFieldName(),
+				fieldValue,
+				answers);
+		if (processat != null) {
+			String serialized = objectMapper.writeValueAsString(new BaseMutableResourceController.OnChangeForSerialization(processat));
+			String response = serialized.substring(serialized.indexOf("\":{") + 2, serialized.length() - 1);
+			return ResponseEntity.ok(response);
+		} else {
+			return ResponseEntity.ok("{}");
+		}
+	}
+
+	@Override
 	@PostMapping("/artifacts/{type}/{code}/validate")
 	@Operation(summary = "Validació del formulari d'un artefacte")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
@@ -301,41 +335,6 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				params,
 				bindingResult);
 		return ResponseEntity.ok().build();
-	}
-
-	@Override
-	@PatchMapping(value = "/artifacts/{type}/{code}/onChange", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Processa els canvis en els camps del formulari d'un artefacte")
-	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
-	public ResponseEntity<String> artifactFormOnChange(
-			@PathVariable
-			@Parameter(description = "Tipus de l'artefacte")
-			final ResourceArtifactType type,
-			@PathVariable
-			@Parameter(description = "Codi de l'artefacte")
-			final String code,
-			@RequestBody @Valid
-			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException {
-		log.debug("Validació del formulari d'un artefacte (type={}, code={}, onChangeEvent={})", type, code, onChangeEvent);
-		Serializable previous = getOnChangePrevious(
-				onChangeEvent,
-				getArtifactFormClass(type, code));
-		Object fieldValue = getOnChangeFieldValue(onChangeEvent);
-		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
-		Map<String, Object> processat = getReadonlyResourceService().artifactOnChange(
-				type,
-				code,
-				previous,
-				onChangeEvent.getFieldName(),
-				fieldValue,
-				answers);
-		if (processat != null) {
-			String serialized = objectMapper.writeValueAsString(new BaseMutableResourceController.OnChangeForSerialization(processat));
-			String response = serialized.substring(serialized.indexOf("\":{") + 2, serialized.length() - 1);
-			return ResponseEntity.ok(response);
-		} else {
-			return ResponseEntity.ok("{}");
-		}
 	}
 
 	@Override
@@ -673,7 +672,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return previous;
 	}
 
-	protected Object getOnChangeFieldValue(OnChangeEvent onChangeEvent) {
+	protected <P extends Serializable> Object getOnChangeFieldValue(
+			OnChangeEvent onChangeEvent,
+			Class<P> resourceClass) {
 		return JsonUtil.getInstance().fillResourceWithFieldsMap(
 				ReflectUtils.newInstance(resourceClass),
 				null,
@@ -1084,13 +1085,6 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Link selfLink = linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel();
 		links.add(selfLink);
 		if (artifact.getFormClass() != null) {
-			Link formValidateLink = Affordances.
-					of(linkTo(methodOn(getClass()).artifactFormValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("formValidate")).
-					afford(HttpMethod.POST).
-					withInputAndOutput(artifact.getFormClass()).
-					withName("formValidate").
-					toLink();
-			links.add(formValidateLink);
 			Link onChangeLink = Affordances.
 					of(linkTo(methodOn(getClass()).artifactFormOnChange(artifact.getType(), artifact.getCode(), null)).withRel("formOnChange")).
 					afford(HttpMethod.PATCH).
@@ -1098,6 +1092,13 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					withName("formOnChange").
 					toLink();
 			links.add(onChangeLink);
+			Link formValidateLink = Affordances.
+					of(linkTo(methodOn(getClass()).artifactFormValidate(artifact.getType(), artifact.getCode(), null, null)).withRel("formValidate")).
+					afford(HttpMethod.POST).
+					withInputAndOutput(artifact.getFormClass()).
+					withName("formValidate").
+					toLink();
+			links.add(formValidateLink);
 		}
 		if (artifact.getType() == ResourceArtifactType.FILTER) {
 			links.add(buildFilterLinkWithAffordances(artifact));

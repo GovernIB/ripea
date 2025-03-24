@@ -2,8 +2,10 @@ import React from 'react';
 import { useBaseAppContext } from '../BaseAppContext';
 import {
     ResourceApiError,
+    ResourceApiOnChangeArgs,
     useResourceApiService,
 } from '../ResourceApiProvider';
+import { ResourceType } from '../ResourceApiContext';
 import { useConfirmDialogButtons } from '../AppButtons';
 import { processApiFields } from '../../util/fields';
 import useLogConsole from '../../util/useLogConsole';
@@ -14,7 +16,6 @@ import ResourceApiFormContext, {
     FormFieldError,
     FormFieldDataAction,
     FormFieldDataActionType,
-    FormResourceType,
     useFormContext
 } from './FormContext';
 
@@ -23,7 +24,7 @@ const LOG_PREFIX = 'FORM';
 export type FormProps = React.PropsWithChildren & {
     title?: string;
     resourceName: string;
-    resourceType?: FormResourceType;
+    resourceType?: ResourceType;
     resourceTypeCode?: string;
     id?: any;
     apiRef?: FormApiRef;
@@ -142,6 +143,8 @@ export const Form: React.FC<FormProps> = (props) => {
         update: apiUpdate,
         delette: apiDelete,
         artifacts: apiArtifacts,
+        artifactFormOnChange: apiArtifactFormOnChange,
+        artifactFormValidate: apiArtifactFormValidate
     } = useResourceApiService(resourceName);
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
@@ -156,27 +159,42 @@ export const Form: React.FC<FormProps> = (props) => {
     const isSaveActionPresent = apiActions?.[id != null ? 'update' : 'create'] != null;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
     const calculatedId = (id?: any) => idFromExternalResetRef.current ?? id;
+    const sendOnChangeRequest = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
+        if (resourceType == null) {
+            return apiOnChange(id, args);
+        } else if (resourceTypeCode != null) {
+            const artifactArgs = {
+                type: resourceType,
+                code: resourceTypeCode,
+                ...args
+            };
+            return apiArtifactFormOnChange(artifactArgs);
+        } else {
+            return new Promise((_resolve, reject) => reject('Couldn\'t send artifact onChange request: empty resource type code'));
+        }
+    }, [apiOnChange, resourceType, resourceTypeCode, apiArtifactFormOnChange]);
     const onChangeActionMiddleware = React.useCallback((state: any, action: FormFieldDataAction) => {
         if (action.type === FormFieldDataActionType.FIELD_CHANGE) {
             const { field, fieldName, value: fieldValue } = action.payload;
             if (field?.onChangeActive) {
                 return new Promise<FormFieldDataAction>((resolve, reject) => {
-                    const resourceTypeArg = resourceType ? { [resourceType]: resourceTypeCode } : {};
-                    apiOnChange(calculatedId(id), {
-                        ...resourceTypeArg,
+                    const onChangeArgs = {
                         fieldName,
                         fieldValue,
                         previous: state,
-                    }).then((changes: any) => {
-                        resolve({
-                            type: action.type,
-                            payload: { ...action.payload, changes }
-                        });
-                    }).catch(reject);
+                    };
+                    sendOnChangeRequest(calculatedId(id), onChangeArgs).
+                        then((changes: any) => {
+                            resolve({
+                                type: action.type,
+                                payload: { ...action.payload, changes }
+                            });
+                        }).
+                        catch(reject);
                 });
             }
         }
-    }, [id, apiOnChange, resourceType, resourceTypeCode]);
+    }, [id, sendOnChangeRequest]);
     const [data, dataDispatchAction] = useReducerWithActionMiddleware<FormFieldDataAction>(
         formDataReducer,
         {},
@@ -190,12 +208,12 @@ export const Form: React.FC<FormProps> = (props) => {
         // Si és un formulari de creació obté les dades dels camps
         const initialData = id != null ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
         const mergedData = { ...initialData, ...additionalData };
-        return initOnChangeRequest ? await apiOnChange(id, { previous: mergedData }) : mergedData;
-    }, [apiGetOne, apiOnChange]);
+        return initOnChangeRequest ? await sendOnChangeRequest(id, { previous: mergedData }) : mergedData;
+    }, [apiGetOne, sendOnChangeRequest]);
     const processSubmitError = (
         error: ResourceApiError,
         temporalMessageTitle: string,
-        reject: (reason: any) => void) => {
+        reject?: (reason: any) => void) => {
         // S'ignoren els errors de tipus cancel·lació
         if (!error.body?.modificationCanceledError) {
             // Quan es produeixen errors es fa un reject de la promesa.
@@ -205,7 +223,7 @@ export const Form: React.FC<FormProps> = (props) => {
             const errorToShow = processValidationErrors(error, setFieldErrors);
             if (errorToShow != null) {
                 temporalMessageShow(temporalMessageTitle, error.message, 'error');
-                reject(errorToShow);
+                reject?.(errorToShow);
             }
         }
     }
@@ -236,10 +254,11 @@ export const Form: React.FC<FormProps> = (props) => {
         // Versió de reset per a cridar externament mitjançant l'API
         const mergedData = { ...(data ?? getInitialDataFromFields(fields)), ...additionalData };
         if (initOnChangeRequest) {
-            apiOnChange(id, { previous: mergedData }).then((changedData: any) => {
-                reset(changedData);
-                idFromExternalResetRef.current = id;
-            });
+            sendOnChangeRequest(id, { previous: mergedData }).
+                then((changedData: any) => {
+                    reset(changedData);
+                    idFromExternalResetRef.current = id;
+                });
         } else {
             reset(mergedData);
             idFromExternalResetRef.current = id;
@@ -266,6 +285,22 @@ export const Form: React.FC<FormProps> = (props) => {
                 });
         }
     }
+    const validate = () => new Promise<any>((resolve, reject) => {
+        if (resourceType != null) {
+            if (resourceTypeCode != null) {
+                apiArtifactFormValidate({ type: resourceType, code: resourceTypeCode, data }).
+                    then(resolve).
+                    catch((error: ResourceApiError) => {
+                        processSubmitError(error, t('form.validate.error'), reject)
+                    });
+            } else {
+                reject('Couldn\'t send artifact validate request: empty resource type code');
+                console.error()
+            }
+        } else {
+            reject('Form validation only available in form artifacts');
+        }
+    });
     const save = () => new Promise<any>((resolve, reject) => {
         if (resourceType == null) {
             const calcId = calculatedId(id);
@@ -377,6 +412,7 @@ export const Form: React.FC<FormProps> = (props) => {
         refresh,
         reset: externalReset,
         revert,
+        validate,
         save,
         delete: delette,
         setFieldValue,
@@ -387,6 +423,7 @@ export const Form: React.FC<FormProps> = (props) => {
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.reset = externalReset;
             apiRefProp.current.revert = revert;
+            apiRefProp.current.validate = validate;
             apiRefProp.current.save = save;
             apiRefProp.current.delete = delette;
             apiRefProp.current.setFieldValue = setFieldValue;
