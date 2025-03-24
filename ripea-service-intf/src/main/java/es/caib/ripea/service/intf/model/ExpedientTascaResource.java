@@ -44,12 +44,12 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REBUTJAR_CODE,
-                        formClass = ExpedientTascaResource.RebutjarFormAction.class,
+                        formClass = ExpedientTascaResource.MotiuFormAction.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_RETOMAR_CODE,
-                        formClass = ExpedientTascaResource.RetomarFormAction.class,
+                        formClass = ExpedientTascaResource.MotiuFormAction.class,
                         requiresId = true),
         })
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {
@@ -107,23 +107,14 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     @Getter
     @Setter
-    public static class ReobrirFormAction implements Serializable {
+    public static class ReobrirFormAction extends MotiuFormAction {
         @NotNull
         private ResourceReference<UsuariResource, String> responsableActual;
-        private String motiu;
     }
 
     @Getter
     @Setter
-    public static class RetomarFormAction implements Serializable {
+    public static class MotiuFormAction implements Serializable {
         private String motiu;
-    }
-
-    @Getter
-    @Setter
-    public static class RebutjarFormAction implements Serializable {
-        @NotNull
-        private TascaEstatEnumDto estat;
-        private String motiuRebuig;
     }
 }

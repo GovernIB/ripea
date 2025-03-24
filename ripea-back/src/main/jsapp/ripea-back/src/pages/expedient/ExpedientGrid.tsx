@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
     GridPage,
     MuiGrid,
@@ -9,7 +8,6 @@ import { Box, Typography, Icon, Grid } from "@mui/material";
 import { formatDate } from '../../util/dateUtils';
 import { useNavigate } from "react-router-dom";
 import { ExpedientCommentDialog as CommentDialog} from "../CommentDialog.tsx";
-import ExpedientFilter from "./ExpedientFilter.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import { useCommonActions } from "./details/CommonActions.tsx";
 import {useTranslation} from "react-i18next";
@@ -29,7 +27,7 @@ const ExpedientGridForm = () => {
     </Grid>
 }
 
-const ExpedientGrid: React.FC = () => {
+const ExpedientGrid = () => {
     const { t } = useTranslation();
     let navigate = useNavigate();
 

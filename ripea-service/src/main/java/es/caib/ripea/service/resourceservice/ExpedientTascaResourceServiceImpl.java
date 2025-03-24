@@ -113,8 +113,14 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                 resourceOptional.ifPresent((resource) -> {
                     target.setDuracio(resource.getDuracio());
                     target.setPrioritat(resource.getPrioritat());
-                    target.setResponsableActual(ResourceReference.toResourceReference(resource.getResponsable()));
                     target.setMetaExpedientTascaDescription(resource.getDescripcio());
+
+                    if(resource.getResponsable()!=null){
+                        target.setResponsableActual(ResourceReference.toResourceReference(
+                                resource.getResponsable().getCodi(),
+                                resource.getResponsable().getCodiAndNom()
+                        ));
+                    }
                 });
             } else {
                 target.setDuracio(null);
@@ -182,8 +188,8 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private void changeEstat(ExpedientTascaResourceEntity entity, TascaEstatEnumDto estat){
         switch (estat){
             case INICIADA:
-//                    SecurityContextHolder.getContext().getAuthentication().getName()
-//                    resource.setResponsableActual(ResourceReference.toResourceReference());
+                usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+                        .ifPresent(entity::setResponsableActual);
                 break;
             case AGAFADA:
                 break;
@@ -214,18 +220,18 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
         }
     }
-    private class RebutjarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.RebutjarFormAction, ExpedientTascaResource> {
+    private class RebutjarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.MotiuFormAction, ExpedientTascaResource> {
 
         @Override
-        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.RebutjarFormAction params) throws ActionExecutionException {
-            changeEstat(entity, params.getEstat());
-            entity.setMotiuRebuig(params.getMotiuRebuig());
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.MotiuFormAction params) throws ActionExecutionException {
+            changeEstat(entity, TascaEstatEnumDto.REBUTJADA);
+            entity.setMotiuRebuig(params.getMotiu());
             expedientTascaResourceRepository.save(entity);
             return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.RebutjarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.RebutjarFormAction target) {
+        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
 
         }
     }
@@ -251,10 +257,10 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
         }
     }
-    private class RetomarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.RetomarFormAction, ExpedientTascaResource> {
+    private class RetomarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.MotiuFormAction, ExpedientTascaResource> {
 
         @Override
-        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.RetomarFormAction params) throws ActionExecutionException {
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.MotiuFormAction params) throws ActionExecutionException {
             if (params.getMotiu() != null) {
                 ExpedientTascaComentariResourceEntity expedientTascaComentariResourceEntity = new ExpedientTascaComentariResourceEntity();
                 expedientTascaComentariResourceEntity.setText(params.getMotiu());
@@ -268,7 +274,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.RetomarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.RetomarFormAction target) {
+        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
 
         }
     }

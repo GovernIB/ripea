@@ -146,9 +146,9 @@ public class ExpedientResource extends NodeResource {
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
-        @ResourceField(onChangeActive = true)
+//        @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioInici = LocalDateTime.now();
-        @ResourceField(onChangeActive = true)
+//        @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
 
         private String numeroRegistre;
