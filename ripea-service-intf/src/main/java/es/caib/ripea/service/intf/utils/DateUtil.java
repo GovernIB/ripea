@@ -1,7 +1,13 @@
 package es.caib.ripea.service.intf.utils;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 public class DateUtil {
 	
@@ -26,6 +32,21 @@ public class DateUtil {
 		return endOfDay(data).getTime();
 	}
 	
+	public static LocalDateTime toDateFinalDia(LocalDateTime data) {
+		if (data == null) {
+			return null;
+		}
+		return data.withHour(23)
+                .withMinute(59)
+                .withSecond(59)
+                .withNano(999999999);
+	}
+	
+	public static LocalDateTime getLocalDateTimeFromDate(Date date) {
+		if (date==null) return null;
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	}
+	
 	public static Calendar endOfDay(Calendar cal) {
 		cal.set(Calendar.HOUR_OF_DAY, 23);
 		cal.set(Calendar.MINUTE, 59);
@@ -40,7 +61,6 @@ public class DateUtil {
 		endOfDay(cal);
 		return cal;
 	}
-
 
 	public static Date toStartOfTheMonth(Date data) {
 		if (data == null) {

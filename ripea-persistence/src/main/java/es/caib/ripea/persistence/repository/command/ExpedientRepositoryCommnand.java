@@ -1,23 +1,30 @@
 package es.caib.ripea.persistence.repository.command;
 
-import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.utils.DateUtil;
-import es.caib.ripea.service.intf.utils.Utils;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.utils.DateUtil;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
@@ -517,8 +524,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final String usuariActual;
         private final MetaExpedientEntity metaExpedient;
         private final String nom;
-        private final Date creacioInici;
-        private final Date creacioFi;
+        private final LocalDateTime creacioInici;
+        private final LocalDateTime creacioFi;
         private final Pageable pageable;
 
         public ExpedientByArxiuPendentCommand(Map<String, Object> params) {
@@ -527,8 +534,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.usuariActual = (String) params.get("usuariActual");
             this.metaExpedient = (MetaExpedientEntity) params.get("metaExpedient");
             this.nom = (String) params.get("nom");
-            this.creacioInici = (Date) params.get("creacioInici");
-            this.creacioFi = (Date) params.get("creacioFi");
+            this.creacioInici = (LocalDateTime) params.get("creacioInici");
+            this.creacioFi = (LocalDateTime) params.get("creacioFi");
             this.pageable = (Pageable) params.get("pageable");
         }
 
@@ -570,8 +577,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final String usuariActual;
         private final MetaExpedientEntity metaExpedient;
         private final String nom;
-        private final Date creacioInici;
-        private final Date creacioFi;
+        private final LocalDateTime creacioInici;
+        private final LocalDateTime creacioFi;
 
         public IdsByArxiuPendentCommand(Map<String, Object> params) {
             this.entitat = (EntitatEntity) params.get("entitat");
@@ -579,8 +586,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.usuariActual = (String) params.get("usuariActual");
             this.metaExpedient = (MetaExpedientEntity) params.get("metaExpedient");
             this.nom = (String) params.get("nom");
-            this.creacioInici = (Date) params.get("creacioInici");
-            this.creacioFi = (Date) params.get("creacioFi");
+            this.creacioInici = (LocalDateTime) params.get("creacioInici");
+            this.creacioFi = (LocalDateTime) params.get("creacioFi");
         }
 
         @Override

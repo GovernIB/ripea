@@ -1,19 +1,16 @@
 package es.caib.ripea.api.interna.config;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken.Access;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
@@ -24,16 +21,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.authority.mapping.SimpleAttributes2GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
@@ -44,14 +38,8 @@ import org.springframework.security.web.authentication.preauth.j2ee.J2eePreAuthe
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTParser;
-
 import es.caib.ripea.service.intf.config.BaseConfig;
-import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-
 /**
  * Configuració de Spring Security per a desplegar l'aplicació sobre JBoss.
  * 
@@ -76,23 +64,18 @@ public class JBossApiInternaSecurityConfig extends BaseApiInternaSecurityConfig 
 	
 	@Value("${es.caib.ripea.security.nameAttributeKey:preferred_username}")
 	private String nameAttributeKey;
-	
-	/** En el cas de les APIs REST els rols solen estar en el resource access a nivell de client i depén de la configuració de la publicació al JBoss. Si es vol
-	 * agafar del client amb un resource access concret s'ha d'informar la següent propietat. */
-	@Value("${es.caib.ripea.security.resourceAcces.api-interna:#{null}}")
-	private String resourceAccess;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.addFilterBefore(
 				preAuthenticatedProcessingFilter(),
 				BasicAuthenticationFilter.class);
 		http.authenticationProvider(preauthAuthProvider());
-		http.logout((lo) -> lo.addLogoutHandler(getLogoutHandler()).
-				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
-				invalidateHttpSession(true).
-				logoutSuccessUrl("/").
-				permitAll(false));
+//		http.logout((lo) -> lo.addLogoutHandler(getLogoutHandler()).
+//				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
+//				invalidateHttpSession(true).
+//				logoutSuccessUrl("/").
+//				permitAll(false));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll().
 				anyRequest().authenticated();
@@ -103,34 +86,6 @@ public class JBossApiInternaSecurityConfig extends BaseApiInternaSecurityConfig 
 	}
 
 	@Bean
-	public J2eePreAuthenticatedProcessingFilter preAuthenticatedProcessingFilter() throws Exception {
-		J2eePreAuthenticatedProcessingFilter preAuthenticatedProcessingFilter = new J2eePreAuthenticatedProcessingFilter();
-		preAuthenticatedProcessingFilter.setAuthenticationDetailsSource(authenticationDetailsSource());
-		preAuthenticatedProcessingFilter.setAuthenticationManager(authenticationManager());
-		preAuthenticatedProcessingFilter.setContinueFilterChainOnUnsuccessfulAuthentication(false);
-		return preAuthenticatedProcessingFilter;
-	}
-
-	@Bean
-	public PreAuthenticatedAuthenticationProvider preauthAuthProvider() {
-		PreAuthenticatedAuthenticationProvider preauthAuthProvider = new PreAuthenticatedAuthenticationProvider();
-		preauthAuthProvider.setPreAuthenticatedUserDetailsService(
-				preAuthenticatedGrantedAuthoritiesUserDetailsService());
-		return preauthAuthProvider;
-	}
-
-	@Bean
-	public LogoutHandler getLogoutHandler() {
-		return (request, response, authentication) -> {
-			try {
-				request.logout();
-			} catch (ServletException ex) {
-				log.error("Error al sortir de l'aplicació", ex);
-			}
-		};
-	}
-
-	@Bean
 	protected AuthenticationManager authenticationManager() throws Exception {
 		final List<AuthenticationProvider> providers = new ArrayList<>(1);
 		providers.add(preauthAuthProvider());
@@ -138,141 +93,105 @@ public class JBossApiInternaSecurityConfig extends BaseApiInternaSecurityConfig 
 	}
 
 	@Bean
+	public PreAuthenticatedAuthenticationProvider preauthAuthProvider() {
+		var preauthAuthProvider = new PreAuthenticatedAuthenticationProvider();
+		preauthAuthProvider.setPreAuthenticatedUserDetailsService(preAuthenticatedGrantedAuthoritiesUserDetailsService());
+		return preauthAuthProvider;
+	}
+
+	@Bean
+	public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+		return new GrantedAuthorityDefaults(ROLE_PREFIX);
+	}
+
+	@Bean
+	public PreAuthenticatedGrantedAuthoritiesUserDetailsService preAuthenticatedGrantedAuthoritiesUserDetailsService() {
+		return new PreAuthenticatedGrantedAuthoritiesUserDetailsService() {
+			protected UserDetails createUserDetails(Authentication token, Collection<? extends GrantedAuthority> authorities) {
+//				if (token.getDetails() instanceof KeycloakWebAuthenticationDetails) {
+//					KeycloakWebAuthenticationDetails keycloakWebAuthenticationDetails = (KeycloakWebAuthenticationDetails)token.getDetails();
+//					return new User(token.getName(), "N/A", true, true, true, true,
+//							authorities, keycloakWebAuthenticationDetails.getKeycloakPrincipal());
+//				}
+				return new User(token.getName(), "N/A", true, true, true, true, authorities);
+			}
+		};
+	}
+
+	@Bean
+	public J2eePreAuthenticatedProcessingFilter preAuthenticatedProcessingFilter() throws Exception {
+		var preAuthenticatedProcessingFilter = new J2eePreAuthenticatedProcessingFilter();
+		preAuthenticatedProcessingFilter.setAuthenticationDetailsSource(authenticationDetailsSource());
+		preAuthenticatedProcessingFilter.setAuthenticationManager(authenticationManager());
+		preAuthenticatedProcessingFilter.setContinueFilterChainOnUnsuccessfulAuthentication(false);
+		return preAuthenticatedProcessingFilter;
+	}
+
+	@Bean
 	public AuthenticationDetailsSource<HttpServletRequest, PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails> authenticationDetailsSource() {
-		J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource authenticationDetailsSource = new J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource() {
-			
+		var authenticationDetailsSource = new J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource() {
 			@Override
 			public PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails buildDetails(HttpServletRequest context) {
-				Collection<String> j2eeUserRoles = getUserRoles(context);
+				var j2eeUserRoles = getUserRoles(context);
 				if (!j2eeUserRoles.contains("tothom")) {
 					j2eeUserRoles.add("tothom");
 				}
 				logger.debug("Roles from ServletRequest for " + context.getUserPrincipal().getName() + ": " + j2eeUserRoles);
 				PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails result;
 				if (context.getUserPrincipal() instanceof KeycloakPrincipal) {
-					logger.debug("Info from KeycloakPrincipal " + context.getUserPrincipal());
-					KeycloakPrincipal<?> keycloakPrincipal = ((KeycloakPrincipal<?>)context.getUserPrincipal());
-					keycloakPrincipal.getKeycloakSecurityContext().getIdTokenString();
+					var keycloakPrincipal = ((KeycloakPrincipal<?>)context.getUserPrincipal());
 					Set<String> roles = new HashSet<>();
 					roles.addAll(j2eeUserRoles);
-					if (getResourceAccess() == null) {
-						// Rols a nivell de realm
-						Access realmAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getRealmAccess();
-						if (realmAccess != null && realmAccess.getRoles() != null) {
-							logger.debug("Keycloak token realm roles: " + realmAccess.getRoles());
-							realmAccess.getRoles().stream().map(r -> ROLE_PREFIX + r).forEach(roles::add);
-						}
-					} else {
-						// Rols a nivell de client
-						Map<String, Access> resourceAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getResourceAccess();
-						if (resourceAccess != null) {
-							Access access = resourceAccess.get(getResourceAccess());
-							logger.debug("Keycloak token resource roles for resource " + getResourceAccess() + ": " + access + " and roles " + (access != null ? access.getRoles() : "(null)"));
-							if (access != null && access.getRoles() != null) {
-								access.getRoles().stream().map(r -> ROLE_PREFIX + r).forEach(roles::add);
-							} else {
-								logger.error("No s'ha trobat informació de rols pel recurs " + getResourceAccess() + ". Altres resources: " + resourceAccess.keySet() + ".");
-							}
-						}
+					var realmAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getRealmAccess();
+					if (realmAccess != null && realmAccess.getRoles() != null) {
+						logger.debug("Keycloak token realm roles: " + realmAccess.getRoles());
+						roles.addAll(realmAccess.getRoles());
+					}
+					var resourceAccess = keycloakPrincipal.getKeycloakSecurityContext().getToken().getResourceAccess(
+							keycloakPrincipal.getKeycloakSecurityContext().getToken().getIssuedFor());
+					if (resourceAccess != null && resourceAccess.getRoles() != null) {
+						logger.debug("Keycloak token resource roles: " + resourceAccess.getRoles());
+						roles.addAll(resourceAccess.getRoles());
 					}
 					logger.debug("Creating WebAuthenticationDetails for " + keycloakPrincipal.getName() + " with roles " + roles);
-					result = new PreauthOidcWebAuthenticationDetails(
-							context,
-							j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(roles),
-							keycloakPrincipal.getKeycloakSecurityContext().getIdTokenString());
+					result = new KeycloakWebAuthenticationDetails(context, j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(roles), keycloakPrincipal);
 				} else {
 					logger.debug("Creating WebAuthenticationDetails for " + context.getUserPrincipal().getName() + " with roles " + j2eeUserRoles);
-					result = new PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails(
-							context,
-							j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(j2eeUserRoles));
+					result = new PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails(context, j2eeUserRoles2GrantedAuthoritiesMapper.getGrantedAuthorities(j2eeUserRoles));
 				}
 				return result;
 			}
 		};
-		
-		SimpleMappableAttributesRetriever mappableAttributesRetriever = new SimpleMappableAttributesRetriever();
+		var mappableAttributesRetriever = new SimpleMappableAttributesRetriever();
 		mappableAttributesRetriever.setMappableAttributes(new HashSet<>(Arrays.asList(mappableRoles.split(","))));
 		authenticationDetailsSource.setMappableRolesRetriever(mappableAttributesRetriever);
-		SimpleAttributes2GrantedAuthoritiesMapper attributes2GrantedAuthoritiesMapper = new SimpleAttributes2GrantedAuthoritiesMapper();
+		var attributes2GrantedAuthoritiesMapper = new SimpleAttributes2GrantedAuthoritiesMapper();
 		attributes2GrantedAuthoritiesMapper.setAttributePrefix(ROLE_PREFIX);
 		authenticationDetailsSource.setUserRoles2GrantedAuthoritiesMapper(attributes2GrantedAuthoritiesMapper);
 		return authenticationDetailsSource;
 	}
+//
+//	@Bean
+//	public LogoutHandler getLogoutHandler() {
+//		return (request, response, authentication) -> {
+//			try {
+//				request.logout();
+//			} catch (ServletException ex) {
+//				log.error("Error al sortir de l'aplicació", ex);
+//			}
+//		};
+//	}
 
-	@Bean
-	public PreAuthenticatedGrantedAuthoritiesUserDetailsService preAuthenticatedGrantedAuthoritiesUserDetailsService() {
-		return new PreAuthenticatedGrantedAuthoritiesUserDetailsService() {
-			@SneakyThrows
-			protected UserDetails createUserDetails(
-					Authentication token,
-					Collection<? extends GrantedAuthority> authorities) {
-				if (token.getDetails() instanceof PreauthOidcWebAuthenticationDetails) {
-					PreauthOidcWebAuthenticationDetails tokenDetails = (PreauthOidcWebAuthenticationDetails)token.getDetails();
-					String jwtIdToken = tokenDetails.getJwtIdToken();
-					if (jwtIdToken != null) {
-						JWT jwt = JWTParser.parse(jwtIdToken);
-						return new PreauthOidcUserDetails(
-								jwtIdToken,
-								token.getName(),
-								jwt.getJWTClaimsSet().getIssueTime().toInstant(),
-								jwt.getJWTClaimsSet().getExpirationTime().toInstant(),
-								jwt.getJWTClaimsSet().getClaims(),
-								nameAttributeKey,
-								authorities);
-					}
-				}
-				return new User(token.getName(), "N/A", true, true, true, true, authorities);
-			}
-		};
-	}
+	@SuppressWarnings("serial")
+	public static class KeycloakWebAuthenticationDetails extends PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails {
+		private KeycloakPrincipal<?> keycloakPrincipal;
+		public KeycloakWebAuthenticationDetails(HttpServletRequest request, Collection<? extends GrantedAuthority> authorities, KeycloakPrincipal<?> keycloakPrincipal) {
 
-	@Getter
-	public static class PreauthOidcWebAuthenticationDetails extends PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails {
-		private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
-		private final String jwtIdToken;
-		public PreauthOidcWebAuthenticationDetails(
-				HttpServletRequest request,
-				Collection<? extends GrantedAuthority> authorities,
-				String jwtIdToken) {
 			super(request, authorities);
-			this.jwtIdToken = jwtIdToken;
+			this.keycloakPrincipal = keycloakPrincipal;
+		}
+		public KeycloakPrincipal<?> getKeycloakPrincipal() {
+			return keycloakPrincipal;
 		}
 	}
-
-	@Getter
-	public static class PreauthOidcUserDetails extends User implements OidcUser {
-		private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
-		private final OidcIdToken idToken;
-		private final OidcUserInfo userInfo;
-		private final Map<String, Object> attributes;
-		private final Map<String, Object> claims;
-		private final String nameAttributeKey;
-		public PreauthOidcUserDetails(
-				String jwtIdToken,
-				String username,
-				Instant issueTime,
-				Instant expirationTime,
-				Map<String, Object> claims,
-				String nameAttributeKey,
-				Collection<? extends GrantedAuthority> authorities) {
-			super(username, "N/A", true, true, true, true, authorities);
-			this.idToken = new OidcIdToken(
-					jwtIdToken,
-					issueTime,
-					expirationTime,
-					claims);
-			this.userInfo = new OidcUserInfo(claims);
-			this.attributes = claims;
-			this.claims = claims;
-			this.nameAttributeKey = nameAttributeKey;
-		}
-		public String getName() {
-			return getUsername();
-		}
-	}
-
-	protected String getResourceAccess() {
-		return resourceAccess;
-	}
-
 }

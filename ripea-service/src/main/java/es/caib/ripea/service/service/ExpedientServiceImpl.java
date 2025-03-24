@@ -125,6 +125,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -1739,9 +1740,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom() : "",
 					filtre.getDataCreacioInici() == null,
-					filtre.getDataCreacioInici(),
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici()),
 					filtre.getDataCreacioFi() == null,
-					DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+					DateUtil.getLocalDateTimeFromDate(DateHelper.toDateFinalDia(filtre.getDataCreacioFi())),
 					filtre.getDataTancatInici() == null,
 					filtre.getDataTancatInici(),
 					filtre.getDataTancatFi() == null,
@@ -1827,9 +1828,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom() : "",
 					filtre.getDataCreacioInici() == null,
-					filtre.getDataCreacioInici(),
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici()),
 					filtre.getDataCreacioFi() == null,
-					DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+					DateUtil.getLocalDateTimeFromDate(DateHelper.toDateFinalDia(filtre.getDataCreacioFi())),
 					filtre.getDataTancatInici() == null,
 					filtre.getDataTancatInici(),
 					filtre.getDataTancatFi() == null,

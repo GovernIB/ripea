@@ -142,7 +142,7 @@
 			urlConsultaLlistat="${urlConsultaLlistat}" 
 			textKey="expedient.tasca.form.camp.responsable"
 			suggestValue="codi"
-			suggestText="nom"
+			suggestText="codiAndNom"
 			required="true"
 			multiple="true"/>
 		<rip:inputSuggest 
@@ -151,7 +151,7 @@
 			urlConsultaLlistat="${urlConsultaLlistat}" 
 			textKey="expedient.tasca.form.camp.observador"
 			suggestValue="codi"
-			suggestText="nom"
+			suggestText="codiAndNom"
 			comment="expedient.tasca.form.camp.observador.comentari"
 			multiple="true"/>
 			

@@ -290,10 +290,10 @@ public class ExpedientPeticioHelper {
 		GrupEntity grup = null;
 		MetaExpedientEntity metaExpedient = expedientPeticioEntity.getMetaExpedient();
 		
-		if (cacheHelper.mostrarLogsGrups())
-			logger.info("metaExpedient= " + metaExpedient.getId() + " - " + metaExpedient.getCodi());
-		
 		if (metaExpedient != null && metaExpedient.isGestioAmbGrupsActiva()) {
+			
+			if (cacheHelper.mostrarLogsGrups())
+				logger.info("metaExpedient= " + metaExpedient.getId() + " - " + metaExpedient.getCodi());
 			
 			if (cacheHelper.mostrarLogsGrups())
 				logger.info("gestioAmbGrupsActiva");
@@ -329,26 +329,22 @@ public class ExpedientPeticioHelper {
 					grup = metaExpedient.getGrupPerDefecte();
 				}
 			}
-		}
 		
-		expedientPeticioEntity.setGrup(grup);
+			expedientPeticioEntity.setGrup(grup);
+		}
 		
 		if (cacheHelper.mostrarLogsGrups())
 			logger.info("calcularGrupAlRecibirAnotacio end (expedientPeticio=" + expedientPeticioEntity.getId() + ", " + expedientPeticioEntity.getIdentificador());
 	}
 	
-	
-	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Exception reintentarCanviEstatDistribucio(Long id) {
-
 		
 		ExpedientPeticioEntity pendent = expedientPeticioRepository.getOne(id);
 		
 		long t2 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("reintentarCanviEstatDistribucio start (" + pendent.getIdentificador() + ", " + id + ")");
-		
 		
 		Exception exception = null;
 		AnotacioRegistreId anotacio = new AnotacioRegistreId();
