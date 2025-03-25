@@ -14,7 +14,7 @@ export const useReducerWithActionMiddleware = <T> (
     middleware?: MiddlewareFn<T>,
     errorHandler?: (err: any) => void): [any, (action: T) => void] => {
     const [state, dispatch] = React.useReducer(reducer, initialState);
-    const stateRef = React.useRef();
+    const stateRef = React.useRef(undefined);
     React.useEffect(() => {
         stateRef.current = state;
     }, [state]);
