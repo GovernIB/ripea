@@ -267,6 +267,18 @@ public class ContingutHelper {
 		}
 		logMsg("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + params.getLevel() + "): "+ (System.currentTimeMillis() - t1) + " ms");
 		
+		if (contingut.getCreatedBy()!=null && contingut.getCreatedBy().get()!=null) {
+			UsuariEntity ue = usuariRepository.findByCodi(contingut.getCreatedBy().get());
+			if (ue!=null) {
+				UsuariDto aux = new UsuariDto();
+				aux.setCodi(ue.getCodi());
+				aux.setNom(ue.getNom());
+				aux.setNif(ue.getNif());
+				aux.setEmail(ue.getEmail());
+				resposta.setCreatedBy(aux);
+			}
+		}
+		
 		return resposta;
 	}
 
@@ -289,8 +301,8 @@ public class ContingutHelper {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
-		resposta.setCreatedDate(
-				Date.from(contingut.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+		if (contingut.getCreatedDate()!=null)
+			resposta.setCreatedDate(Date.from(contingut.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));;
 	}
 
 	private void setAlerta(ContingutDto resposta, ContingutEntity contingut) {

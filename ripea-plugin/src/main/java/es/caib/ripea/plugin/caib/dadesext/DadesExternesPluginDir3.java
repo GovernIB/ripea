@@ -297,6 +297,16 @@ public class DadesExternesPluginDir3 extends RipeaAbstractPluginProperties imple
 					BindingProvider.PASSWORD_PROPERTY,
 					getPassword());
 		}
+		
+		/*
+		// Activar només si la URL es diferent a intranet.caib.es (producció)
+		HTTPConduit httpConduit = (HTTPConduit) client.getConduit();
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck(true); // Deshabilita la verificación del CN
+        tlsClientParameters.setTrustManagers(null); // Opcional, confía en todos los certificados
+        httpConduit.setTlsClientParameters(tlsClientParameters);
+        */
+		
 		return client;
 	}
 

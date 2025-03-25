@@ -94,6 +94,7 @@ import es.caib.ripea.service.intf.dto.ContingutLogDto;
 import es.caib.ripea.service.intf.dto.ContingutMassiuDto;
 import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.service.intf.dto.ContingutMovimentDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
@@ -113,6 +114,7 @@ import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -914,18 +916,12 @@ public class ContingutServiceImpl implements ContingutService {
 		
 	}
 	
-	
-	
 	@Transactional(readOnly = true)
 	@Override
-	public boolean isExpedient(
-			Long contingutId) {
-
-		ContingutEntity contingut = contingutRepository.getOne(contingutId);
-
-		return contingut instanceof ExpedientEntity;
+	public boolean isExpedient(Long contingutId) {
+		ContingutEntity contingut = contingutRepository.findById(contingutId).get();
+		return ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus());
 	}
-
 
 	@Transactional(readOnly = true)
 	@Override
@@ -2664,5 +2660,15 @@ public class ContingutServiceImpl implements ContingutService {
 	}
 	
     private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
+
+	@Override
+	@Transactional(readOnly = true)
+	public UsuariDto findUsuariCreacio(Long contingutId) {
+		ContingutEntity ce = contingutRepository.findById(contingutId).get();
+		if (ce!=null && ce.getCreatedBy()!=null) {
+			return conversioTipusHelper.convertir(usuariRepository.findByCodi(ce.getCreatedBy().get()), UsuariDto.class);
+		}
+		return null;
+	}
 
 }

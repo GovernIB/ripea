@@ -43,16 +43,20 @@ public class RolHelper {
 		return rolsCurrentUser;
 	}
 	
-	
-	public boolean doesCurrentUserHasRol(
-			String rolToCheck) {
-
+	public boolean doesCurrentUserHasRol(String rolToCheck) {
 		boolean hasRol = false;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<String> rols = cacheHelper.findRolsAmbCodi(auth.getName());
-		if (rols != null) {
-			for (String rol : rols) {
-				if (rol.equals(rolToCheck)) {
+//		List<String> rols = cacheHelper.findRolsAmbCodi(auth.getName());
+//		if (rols != null) {
+//			for (String rol : rols) {
+//				if (rol.equals(rolToCheck)) {
+//					hasRol = true;
+//				}
+//			}
+//		}
+		if (auth.getAuthorities() != null) {
+			for (GrantedAuthority rol : auth.getAuthorities()) {
+				if (rol.getAuthority().equals(rolToCheck)) {
 					hasRol = true;
 				}
 			}

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.service.intf.service;
 
 import es.caib.ripea.service.intf.dto.*;
@@ -12,15 +9,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Declaració dels mètodes per a gestionar continguts.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @PreAuthorize("isAuthenticated()")
 public interface ContingutService {
-
-
 
 	/**
 	 * Modifica els valors de les dades d'un node.
@@ -42,6 +32,9 @@ public interface ContingutService {
 			Map<String, Object> valors, 
 			Long tascaId) throws NotFoundException;
 
+	@PreAuthorize("isAuthenticated()")
+	public UsuariDto findUsuariCreacio(Long contingutId);
+	
 	/**
 	 * Marca un contingut com a esborrat. Posteriorment un administrador
 	 * el podria recuperar.

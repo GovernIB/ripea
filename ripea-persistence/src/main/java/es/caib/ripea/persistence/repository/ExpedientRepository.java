@@ -1,8 +1,10 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,9 +13,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 
 @Component
 public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long> {
@@ -154,9 +164,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi,
+			@Param("creacioFi") LocalDateTime creacioFi,
 			@Param("esNullTancatInici") boolean esNullTancatInici,
 			@Param("tancatInici") Date tancatInici,
 			@Param("esNullTancatFi") boolean esNullTancatFi,
@@ -300,9 +310,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi,
+			@Param("creacioFi") LocalDateTime creacioFi,
 			@Param("esNullTancatInici") boolean esNullTancatInici,
 			@Param("tancatInici") Date tancatInici,
 			@Param("esNullTancatFi") boolean esNullTancatFi,
@@ -678,9 +688,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi,
+			@Param("creacioFi") LocalDateTime creacioFi,
 			Pageable pageable);
 
 	@Query(FIND_BY_ARXIU_PENDENT)
@@ -694,9 +704,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi);
+			@Param("creacioFi") LocalDateTime creacioFi);
 	
 	
 	@Query(	"select " +
@@ -724,9 +734,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi);	
+			@Param("creacioFi") LocalDateTime creacioFi);	
 
 
 	@Query(	"select " +

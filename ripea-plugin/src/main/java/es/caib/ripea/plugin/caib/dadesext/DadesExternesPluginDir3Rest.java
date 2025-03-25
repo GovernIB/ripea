@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.CodiValor;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -35,20 +36,17 @@ import java.util.Properties;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
-public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
+public class DadesExternesPluginDir3Rest extends RipeaAbstractPluginProperties implements DadesExternesPlugin {
 
-	private static final String SERVEI_CATALEG = "/rest/catalogo/";
-	private final Properties properties;
-
-	public DadesExternesPluginDir3Rest(Properties properties) {
-		this.properties = properties;
+	public DadesExternesPluginDir3Rest(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
 	}
 
 	@Override
 	public List<Pais> paisFindAll() throws SistemaExternException {
 		List<Pais> paisos = new ArrayList<>();
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "paises?estado=V");
+			URL url = new URL(getServiceUrl() + "paises?estado=V");
 			log.info("[DADES_EXTERNES] Consulta paisos url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
@@ -77,7 +75,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	public List<ComunitatAutonoma> comunitatFindAll() throws SistemaExternException {
 		List<ComunitatAutonoma> comunitats = new ArrayList<>();
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "comunidadesAutonomas");
+			URL url = new URL(getServiceUrl() + "comunidadesAutonomas");
 			log.info("[DADES_EXTERNES] Consulta comunitats autonomes url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
@@ -108,7 +106,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	public List<Provincia> provinciaFindAll() throws SistemaExternException {
 		List<Provincia> provincies = new ArrayList<>();
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias");
+			URL url = new URL(getServiceUrl() + "provincias");
 			log.info("[DADES_EXTERNES] Consulta provincies url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
@@ -142,7 +140,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 			return provinciesComunitat;
 
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias/comunidadAutonoma?id=" + comunitatCodi);
+			URL url = new URL(getServiceUrl() + "provincias/comunidadAutonoma?id=" + comunitatCodi);
 			log.info("[DADES_EXTERNES] Consulta provincies url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
@@ -176,7 +174,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 			return municipisProvincia;
 
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG
+			URL url = new URL(getServiceUrl()
 					+ "localidades/provincia/entidadGeografica?"
 					+ "codigoProvincia=" + provinciaCodi
 					+ "&codigoEntidadGeografica=01");
@@ -214,7 +212,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	public List<NivellAdministracio> nivellAdministracioFindAll() throws SistemaExternException {
 		List<NivellAdministracio> nivellsAdministracio = new ArrayList<>();
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "nivelesAdministracion");
+			URL url = new URL(getServiceUrl() + "nivelesAdministracion");
 			log.info("[DADES_EXTERNES] Consulta nivells administracio url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
@@ -244,7 +242,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	public List<TipusVia> tipusViaFindAll() throws SistemaExternException {
 		List<TipusVia> tipusVia = new ArrayList<>();
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "tiposvia");
+			URL url = new URL(getServiceUrl() + "tiposvia");
 			log.info("[DADES_EXTERNES] Consulta tipus de via url " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
@@ -272,7 +270,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	
 	@Override
 	public String getEndpointURL() {
-		String endpoint = properties.getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_ENDPOINT));
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_ENDPOINT));
 		if (Utils.isEmpty(endpoint)) {
 			endpoint = getServiceUrl();
 		}
@@ -280,10 +278,7 @@ public class DadesExternesPluginDir3Rest implements DadesExternesPlugin {
 	}
 	
 	private String getServiceUrl() {
-		String url = properties.getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_URL1));
-		if (url == null) {
-			url = properties.getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_URL2));
-		}
+		String url = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.DADESEXT_PLUGIN_DIR3_REST_URL));
 		return url != null ? (!url.endsWith("/") ? url + "/" : url) : null;
 	}
 
