@@ -5,26 +5,27 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const RetomarForm = () => {
+const EnviarViaEmailForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField xs={12} name="email" type={"text"}/>
+        <GridFormField xs={12} name="responsables" multiple/>
     </Grid>
 }
 
-const Retomar = (props:any) => {
+const EnviarViaEmail = (props:any) => {
     const { t } = useTranslation();
 
     return <FormActionDialog
-        resourceName={"expedientTascaResource"}
-        action={"ACTION_RETOMAR"}
+        resourceName={"documentResource"}
+        action={"ENVIAR_VIA_EMAIL"}
         title={t('page.tasca.action.retomar')}
         {...props}
     >
-        <RetomarForm/>
+        <EnviarViaEmailForm/>
     </FormActionDialog>
 }
 
-const useRetomar = (refresh?: () => void) => {
+const useEnviarViaEmail = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -41,7 +42,7 @@ const useRetomar = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <Retomar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <EnviarViaEmail apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
-export default useRetomar;
+export default useEnviarViaEmail;

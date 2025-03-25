@@ -1,8 +1,9 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const RebutjarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -10,39 +11,37 @@ const RebutjarForm = () => {
     </Grid>
 }
 
-const Rebutjar = (props: { apiRef:any }) => {
+const Rebutjar = (props:any) => {
     const { t } = useTranslation();
-    const { apiRef } = props;
 
-    return <MuiFormDialog
+    return <FormActionDialog
         resourceName={"expedientTascaResource"}
+        action={"ACTION_REBUTJAR"}
         title={t('page.tasca.action.rebutjar')}
-        apiRef={apiRef}
+        {...props}
     >
         <RebutjarForm/>
-    </MuiFormDialog>
+    </FormActionDialog>
 }
 
 const useRebutjar = (refresh?: (value?:string) => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any,row:any) => {
-        // TODO: change
-        // apiAction(id,{code:'ACTION_REBUTJAR'})
-        return apiRef.current?.show?.(id,{estat: 'REBUTJADA', motiu:row?.motiuRebuig})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow('Error', error.message, 'error');
-            });
+    const handleShow = (id:any, row:any) :void => {
+        apiRef.current?.show?.(id,{motiu:row?.motiuRebuig})
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, '', 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow('Error', error.message, 'error');
     }
 
     return {
         handleShow,
-        content: <Rebutjar apiRef={apiRef}/>
+        content: <Rebutjar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
 export default useRebutjar;
