@@ -31,6 +31,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Size;
@@ -102,15 +103,13 @@ public class CustomHalFormsPropertyFactory {
 				} else if (ResourceReference.class.isAssignableFrom(resolvedType) || resolvedType.isEnum()) {
 					inputType = "search";
 				} else {
-					try {
-						Field currentField = payload.getType().getDeclaredField(metadata.getName());
-						if (TypeUtil.isMultipleFieldType(currentField)) {
-							Class<?> multipleType = TypeUtil.getMultipleFieldType(currentField);
-							if (multipleType != null && (ResourceReference.class.isAssignableFrom(multipleType) || multipleType.isEnum())) {
-								inputType = "search";
-							}
+					Field currentField = ReflectionUtils.findField(Objects.requireNonNull(payload.getType()), metadata.getName());
+					if (currentField != null && TypeUtil.isMultipleFieldType(currentField)) {
+						Class<?> multipleType = TypeUtil.getMultipleFieldType(currentField);
+						if (multipleType != null && (ResourceReference.class.isAssignableFrom(multipleType) || multipleType.isEnum())) {
+							inputType = "search";
 						}
-					} catch (NoSuchFieldException ignored) {}
+					}
 				}
 			}
 

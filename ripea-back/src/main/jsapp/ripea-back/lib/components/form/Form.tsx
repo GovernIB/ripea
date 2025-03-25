@@ -152,8 +152,8 @@ export const Form: React.FC<FormProps> = (props) => {
     const [modified, setModified] = React.useState<boolean>(false);
     const [fields, setFields] = React.useState<any[]>();
     const [fieldErrors, setFieldErrors] = React.useState<FormFieldError[] | undefined>();
-    const [revertData, setRevertData] = React.useState<any>();
-    const [apiActions, setApiActions] = React.useState<any>();
+    const [revertData, setRevertData] = React.useState<any>(undefined);
+    const [apiActions, setApiActions] = React.useState<any>(undefined);
     const apiRef = React.useRef<FormApi>();
     const idFromExternalResetRef = React.useRef<any>();
     const isSaveActionPresent = apiActions?.[id != null ? 'update' : 'create'] != null;

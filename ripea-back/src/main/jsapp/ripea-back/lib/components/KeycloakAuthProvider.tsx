@@ -108,9 +108,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
     const logConsole = useLogConsole(LOG_PREFIX);
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
-    const tokenRef = React.useRef<string>();
-    const tokenParsedRef = React.useRef<any>();
-    const keycloakRef = React.useRef<Keycloak>();
+    const tokenRef = React.useRef<string>(undefined);
+    const tokenParsedRef = React.useRef<any>(undefined);
+    const keycloakRef = React.useRef<Keycloak>(undefined);
     React.useEffect(() => {
         if (!keycloakRef.current) {
             debug && logConsole.debug('Nova instància de Keycloak', config);

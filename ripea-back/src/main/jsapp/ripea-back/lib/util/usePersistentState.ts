@@ -22,7 +22,7 @@ const savePersistentState = (key: string, value: any) => {
 }
 
 export const usePersistentState: (appName: string) => PersistentStateReturned = (appName) => {
-    const persistentStateRef = React.useRef<any>();
+    const persistentStateRef = React.useRef<any>(undefined);
     const [persistentStateReady, setPersistentStateReady] = React.useState<boolean>(false);
     const { isReady: authIsReady, getUserId: authGetUserId } = useOptionalAuthContext() ?? {};
     const key = generateKey(appName, authGetUserId?.());

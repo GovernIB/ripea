@@ -9,22 +9,22 @@ export const FormFieldRange: React.FC<FormFieldCustomProps> = (props) => {
         name,
         label,
         value,
-        field,
-        fieldError,
-        inline,
-        required,
+        field: _field,
+        fieldError: _fieldError,
+        inline: _inline,
+        required: _required,
         disabled,
-        readOnly,
+        readOnly: _readOnly,
         onChange,
         componentProps,
     } = props;
-    const marks = [{
+    /*const marks = [{
         value: 0,
         label: '0%'
     }, {
         value: 100,
         label: '100%',
-    }];
+    }];*/
     return <Box sx={{ ml: 1, mr: 1 }}>
         <Typography variant="subtitle1" gutterBottom>{label}</Typography>
         <Slider

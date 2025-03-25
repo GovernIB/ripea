@@ -177,7 +177,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         unpaged: true
     }), [filter, namedQueries, perspectives]);
     const {
-        loading,
+        loading: _loading,
         rows,
         refresh,
         quickFilterComponent
