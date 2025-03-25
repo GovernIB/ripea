@@ -153,18 +153,14 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				fieldName,
 				fieldValue,
 				answers);
-		Field field = ReflectionUtils.findField(getResourceClass(), fieldName);
-		if (field != null) {
-			return onChangeProcessRecursiveLogic(
-					previous,
-					fieldName,
-					fieldValue,
-					null,
-					this,
-					answers);
-		} else {
-			throw new ResourceFieldNotFoundException(getResourceClass(), fieldName);
-		}
+		onChangeCheckIfFieldExists(getResourceClass(), fieldName);
+		return onChangeProcessRecursiveLogic(
+				previous,
+				fieldName,
+				fieldValue,
+				null,
+				this,
+				answers);
 	}
 
 	@Override

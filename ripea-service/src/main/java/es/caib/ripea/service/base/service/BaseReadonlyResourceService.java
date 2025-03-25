@@ -237,32 +237,27 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				answers);
 		ResourceArtifact artifact = artifactGetOne(type, code);
 		if (artifact.getFormClass() != null) {
-			Class<P> formClass = (Class<P>)artifact.getFormClass();
-			Field field = ReflectionUtils.findField(formClass, fieldName);
-			if (field != null) {
-				return onChangeProcessRecursiveLogic(
-						previous,
-						fieldName,
-						fieldValue,
-						null,
-						(previous1,
-						 fieldName1,
-						 fieldValue1,
-						 answers1,
-						 previousFieldNames,
-						 target) -> internalArtifactOnChange(
-								type,
-								code,
-								previous1,
-								fieldName1,
-								fieldValue1,
-								answers1,
-								previousFieldNames,
-								target),
-						answers);
-			} else {
-				throw new ResourceFieldNotFoundException(formClass, fieldName);
-			}
+			onChangeCheckIfFieldExists(artifact.getFormClass(), fieldName);
+			return onChangeProcessRecursiveLogic(
+					previous,
+					fieldName,
+					fieldValue,
+					null,
+					(previous1,
+					 fieldName1,
+					 fieldValue1,
+					 answers1,
+					 previousFieldNames,
+					 target) -> internalArtifactOnChange(
+							type,
+							code,
+							previous1,
+							fieldName1,
+							fieldValue1,
+							answers1,
+							previousFieldNames,
+							target),
+					answers);
 		} else {
 			log.warn("Couldn't find form class for artifact (resourceClass={}, type={}, code={})", getResourceClass(), type, code);
 			return new HashMap<>();
@@ -494,6 +489,15 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 	}
 
+	protected void onChangeCheckIfFieldExists(Class<?> formClass, String fieldName) {
+		if (fieldName != null) {
+			Field field = ReflectionUtils.findField(formClass, fieldName);
+			if (field == null) {
+				throw new ResourceFieldNotFoundException(formClass, fieldName);
+			}
+		}
+	}
+
 	protected <P extends Serializable> Map<String, Object> onChangeProcessRecursiveLogic(
 			P previous,
 			String fieldName,
@@ -529,12 +533,12 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			}
 			if (!changes.isEmpty()) {
 				changesToReturn = new HashMap<>(changes);
-				for (String changedFieldName : changes.keySet()) {
+				for (String changedFieldName: changes.keySet()) {
 					Field changedField = ReflectionUtils.findField(previous.getClass(), changedFieldName);
 					if (changedField != null) {
 						ResourceField fieldAnnotation = changedField.getAnnotation(ResourceField.class);
 						if (fieldAnnotation != null && fieldAnnotation.onChangeActive()) {
-							P previousWithChanges = (P)cloneObjectWithFieldsMap(
+							Object previousWithChanges = cloneObjectWithFieldsMap(
 									previous,
 									fieldName,
 									fieldValue,
@@ -544,9 +548,11 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 							if (previousFieldNames != null) {
 								previousFieldNamesWithChangedFieldName.addAll(Arrays.asList(previousFieldNames));
 							}
-							previousFieldNamesWithChangedFieldName.add(fieldName);
+							if (fieldName != null) {
+								previousFieldNamesWithChangedFieldName.add(fieldName);
+							}
 							Map<String, Object> changesPerField = onChangeProcessRecursiveLogic(
-									previousWithChanges,
+									(P)previousWithChanges,
 									changedFieldName,
 									changes.get(changedFieldName),
 									previousFieldNamesWithChangedFieldName.toArray(new String[0]),
@@ -570,22 +576,24 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			Map<String, Object> fields,
 			String excludeField) {
 		Object clonedResource = objectMappingHelper.clone(resource);
-		try {
-			Field field = resource.getClass().getDeclaredField(fieldName);
-			ReflectionUtils.makeAccessible(field);
-			ReflectionUtils.setField(field, clonedResource, fieldValue);
-		} catch (Exception ex) {
-			log.error("Processing onChange request: couldn't find field {} on resource {}",
-					fieldName,
-					resource.getClass().getName(),
-					ex);
+		if (fieldName != null) {
+			Field field = ReflectionUtils.findField(resource.getClass(), fieldName);
+			if (field != null) {
+				ReflectionUtils.makeAccessible(field);
+				ReflectionUtils.setField(field, clonedResource, fieldValue);
+			} else {
+				log.error(
+						"Processing onChange request: couldn't find field {} on resource {}",
+						fieldName,
+						resource.getClass().getName());
+			}
 		}
 		fields.forEach((k, v) -> {
 			if (!k.equals(excludeField)) {
-				Field field = ReflectionUtils.findField(resource.getClass(), k);
-				if (field != null) {
-					ReflectionUtils.makeAccessible(field);
-					ReflectionUtils.setField(field, clonedResource, v);
+				Field f = ReflectionUtils.findField(resource.getClass(), k);
+				if (f != null) {
+					ReflectionUtils.makeAccessible(f);
+					ReflectionUtils.setField(f, clonedResource, v);
 				}
 			}
 		});
