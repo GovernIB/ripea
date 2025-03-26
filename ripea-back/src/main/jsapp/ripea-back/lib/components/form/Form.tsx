@@ -255,7 +255,7 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
-        const mergedData = { ...(data ?? getInitialDataFromFields(fields)), ...additionalData };
+        const mergedData = data ?? { ...getInitialDataFromFields(fields), ...additionalData };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {

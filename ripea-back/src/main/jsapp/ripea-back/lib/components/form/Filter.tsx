@@ -62,9 +62,9 @@ export const Filter: React.FC<FilterProps> = (props) => {
                 onDataChange?.(formData);
             });
     }
-    const clear = () => {
+    const clear = (data?: any) => {
         setNextDataChangeAsUncontrolled(true);
-        formApiRef.current?.revert(true);
+        formApiRef.current?.reset(data);
     }
     const handleDataChange = (data: any) => {
         if (nextDataChangeAsUncontrolled) {
