@@ -122,6 +122,7 @@ const componentsCa = {
             cancel: 'Cancel·lar',
         },
         misc: {
+            close: 'Tancar',
             retry: 'Tornar a provar',
         },
     }

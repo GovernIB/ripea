@@ -45,6 +45,15 @@ export const useConfirmDialogButtons = (): DialogButton[] => {
     }];
 };
 
+export const useCloseDialogButtons: () => DialogButton[] = () => {
+    const { t } = useBaseAppContext();
+    return [{
+        value: false,
+        text: t('buttons.misc.close'),
+        componentProps: { variant: 'contained' }
+    }];
+};
+
 export const useFormDialogButtons: () => DialogButton[] = () => {
     const { t } = useBaseAppContext();
     return [{
@@ -84,14 +93,5 @@ export const useReportDialogButtons: () => DialogButton[] = () => {
         text: t('buttons.report.generate'),
         icon: 'summarize',
         componentProps: { variant: 'contained' }
-    }];
-};
-
-export const useCloseDialogButtons: () => DialogButton[] = () => {
-    const { t } = useBaseAppContext();
-    return [{
-        value: false,
-        text: t('buttons.close.close'),
-        componentProps: { variant: 'outlined' }
     }];
 };
