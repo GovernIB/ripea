@@ -102,6 +102,7 @@ export type MuiDataGridProps = {
     height?: number;
     autoHeight?: true;
     striped?: true;
+    semiBordered?: true;
     sx?: any;
     debug?: boolean;
 } & Omit<DataGridProps, 'apiRef'>;
@@ -309,6 +310,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         height,
         autoHeight,
         striped,
+        semiBordered,
         sx,
         debug = false,
         ...otherProps
@@ -505,6 +507,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
                 row: { linkTo: rowLink, cursorPointer: onRowClick != null },
                 footer: { paginationActive, selectionActive, pageInfo, setRowSelectionModel },
             }}
+            semiBordered={semiBordered}
             autoHeight={autoHeight}
             sx={{
                 height: autoHeight ? 'auto' : undefined,

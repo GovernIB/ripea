@@ -676,11 +676,15 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	protected <P extends Serializable> Object getOnChangeFieldValue(
 			OnChangeEvent onChangeEvent,
 			Class<P> resourceClass) {
-		return JsonUtil.getInstance().fillResourceWithFieldsMap(
-				ReflectUtils.newInstance(resourceClass),
-				null,
-				onChangeEvent.getFieldName(),
-				onChangeEvent.getFieldValue());
+		if (onChangeEvent.getFieldName() != null) {
+			return JsonUtil.getInstance().fillResourceWithFieldsMap(
+					ReflectUtils.newInstance(resourceClass),
+					null,
+					onChangeEvent.getFieldName(),
+					onChangeEvent.getFieldValue());
+		} else {
+			return null;
+		}
 	}
 
 	protected Map<String, AnswerRequiredException.AnswerValue> getAnswersFromHeaderOrRequest(

@@ -837,8 +837,8 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const isAuthReady = authContext?.isReady;
     const isAuthenticated = authContext?.isAuthenticated;
     const getToken = authContext?.getToken;
-    const kettingClientRef = React.useRef<Client>();
-    const openAnswerRequiredDialogRef = React.useRef<OpenAnswerRequiredDialogFn>();
+    const kettingClientRef = React.useRef<Client>(undefined);
+    const openAnswerRequiredDialogRef = React.useRef<OpenAnswerRequiredDialogFn>(undefined);
     const [userSession, setUserSession] = React.useState<any | undefined>(defaultUserSession);
     const [currentLanguage, setCurrentLanguage] = useControlledUncontrolledState<string | undefined>(
         defaultLanguage,

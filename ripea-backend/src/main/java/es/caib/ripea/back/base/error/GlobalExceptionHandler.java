@@ -34,7 +34,7 @@ import java.util.Objects;
  * @author Límit Tecnologies
  */
 @Slf4j
-@ControllerAdvice
+@ControllerAdvice(basePackages = { "es.caib.ripea.back.base.controller", "es.caib.ripea.back.resourcecontroller" })
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	public static final String REQUEST_PARAM_TRACE = "trace";

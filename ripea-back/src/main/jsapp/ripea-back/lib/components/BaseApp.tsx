@@ -62,7 +62,7 @@ export type BaseAppContentComponentProps = React.PropsWithChildren & {
 };
 
 const useDialog = () => {
-    const dialogShowFn = React.useRef<MessageDialogShowFn>();
+    const dialogShowFn = React.useRef<MessageDialogShowFn>(undefined);
     const setMessageDialogShow = (fn: MessageDialogShowFn) => {
         dialogShowFn.current = fn;
     }
@@ -85,7 +85,7 @@ const useDialog = () => {
 }
 
 const useTemporalMessage = () => {
-    const temporalMessageShowFn = React.useRef<TemporalMessageShowFn>();
+    const temporalMessageShowFn = React.useRef<TemporalMessageShowFn>(undefined);
     const setTemporalMessageShow = (fn: TemporalMessageShowFn) => {
         temporalMessageShowFn.current = fn;
     }

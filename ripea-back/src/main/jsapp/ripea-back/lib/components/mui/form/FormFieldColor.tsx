@@ -20,7 +20,7 @@ export const FormFieldColor: React.FC<FormFieldCustomProps> = (props) => {
         onChange,
         componentProps,
     } = props;
-    const fileInputRef = React.useRef();
+    const fileInputRef = React.useRef<HTMLInputElement>(undefined);
     const handleClearClick = () => {
         onChange(null);
     }

@@ -1,6 +1,7 @@
 import useDocumentDetail from "./DocumentDetail.tsx";
 import useInformacioArxiu from "../../expedient/actions/InformacioArxiu.tsx";
 import {useTranslation} from "react-i18next";
+import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 
 export const useContingutActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -12,6 +13,7 @@ export const useContingutActions = (refresh?: () => void) => {
 
     const {handleOpen: detallhandleOpen, dialog: detallDialog} = useDocumentDetail();
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("archivo");
+    const {handleShow: handleEnviarViaEmailShow, content: contentEnviarViaEmail} = useEnviarViaEmail(refresh);
 
     const actions = [
         {
@@ -51,6 +53,7 @@ export const useContingutActions = (refresh?: () => void) => {
             title: t('page.document.acciones.mail'),
             icon: "mail",
             showInMenu: true,
+            onClick: handleEnviarViaEmailShow,
         },
         {
             title: t('page.document.acciones.history'),
@@ -73,6 +76,7 @@ export const useContingutActions = (refresh?: () => void) => {
     const components = <>
         {detallDialog}
         {arxiuDialog}
+        {contentEnviarViaEmail}
     </>;
     return {
         actions,

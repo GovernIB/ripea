@@ -48,7 +48,7 @@ const useExpedientFilter = () => {
             //     )
             // )
         )
-        console.log('>>> springFilterBuilder:', filterStr)
+        // console.log('>>> springFilterBuilder:', filterStr)
         return filterStr;
     }
     const cercar = ()=> {
@@ -58,11 +58,11 @@ const useExpedientFilter = () => {
         filterRef.current.clear()
     }
 
-    const [springFilter, setSpringFilter] = useState(
-        springFilterBuilder({
-            estat: 'OBERT',
-            dataCreacioInici: new Date(),
-        })
+    const [springFilter, setSpringFilter] = useState<string>(
+        // springFilterBuilder({
+        //     estat: 'OBERT',
+        //     dataCreacioInici: new Date(),
+        // })
     );
     const content = <MuiFilter
             resourceName="expedientResource"

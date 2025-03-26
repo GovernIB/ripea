@@ -1,8 +1,8 @@
 import React from 'react';
 
 export type FilterApi = {
-    clear: () => void;
-    filter: () => void;
+    clear: (data?: any) => void;
+    filter: (data?: any) => void;
 };
 
 export type FilterApiRef = React.MutableRefObject<FilterApi | undefined>;

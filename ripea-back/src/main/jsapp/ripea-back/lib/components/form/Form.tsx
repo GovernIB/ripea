@@ -152,8 +152,8 @@ export const Form: React.FC<FormProps> = (props) => {
     const [modified, setModified] = React.useState<boolean>(false);
     const [fields, setFields] = React.useState<any[]>();
     const [fieldErrors, setFieldErrors] = React.useState<FormFieldError[] | undefined>();
-    const [revertData, setRevertData] = React.useState<any>();
-    const [apiActions, setApiActions] = React.useState<any>();
+    const [revertData, setRevertData] = React.useState<any>(undefined);
+    const [apiActions, setApiActions] = React.useState<any>(undefined);
     const apiRef = React.useRef<FormApi>();
     const idFromExternalResetRef = React.useRef<any>();
     const isSaveActionPresent = apiActions?.[id != null ? 'update' : 'create'] != null;
@@ -203,10 +203,13 @@ export const Form: React.FC<FormProps> = (props) => {
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
     const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
-        // Obté les dades inicials
-        // Si és un formulari de modificació obté les dades fent una petició al servidor
-        // Si és un formulari de creació obté les dades dels camps
-        const initialData = id != null ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
+        // Obté les dades inicials.
+        // Si és un formulari d'artefacte obté les dades dels camps
+        // Si no és un formulari d'artefacte:
+        //     - Si és un formulari de modificació obté les dades fent una petició al servidor
+        //     - Si és un formulari de creació obté les dades dels camps
+        const getInitialDataFromApiGetOne = resourceType == null && id != null;
+        const initialData = getInitialDataFromApiGetOne ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
         const mergedData = { ...initialData, ...additionalData };
         return initOnChangeRequest ? await sendOnChangeRequest(id, { previous: mergedData }) : mergedData;
     }, [apiGetOne, sendOnChangeRequest]);
@@ -252,7 +255,7 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
-        const mergedData = { ...(data ?? getInitialDataFromFields(fields)), ...additionalData };
+        const mergedData = data ?? { ...getInitialDataFromFields(fields), ...additionalData };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {
