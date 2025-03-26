@@ -334,15 +334,6 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		}
 		return "metaExpedientTascaForm";
 	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 
 	@RequestMapping(value = "/{metaExpedientId}/tasca/save", method = RequestMethod.POST)
 	public String save(

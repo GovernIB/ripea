@@ -350,18 +350,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		model.addAttribute("hasEsborranys", hasEsborranys);
 
 	}
-	
-	
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 
 	private ContingutMassiuFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -380,5 +368,4 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientMassiuTancamentController.class);
-
 }

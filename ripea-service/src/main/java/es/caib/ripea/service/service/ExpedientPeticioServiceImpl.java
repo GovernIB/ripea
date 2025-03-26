@@ -83,6 +83,7 @@ import es.caib.ripea.service.intf.dto.RegistreJustificantDto;
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -743,10 +744,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					filtre.getNumero() == null,
 					filtre.getNumero() != null ? filtre.getNumero().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+							dataInici == null,
+							DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+							dataFi == null,
+							DateUtil.getLocalDateTimeFromDate(dataFi, false, true),
 					metaExpedient == null,
 					metaExpedient,
 					expedient == null,
@@ -769,10 +770,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					filtre.getNumero() == null,
 					filtre.getNumero() != null ? filtre.getNumero().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+							dataInici == null,
+							DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+							dataFi == null,
+							DateUtil.getLocalDateTimeFromDate(dataFi, false, true),
 					metaExpedient == null,
 					metaExpedient,
 					expedient == null,

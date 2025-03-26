@@ -152,14 +152,4 @@ public class ContingutCarpetaController extends BaseUserController {
 	private boolean isExportacioExcelActiva() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL));
 	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 }

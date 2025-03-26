@@ -579,15 +579,6 @@ public class DocumentEnviamentController extends BaseUserController {
 				new Object[] { documentPublicacioDto.getDocumentNom() });
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 	@RequestMapping(value = "/{documentId}/estat", method = RequestMethod.GET)
 	@ResponseBody
 	public String getEstatDarreraNotificació(

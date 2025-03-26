@@ -155,6 +155,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		execucioMassiva.setVersioImprimible(execMassDto.getVersioImprimible());
 		execucioMassiva.setNomFitxer(execMassDto.getNomFitxer());
 		
+		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
+		
 		int ordre = 0;
 		for (ExecucioMassivaContingutDto execElement: execElements) {
 			
@@ -176,7 +178,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					elementTipus, 
 					ordre++).build();
 			
-			execucioMassiva.addContingut(emc);
+//			execucioMassiva.addContingut(emc);
 			emc.updateEstatDataFi(
 					execElement.getEstat(),
 					execElement.getDataFi());
@@ -193,8 +195,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			}
 			execucioMassivaContingutRepository.save(emc);
 		}
-		
-		execucioMassivaRepository.save(execucioMassiva);
+//		execucioMassivaRepository.save(execucioMassiva);
 	}
 
 	@Override

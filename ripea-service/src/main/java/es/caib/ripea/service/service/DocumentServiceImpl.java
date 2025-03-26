@@ -126,6 +126,7 @@ import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 
 @Service
@@ -1440,10 +1441,10 @@ public class DocumentServiceImpl implements DocumentService {
 					metaDocument,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+							dataInici == null,
+							DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+							dataFi == null,
+							DateUtil.getLocalDateTimeFromDate(dataFi, false, true),
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
@@ -1523,10 +1524,10 @@ public class DocumentServiceImpl implements DocumentService {
 					metaDocument,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi);
+							dataInici == null,
+							DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+							dataFi == null,
+							DateUtil.getLocalDateTimeFromDate(dataFi, false, true));
 			return documentsIds;
 		} else {
 			return new ArrayList<>();

@@ -1,10 +1,9 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.aggregation.MetaExpedientCountAggregation;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,8 +12,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.aggregation.MetaExpedientCountAggregation;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 
 @Component
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
@@ -354,9 +363,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
 	
 	@Query(	"select " +
@@ -393,9 +402,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") LocalDateTime dataFi);
 	
 	@Query(	"select " +
 			"    d " +
@@ -430,9 +439,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
 	
 	
@@ -469,9 +478,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") LocalDateTime dataFi);
 	
 	@Query(	"select " +
 			"    d " +
@@ -503,9 +512,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
 	
 
@@ -553,9 +562,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
 	
 	
@@ -595,9 +604,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") LocalDateTime dataFi);
 	
 	public List<DocumentEntity> findByArxiuUuidAndEsborrat(String arxiuUuid, int esborrat);
 	
@@ -702,9 +711,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi,
+			@Param("creacioFi") LocalDateTime creacioFi,
 			Pageable pageable);
 	
 	
@@ -741,9 +750,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi);
+			@Param("creacioFi") LocalDateTime creacioFi);
 	
     @Query("select case when count(c) > 0 then true else false end " + 
     		"from DocumentEntity d " +

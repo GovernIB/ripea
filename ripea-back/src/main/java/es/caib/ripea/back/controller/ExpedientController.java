@@ -1940,16 +1940,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "redirect:/expedient";
 		}
 	}
-	
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 
 	private void emplenarFiltreRelacionats(
 			HttpServletRequest request, 

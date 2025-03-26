@@ -741,17 +741,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
-
-
 	private void emplenarModelPortafirmes(
 			HttpServletRequest request,
 			Long documentId,

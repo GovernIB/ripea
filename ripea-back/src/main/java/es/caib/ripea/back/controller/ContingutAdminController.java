@@ -285,15 +285,6 @@ public class ContingutAdminController extends BaseAdminController {
 				"contingut.admin.controller.esborrat.definitiu.ok");
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
 	@ResponseBody

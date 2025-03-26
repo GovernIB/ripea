@@ -407,16 +407,6 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		return "consultaExecucionsMassives";
 	}
 
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 	private void setFluxPredefinit(
 			MetaDocumentDto metaDocument,
 			Model model,

@@ -1,17 +1,18 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
-import es.caib.ripea.persistence.entity.ContingutLogEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
+import es.caib.ripea.persistence.entity.ContingutLogEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 
 @Component
 public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity, Long> {
@@ -35,8 +36,8 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "group by" +
 	        "     e.metaExpedient, log.tipus, i.documentNum")
 	List<ContingutLogCountAggregation<String>> findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
-			@Param("createdDateIni") Date createdDateIni,
-			@Param("createdDateEnd") Date createdDateEnd);
+			@Param("createdDateIni") LocalDateTime createdDateIni,
+			@Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	@Query( "select   " +
 			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
@@ -54,7 +55,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "group by" +
 	        "     e.metaExpedient, log.tipus, i.documentNum")
 	List<ContingutLogCountAggregation<String>> findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
-			@Param("createdDateEnd") Date createdDateEnd);
+			@Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	@Query( "select   " +
 			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
@@ -73,8 +74,8 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "group by" +
 	        "     e.metaExpedient, log.createdBy, log.tipus")
 	List<ContingutLogCountAggregation<UsuariEntity>> findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
-			@Param("createdDateIni") Date createdDateIni,
-			@Param("createdDateEnd") Date createdDateEnd);
+			@Param("createdDateIni") LocalDateTime createdDateIni,
+			@Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	@Query( "select   " +
 			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
@@ -92,7 +93,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "group by" +
 	        "     e.metaExpedient, log.createdBy, log.tipus")
 	List<ContingutLogCountAggregation<UsuariEntity>> findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
-			@Param("createdDateEnd") Date createdDateEnd);
+			@Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	@Query( "select   " +
             "    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
@@ -111,8 +112,8 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "group by" +
             "     e.metaExpedient, log.tipus")
         List<ContingutLogCountAggregation<MetaExpedientEntity>> findLogsExpedientBetweenCreatedDateGroupByMetaExpedient(
-            @Param("createdDateIni") Date createdDateIni,
-            @Param("createdDateEnd") Date createdDateEnd);
+            @Param("createdDateIni") LocalDateTime createdDateIni,
+            @Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	@Query( "select   " +
             "    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +
@@ -130,7 +131,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "group by" +
             "     e.metaExpedient, log.tipus")
         List<ContingutLogCountAggregation<MetaExpedientEntity>> findLogsExpedientBeforeCreatedDateGroupByMetaExpedient(
-            @Param("createdDateEnd") Date createdDateEnd);
+            @Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	
 	@Query( "select   " +
@@ -150,8 +151,8 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "group by" +
             "     e.metaExpedient, log.tipus")
         List<ContingutLogCountAggregation<MetaExpedientEntity>> findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
-                @Param("createdDateIni") Date createdDateIni,
-                @Param("createdDateEnd") Date createdDateEnd);
+                @Param("createdDateIni") LocalDateTime createdDateIni,
+                @Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	
 	@Query( "select   " +
@@ -171,11 +172,8 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
             "group by" +
             "     e.metaExpedient, log.objecteLogTipus")
         List<ContingutLogCountAggregation<MetaExpedientEntity>> findLogsNotificacioBetweenCreatedDateGroupByMetaExpedient(
-                @Param("createdDateIni") Date createdDateIni,
-                @Param("createdDateEnd") Date createdDateEnd);
-
-
-
+                @Param("createdDateIni") LocalDateTime createdDateIni,
+                @Param("createdDateEnd") LocalDateTime createdDateEnd);
 
 	// Mètodes per evitar errors al tenir continguts orfes en base de dades
 	// ////////////////////////////////////////////////////////////////////

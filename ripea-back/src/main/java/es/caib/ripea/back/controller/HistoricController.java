@@ -15,9 +15,12 @@ import es.caib.ripea.service.intf.exception.PermissionDeniedStatisticsException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.HistoricService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -354,10 +359,6 @@ public class HistoricController extends BaseAdminController {
 		return null;
 	}
 
-	////
-	// PRIVATE CONTENT
-	////
-
 	private HistoricFiltreCommand getFiltreCommand(HttpServletRequest request) {
 		HistoricFiltreCommand filtreCommand = (HistoricFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -372,5 +373,4 @@ public class HistoricController extends BaseAdminController {
 //		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
 		return filtreCommand;
 	}
-
 }

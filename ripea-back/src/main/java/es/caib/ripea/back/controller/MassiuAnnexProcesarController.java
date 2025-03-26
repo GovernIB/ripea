@@ -398,17 +398,6 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	private String getSessionAttributeSelecio(HttpServletRequest request) {
 		return SESSION_ATTRIBUTE_SELECCIO;
 	}
-	
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 
 	private MassiuAnnexProcesarFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -427,5 +416,5 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MassiuAnnexProcesarController.class);
-	
+
 }

@@ -261,16 +261,6 @@ public class ContingutImportacioController extends BaseUserController {
 						new Object[] {sb.toString()}));
 		}
 	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutImportacioController.class);
-
 }

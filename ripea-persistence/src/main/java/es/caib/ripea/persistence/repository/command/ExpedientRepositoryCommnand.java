@@ -341,8 +341,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     Utils.getNullIfEmpty((List<MetaExpedientEntity>) sublist),
                     metaExpedient == null, metaExpedient,
                     expedient == null, expedient,
-                    dataInici == null, dataInici,
-                    dataFi == null, dataFi,
+                    dataInici == null,	DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+                    dataFi == null,		DateUtil.getLocalDateTimeFromDate(dataFi, false, true),
                     estatEnum == null, estatEnum,
                     !Utils.hasValue(nom), nom,
                     estat == null, estat,
@@ -391,8 +391,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     Utils.getNullIfEmpty((List<MetaExpedientEntity>) sublist),
                     metaExpedient == null, metaExpedient,
                     expedient == null, expedient,
-                    dataInici == null, dataInici,
-                    dataFi == null, dataFi,
+                    dataInici == null,	DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+                    dataFi == null,		DateUtil.getLocalDateTimeFromDate(dataFi, false, true),
                     estatEnum == null, estatEnum,
                     estat == null, estat,
                     prioritat == null, prioritat);
@@ -459,8 +459,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     (List<MetaExpedientEntity>) sublist,
                     metaExpedient == null, metaExpedient,
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
-                    dataInici == null, dataInici,
-                    dataFi == null, dataFi,
+                    dataInici == null,	DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+                    dataFi == null,		DateUtil.getLocalDateTimeFromDate(dataFi, false, true),
                     estatEnum == null, estatEnum,
                     estat == null, estat,
                     prioritat == null, prioritat,
@@ -502,8 +502,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     (List<MetaExpedientEntity>) sublist,
                     metaExpedient == null, metaExpedient,
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
-                    dataInici == null, dataInici,
-                    dataFi == null, dataFi);
+                    dataInici == null,	DateUtil.getLocalDateTimeFromDate(dataInici, true, false),
+                    dataFi == null,		DateUtil.getLocalDateTimeFromDate(dataFi, false, true));
         }
         @Override
         public Page<Long> executePage(List<?> sublist) {
@@ -524,8 +524,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         private final String usuariActual;
         private final MetaExpedientEntity metaExpedient;
         private final String nom;
-        private final LocalDateTime creacioInici;
-        private final LocalDateTime creacioFi;
+        private final Date creacioInici;
+        private final Date creacioFi;
         private final Pageable pageable;
 
         public ExpedientByArxiuPendentCommand(Map<String, Object> params) {
@@ -534,8 +534,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
             this.usuariActual = (String) params.get("usuariActual");
             this.metaExpedient = (MetaExpedientEntity) params.get("metaExpedient");
             this.nom = (String) params.get("nom");
-            this.creacioInici = (LocalDateTime) params.get("creacioInici");
-            this.creacioFi = (LocalDateTime) params.get("creacioFi");
+            this.creacioInici = (Date) params.get("creacioInici");
+            this.creacioFi = (Date) params.get("creacioFi");
             this.pageable = (Pageable) params.get("pageable");
         }
 
@@ -547,9 +547,10 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     usuariActual,
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
                     metaExpedient == null, metaExpedient,
-                    creacioInici == null, creacioInici,
-                    creacioFi == null, DateUtil.toDateFinalDia(creacioFi));
+                    creacioInici == null,	DateUtil.getLocalDateTimeFromDate(creacioInici, true, false),
+                    creacioFi == null,		DateUtil.getLocalDateTimeFromDate(creacioFi, false, true));
         }
+        
         @Override
         public Page<ExpedientEntity> executePage(List<?> sublist) {
             return expedientRepository.findArxiuPendents(entitat,
@@ -558,8 +559,8 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
                     usuariActual,
                     Utils.isEmpty(nom), Utils.getEmptyStringIfNull(nom),
                     metaExpedient == null, metaExpedient,
-                    creacioInici == null, creacioInici,
-                    creacioFi == null, DateUtil.toDateFinalDia(creacioFi),
+                    creacioInici == null,	DateUtil.getLocalDateTimeFromDate(creacioInici, true, false),
+                    creacioFi == null,		DateUtil.getLocalDateTimeFromDate(creacioFi, false, true),
                     pageable);
         }
 

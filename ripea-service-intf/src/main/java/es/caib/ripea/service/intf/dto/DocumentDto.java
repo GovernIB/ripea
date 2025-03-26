@@ -77,6 +77,8 @@ public class DocumentDto extends NodeDto {
 	
 	private Integer resolucion;
 	private String idioma;
+	//Nomes per evitar el error al llistat de continguts de admin: No s'ha pogut llegir la propietat de l'objecte (propietatNom=numero)
+	private String numero;
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {

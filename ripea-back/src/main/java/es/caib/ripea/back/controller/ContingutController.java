@@ -917,22 +917,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		}
 	}
 
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	    
-	    
-	    binder.registerCustomEditor(
-	    		Date[].class,
-	    		new CustomDatesEditor());
-	}
-
-
 	public void omplirModelPerMostrarContingut(
 			HttpServletRequest request,
 			EntitatDto entitatActual,

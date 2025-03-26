@@ -182,13 +182,5 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		return resposta;
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 	private static final Logger logger = LoggerFactory.getLogger(PortafirmesFluxController.class);
 }

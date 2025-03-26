@@ -1,7 +1,9 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,8 +12,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 
 @Component
 public interface ContingutRepository extends JpaRepository<ContingutEntity, Long> {
@@ -96,9 +102,9 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullDataEsborratInici") boolean esNullDataEsborratInici,
 			@Param("dataEsborratInici") Date dataEsborratInici,
 			@Param("esNullDataEsborratFi") boolean esNullDataEsborratFi,
@@ -141,9 +147,9 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullDataEsborratInici") boolean esNullDataEsborratInici,
 			@Param("dataEsborratInici") Date dataEsborratInici,
 			@Param("esNullDataEsborratFi") boolean esNullDataEsborratFi,

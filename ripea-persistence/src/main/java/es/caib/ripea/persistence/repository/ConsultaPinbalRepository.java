@@ -1,9 +1,7 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 
 @Component
 public interface ConsultaPinbalRepository extends JpaRepository<ConsultaPinbalEntity, Long> {
@@ -44,9 +45,9 @@ public interface ConsultaPinbalRepository extends JpaRepository<ConsultaPinbalEn
 			@Param("esNullCreatPer") boolean esNullCreatPer,
 			@Param("creatPer") UsuariEntity creatPer,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFinal") boolean esNullDataFinal,
-			@Param("dataFinal") Date dataFinal,
+			@Param("dataFinal") LocalDateTime dataFinal,
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") ConsultaPinbalEstatEnumDto estat,
 			Pageable paginacio);

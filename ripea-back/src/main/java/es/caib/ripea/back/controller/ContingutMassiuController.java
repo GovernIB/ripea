@@ -339,15 +339,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		return true;
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 	private ContingutMassiuFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ContingutMassiuFiltreCommand filtreCommand = (ContingutMassiuFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(

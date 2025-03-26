@@ -87,16 +87,6 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				"id");
 		return dtr;
 	}
-
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 	
 	@RequestMapping(value = "/checkIfHasGrupPerDefecte/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody

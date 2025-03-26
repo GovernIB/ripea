@@ -255,26 +255,5 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		}
 	}
 	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	    binder.registerCustomEditor(
-	    		BigDecimal.class,
-	    		new CustomNumberEditor(
-	    				BigDecimal.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
-	    binder.registerCustomEditor(
-	    		Double.class,
-	    		new CustomNumberEditor(
-	    				Double.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
-	}
-	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentMetaDadaController.class);
 }

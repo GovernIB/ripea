@@ -1,6 +1,9 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.*;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,8 +11,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
 
 @Component
 public interface InteressatRepository extends JpaRepository<InteressatEntity, Long> {
@@ -216,9 +225,9 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
-			@Param("creacioInici") Date creacioInici,
+			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") Date creacioFi,
+			@Param("creacioFi") LocalDateTime creacioFi,
 			Pageable pageable);
 	
 	@Query(	"select " +
