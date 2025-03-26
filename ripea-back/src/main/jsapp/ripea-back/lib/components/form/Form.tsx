@@ -203,10 +203,13 @@ export const Form: React.FC<FormProps> = (props) => {
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
     const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
-        // Obté les dades inicials
-        // Si és un formulari de modificació obté les dades fent una petició al servidor
-        // Si és un formulari de creació obté les dades dels camps
-        const initialData = id != null ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
+        // Obté les dades inicials.
+        // Si és un formulari d'artefacte obté les dades dels camps
+        // Si no és un formulari d'artefacte:
+        //     - Si és un formulari de modificació obté les dades fent una petició al servidor
+        //     - Si és un formulari de creació obté les dades dels camps
+        const getInitialDataFromApiGetOne = resourceType == null && id != null;
+        const initialData = getInitialDataFromApiGetOne ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
         const mergedData = { ...initialData, ...additionalData };
         return initOnChangeRequest ? await sendOnChangeRequest(id, { previous: mergedData }) : mergedData;
     }, [apiGetOne, sendOnChangeRequest]);
