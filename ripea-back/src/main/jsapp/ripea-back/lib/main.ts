@@ -6,6 +6,7 @@ export { BaseAppContext, useBaseAppContext } from './components/BaseAppContext';
 export {
     useMessageDialogButtons,
     useConfirmDialogButtons,
+    useCloseDialogButtons,
     useFormDialogButtons,
     useActionDialogButtons,
     useReportDialogButtons
@@ -23,6 +24,7 @@ export { DataFormDialog as MuiFormDialog } from './components/mui/datacommon/Dat
 export { MuiFormSidebar } from './components/mui/form/MuiFormSidebar';
 export { MuiFormTabs, MuiFormTabContent } from './components/mui/form/MuiFormTabs';
 export { MuiFilter } from './components/mui/form/MuiFilter';
+export { Dialog as MuiDialog, useContentDialog as useMuiContentDialog, useMessageDialog as useMuiMessageDialog} from './components/mui/Dialog';
 export { ActionReportButton as MuiActionReportButton, useActionReportLogic as useMuiActionReportLogic } from './components/mui/ActionReportButton';
 
 export { FormField } from './components/form/FormField';
@@ -33,7 +35,6 @@ export { useFilterContext } from './components/form/FilterContext';
 export { useFilterApiRef, useFilterApiContext } from './components/form/Filter';
 
 export { Toolbar } from './components/mui/Toolbar';
-export { Dialog, useContentDialog, useMessageDialog } from './components/mui/Dialog';
 export { TextAvatar, IconAvatar } from './components/mui/Avatars';
 
 export { envVar } from './util/envVars';

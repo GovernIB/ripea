@@ -56,10 +56,8 @@ export const Filter: React.FC<FilterProps> = (props) => {
         formApiRef.current.validate().
             then(() => {
                 const formData = data ?? formApiRef.current?.getData();
-                console.log('>>> filter', formData)
                 const springFilter = springFilterBuilder(formData);
                 onSpringFilterChange?.(springFilter);
-                onDataChange?.(formData);
             });
     }
     const clear = (data?: any) => {
@@ -67,6 +65,7 @@ export const Filter: React.FC<FilterProps> = (props) => {
         formApiRef.current?.reset(data);
     }
     const handleDataChange = (data: any) => {
+        onDataChange?.(data);
         if (nextDataChangeAsUncontrolled) {
             setNextDataChangeAsUncontrolled(false);
             filter(data);

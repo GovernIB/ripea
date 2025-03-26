@@ -121,10 +121,8 @@ const componentsEn = {
             generate: 'Generate',
             cancel: 'Cancel',
         },
-        close: {
-            close: 'Close'
-        },
         misc: {
+            close: 'Close',
             retry: 'Retry',
         },
     },
