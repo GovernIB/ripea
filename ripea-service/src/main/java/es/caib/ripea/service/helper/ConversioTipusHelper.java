@@ -84,6 +84,7 @@ import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientExportDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
@@ -111,7 +112,6 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 
@@ -189,6 +189,11 @@ public class ConversioTipusHelper {
 	      
 	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientDto.class).byDefault().register();
 	      
+	      mapperFactory.classMap(MetaExpedientEntity.class, MetaExpedientExportDto.class)
+          .field("metaDocuments", "metaDocuments")
+          .byDefault()
+          .register();
+	      
 	      mapperFactory
 			.classMap(DadesUsuari.class, UsuariDto.class)
 			.field("nomSencer", "nom")
@@ -198,8 +203,24 @@ public class ConversioTipusHelper {
 	      .customize(new CustomMapper<MetaExpedientComentariEntity, MetaExpedientComentariDto>() {
 	      		@Override
 				public void mapAtoB(MetaExpedientComentariEntity source, MetaExpedientComentariDto target, MappingContext context) {
-	      			target.setCreatedBy(convertir(source.getCreatedBy().get(), UsuariDto.class));
-	      			target.setLastModifiedBy(convertir(source.getLastModifiedBy().get(), UsuariDto.class));
+					if (source.getCreatedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+		      			UsuariDto uDto = new UsuariDto();
+		      			uDto.setCodi(ue.getCodi());
+		      			uDto.setNom(ue.getNom());
+		      			uDto.setNif(ue.getNif());
+		      			uDto.setEmail(ue.getEmail());
+		      			target.setCreatedBy(uDto);
+					}
+					if (source.getLastModifiedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getLastModifiedBy().get());
+		      			UsuariDto uDto = new UsuariDto();
+		      			uDto.setCodi(ue.getCodi());
+		      			uDto.setNom(ue.getNom());
+		      			uDto.setNif(ue.getNif());
+		      			uDto.setEmail(ue.getEmail());
+		      			target.setLastModifiedBy(uDto);
+					}
 	      		}
 		      })
 	      .byDefault().register(); 
@@ -208,8 +229,24 @@ public class ConversioTipusHelper {
 	      .customize(new CustomMapper<MetaNodeEntity, MetaNodeDto>() {
       		@Override
 			public void mapAtoB(MetaNodeEntity source, MetaNodeDto target, MappingContext context) {
-      			target.setCreatedBy(convertir(source.getCreatedBy().get(), UsuariDto.class));
-      			target.setLastModifiedBy(convertir(source.getLastModifiedBy().get(), UsuariDto.class));
+				if (source.getCreatedBy().isPresent()) {
+	      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+	      			UsuariDto uDto = new UsuariDto();
+	      			uDto.setCodi(ue.getCodi());
+	      			uDto.setNom(ue.getNom());
+	      			uDto.setNif(ue.getNif());
+	      			uDto.setEmail(ue.getEmail());
+	      			target.setCreatedBy(uDto);
+				}
+				if (source.getLastModifiedBy().isPresent()) {
+	      			UsuariEntity ue = usuariRepository.findByCodi(source.getLastModifiedBy().get());
+	      			UsuariDto uDto = new UsuariDto();
+	      			uDto.setCodi(ue.getCodi());
+	      			uDto.setNom(ue.getNom());
+	      			uDto.setNif(ue.getNif());
+	      			uDto.setEmail(ue.getEmail());
+	      			target.setLastModifiedBy(uDto);
+				}
       		}
 	      })
 	      .byDefault().register();
@@ -244,13 +281,10 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient(), false, false));
 						target.setMetaExpedientTasca(convertir(source.getMetaTasca(), MetaExpedientTascaDto.class));
-						
-						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
 						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));
 						target.setObservadors(convertirList(source.getObservadors(), UsuariDto.class));
 						target.setDelegat(convertir(source.getDelegat(), UsuariDto.class));
-						
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
 						target.setTitol(source.getTitol());
@@ -282,6 +316,17 @@ public class ConversioTipusHelper {
 						target.setUsuariActualObservador(usuariActualObservador);
 						
 						target.setUsuariActualDelegat(source.getDelegat() != null && source.getDelegat().getCodi().equals(auth.getName()));
+						
+						if (source.getCreatedBy().isPresent()) {
+			      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+			      			UsuariDto uDto = new UsuariDto();
+			      			uDto.setCodi(ue.getCodi());
+			      			uDto.setNom(ue.getNom());
+			      			uDto.setNif(ue.getNif());
+			      			uDto.setEmail(ue.getEmail());
+			      			target.setCreatedBy(uDto);
+						}
+						
 						return target;
 					}
 				});
@@ -359,9 +404,17 @@ public class ConversioTipusHelper {
 						}
 						target.setArxiuDataActualitzacio(source.getArxiuDataActualitzacio());
 						target.setArxiuUuid(source.getArxiuUuid());
-						target.setCreatedBy(convertir(
-								source.getCreatedBy(), 
-								UsuariDto.class));
+						
+						if (source.getCreatedBy().isPresent()) {
+			      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+			      			UsuariDto uDto = new UsuariDto();
+			      			uDto.setCodi(ue.getCodi());
+			      			uDto.setNom(ue.getNom());
+			      			uDto.setNif(ue.getNif());
+			      			uDto.setEmail(ue.getEmail());
+			      			target.setCreatedBy(uDto);
+						}
+						
 						target.setCreatedDate(
 								Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
 						target.setEntitat(convertir(
@@ -713,7 +766,15 @@ public class ConversioTipusHelper {
 						target.setPortafirmesFluxId(source.getPortafirmesFluxId());
 						target.setPortafirmesTransaccioId(source.getPortafirmesTransaccioId());
 						target.setEnviarCorreu(source.getEnviarCorreu());
-						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
+						if (source.getCreatedBy().isPresent()) {
+			      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+			      			UsuariDto uDto = new UsuariDto();
+			      			uDto.setCodi(ue.getCodi());
+			      			uDto.setNom(ue.getNom());
+			      			uDto.setNif(ue.getNif());
+			      			uDto.setEmail(ue.getEmail());
+			      			target.setCreatedBy(uDto);
+						}
 						return target;
 					}
 				});
@@ -880,10 +941,10 @@ public class ConversioTipusHelper {
 	            	target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
 	            	target.setExpedientNumeroTitol(source.getExpedient() != null ? source.getExpedient().getNomINumero() : null);
 	            	target.setProcedimentCodiNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getCodiSiaINom() : null);
-	            	if (source.getCreatedBy()!=null) {
-	            		String usuCodiAndNom = usuariRepository.findById(source.getCreatedBy().get()).get().getCodiAndNom();
-	            		target.setCreatedBy(usuCodiAndNom);	
-	            	}
+					if (source.getCreatedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+		      			target.setCreatedBy(ue.getCodiAndNom());
+					}
 	            	target.setCreatedDate(
 				            Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
 	            	target.setError(HtmlUtils.htmlEscape(source.getError()));

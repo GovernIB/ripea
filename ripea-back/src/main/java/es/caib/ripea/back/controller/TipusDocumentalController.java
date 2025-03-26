@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.command.TipusDocumentalCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
@@ -81,6 +82,7 @@ public class TipusDocumentalController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "tipusDocumentalForm";
 		}
 		if (command.getId() != null) {

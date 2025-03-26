@@ -1,15 +1,15 @@
 package es.caib.ripea.persistence.base.config;
 
-import es.caib.ripea.service.intf.config.PropertyConfig;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Optional;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 
 /**
  * Configuració per a les entitats de base de dades auditables.
@@ -26,13 +26,11 @@ public class AuditingConfig {
 	@Bean
 	public AuditorAware<String> auditorProvider() {
 		return () -> {
-//			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//			if (authentication != null && authentication.isAuthenticated()) {
-//				return Optional.of(authentication.getName());
-//			}
-//			return Optional.ofNullable(defaultAuditor);
-            return Optional.of("rip_admin");
+			if (SecurityContextHolder.getContext()!=null && SecurityContextHolder.getContext().getAuthentication()!=null) {
+				return Optional.of(SecurityContextHolder.getContext().getAuthentication().getName());
+			} else {
+				return Optional.of("rip_admin");
+			}
 		};
 	}
-
 }

@@ -273,6 +273,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			}
 			model.addAttribute("interessatCommand", interessatCommand);
 			model.addAttribute("netejar", false);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "expedientInteressatForm";
 		}
 		
@@ -486,6 +487,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			model.addAttribute("interessatId", interessatId);
 			model.addAttribute("interessatCommand", interessatCommand);
 			model.addAttribute("netejar", false);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "expedientInteressatForm";
 		}
 		

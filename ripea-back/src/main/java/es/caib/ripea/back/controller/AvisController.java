@@ -167,6 +167,7 @@ public class AvisController extends BaseAdminController {
 			@Valid AvisCommand command,
 			BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "avisForm";
 		}
 		AvisDto resultat = null;

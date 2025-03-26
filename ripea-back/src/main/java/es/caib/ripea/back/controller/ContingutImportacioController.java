@@ -101,6 +101,7 @@ public class ContingutImportacioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelImportacio(request, contingutId, command, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "contingutImportacioForm";
 		}
 		int documentsRepetits = 0;

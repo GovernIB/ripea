@@ -281,6 +281,7 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		if (bindingResult.hasErrors()) {
 			fillFormModel(request, dto, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "metaExpedientForm";
 		}
 		String rolActual = RolHelper.getRolActual(request);
@@ -602,54 +603,60 @@ public class MetaExpedientController extends BaseAdminController {
 	
 	private void fillImportEditForm(MetaExpedientExportDto metaExpedientExport, Model model, EntitatDto entitatActual, HttpServletRequest request, MetaExpedientImportEditCommand metaExpedientImportEditCommand) {
 		
-		for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
-			if (metaDocumentDto.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && metaDocumentDto.getPortafirmesResponsables() != null && metaDocumentDto.getPortafirmesResponsables().length != 0) {
-				List<String> respons = new ArrayList<>();
-				for (int i = 0; i < metaDocumentDto.getPortafirmesResponsables().length; i++) {
-					try {
-						aplicacioService.findUsuariAmbCodiDades(metaDocumentDto.getPortafirmesResponsables()[i]);
-						respons.add(metaDocumentDto.getPortafirmesResponsables()[i]);
-					} catch (Exception e) {
+		if (metaExpedientExport.getMetaDocuments()!=null) {
+			for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
+				if (metaDocumentDto.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && metaDocumentDto.getPortafirmesResponsables() != null && metaDocumentDto.getPortafirmesResponsables().length != 0) {
+					List<String> respons = new ArrayList<>();
+					for (int i = 0; i < metaDocumentDto.getPortafirmesResponsables().length; i++) {
+						try {
+							aplicacioService.findUsuariAmbCodiDades(metaDocumentDto.getPortafirmesResponsables()[i]);
+							respons.add(metaDocumentDto.getPortafirmesResponsables()[i]);
+						} catch (Exception e) {
+						}
 					}
-				}
-				metaDocumentDto.setPortafirmesResponsables(respons.toArray(new String[0]));
-				
-				metaExpedientImportEditCommand.getMetaDocuments().add(ConversioTipusHelper.convertir(metaDocumentDto, MetaDocumentCommand.class));
-			}
-		}
-		
-		for (ExpedientEstatDto expedientEstatDto : metaExpedientExport.getEstats()) {
-			if (expedientEstatDto.getResponsableCodi() != null) {
-				try {
-					aplicacioService.findUsuariAmbCodiDades(expedientEstatDto.getResponsableCodi());
-				} catch (Exception e) {
-					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-					if (root instanceof NotFoundException) {
-						logger.debug("Pocediment import. Responsable per estat no trobat. " + root.getMessage());
-					} else {
-						logger.error("Pocediment import. Error al cercar usuari per estat", e);
-					}
+					metaDocumentDto.setPortafirmesResponsables(respons.toArray(new String[0]));
 					
-					expedientEstatDto.setResponsableCodi(null);
+					metaExpedientImportEditCommand.getMetaDocuments().add(ConversioTipusHelper.convertir(metaDocumentDto, MetaDocumentCommand.class));
 				}
-				metaExpedientImportEditCommand.getEstats().add(ConversioTipusHelper.convertir(expedientEstatDto, ExpedientEstatCommand.class));
 			}
 		}
 		
-		for (MetaExpedientTascaDto metaExpedientTascaDto : metaExpedientExport.getTasques()) {
-			if (metaExpedientTascaDto.getResponsable() != null) {
-				try {
-					aplicacioService.findUsuariAmbCodiDades(metaExpedientTascaDto.getResponsable());
-				} catch (Exception e) {
-					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-					if (root instanceof NotFoundException) {
-						logger.debug("Pocediment import. Responsable per tasca no trobat. " + root.getMessage());
-					} else {
-						logger.error("Pocediment import. Error al cercar usuari per tasca", e);
+		if (metaExpedientExport.getEstats()!=null) {
+			for (ExpedientEstatDto expedientEstatDto : metaExpedientExport.getEstats()) {
+				if (expedientEstatDto.getResponsableCodi() != null) {
+					try {
+						aplicacioService.findUsuariAmbCodiDades(expedientEstatDto.getResponsableCodi());
+					} catch (Exception e) {
+						Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+						if (root instanceof NotFoundException) {
+							logger.debug("Pocediment import. Responsable per estat no trobat. " + root.getMessage());
+						} else {
+							logger.error("Pocediment import. Error al cercar usuari per estat", e);
+						}
+						
+						expedientEstatDto.setResponsableCodi(null);
 					}
-					metaExpedientTascaDto.setResponsable(null);
+					metaExpedientImportEditCommand.getEstats().add(ConversioTipusHelper.convertir(expedientEstatDto, ExpedientEstatCommand.class));
 				}
-				metaExpedientImportEditCommand.getTasques().add(ConversioTipusHelper.convertir(metaExpedientTascaDto, MetaExpedientTascaCommand.class));
+			}
+		}
+		
+		if (metaExpedientExport.getTasques()!=null) {
+			for (MetaExpedientTascaDto metaExpedientTascaDto : metaExpedientExport.getTasques()) {
+				if (metaExpedientTascaDto.getResponsable() != null) {
+					try {
+						aplicacioService.findUsuariAmbCodiDades(metaExpedientTascaDto.getResponsable());
+					} catch (Exception e) {
+						Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+						if (root instanceof NotFoundException) {
+							logger.debug("Pocediment import. Responsable per tasca no trobat. " + root.getMessage());
+						} else {
+							logger.error("Pocediment import. Error al cercar usuari per tasca", e);
+						}
+						metaExpedientTascaDto.setResponsable(null);
+					}
+					metaExpedientImportEditCommand.getTasques().add(ConversioTipusHelper.convertir(metaExpedientTascaDto, MetaExpedientTascaCommand.class));
+				}
 			}
 		}
 		

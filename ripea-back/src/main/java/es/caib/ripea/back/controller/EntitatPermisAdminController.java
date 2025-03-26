@@ -2,6 +2,7 @@ package es.caib.ripea.back.controller;
 
 import es.caib.ripea.back.command.PermisCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
@@ -99,6 +100,7 @@ public class EntitatPermisAdminController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "adminPermisForm";
 		}
 		entitatService.updatePermisAdmin(

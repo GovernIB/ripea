@@ -3,18 +3,15 @@ package es.caib.ripea.back.helper;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
+import javax.management.MBeanServer;
 
-
-@SuppressWarnings("restriction")
 public class MonitorHelper {
+	
 	private static Boolean actiu = null;
 	private static long prevUpTime, prevProcessCpuTime;
-
 	private static RuntimeMXBean rmBean;
-
-	
-	
 	private static com.sun.management.OperatingSystemMXBean sunOSMBean;
+	
 	public static com.sun.management.OperatingSystemMXBean getSunOSMBean() {
 		return sunOSMBean;
 	}
@@ -65,9 +62,9 @@ public class MonitorHelper {
 	static {
 		try {
 			rmBean = ManagementFactory.getRuntimeMXBean();
-			// reperisco l'MBean relativo al sunOS
-			sunOSMBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, com.sun.management.OperatingSystemMXBean.class);
-
+			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			String opmn = ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME;			
+			sunOSMBean = ManagementFactory.newPlatformMXBeanProxy(mbs, opmn, com.sun.management.OperatingSystemMXBean.class);
 			result = new Result();
 			result.nCPUs = sunOSMBean.getAvailableProcessors();
 			result.upTime = rmBean.getUptime();

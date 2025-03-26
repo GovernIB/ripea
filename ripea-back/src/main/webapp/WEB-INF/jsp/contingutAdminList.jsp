@@ -8,7 +8,7 @@
 pageContext.setAttribute(
 		"contingutAdminOpcionsEsborratEnumOptions",
 		es.caib.ripea.back.helper.EnumHelper.getOptionsForEnum(
-				es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum.class,
+				es.caib.ripea.back.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum.class,
 				"contingut.admin.opcions.esborrat.enum."));
 %>
 <rip:blocIconaContingutNoms/>

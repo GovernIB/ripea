@@ -602,10 +602,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelPortafirmes(
-					request,
-					documentId,
-					model);
+			emplenarModelPortafirmes(request, documentId, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "viaFirmaForm";
 		}
 		try {

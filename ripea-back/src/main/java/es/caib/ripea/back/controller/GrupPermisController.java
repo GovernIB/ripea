@@ -2,6 +2,7 @@ package es.caib.ripea.back.controller;
 
 import es.caib.ripea.back.command.PermisCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.service.GrupService;
@@ -83,9 +84,8 @@ public class GrupPermisController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"grup",
-					grupService.findById(grupId));
+			model.addAttribute("grup", grupService.findById(grupId));
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "grupPermisForm";
 		}
 		

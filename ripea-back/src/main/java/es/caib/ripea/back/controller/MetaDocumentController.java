@@ -5,6 +5,7 @@ import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
@@ -101,6 +102,7 @@ public class MetaDocumentController extends BaseAdminController {
 		
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "metaDocumentForm";
 		}
 		if (command.getId() != null) {
