@@ -11,6 +11,7 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
+//        register(ExpedientFilterForm.Fields.dataCreacioInici, new FilterOnchangeLogicProcessor());
+        register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
     }
 
     @Override
@@ -82,15 +86,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 = metaExpedientSequenciaResourceRepository.findByMetaExpedientAndAny(entity.getMetaExpedient(), resource.getAny());
 
         metaExpedientSequenciaResourceEntity.ifPresentOrElse(
-                (metaExpedientSequencia)->{
-                    metaExpedientSequencia.setValor(metaExpedientSequencia.getValor()+1);
+                (metaExpedientSequencia) -> {
+                    metaExpedientSequencia.setValor(metaExpedientSequencia.getValor() + 1);
                     metaExpedientSequenciaResourceRepository.save(metaExpedientSequencia);
                 },
-                ()->{
+                () -> {
                     MetaExpedientSequenciaResourceEntity metaExpedientSequencia = new MetaExpedientSequenciaResourceEntity();
                     metaExpedientSequencia.setMetaExpedient(entity.getMetaExpedient());
                     metaExpedientSequencia.setAny(resource.getAny());
-                    metaExpedientSequencia.setValor(resource.getSequencia()+1);
+                    metaExpedientSequencia.setValor(resource.getSequencia() + 1);
 
                     metaExpedientSequenciaResourceRepository.save(metaExpedientSequencia);
                 }
@@ -110,6 +114,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumTasques(entity.getTasques().size());
         }
     }
+
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -160,6 +165,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
+
     private class AnyOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
         @Override
         public void onChange(
@@ -189,6 +195,27 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 });
             } else {
                 target.setSequencia(null);
+            }
+        }
+    }
+
+    private static class FilterOnchangeLogicProcessor implements FilterProcessor<ExpedientFilterForm> {
+
+        @Override
+        public void onChange(ExpedientFilterForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientFilterForm target) {
+            switch (fieldName) {
+                case ExpedientFilterForm.Fields.dataCreacioInici:
+                    if (fieldValue != null && previous.getDataCreacioFinal() != null
+                            && previous.getDataCreacioFinal().isBefore((ChronoLocalDateTime<?>) fieldValue)) {
+                        target.setDataCreacioInici(null);
+                    }
+                    break;
+                case ExpedientFilterForm.Fields.dataCreacioFinal:
+                    if (fieldValue != null && previous.getDataCreacioInici() != null
+                            && previous.getDataCreacioInici().isAfter((ChronoLocalDateTime<?>) fieldValue)) {
+                        target.setDataCreacioFinal(null);
+                    }
+                    break;
             }
         }
     }

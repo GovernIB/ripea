@@ -18,7 +18,7 @@ const EnviarViaEmail = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_VIA_EMAIL"}
-        title={t('page.tasca.action.retomar')}
+        title={t('page.document.action.enviarEmail')}
         {...props}
     >
         <EnviarViaEmailForm/>

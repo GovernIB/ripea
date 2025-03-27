@@ -5,32 +5,36 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const ReobrirForm = () => {
+const EviarPortafirmesForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="responsable" required/>
         <GridFormField xs={12} name="motiu"/>
+        <GridFormField xs={12} name="prioritat"/>
+        <GridFormField xs={12} name="annexos"/>
+        <GridFormField xs={12} name="fluxFirma"/>
     </Grid>
 }
 
-const Reobrir = (props:any) => {
+const EviarPortafirmes = (props:any) => {
     const { t } = useTranslation();
 
     return <FormActionDialog
-        resourceName={"expedientTascaResource"}
-        action={"ACTION_REABRIR"}
-        title={t('page.tasca.action.reobrir')}
+        resourceName={"documentResource"}
+        action={"ENVIAR_PORTAFIRMES"}
+        title={t('page.document.action.enviarPortafirmes')}
         {...props}
     >
-        <ReobrirForm/>
+        <EviarPortafirmesForm/>
     </FormActionDialog>
 }
 
-const useReobrir = (refresh?: () => void) => {
+const useEviarPortafirmes = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        apiRef.current?.show?.(id,{responsableActual:row?.responsableActual})
+        apiRef.current?.show?.(id, {
+            motiu: `Tramitació de l'expedient [${row?.expedient?.description}]`,
+        })
     }
     const onSuccess = () :void => {
         refresh?.()
@@ -42,7 +46,7 @@ const useReobrir = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <Reobrir apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <EviarPortafirmes apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
-export default useReobrir;
+export default useEviarPortafirmes;

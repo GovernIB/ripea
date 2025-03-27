@@ -4,8 +4,8 @@ import {
     BasePage,
     useResourceApiService,
 } from 'reactlib';
-import React, {useState} from "react";
-import {Box, Typography, Card, CardContent, Grid, Icon, IconButton} from '@mui/material';
+import {useState, useEffect} from "react";
+import {Typography, Card, CardContent, Grid, Icon, IconButton} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -14,6 +14,7 @@ import TasquesGrid from "../../tasca/TasquesGrid.tsx";
 import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
+import DadaGrid from "../../dada/DadaGrid.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -25,7 +26,7 @@ const CardProp = (props :any) => {
     </>;
 }
 
-const Expedient: React.FC = () => {
+const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();
 
@@ -33,15 +34,15 @@ const Expedient: React.FC = () => {
         isReady: apiIsReady,
         getOne: appGetOne,
     } = useResourceApiService('expedientResource');
-    const [expedient, setExpedient] = useState<any>();
+    const [expedient, setExpedient] = useState<any>({id: id});
 
-    React.useEffect(()=>{
+    useEffect(()=>{
         if (apiIsReady) {
             appGetOne(id, {perspectives: ['COUNT']}).then((app) => setExpedient(app))
         }
     },[apiIsReady])
 
-    const border= { border: '1px solid #e3e3e3', borderRadius: 10 };
+    const border= { border: '1px solid #e3e3e3', borderRadius: '10px' };
     const backgroundColor= { backgroundColor: '#f5f5f5' };
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
@@ -55,21 +56,22 @@ const Expedient: React.FC = () => {
         {
             value: "contingut",
             label: t('page.contingut.tabs.contingut'),
-            content: <DocumentsGrid id={id} entity={expedient} onRowCountChange={setNumContingut}/>,
+            content: <DocumentsGrid entity={expedient} onRowCountChange={setNumContingut}/>,
             badge: numContingut ?? expedient?.numContingut,
         },
         {
             value: "dades",
             label: t('page.contingut.tabs.dades'),
-            content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
+            // content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
+            content: <DadaGrid entity={expedient}/>,
             badge: expedient?.numDades,
-            hidden: expedient?.numDades == 0,
+            // hidden: expedient?.numDades == 0,
         },
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
             content: <InteressatsGrid id={id} onRowCountChange={setNumInteressats}/>,
-            badge: numInteressats ?? expedient?.numInteressats,
+            badge: numInteressats ,
             hidden: !isExperientOrCarpeta(expedient),
         },
         {
@@ -103,73 +105,68 @@ const Expedient: React.FC = () => {
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
-            content: <TasquesGrid id={id} entity={expedient} onRowCountChange={setNumTasques}/>,
+            content: <TasquesGrid entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
             hidden: !isExperientOrCarpeta(expedient),
         },
     ]
 
-    return expedient && <BasePage>
-        <div style={border}>
-            <Box sx={{backgroundColor, borderBottom: '1px solid #e3e3e3', borderTopRightRadius: 10, borderTopLeftRadius: 10, p: 1}}>
-                <Grid container sx={{
-                    direction: "row",
-                    columnSpacing:1,
-                    rowSpacing:1,
-                    justifyContent:"space-between",
-                    alignItems:"center"
-                }} >
+    return <BasePage>
+        <Card sx={{border}}>
+            <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
+                <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
                     <Grid item xs={7}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                        <Icon>folder</Icon>{expedient.nom}</Typography>
+                        <Icon>folder</Icon>{expedient?.nom}</Typography>
                     </Grid>
                     {expedient?.agafatPer && <Grid item xs={4}>
                         <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1}>
                             {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
 
-                                <IconButton aria-label="lock_open" color={"inherit"}>
-                                    <Icon>lock_open</Icon>
-                                </IconButton>
+                            <IconButton aria-label="lock_open" color={"inherit"}>
+                                <Icon>lock_open</Icon>
+                            </IconButton>
                         </Typography>
                     </Grid>}
                 </Grid>
-            </Box>
+            </CardContent>
+            <CardContent>
+                <Grid container direction={'row'} columnSpacing={1} sx={{ alignItems: "stretch" }}>
+                    <Grid item xs={3}>
+                        <Card sx={{ backgroundColor, border }}>
+                            <CardContent>
+                                <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
+                                    Informació de l'expedient
+                                </Typography>
 
-            <Grid container direction={"row"} sx={{ p: 1, alignItems: "stretch" }}>
-                <Grid item xs={3}>
-                    <Card sx={{ backgroundColor, border }}>
-                        <CardContent>
-                            <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
-                                Informació de l'expedient
-                            </Typography>
+                                <CardProp title={t('page.contingut.detalle.numero')}>{expedient?.numero}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.titol')}>{expedient?.nom}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.estat')}
+                                          sx={{borderLeft: `3px solid ${'red'}`, pl: 1}}>{expedient?.estat}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.prioritat')}
+                                          sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>{expedient?.prioritat}</CardProp>
+                                <CardProp title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</CardProp>
 
-                            <CardProp title={t('page.contingut.detalle.numero')}>{expedient.numero}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.titol')}>{expedient.nom}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.metaExpedient')}>{expedient.metaExpedient.description}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.organGestor')}>{expedient.organGestor.description}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient.ntiFechaApertura)}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.estat')}
-                                      sx={{borderLeft: `3px solid ${'red'}`, pl: 1}}>{expedient.estat}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.prioritat')}
-                                      sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>{expedient.prioritat}</CardProp>
-                            <CardProp title={t('page.contingut.detalle.clasificacio')}>{expedient.ntiClasificacionSia}</CardProp>
+                                <ExpedientActionButton entity={expedient}/>
+                            </CardContent>
+                        </Card>
+                    </Grid>
 
-                            <ExpedientActionButton entity={expedient}/>
-                        </CardContent>
-                    </Card>
+                    <Grid item xs={9}>
+                        <TabComponent
+                            indicatorColor={"primary"}
+                            textColor={"primary"}
+                            aria-label="scrollable force tabs"
+                            tabs={tabs}
+                            variant="scrollable"
+                            headerAdditionalData={<CommentDialog entity={expedient}/>}
+                        />
+                    </Grid>
                 </Grid>
-
-                <Grid item xs={9}>
-                    <TabComponent
-                        indicatorColor={"primary"}
-                        textColor={"primary"}
-                        aria-label="scrollable force tabs"
-                        tabs={tabs}
-                        variant="scrollable"
-                        headerAdditionalData={<CommentDialog entity={expedient}/>}
-                    />
-                </Grid>
-            </Grid>
-        </div>
+            </CardContent>
+        </Card>
     </BasePage>;
 }
 
