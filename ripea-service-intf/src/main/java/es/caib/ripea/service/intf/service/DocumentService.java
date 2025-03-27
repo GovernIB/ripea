@@ -412,14 +412,13 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
+	@PreAuthorize("isAuthenticated()")
 	public Exception portafirmesCallback(
 			long documentId,
 			PortafirmesCallbackEstatEnumDto estat,
 			String motiuRebuig,
 			String administrationId,
 			String name) throws NotFoundException;
-
-
 
 	/**
 	 * Retorna la informació del darrer enviament a portafirmes del document.

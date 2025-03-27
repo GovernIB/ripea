@@ -67,6 +67,20 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 		Pageable pageable);
 
+	/*select * 
+	  from IPA_EXPEDIENT_TASCA TASCA
+	     , IPA_EXPEDIENT_TASCA_RESP responsable
+	     , IPA_EXPEDIENT EXP
+	     , IPA_CONTINGUT CONT
+	     , IPA_EXPEDIENT_TASCA_OBSE observador
+	WHERE TASCA.EXPEDIENT_ID=EXP.ID
+	  AND CONT.ID=EXP.ID
+	  AND TASCA.ID=responsable.TASCA_ID
+	  AND TASCA.ID=observador.TASCA_ID(+)
+	  AND CONT.esborrat = 0
+	  AND TASCA.estat in ('FINALITZADA', 'CANCELLADA')
+	  and (TASCA.DELEGAT=:usuariCodi OR observador.OBSERVADOR_CODI=:usuariCodi OR responsable.RESPONSABLE_CODI=:usuariCodi);*/
+	
 	@Query("select " +
 		"    tasca " +
 		"from " +

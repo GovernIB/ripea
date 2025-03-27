@@ -1686,6 +1686,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}		
 		
 		metaExpedientHelper.actualitzarProcediments(entitat, metaExpedients, locale, null);
+		MessageHelper.setCurrentLocale(null); //Ara el massages helper tornarà a afagar el locale del contexte
 	}
 
 	private MetaExpedientTascaEntity getMetaExpedientTasca(Long entitatId, Long metaExpedientId, Long id) {

@@ -6,6 +6,7 @@ import es.caib.portafib.callback.beans.v1.SigningRequest;
 import es.caib.ripea.service.intf.dto.IntegracioAccioBuilderDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCalbackDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,8 @@ import java.util.Map;
 @RequestMapping("/rest/portafib/v1")
 public class PortafibRestController {
 
-	@Autowired
-	private DocumentService documentService;
+	@Autowired private DocumentService documentService;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@RequestMapping(value = "/event", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -36,6 +37,9 @@ public class PortafibRestController {
 
 		try {
 
+			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria podrien donar error
+			aplicacioService.processarAutenticacioUsuari();
+			
 			PortafirmesCalbackDto portafirmesCalback = getPortafirmesCallback(event);
 			
 			IntegracioAccioBuilderDto integracioAccio = getIntegraccioAccio(portafirmesCalback);
