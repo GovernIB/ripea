@@ -33,6 +33,7 @@ export type DataCommonShowUpdateDialogFn = (id: any, row?: any) => void;
 
 export const useApiDataCommon = (
     resourceName: string,
+    findDisabled?: boolean,
     findArgs?: DataCommonFindArgs,
     quickFilterInitialValue?: string,
     quickFilterProps?: any,
@@ -51,7 +52,7 @@ export const useApiDataCommon = (
         component: quickFilterComponent
     } = useDataQuickFilter(quickFilterInitialValue, quickFilterProps);
     const refresh = () => {
-        if (apiIsReady) {
+        if (apiIsReady && !findDisabled) {
             const processedFindArgs = {
                 ...(findArgs ?? {}),
                 quickFilter: quickFilterValue?.length ? quickFilterValue : undefined,
@@ -71,6 +72,7 @@ export const useApiDataCommon = (
     }, [
         apiIsReady,
         quickFilterValue,
+        findDisabled,
         findArgs,
     ]);
     React.useEffect(() => {
@@ -86,7 +88,7 @@ export const useApiDataCommon = (
     }, [apiIsReady, getArtifacts]);
     return {
         loading,
-        rows,
+        rows: findDisabled ? [] : rows,
         pageInfo,
         artifacts,
         refresh,

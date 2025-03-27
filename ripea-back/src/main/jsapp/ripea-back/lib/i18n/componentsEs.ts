@@ -42,6 +42,7 @@ const componentsEs = {
         toolbar: {
             error: 'An error has occurred',
         },
+        findDisabled: 'Sin consultar',
         noRows: 'No data',
     },
     form: {
@@ -99,6 +100,7 @@ const componentsEs = {
             one: '1 selected row ',
             multiple: '{{count}} selected rows',
         },
+        pageInfo: '{{from}} a {{to}} de {{count}}',
     },
     buttons: {
         answerRequired: {

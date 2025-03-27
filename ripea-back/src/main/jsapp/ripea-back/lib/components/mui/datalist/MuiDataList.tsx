@@ -40,6 +40,7 @@ export type MuiDataListProps = {
     primaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
     secondaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
     readOnly?: boolean;
+    findDisabled?: boolean;
     quickFilterInitialValue?: string;
     filter?: string;
     namedQueries?: string[];
@@ -138,6 +139,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         primaryFieldRenderer,
         secondaryFieldRenderer,
         readOnly,
+        findDisabled,
         quickFilterInitialValue,
         filter,
         namedQueries,
@@ -183,6 +185,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
+        findDisabled,
         findArgs,
         quickFilterInitialValue,
         { sx: { ml: 1 } });

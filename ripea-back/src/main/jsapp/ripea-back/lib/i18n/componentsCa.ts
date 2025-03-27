@@ -42,6 +42,7 @@ const componentsCa = {
         toolbar: {
             error: 'S\'ha produit un error',
         },
+        findDisabled: 'Sense consultar',
         noRows: 'Sense dades',
     },
     grid: {
@@ -49,6 +50,7 @@ const componentsCa = {
             one: '1 fila seleccionada',
             multiple: '{{count}} files seleccionades',
         },
+        pageInfo: '{{from}} a {{to}} de {{count}}',
     },
     form: {
         goBack: {

@@ -62,6 +62,7 @@ export type MuiDataGridProps = {
     resourceFieldName?: string;
     columns: MuiDataGridColDef[];
     readOnly?: boolean;
+    findDisabled?: boolean;
     paginationActive?: boolean;
     selectionActive?: boolean;
     sortModel?: GridSortModel;
@@ -270,6 +271,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         resourceFieldName,
         columns,
         readOnly,
+        findDisabled,
         paginationActive,
         selectionActive,
         sortModel,
@@ -367,6 +369,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
+        findDisabled,
         findArgs,
         quickFilterInitialValue,
         { fullWidth: quickFilterFullWidth, sx: { ml: quickFilterFullWidth ? 0 : 1 } },
@@ -508,6 +511,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             slotProps={{
                 row: { linkTo: rowLink, cursorPointer: onRowClick != null },
                 footer: { paginationActive, selectionActive, pageInfo, setRowSelectionModel },
+                noRowsOverlay: { findDisabled },
             }}
             semiBordered={semiBordered}
             autoHeight={autoHeight}
