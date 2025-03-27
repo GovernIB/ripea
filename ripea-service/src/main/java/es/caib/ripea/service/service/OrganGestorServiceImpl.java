@@ -334,6 +334,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		} finally {
 			progres.setProgres(100);
 			progres.setFinished(true);
+			MessageHelper.setCurrentLocale(null); //Ara el massages helper tornrà a afagar el locale del contexte
 		}
 
 		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};

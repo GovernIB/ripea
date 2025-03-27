@@ -141,10 +141,10 @@
 					<groupId>stax</groupId>
 					<artifactId>stax-api</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.apache.xmlbeans</groupId>
-					<artifactId>xmlbeans</artifactId>
-				</exclusion>
+<!--				<exclusion>-->
+<!--					<groupId>org.apache.xmlbeans</groupId>-->
+<!--					<artifactId>xmlbeans</artifactId>-->
+<!--				</exclusion>-->
 			</exclusions>
 		</dependency>
 		<dependency>

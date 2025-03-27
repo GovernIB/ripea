@@ -3,33 +3,37 @@ package es.caib.ripea.service.helper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
-@Component
+@Component("serviceMessageHelper")
 public class MessageHelper implements MessageSourceAware {
 
-	private static ThreadLocal<Locale> currentLocale = new ThreadLocal<>();
+	private static Locale messagesLocale;
 	private MessageSource messageSource;
-	
-	public static void setCurrentLocale(Locale locale) {
-		MessageHelper.currentLocale.set(locale);
-	}
 
+	public static void setCurrentLocale(Locale locale) {
+		MessageHelper.messagesLocale=locale;
+	}
+	
+	private Locale getLocale(Locale locale) {
+		if (MessageHelper.messagesLocale!=null) { return MessageHelper.messagesLocale; }
+		if (locale!=null) { return locale; }
+		return LocaleContextHolder.getLocale();
+	}
+	
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 		String msg = "???" + (keys.length > 0 ? keys[keys.length-1] : "") + "???";
 		boolean found = false;
 		int i = 0;
-		if (locale == null) {
-			locale = MessageHelper.currentLocale.get();
-		}
 		while( ! found && i < keys.length) {		
 			try {
 				msg = messageSource.getMessage(
 						keys[i],
 						vars,
-						locale);
+						getLocale(locale));
 				found = true;
 			} catch (NoSuchMessageException ex) {
 				i++;
@@ -44,14 +48,11 @@ public class MessageHelper implements MessageSourceAware {
 		return msg;
 	}
 	public String getMessage(String key, Object[] vars, Locale locale) {
-		if (locale == null) {
-			locale = MessageHelper.currentLocale.get();
-		}
 		try {
 			return messageSource.getMessage(
 					key,
 					vars,
-					locale);
+					getLocale(locale));
 		} catch (NoSuchMessageException ex) {
 			if (key.startsWith("enum.")){
 				return key.substring(key.lastIndexOf(".") + 1);
@@ -65,9 +66,7 @@ public class MessageHelper implements MessageSourceAware {
 	public String getMessage(String key) {
 		return getMessage(key, null, null);
 	}
-
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
-
 }
