@@ -42,6 +42,7 @@ export { numberFormat, numberFormatCurrency } from './util/numberFormat';
 export { dateFormatLocale, timeFormatLocale, isoDateToDate, isoDateTimeToDate } from './util/dateFormat';
 export { parseIsoDuration } from './util/durationFormat';
 export { toolbarBackgroundStyle } from './util/toolbar';
+export * as springFilterBuilder from './util/springFilterBuilder';
 
 export type { MenuEntry } from './components/mui/Menu';
 export type { MuiDataGridColDef } from './components/mui/datagrid/MuiDataGrid';

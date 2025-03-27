@@ -66,7 +66,7 @@ const useTascaActions = (refresh?: () => void) => {
             icon: "play_arrow",
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'INICIADA'),
-            // disabled: disableResponsable,
+            disabled: disableResponsable,
             hidden: (row: any): boolean => row?.estat != 'PENDENT',
         },
         {

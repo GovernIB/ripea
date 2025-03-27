@@ -1,9 +1,10 @@
 import {Grid, Typography} from "@mui/material";
-import {BasePage, Dialog} from "reactlib";
+import {BasePage} from "reactlib";
 import {useState} from "react";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
+import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 
 const InformacionData = (props:any) => {
     const {title, children, hxs, bsx} = props;

@@ -1,4 +1,5 @@
 import { dateFormatLocale, timeFormatLocale } from './dateFormat';
+import { parseIsoDuration } from './durationFormat';
 import { numberFormatCurrency, numberFormatField } from './numberFormat';
 
 /*config: {
@@ -33,6 +34,7 @@ export const isFieldNumericType = (field: any, forcedType?: any) => {
     const isNumeric = type === 'number' ||
         type === 'decimal' ||
         type === 'currency' ||
+        type === 'range' ||
         type === 'date' ||
         type === 'time' ||
         type === 'datetime-local' ||
@@ -40,14 +42,28 @@ export const isFieldNumericType = (field: any, forcedType?: any) => {
     return isNumeric;
 }
 
-export const formattedFieldValue = (value: any, field?: any, config?: any): string => {
-    const processedType = config?.type ?? field?.type;
+export const formattedFieldValue = (value: any, field?: any, config?: any): string | undefined => {
+    const processedType = processType(field, config?.type);
     if (processedType === 'date') {
         return value ? dateFormatLocale(value) : value;
     } else if (processedType === 'time') {
         return value ? timeFormatLocale(value, config?.noSeconds) : value;
     } else if (processedType === 'datetime-local') {
-        return value ? dateFormatLocale(value, true) : value;
+        return value ? dateFormatLocale(value, config?.noTime ? false : true) : value;
+    } else if (processedType === 'duration') {
+        const duration = parseIsoDuration(value);
+        if (duration != null) {
+            const parts: string[] = [];
+            duration.years > 0 && parts.push(duration.years + 'y');
+            duration.months > 0 && parts.push(duration.months + 'm');
+            duration.days > 0 && parts.push(duration.days + 'd');
+            duration.hours > 0 && parts.push(duration.hours + 'h');
+            duration.minutes > 0 && parts.push(duration.minutes + 'm');
+            duration.seconds > 0 && parts.push(duration.seconds + 's');
+            return parts.join(' ');
+        } else {
+            return value;
+        }
     } else if (processedType === 'number' || processedType === 'decimal') {
         return (value === 0 || value) ? numberFormatField(value, field, config?.currentLanguage) : value;
     } else if (processedType === 'currency') {

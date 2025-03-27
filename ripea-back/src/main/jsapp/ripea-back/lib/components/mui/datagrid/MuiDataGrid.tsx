@@ -49,6 +49,7 @@ export type MuiDataGridColDef = GridColDef & {
     currencyDecimalPlaces?: number | ((row: any) => number);
     currencyLocale?: string | ((row: any) => string);
     decimalPlaces?: number | ((row: any) => number);
+    noTime?: boolean;
     noSeconds?: boolean;
     exportExcluded?: boolean;
 };
@@ -213,6 +214,7 @@ const useGridColumns = (
                         currencyDecimalPlaces: cany['currencyDecimalPlaces'],
                         currencyLocale: cany['currencyLocale'],
                         decimalPlaces: cany['decimalPlaces'],
+                        noTime: cany['noTime'],
                         noSeconds: cany['noSeconds'],
                         formatterParams: row,
                     });

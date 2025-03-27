@@ -29,6 +29,28 @@ export const InteressatsGridForm = () => {
     </Grid>
 }
 
+const columns = [
+    {
+        field: 'tipus',
+        flex: 1,
+    },
+    {
+        field: 'documentNum',
+        flex: 0.5,
+    },
+    {
+        field: 'nomComplet',
+        flex: 0.5,
+    },
+    {
+        field: 'representant',
+        flex: 0.5,
+        valueFormatter: (value: any) => {
+            return value?.description;
+        }
+    },
+];
+
 interface DetailGridProps {
     id: any,
     onRowCountChange?: (number: number) => void,
@@ -39,28 +61,6 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef()
     const {actions, components} = useInteressatActions(apiRef?.current?.refresh)
-
-    const columns = [
-        {
-            field: 'tipus',
-            flex: 1,
-        },
-        {
-            field: 'documentNum',
-            flex: 0.5,
-        },
-        {
-            field: 'nomComplet',
-            flex: 0.5,
-        },
-        {
-            field: 'representant',
-            flex: 0.5,
-            valueFormatter: (value: any) => {
-                return value?.description;
-            }
-        },
-    ];
 
     return <GridPage>
         <MuiGrid
@@ -77,9 +77,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
             formAdditionalData={{
-                expedient: {
-                    id: id
-                },
+                expedient: {id: id},
             }}
             rowAdditionalActions={actions}
             onRowsChange={(rows) => onRowCountChange?.(rows.length)}

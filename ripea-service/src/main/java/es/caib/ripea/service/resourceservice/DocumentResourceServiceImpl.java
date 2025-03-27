@@ -2,10 +2,12 @@ package es.caib.ripea.service.resourceservice;
 
 import es.caib.ripea.persistence.entity.resourceentity.*;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
@@ -13,6 +15,7 @@ import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -22,6 +25,10 @@ import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
+import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,20 +44,25 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     private final DocumentResourceHelper documentResourceHelper;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
+    private final EmailHelper emailHelper;
 
     @PostConstruct
     public void init() {
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
+        register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.metaDocument, new MetaDocumentOnchangeLogicProcessor());
         register(DocumentResource.Fields.adjunt, new AdjuntOnchangeLogicProcessor());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaAdjuntOnchangeLogicProcessor());
         register(DocumentResource.Fields.hasFirma, new HasFirmaOnchangeLogicProcessor());
         register(DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE, new EnviarViaEmailActionExecutor());
+        register(DocumentResource.ACTION_MOURE_CODE, new MoureActionExecutor());
+        register(DocumentResource.ACTION_PUBLICAR_CODE, new PublicarActionExecutor());
+        register(DocumentResource.ACTION_NOTIFICAR_CODE, new NotificarActionExecutor());
+        register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
     }
 
     @Override
     protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        entity.setPare(entity.getExpedient());
         beforeSave(entity, resource, answers);
 
         entity.setEstat(entity.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT);
@@ -69,6 +81,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
 
     private void beforeSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
+        entity.setPare(entity.getExpedient());
+
         Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
         optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> {
             entity.setMetaNode(metaDocumentResourceEntity);
@@ -145,6 +159,21 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 arrayIndex++;
             }
             entity.setTreePath(result);
+        }
+    }
+
+    // FieldDownloader
+    private class AdjuntFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
+        @Override
+        public DownloadableFile download(
+                DocumentResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+            return new DownloadableFile(
+                    entity.getFitxerNom(),
+                    entity.getFitxerContentType(),
+                    entity.getFitxerContingut()
+            );
         }
     }
 
@@ -260,12 +289,106 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarViaEmailFormAction params) throws ActionExecutionException {
-            // TODO: EnviarViaEmail
+
+            if (!params.getEmail().isEmpty() || !params.getResponsables().isEmpty()) {
+                List<String> emails = Arrays.asList(params.getEmail().split(","));
+                List<String> desinataris = params.getResponsables().stream()
+                        .map(ResourceReference::getId)
+                        .collect(Collectors.toList());
+
+                emailHelper.enviarDocument(entity.getId(), emails, desinataris);
+            }
+
             return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
         }
 
         @Override
         public void onChange(DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
+
+        }
+    }
+    private class MoureActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.MoureFormAction, DocumentResource> {
+
+        @Override
+        public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
+
+            if (!Objects.equals(params.getExpedient(), entity.getExpedient())){
+                // TODO: Moure
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        }
+
+        @Override
+        public void onChange(DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {
+
+        }
+    }
+    private class PublicarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.PublicarFormAction, DocumentResource> {
+
+        @Override
+        public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.PublicarFormAction params) throws ActionExecutionException {
+            return null;
+        }
+
+        @Override
+        public void onChange(DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {
+
+        }
+    }
+    private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
+
+        @Override
+        public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.NotificarFormAction params) throws ActionExecutionException {
+            return null;
+        }
+
+        @Override
+        public void onChange(DocumentResource.NotificarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.NotificarFormAction target) {
+
+            switch (fieldName){
+                case DocumentResource.NotificarFormAction.Fields.duracio:
+                    if (fieldValue != null) {
+                        Date dataLimit= DateUtils.addDays(new Date(), (Integer) fieldValue);
+                        if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
+                            target.setDataCaducitat(dataLimit);
+                        }
+                    } else {
+                        if (previous.getDataCaducitat()!=null) {
+                            target.setDataCaducitat(null);
+                        }
+                    }
+                    break;
+
+                case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
+                    if (fieldValue != null) {
+                        LocalDate start = LocalDate.now();
+                        LocalDate end = ((Date)fieldValue).toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate();
+                        int dias = (int) start.until(end, ChronoUnit.DAYS);
+
+                        if (!Objects.equals(previous.getDuracio(), dias)) {
+                            target.setDuracio(dias);
+                        }
+                    } else {
+                        if (previous.getDuracio()!=null) {
+                            target.setDuracio(null);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+    private class EnviarPortafirmesActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarPortafirmesFormAction, DocumentResource> {
+
+        @Override
+        public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {
+            return null;
+        }
+
+        @Override
+        public void onChange(DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
 
         }
     }

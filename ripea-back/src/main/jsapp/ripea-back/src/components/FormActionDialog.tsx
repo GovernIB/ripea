@@ -7,7 +7,7 @@ import {
 import {useFormDialog} from "../../lib/components/mui/form/FormDialog.tsx";
 
 type FormActionDialogProp = {
-    title?:string,
+    title?: string | ((data:any) => string),
     resourceName: string,
     action: string,
     formDialogComponentProps?: any,
@@ -49,9 +49,10 @@ const FormActionDialog = (props:FormActionDialogProp) => {
             });
     });
     const exec = (id: any, formAdditionalData?: any) :Promise<any> => {
+        const customTitle = (typeof title === 'function') ?title?.(formAdditionalData) :title;
         const formDialogTitle = apiLink?.title ?? ('Exec ' + action);
         return formDialogShow(id, {
-            title: title ?? formDialogTitle,
+            title: customTitle ?? formDialogTitle,
             additionalData: formAdditionalData,
             dialogComponentProps: formDialogComponentProps ?? { fullWidth: true, maxWidth: 'md' }
         });

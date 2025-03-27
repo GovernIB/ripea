@@ -1,8 +1,8 @@
-import {Dialog} from 'reactlib';
 import {Typography} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {useState} from "react";
+import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 
 const useAnotacioDetail = () => {
     const { t } = useTranslation();

@@ -4,18 +4,18 @@ import {
     useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
-import { Box, Typography, Icon, Grid } from "@mui/material";
+import {Typography, Icon, Grid, Card, CardContent} from "@mui/material";
 import { formatDate } from '../../util/dateUtils';
 import { useNavigate } from "react-router-dom";
-import { ExpedientCommentDialog as CommentDialog} from "../CommentDialog.tsx";
+import { ExpedientCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import { useCommonActions } from "./details/CommonActions.tsx";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import useExpedientFilter from "./ExpedientFilter.tsx";
 
 const ExpedientGridForm = () => {
-    const formContext = useFormContext();
-    const { data } = formContext;
+    const { data }  = useFormContext();
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id} />
         <GridFormField xs={12} name="nom" />
@@ -27,147 +27,146 @@ const ExpedientGridForm = () => {
     </Grid>
 }
 
+const columns = [
+    {
+        field: 'numero',
+        flex: 1,
+    },
+    {
+        field: 'nom',
+        flex: 1,
+    },
+    {
+        field: 'avisos',
+        headerName: 'Avisos',
+        sortable: false,
+        disableColumnMenu: true,
+        flex: 0.5,
+        renderCell: (params: any) => (<>
+            {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
+            {params.row.errorLastEnviament && <Icon color={"error"} title="enviaments">mode_square</Icon>}
+            {params.row.errorLastNotificacio && <Icon color={"error"} title="notificacions">email_square</Icon>}
+            {params.row.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments">mode_square</Icon>}
+            {params.row.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">email_square</Icon>}
+            {params.row.alerta && <Icon color={"error"} title="alertes">warning_circle</Icon>}
+            {params.row.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning_triangle</Icon>}
+        </>),
+    },
+    {
+        field: 'tipusStr',
+        flex: 1,
+    },
+    {
+        field: 'createdDate',
+        flex: 1,
+        valueFormatter: (value: any) => {
+            return formatDate(value);
+        }
+    },
+    {
+        field: 'estat',
+        flex: 0.5,
+    },
+    {
+        field: 'prioritat',
+        flex: 0.5,
+    },
+    {
+        field: 'agafatPer',
+        flex: 1,
+        valueFormatter: (value: any) => {
+            return value?.description;
+        }
+    },
+    {
+        field: 'interessats',
+        flex: 1,
+        valueFormatter: (value: any) => {
+            let resum = '';
+            for (const interessat of value) {
+                switch (interessat.tipus) {
+                    case 'InteressatPersonaFisicaEntity':
+                        resum += interessat?.nom == null ? "" : interessat?.nom + " ";
+                        resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
+                        resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
+                        resum += "(" + interessat?.documentNum + ")" + "\n";
+                        break;
+                    case 'InteressatPersonaJuridicaEntity':
+                        resum += interessat?.raoSocial + " ";
+                        resum += "(" + interessat?.documentNum + ")" + "\n";
+                        break;
+                    case 'InteressatAdministracioEntity':
+                        resum += interessat?.nomComplet + " ";
+                        resum += "(" + interessat?.documentNum + ")" + "\n";
+                        break;
+                }
+            }
+            return resum;
+        }
+    },
+    {
+        field: 'grup',
+        flex: 0.5,
+        sortable: false,
+        disableColumnMenu: true,
+        valueFormatter: (value: any) => {
+            return value?.description;
+        }
+    },
+    {
+        field: 'numComentaris',
+        headerName: '',
+        sortable: false,
+        disableColumnMenu: true,
+        flex: 0.5,
+        renderCell: (params: any) => {
+            return <CommentDialog entity={params?.row} />;
+        }
+    },
+];
+
 const ExpedientGrid = () => {
     const { t } = useTranslation();
-    let navigate = useNavigate();
+    const navigate = useNavigate();
 
     const apiRef = useMuiDataGridApiRef()
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
-    const {
-        actions: commonActionsActions,
-        components: commonActionsComponents
-    } = useCommonActions(refresh);
 
-    const columns = [
-        {
-            field: 'numero',
-            flex: 1,
-        },
-        {
-            field: 'nom',
-            flex: 1,
-        },
-        {
-            field: 'avisos',
-            headerName: 'Avisos',
-            sortable: false,
-            disableColumnMenu: true,
-            flex: 0.5,
-            renderCell: (params: any) => (<>
-                {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
-                {params.row.errorLastEnviament && <Icon color={"error"} title="enviaments">mode_square</Icon>}
-                {params.row.errorLastNotificacio && <Icon color={"error"} title="notificacions">email_square</Icon>}
-                {params.row.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments">mode_square</Icon>}
-                {params.row.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">email_square</Icon>}
-                {params.row.alerta && <Icon color={"error"} title="alertes">warning_circle</Icon>}
-                {params.row.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning_triangle</Icon>}
-            </>),
-        },
-        {
-            field: 'tipusStr',
-            flex: 1,
-        },
-        {
-            field: 'createdDate',
-            flex: 1,
-            valueFormatter: (value: any) => {
-                return formatDate(value);
-            }
-        },
-        {
-            field: 'estat',
-            flex: 0.5,
-        },
-        {
-            field: 'prioritat',
-            flex: 0.5,
-        },
-        {
-            field: 'agafatPer',
-            flex: 1,
-            valueFormatter: (value: any) => {
-                return value?.description;
-            }
-        },
-        {
-            field: 'interessats',
-            flex: 1,
-            valueFormatter: (value: any) => {
-                let resum = '';
-                for (const interessat of value) {
-                    switch (interessat.tipus) {
-                        case 'InteressatPersonaFisicaEntity':
-                            resum += interessat?.nom == null ? "" : interessat?.nom + " ";
-                            resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
-                            resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
-                            resum += "(" + interessat?.documentNum + ")" + "\n";
-                            break;
-                        case 'InteressatPersonaJuridicaEntity':
-                            resum += interessat?.raoSocial + " ";
-                            resum += "(" + interessat?.documentNum + ")" + "\n";
-                            break;
-                        case 'InteressatAdministracioEntity':
-                            resum += interessat?.nomComplet + " ";
-                            resum += "(" + interessat?.documentNum + ")" + "\n";
-                            break;
-                    }
-                }
-                return resum;
-            }
-        },
-        {
-            field: 'grup',
-            flex: 0.5,
-            sortable: false,
-            disableColumnMenu: true,
-            valueFormatter: (value: any) => {
-                return value?.description;
-            }
-        },
-        {
-            field: 'numComentaris',
-            headerName: '',
-            sortable: false,
-            disableColumnMenu: true,
-            flex: 0.5,
-            renderCell: (params: any) => {
-                return <CommentDialog entity={params?.row} />;
-            }
-        },
-    ];
-
+    const {actions, components} = useCommonActions(refresh);
     const { springFilter, content } = useExpedientFilter();
 
     return <GridPage>
-        <div style={{ border: '1px solid #e3e3e3' }}>
-            <Box sx={{ backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3', p: 1 }}>
+        <Card sx={{border: '1px solid #e3e3e3', borderRadius: '10px', height: '100%' }}>
+            <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
                 <Typography variant="h5">{t('page.expedient.filter.title')}</Typography>
-            </Box>
+            </CardContent>
 
-            {content}
+            <CardContent sx={{height: '58%'}} >
+                    {content}
 
-            <MuiGrid
-                resourceName="expedientResource"
-                popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                columns={columns}
-                paginationActive
-                filter={springFilter}
-                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                perspectives={["INTERESSATS_RESUM"]}
-                titleDisabled
-                popupEditCreateActive
-                apiRef={apiRef}
-                // popupEditFormDialogTitle={"Crear nuevo expediente"}
-                popupEditFormContent={<ExpedientGridForm />}
-                onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
-                rowAdditionalActions={commonActionsActions}
-                rowHideDeleteButton
-            />
+                    <MuiGrid
+                        resourceName="expedientResource"
+                        popupEditFormDialogResourceTitle={t('page.expedient.title')}
+                        columns={columns}
+                        paginationActive
+                        filter={springFilter}
+                        sortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                        perspectives={["INTERESSATS_RESUM"]}
+                        titleDisabled
+                        popupEditCreateActive
+                        apiRef={apiRef}
+                        // popupEditFormDialogTitle={"Crear nuevo expediente"}
+                        popupEditFormContent={<ExpedientGridForm />}
+                        onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
+                        rowAdditionalActions={actions}
+                        rowHideDeleteButton
+                    />
 
-            {commonActionsComponents}
-        </div>
+                    {components}
+            </CardContent>
+        </Card>
     </GridPage>
 }
 
