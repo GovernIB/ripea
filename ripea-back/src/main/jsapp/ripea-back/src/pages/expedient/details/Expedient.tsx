@@ -14,7 +14,7 @@ import TasquesGrid from "../../tasca/TasquesGrid.tsx";
 import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
-import DadaGrid from "../../dada/DadaGrid.tsx";
+// import DadaGrid from "../../dada/DadaGrid.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -62,8 +62,8 @@ const Expedient = () => {
         {
             value: "dades",
             label: t('page.contingut.tabs.dades'),
-            // content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
-            content: <DadaGrid entity={expedient}/>,
+            content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
+            // content: <DadaGrid entity={expedient}/>,
             badge: expedient?.numDades,
             // hidden: expedient?.numDades == 0,
         },
