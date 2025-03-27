@@ -245,7 +245,15 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 			dadesUsuari.setNomSencer(userInfo.getFullName());
 			dadesUsuari.setNom(userInfo.getName());
 			dadesUsuari.setLlinatges(userInfo.getSurname1() + (userInfo.getSurname2() != null ? " " + userInfo.getSurname2() : ""));
-			dadesUsuari.setNif(userInfo.getAdministrationID());
+			if (userInfo.getAttributes()!=null) {
+				if (userInfo.getAttributes().containsKey("NIF")) {
+					dadesUsuari.setNif(userInfo.getAttributes().get("NIF"));
+				} else if (userInfo.getAttributes().containsKey("nif")) {
+					dadesUsuari.setNif(userInfo.getAttributes().get("nif"));
+				} else if (userInfo.getAttributes().containsKey("Nif")) {
+					dadesUsuari.setNif(userInfo.getAttributes().get("Nif"));				
+				}
+			}
 			dadesUsuari.setEmail(userInfo.getEmail());
 			return dadesUsuari;
 		} else {

@@ -35,6 +35,12 @@ public class EjbClientApiIntConfig {
 	
 	@Bean
 	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean aplicacioService() {
+		return getLocalEjbFactoyBean(AplicacioService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean resourceApiService() {
 		return getLocalEjbFactoyBean(ResourceApiService.class);
 	}

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,11 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 public class DistribucioRestController {
 
 	@Autowired private ExpedientPeticioService expedientPeticioService;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@RequestMapping(value = "/comunicarAnotacionsPendents", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<String> event(@RequestBody List<AnotacioRegistreId> event) {
 		try {
+			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria podrien donar error
+			aplicacioService.processarAutenticacioUsuari();
 			expedientPeticioService.crearExpedientPeticion(event);
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
 		} catch (Exception e) {

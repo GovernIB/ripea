@@ -1049,9 +1049,10 @@ public class ConversioTipusHelper {
 	}
 
 	private InteressatDto getInteressatDto(final InteressatEntity source) {
-		InteressatDto target = createTargetDto(source);
-		mapCommonFields(target, source);
-		mapRepresentantFields(target, source);
+		InteressatEntity interessat = deproxyInteressatEntity(source);
+		InteressatDto target = createTargetDto(interessat);
+		mapCommonFields(target, interessat);
+		mapRepresentantFields(target, interessat);
 		return target;
 	}
 

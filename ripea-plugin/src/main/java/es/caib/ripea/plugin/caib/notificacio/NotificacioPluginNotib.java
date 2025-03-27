@@ -95,9 +95,11 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			if (provaLocal) {
 				notificacioNotib.setProcedimentCodi("894623");
 				notificacioNotib.setOrganGestor("A04027005");
+				notificacioNotib.setUsuariCodi("e18225486X");
 			} else {
 				notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
-				notificacioNotib.setOrganGestor(notificacio.getOrganGestor());				
+				notificacioNotib.setOrganGestor(notificacio.getOrganGestor());
+				notificacioNotib.setUsuariCodi(notificacio.getUsuariCodi());
 			}
 			
 			notificacioNotib.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());
@@ -116,7 +118,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				document.setUuid(notificacio.getDocumentArxiuUuid());
 			}
 			notificacioNotib.setDocument(document);
-			notificacioNotib.setUsuariCodi(notificacio.getUsuariCodi());
 			notificacioNotib.setNumExpedient(notificacio.getNumExpedient());
 			if (notificacio.getEnviaments() != null) {
 				for (Enviament enviament : notificacio.getEnviaments()) {
