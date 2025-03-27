@@ -5,6 +5,7 @@ package es.caib.ripea.back.controller;
 
 import es.caib.ripea.back.command.PermisCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.service.EntitatService;
@@ -107,9 +108,8 @@ public class EntitatPermisSuperController extends BaseController {
 			BindingResult bindingResult,
 			Model model) {
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"entitat",
-					entitatService.findById(entitatId));
+			model.addAttribute("entitat", entitatService.findById(entitatId));
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "entitatPermisForm";
 		}
 		entitatService.updatePermisSuper(

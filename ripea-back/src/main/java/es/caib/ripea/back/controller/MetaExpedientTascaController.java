@@ -334,15 +334,6 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		}
 		return "metaExpedientTascaForm";
 	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 
 	@RequestMapping(value = "/{metaExpedientId}/tasca/save", method = RequestMethod.POST)
 	public String save(
@@ -359,12 +350,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"metaExpedient",
-					metaExpedientService.findById(
-							entitatActual.getId(),
-							metaExpedientId));
-			
+			model.addAttribute("metaExpedient", metaExpedientService.findById(entitatActual.getId(), metaExpedientId));
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "metaExpedientTascaForm";
 		}
 		

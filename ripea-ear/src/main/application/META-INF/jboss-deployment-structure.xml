@@ -5,20 +5,25 @@
 			<module name="org.keycloak.keycloak-core" export="true"/>
 			<module name="org.apache.cxf.impl"/>
 			<module name="org.apache.ws.security"/>
+			<module name="org.bouncycastle"/>
 			<module name="io.undertow.core" export="true"/>
 			<module name="io.undertow.servlet" export="true"/>
 			<module name="io.undertow.websocket" export="true"/>
+			<module name="jdk.management"/>
 		</dependencies>
 	</deployment>
 	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
 	<sub-deployment name="ripea-back.war">
 		<exclude-subsystems>
-			<subsystem name="jsf"/>
+			<subsystem name="jsf"/>			
 		</exclude-subsystems>
+		<dependencies>
+			<module name="jdk.management"/>
+		</dependencies>		
 	</sub-deployment>
-	<sub-deployment name="ripea-api-interna.war">
-		<exclude-subsystems>
-			<subsystem name="jsf"/>
-		</exclude-subsystems>
-	</sub-deployment>
+<!-- 	<sub-deployment name="ripea-api-interna.war"> -->
+<!-- 		<exclude-subsystems> -->
+<!-- 			<subsystem name="jsf"/> -->
+<!-- 		</exclude-subsystems> -->
+<!-- 	</sub-deployment> -->
 </jboss-deployment-structure>

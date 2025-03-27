@@ -304,18 +304,6 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		}
 		return sessionAttribute;
 	}
-	
-	
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
 
 	private ContingutMassiuFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -332,5 +320,4 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		}
 		return filtreCommand;
 	}
-
 }

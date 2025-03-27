@@ -397,19 +397,6 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 		return metaDocuments;
 	}	
 
-
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
-
-
 	private ContingutMassiuFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ContingutMassiuFiltreCommand filtreCommand = (ContingutMassiuFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
@@ -425,7 +412,4 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 		}
 		return filtreCommand;
 	}
-
-
-	
 }

@@ -690,12 +690,27 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				tasca.getExpedient().getId());
 		}
 
-
 		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
-
-		return conversioTipusHelper.convertirList(tascacoms, ExpedientTascaComentariDto.class);
+		List<ExpedientTascaComentariDto> resultat = new ArrayList<ExpedientTascaComentariDto>();
+		
+		if (tascacoms!=null) {
+			for (ExpedientTascaComentariEntity etc: tascacoms) {
+				ExpedientTascaComentariDto etcDto = conversioTipusHelper.convertir(etc, ExpedientTascaComentariDto.class);
+				if (etc.getCreatedBy().isPresent()) {
+					UsuariEntity ue = usuariRepository.findByCodi(etc.getCreatedBy().get());
+					UsuariDto ucb = new UsuariDto();
+					ucb.setCodi(ue.getCodi());
+					ucb.setNom(ue.getNom());
+					ucb.setNif(ue.getNif());
+					ucb.setEmail(ue.getEmail());
+					etcDto.setCreatedBy(ucb);
+				}
+				resultat.add(etcDto);
+			}
+		}
+		
+		return resultat;
 	}
-
 
 	@Transactional
 	@Override
@@ -709,17 +724,14 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		//Si no ha canviat res en el DTO respecte del entity (info a BBDD), no fer cap acció
 		if (Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDataLimit(), expedientTascaDto.getDataLimit()) ||
 			Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDuracio(), expedientTascaDto.getDuracio())) {
-
 			expedientTascaEntity.updateDataLimit(expedientTascaDto.getDataLimit());
 			expedientTascaEntity.setDuracio(expedientTascaDto.getDuracio());
-
 			emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
 		}
 
 		log(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
 
-		return conversioTipusHelper.convertir(expedientTascaEntity,
-			ExpedientTascaDto.class);
+		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
 	@Override

@@ -1214,11 +1214,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		return null;
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
-	}
-
 	/**
 	 * Gets filtreCommand from session, if it doesnt exist it creates new one in session
 	 * @param request

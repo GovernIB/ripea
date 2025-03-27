@@ -111,9 +111,7 @@ public class ExpedientTascaCommand {
 	public void setDuracio(Integer duracio) { this.duracio = duracio; }
 	
 	public static ExpedientTascaCommand asCommand(ExpedientTascaDto dto) {
-		ExpedientTascaCommand command = ConversioTipusHelper.convertir(
-				dto,
-				ExpedientTascaCommand.class);
+		ExpedientTascaCommand command = ConversioTipusHelper.convertir(dto, ExpedientTascaCommand.class);
 		command.setMetaExpedientTascaId(dto.getMetaExpedientTasca().getId());
 		command.setMetaExpedientTascaDescripcio(dto.getMetaExpedientTasca().getDescripcio());
 		if (command.getResponsablesCodi() == null && !dto.getResponsables().isEmpty()) command.setResponsablesCodi(new ArrayList<String>());
@@ -122,10 +120,14 @@ public class ExpedientTascaCommand {
 			
 		}
 		
+		if (command.getObservadorsCodi()==null) {
+			List<String> obsCodis = new ArrayList<String>();
+			command.setObservadorsCodi(obsCodis);
+		}
+		
 		if (dto.getObservadors() != null && !dto.getObservadors().isEmpty()) {
 			for (UsuariDto observador : dto.getObservadors()) {
 				command.getObservadorsCodi().add(observador.getCodi());
-				
 			}
 		}
 		

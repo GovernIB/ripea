@@ -252,12 +252,6 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 	private String getSessionAttributeSelecio(HttpServletRequest request) {
 		return SESSION_ATTRIBUTE_SELECCIO;
 	}
-	
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
-	}
 
 	/**
 	 * Gets filtreCommand from session, if it doesnt exist it creates new one in session
@@ -276,7 +270,5 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 		return filtreCommand;
 	}
 	
-
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioComunicadesController.class);
-
 }

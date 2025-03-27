@@ -32,7 +32,7 @@ export const ExpedientCommentDialog = (props:any) => {
     });
 
     return <>
-        <CommentDialog numComm={numComm} handleOpen={handleOpen}/>
+        <CommentDialog numComm={numComm ?? entity?.numComentaris} handleOpen={handleOpen}/>
         {dialog}
     </>
 }
@@ -48,7 +48,7 @@ export const TascaCommentDialog = (props:any) => {
     });
 
     return <>
-        <CommentDialog numComm={numComm} handleOpen={handleOpen}/>
+        <CommentDialog numComm={numComm ?? entity?.numComentaris} handleOpen={handleOpen}/>
         {dialog}
     </>
 }

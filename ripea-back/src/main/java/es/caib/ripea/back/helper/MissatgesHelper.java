@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class MissatgesHelper {
 
+	public static final String SESSION_ATTRIBUTE_BINDING_ERRORS = "MissatgesHelper.BindingErrors";
 	public static final String SESSION_ATTRIBUTE_ERROR = "MissatgesHelper.Error";
 	public static final String SESSION_ATTRIBUTE_WARNING = "MissatgesHelper.Warning";
 	public static final String SESSION_ATTRIBUTE_SUCCESS = "MissatgesHelper.Success";

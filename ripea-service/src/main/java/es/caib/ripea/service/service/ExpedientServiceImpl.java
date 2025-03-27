@@ -50,6 +50,7 @@ import es.caib.ripea.persistence.entity.ExpedientComentariEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
@@ -107,6 +108,7 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
@@ -644,10 +646,26 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null);
 
-		List<ExpedientComentariEntity> expcoms = expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(
-				expedient);
-
-		return conversioTipusHelper.convertirList(expcoms, ExpedientComentariDto.class);
+		List<ExpedientComentariEntity> expcoms = expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(	expedient);
+		List<ExpedientComentariDto> resultat = new ArrayList<ExpedientComentariDto>();
+		
+		if (expcoms!=null) {
+			for (ExpedientComentariEntity etc: expcoms) {
+				ExpedientComentariDto etcDto = conversioTipusHelper.convertir(etc, ExpedientComentariDto.class);
+				if (etc.getCreatedBy().isPresent()) {
+					UsuariEntity ue = usuariRepository.findByCodi(etc.getCreatedBy().get());
+					UsuariDto ucb = new UsuariDto();
+					ucb.setCodi(ue.getCodi());
+					ucb.setNom(ue.getNom());
+					ucb.setNif(ue.getNif());
+					ucb.setEmail(ue.getEmail());
+					etcDto.setCreatedBy(ucb);
+				}
+				resultat.add(etcDto);
+			}
+		}
+		
+		return resultat;
 	}
 
 	@Transactional(readOnly = true)
@@ -1740,9 +1758,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom() : "",
 					filtre.getDataCreacioInici() == null,
-					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici()),
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
 					filtre.getDataCreacioFi() == null,
-					DateUtil.getLocalDateTimeFromDate(DateHelper.toDateFinalDia(filtre.getDataCreacioFi())),
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
 					filtre.getDataTancatInici() == null,
 					filtre.getDataTancatInici(),
 					filtre.getDataTancatFi() == null,
@@ -1828,9 +1846,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom() : "",
 					filtre.getDataCreacioInici() == null,
-					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici()),
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
 					filtre.getDataCreacioFi() == null,
-					DateUtil.getLocalDateTimeFromDate(DateHelper.toDateFinalDia(filtre.getDataCreacioFi())),
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
 					filtre.getDataTancatInici() == null,
 					filtre.getDataTancatInici(),
 					filtre.getDataTancatFi() == null,

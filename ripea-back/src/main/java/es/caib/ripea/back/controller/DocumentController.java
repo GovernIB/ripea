@@ -602,10 +602,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelPortafirmes(
-					request,
-					documentId,
-					model);
+			emplenarModelPortafirmes(request, documentId, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "viaFirmaForm";
 		}
 		try {
@@ -742,17 +740,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		}
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 	}
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-
-
 
 	private void emplenarModelPortafirmes(
 			HttpServletRequest request,

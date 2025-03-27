@@ -230,6 +230,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					model, 
 					tascaId);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "contingutDocumentForm";
 		}
 		try {
@@ -317,7 +318,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				model.addAttribute("nomDocument", document.getFitxerNom());
 				command.setValidacioFirmaCorrecte(true);
 			}
-			omplirModelFormulari(request, command, contingutId, model, tascaId);			
+			omplirModelFormulari(request, command, contingutId, model, tascaId);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "contingutDocumentForm";
 		}
 		try {
@@ -1133,6 +1135,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							null,
 							false));
 			model.addAttribute("expedientId", expedientId);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "notificarMultipleDocuemntTipusForm";
 		}
 
@@ -1560,13 +1563,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				contingutId, 
 				metaDocumentId);
 		return document;
-	}
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"),true));
-	    binder.registerCustomEditor(Long[].class, new StringArrayPropertyEditor(null));
-	    binder.registerCustomEditor(LocalDateTime.class, new CustomDateTimeEditor("dd/MM/yyyy HH:mm:ss"));
 	}
 	
 	private void emplenarModelDescarrega(

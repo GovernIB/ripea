@@ -581,7 +581,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						RolHelper.getRolActual(request));
 				model.addAttribute("grups", grups);
 			}
-			
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "contingutExpedientForm";
 		}
 		try {
@@ -679,7 +679,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getMetaNodeId(),
 					RolHelper.getRolActual(request));
 			model.addAttribute("grups", grups);
-			
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "contingutExpedientForm";
 		}
 		try {
@@ -1345,9 +1345,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-//			model.addAttribute(
-//					"metaExpedients",
-//					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "expedientEstatsForm";
 		}
 		ExpedientDto expedientDto = expedientEstatService.changeExpedientEstat(
@@ -1404,6 +1402,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		
 		if (bindingResult.hasErrors()) {
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "expedientChoosePrioritatForm";
 		}
 		
@@ -1940,16 +1939,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			return "redirect:/expedient";
 		}
-	}
-	
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
 	}
 
 	private void emplenarFiltreRelacionats(

@@ -62,6 +62,7 @@ import es.caib.ripea.service.intf.dto.SeguimentDto;
 import es.caib.ripea.service.intf.dto.SeguimentFiltreDto;
 import es.caib.ripea.service.intf.dto.SeguimentNotificacionsFiltreDto;
 import es.caib.ripea.service.intf.service.SeguimentService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 
 @Service
@@ -155,9 +156,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 				filtre.getCreatedByCodi() == null,
 				filtre.getCreatedByCodi() != null ? usuariRepository.getOne(filtre.getCreatedByCodi()) : null,
 				filtre.getDataInici() == null, 
-				DateHelper.toDateInicialDia(filtre.getDataInici()), 
+				DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false), 
 				filtre.getDataFinal() == null, 
-				DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+				DateUtil.getLocalDateTimeFromDate(filtre.getDataFinal(), false, true), 
 				filtre.getEstat() == null, 
 				filtre.getEstat(), 
 				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
@@ -250,9 +251,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 					Utils.isEmpty(filtre.getDocumentNom()),
 					filtre.getDocumentNom() != null ? filtre.getDocumentNom() : "",
 					filtre.getDataInici() == null, 
-					filtre.getDataInici(), 
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false), 
 					filtre.getDataFinal() == null, 
-					DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFinal(), false, true), 
 					estatNotificacio == null, 
 					estatNotificacio, 
 					estatEnviament == null, 
@@ -285,9 +286,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 					Utils.isEmpty(filtre.getDocumentNom()),
 					filtre.getDocumentNom() != null ? filtre.getDocumentNom() : "",
 					filtre.getDataInici() == null, 
-					filtre.getDataInici(), 
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false), 
 					filtre.getDataFinal() == null, 
-					DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFinal(), false, true), 
 					estatNotificacio == null, 
 					estatNotificacio, 
 					estatEnviament == null, 
@@ -330,7 +331,6 @@ public class SeguimentServiceImpl implements SeguimentService {
 		UsuariEntity responsable = filtre.getResponsableCodi() != null ? usuariHelper.getUsuariByCodi(filtre.getResponsableCodi()) : null;
 		MetaExpedientTascaEntity metaExpedientTascaEntity = filtre.getMetaExpedientTascaId() != null ? metaExpedientTascaRepository.getOne(filtre.getMetaExpedientTascaId()) : null;
 		
-		
 		Page<ExpedientTascaEntity> docsEnvs = expedientTascaRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
@@ -338,9 +338,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 				metaExpedientTascaEntity == null, 
 				metaExpedientTascaEntity, 
 				filtre.getDataInici() == null, 
-				filtre.getDataInici(), 
+				DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false), 
 				filtre.getDataFinal() == null, 
-				DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+				DateUtil.getLocalDateTimeFromDate(filtre.getDataFinal(), false, true), 
 				responsable == null, 
 				responsable, 
 				filtre.getTascaEstat() == null, 
@@ -350,9 +350,6 @@ public class SeguimentServiceImpl implements SeguimentService {
 		return paginacioHelper.toPaginaDto(docsEnvs, SeguimentDto.class);
 		
 	}
-	
-	
-	
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -534,9 +531,6 @@ public class SeguimentServiceImpl implements SeguimentService {
 
 			if (resultEnum == ResultEnumDto.PAGE) {
 
-//				List<DocumentEntity> docs1 = documentRepository.findArxiuPendents2();
-				
-				
 				// ============ RETURNS PAGE (DATATABLE) ================
 				Page<DocumentEntity> docs = documentRepository.findArxiuPendents(
 						entitat,
@@ -550,32 +544,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						metaExpedient == null,
 						metaExpedient, 
 						filtre.getDataCreacioInici() == null,
-						filtre.getDataCreacioInici(),
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
 						filtre.getDataCreacioFi() == null,
-						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
-				
-				
-//				Page<DocumentEntity> docs = documentRepository.findArxiuPendents(
-//						entitat,
-//						permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
-//						permisosPerExpedients.getIdsMetaExpedientsPermesos(),
-//						permisosPerExpedients.getIdsOrgansPermesos() == null,
-//						permisosPerExpedients.getIdsOrgansPermesos(),
-//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
-//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
-//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
-//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
-//						permisosPerExpedients.getIdsProcedimentsComuns(),
-//						nomesAgafats,
-//						auth.getName(),
-//						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-//						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-//						expedient == null,
-//						expedient,
-//						metaExpedient == null,
-//						metaExpedient, 
-//						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 
 				result.setPagina(paginacioHelper.toPaginaDto(docs, SeguimentArxiuPendentsDto.class));
 
@@ -594,9 +566,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 						metaExpedient == null,
 						metaExpedient,
 						filtre.getDataCreacioInici() == null,
-						filtre.getDataCreacioInici(),
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
 						filtre.getDataCreacioFi() == null,
-						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true));
 				result.setIds(docs);
 			}
 
@@ -623,9 +595,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 						metaExpedient == null,
 						metaExpedient,
 						filtre.getDataCreacioInici() == null,
-						filtre.getDataCreacioInici(),
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioInici(), true, false),
 						filtre.getDataCreacioFi() == null,
-						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+						DateUtil.getLocalDateTimeFromDate(filtre.getDataCreacioFi(), false, true),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 
 				result.setPagina(paginacioHelper.toPaginaDto(ints, SeguimentArxiuPendentsDto.class));

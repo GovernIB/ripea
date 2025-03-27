@@ -120,6 +120,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DominiService;
+import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 
 @Service
@@ -1192,9 +1193,9 @@ public class ContingutServiceImpl implements ContingutService {
 							(metaNode == null),
 							metaNode,
 							(dataCreacioInici == null),
-							dataCreacioInici,
+							DateUtil.getLocalDateTimeFromDate(dataCreacioInici, true, false),
 							(dataCreacioFi == null),
-							dataCreacioFi,
+							DateUtil.getLocalDateTimeFromDate(dataCreacioFi, false, true),
 							(dataEsborratInici == null),
 							dataEsborratInici,
 							(dataEsborratFi == null),
@@ -1232,9 +1233,9 @@ public class ContingutServiceImpl implements ContingutService {
 					(metaNode == null),
 					metaNode,
 					(dataCreacioInici == null),
-					dataCreacioInici,
+					DateUtil.getLocalDateTimeFromDate(dataCreacioInici, true, false),
 					(dataCreacioFi == null),
-					dataCreacioFi,
+					DateUtil.getLocalDateTimeFromDate(dataCreacioFi, false, true),
 					(dataEsborratInici == null),
 					dataEsborratInici,
 					(dataEsborratFi == null),
@@ -1864,9 +1865,6 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		if (!metaExpedientsPermesos.isEmpty()) {
-			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			ordenacioMap.put("metaDocument.nom", new String[] {"metaNode.nom"});
@@ -1881,10 +1879,10 @@ public class ContingutServiceImpl implements ContingutService {
 					metaDocument,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+					filtre.getDataInici() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false),
+					filtre.getDataFi() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFi(), false, true),
 					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,
@@ -1944,9 +1942,6 @@ public class ContingutServiceImpl implements ContingutService {
 					filtre.getMetaDocumentId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
-			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdByCodiAndNom", new String[] {"createdBy.nom"});
 			ordenacioMap.put("tipusDocumentNom", new String[] {"metaNode.nom"});
@@ -1961,10 +1956,10 @@ public class ContingutServiceImpl implements ContingutService {
 					metaDocument,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+					filtre.getDataInici() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false),
+					filtre.getDataFi() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFi(), false, true),
 					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			
 			return paginacioHelper.toPaginaDto(
@@ -2024,8 +2019,6 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		if (!metaExpedientsPermesos.isEmpty()) {
-			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			List<Long> idsDocuments = documentRepository.findIdsDocumentsPerFirmaMassiu(
 					entitat,
 					metaExpedientsPermesos, 
@@ -2037,10 +2030,10 @@ public class ContingutServiceImpl implements ContingutService {
 					metaDocument,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi);
+					filtre.getDataInici() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false),
+					filtre.getDataFi() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFi(), false, true));
 			return idsDocuments;
 		} else {
 			return new ArrayList<>();
@@ -2088,10 +2081,7 @@ public class ContingutServiceImpl implements ContingutService {
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(filtre.getMetaDocumentId());
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId,
-				rolActual);
-		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 
 		if (resultEnum == ResultEnumDto.PAGE) {
 
@@ -2109,10 +2099,10 @@ public class ContingutServiceImpl implements ContingutService {
 					metaDocument,
 					filtre.getNom() == null,
 					Utils.getEmptyStringIfNull(filtre.getNom()),
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+					filtre.getDataInici() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false),
+					filtre.getDataFi() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFi(), false, true),
 					paginacioHelper.toSpringDataPageable(
 							paginacioParams,
 							ordenacioMap));
@@ -2151,10 +2141,10 @@ public class ContingutServiceImpl implements ContingutService {
 					metaDocument,
 					filtre.getNom() == null,
 					Utils.getEmptyStringIfNull(filtre.getNom()),
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi);
+					filtre.getDataInici() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false),
+					filtre.getDataFi() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFi(), false, true));
 
 			result.setIds(ids);
 		}
@@ -2201,9 +2191,6 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		if (!metaExpedientsPermesos.isEmpty()) {
-			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			ordenacioMap.put("metaDocument.nom", new String[] {"metaNode.nom"});
@@ -2218,10 +2205,10 @@ public class ContingutServiceImpl implements ContingutService {
 					metaDocument,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
-					dataInici == null,
-					dataInici,
-					dataFi == null,
-					dataFi,
+					filtre.getDataInici() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false),
+					filtre.getDataFi() == null,
+					DateUtil.getLocalDateTimeFromDate(filtre.getDataFi(), false, true),
 					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			return paginacioHelper.toPaginaDto(
 					paginaDocuments,

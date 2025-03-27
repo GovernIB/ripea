@@ -1,12 +1,8 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 
 @Component
 public interface DocumentNotificacioRepository extends JpaRepository<DocumentNotificacioEntity, Long> {
@@ -106,9 +107,9 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,
 			@Param("documentNom") String documentNom,
 			@Param("esNullDataEnviamentInici") boolean esNullDataEnviamentInici,
-			@Param("dataEnviamentInici") Date dataEnviamentInici,
+			@Param("dataEnviamentInici") LocalDateTime dataEnviamentInici,
 			@Param("esNullDataEnviamentFinal") boolean esNullDataEnviamentFinal,
-			@Param("dataEnviamentFinal") Date dataEnviamentFinal,
+			@Param("dataEnviamentFinal") LocalDateTime dataEnviamentFinal,
 			@Param("esNullEstatNotificacio") boolean esNullEstatNotificacio,
 			@Param("estatNotificacio") DocumentNotificacioEstatEnumDto estatNotificacio,
 			@Param("esNullEstatEnviament") boolean esNullEstatEnviament,
@@ -156,9 +157,9 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,
 			@Param("documentNom") String documentNom,
 			@Param("esNullDataEnviamentInici") boolean esNullDataEnviamentInici,
-			@Param("dataEnviamentInici") Date dataEnviamentInici,
+			@Param("dataEnviamentInici") LocalDateTime dataEnviamentInici,
 			@Param("esNullDataEnviamentFinal") boolean esNullDataEnviamentFinal,
-			@Param("dataEnviamentFinal") Date dataEnviamentFinal,
+			@Param("dataEnviamentFinal") LocalDateTime dataEnviamentFinal,
 			@Param("esNullEstatNotificacio") boolean esNullEstatNotificacio,
 			@Param("estatNotificacio") DocumentNotificacioEstatEnumDto estatNotificacio,
 			@Param("esNullEstatEnviament") boolean esNullEstatEnviament,

@@ -133,16 +133,6 @@ public class AvisController extends BaseAdminController {
 			return -1;
 		}
 	}
-
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
 	
 	@RequestMapping(value = "/{avisId}", method = RequestMethod.GET)
 	public String get(
@@ -167,6 +157,7 @@ public class AvisController extends BaseAdminController {
 			@Valid AvisCommand command,
 			BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "avisForm";
 		}
 		AvisDto resultat = null;

@@ -1,9 +1,8 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 
 @Component
 public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEntity, Long> {
@@ -65,9 +66,9 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
@@ -103,9 +104,9 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,

@@ -1,18 +1,12 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
-import es.caib.ripea.persistence.repository.ContingutLogRepository;
-import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
-import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
-import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
-import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
-import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
-import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.service.intf.exception.PermissionDeniedStatisticsException;
-import es.caib.ripea.service.permission.ExtendedPermission;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +16,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
+import es.caib.ripea.persistence.entity.HistoricEntity;
+import es.caib.ripea.persistence.entity.HistoricExpedientEntity;
+import es.caib.ripea.persistence.entity.HistoricInteressatEntity;
+import es.caib.ripea.persistence.entity.HistoricUsuariEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.ContingutLogRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.service.intf.exception.PermissionDeniedStatisticsException;
+import es.caib.ripea.service.intf.utils.DateUtil;
+import es.caib.ripea.service.permission.ExtendedPermission;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -125,8 +137,8 @@ public class HistoricHelper {
 
 		// all logs created for all expedients between dates, count of logs grouped by metaxpedient and log tipus 
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByMetaExpedient(
-				startDate,
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(startDate, true, false),
+				DateUtil.getLocalDateTimeFromDate(endDate, false, true));
 //		+---------------+------------+-------+
 //		| METAEXPEDIENT | TIPUS      | COUNT |
 //		+---------------+------------+-------+
@@ -158,7 +170,7 @@ public class HistoricHelper {
 
 		// count all logs created until date specified
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBeforeCreatedDateGroupByMetaExpedient(
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(endDate));
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapExpedients);
 //		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
 //		| METAEXPEDIENT | NUM_CREATS | NUM_OBERTS 	| NUM_TANCATS | NUM_CREATS_TOTAL | NUM_OBERTS_TOTAL   | NUM_TANCATS_TOTAL |		| ENTITAT  | ORGANGESTOR  | DATE        | TIPUS_LOG 		|
@@ -187,8 +199,9 @@ public class HistoricHelper {
 
 		
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> countAggregation1 = contingutLogRepository.findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
-				startDate,
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(startDate, true, false),
+				DateUtil.getLocalDateTimeFromDate(endDate, false, true));
+		
 		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countAggregation1) {
 			HistoricExpedientEntity historic = mapExpedients.getHistoric(
 					count.getMetaExpedient().getId(),
@@ -204,8 +217,9 @@ public class HistoricHelper {
 		}
 		
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> countAggregation2 = contingutLogRepository.findLogsNotificacioBetweenCreatedDateGroupByMetaExpedient(
-				startDate,
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(startDate, true, false),
+				DateUtil.getLocalDateTimeFromDate(endDate, false, true));
+
 		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countAggregation2) {
 			HistoricExpedientEntity historic = mapExpedients.getHistoric(
 					count.getMetaExpedient().getId(),
@@ -242,13 +256,13 @@ public class HistoricHelper {
 		Date endDate = getEndDate(date, tipusLog);
 		
 		List<ContingutLogCountAggregation<UsuariEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
-				startDate,
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(startDate, true, false),
+				DateUtil.getLocalDateTimeFromDate(endDate, false, true));
 		MapHistoricUsuaris mapHistorics = new MapHistoricUsuaris(startDate, tipusLog);
 		registreHistoricExpedients(logsCount, mapHistorics);
 
 		List<ContingutLogCountAggregation<UsuariEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(endDate));
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics);
 
 		for (HistoricUsuariEntity historic : mapHistorics.getValues()) {
@@ -276,13 +290,13 @@ public class HistoricHelper {
 		Date endDate = getEndDate(date, tipusLog);
 
 		List<ContingutLogCountAggregation<String>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
-				startDate,
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(startDate, true, false),
+						DateUtil.getLocalDateTimeFromDate(endDate, false, true));
 		MapHistoricInteressat mapHistorics = new MapHistoricInteressat(startDate, tipusLog);
 		registreHistoricExpedients(logsCount, mapHistorics);
 
 		List<ContingutLogCountAggregation<String>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
-				endDate);
+				DateUtil.getLocalDateTimeFromDate(endDate));
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics);
 
 		for (HistoricInteressatEntity historic : mapHistorics.getValues()) {

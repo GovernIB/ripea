@@ -10,10 +10,6 @@ type TabProps = {
     badgeColor?: 'primary' | 'secondary' | 'default' | 'error' | 'info' | 'success' | 'warning' | undefined;
     hidden?: boolean;
 };
-type TabComponentProps = {
-    tabs: TabProps[];
-    headerAdditionalData?:any;
-};
 
 const TabPanel = (props:any) => {
     const { children, value, index, ...other } = props;
@@ -36,8 +32,8 @@ const TabPanel = (props:any) => {
     );
 }
 
-const TabComponent: React.FC<TabComponentProps> = (props :TabComponentProps) => {
-    const { tabs,headerAdditionalData, ...other}=props;
+const TabComponent = (props :any) => {
+    const { tabs, headerAdditionalData, ...other}=props;
     const [value, setValue] = React.useState(tabs[0].value);
 
     const handleChange = (event :any, newValue :string) : void => {
@@ -51,7 +47,7 @@ const TabComponent: React.FC<TabComponentProps> = (props :TabComponentProps) => 
             {...other}
             sx={{px: 1}}
         >
-            {tabs.filter((tab)=>!tab.hidden).map((tab) => {
+            {tabs.filter((tab:TabProps)=>!tab.hidden).map((tab:TabProps) => {
                 const {value, label , content, badge, badgeColor= 'primary'} = tab;
 
                 return <Tab value={value} content={content} key={"tab-" + value} label={
@@ -61,7 +57,7 @@ const TabComponent: React.FC<TabComponentProps> = (props :TabComponentProps) => 
             {headerAdditionalData}
         </Tabs>
 
-        {tabs.map((tab) =>
+        {tabs.map((tab:TabProps) =>
             <TabPanel value={value} index={tab.value} key={"tab-panel-"+tab.value}>
                 {tab.content}
             </TabPanel>

@@ -42,9 +42,26 @@ public class DateUtil {
                 .withNano(999999999);
 	}
 	
+	public static LocalDateTime toDateIniciDia(LocalDateTime data) {
+		if (data == null) {
+			return null;
+		}
+		return data.withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+	}
+	
 	public static LocalDateTime getLocalDateTimeFromDate(Date date) {
+		return getLocalDateTimeFromDate(date, false, false);
+	}
+	
+	public static LocalDateTime getLocalDateTimeFromDate(Date date, boolean iniciDia, boolean fiDia) {
 		if (date==null) return null;
-		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		LocalDateTime ldt = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		if (iniciDia) { return toDateIniciDia(ldt); }
+		if (fiDia)	{ 	return toDateFinalDia(ldt); }
+		return ldt;
 	}
 	
 	public static Calendar endOfDay(Calendar cal) {

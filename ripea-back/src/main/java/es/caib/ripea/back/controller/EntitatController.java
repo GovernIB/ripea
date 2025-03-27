@@ -9,6 +9,7 @@ import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.dto.config.ConfigGroupDto;
@@ -137,6 +138,7 @@ public class EntitatController extends BaseUserController {
 //		        Because it is not possible to remove error from bindingResult we ignore it.
              				
 			} else {
+				request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 				return "entitatForm";
 			}
 		}

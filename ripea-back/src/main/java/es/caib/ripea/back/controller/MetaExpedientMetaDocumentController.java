@@ -180,6 +180,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
              
 			} else {
 				emplenarModelForm(request, model);
+				request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 				return "metaExpedientMetaDocumentForm";
 			}
 		} else {

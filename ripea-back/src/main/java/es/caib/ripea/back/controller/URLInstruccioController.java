@@ -101,6 +101,7 @@ public class URLInstruccioController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (bindingResult.hasErrors()) {
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "urlInstruccioForm";
 		}
 		if (command.getId() != null) {

@@ -1,9 +1,10 @@
 import {Grid, Typography} from "@mui/material";
-import {BasePage, Dialog} from "reactlib";
+import {BasePage, useResourceApiService} from "reactlib";
 import {useState} from "react";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
+import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
@@ -40,6 +41,11 @@ const Versiones = () => {
 
 const useDocumentDetail = () => {
     const { t } = useTranslation();
+
+    const {
+        fieldDownload: apiDownload,
+    } = useResourceApiService('documentResource');
+
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
@@ -82,7 +88,19 @@ const useDocumentDetail = () => {
             ]}
             buttonCallback={(value :any) :void=>{
                 if (value=='download') {
-                    // TODO: download action
+                    apiDownload(entity?.id,{fieldName: 'adjunt'})
+                        .then((result:any)=>{
+                            const url = URL.createObjectURL(result.blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = result.fileName; // Usa el nombre recibido
+                            document.body.appendChild(link);
+                            link.click();
+
+                            // Limpieza
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                        })
                     handleClose();
                 }
             }}

@@ -53,19 +53,19 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     private MetaExpedientEntity pare;
 
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-    protected Set<MetaExpedientSequenciaEntity> sequencies;
+    private Set<MetaExpedientSequenciaEntity> sequencies;
 
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-    protected Set<MetaDocumentEntity> metaDocuments;
+    private Set<MetaDocumentEntity> metaDocuments;
 
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-    protected Set<ExpedientEstatEntity> estats;
+    private Set<ExpedientEstatEntity> estats;
     
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-    protected Set<MetaExpedientTascaEntity> tasques;
+    private Set<MetaExpedientTascaEntity> tasques;
     
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-    protected Set<HistoricEntity> historics;
+    private Set<HistoricEntity> historics;
     
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -81,7 +81,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     private OrganGestorEntity organGestor;
 
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-    protected Set<MetaExpedientOrganGestorEntity> metaExpedientOrganGestors;
+    private Set<MetaExpedientOrganGestorEntity> metaExpedientOrganGestors;
     
     @Column(name = "gestio_amb_grups_activa", nullable = false)
     private boolean gestioAmbGrupsActiva;

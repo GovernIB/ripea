@@ -8,12 +8,18 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.service.SeguimentService;
+
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +27,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -573,7 +581,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO_INTERESSATS, seleccio);
 		return "redirect:/seguimentArxiuPendents/#interessats";
 	}
-
+	
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(SeguimentArxiuPendentsController.class);
 }

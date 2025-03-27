@@ -13,10 +13,12 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,11 +38,35 @@ import java.util.List;
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
                         formClass = DocumentResource.EnviarViaEmailFormAction.class,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_MOURE_CODE,
+                        formClass = DocumentResource.MoureFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_PUBLICAR_CODE,
+                        formClass = DocumentResource.PublicarFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_NOTIFICAR_CODE,
+                        formClass = DocumentResource.NotificarFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE,
+                        formClass = DocumentResource.EnviarPortafirmesFormAction.class,
+                        requiresId = true),
         })
 public class DocumentResource extends NodeResource {
 
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
+    public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
+    public static final String ACTION_MOURE_CODE = "MOURE";
+    public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
+    public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
 
 	@NotNull
 	private DocumentTipusEnumDto documentTipus = DocumentTipusEnumDto.DIGITAL;
@@ -50,7 +76,7 @@ public class DocumentResource extends NodeResource {
 //	@NotNull
 	private Date data;
 	@NotNull
-	private Date dataCaptura;
+	private Date dataCaptura = new Date();
 	private Date custodiaData;
 	@Size(max = 256)
 	private String custodiaId;
@@ -172,6 +198,78 @@ public class DocumentResource extends NodeResource {
     @Setter
     public static class EnviarViaEmailFormAction implements Serializable {
         private String email;
-        private List<ResourceReference<UsuariResource, String>> responsables;
+        private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+    }
+
+    @Getter
+    @Setter
+    public static class MoureFormAction implements Serializable {
+        private String contingut;
+        @NotNull
+        protected ResourceReference<ExpedientResource, Long> expedient;
+    }
+
+    @Getter
+    @Setter
+    public static class PublicarFormAction implements Serializable {
+        @NotNull
+        private DocumentPublicacioTipusEnumDto tipus = DocumentPublicacioTipusEnumDto.BOIB;
+        @NotNull
+        private EstatEnum estat = EstatEnum.PENDENT;
+        @NotNull
+        private String assumpte;
+        private Date dataPublicacio;
+        @NotNull
+        private Date dataEnviament;
+//        @Field(type = Field.TYPE_TEXTAREA)
+        private String descripcio;
+
+        private enum EstatEnum {
+            PENDENT,
+            REBUTJADA,
+        }
+    }
+
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class NotificarFormAction implements Serializable {
+
+        private TipusEnum tipus;
+        @NotNull
+        private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
+        @NotEmpty
+        private List<ResourceReference<InteressatResource, Long>> interessats = new ArrayList<>();
+        @NotNull
+        private String concepte;
+        @NotNull
+        private ServeiTipusEnumDto serveiTipus = ServeiTipusEnumDto.NORMAL;
+//        @Field(type = Field.TYPE_TEXTAREA)
+        private String descripcio;
+
+        private Date dataProgramada;
+        @NotNull
+        private Date dataCaducitat;
+        @NotNull
+        private Integer duracio;
+        private Integer retard;
+        private Boolean entregaPostal;
+
+        private enum TipusEnum {
+            COMUNICACIO,
+            NOTIFICACIO,
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class EnviarPortafirmesFormAction implements Serializable {
+        @NotNull
+        private String motiu;
+        @NotNull
+        private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
+
+//        private List<ResourceReference<>> annexos;
+//        private ResourceReference<> fluxFirma;
     }
 }

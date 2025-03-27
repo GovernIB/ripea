@@ -178,7 +178,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	public String save(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
-			@Valid MetaDadaCommand command,
+			@Valid MetaDadaCommand metaDadaCommand,
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
@@ -189,14 +189,15 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("existContingut",  expedientService.countByMetaExpedient(entitatActual.getId(), metaExpedientId) != 0);
 			model.addAttribute("isMarcarEnviableArxiuActiu", isMarcarEnviableArxiuActiu());
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "metaDadaForm";
 		}
 
-		if (command.getId() != null) {
+		if (metaDadaCommand.getId() != null) {
 			metaDadaService.update(
 					entitatActual.getId(),
 					metaExpedientId,
-					MetaDadaCommand.asDto(command), rolActual, organActual != null ? organActual.getId() : null);
+					MetaDadaCommand.asDto(metaDadaCommand), rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -205,12 +206,12 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 					request,
 					"redirect:metaDada",
 					"metadada.controller.modificat.ok",
-					new Object[] { command.getNom() });
+					new Object[] { metaDadaCommand.getNom() });
 		} else {
 			metaDadaService.create(
 					entitatActual.getId(),
 					metaExpedientId,
-					MetaDadaCommand.asDto(command), rolActual, organActual != null ? organActual.getId() : null);
+					MetaDadaCommand.asDto(metaDadaCommand), rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -219,7 +220,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 					request,
 					"redirect:metaDada",
 					"metadada.controller.creat.ok",
-					new Object[] { command.getNom() });
+					new Object[] { metaDadaCommand.getNom() });
 		}
 	}
 
@@ -397,28 +398,6 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	
 	private boolean isMarcarEnviableArxiuActiu() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES));
-	}
-
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	    binder.registerCustomEditor(
-	    		BigDecimal.class,
-	    		new CustomNumberEditor(
-	    				BigDecimal.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
-	    binder.registerCustomEditor(
-	    		Double.class,
-	    		new CustomNumberEditor(
-	    				Double.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientMetaDadaController.class);

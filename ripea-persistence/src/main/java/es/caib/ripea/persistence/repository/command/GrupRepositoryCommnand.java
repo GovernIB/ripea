@@ -16,9 +16,7 @@ import java.util.Map;
 @Component
 public class GrupRepositoryCommnand extends AbstractRepositoryCommnand {
 
-    @Autowired
-    private GrupRepository grupRepository;
-
+    @Autowired private GrupRepository grupRepository;
 
     public List<GrupEntity> findByEntitatAndOrgan(final EntitatEntity entitat, final Long metaexpedientId, final List<String> codisOrgansFills) {
         Map<String, Object> params = new HashMap<String, Object>() {{
@@ -50,10 +48,6 @@ public class GrupRepositoryCommnand extends AbstractRepositoryCommnand {
         return getPage(new GrupByEntitatAndProcedimentCommand(params), codisOrgansFills, true);
     }
 
-
-
-    // RepositoryCommands
-    // //////////////////////////////////////////////////////////////////////////////////////////////
     @SuppressWarnings("unchecked")
     private class GrupByEntitatAndOrganCommand implements RepositoryCommand<GrupEntity>{
 
@@ -96,7 +90,6 @@ public class GrupRepositoryCommnand extends AbstractRepositoryCommnand {
             this.metaExpedientId = (Long) params.get("metaexpedientId");
             this.pageable = (Pageable) params.get("pageable");
         }
-
 
         @Override
         public List<GrupEntity> executeList(List<?> sublist) {

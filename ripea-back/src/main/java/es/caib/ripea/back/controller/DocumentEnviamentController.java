@@ -115,12 +115,8 @@ public class DocumentEnviamentController extends BaseUserController {
         try {
             EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
             if (bindingResult.hasErrors()) {
-                emplenarModelNotificacio(
-                        request,
-                        entitatActual,
-                        documentId,
-                        command,
-                        model, null);
+                emplenarModelNotificacio(request, entitatActual, documentId, command, model, null);
+                request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
                 return "notificacioForm";
             }
 
@@ -353,12 +349,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelNotificacio(
-					request,
-					getEntitatActualComprovantPermisos(request),
-					documentId,
-					null,
-					model, null);
+			emplenarModelNotificacio(request, getEntitatActualComprovantPermisos(request), documentId, null, model, null);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "notificacioForm";
 		}
 		DocumentNotificacioDto documentNotificacioDto = documentEnviamentService.notificacioUpdate(
@@ -495,10 +487,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) {
 		if (bindingResult.hasErrors()) {
-			emplenarModelPublicacio(
-					request,
-					documentId,
-					model);
+			emplenarModelPublicacio(request, documentId, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "publicacioForm";
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -557,10 +547,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelPublicacio(
-					request,
-					documentId,
-					model);
+			emplenarModelPublicacio(request, documentId, model);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "publicacioForm";
 		}
 		DocumentPublicacioDto documentPublicacioDto = documentEnviamentService.publicacioUpdate(
@@ -589,15 +577,6 @@ public class DocumentEnviamentController extends BaseUserController {
 				"redirect:../../../../contingut/" + documentId,
 				"expedient.controller.publicacio.esborrada.ok",
 				new Object[] { documentPublicacioDto.getDocumentNom() });
-	}
-
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
 	}
 
 	@RequestMapping(value = "/{documentId}/estat", method = RequestMethod.GET)

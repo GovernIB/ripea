@@ -146,6 +146,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("existContingut",  documentService.countByMetaDocument(entitatActual.getId(), metaDocumentId) != 0);
+			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "metaDadaForm";
 		}
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
@@ -252,27 +253,6 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 					e);
 
 		}
-	}
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	    binder.registerCustomEditor(
-	    		BigDecimal.class,
-	    		new CustomNumberEditor(
-	    				BigDecimal.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
-	    binder.registerCustomEditor(
-	    		Double.class,
-	    		new CustomNumberEditor(
-	    				Double.class,
-	    				NumberFormat.getInstance(new Locale("es","ES")),
-	    				true));
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentMetaDadaController.class);

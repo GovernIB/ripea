@@ -408,13 +408,4 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		return expedientTascaService.findComentarisPerTasca(entitatActual.getId(), expedientTascaId);
 	}
 	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
-	}
-	
 }

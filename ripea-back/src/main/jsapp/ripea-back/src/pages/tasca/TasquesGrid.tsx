@@ -1,22 +1,21 @@
 import {
     GridPage,
-    MuiGrid,
+    MuiGrid, useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import { formatDate } from "../../util/dateUtils.ts";
 import { Grid } from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
-import React from "react";
 import * as builder from "../../util/springFilterUtils.ts";
 import { TascaCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import useTascaActions from "./details/TascaActions.tsx";
 import {useTranslation} from "react-i18next";
 
-const TasquesGridForm = (props: any) => {
-    const { expedient } = props;
+const TasquesGridForm = () => {
+    const { data } = useFormContext();
 
     const metaTascaFilter: string = builder.and(
-        builder.eq("metaExpedient.id", expedient?.metaExpedient?.id),
+        builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("activa", true),
     );
 
@@ -33,71 +32,72 @@ const TasquesGridForm = (props: any) => {
     </Grid>
 }
 
-const TasquesGrid: React.FC = (props: any) => {
-    const { id, entity, onRowCountChange } = props;
-    const apiRef = useMuiDataGridApiRef()
-    const { t } = useTranslation();
+const columns = [
+    {
+        field: 'metaExpedientTasca',
+        flex: 0.5,
+        valueFormatter: (value: any) => {
+            return value?.description;
+        }
+    },
+    {
+        field: 'dataInici',
+        flex: 0.5,
+        valueFormatter: (value: any) => {
+            return formatDate(value);
+        }
+    },
+    {
+        field: 'dataLimit',
+        flex: 0.5,
+        valueFormatter: (value: any) => {
+            return formatDate(value, "DD/MM/Y");
+        }
+    },
+    {
+        field: 'titol',
+        flex: 0.5,
+    },
+    {
+        field: 'observacions',
+        flex: 0.5,
+    },
+    {
+        field: 'responsablesStr',
+        flex: 0.5,
+    },
+    {
+        field: 'responsableActual',
+        flex: 0.5,
+        valueFormatter: (value: any) => {
+            return value?.description;
+        }
+    },
+    {
+        field: 'estat',
+        flex: 0.5,
+    },
+    {
+        field: 'prioritat',
+        flex: 0.5,
+    },
+    {
+        field: 'numComentaris',
+        headerName: '',
+        sortable: false,
+        disableColumnMenu: true,
+        flex: 0.25,
+        renderCell: (params: any) => {
+            return <CommentDialog entity={params?.row} />;
+        }
+    },
+];
 
-    const columns = [
-        {
-            field: 'metaExpedientTasca',
-            flex: 0.5,
-            valueFormatter: (value: any) => {
-                return value?.description;
-            }
-        },
-        {
-            field: 'dataInici',
-            flex: 0.5,
-            valueFormatter: (value: any) => {
-                return formatDate(value);
-            }
-        },
-        {
-            field: 'dataLimit',
-            flex: 0.5,
-            valueFormatter: (value: any) => {
-                return formatDate(value, "DD/MM/Y");
-            }
-        },
-        {
-            field: 'titol',
-            flex: 0.5,
-        },
-        {
-            field: 'observacions',
-            flex: 0.5,
-        },
-        {
-            field: 'responsablesStr',
-            flex: 0.5,
-        },
-        {
-            field: 'responsableActual',
-            flex: 0.5,
-            valueFormatter: (value: any) => {
-                return value?.description;
-            }
-        },
-        {
-            field: 'estat',
-            flex: 0.5,
-        },
-        {
-            field: 'prioritat',
-            flex: 0.5,
-        },
-        {
-            field: 'numComentaris',
-            headerName: '',
-            sortable: false,
-            disableColumnMenu: true,
-            flex: 0.25,
-            renderCell: (params: any) => {
-                return <CommentDialog entity={params?.row} />;
-            }
-        },
-    ];
+const TasquesGrid = (props: any) => {
+    const { entity, onRowCountChange } = props;
+    const { t } = useTranslation();
+    const apiRef = useMuiDataGridApiRef();
+
     const { actions, components } = useTascaActions(apiRef?.current?.refresh);
 
     return <GridPage>
@@ -107,21 +107,20 @@ const TasquesGrid: React.FC = (props: any) => {
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={columns}
             paginationActive
-            filter={`expedient.id:${id}`}
+            filter={`expedient.id:${entity?.id}`}
             titleDisabled
             perspectives={["RESPONSABLES_RESUM"]}
             onRowsChange={(rows) => onRowCountChange?.(rows.length)}
             popupEditCreateActive
-            popupEditFormContent={<TasquesGridForm expedient={entity} />}
+            popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
-                expedient: {
-                    id: id
-                },
+                expedient: {id: entity?.id},
+                metaExpedient: {id: entity?.metaExpedient?.id},
             }}
             rowAdditionalActions={actions}
             disableColumnMenu
             rowHideUpdateButton
-        // rowHideDeleteButton
+            rowHideDeleteButton
         />
         {components}
     </GridPage>

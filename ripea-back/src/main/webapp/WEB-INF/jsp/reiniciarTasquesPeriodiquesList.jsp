@@ -114,7 +114,7 @@
 	</table>
 	<script id="tasquesTableBotoTots" type="text/x-jsrender">
 	<div style="float: right;">
-		<a href="Javascript:actualitzarTaula();" class="btn btn-success" style="margin-right: 45px;"><span class="fa fa-list"></span>&nbsp;<spring:message code="monitor.tasques.boto.refresh.taula"/>x</a>
+		<a href="Javascript:actualitzarTaula();" class="btn btn-success" style="margin-right: 45px;"><span class="fa fa-list"></span>&nbsp;<spring:message code="monitor.tasques.boto.refresh.taula"/></a>
 		<a href="Javascript:reiniciarTasca();" class="btn btn-warning" style="margin-right: 45px;"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="monitor.tasques.boto.reiniciar.totes"/></a>
 	</div>
 	</script>

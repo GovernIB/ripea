@@ -98,8 +98,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
-			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
-			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
+			"and (:esNullTancatInici = true or e.tancatData >= :tancatInici) " +
+			"and (:esNullTancatFi = true or e.tancatData <= :tancatFi) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaNode = true))) " +
 			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
@@ -244,8 +244,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
-			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
-			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
+			"and (:esNullTancatInici = true or e.tancatData >= :tancatInici) " +
+			"and (:esNullTancatFi = true or e.tancatData <= :tancatFi) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaNode = true))) " +
 			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
@@ -451,9 +451,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullNom") boolean esNullNom,
@@ -514,9 +514,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
@@ -576,9 +576,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi,
+			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,	
 			@Param("esNullEstat") boolean esNullEstat,
@@ -656,9 +656,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") Date dataInici,
+			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") LocalDateTime dataFi);
 
 
 	static final String FIND_BY_ARXIU_PENDENT =	"select " +

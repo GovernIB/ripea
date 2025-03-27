@@ -18,9 +18,11 @@ import es.caib.ripea.persistence.entity.ContingutLogEntity;
 import es.caib.ripea.persistence.entity.ContingutMovimentEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ContingutLogRepository;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.ContingutLogDetallsDto;
 import es.caib.ripea.service.intf.dto.ContingutLogDto;
 import es.caib.ripea.service.intf.dto.ContingutMovimentDto;
@@ -36,6 +38,7 @@ public class ContingutLogHelper {
 	@Autowired private ContingutLogRepository contingutLogRepository;
 	@Autowired private ContingutMovimentRepository contingutMovimentRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private UsuariRepository usuariRepository;	
 
 	public ContingutLogEntity logCreacio(
 			ContingutEntity contingut,
@@ -360,10 +363,17 @@ public class ContingutLogHelper {
 		if (log.getCreatedDate() != null)
 			dto.setCreatedDate(
 					Date.from(log.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-		dto.setCreatedBy(
-				conversioTipusHelper.convertir(
-						log.getCreatedBy(),
-						UsuariDto.class));
+		
+		if (log.getCreatedBy().isPresent()) {
+			UsuariEntity ue = usuariRepository.findByCodi(log.getCreatedBy().get());
+  			UsuariDto target = new UsuariDto();
+  			target.setCodi(ue.getCodi());
+  			target.setNom(ue.getNom());
+  			target.setNif(ue.getNif());
+  			target.setEmail(ue.getEmail());
+  			dto.setCreatedBy(target);
+		}
+
 		if (log.getLastModifiedDate() != null)
 			dto.setLastModifiedDate(
 					Date.from(log.getLastModifiedDate().get().atZone(ZoneId.systemDefault()).toInstant()));

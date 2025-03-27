@@ -5,32 +5,35 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const ReobrirForm = () => {
+const MoureForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="responsable" required/>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField xs={12} name="contingut" readOnly disabled/>
+        <GridFormField xs={12} name="expedient"/>
     </Grid>
 }
 
-const Reobrir = (props:any) => {
+const Moure = (props:any) => {
     const { t } = useTranslation();
 
     return <FormActionDialog
-        resourceName={"expedientTascaResource"}
-        action={"ACTION_REABRIR"}
-        title={t('page.tasca.action.reobrir')}
+        resourceName={"documentResource"}
+        action={"MOURE"}
+        title={t('page.document.action.move')}
         {...props}
     >
-        <ReobrirForm/>
+        <MoureForm/>
     </FormActionDialog>
 }
 
-const useReobrir = (refresh?: () => void) => {
+const useMoure = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        apiRef.current?.show?.(id,{responsableActual:row?.responsableActual})
+        apiRef.current?.show?.(id, {
+            contingut: row?.nom,
+            expedient: row?.expedient,
+        })
     }
     const onSuccess = () :void => {
         refresh?.()
@@ -42,7 +45,7 @@ const useReobrir = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <Reobrir apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Moure apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
-export default useReobrir;
+export default useMoure;
