@@ -34,6 +34,7 @@ export const isFieldNumericType = (field: any, forcedType?: any) => {
     const isNumeric = type === 'number' ||
         type === 'decimal' ||
         type === 'currency' ||
+        type === 'range' ||
         type === 'date' ||
         type === 'time' ||
         type === 'datetime-local' ||
