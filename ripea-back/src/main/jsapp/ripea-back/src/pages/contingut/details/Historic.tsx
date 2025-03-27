@@ -1,8 +1,9 @@
 import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
-import {BasePage, Dialog} from "reactlib";
+import {BasePage} from "reactlib";
 import {useState} from "react";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {useTranslation} from "react-i18next";
+import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;

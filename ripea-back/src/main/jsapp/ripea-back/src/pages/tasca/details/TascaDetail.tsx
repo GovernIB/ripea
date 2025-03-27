@@ -1,8 +1,8 @@
 import {Grid, Typography} from "@mui/material";
-import {Dialog} from "reactlib";
 import {useState} from "react";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
+import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
