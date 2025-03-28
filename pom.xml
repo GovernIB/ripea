@@ -131,12 +131,7 @@
 			<dependency>
 				<groupId>net.sf.jasperreports</groupId>
 				<artifactId>jasperreports</artifactId>
-				<version>7.0.2</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.jasperreports</groupId>
-				<artifactId>jasperreports-pdf</artifactId>
-				<version>7.0.2</version>
+				<version>6.21.4</version>
 			</dependency>
 			<dependency>
 				<groupId>ma.glasnost.orika</groupId>
