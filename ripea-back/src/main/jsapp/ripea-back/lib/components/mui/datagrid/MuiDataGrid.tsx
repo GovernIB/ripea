@@ -77,6 +77,7 @@ export type MuiDataGridProps = {
     treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
     toolbarType?: DataToolbarType;
     toolbarHide?: true;
+    toolbarHideCreate?: true;
     toolbarHideRefresh?: true;
     toolbarHideQuickFilter?: true;
     toolbarCreateLink?: string;
@@ -286,6 +287,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         treeDataAdditionalRows,
         toolbarType = 'default',
         toolbarHide,
+        toolbarHideCreate,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
         toolbarCreateLink,
@@ -411,13 +413,14 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         apiCurrentActions,
         apiDelete,
         refresh);
+    const toolbarNodesPosition = 2;
     const toolbarGridElementsWithPositions: ReactElementWithPosition[] = [];
     toolbarAddElement != null && toolbarGridElementsWithPositions.push({
-        position: 2,
-        element: toolbarAddElement
+        position: toolbarNodesPosition,
+        element: !toolbarHideCreate ? toolbarAddElement : <span/>,
     });
     const toolbarHideExport = true;
-    const toolbarNumElements = 2 + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
+    const toolbarNumElements = toolbarNodesPosition + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
     const joinedToolbarElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
         toolbarNumElements,
         toolbarGridElementsWithPositions,
