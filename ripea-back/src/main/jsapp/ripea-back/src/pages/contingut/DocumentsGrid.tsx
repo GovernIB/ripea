@@ -34,51 +34,43 @@ const DocumentsGridForm = () => {
     </Grid>
 }
 
-const useAdditionalRow = (treeView:boolean, refresh:() => void) => {
+const ExpandButton = (props:{value:any, onChange:(value:any) => void}) => {
     const { t } = useTranslation();
+    const {value, onChange} = props;
 
-    const [expand, setExpand] = useState<boolean>(true);
-    const [vista, setVista] = useState<string>("carpeta");
+    return <FormControlLabel control={<Checkbox
+        checked={value}
+        onChange={(event) => onChange(event.target.checked)}
+        icon={<Icon>arrow_right</Icon>}
+        checkedIcon={<Icon>arrow_drop_down</Icon>}
+    />} label={value ? t("common.contract") : t("common.expand")} />
+}
 
-    const content = <Grid display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"space-between"} pb={1}>
-        <Grid item xs={2}>
-            {treeView && <FormControlLabel control={<Checkbox
-                checked={expand}
-                onChange={(event) => setExpand(event.target.checked)}
-                icon={<Icon>arrow_right</Icon>}
-                checkedIcon={<Icon>arrow_drop_down</Icon>}
-            />} label={expand ? t("common.contract") : t("common.expand")} />}
-        </Grid>
+const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) => {
+    const { t } = useTranslation();
+    const {value, onChange} = props;
 
-        <Grid item xs={3}>
-            <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>
-                <Select
-                    labelId="demo-simple-select-label"
-                    value={vista}
-                    onChange={(event) => {
-                        setVista(event.target.value)
-                        refresh?.()
-                    }}
-                >
-                    <MenuItem value={"estat"}>{t('page.document.view.estat')}</MenuItem>
-                    <MenuItem value={"tipus"}>{t('page.document.view.tipus')}</MenuItem>
-                    <MenuItem value={"carpeta"} selected>{t('page.document.view.carpeta')}</MenuItem>
-                </Select>
-            </FormControl>
-        </Grid>
+    return <Grid item xs={3}>
+        <FormControl fullWidth size="small">
+            <InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>
+            <Select
+                labelId="demo-simple-select-label"
+                value={value}
+                onChange={(event) => onChange(event.target.value)}
+            >
+                <MenuItem value={"estat"}>{t('page.document.view.estat')}</MenuItem>
+                <MenuItem value={"tipus"}>{t('page.document.view.tipus')}</MenuItem>
+                <MenuItem value={"carpeta"} selected>{t('page.document.view.carpeta')}</MenuItem>
+            </Select>
+        </FormControl>
     </Grid>
-
-    return { expand, vista, content }
 }
 
 const columns = [
     {
         field: 'nom',
         flex: 0.5,
-        renderCell: (params: any) => {
-            return <ContingutIcon entity={params?.row}>{params?.row.nom}</ContingutIcon>
-        }
+        renderCell: (params: any) => <ContingutIcon entity={params?.row}>{params?.row.nom}</ContingutIcon>
     },
     {
         field: 'descripcio',
@@ -87,9 +79,6 @@ const columns = [
     {
         field: 'metaDocument',
         flex: 0.5,
-        valueFormatter: (value: any) => {
-            return value?.description;
-        }
     },
     {
         field: 'createdDate',
@@ -104,7 +93,6 @@ const columns = [
 const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
-    const [treeView, setTreeView] = useState<boolean>(true);
     const dataGridApiRef = useMuiDataGridApiRef()
 
     const refresh = () => {
@@ -113,9 +101,11 @@ const DocumentsGrid = (props:any) => {
     const {
         actions: commonActionsActions,
         components: commonActionsComponents
-    } = useContingutActions(refresh);
+    } = useContingutActions(dataGridApiRef);
 
-    const {expand, vista, content} = useAdditionalRow(treeView, refresh);
+    const [treeView, setTreeView] = useState<boolean>(true);
+    const [expand, setExpand] = useState<boolean>(true);
+    const [vista, setVista] = useState<string>("carpeta");
 
     return <GridPage>
         <MuiGrid
@@ -137,7 +127,7 @@ const DocumentsGrid = (props:any) => {
             rowHideDeleteButton
             apiRef={dataGridApiRef}
             rowAdditionalActions={commonActionsActions}
-            onRowsChange={(rows) => onRowCountChange?.(rows.filter((a)=>a?.tipus=="DOCUMENT").length)}
+            onRowsChange={(rows) => onRowCountChange?.(rows.filter((a) => a?.tipus == "DOCUMENT").length)}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {
@@ -166,7 +156,21 @@ const DocumentsGrid = (props:any) => {
                 }
             }}
             isGroupExpandedByDefault={() => expand}
-            toolbarAdditionalRow={content}
+            rowHideUpdateButton
+
+            toolbarElementsWithPositions={[
+                {
+                    position: 0,
+                    element: treeView ? <ExpandButton value={expand} onChange={setExpand} /> :<></>,
+                },
+                {
+                    position: 3,
+                    element: <TreeViewSelector value={vista} onChange={(value:any) => {
+                        setVista(value);
+                        refresh();
+                    }} />,
+                }
+            ]}
         />
         {commonActionsComponents}
     </GridPage>

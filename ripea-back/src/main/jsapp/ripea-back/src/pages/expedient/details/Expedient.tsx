@@ -14,7 +14,7 @@ import TasquesGrid from "../../tasca/TasquesGrid.tsx";
 import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
-// import DadaGrid from "../../dada/DadaGrid.tsx";
+import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 
 const CardProp = (props :any) => {
     const { title, children, ...other } = props;
@@ -47,6 +47,7 @@ const Expedient = () => {
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
+    const [numDades, setNumDades] = useState<number>(expedient?.numTasques);
 
     const isExperientOrCarpeta=(row:any)=>{
         return row?.tipus=="EXPEDIENT" || row?.tipus=="CARPETA"
@@ -62,16 +63,15 @@ const Expedient = () => {
         {
             value: "dades",
             label: t('page.contingut.tabs.dades'),
-            content: <Typography>{t('page.contingut.tabs.dades')}</Typography>,
-            // content: <DadaGrid entity={expedient}/>,
-            badge: expedient?.numDades,
-            // hidden: expedient?.numDades == 0,
+            content: <MetaDadaGrid entity={expedient} onRowCountChange={setNumDades}/>,
+            badge: numDades ?? expedient?.numDades,
+            // hidden: expedient?.numMetaDades == 0,
         },
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
             content: <InteressatsGrid id={id} onRowCountChange={setNumInteressats}/>,
-            badge: numInteressats ,
+            badge: numInteressats ?? expedient?.numInteressats,
             hidden: !isExperientOrCarpeta(expedient),
         },
         {

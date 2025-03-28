@@ -144,14 +144,15 @@ const useInteressatActions = (refresh?: () => void) => {
         },
     ];
 
-    const components=
+    const components=<>
         <MuiFormDialog
             resourceName={"interessatResource"}
             title={t('page.interessat.rep')}
             apiRef={apiRef}
         >
             <InteressatsGridForm/>
-        </MuiFormDialog>;
+        </MuiFormDialog>
+    </>;
 
     return {
         actions,

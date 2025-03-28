@@ -46,7 +46,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
-//        register(ExpedientFilterForm.Fields.dataCreacioInici, new FilterOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
     }
 

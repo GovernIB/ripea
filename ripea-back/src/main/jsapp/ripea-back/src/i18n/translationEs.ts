@@ -1,6 +1,8 @@
 const translationEs = {
     common: {
         close: "Cerrar",
+        create: 'Crear',
+        update: 'Modificar',
         delete: "Borrar",
         action: "Acción",
         expand: "Expandir",
@@ -197,9 +199,23 @@ const translationEs = {
                 history: "Histórico de acciones",
                 infoArxiu: "Información archivo",
                 export: "Exportación EIN...",
+                notificar: "Notificar o comunicar...",
+                publicar: "Publicar...",
             },
             action: {
-
+                enviarEmail: "Enviar documento por email",
+                move: "Mover contenido",
+                notificar: "Crear notificación documento",
+                publicar: "Crear publicación",
+            },
+        },
+        dada: {
+            title: 'Dato'
+        },
+        metaDada: {
+            title: 'Tipo de dato',
+            acciones: {
+                detail: 'Detalle',
             },
         },
         notFound: "No encontrado",

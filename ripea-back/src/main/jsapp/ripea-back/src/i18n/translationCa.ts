@@ -1,6 +1,8 @@
 const translationCa = {
     common: {
         close: "Tancar",
+        create: "Crear",
+        update: "Modificar",
         delete: "Esborrar",
         action: "Acció",
         expand: "Expandir",
@@ -48,14 +50,14 @@ const translationCa = {
             detall: {
                 title: "Detalls de la tasca",
                 metaExpedientTasca: "Tipus de tasca",
-                metaExpedientTascaDescription: "Descripció tipus de tasca",
+                metaExpedientTascaDescription: "Descripció del tipus de tasca",
                 createdBy: "Creada per",
                 responsablesStr: "Responsables",
                 responsableActual: "Responsable actual",
                 delegat: "Delegat",
                 observadors: "Observadors",
                 dataInici: "Data d'inici",
-                duracio: "Durada",
+                duracio: "Duració",
                 dataLimit: "Data límit",
                 estat: "Estat",
                 prioritat: "Prioritat",
@@ -136,7 +138,7 @@ const translationCa = {
             detall: {
                 title: "Informació obtinguda de l'arxiu",
                 arxiuUuid: "Identificador arxiu",
-                fitxerNom: "Nom del fitxer",
+                fitxerNom: "Nom de l'arxiu",
                 serie: "Sèrie documental",
                 arxiuEstat: "Estat de l'arxiu",
                 document: "Contingut document",
@@ -150,7 +152,7 @@ const translationCa = {
                 origen: "Origen",
                 estadoElaboracion: "Estat d'elaboració",
                 tipoDocumental: "Tipus documental NTI",
-                format: "Nom del format",
+                format: "Format nom",
                 clasificacion: "Classificació",
                 estat: "Estat",
                 interessats: "Interessats",
@@ -185,21 +187,35 @@ const translationCa = {
                 estadoElaboracion: "Estat d'elaboració",
                 csv: "CSV",
                 csvRegulacion: "Regulació del CSV",
-                tipoFirma: "Tipus de signatura",
+                tipoFirma: "Tipus de firma",
             },
             acciones: {
                 detall: "Detalls",
                 move: "Moure...",
                 view: "Visualitzar",
                 portafirmes: "Enviar a portafirmes...",
-                firmar: "Signar des del navegador...",
-                mail: "Enviar per correu electrònic...",
+                firmar: "Firma des del navegador...",
+                mail: "Enviar via email...",
                 history: "Històric d'accions",
                 infoArxiu: "Informació arxiu",
                 export: "Exportació EIN...",
+                notificar: "Notificar o comunicar...",
+                publicar: "Publicar...",
             },
             action: {
-
+                enviarEmail: "Enviar document per email",
+                move: "Moure contingut",
+                notificar: "Crear notificació document",
+                publicar: "Crear publicació",
+            },
+        },
+        dada: {
+            title: 'Dada'
+        },
+        metaDada: {
+            title: 'Tipus de dada',
+            acciones: {
+                detail: 'Detall',
             },
         },
         notFound: "No trobat",

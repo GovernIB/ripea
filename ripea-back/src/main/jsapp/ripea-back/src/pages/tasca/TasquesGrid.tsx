@@ -36,23 +36,16 @@ const columns = [
     {
         field: 'metaExpedientTasca',
         flex: 0.5,
-        valueFormatter: (value: any) => {
-            return value?.description;
-        }
     },
     {
         field: 'dataInici',
         flex: 0.5,
-        valueFormatter: (value: any) => {
-            return formatDate(value);
-        }
+        valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'dataLimit',
         flex: 0.5,
-        valueFormatter: (value: any) => {
-            return formatDate(value, "DD/MM/Y");
-        }
+        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
     },
     {
         field: 'titol',
@@ -69,9 +62,6 @@ const columns = [
     {
         field: 'responsableActual',
         flex: 0.5,
-        valueFormatter: (value: any) => {
-            return value?.description;
-        }
     },
     {
         field: 'estat',
@@ -87,9 +77,7 @@ const columns = [
         sortable: false,
         disableColumnMenu: true,
         flex: 0.25,
-        renderCell: (params: any) => {
-            return <CommentDialog entity={params?.row} />;
-        }
+        renderCell: (params: any) => <CommentDialog entity={params?.row} />
     },
 ];
 

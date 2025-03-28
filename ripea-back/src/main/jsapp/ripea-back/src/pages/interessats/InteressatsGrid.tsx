@@ -45,9 +45,6 @@ const columns = [
     {
         field: 'representant',
         flex: 0.5,
-        valueFormatter: (value: any) => {
-            return value?.description;
-        }
     },
 ];
 

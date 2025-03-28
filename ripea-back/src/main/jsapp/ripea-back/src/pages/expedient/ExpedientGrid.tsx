@@ -59,9 +59,7 @@ const columns = [
     {
         field: 'createdDate',
         flex: 1,
-        valueFormatter: (value: any) => {
-            return formatDate(value);
-        }
+        valueFormatter: (value: any) => formatDate(value)
     },
     {
         field: 'estat',
@@ -74,9 +72,6 @@ const columns = [
     {
         field: 'agafatPer',
         flex: 1,
-        valueFormatter: (value: any) => {
-            return value?.description;
-        }
     },
     {
         field: 'interessats',
@@ -109,9 +104,6 @@ const columns = [
         flex: 0.5,
         sortable: false,
         disableColumnMenu: true,
-        valueFormatter: (value: any) => {
-            return value?.description;
-        }
     },
     {
         field: 'numComentaris',
@@ -119,9 +111,7 @@ const columns = [
         sortable: false,
         disableColumnMenu: true,
         flex: 0.5,
-        renderCell: (params: any) => {
-            return <CommentDialog entity={params?.row} />;
-        }
+        renderCell: (params: any) => <CommentDialog entity={params?.row} />
     },
 ];
 
