@@ -224,7 +224,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	@Override
-	@GetMapping
+	@GetMapping(value = "/export")
 	@Operation(summary = "Exportació de recursos")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('EXPORT'))")
 	public ResponseEntity<InputStreamResource> export(
