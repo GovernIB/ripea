@@ -268,7 +268,7 @@
 			<id>redhat-repo</id>
 			<name>Redhat GA Repository</name>
 			<url>https://maven.repository.redhat.com/ga/</url>
-		</repository>		
+		</repository>
 	</repositories>
 	<build>
 		<plugins>

@@ -27,11 +27,6 @@
 			<artifactId>jasperreports</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.dynamicreports</groupId>
-			<artifactId>dynamicreports-core</artifactId>
-			<version>6.20.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.fundaciobit.pluginsib.arxiu</groupId>
 			<artifactId>pluginsib-arxiu-caib</artifactId>
 		</dependency>
