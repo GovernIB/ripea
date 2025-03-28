@@ -35,6 +35,19 @@ public class ReportGenerationException extends RuntimeException {
 
 	public ReportGenerationException(
 			Class<?> resourceClass,
+			String message,
+			Throwable cause) {
+		this(resourceClass, null, null, message, cause);
+	}
+
+	public ReportGenerationException(
+			Class<?> resourceClass,
+			String message) {
+		this(resourceClass, null, null, message, null);
+	}
+
+	public ReportGenerationException(
+			Class<?> resourceClass,
 			Serializable id,
 			String code,
 			String message,

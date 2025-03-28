@@ -8,7 +8,6 @@ import {
     useGridSelector,
     gridPageSelector,
     gridPageSizeSelector,
-    gridPaginationRowRangeSelector,
     selectedGridRowsCountSelector,
     GridRowSelectionModel,
 } from '@mui/x-data-grid';
@@ -49,16 +48,17 @@ const DataGridFooterSelection: React.FC<DataGridFooterSelectionProps> = (props) 
 
 const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) => {
     const { pageInfo } = props;
+    const { t } = useBaseAppContext();
     const apiRef = useGridApiContext();
     const page = useGridSelector(apiRef, gridPageSelector);
     const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
     const pageCount = pageInfo?.totalElements && pageSize ? Math.ceil(pageInfo.totalElements / pageSize) : undefined;
+    const pageRowCount = page === (pageCount ?? 0) - 1 ? pageInfo.totalElements % pageSize : pageSize;
     const firstElementIndex = page * pageSize + 1;
-    const rowRange = useGridSelector(apiRef, gridPaginationRowRangeSelector);
     const boxStyle = { display: 'flex', justifContent: 'flex-end', alignItems: 'center' };
     return <Box style={boxStyle}>
         <Box>
-            {pageInfo && rowRange ? ((firstElementIndex + ' a ' + (firstElementIndex + rowRange.lastRowIndex)) + ' de ' + pageInfo.totalElements) : ''}
+            {pageInfo != null ? t('grid.pageInfo', { from: firstElementIndex, to: (firstElementIndex + pageRowCount - 1), count: pageInfo.totalElements }) : ''}
         </Box>
         <Pagination
             color="primary"

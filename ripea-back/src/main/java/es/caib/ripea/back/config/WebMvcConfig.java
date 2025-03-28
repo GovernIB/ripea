@@ -1,7 +1,8 @@
 package es.caib.ripea.back.config;
 
-import java.util.List;
-
+import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
+import es.caib.ripea.back.interceptor.*;
+import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -26,29 +27,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
-
-import es.caib.ripea.back.interceptor.AccesAdminEntitatInterceptor;
-import es.caib.ripea.back.interceptor.AccesAdminEntitatOAdminOrganORevisorInterceptor;
-import es.caib.ripea.back.interceptor.AccesAdminEntitatORevisorInterceptor;
-import es.caib.ripea.back.interceptor.AccesAdminEntitatOrUsuariInterceptor;
-import es.caib.ripea.back.interceptor.AccesFluxosFirmaUsuariInterceptor;
-import es.caib.ripea.back.interceptor.AccesSuperInterceptor;
-import es.caib.ripea.back.interceptor.AccesURLsInstruccioInterceptor;
-import es.caib.ripea.back.interceptor.AjaxInterceptor;
-import es.caib.ripea.back.interceptor.AnotacionsPendentsInterceptor;
-import es.caib.ripea.back.interceptor.AplicacioInterceptor;
-import es.caib.ripea.back.interceptor.AvisosInterceptor;
-import es.caib.ripea.back.interceptor.ExpedientsInterceptor;
-import es.caib.ripea.back.interceptor.FluxFirmaInterceptor;
-import es.caib.ripea.back.interceptor.LlistaEntitatsInterceptor;
-import es.caib.ripea.back.interceptor.LlistaRolsInterceptor;
-import es.caib.ripea.back.interceptor.MetaExpedientInterceptor;
-import es.caib.ripea.back.interceptor.ModalInterceptor;
-import es.caib.ripea.back.interceptor.NodecoInterceptor;
-import es.caib.ripea.back.interceptor.SeguimentEnviamentsUsuariInterceptor;
-import es.caib.ripea.back.interceptor.SessioInterceptor;
-import es.caib.ripea.back.interceptor.TasquesPendentsInterceptor;
+import java.util.List;
 
 /**
  * Configuració de Spring MVC.
@@ -263,56 +242,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				}
 				return pageable;
 			}
-		}
-	}
-
-	public static class UnpagedButSorted implements Pageable {
-		private final Sort sort;
-		public UnpagedButSorted(Sort sort) {
-			this.sort = sort;
-		}
-		@Override
-		public boolean isPaged() {
-			return false;
-		}
-		@Override
-		public Pageable previousOrFirst() {
-			return this;
-		}
-		@Override
-		public Pageable next() {
-			return this;
-		}
-		@Override
-		public boolean hasPrevious() {
-			return false;
-		}
-		@Override
-		public Sort getSort() {
-			return sort;
-		}
-		@Override
-		public int getPageSize() {
-			throw new UnsupportedOperationException();
-		}
-		@Override
-		public int getPageNumber() {
-			throw new UnsupportedOperationException();
-		}
-		@Override
-		public long getOffset() {
-			throw new UnsupportedOperationException();
-		}
-		@Override
-		public Pageable first() {
-			return this;
-		}
-		@Override
-		public Pageable withPage(int pageNumber) {
-			if (pageNumber == 0) {
-				return this;
-			}
-			throw new UnsupportedOperationException();
 		}
 	}
 

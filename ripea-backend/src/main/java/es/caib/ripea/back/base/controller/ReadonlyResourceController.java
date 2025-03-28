@@ -3,12 +3,10 @@ package es.caib.ripea.back.base.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
-import es.caib.ripea.service.intf.base.model.OnChangeEvent;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
@@ -52,7 +50,7 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	 *            la llista de perspectives a aplicar.
 	 * @param pageable
 	 *            informació sobre la pagina de resultats que es vol obtenir.
-	 * @return la llista de camps.
+	 * @return la llista de recusos.
 	 */
 	ResponseEntity<PagedModel<EntityModel<R>>> find(
 			final String quickFilter,
@@ -60,6 +58,36 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String[] namedQueries,
 			final String[] perspectives,
 			final Pageable pageable);
+
+	/**
+	 * Exportació de recursos.
+	 *
+	 * @param quickFilter
+	 *            text per a filtrar múltiples camps.
+	 * @param filter
+	 *            consulta en format Spring Filter.
+	 * @param namedQueries
+	 *            la llista de noms de consultes a aplicar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @param sort
+	 *            ordenació dels resultats.
+	 * @param fields
+	 *            camps a exportar (tots si no s'especifica).
+	 * @param fileType
+	 *            tipus de fitxer que s'ha de generar.
+	 * @return el fitxer amb l'exportació.
+	 * @throws IOException
+	 *             si es produeix algun error al escriure l'arxiu a la resposta.
+	 */
+	ResponseEntity<InputStreamResource> export(
+			final String quickFilter,
+			final String filter,
+			final String[] namedQueries,
+			final String[] perspectives,
+			final Sort sort,
+			final String[] fields,
+			final ExportFileType fileType) throws IOException;
 
 	/**
 	 * Descàrrega de l'arxiu associat a un camp del recurs.

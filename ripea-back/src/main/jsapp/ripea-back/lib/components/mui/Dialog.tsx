@@ -4,7 +4,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { DialogButton, ContentDialogShowFn, MessageDialogShowFn } from '../BaseAppContext';
-import { useCloseDialogButtons, useMessageDialogButtons } from '../AppButtons';
+import { useMessageDialogButtons, useConfirmDialogButtons } from '../AppButtons';
 import DialogButtons from './DialogButtons';
 
 export type DialogProps = React.PropsWithChildren & {
@@ -14,13 +14,14 @@ export type DialogProps = React.PropsWithChildren & {
     buttons?: DialogButton[];
     buttonCallback?: (value: any) => void;
     componentProps?: any;
+    ref: React.RefObject<HTMLDivElement | null>;
 };
 
 export const useContentDialog: ((
     dialogButtons?: DialogButton[],
     validateFn?: (value?: any) => Promise<boolean>,
-    resolveValueFn?: (value?: any) => any) => [ContentDialogShowFn, React.ReactElement]) = (dialogButtons, validateFn, resolveValueFn) => {
-    const defaultDialogButtons = useCloseDialogButtons();
+    resolveValueFn?: (value?: any) => any) => [ContentDialogShowFn, React.ReactElement, React.RefObject<HTMLDivElement | null>]) = (dialogButtons, validateFn, resolveValueFn) => {
+    const defaultDialogButtons = useConfirmDialogButtons();
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
     const [content, setContent] = React.useState<React.ReactElement>();
@@ -28,6 +29,7 @@ export const useContentDialog: ((
     const [dialogProps, setDialogProps] = React.useState<any>();
     const [resolveFn, setResolveFn] = React.useState<(value: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value: any) => void>();
+    const dialogRef = React.useRef<HTMLDivElement | null>(null);
     const showDialog: ContentDialogShowFn = (
         title: string | null,
         content: React.ReactElement,
@@ -74,8 +76,9 @@ export const useContentDialog: ((
         closeCallback={closeCallback}
         title={title}
         buttons={buttons}
-        componentProps={dialogProps}>{content}</Dialog>;
-    return [showDialog, dialogComponent];
+        componentProps={dialogProps}
+        ref={dialogRef}>{content}</Dialog>;
+    return [showDialog, dialogComponent, dialogRef];
 }
 
 export const useMessageDialog: (() => [MessageDialogShowFn, React.ReactElement]) = () => {
@@ -100,15 +103,19 @@ export const Dialog: React.FC<DialogProps> = (props) => {
         title,
         buttons,
         componentProps,
+        ref,
         children,
     } = props;
     return <MuiDialog
         open={open}
         onClose={() => closeCallback()}
+        ref={ref}
         {...componentProps}>
         {title && <DialogTitle>{title}</DialogTitle>}
         <DialogContent>{children}</DialogContent>
-        {buttons && <DialogButtons buttons={buttons} handleClose={(value: any) => buttonCallback?.(value)} />}
+        {buttons && <DialogButtons
+            buttons={buttons}
+            handleClose={(value: any) => buttonCallback?.(value)} />}
     </MuiDialog>;
 }
 

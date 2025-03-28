@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.back.base.config.WebMvcBaseConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -126,7 +125,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			final ID id,
 			@RequestParam(value = "perspective", required = false)
 			final String[] perspectives) {
-		log.debug("Obtenint entitat (id={})", id);
+		log.debug("Obtenint recurs (id={})", id);
 		R resource = getReadonlyResourceService().getOne(
 				id,
 				perspectives);
@@ -159,9 +158,11 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestParam(value = "perspective", required = false)
 			@Parameter(description = "Perspectives de la consulta")
 			final String[] perspectives,
-			@Parameter(description = "Paginació dels resultats", required = false)
+			@Parameter(description = "Paginació dels resultats")
 			final Pageable pageable) {
-		log.debug("Consultant entitats amb filtre i paginació (quickFilter={},filter={},namedQueries={},perspectives={},pageable={})",
+		log.debug("Consultant recursos amb filtre i paginació (" +
+						"quickFilter={}, filter={}, namedQueries={}, " +
+						"perspectives={}, pageable={})",
 				quickFilter,
 				filter,
 				Arrays.toString(namedQueries),
@@ -220,6 +221,57 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 									null,
 									resourcePermissions)));
 		}
+	}
+
+	@Override
+	@GetMapping
+	@Operation(summary = "Exportació de recursos")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('EXPORT'))")
+	public ResponseEntity<InputStreamResource> export(
+			@RequestParam(value = "quickFilter", required = false)
+			@Parameter(description = "Filtre ràpid (text)")
+			final String quickFilter,
+			@RequestParam(value = "filter", required = false)
+			@Parameter(description = "Consulta en format Spring Filter")
+			final String filter,
+			@RequestParam(value = "namedQuery", required = false)
+			@Parameter(description = "Consultes predefinides")
+			final String[] namedQueries,
+			@RequestParam(value = "perspective", required = false)
+			@Parameter(description = "Perspectives de la consulta")
+			final String[] perspectives,
+			@Parameter(description = "Ordenació dels resultats")
+			final Sort sort,
+			@RequestParam(value = "fields", required = false)
+			@Parameter(description = "Camps a exportar (tots si no s'especifica)")
+			final String[] fields,
+			@RequestParam(value = "fileType", required = false)
+			@Parameter(description = "Tipus de fitxer que s'ha de generar")
+			final ExportFileType fileType) throws IOException {
+		log.debug("Exportant recursos amb filtre i paginació (" +
+						"quickFilter={}, filter={}, namedQueries={}, " +
+						"perspectives={}, fields={}, fileType={})",
+				quickFilter,
+				filter,
+				Arrays.toString(namedQueries),
+				Arrays.toString(perspectives),
+				fields,
+				fileType);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DownloadableFile file = getReadonlyResourceService().export(
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				sort,
+				fields,
+				fileType,
+				baos);
+		if (file.getContent() != null && baos.size() == 0) {
+			baos.write(file.getContent());
+		}
+		InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(baos.toByteArray()));
+		return writeDownloadableFileToResponse(file, resource);
 	}
 
 	@Override
@@ -1392,7 +1444,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				if (pageable.isPaged()) {
 					return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSortOr(sort));
 				} else {
-					return new WebMvcBaseConfig.UnpagedButSorted(pageable.getSortOr(sort));
+					return new UnpagedButSorted(pageable.getSortOr(sort));
 				}
 			} else {
 				return pageable;

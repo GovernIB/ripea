@@ -40,12 +40,13 @@ export type MuiDataListProps = {
     primaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
     secondaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
     readOnly?: boolean;
+    findDisabled?: boolean;
     quickFilterInitialValue?: string;
     filter?: string;
     namedQueries?: string[];
     perspectives?: string[];
     formAdditionalData?: any;
-    toolbarHideExport?: boolean;
+    toolbarHideCreate?: boolean;
     toolbarHideRefresh?: boolean;
     toolbarHideQuickFilter?: boolean;
     toolbarCreateLink?: string;
@@ -138,12 +139,13 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         primaryFieldRenderer,
         secondaryFieldRenderer,
         readOnly,
+        findDisabled,
         quickFilterInitialValue,
         filter,
         namedQueries,
         perspectives,
         formAdditionalData,
-        toolbarHideExport = true,
+        toolbarHideCreate,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
         toolbarCreateLink,
@@ -183,6 +185,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
+        findDisabled,
         findArgs,
         quickFilterInitialValue,
         { sx: { ml: 1 } });
@@ -216,10 +219,12 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const toolbarListElementsWithPositions: ReactElementWithPosition[] = [];
     toolbarAddElement != null && toolbarListElementsWithPositions.push({
         position: toolbarNodesPosition,
-        element: toolbarAddElement
+        element: !toolbarHideCreate ? toolbarAddElement : <span/>,
     });
+    const toolbarHideExport = true;
+    const toolbarNumElements = toolbarNodesPosition + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
     const joinedElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
-        toolbarNodesPosition,
+        toolbarNumElements,
         toolbarListElementsWithPositions,
         toolbarElementsWithPositions);
     const toolbar = useDataToolbar(
@@ -231,7 +236,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         quickFilterComponent,
         refresh,
         undefined,
-        toolbarHideExport,
+        true, // toolbarHideExport
         toolbarHideRefresh,
         toolbarHideQuickFilter,
         joinedElementsWithPositions);
