@@ -1,12 +1,10 @@
 package es.caib.ripea.service.intf.base.service;
 
 import es.caib.ripea.service.intf.base.exception.*;
-import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,6 +58,37 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 			String[] namedQueries,
 			String[] perspectives,
 			Pageable pageable);
+
+	/**
+	 * Exportació de recursos.
+	 *
+	 * @param quickFilter
+	 *            filtre ràpid en format text.
+	 * @param filter
+	 *            consulta en format Spring Filter.
+	 * @param namedQueries
+	 *            llista de noms de consultes a aplicar.
+	 * @param perspectives
+	 *            llista de perspectives a aplicar.
+	 * @param sort
+	 *            ordenació dels resultats.
+	 * @param fields
+	 *            camps a exportar (tots si no s'especifica).
+	 * @param fileType
+	 *            tipus de fitxer que s'ha de generar.
+	 * @param out
+	 *            stream a on posar el fitxer generat.
+	 * @return la llista de recursos.
+	 */
+	DownloadableFile export(
+			String quickFilter,
+			String filter,
+			String[] namedQueries,
+			String[] perspectives,
+			Sort sort,
+			String[] fields,
+			ExportFileType fileType,
+			OutputStream out);
 
 	/**
 	 * Descàrrega del fitxer associat a un camp del recurs.

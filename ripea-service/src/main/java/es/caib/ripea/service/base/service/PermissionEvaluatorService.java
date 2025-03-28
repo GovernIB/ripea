@@ -62,6 +62,7 @@ public class PermissionEvaluatorService implements es.caib.ripea.service.intf.ba
 			switch (restapiOperation) {
 				case GET_ONE:
 				case FIND:
+				case EXPORT:
 				case ARTIFACT:
 				case REPORT:
 				case FIELDDOWNLOAD:

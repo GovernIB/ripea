@@ -2,6 +2,7 @@ package es.caib.ripea.service.base.service;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.persistence.base.repository.BaseRepository;
+import es.caib.ripea.service.base.helper.JasperReportsHelper;
 import es.caib.ripea.service.base.helper.ObjectMappingHelper;
 import es.caib.ripea.service.base.helper.ResourceEntityMappingHelper;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
@@ -54,6 +55,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	@Autowired
 	protected ObjectMappingHelper objectMappingHelper;
 	@Autowired
+	protected JasperReportsHelper jasperReportsHelper;
+	@Autowired
 	protected ResourceEntityMappingHelper resourceEntityMappingHelper;
 
 	private Class<R> resourceClass;
@@ -90,7 +93,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			Pageable pageable) {
 		long t0 = System.currentTimeMillis();
 		log.debug(
-				"Querying entities page with filter and pagination (quickFilter={}, filter={}, namedQueries={}, perspectives={}, pageable={})",
+				"Querying entities page with filter and pagination (" +
+						"quickFilter={}, filter={}, namedQueries={}, " +
+						"perspectives={}, pageable={})",
 				quickFilter,
 				filter,
 				Arrays.toString(namedQueries),
@@ -125,6 +130,54 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				elapsedDatabase,
 				elapsedConversion);
 		return response;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DownloadableFile export(
+			String quickFilter,
+			String filter,
+			String[] namedQueries,
+			String[] perspectives,
+			Sort sort,
+			String[] fields,
+			ExportFileType fileType,
+			OutputStream out) {
+		long t0 = System.currentTimeMillis();
+		log.debug(
+				"Querying entities for export with filter and pagination (" +
+						"quickFilter={}, filter={}, namedQueries={}, " +
+						"perspectives={}, sort={}, fields={}, fileType={})",
+				quickFilter,
+				filter,
+				Arrays.toString(namedQueries),
+				Arrays.toString(perspectives),
+				sort,
+				fields,
+				fileType);
+		Pageable pageable = new UnpagedButSorted(sort);
+		beforeFind(
+				quickFilter,
+				filter,
+				namedQueries,
+				pageable);
+		Page<E> resultat = internalFindEntities(
+				quickFilter,
+				filter,
+				namedQueries,
+				pageable);
+		beforeConversion(resultat.getContent());
+		Page<R> response = new PageImpl<>(
+				entitiesToResources(resultat.getContent()),
+				pageable,
+				resultat.getTotalElements());
+		afterConversion(resultat.getContent(), response.getContent());
+		return jasperReportsHelper.export(
+				getResourceClass(),
+				response.getContent(),
+				fields,
+				fileType,
+				out);
 	}
 
 	@Override

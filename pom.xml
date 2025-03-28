@@ -30,7 +30,6 @@
 		<module>ripea-plugin-intf</module>
 		<module>ripea-plugin</module>
         <module>ripea-backend</module>
-<!--        <module>ripea-spring-bom</module>-->
     </modules>
 	<dependencyManagement>
 		<dependencies>
@@ -53,7 +52,7 @@
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-security</artifactId>
 				<version>1.7.0</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.fundaciobit.pluginsib.arxiu</groupId>
 				<artifactId>pluginsib-arxiu-caib</artifactId>
@@ -128,6 +127,16 @@
 				<groupId>com.turkraft</groupId>
 				<artifactId>spring-filter</artifactId>
 				<version>2.1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
+				<artifactId>jasperreports</artifactId>
+				<version>7.0.2</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
+				<artifactId>jasperreports-pdf</artifactId>
+				<version>7.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>ma.glasnost.orika</groupId>

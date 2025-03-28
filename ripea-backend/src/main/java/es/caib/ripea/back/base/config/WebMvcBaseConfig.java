@@ -1,7 +1,6 @@
 package es.caib.ripea.back.base.config;
 
-import java.util.List;
-
+import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +16,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 public class WebMvcBaseConfig implements WebMvcConfigurer {
 
@@ -66,53 +67,4 @@ public class WebMvcBaseConfig implements WebMvcConfigurer {
 		}
 	}
 
-	public static class UnpagedButSorted implements Pageable {
-		private final Sort sort;
-		public UnpagedButSorted(Sort sort) {
-			this.sort = sort;
-		}
-		@Override
-		public boolean isPaged() {
-			return false;
-		}
-		@Override
-		public Pageable previousOrFirst() {
-			return this;
-		}
-		@Override
-		public Pageable next() {
-			return this;
-		}
-		@Override
-		public boolean hasPrevious() {
-			return false;
-		}
-		@Override
-		public Sort getSort() {
-			return sort;
-		}
-		@Override
-		public int getPageSize() {
-			throw new UnsupportedOperationException();
-		}
-		@Override
-		public int getPageNumber() {
-			throw new UnsupportedOperationException();
-		}
-		@Override
-		public long getOffset() {
-			throw new UnsupportedOperationException();
-		}
-		@Override
-		public Pageable first() {
-			return this;
-		}
-		@Override
-		public Pageable withPage(int pageNumber) {
-			if (pageNumber == 0) {
-				return this;
-			}
-			throw new UnsupportedOperationException();
-		}
-	}
 }
