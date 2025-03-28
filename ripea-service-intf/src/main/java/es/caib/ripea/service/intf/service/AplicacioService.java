@@ -10,12 +10,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 import java.util.Properties;
 
+import javax.annotation.security.PermitAll;
+
 /**
  * Declaració dels mètodes comuns de l'aplicació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@PreAuthorize("isAuthenticated()")
+
 public interface AplicacioService {
 
 	void actualitzarEntiatThreadLocal(EntitatDto entitat);
@@ -26,7 +28,7 @@ public interface AplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
-	@PreAuthorize("isAuthenticated()")
+	@PermitAll
 	public void processarAutenticacioUsuari() throws NotFoundException;
 
 	/**

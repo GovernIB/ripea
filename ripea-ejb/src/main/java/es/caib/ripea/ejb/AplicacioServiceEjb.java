@@ -5,6 +5,7 @@ import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import lombok.experimental.Delegate;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -26,7 +27,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public void processarAutenticacioUsuari() {
 		delegateService.processarAutenticacioUsuari();
 	}
