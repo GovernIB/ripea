@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,12 +30,16 @@ public class DistribucioRestController {
 	@ResponseBody
 	public ResponseEntity<String> event(@RequestBody List<AnotacioRegistreId> event) {
 		try {
-			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria podrien donar error
+			//Guardam el usuari a la taula de BBDD, aquest en concret ha de existir a Keycloak, i tendrem les dades de auditoria correctes.
 			aplicacioService.processarAutenticacioUsuari();
 			expedientPeticioService.crearExpedientPeticion(event);
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
+			//Eliminam la autenticació ja que nomes hauria de servir per la petició actual
+			//Sino despres arriben altres peticions (per portafib) i encara estam autenticats amb $distribucio_ripea
+			SecurityContextHolder.clearContext();
 		}
 	}
 }

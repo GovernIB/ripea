@@ -698,6 +698,7 @@ public interface DocumentService {
 	@PreAuthorize("isAuthenticated()")
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId)  throws SistemaExternException;
 
+	@PreAuthorize("isAuthenticated()")
 	public void portafirmesCallbackIntegracioOk(
 			String descripcio,
 			Map<String, String> parametres);

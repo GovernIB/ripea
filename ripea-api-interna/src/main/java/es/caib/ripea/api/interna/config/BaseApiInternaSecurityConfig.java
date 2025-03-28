@@ -30,6 +30,7 @@ public class BaseApiInternaSecurityConfig {
 				new AntPathRequestMatcher("/swagger-ui"),
 				new AntPathRequestMatcher("/swagger-ui/**/*"),
 				new AntPathRequestMatcher("/apidocs"),
+				new AntPathRequestMatcher("/rest/portafib/v1/**/*"),
 				new AntPathRequestMatcher("/apidocs/**/*"),
 		};
 	}

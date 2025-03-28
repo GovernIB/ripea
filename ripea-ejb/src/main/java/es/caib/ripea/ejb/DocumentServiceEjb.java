@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -202,7 +203,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public Exception portafirmesCallback(
 			long documentId,
 			PortafirmesCallbackEstatEnumDto estat,
@@ -523,7 +524,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public void portafirmesCallbackIntegracioOk(
 			String descripcio,
 			Map<String, String> parametres) {

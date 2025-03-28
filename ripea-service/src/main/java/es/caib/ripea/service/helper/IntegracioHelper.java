@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
@@ -28,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class IntegracioHelper {
 	
-	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
 
@@ -209,15 +207,12 @@ public class IntegracioHelper {
 	private void afegirParametreUsuari(IntegracioAccioDto accio) {
 
 		String usuariNomCodi = null;
-		UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
-		if (usuari != null) {
-			usuariNomCodi = usuari.getNom() + " (" + usuari.getCodi() + ")";
-		} else {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null) {
-				usuariNomCodi = auth.getName();
-			}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			usuariNomCodi = auth.getName();
 		}
+
 		if (usuariNomCodi != null) {
 			if (accio.getParametres() == null) {
 				accio.setParametres(new HashMap<String, String>());

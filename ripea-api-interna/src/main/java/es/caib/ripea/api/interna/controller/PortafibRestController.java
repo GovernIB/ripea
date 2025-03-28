@@ -1,27 +1,32 @@
 package es.caib.ripea.api.interna.controller;
 
-import es.caib.portafib.callback.beans.v1.Actor;
-import es.caib.portafib.callback.beans.v1.PortaFIBEvent;
-import es.caib.portafib.callback.beans.v1.SigningRequest;
-import es.caib.ripea.service.intf.dto.IntegracioAccioBuilderDto;
-import es.caib.ripea.service.intf.dto.PortafirmesCalbackDto;
-import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.DocumentService;
-import es.caib.ripea.service.intf.utils.Utils;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.Map;
+import es.caib.portafib.callback.beans.v1.Actor;
+import es.caib.portafib.callback.beans.v1.PortaFIBEvent;
+import es.caib.portafib.callback.beans.v1.SigningRequest;
+import es.caib.ripea.service.intf.dto.IntegracioAccioBuilderDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCalbackDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -29,7 +34,7 @@ import java.util.Map;
 public class PortafibRestController {
 
 	@Autowired private DocumentService documentService;
-	@Autowired private AplicacioService aplicacioService;
+//	@Autowired private AplicacioService aplicacioService;
 	
 	@RequestMapping(value = "/event", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -37,9 +42,14 @@ public class PortafibRestController {
 
 		try {
 
-			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria podrien donar error
-			aplicacioService.processarAutenticacioUsuari();
-			
+			// Crear un usuario autenticado simulado. En portafib no se puede configurar una autenticación BASIC
+	        User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			//Guardam el usuari a la taula de BBDD, ja que sino algunes dades d'auditoria donen error
+//			aplicacioService.processarAutenticacioUsuari();
+
 			PortafirmesCalbackDto portafirmesCalback = getPortafirmesCallback(event);
 			
 			IntegracioAccioBuilderDto integracioAccio = getIntegraccioAccio(portafirmesCalback);
@@ -81,6 +91,9 @@ public class PortafibRestController {
 			return new ResponseEntity<String>(
 					"Error desconegut processant event de Peticio de Firma REST: " + th.getMessage(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
+			//Eliminam la autenticació provissional creada per el usuari $portafib_ripea
+			SecurityContextHolder.clearContext();
 		}
 	}
   
