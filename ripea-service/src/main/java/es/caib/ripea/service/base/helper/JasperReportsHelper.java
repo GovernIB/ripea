@@ -4,6 +4,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ExportFileType;
 import lombok.extern.slf4j.Slf4j;
+/*
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
@@ -13,6 +14,7 @@ import net.sf.jasperreports.engine.export.oasis.JROdtExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.*;
+*/
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -33,7 +35,16 @@ import java.util.Map;
 public class JasperReportsHelper {
 
 	private static final String EXPORT_REPORT_PATH = "/export_report.jrxml";
-
+	
+	public DownloadableFile export(
+			Class<?> resourceClass,
+			List<?> resultats,
+			String[] fields,
+			ExportFileType fileType,
+			OutputStream out) throws ReportGenerationException {
+		return null;
+	}
+/*
 	public DownloadableFile export(
 			Class<?> resourceClass,
 			List<?> resultats,
@@ -199,5 +210,5 @@ public class JasperReportsHelper {
 				"application/pdf",
 				null);
 	}
-
+*/
 }

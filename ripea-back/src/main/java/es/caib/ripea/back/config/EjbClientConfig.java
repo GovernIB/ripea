@@ -10,6 +10,7 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientComentariResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
@@ -18,6 +19,7 @@ import es.caib.ripea.service.intf.resourceservice.ExpedientTascaComentariResourc
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
 import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaDadaResourceService;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientTascaResourceService;
@@ -366,6 +368,18 @@ public class EjbClientConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean expedientTascaComentariResourceService() {
 		return getLocalEjbFactoyBean(ExpedientTascaComentariResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean dadaResourceService() {
+		return getLocalEjbFactoyBean(DadaResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean metaDadaResourceService() {
+		return getLocalEjbFactoyBean(MetaDadaResourceService.class);
 	}
 	
 	/*

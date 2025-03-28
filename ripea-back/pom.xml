@@ -249,6 +249,11 @@
 	<profiles>
 		<profile>
 			<id>ide</id>
+			<activation>
+				<file>
+                	<exists>${basedir}/boot.profile</exists>
+            	</file>
+			</activation>			
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
@@ -301,7 +306,9 @@
 		<profile>
 			<id>jboss</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<file>
+                	<missing>${basedir}/boot.profile</missing>
+            	</file>
 			</activation>
 			<dependencies>
 				<dependency>

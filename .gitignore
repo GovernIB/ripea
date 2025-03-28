@@ -12,3 +12,4 @@ target/
 /republish.sh
 /docker-compose.yml
 /ripea-back/application.properties
+/jboss.profile
