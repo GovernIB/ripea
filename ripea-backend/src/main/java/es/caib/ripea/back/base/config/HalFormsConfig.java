@@ -80,24 +80,20 @@ public class HalFormsConfig {
 		MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder = new MutableHolder<>(halFormsConfiguration);
 		ReflectionUtils.doWithFields(
 				resourceClass,
-				field -> {
-					configurationWithEnumOptions(
-							halFormsConfigurationHolder,
-							resourceClass,
-							null,
-							field);
-				},
+				field -> configurationWithEnumOptions(
+						halFormsConfigurationHolder,
+						resourceClass,
+						null,
+						field),
 				this::isEnumTypeMultipleAware);
 		ReflectionUtils.doWithFields(
 				resourceClass,
-				field -> {
-					configurationWithResourceReferenceOptions(
-							halFormsConfigurationHolder,
-							resourceClass,
-							null,
-							field,
-							resourceControllerClasses);
-				},
+				field -> configurationWithResourceReferenceOptions(
+						halFormsConfigurationHolder,
+						resourceClass,
+						null,
+						field,
+						resourceControllerClasses),
 				this::isResourceReferenceTypeMultipleAware);
 		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
@@ -105,24 +101,20 @@ public class HalFormsConfig {
 				if (!Serializable.class.equals(artifact.formClass())) {
 					ReflectionUtils.doWithFields(
 							artifact.formClass(),
-							field -> {
-								configurationWithEnumOptions(
-										halFormsConfigurationHolder,
-										resourceClass,
-										artifact,
-										field);
-							},
+							field -> configurationWithEnumOptions(
+									halFormsConfigurationHolder,
+									resourceClass,
+									artifact,
+									field),
 							this::isEnumTypeMultipleAware);
 					ReflectionUtils.doWithFields(
 							artifact.formClass(),
-							field -> {
-								configurationWithResourceReferenceOptions(
-										halFormsConfigurationHolder,
-										resourceClass,
-										artifact,
-										field,
-										resourceControllerClasses);
-							},
+							field -> configurationWithResourceReferenceOptions(
+									halFormsConfigurationHolder,
+									resourceClass,
+									artifact,
+									field,
+									resourceControllerClasses),
 							this::isResourceReferenceTypeMultipleAware);
 				}
 

@@ -4,6 +4,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ExportFileType;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
@@ -43,6 +44,7 @@ public class JasperReportsHelper {
 			ExportFileType fileType,
 			OutputStream out) throws ReportGenerationException {
 		try {
+			DynamicReports.report().columns();
 			JasperReport report = getCompiledJasperReport(resourceClass);
 			Map<String, Object> params = new HashMap<>();
 			params.put("fields", fields);
