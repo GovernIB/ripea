@@ -242,7 +242,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			final String[] perspectives,
 			@Parameter(description = "Ordenació dels resultats")
 			final Sort sort,
-			@RequestParam(value = "fields", required = false)
+			@RequestParam(value = "field", required = false)
 			@Parameter(description = "Camps a exportar (tots si no s'especifica)")
 			final String[] fields,
 			@RequestParam(value = "fileType", required = false)
