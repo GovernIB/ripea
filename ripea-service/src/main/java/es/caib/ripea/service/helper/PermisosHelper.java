@@ -353,9 +353,9 @@ public class PermisosHelper {
 			Class<?> clazz,
 			Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAll(objects, new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
+		filterGrantedAll(objects, new ObjectIdentifierExtractor<Persistable<Serializable>>() {
 			@Override
-			public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
+			public Serializable getObjectIdentifier(Persistable<Serializable> entitat) {
 				return entitat.getId();
 			}
 		}, clazz, permissions, auth);
