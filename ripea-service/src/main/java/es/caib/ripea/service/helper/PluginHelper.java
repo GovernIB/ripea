@@ -91,6 +91,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternNoTrobatException;
@@ -213,6 +214,8 @@ import es.caib.ripea.service.intf.utils.Utils;
 @Component
 public class PluginHelper {
 
+    private final UsuariHelper usuariHelper;
+
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_DOC_TMP = "anotacions_registre_doc_tmp";
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
@@ -255,6 +258,10 @@ public class PluginHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+
+    PluginHelper(UsuariHelper usuariHelper) {
+        this.usuariHelper = usuariHelper;
+    }
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -382,6 +389,11 @@ public class PluginHelper {
 		
 		try {
 			List<DadesUsuari> dadesUsuari = dadesUsuariPlugin.findAmbFiltre(filtre);
+			
+			if (dadesUsuari==null) {
+				return usuariHelper.findDadesUsuariAmbText(filtre);
+			}
+			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,

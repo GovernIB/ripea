@@ -22,7 +22,7 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 			+ "from "
 			+ "    UsuariEntity u "
 			+ "where "
-			+ "    lower(u.nom) like concat('%', lower(?1), '%') "
+			+ "    lower(u.nom) like concat('%', lower(?1), '%') OR lower(u.codi) like concat('%', lower(?1), '%') "
 			+ "order by "
 			+ "    u.nom desc")
 	public List<UsuariEntity> findByText(String text);

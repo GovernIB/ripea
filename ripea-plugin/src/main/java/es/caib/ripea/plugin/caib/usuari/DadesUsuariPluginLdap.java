@@ -25,11 +25,6 @@ import es.caib.ripea.plugin.SistemaExternNoTrobatException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 
-/**
- * Implementació del plugin de consulta de dades d'usuaris emprant LDAP.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties implements DadesUsuariPlugin {
 
 	public DadesUsuariPluginLdap() {
@@ -42,33 +37,80 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 
 	@Override
 	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
+		
 		LOGGER.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+		
 		try {
-			return consultaRolsUsuari(
-					getLdapFiltreCodi(),
-					usuariCodi);
+		
+			List<String> rolsUsuari = new ArrayList<String>();
+			Hashtable<String, String> entornLdap = new Hashtable<String, String>();
+			entornLdap.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+			entornLdap.put(Context.PROVIDER_URL, getLdapServerUrl());
+			entornLdap.put(Context.SECURITY_PRINCIPAL, getLdapPrincipal());
+			entornLdap.put(Context.SECURITY_CREDENTIALS, getLdapCredentials());
+			LdapContext ctx = new InitialLdapContext(entornLdap, null);
+			
+			try {
+				String[] atributs = getLdapAtributs().split(",");
+				SearchControls searchCtls = new SearchControls();
+				searchCtls.setReturningAttributes(atributs);
+				searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+				NamingEnumeration<SearchResult> answer = ctx.search(
+						getLdapSearchBase(),
+						getLdapFiltreCodi().replace("XXX", usuariCodi),
+						searchCtls);
+				while (answer.hasMoreElements()) {
+					SearchResult result = answer.next();
+						rolsUsuari = obtenirAtributComListString(
+								result.getAttributes(),
+								atributs[5]);
+					
+				}
+			} finally {
+				ctx.close();
+			}
+			
+			return rolsUsuari;
 			
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")",
-					ex);
+			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
 	
 	@Override
-	public DadesUsuari findAmbCodi(
-			String usuariCodi) throws SistemaExternException {
+	public DadesUsuari findAmbCodi(String usuariCodi) throws SistemaExternException {
+		
 		LOGGER.debug("Consulta de les dades de l'usuari (codi=" + usuariCodi + ")");
+		
 		try {
-			return consultaUsuariUnic(
-					getLdapFiltreCodi(),
-					usuariCodi);
+			
+			String filtre = getLdapFiltreCodi();
+			List<DadesUsuari> usuaris = consultaUsuaris(filtre, usuariCodi);
+			
+			if (usuaris.size() == 1) {
+				return usuaris.get(0);
+			} else if(usuaris.size() > 1){
+				throw new SistemaExternException(
+						"La consulta d'usuari únic ha retornat més d'un resultat (" +
+						"filtre=" + filtre + ", " +
+						"valor=" + usuariCodi + ")");
+			} else if(usuaris.size() == 0){
+				usuaris = findAmbFiltre(usuariCodi);
+				if (usuaris.size() == 0) {
+					throw new SistemaExternNoTrobatException(
+							"La consulta d'usuari únic no ha retornat cap resultat (" +
+							"filtre=" + filtre + ", " +
+							"valor=" + usuariCodi + ")");
+				} else {
+					return usuaris.get(0);
+				}
+			} else {
+				throw new SistemaExternException("Error desconegut al consultar un usuari únic");
+			}
 		} catch (SistemaExternException ex) {
 			throw ex;
 		} catch (NamingException ex) {
-			throw new SistemaExternException(
-					"Error al consultar l'usuari amb codi (codi=" + usuariCodi + ")",
-					ex);
+			throw new SistemaExternException("Error al consultar l'usuari amb codi (codi=" + usuariCodi + ")",ex);
 		}
 	}
 
@@ -77,9 +119,7 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 			String grupCodi) throws SistemaExternException {
 		LOGGER.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
 		try {
-			return consultaUsuaris(
-					getLdapFiltreGrup(),
-					grupCodi);
+			return consultaUsuaris(getLdapFiltreGrup(), grupCodi);
 		} catch (NamingException ex) {
 			throw new SistemaExternException(
 					"Error al consultar els usuaris del grup (grupCodi=" + grupCodi + ")",
@@ -87,68 +127,27 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 		}
 	}
 
-	@Override
-	public String getEndpointURL() {
-		String endpoint = getProperty("plugin.dades.usuari.endpointName");
-		if (Utils.isEmpty(endpoint)) {
-			endpoint = getLdapServerUrl();
-		}
-		return endpoint;
-	}
-
-	private DadesUsuari consultaUsuariUnic(
-			String filtre,
-			String valor) throws SistemaExternException, NamingException {
-		List<DadesUsuari> usuaris = consultaUsuaris(filtre, valor);
-		if (usuaris.size() == 1) {
-			return usuaris.get(0);
-		} else if(usuaris.size() > 1){
-			throw new SistemaExternException(
-					"La consulta d'usuari únic ha retornat més d'un resultat (" +
-					"filtre=" + filtre + ", " +
-					"valor=" + valor + ")");
-		} else if(usuaris.size() == 0){
-			usuaris = findAmbFiltre(valor);
-			if (usuaris.size() == 0) {
-				throw new SistemaExternNoTrobatException(
-						"La consulta d'usuari únic no ha retornat cap resultat (" +
-						"filtre=" + filtre + ", " +
-						"valor=" + valor + ")");
-			} else {
-				return usuaris.get(0);
-			}
-		} else {
-			throw new SistemaExternException("Error desconegut al consultar un usuari únic");
-		}
-	}
-	private List<DadesUsuari> consultaUsuaris(
-			String filtre,
-			String valor) throws NamingException {
+	private List<DadesUsuari> consultaUsuaris(String filtre, String valor) throws NamingException {
+		
 		List<DadesUsuari> usuaris = new ArrayList<DadesUsuari>();
 		Hashtable<String, String> entornLdap = new Hashtable<String, String>();
-		entornLdap.put(Context.INITIAL_CONTEXT_FACTORY,
-				  "com.sun.jndi.ldap.LdapCtxFactory");
+		entornLdap.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		entornLdap.put(Context.PROVIDER_URL, getLdapServerUrl());
 		entornLdap.put(Context.SECURITY_PRINCIPAL, getLdapPrincipal());
 		entornLdap.put(Context.SECURITY_CREDENTIALS, getLdapCredentials());
 		LdapContext ctx = new InitialLdapContext(entornLdap, null);
+		
 		try {
 			String[] atributs = getLdapAtributs().split(",");
 			SearchControls searchCtls = new SearchControls();
 			searchCtls.setReturningAttributes(atributs);
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			NamingEnumeration<SearchResult> answer = ctx.search(
-					getLdapSearchBase(),
-					filtre.replace("XXX", valor),
-					searchCtls);
+			NamingEnumeration<SearchResult> answer = ctx.search(getLdapSearchBase(), filtre.replace("XXX", valor), searchCtls);
+			
 			while (answer.hasMoreElements()) {
 				SearchResult result = answer.next();
-				String grup = obtenirAtributComString(
-						result.getAttributes(),
-						atributs[4]);
-				String memberOf = obtenirAtributComString(
-						result.getAttributes(),
-						atributs[5]);
+				String grup = obtenirAtributComString(result.getAttributes(), atributs[4]);
+				String memberOf = obtenirAtributComString(result.getAttributes(), atributs[5]);
 				boolean excloure = false;
 				if (getLdapExcloureGrup() != null) {
 					excloure = grup.equals(getLdapExcloureGrup());
@@ -157,21 +156,11 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 					}
 				}
 				if (!excloure) {
-					String codi = obtenirAtributComString(
-							result.getAttributes(),
-							atributs[0]);
-					String nom = obtenirAtributComString(
-							result.getAttributes(),
-							atributs[1]);
-					String llinatges = obtenirAtributComString(
-							result.getAttributes(),
-							atributs[2]);
-					String email = obtenirAtributComString(
-							result.getAttributes(),
-							atributs[3]);
-					String nif = obtenirAtributComString(
-							result.getAttributes(),
-							atributs[4]);
+					String codi 		= obtenirAtributComString(result.getAttributes(), atributs[0]);
+					String nom 			= obtenirAtributComString(result.getAttributes(), atributs[1]);
+					String llinatges 	= obtenirAtributComString(result.getAttributes(), atributs[2]);
+					String email 		= obtenirAtributComString(result.getAttributes(), atributs[3]);
+					String nif 			= obtenirAtributComString(result.getAttributes(), atributs[4]);
 					DadesUsuari dadesUsuari = new DadesUsuari();
 					dadesUsuari.setCodi(codi);
 					dadesUsuari.setNom(nom);
@@ -187,48 +176,11 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 		return usuaris;
 	}
 	
-	private List<String> consultaRolsUsuari(
-			String filtre,
-			String valor) throws NamingException {
-		
-		List<String> rolsUsuari = new ArrayList<String>();
-		Hashtable<String, String> entornLdap = new Hashtable<String, String>();
-		entornLdap.put(
-				Context.INITIAL_CONTEXT_FACTORY,
-				"com.sun.jndi.ldap.LdapCtxFactory");
-		entornLdap.put(Context.PROVIDER_URL, getLdapServerUrl());
-		entornLdap.put(Context.SECURITY_PRINCIPAL, getLdapPrincipal());
-		entornLdap.put(Context.SECURITY_CREDENTIALS, getLdapCredentials());
-		LdapContext ctx = new InitialLdapContext(entornLdap, null);
-		try {
-			String[] atributs = getLdapAtributs().split(",");
-			SearchControls searchCtls = new SearchControls();
-			searchCtls.setReturningAttributes(atributs);
-			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			NamingEnumeration<SearchResult> answer = ctx.search(
-					getLdapSearchBase(),
-					filtre.replace("XXX", valor),
-					searchCtls);
-			while (answer.hasMoreElements()) {
-				SearchResult result = answer.next();
-					rolsUsuari = obtenirAtributComListString(
-							result.getAttributes(),
-							atributs[5]);
-				
-			}
-		} finally {
-			ctx.close();
-		}
-		return rolsUsuari;
-	}
-	
 	@SuppressWarnings("rawtypes")
-	private List<String> obtenirAtributComListString(
-			Attributes atributs,
-			String atributNom) throws NamingException {
-		Attribute atribut = atributs.get(atributNom);
-		List<String> listRols = new ArrayList<String>();
+	private List<String> obtenirAtributComListString(Attributes atributs, String atributNom) throws NamingException {
 		
+		Attribute atribut = atributs.get(atributNom);
+		List<String> listRols = new ArrayList<String>();		
 		NamingEnumeration rols = atribut.getAll();
 		
 		while (rols.hasMoreElements()) {
@@ -263,6 +215,15 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 		return (atribut != null) ? (String)atribut.get() : null;
 	}
 
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty("plugin.dades.usuari.endpointName");
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getLdapServerUrl();
+		}
+		return endpoint;
+	}
+	
 	private String getLdapServerUrl() {
 		return getProperty("plugin.dades.usuari.ldap.server.url");
 	}
@@ -289,7 +250,7 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 	}
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))
-		return getProperty("plugin.dades.usuari.ldap.filtre.grup");
+		return getProperty("plugin.dades.usuari.ldap.filtre");
 	}
 	private String getLdapExcloureGrup() {
 		return getProperty("plugin.dades.usuari.ldap.excloure.grup");
@@ -299,5 +260,4 @@ public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties impleme
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginLdap.class);
-
 }

@@ -177,20 +177,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
-		return conversioTipusHelper.convertir(
-				usuariRepository.findById(codi),
-				UsuariDto.class);
+		return conversioTipusHelper.convertir(usuariRepository.findById(codi), UsuariDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		logger.debug("Consultant usuaris amb text (text=" + text + ")");
-		return conversioTipusHelper.convertirList(
-				usuariRepository.findByText(text),
-				UsuariDto.class);
+		return usuariHelper.findUsuariAmbText(text);
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override

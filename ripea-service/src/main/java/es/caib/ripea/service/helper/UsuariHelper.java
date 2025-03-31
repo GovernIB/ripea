@@ -16,6 +16,7 @@ import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 
 @Component
@@ -24,6 +25,7 @@ public class UsuariHelper {
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
 
 	public Authentication generarUsuariAutenticat(
 			String usuariCodi,
@@ -37,6 +39,18 @@ public class UsuariHelper {
 		return auth;
 	}
 
+	public List<UsuariDto> findUsuariAmbText(String text) {
+		return conversioTipusHelper.convertirList(
+				usuariRepository.findByText(text),
+				UsuariDto.class);
+	}
+	
+	public List<DadesUsuari> findDadesUsuariAmbText(String text) {
+		return conversioTipusHelper.convertirList(
+				usuariRepository.findByText(text),
+				DadesUsuari.class);
+	}
+	
 	public class DadesUsuariAuthenticationToken extends AbstractAuthenticationToken {
 		String principal;
 		public DadesUsuariAuthenticationToken(

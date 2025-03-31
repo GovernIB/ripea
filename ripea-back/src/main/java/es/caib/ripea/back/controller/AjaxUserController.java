@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.controller;
 
 import es.caib.ripea.back.helper.EnumHelper.HtmlOption;
@@ -31,10 +28,7 @@ import java.util.List;
 @RequestMapping("/userajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
 public class AjaxUserController extends BaseUserController {
 
-	@Autowired
-	private AplicacioService aplicacioService;
-
-
+	@Autowired private AplicacioService aplicacioService;
 
 	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
 	@ResponseBody
