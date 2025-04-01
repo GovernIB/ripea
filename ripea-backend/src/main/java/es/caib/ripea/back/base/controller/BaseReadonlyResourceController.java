@@ -137,6 +137,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				buildSingleResourceLinks(
 						resource.getId(),
 						perspectives,
+						true,
 						null,
 						resourceApiService.permissionsCurrentUser(
 								getResourceClass(),
@@ -191,6 +192,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			PagedModel<EntityModel<R>> pagedModel = toPagedModel(
 					page,
 					perspectives,
+					true,
 					null,
 					resourcePermissions,
 					buildResourceCollectionLinks(
@@ -670,6 +672,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	protected <RR extends Resource<?>> PagedModel<EntityModel<RR>> toPagedModel(
 			Page<RR> page,
 			String[] perspectives,
+			boolean withDownloadLink,
 			Link singleResourceSelfLink,
 			ResourcePermissions resourcePermissions,
 			Link... links) {
@@ -678,6 +681,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					Link[] resourceLinks = resource != null ? buildSingleResourceLinks(
 							resource.getId(),
 							perspectives,
+							withDownloadLink,
 							singleResourceSelfLink,
 							resourcePermissions).toArray(new Link[0]) : new Link[0];
 					return toEntityModel(resource, resourceLinks);
@@ -830,6 +834,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						toPagedModel(
 								page,
 								perspectives,
+								false,
 								singleResourceBaseSelfLink,
 								ResourcePermissions.readOnly(),
 								buildOptionsLinks(
@@ -881,6 +886,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					buildSingleResourceLinks(
 							resource.getId(),
 							perspectives,
+							false,
 							singleResourceBaseSelfLink,
 							ResourcePermissions.readOnly()).toArray(new Link[0]));
 			return ResponseEntity.ok(entityModel);
@@ -893,6 +899,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	protected List<Link> buildSingleResourceLinks(
 			Serializable id,
 			String[] perspective,
+			boolean withDownloadLink,
 			Link singleResourceBaseSelfLink,
 			ResourcePermissions resourcePermissions) {
 		List<Link> ls = new ArrayList<>();
@@ -908,7 +915,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Map<String, Object> expandMap = new HashMap<>();
 		expandMap.put("perspective", perspective);
 		ls.add(selfLink.expand(expandMap));
-		ls.add(buildFieldDownloadLink(id));
+		if (withDownloadLink) {
+			ls.add(buildFieldDownloadLink(id));
+		}
 		ls.addAll(buildSingleResourceArtifactLinks(id));
 		return ls;
 	}
@@ -948,8 +957,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			}
 		} else {
 			// Enllaços que es retornen amb els resultats de la consulta
+			Link baseLink = resourceCollectionBaseSelfLink != null ? resourceCollectionBaseSelfLink : linkTo(getClass()).withSelfRel();
 			Link selfLink = buildFindLinkWithParams(
-					resourceCollectionBaseSelfLink != null ? resourceCollectionBaseSelfLink : linkTo(getClass()).withSelfRel(),
+					baseLink,
 					quickFilter,
 					filter,
 					namedQuery,
@@ -962,7 +972,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						if (!page.isFirst()) {
 							ls.add(
 									buildFindLinkWithParams(
-											linkTo(getClass()).withRel("first"),
+											baseLink.withRel("first"),
 											quickFilter,
 											filter,
 											namedQuery,
@@ -972,7 +982,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						if (page.hasPrevious()) {
 							ls.add(
 									buildFindLinkWithParams(
-											linkTo(getClass()).withRel("previous"),
+											baseLink.withRel("previous"),
 											quickFilter,
 											filter,
 											namedQuery,
@@ -982,7 +992,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						if (page.hasNext()) {
 							ls.add(
 									buildFindLinkWithParams(
-											linkTo(getClass()).withRel("next"),
+											baseLink.withRel("next"),
 											quickFilter,
 											filter,
 											namedQuery,
@@ -992,7 +1002,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						if (!page.isLast()) {
 							ls.add(
 									buildFindLinkWithParams(
-											linkTo(getClass()).withRel("last"),
+											baseLink.withRel("last"),
 											quickFilter,
 											filter,
 											namedQuery,
@@ -1001,7 +1011,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 						}
 						if (page.getTotalElements() > 0 && page.getTotalPages() > 1) {
 							Link findLink = buildFindLinkWithParams(
-									linkTo(getClass()).withRel("toPageNumber"),
+									baseLink.withRel("toPageNumber"),
 									quickFilter,
 									filter,
 									namedQuery,
@@ -1100,20 +1110,25 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		if (perspective != null) {
 			expandMap.put("perspective", Arrays.asList(perspective));
 		}
-		return Link.of(
-						UriTemplate.of(
-								baseLink.toUri().toString(),
-								new TemplateVariables(
-										TemplateVariable.requestParameter("page"),
-										TemplateVariable.requestParameter("size"),
-										TemplateVariable.requestParameter("sort").composite(),
-										TemplateVariable.requestParameter("quickFilter"),
-										TemplateVariable.requestParameter("query"),
-										TemplateVariable.requestParameter("filter"),
-										TemplateVariable.requestParameter("namedQuery").composite(),
-										TemplateVariable.requestParameter("perspective").composite())),
-						baseLink.getRel()).
-				expand(expandMap);
+		String linkTemplate = baseLink.getHref();
+		int linkTemplateGroupIndex = baseLink.getHref().lastIndexOf('{');
+		if (linkTemplateGroupIndex != -1) {
+			linkTemplate = baseLink.getHref().substring(0, linkTemplateGroupIndex);
+		}
+		Link link = Link.of(
+				UriTemplate.of(
+						linkTemplate,
+						new TemplateVariables(
+								TemplateVariable.requestParameter("page"),
+								TemplateVariable.requestParameter("size"),
+								TemplateVariable.requestParameter("sort").composite(),
+								TemplateVariable.requestParameter("quickFilter"),
+								TemplateVariable.requestParameter("query"),
+								TemplateVariable.requestParameter("filter"),
+								TemplateVariable.requestParameter("namedQuery").composite(),
+								TemplateVariable.requestParameter("perspective").composite())),
+				baseLink.getRel());
+		return expandMap.isEmpty() ? link : link.expand(expandMap);
 	}
 
 	protected List<Link> buildSingleResourceArtifactLinks(Serializable id) {
@@ -1232,17 +1247,21 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			Page<?> page,
 			Link resourceCollectionBaseSelfLink,
 			ResourcePermissions resourcePermissions) {
-		return buildResourceCollectionLinks(
-				quickFilter,
-				filter,
-				namedQuery,
-				perspective,
-				pageable,
-				page,
-				resourceCollectionBaseSelfLink,
-				resourcePermissions).stream().
-				filter(l -> !l.getRel().value().equals("getOne")).
-				collect(Collectors.toList());
+		if (page != null) {
+			return buildResourceCollectionLinks(
+					quickFilter,
+					filter,
+					namedQuery,
+					perspective,
+					pageable,
+					page,
+					resourceCollectionBaseSelfLink,
+					resourcePermissions).stream().
+					filter(l -> !l.getRel().value().equals("getOne")).
+					collect(Collectors.toList());
+		} else {
+			return Collections.singletonList(resourceCollectionBaseSelfLink);
+		}
 	}
 
 	private String filterWithFieldParameters(String filter, Class<?> resourceClass) {
