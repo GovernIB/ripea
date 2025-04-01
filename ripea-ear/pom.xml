@@ -165,7 +165,6 @@
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>
 <!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory>-->
-					<finalName>ripea</finalName>
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
@@ -196,19 +195,19 @@
 					</modules>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>resources</goal>
-							<goal>testResources</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-resources-plugin</artifactId>-->
+<!--				<version>2.6</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>resources</goal>-->
+<!--							<goal>testResources</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 		<finalName>${project.parent.artifactId}</finalName>
 	</build>

@@ -2,6 +2,7 @@ package es.caib.ripea.service.config;
 
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.MonitorTasquesService;
 import es.caib.ripea.service.intf.service.SegonPlaService;
@@ -35,14 +36,11 @@ import java.util.concurrent.TimeUnit;
 @EnableScheduling
 public class SchedulingConfig implements SchedulingConfigurer {
 
-    @Autowired
-    private ExecucioMassivaService execucioMassivaService;
-    @Autowired
-    private SegonPlaService segonPlaService;
-    @Autowired
-    private MonitorTasquesService monitorTasquesService;
-    @Autowired
-    private ConfigHelper configHelper;
+    @Autowired private ExecucioMassivaService execucioMassivaService;
+    @Autowired private SegonPlaService segonPlaService;
+    @Autowired private AplicacioService aplicacioService;
+    @Autowired private MonitorTasquesService monitorTasquesService;
+    @Autowired private ConfigHelper configHelper;
 
     private Boolean[] primeraVez = {
             Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE
@@ -568,6 +566,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 		String errMsg = th.getClass() + ": " + th.getMessage() + " (" + new Date().getTime() + ")";
 		logger.error("Error no controlat a l'execució de la tasca en segon pla amb codi \"" + codiTasca + "\": " + errMsg, th);
 		monitorTasquesService.error(codiTasca, errMsg);
+		aplicacioService.excepcioSave(th);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);

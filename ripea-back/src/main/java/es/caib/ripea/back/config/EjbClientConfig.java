@@ -24,6 +24,8 @@ import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.resourceservice.MetaExpedientTascaResourceService;
 import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
+import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
+import es.caib.ripea.service.intf.resourceservice.RegistreInteressatResourceService;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import es.caib.ripea.service.intf.service.AlertaService;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -380,6 +382,18 @@ public class EjbClientConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean metaDadaResourceService() {
 		return getLocalEjbFactoyBean(MetaDadaResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean registreAnnexResourceService() {
+		return getLocalEjbFactoyBean(RegistreAnnexResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean registreInteressatResourceService() {
+		return getLocalEjbFactoyBean(RegistreInteressatResourceService.class);
 	}
 	
 	/*
