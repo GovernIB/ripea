@@ -16,7 +16,7 @@ import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 
-const CardProp = (props :any) => {
+const ContenidoData = (props :any) => {
     const { title, children, ...other } = props;
     return <>
         <Typography sx={{ color: 'text.secondary', fontSize: 14, mt: 1, fontStyle: "italic" }}>
@@ -38,7 +38,7 @@ const Expedient = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id, {perspectives: ['COUNT']}).then((app) => setExpedient(app))
+            appGetOne(id, {perspectives: ['COUNT', 'ESTAT']}).then((app) => setExpedient(app))
         }
     },[apiIsReady])
 
@@ -48,6 +48,7 @@ const Expedient = () => {
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
     const [numDades, setNumDades] = useState<number>(expedient?.numTasques);
+    const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numTasques);
 
     const isExperientOrCarpeta=(row:any)=>{
         return row?.tipus=="EXPEDIENT" || row?.tipus=="CARPETA"
@@ -65,7 +66,7 @@ const Expedient = () => {
             label: t('page.contingut.tabs.dades'),
             content: <MetaDadaGrid entity={expedient} onRowCountChange={setNumDades}/>,
             badge: numDades ?? expedient?.numDades,
-            // hidden: expedient?.numMetaDades == 0,
+            hidden: expedient?.numMetaDades == 0,
         },
         {
             value: "interessats",
@@ -91,8 +92,8 @@ const Expedient = () => {
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
-            content: <AnotacionsGrid/>,
-            badge: expedient?.numAnotacions,
+            content: <AnotacionsGrid id={id} onRowCountChange={setNumAnotacions}/>,
+            badge: numAnotacions ?? expedient?.numAnotacions,
             hidden: !isExperientOrCarpeta(expedient) || expedient?.numAnotacions == 0,
         },
         {
@@ -138,16 +139,20 @@ const Expedient = () => {
                                     Informació de l'expedient
                                 </Typography>
 
-                                <CardProp title={t('page.contingut.detalle.numero')}>{expedient?.numero}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.titol')}>{expedient?.nom}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.estat')}
-                                          sx={{borderLeft: `3px solid ${'red'}`, pl: 1}}>{expedient?.estat}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.prioritat')}
-                                          sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>{expedient?.prioritat}</CardProp>
-                                <CardProp title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</CardProp>
+                                <ContenidoData title={t('page.contingut.detalle.numero')}>{expedient?.numero}</ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.titol')}>{expedient?.nom}</ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.estat')}
+                                          sx={{borderLeft: `3px solid ${expedient?.estatAdditionalInfo?.color ?? 'grey'}`, pl: 1}}>
+                                    {expedient?.estatAdditionalInfo?.nom ?? expedient?.estat}
+                                </ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.prioritat')}
+                                          sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>
+                                    {expedient?.prioritat}
+                                </ContenidoData>
+                                <ContenidoData title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</ContenidoData>
 
                                 <ExpedientActionButton entity={expedient}/>
                             </CardContent>

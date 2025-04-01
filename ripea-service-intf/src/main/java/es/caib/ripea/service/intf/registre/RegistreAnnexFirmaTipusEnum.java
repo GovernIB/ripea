@@ -9,10 +9,16 @@ package es.caib.ripea.service.intf.registre;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum RegistreInteressatTipusEnum {
+public enum RegistreAnnexFirmaTipusEnum {
 
-	PERSONA_FISICA,
-	PERSONA_JURIDICA,
-	ADMINISTRACIO;
+    CSV,
+    XADES_DET,
+    XADES_ENV,
+    CADES_DET,
+    CADES_ATT,
+    PADES,
+    SMIME,
+    ODT,
+    OOXML;
 
 }

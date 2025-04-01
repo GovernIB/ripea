@@ -1,8 +1,8 @@
 const translationEs = {
     common: {
         close: "Cerrar",
-        create: 'Crear',
-        update: 'Modificar',
+        create: "Crear",
+        update: "Modificar",
         delete: "Borrar",
         action: "Acción",
         expand: "Expandir",
@@ -43,6 +43,15 @@ const translationEs = {
                 registre: "Información registro",
                 interessats: "Interesados",
                 annexos: "Annexos",
+            },
+            detall: {
+                title: "Detalles de la anotación de registro",
+                estatView: "Estado",
+                dataAlta: "Fecha alta",
+                observacions: "Motivo",
+                rejectedDate: "Fecha rechazo",
+                acceptedDate: "Fecha aceptación",
+                usuariActualitzacio: "Usuario",
             },
         },
         tasca: {
@@ -210,12 +219,47 @@ const translationEs = {
             },
         },
         dada: {
-            title: 'Dato'
+            title: "Dato"
         },
         metaDada: {
-            title: 'Tipo de dato',
+            title: "Tipo de dato",
             acciones: {
-                detail: 'Detalle',
+                detail: "Detalle",
+            },
+        },
+        registre: {
+            grid: {
+                extracte: "Extracto",
+                origenRegistreNumero: "Numero registro",
+                data: "Fecha registro",
+                destiDescripcio: "Destino",
+            },
+            detall: {
+                oficina: "Oficina",
+                extracte: "Extracto",
+                observacions: "Observaciones",
+                identificador: "Num. origen",
+                data: "Fecha origen",
+                oficinaDescripcio: "Oficina origen",
+                docFisica: "Documentación física",
+                desti: "Órgano destino",
+                refExterna: "Ref. externa",
+                expedientNumero: "Num. expediente",
+                procediment: "Procedimiento",
+                llibre: "Libro",
+                assumpte: "Tipo de asunto",
+                idioma: "Idioma",
+                assumpteCodi: "Código asunto",
+                transport: "Transporte",
+                transportNumero: "Num. transporte",
+                origenRegistreNumero: "Num. origen",
+                origenData: "Fecha origen",
+
+                required: "Datos obligatorios",
+                optional: "Datos opcionales",
+                infoResumida: "Información de registro resumida",
+                interessats: "Interesados",
+                annexos: "Anexos",
             },
         },
         notFound: "No encontrado",
