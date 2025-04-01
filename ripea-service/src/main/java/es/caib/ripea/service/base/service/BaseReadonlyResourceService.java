@@ -140,7 +140,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String[] namedQueries,
 			String[] perspectives,
 			Sort sort,
-			String[] fields,
+			ExportField[] fields,
 			ExportFileType fileType,
 			OutputStream out) {
 		long t0 = System.currentTimeMillis();
@@ -166,18 +166,27 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				filter,
 				namedQueries,
 				pageable);
+		long elapsedDatabase = System.currentTimeMillis() - t0;
 		beforeConversion(resultat.getContent());
 		Page<R> response = new PageImpl<>(
 				entitiesToResources(resultat.getContent()),
 				pageable,
 				resultat.getTotalElements());
 		afterConversion(resultat.getContent(), response.getContent());
-		return jasperReportsHelper.export(
+		long elapsedConversion = System.currentTimeMillis() - elapsedDatabase;
+		DownloadableFile exportFile = jasperReportsHelper.export(
 				getResourceClass(),
 				response.getContent(),
 				fields,
 				fileType,
 				out);
+		long elapsedGeneration = System.currentTimeMillis() - elapsedDatabase;
+		log.debug(
+				"Export elapsed time (database={}ms, conversion={}ms, generation={}ms)",
+				elapsedDatabase,
+				elapsedConversion,
+				elapsedGeneration);
+		return exportFile;
 	}
 
 	@Override
