@@ -36,6 +36,9 @@ import java.util.List;
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_COUNT),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_ESTAT_CODE),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class)
@@ -44,6 +47,7 @@ public class ExpedientResource extends NodeResource {
 
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
+	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
 	@NotNull
@@ -117,6 +121,9 @@ public class ExpedientResource extends NodeResource {
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	@Size(max = 1024)
 	private String prioritatMotiu;
+
+    @Transient
+    private ExpedientEstatResource estatAdditionalInfo;
 
     @Transient private List<InteressatResource> interessats;
     @Transient private int numComentaris;

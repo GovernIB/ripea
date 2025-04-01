@@ -85,6 +85,10 @@ public class CustomHalFormsTemplateBuilder extends HalFormsTemplateBuilder {
 		return templates;
 	}
 
+	public CustomHalFormsPropertyFactory getCustomHalFormsPropertyFactory() {
+		return customFactory;
+	}
+
 	private HalFormsTemplate applyTo(HalFormsTemplate template, TemplateTitle templateTitle) {
 
 		return Optional.ofNullable(resolver.resolve(templateTitle)) //

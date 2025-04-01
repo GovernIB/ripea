@@ -16,10 +16,7 @@ import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.base.service.ResourceServiceLocator;
-import es.caib.ripea.service.intf.base.util.HttpRequestUtil;
-import es.caib.ripea.service.intf.base.util.JsonUtil;
-import es.caib.ripea.service.intf.base.util.RequestSessionUtil;
-import es.caib.ripea.service.intf.base.util.TypeUtil;
+import es.caib.ripea.service.intf.base.util.*;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.ReflectUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -42,6 +40,8 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.TemplateVariable.VariableType;
 import org.springframework.hateoas.mediatype.Affordances;
+import org.springframework.hateoas.mediatype.hal.forms.CustomHalFormsPropertyFactory;
+import org.springframework.hateoas.mediatype.hal.forms.CustomHalFormsTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -66,6 +66,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -98,6 +99,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 
 	protected static final HttpMethod FAKE_DEFAULT_TEMPLATE_HTTP_METHOD = HttpMethod.OPTIONS;
 
+	@Autowired
+	private ApplicationContext applicationContext;
 	@Autowired
 	protected ReadonlyResourceService<R, ID> readonlyResourceService;
 	@Autowired
@@ -264,7 +267,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				namedQueries,
 				perspectives,
 				sort,
-				fields,
+				toExportFields(fields),
 				fileType,
 				baos);
 		if (file.getContent() != null && baos.size() == 0) {
@@ -1452,6 +1455,49 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		} else {
 			return Pageable.unpaged();
 		}
+	}
+
+	private ExportField[] toExportFields(String[] fields) {
+		String[] fieldNames;
+		if (fields == null) {
+			List<String> fs = new ArrayList<>();
+			ReflectionUtils.doWithFields(
+					resourceClass,
+					f -> fs.add(f.getName()),
+					f -> !Modifier.isStatic(f.getModifiers()));
+			ReflectionUtils.doWithMethods(
+					resourceClass,
+					m -> fs.add(StringUtil.decapitalize(m.getName().substring(3))),
+					m -> m.getName().startsWith("get") && !Modifier.isStatic(m.getModifiers()));
+			fieldNames = fs.toArray(new String[0]);
+		} else {
+			fieldNames = fields;
+		}
+		Link linkWithAffordances = Affordances.
+				of(linkTo(methodOn(getClass()).getOne(null, null)).withSelfRel()).
+				afford(HttpMethod.POST).
+				withInputAndOutput(getResourceClass()).
+				withName("default").
+				toLink();
+		AffordanceModel halFormsModel = linkWithAffordances.getAffordances().get(1).getAffordanceModel(MediaTypes.HAL_FORMS_JSON);
+		Object halFormsTemplatePropertyWriter = applicationContext.getBean("halFormsTemplatePropertyWriter");
+		Field builderField = ReflectionUtils.findField(halFormsTemplatePropertyWriter.getClass(), "builder");
+		ReflectionUtils.makeAccessible(builderField);
+		CustomHalFormsTemplateBuilder halFormsTemplateBuilder = (CustomHalFormsTemplateBuilder)ReflectionUtils.getField(builderField, halFormsTemplatePropertyWriter);
+		CustomHalFormsPropertyFactory halFormsPropertyFactory = halFormsTemplateBuilder.getCustomHalFormsPropertyFactory();
+		Method createPropertiesMethod = ReflectionUtils.findMethod(halFormsPropertyFactory.getClass(), "createProperties", halFormsModel.getClass());
+		ReflectionUtils.makeAccessible(createPropertiesMethod);
+		List<?> properties = (List<?>)ReflectionUtils.invokeMethod(createPropertiesMethod, halFormsPropertyFactory, halFormsModel);
+		ExportField[] exportFields = properties.stream().
+				filter(p -> {
+					String name = (String)TypeUtil.getFieldValue(p, "name");
+					return Arrays.asList(fieldNames).contains(name);
+				}).
+				map(p -> new ExportField(
+						TypeUtil.getFieldValue(p, "name"),
+						TypeUtil.getFieldValue(p, "prompt"))).
+				toArray(ExportField[]::new);
+		return exportFields;
 	}
 
 	protected ResponseEntity<InputStreamResource> writeDownloadableFileToResponse(

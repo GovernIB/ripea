@@ -86,7 +86,7 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 			String[] namedQueries,
 			String[] perspectives,
 			Sort sort,
-			String[] fields,
+			ExportField[] fields,
 			ExportFileType fileType,
 			OutputStream out);
 

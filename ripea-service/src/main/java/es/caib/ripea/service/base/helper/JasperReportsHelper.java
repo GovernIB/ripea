@@ -1,11 +1,28 @@
 package es.caib.ripea.service.base.helper;
 
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.ExportFileType;
+import es.caib.ripea.service.intf.base.model.*;
+import es.caib.ripea.service.intf.base.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-/*
-import net.sf.jasperreports.engine.*;
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.FieldBuilder;
+import net.sf.dynamicreports.report.builder.ReportTemplateBuilder;
+import net.sf.dynamicreports.report.builder.column.ColumnBuilder;
+import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
+import net.sf.dynamicreports.report.builder.datatype.DataTypes;
+import net.sf.dynamicreports.report.builder.expression.JasperExpression;
+import net.sf.dynamicreports.report.builder.style.StyleBuilder;
+import net.sf.dynamicreports.report.builder.tableofcontents.TableOfContentsCustomizerBuilder;
+import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
+import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
+import net.sf.dynamicreports.report.definition.datatype.DRIDataType;
+import net.sf.dynamicreports.report.exception.DRException;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
@@ -14,16 +31,23 @@ import net.sf.jasperreports.engine.export.oasis.JROdtExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.*;
-*/
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
-import java.io.IOException;
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashMap;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
+
+import static net.sf.dynamicreports.report.builder.DynamicReports.*;
 
 /**
  * Generació d'informes amb Jasper Reports.
@@ -35,37 +59,44 @@ import java.util.Map;
 public class JasperReportsHelper {
 
 	private static final String EXPORT_REPORT_PATH = "/export_report.jrxml";
-	
+
 	public DownloadableFile export(
 			Class<?> resourceClass,
 			List<?> resultats,
-			String[] fields,
-			ExportFileType fileType,
-			OutputStream out) throws ReportGenerationException {
-		return null;
-	}
-/*
-	public DownloadableFile export(
-			Class<?> resourceClass,
-			List<?> resultats,
-			String[] fields,
+			ExportField[] fields,
 			ExportFileType fileType,
 			OutputStream out) throws ReportGenerationException {
 		try {
-			JasperReport report = getCompiledJasperReport(resourceClass);
-			Map<String, Object> params = new HashMap<>();
-			params.put("fields", fields);
+			//InputStream is = getClass().getResourceAsStream("/dynamic_template.jrxml");
+			ComponentBuilder<?, ?> dynamicReportsComponent = cmp.horizontalList(cmp.image(getClass().getResource("/logo192.png")).setFixedDimension(60, 60),
+							cmp.verticalList(
+									cmp.text("DynamicReports").setStyle(ReportTemplateStyle.bold22CenteredStyle).setHorizontalTextAlignment(HorizontalTextAlignment.LEFT),
+									cmp.text("http://www.dynamicreports.org").setStyle(ReportTemplateStyle.italicStyle))).
+					setFixedWidth(300);
+			JasperReportBuilder reportBuilder = DynamicReports.report().
+					setTemplate(ReportTemplateStyle.reportTemplate).
+					//setTemplateDesign(is).
+							title(cmp.horizontalList()
+							.add(dynamicReportsComponent, cmp.text("Export").setStyle(ReportTemplateStyle.bold18CenteredStyle).setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT))
+							.newRow()
+							.add(cmp.line())
+							.newRow()
+							.add(cmp.verticalGap(10))).
+					columnHeader();
+			reportBuilder.fields(getReportFields(resourceClass, fields));
+			reportBuilder.columns(getReportColumns(resourceClass, fields));
 			JRDataSource dataSource = new JRBeanCollectionDataSource(resultats);
+			printJrxml(reportBuilder);
 			JasperPrint jasperPrint = JasperFillManager.fillReport(
-					report,
-					params,
+					reportBuilder.toJasperReport(),
+					reportBuilder.getJasperParameters(),
 					dataSource);
 			return generateDownloadableFile(
 					resourceClass,
 					jasperPrint,
 					fileType,
 					out);
-		} catch (JRException | IOException ex) {
+		} catch (DRException | JRException ex) {
 			throw new ReportGenerationException(
 					resourceClass,
 					"Couldn't generate export file",
@@ -73,16 +104,87 @@ public class JasperReportsHelper {
 		}
 	}
 
-	private JasperReport getCompiledJasperReport(
-			Class<?> resourceClass) throws JRException, IOException, ReportGenerationException {
-		URL reportUrl = getClass().getResource(EXPORT_REPORT_PATH);
-		if (reportUrl == null) {
+	private FieldBuilder<?>[] getReportFields(
+			Class<?> resourceClass,
+			ExportField[] fields) {
+		return Arrays.stream(fields).
+				map(f -> {
+					Field ff = ReflectionUtils.findField(resourceClass, f.getName());
+					if (ff != null) {
+						return DynamicReports.field(f.getName(), ff.getType());
+					} else {
+						String getMethodName = "get" + StringUtil.capitalize(f.getName());
+						Method m = ReflectionUtils.findMethod(resourceClass, getMethodName);
+						if (m != null) {
+							return DynamicReports.field(f.getName(), m.getReturnType());
+						} else {
+							throw new ReportGenerationException(
+									resourceClass,
+									"Unknown export field (resourceClass=" + resourceClass.getName() + ", fieldName=" + f.getName() + ")");
+						}
+					}
+				}).
+				toArray(FieldBuilder[]::new);
+	}
+
+	private ColumnBuilder<?, ?>[] getReportColumns(
+			Class<?> resourceClass,
+			ExportField[] fields) {
+		return Arrays.stream(fields).
+				map(f -> {
+					Field ff = ReflectionUtils.findField(resourceClass, f.getName());
+					if (ff != null) {
+						return toColumn(resourceClass, f, ff.getType());
+					} else {
+						String getMethodName = "get" + StringUtil.capitalize(f.getName());
+						Method m = ReflectionUtils.findMethod(resourceClass, getMethodName);
+						if (m != null) {
+							return toColumn(resourceClass, f, m.getReturnType());
+						} else {
+							throw new ReportGenerationException(
+									resourceClass,
+									"Unknown export field (resourceClass=" + resourceClass.getName() + ", fieldName=" + f.getName() + ")");
+						}
+					}
+				}).
+				toArray(ColumnBuilder[]::new);
+	}
+
+	private ColumnBuilder<?, ?> toColumn(
+			Class<?> resourceClass,
+			ExportField field,
+			Class<?> type) {
+		try {
+			if (LocalDate.class.isAssignableFrom(type)) {
+				JasperExpression<Date> localDateToDateExpression = DynamicReports.exp.jasperSyntax(
+						"java.util.Date.from($F{" + field.getName() + "}.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant())");
+				return Columns.column(field.getLabel(), localDateToDateExpression);
+			} else if (LocalDateTime.class.isAssignableFrom(type)) {
+				JasperExpression<Date> localDateTimeToDateExpression = DynamicReports.exp.jasperSyntax(
+						"java.util.Date.from($F{" + field.getName() + "}.atZone(java.time.ZoneId.systemDefault()).toInstant())");
+				return Columns.column(field.getLabel(), localDateTimeToDateExpression);
+			} else if (type.isEnum()) {
+				JasperExpression<String> toStringExpression = DynamicReports.exp.jasperSyntax("$F{" + field.getName() + "}.toString()");
+				return Columns.column(field.getLabel(), toStringExpression);
+			} else if (ResourceReference.class.isAssignableFrom(type)) {
+				JasperExpression<String> resourceReferenceExpression = DynamicReports.exp.jasperSyntax("$F{" + field.getName() + "}.getDescription()");
+				return Columns.column(field.getLabel(), resourceReferenceExpression);
+			} else if (Serializable.class.equals(type)) {
+				JasperExpression<String> toStringExpression = DynamicReports.exp.jasperSyntax("$F{" + field.getName() + "}.toString()");
+				return Columns.column(field.getLabel(), toStringExpression);
+			} else if (Resource.class.isAssignableFrom(type)) {
+				JasperExpression<String> toStringExpression = DynamicReports.exp.jasperSyntax("$F{" + field.getName() + "}.toString()");
+				return Columns.column(field.getLabel(), toStringExpression);
+			} else {
+				DRIDataType<?, ?> dataType = DataTypes.detectType(type);
+				return Columns.column(field.getLabel(), field.getName(), dataType);
+			}
+		} catch (DRException ex) {
 			throw new ReportGenerationException(
 					resourceClass,
-					"Couldn't find report resource in classpath: " + EXPORT_REPORT_PATH);
+					"Unknown export data type for field (resourceClass=" + resourceClass.getName() + ", fieldName=" + field.getName() + ")",
+					ex);
 		}
-		URLConnection urlConnection = reportUrl.openConnection();
-		return JasperCompileManager.compileReport(urlConnection.getInputStream());
 	}
 
 	private DownloadableFile generateDownloadableFile(
@@ -134,6 +236,7 @@ public class JasperReportsHelper {
 		JROdsExporter exporter = new JROdsExporter();
 		exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(out));
+
 		SimpleOdsExporterConfiguration configuration = new SimpleOdsExporterConfiguration();
 		exporter.setConfiguration(configuration);
 		exporter.exportReport();
@@ -167,6 +270,8 @@ public class JasperReportsHelper {
 		exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(out));
 		SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+		configuration.setOnePagePerSheet(false);
+		configuration.setRemoveEmptySpaceBetweenRows(true);
 		exporter.setConfiguration(configuration);
 		exporter.exportReport();
 		return new DownloadableFile(
@@ -210,5 +315,43 @@ public class JasperReportsHelper {
 				"application/pdf",
 				null);
 	}
-*/
+
+	private void printJrxml(JasperReportBuilder reportBuilder) throws DRException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		reportBuilder.toJrXml(baos);
+		System.out.println(baos);
+	}
+
+	public static class ReportTemplateStyle {
+		public static final StyleBuilder rootStyle = stl.style().setPadding(2);
+		public static final StyleBuilder boldStyle = stl.style(rootStyle).bold();
+		public static final StyleBuilder italicStyle = stl.style(rootStyle).italic();
+		public static final StyleBuilder boldCenteredStyle = stl.style(boldStyle).setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE);
+		public static final StyleBuilder bold12CenteredStyle = stl.style(boldCenteredStyle).setFontSize(12);
+		public static final StyleBuilder bold18CenteredStyle = stl.style(boldCenteredStyle).setFontSize(18);
+		public static final StyleBuilder bold22CenteredStyle = stl.style(boldCenteredStyle).setFontSize(22);
+		public static final StyleBuilder columnStyle = stl.style(rootStyle).setVerticalTextAlignment(VerticalTextAlignment.MIDDLE);
+		public static final StyleBuilder columnTitleStyle = stl.style(columnStyle).setBorder(stl.pen1Point()).setHorizontalTextAlignment(HorizontalTextAlignment.CENTER).setBackgroundColor(Color.LIGHT_GRAY).bold();
+		public static final StyleBuilder groupStyle = stl.style(boldStyle).setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
+		public static final StyleBuilder subtotalStyle = stl.style(boldStyle).setTopBorder(stl.pen1Point());
+		public static final StyleBuilder  crosstabGroupStyle = stl.style(columnTitleStyle);
+		public static final StyleBuilder  crosstabGroupTotalStyle = stl.style(columnTitleStyle).setBackgroundColor(new Color(170, 170, 170));
+		public static final StyleBuilder  crosstabGrandTotalStyle = stl.style(columnTitleStyle).setBackgroundColor(new Color(140, 140, 140));
+		public static final StyleBuilder  crosstabCellStyle = stl.style(columnStyle).setBorder(stl.pen1Point());
+		public static final TableOfContentsCustomizerBuilder tableOfContentsCustomizer = tableOfContentsCustomizer().setHeadingStyle(0, stl.style(rootStyle).bold());
+		public static final ReportTemplateBuilder reportTemplate = template().setLocale(Locale.ENGLISH).
+				setColumnStyle(columnStyle).
+				setColumnTitleStyle(columnTitleStyle).
+				setGroupStyle(groupStyle).
+				setGroupTitleStyle(groupStyle).
+				setSubtotalStyle(subtotalStyle).
+				highlightDetailEvenRows().
+				crosstabHighlightEvenRows().
+				setCrosstabGroupStyle(crosstabGroupStyle).
+				setCrosstabGroupTotalStyle(crosstabGroupTotalStyle).
+				setCrosstabGrandTotalStyle(crosstabGrandTotalStyle).
+				setCrosstabCellStyle(crosstabCellStyle).
+				setTableOfContentsCustomizer(tableOfContentsCustomizer);
+	}
+
 }

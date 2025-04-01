@@ -134,6 +134,11 @@
 				<version>6.21.4</version>
 			</dependency>
 			<dependency>
+				<groupId>net.sourceforge.dynamicreports</groupId>
+				<artifactId>dynamicreports-core</artifactId>
+				<version>6.12.1</version>
+			</dependency>
+			<dependency>
 				<groupId>ma.glasnost.orika</groupId>
 				<artifactId>orika-core</artifactId>
 				<version>1.5.4</version>

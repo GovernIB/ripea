@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.base.util;
 
+import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -130,7 +131,7 @@ public class TypeUtil {
 		if (getMethod != null) {
 			return (C)ReflectionUtils.invokeMethod(getMethod, target);
 		} else {
-			field.setAccessible(true);
+			ReflectionUtils.makeAccessible(field);
 			return (C)ReflectionUtils.getField(field, target);
 		}
 	}
@@ -142,8 +143,18 @@ public class TypeUtil {
 		if (setMethod != null) {
 			ReflectionUtils.invokeMethod(setMethod, target, value);
 		} else {
-			field.setAccessible(true);
+			ReflectionUtils.makeAccessible(field);
 			ReflectionUtils.setField(field, target, value);
+		}
+	}
+
+	public static <V> V getFieldValue(Object target, String fieldName) {
+		Field field = ReflectionUtils.findField(target.getClass(), fieldName);
+		if (field != null) {
+			ReflectionUtils.makeAccessible(field);
+			return (V)ReflectionUtils.getField(field, target);
+		} else {
+			throw new ResourceFieldNotFoundException(target.getClass(), "fieldName");
 		}
 	}
 

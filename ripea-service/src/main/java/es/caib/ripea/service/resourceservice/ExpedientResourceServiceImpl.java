@@ -3,6 +3,7 @@ package es.caib.ripea.service.resourceservice;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientEstatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -10,6 +11,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.InteressatResource;
@@ -17,6 +19,7 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -39,11 +42,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+    private final ExpedientEstatResourceRepository expedientEstatResourceRepository;
 
     @PostConstruct
     public void init() {
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_ESTAT_CODE, new EstatPerspectiveApplicator());
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
@@ -111,6 +116,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
             resource.setNumTasques(entity.getTasques().size());
+            resource.setNumAnotacions(entity.getPeticions().size());
         }
     }
 
@@ -121,6 +127,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     .map(interessatResourceEntity -> objectMappingHelper.newInstanceMap(interessatResourceEntity, InteressatResource.class))
                     .collect(Collectors.toList());
             resource.setInteressats(interessats);
+        }
+    }
+
+    private class EstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            if (entity.getEstatAdditional()!=null) {
+                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(entity.getEstatAdditional(), ExpedientEstatResource.class));
+            }
         }
     }
 
