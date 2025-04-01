@@ -127,6 +127,26 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String code) throws ArtifactNotFoundException;
 
 	/**
+	 * Processa els canvis en els camps del formulari d'un artefacte.
+	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param onChangeEvent
+	 *            informació de l'event onChange.
+	 * @return HTTP 200 si tot ha anat be.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'artefacte amb el codi especificat.
+	 * @throws JsonProcessingException
+	 *             si es produeix algun error al extreure els paràmetres.
+	 */
+	ResponseEntity<String> artifactFormOnChange(
+			final ResourceArtifactType type,
+			final String code,
+			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException;
+
+	/**
 	 * Valida el formulari associat a un artefacte.
 	 *
 	 * @param type
@@ -150,26 +170,6 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String code,
 			final JsonNode params,
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
-
-	/**
-	 * Processa els canvis en els camps del formulari d'un artefacte.
-	 *
-	 * @param type
-	 *            el tipus de l'artefacte.
-	 * @param code
-	 *            el codi de l'artefacte.
-	 * @param onChangeEvent
-	 *            informació de l'event onChange.
-	 * @return HTTP 200 si tot ha anat be.
-	 * @throws ArtifactNotFoundException
-	 *             si no es troba l'artefacte amb el codi especificat.
-	 * @throws JsonProcessingException
-	 *             si es produeix algun error al extreure els paràmetres.
-	 */
-	ResponseEntity<String> artifactFormOnChange(
-			final ResourceArtifactType type,
-			final String code,
-			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException;
 
 	/**
 	 * Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany

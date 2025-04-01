@@ -339,29 +339,6 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	@Override
-	@PostMapping("/artifacts/{type}/{code}/validate")
-	@Operation(summary = "Validació del formulari d'un artefacte")
-	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
-	public ResponseEntity<?> artifactFormValidate(
-			@PathVariable
-			@Parameter(description = "Tipus de l'artefacte")
-			final ResourceArtifactType type,
-			@PathVariable
-			@Parameter(description = "Codi de l'artefacte")
-			final String code,
-			@RequestBody
-			final JsonNode params,
-			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
-		Class<?> formClass = getArtifactFormClass(type, code);
-		getArtifactParamsAsObjectWithFormClass(
-				formClass,
-				params,
-				bindingResult);
-		return ResponseEntity.ok().build();
-	}
-
-	@Override
 	@PatchMapping(value = "/artifacts/{type}/{code}/onChange", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "Processa els canvis en els camps del formulari d'un artefacte")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
@@ -393,6 +370,29 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		} else {
 			return ResponseEntity.ok("{}");
 		}
+	}
+
+	@Override
+	@PostMapping("/artifacts/{type}/{code}/validate")
+	@Operation(summary = "Validació del formulari d'un artefacte")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public ResponseEntity<?> artifactFormValidate(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@RequestBody
+			final JsonNode params,
+			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
+		log.debug("Validació del formulari d'un artefacte (type={}, code={}, params={})", type, code, params);
+		Class<?> formClass = getArtifactFormClass(type, code);
+		getArtifactParamsAsObjectWithFormClass(
+				formClass,
+				params,
+				bindingResult);
+		return ResponseEntity.ok().build();
 	}
 
 	@Override
