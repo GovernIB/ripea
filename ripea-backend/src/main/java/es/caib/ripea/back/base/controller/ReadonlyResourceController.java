@@ -172,6 +172,66 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException;
 
 	/**
+	 * Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany
+	 * al formulari d'un artefacte.
+	 *
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param quickFilter
+	 *            text per a filtrar múltiples camps.
+	 * @param filter
+	 *            consulta en format Spring Filter.
+	 * @param namedQueries
+	 *            llista de noms de consultes a aplicar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @param pageable
+	 *            informació sobre la pagina de resultats que es vol obtenir.
+	 * @return la pàgina amb els resultats de la consulta.
+	 */
+	<RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactFieldOptionsFind(
+			final ResourceArtifactType type,
+			final String code,
+			final String fieldName,
+			final String quickFilter,
+			final String filter,
+			final String[] namedQueries,
+			final String[] perspectives,
+			final Pageable pageable);
+
+	/**
+	 * Consulta una de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany
+	 * al formulari d'un artefacte.
+	 * @param <RR>
+	 *            Classe del recurs (ha d'estendre de Resource).
+	 * @param <RID>
+	 *            Tipus de l'id del recurs (ha d'estendre de Serializable).
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param id
+	 *            id de l'element que es vol consultar.
+	 * @param perspectives
+	 *            la llista de perspectives a aplicar.
+	 * @return L'element amb l'id especificat.
+	 */
+	<RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactFieldOptionsGetOne(
+			final ResourceArtifactType type,
+			final String code,
+			final String fieldName,
+			final RID id,
+			final String[] perspectives);
+
+	/**
 	 * Generació d'un informe associat a un recurs.
 	 *
 	 * @param code

@@ -526,7 +526,13 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				filter(l -> l.getRel().value().equals("self")).
 				findFirst().orElse(null);
 		if (selfLink != null && pageable == null) {
-			Link fieldOptionsFindLink = linkTo(methodOn(getClass()).fieldOptionsFind(null, null, null, null, null, null)).withRel("fieldOptionsFind");
+			Link fieldOptionsFindLink = linkTo(methodOn(getClass()).fieldOptionsFind(
+					null,
+					null,
+					null,
+					null,
+					null,
+					null)).withRel("fieldOptionsFind");
 			links.add(buildFindLinkWithParams(
 					fieldOptionsFindLink,
 					null,
