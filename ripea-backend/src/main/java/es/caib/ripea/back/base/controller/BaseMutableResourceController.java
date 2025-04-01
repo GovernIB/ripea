@@ -103,6 +103,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 						buildSingleResourceLinks(
 								created.getId(),
 								null,
+								true,
 								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
@@ -138,6 +139,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 						buildSingleResourceLinks(
 								updated.getId(),
 								null,
+								true,
 								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
@@ -176,6 +178,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 						buildSingleResourceLinks(
 								updated.getId(),
 								null,
+								true,
 								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
@@ -457,11 +460,13 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	protected List<Link> buildSingleResourceLinks(
 			Serializable id,
 			String[] perspective,
+			boolean withDownloadLink,
 			Link singleResourceSelfLink,
 			ResourcePermissions resourcePermissions) {
 		List<Link> links = super.buildSingleResourceLinks(
 				id,
 				perspective,
+				withDownloadLink,
 				singleResourceSelfLink,
 				resourcePermissions);
 		Link selfLink = links.stream().
@@ -520,7 +525,15 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		Link selfLink = links.stream().
 				filter(l -> l.getRel().value().equals("self")).
 				findFirst().orElse(null);
-		if (selfLink != null) {
+		if (selfLink != null && pageable == null) {
+			Link fieldOptionsFindLink = linkTo(methodOn(getClass()).fieldOptionsFind(null, null, null, null, null, null)).withRel("fieldOptionsFind");
+			links.add(buildFindLinkWithParams(
+					fieldOptionsFindLink,
+					null,
+					null,
+					null,
+					null,
+					null));
 			if (resourcePermissions.isCreateGranted() && resourcePermissions.isWriteGranted()) {
 				links.set(
 						links.indexOf(selfLink),
