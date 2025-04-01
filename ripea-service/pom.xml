@@ -29,6 +29,13 @@
 		<dependency>
 			<groupId>net.sourceforge.dynamicreports</groupId>
 			<artifactId>dynamicreports-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<!-- Aquestes classes ja es troben al Java 11 -->
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.fundaciobit.pluginsib.arxiu</groupId>
