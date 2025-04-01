@@ -44,6 +44,15 @@ const translationCa = {
                 interessats: "Interessats",
                 annexos: "Annexos",
             },
+            detall: {
+                title: "Detalls de l'anotació de registre",
+                estatView: "Estat",
+                dataAlta: "Data d'alta",
+                observacions: "Motiu",
+                rejectedDate: "Data de rebuig",
+                acceptedDate: "Data d'acceptació",
+                usuariActualitzacio: "Usuari",
+            },
         },
         tasca: {
             title: "Tasca",
@@ -210,12 +219,47 @@ const translationCa = {
             },
         },
         dada: {
-            title: 'Dada'
+            title: "Dada"
         },
         metaDada: {
-            title: 'Tipus de dada',
+            title: "Tipus de dada",
             acciones: {
-                detail: 'Detall',
+                detail: "Detall",
+            },
+        },
+        registre: {
+            grid: {
+                extracte: "Extracte",
+                origenRegistreNumero: "Número de registre",
+                data: "Data de registre",
+                destiDescripcio: "Destinació",
+            },
+            detall: {
+                oficina: "Oficina",
+                extracte: "Extracte",
+                observacions: "Observacions",
+                identificador: "Núm. origen",
+                data: "Data d'origen",
+                oficinaDescripcio: "Oficina d'origen",
+                docFisica: "Documentació física",
+                desti: "Òrgan de destinació",
+                refExterna: "Ref. externa",
+                expedientNumero: "Núm. expedient",
+                procediment: "Procediment",
+                llibre: "Llibre",
+                assumpte: "Tipus d'assumpte",
+                idioma: "Idioma",
+                assumpteCodi: "Codi d'assumpte",
+                transport: "Transport",
+                transportNumero: "Núm. de transport",
+                origenRegistreNumero: "Núm. d'origen",
+                origenData: "Data d'origen",
+
+                required: "Dades obligatòries",
+                optional: "Dades opcionals",
+                infoResumida: "Informació de registre resumida",
+                interessats: "Interessats",
+                annexos: "Annexos",
             },
         },
         notFound: "No trobat",
