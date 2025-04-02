@@ -45,6 +45,7 @@ import java.util.List;
 		})
 public class ExpedientResource extends NodeResource {
 
+	private static final long serialVersionUID = 7440910672703796468L;
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
@@ -126,6 +127,8 @@ public class ExpedientResource extends NodeResource {
     private ExpedientEstatResource estatAdditionalInfo;
 
     @Transient private List<InteressatResource> interessats;
+    @Transient private List<UsuariResource> seguidors;
+    @Transient private List<ExpedientResource> relacionatsAmb;
     @Transient private int numComentaris;
     @Transient private int numSeguidors;
     @Transient private int numContingut;
@@ -146,7 +149,7 @@ public class ExpedientResource extends NodeResource {
     @NoArgsConstructor
     @FieldNameConstants
 	public static class ExpedientFilterForm implements Serializable {
-        private String numero;
+		private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
         private String interessat;

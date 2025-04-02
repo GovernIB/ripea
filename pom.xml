@@ -274,6 +274,11 @@
 			<name>Redhat GA Repository</name>
 			<url>https://maven.repository.redhat.com/ga/</url>
 		</repository>
+		<repository>
+		   <id>jaspersoft-third-party</id>
+		   <name>Jasper reports (308-permanent-redirect workaround DGMAD)</name>
+		   <url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+		</repository>
 	</repositories>
 	<build>
 		<plugins>

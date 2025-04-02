@@ -1,5 +1,16 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.time.chrono.ChronoLocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
@@ -16,19 +27,10 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.time.chrono.ChronoLocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -129,7 +131,27 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setInteressats(interessats);
         }
     }
-
+    /*
+    private class SeguidorsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            List<UsuariResource> seguidors = entity.getSeguidors().stream()
+                    .map(usuariResourceEntity -> objectMappingHelper.newInstanceMap(usuariResourceEntity, UsuariResource.class))
+                    .collect(Collectors.toList());
+            resource.setSeguidors(seguidors);
+        }
+    }
+    
+    private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            List<ExpedientResource> relacionats = entity.getRelacionatsAmb().stream()
+                    .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
+                    .collect(Collectors.toList());
+            resource.setRelacionatsAmb(relacionats);
+        }
+    }
+     */
     private class EstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {

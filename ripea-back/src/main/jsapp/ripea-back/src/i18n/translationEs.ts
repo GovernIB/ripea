@@ -142,6 +142,9 @@ const translationEs = {
                 changeEstat: "Modificar estado del expediente",
                 assignar: "Assignar expediente a usuario",
             },
+			modal: {
+				seguidors: "Seguidors del expedient",
+			}
         },
         arxiu: {
             detall: {

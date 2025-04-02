@@ -13,3 +13,4 @@ target/
 /docker-compose.yml
 /ripea-back/application.properties
 /jboss.profile
+/boot.profile

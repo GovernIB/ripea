@@ -8,5 +8,4 @@ import org.springframework.data.domain.Persistable;
  * 
  * @author Límit Tecnologies
  */
-public interface ResourceEntity<R, PK> extends Persistable<PK> {
-}
+public interface ResourceEntity<R, PK> extends Persistable<PK> {}

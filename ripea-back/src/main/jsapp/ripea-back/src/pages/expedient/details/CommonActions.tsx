@@ -26,12 +26,6 @@ export const useCommonActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: "Seguidores",
-            icon: "people",
-        },
-        ////
-
-        {
             title: t('page.expedient.acciones.detall'),
             icon: "folder",
             linkTo: "/contingut/{{id}}",

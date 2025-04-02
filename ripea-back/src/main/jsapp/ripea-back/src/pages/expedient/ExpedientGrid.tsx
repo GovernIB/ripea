@@ -8,6 +8,7 @@ import {Typography, Icon, Grid, Card, CardContent} from "@mui/material";
 import { formatDate } from '../../util/dateUtils';
 import { useNavigate } from "react-router-dom";
 import { ExpedientCommentDialog as CommentDialog } from "../CommentDialog.tsx";
+import { ExpedientFollowersDialog as FollowersDialog } from "../FollowersDialog.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import { useCommonActions } from "./details/CommonActions.tsx";
 import { useTranslation } from "react-i18next";
@@ -113,6 +114,14 @@ const columns = [
         flex: 0.5,
         renderCell: (params: any) => <CommentDialog entity={params?.row} />
     },
+	{
+	    field: 'numSeguidors',
+	    headerName: '',
+	    sortable: false,
+	    disableColumnMenu: true,
+	    flex: 0.5,
+	    renderCell: (params: any) => <FollowersDialog entity={params?.row} />
+	},	
 ];
 
 const ExpedientGrid = () => {

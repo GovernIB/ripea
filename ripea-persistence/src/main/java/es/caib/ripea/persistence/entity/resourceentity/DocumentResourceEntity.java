@@ -24,7 +24,6 @@ import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
-import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -17,7 +17,7 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Component
+@Component("internaConversioTipusHelper")
 public class ConversioTipusHelper {
 
 	private static MapperFactory mapperFactory;
