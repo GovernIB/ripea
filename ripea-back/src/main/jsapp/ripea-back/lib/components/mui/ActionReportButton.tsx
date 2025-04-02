@@ -99,13 +99,13 @@ export const useActionReportLogic = (
     const {
         isReady: apiIsReady,
         artifacts: apiArtifacts,
-        action: apiAction,
-        report: apiReport,
+        artifactAction: apiArtifactAction,
+        artifactReport: apiArtifactReport,
     } = useResourceApiService(resourceName);
     const execAction: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (action != null) {
             const requestArgs = { code: action, data };
-            apiAction(id, requestArgs).then((result: any) => {
+            apiArtifactAction(id, requestArgs).then((result: any) => {
                 onSuccess?.(result);
                 resolve(formDialogResultProcessor?.(result));
             }).catch(error => {
@@ -119,7 +119,7 @@ export const useActionReportLogic = (
     const generateReport: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (report != null) {
             const requestArgs = { code: report, data };
-            apiReport(id, requestArgs).then((result) => {
+            apiArtifactReport(id, requestArgs).then((result) => {
                 onSuccess?.(result);
                 resolve(formDialogResultProcessor?.(result));
             }).catch(error => {

@@ -26,12 +26,12 @@ type FormFieldRefProps = FormFieldCustomProps & {
     sorts?: string[];
     namedQueries?: string[];
     perspectives?: string[];
-    optionRenderer?: (args: FormFieldReferenceRendererArgs) => React.ReactElement;
     advancedSearchColumns?: GridColDef[];
     optionsPageSize?: number;
     optionsUnpaged?: boolean;
-    multiple?: boolean;
     optionsRequest?: (q: string) => AdvancedSearchOptionsRequestType,
+    optionRenderer?: (args: FormFieldReferenceRendererArgs) => React.ReactElement;
+    multiple?: boolean;
 };
 
 type AdvancedSearchDialogApi = {
@@ -40,8 +40,7 @@ type AdvancedSearchDialogApi = {
 
 type AdvancedSearchDialogProps = React.PropsWithChildren & {
     title: string;
-    resourceName: string;
-    field: any;
+    fieldName: string;
     columns: GridColDef[];
     apiRef: React.MutableRefObject<AdvancedSearchDialogApi | undefined>;
     dialogComponentProps?: any;
@@ -60,13 +59,22 @@ type AdvancedSearchOptionsRequestType = Promise<FormFieldRefOptionsResponse> | [
 const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
     const {
         title,
-        resourceName,
-        field,
+        fieldName,
         columns,
         apiRef,
         dialogComponentProps
     } = props;
-    const [gridDialogShow, gridDialogComponent] = useDataGridDialog(resourceName, columns, field.name);
+    const {
+        resourceName,
+        resourceType,
+        resourceTypeCode,
+    } = useFormContext();
+    const [gridDialogShow, gridDialogComponent] = useDataGridDialog(
+        resourceName,
+        columns,
+        resourceType,
+        resourceTypeCode,
+        fieldName);
     const show = () => {
         return gridDialogShow(
             title,
@@ -128,15 +136,14 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         sorts,
         namedQueries,
         perspectives,
-        optionRenderer,
         advancedSearchColumns,
         optionsPageSize = DEFAULT_PAGE_SIZE,
         optionsUnpaged,
-        multiple: multipleProp,
         optionsRequest: optionsRequestProp,
+        optionRenderer,
+        multiple: multipleProp,
     } = props;
     const { t } = useBaseAppContext();
-    const { resourceName } = useFormContext();
     const { requestHref } = useResourceApiContext();
     const advancedSearchApiRef = React.useRef<AdvancedSearchDialogApi>();
     const multiple = (field?.multiple || multipleProp) ?? false;
@@ -222,7 +229,8 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     const optionsErrorIconElement = optionsError != null ? <Icon fontSize="small" color="error" title={optionsError.message} sx={{ ml: 1 }}>
         warning
     </Icon> : null;
-    const advancedSearchButtonElement = advancedSearchColumns && !disabled && !readOnly ? <IconButton
+    const advancedSearchButtonActive = advancedSearchColumns != null && !disabled && !readOnly;
+    const advancedSearchButtonElement = advancedSearchButtonActive ? <IconButton
         onClick={handleAdvancedSearchClick}
         size="small"
         tabIndex={-1}>
@@ -239,10 +247,9 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     const endAdornment = optionsLoading ? loadingElement : componentProps?.slotProps?.input?.endAdornment;
     const valueMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? null);
     return <>
-        {advancedSearchColumns && !disabled && !readOnly && <AdvancedSearchDialog
+        {advancedSearchButtonActive && <AdvancedSearchDialog
             title={t('form.field.reference.advanced.title')}
-            resourceName={resourceName}
-            field={field}
+            fieldName={field.name}
             columns={advancedSearchColumns}
             apiRef={advancedSearchApiRef} />}
         <Autocomplete
@@ -311,7 +318,6 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 title={title}
                 helperText={helperText}
                 autoFocus={autoFocus}
-                multiline={multiple}
                 sx={{
                     // Sin esto, si la columna no tiene suficiente espacio para el texto y el icono,
                     // coloca uno encima del otro y se ve cortado por la mitad.

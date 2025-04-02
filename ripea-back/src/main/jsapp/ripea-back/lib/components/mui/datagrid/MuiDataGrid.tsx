@@ -23,7 +23,7 @@ import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions
 } from '../../../util/reactNodePosition';
-import { useResourceApiContext } from '../../ResourceApiContext';
+import { useResourceApiContext, ResourceType } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 import { toDataGridActionItem, DataGridActionItemOnClickFn } from './DataGridActionItem';
 import {
@@ -59,6 +59,8 @@ export type MuiDataGridProps = {
     titleDisabled?: true;
     subtitle?: string;
     resourceName: string;
+    resourceType?: ResourceType;
+    resourceTypeCode?: string;
     resourceFieldName?: string;
     columns: MuiDataGridColDef[];
     readOnly?: boolean;
@@ -77,6 +79,7 @@ export type MuiDataGridProps = {
     treeDataAdditionalRows?: any[] | ((rows: any[]) => any[]);
     toolbarType?: DataToolbarType;
     toolbarHide?: true;
+    toolbarHideExport?: true;
     toolbarHideCreate?: true;
     toolbarHideRefresh?: true;
     toolbarHideQuickFilter?: true;
@@ -269,6 +272,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         titleDisabled,
         subtitle,
         resourceName,
+        resourceType,
+        resourceTypeCode,
         resourceFieldName,
         columns,
         readOnly,
@@ -287,6 +292,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         treeDataAdditionalRows,
         toolbarType = 'default',
         toolbarHide,
+        toolbarHideExport = true,
         toolbarHideCreate,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
@@ -331,7 +337,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>();
     const [additionalRows, setAdditionalRows] = React.useState<any[]>(!treeDataAdditionalRowsIsFunction ? [] : treeDataAdditionalRows as any[]);
     const {
-        currentFields: apiCurrentFields,
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
         delette: apiDelete,
@@ -364,6 +369,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     ]);
     const {
         loading,
+        fields,
         rows,
         pageInfo,
         artifacts,
@@ -371,6 +377,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
         findDisabled,
         findArgs,
         quickFilterInitialValue,
@@ -419,7 +428,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         position: toolbarNodesPosition,
         element: !toolbarHideCreate ? toolbarAddElement : <span/>,
     });
-    const toolbarHideExport = true;
     const toolbarNumElements = toolbarNodesPosition + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
     const joinedToolbarElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
         toolbarNumElements,
@@ -443,7 +451,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowActionsColumnProps,
         [...rowAdditionalActions, ...rowEditActions],
         rowEditActions,
-        apiCurrentFields,
+        fields,
         showCreateDialog,
         showUpdateDialog,
         artifacts,

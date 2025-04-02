@@ -22,6 +22,7 @@ import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions
 } from '../../../util/reactNodePosition';
+import { ResourceType } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 
 type MuiDataListFieldRendererArgs = {
@@ -35,6 +36,9 @@ export type MuiDataListProps = {
     titleDisabled?: true;
     subtitle?: string;
     resourceName: string;
+    resourceType?: ResourceType;
+    resourceTypeCode?: string;
+    resourceFieldName?: string;
     primaryField: string;
     secondaryField?: string;
     primaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
@@ -134,6 +138,9 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         titleDisabled,
         subtitle,
         resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
         primaryField,
         secondaryField,
         primaryFieldRenderer,
@@ -169,7 +176,6 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
-        currentFields: apiCurrentFields,
         delette: apiDelete,
     } = useResourceApiService(resourceName);
     const findArgs = React.useMemo(() => ({
@@ -180,11 +186,15 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     }), [filter, namedQueries, perspectives]);
     const {
         loading: _loading,
+        fields,
         rows,
         refresh,
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
         findDisabled,
         findArgs,
         quickFilterInitialValue,
@@ -248,8 +258,8 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
             disablePadding
             sx={{ border: '1px solid ' + theme.palette.divider, borderRadius: '4px' }}>
             {rows.map((r, i) => {
-                const primary = fieldDescription(primaryField, r[primaryField], apiCurrentFields);
-                const secondary = secondaryField ? fieldDescription(secondaryField, r[secondaryField], apiCurrentFields) : undefined;
+                const primary = fieldDescription(primaryField, r[primaryField], fields);
+                const secondary = secondaryField ? fieldDescription(secondaryField, r[secondaryField], fields) : undefined;
                 const primaryFieldRendererArgs = {
                     value: r[primaryField],
                     row: r,

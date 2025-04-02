@@ -918,9 +918,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			String artifactCode,
 			Link resourceCollectionBaseSelfLink,
 			Link singleResourceBaseSelfLink) {
-		Class<?> artifactFormClass = getArtifactAwareResourceClass(artifactType, artifactCode);
 		Optional<FieldAndClass> referencedResourceFieldAndClass = findReferenceFieldAndClass(
-				artifactFormClass,
+				getArtifactAwareResourceClass(artifactType, artifactCode),
 				fieldName);
 		if (referencedResourceFieldAndClass.isPresent()) {
 			if (pageable != null) {
@@ -948,7 +947,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 								singleResourceBaseSelfLink,
 								ResourcePermissions.readOnly(),
 								buildOptionsLinks(
-										artifactFormClass,
+										referencedResourceFieldAndClass.get().getClazz(),
 										quickFilter,
 										filter,
 										namedQueries,
@@ -963,7 +962,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				return ResponseEntity.ok(
 						PagedModel.empty(
 								buildOptionsLinks(
-										artifactFormClass,
+										referencedResourceFieldAndClass.get().getClazz(),
 										quickFilter,
 										filter,
 										namedQueries,

@@ -34,8 +34,12 @@ type ResourceApiMethods = {
     artifacts: (args: ResourceApiArtifactsArgs) => Promise<ResourceApiArtifact[]>;
     artifactFormOnChange: (args: ResourceApiArtifactOnChangeArgs) => Promise<any>;
     artifactFormValidate: (args: ResourceApiArtifactFormArgs) => Promise<void>;
-    action: (id: any, args: ResourceApiActionArgs) => Promise<any>;
-    report: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
+    artifactFieldOptionsFields: (args: ResourceApiArtifactFieldOptionsArgs) => Promise<any[]>;
+    artifactFieldOptionsFind: (args: ResourceApiArtifactFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
+    artifactAction: (id: any, args: ResourceApiActionArgs) => Promise<any>;
+    artifactReport: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
+    fieldOptionsFields: (args: ResourceApiFieldArgs) => Promise<any[]>;
+    fieldOptionsFind: (args: ResourceApiFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
 }
 
@@ -129,6 +133,12 @@ export type ResourceApiArtifactFormArgs = ResourceApiRequestArgs & {
     code: string;
 };
 
+export type ResourceApiArtifactFieldOptionsArgs = ResourceApiArtifactFormArgs & {
+    fieldName: string;
+};
+
+export type ResourceApiArtifactFieldOptionsFindArgs = ResourceApiArtifactFieldOptionsArgs & ResourceApiFindArgs;
+
 export type ResourceApiArtifactOnChangeArgs = ResourceApiArtifactFormArgs & ResourceApiOnChangeArgs;
 
 export type ResourceApiActionArgs = ResourceApiRequestArgs & {
@@ -143,6 +153,8 @@ export type ResourceApiReportArgs = ResourceApiRequestArgs & {
 export type ResourceApiFieldArgs = ResourceApiRequestArgs & {
     fieldName: string;
 };
+
+export type ResourceApiFieldOptionsFindArgs = ResourceApiFieldArgs & ResourceApiFindArgs;
 
 export type ResourceApiProviderProps = React.PropsWithChildren & {
     apiUrl: string;
@@ -519,7 +531,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const artifacts = React.useCallback((args?: ResourceApiArtifactsArgs): Promise<ResourceApiArtifact[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts', null, { ...args }).then((state: State) => {
+            request('artifacts', null, args).then((state: State) => {
                 const getActionRelFromArtifact = (artifact: any) => {
                     if (artifact?.type === 'ACTION') {
                         return 'exec_' + artifact.code;
@@ -555,7 +567,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const artifactFormOnChange = React.useCallback((args: ResourceApiArtifactOnChangeArgs): Promise<any> => {
         return new Promise((resolve, reject) => {
-            request('artifacts', null, { ...args }).
+            request('artifacts', null, args).
                 then((state: State) => {
                     const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
                     if (artifactState != null) {
@@ -589,7 +601,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const artifactFormValidate = React.useCallback((args: ResourceApiArtifactFormArgs): Promise<void> => {
         return new Promise((resolve, reject) => {
-            request('artifacts', null, { ...args }).
+            request('artifacts', null, args).
                 then((state: State) => {
                     const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
                     if (artifactState != null) {
@@ -607,7 +619,73 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 catch(reject);
         });
     }, [request]);
-    const action = React.useCallback((id: any, args: ResourceApiActionArgs): Promise<any[]> => {
+    
+    const artifactFieldOptionsFields = React.useCallback((args: ResourceApiArtifactFieldOptionsArgs): Promise<any[]> => {
+        return new Promise((resolve, reject) => {
+            request('artifacts', null, args).
+                then((state: State) => {
+                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
+                    if (artifactState != null) {
+                        const fieldOptionsFindLink = artifactState.links.get('artifactFieldOptionsFind');
+                        if (fieldOptionsFindLink != null) {
+                            request(fieldOptionsFindLink.rel, null, { data: { fieldName: args.fieldName } }, artifactState).
+                                then((state: State) => {
+                                    const processedFields = processApiFields(state.action().fields);
+                                    resolve(processedFields);
+                                }).
+                                catch(reject);
+                        }
+                    }
+                }).
+                catch(reject);
+        });
+    }, [request]);
+    const artifactFieldOptionsFind = React.useCallback((args: ResourceApiArtifactFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
+        return new Promise((resolve, reject) => {
+            request('artifacts', null, args).
+                then((state: State) => {
+                    const artifactState = state.getEmbedded().find(e => e.data.type === args.type && e.data.code === args.code);
+                    if (artifactState != null) {
+                        const fieldOptionsFindLink = artifactState.links.get('artifactFieldOptionsFind');
+                        if (fieldOptionsFindLink != null) {
+                            const pageArgs = args?.unpaged ? { page: 'UNPAGED' } : { page: args?.page, size: args?.size };
+                            const requestArgs = {
+                                ...args,
+                                data: {
+                                    fieldName: args.fieldName,
+                                    ...pageArgs,
+                                    sort: args?.sorts,
+                                    filter: args?.filter,
+                                    quickFilter: args?.quickFilter,
+                                    namedQuery: args?.namedQueries,
+                                    perspective: args?.perspectives,
+                                },
+                                refresh: args?.refresh ?? true,
+                            };
+                            request(fieldOptionsFindLink.rel, null, requestArgs, artifactState).
+                                then((state: State) => {
+                                    const rows = state.getEmbedded().map((e: any) => {
+                                        if (args?.includeLinksInRows) {
+                                            return {
+                                                ...e.data,
+                                                '_links': processStateLinks(e.links),
+                                                '_actions': processStateActions(e.actions()),
+                                            };
+                                        } else {
+                                            return e.data;
+                                        }
+                                    });
+                                    const page = state.data.page;
+                                    resolve({ rows, page });
+                                }).
+                                catch(reject);
+                        }
+                    }
+                }).
+                catch(reject);
+        });
+    }, [request]);
+    const artifactAction = React.useCallback((id: any, args: ResourceApiActionArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             if (args?.code != null) {
                 const actionRel = 'exec_' + args.code;
@@ -631,7 +709,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
             }
         });
     }, [request]);
-    const report = React.useCallback((id: any, args: ResourceApiReportArgs): Promise<any[]> => {
+    const artifactReport = React.useCallback((id: any, args: ResourceApiReportArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             if (args?.code != null) {
                 const reportRel = 'generate_' + args.code;
@@ -653,6 +731,47 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
             } else {
                 reject('Report code not specified')
             }
+        });
+    }, [request]);
+    const fieldOptionsFields = React.useCallback((args: ResourceApiFieldArgs): Promise<any[]> => {
+        const requestArgs = {
+            ...args,
+            data: { fieldName: args.fieldName },
+            refresh: args?.refresh ?? true,
+        };
+        return new Promise((resolve, reject) => {
+            request('fieldOptionsFind', null, requestArgs).
+                then((state: State) => {
+                    console.log('>>> fieldOptionsFields', state)
+                    resolve([]);
+                }).
+                catch(reject);
+        });
+    }, [request]);
+    const fieldOptionsFind = React.useCallback((args: ResourceApiFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
+        const requestArgs = {
+            ...args,
+            data: { fieldName: args.fieldName },
+            refresh: args?.refresh ?? true,
+        };
+        return new Promise((resolve, reject) => {
+            request('fieldOptionsFind', null, requestArgs).
+                then((state: State) => {
+                    const rows = state.getEmbedded().map((e: any) => {
+                        if (args?.includeLinksInRows) {
+                            return {
+                                ...e.data,
+                                '_links': processStateLinks(e.links),
+                                '_actions': processStateActions(e.actions()),
+                            };
+                        } else {
+                            return e.data;
+                        }
+                    });
+                    const page = state.data.page;
+                    resolve({ rows, page });
+                }).
+                catch(reject);
         });
     }, [request]);
     const fieldDownload = React.useCallback((id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {
@@ -680,8 +799,12 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
         artifacts,
         artifactFormOnChange,
         artifactFormValidate,
-        action,
-        report,
+        artifactFieldOptionsFields,
+        artifactFieldOptionsFind,
+        artifactAction,
+        artifactReport,
+        fieldOptionsFields,
+        fieldOptionsFind,
         fieldDownload,
     };
 }
@@ -724,9 +847,9 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
     });
     const currentRefresh = (args?: ResourceApiRequestArgs) => {
         indexState != null && resourceName != null && getPromiseFromStateLink(indexState, resourceName, args, true).
-            then((response: State) => {
-                setCurrentState(response);
-                const processedFields = processApiFields(response.action().fields);
+            then((state: State) => {
+                setCurrentState(state);
+                const processedFields = processApiFields(state.action().fields);
                 setCurrentFields(processedFields);
                 setIsCurrentLoading(false);
                 !isCurrentLoaded && setIsCurrentLoaded(true);
