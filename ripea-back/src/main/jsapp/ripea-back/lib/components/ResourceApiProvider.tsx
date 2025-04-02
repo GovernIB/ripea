@@ -355,23 +355,28 @@ const processAnswerRequiredError = (
     }
 }
 
+const buildFindArgs = (args?: ResourceApiFindArgs, fieldName?: string) => {
+    const pageArgs = args?.unpaged ? { page: 'UNPAGED' } : { page: args?.page, size: args?.size };
+    return {
+        ...args,
+        data: {
+            fieldName,
+            ...pageArgs,
+            sort: args?.sorts,
+            filter: args?.filter,
+            quickFilter: args?.quickFilter,
+            namedQuery: args?.namedQueries,
+            perspective: args?.perspectives,
+        },
+        refresh: args?.refresh ?? true,
+    };
+}
+
 const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDialog: Function): ResourceApiMethods => {
     const find = React.useCallback((args?: ResourceApiFindArgs): Promise<ResourceApiFindResponse> => {
-        const pageArgs = args?.unpaged ? { page: 'UNPAGED' } : { page: args?.page, size: args?.size };
-        const requestArgs = {
-            ...args,
-            data: {
-                ...pageArgs,
-                sort: args?.sorts,
-                filter: args?.filter,
-                quickFilter: args?.quickFilter,
-                namedQuery: args?.namedQueries,
-                perspective: args?.perspectives,
-            },
-            refresh: args?.refresh ?? true,
-        };
+        const findArgs = buildFindArgs(args);
         return new Promise((resolve, reject) => {
-            request('find', null, requestArgs).
+            request('find', null, findArgs).
                 then((state: State) => {
                     const rows = state.getEmbedded().map((e: any) => {
                         if (args?.includeLinksInRows) {
@@ -648,21 +653,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     if (artifactState != null) {
                         const fieldOptionsFindLink = artifactState.links.get('artifactFieldOptionsFind');
                         if (fieldOptionsFindLink != null) {
-                            const pageArgs = args?.unpaged ? { page: 'UNPAGED' } : { page: args?.page, size: args?.size };
-                            const requestArgs = {
-                                ...args,
-                                data: {
-                                    fieldName: args.fieldName,
-                                    ...pageArgs,
-                                    sort: args?.sorts,
-                                    filter: args?.filter,
-                                    quickFilter: args?.quickFilter,
-                                    namedQuery: args?.namedQueries,
-                                    perspective: args?.perspectives,
-                                },
-                                refresh: args?.refresh ?? true,
-                            };
-                            request(fieldOptionsFindLink.rel, null, requestArgs, artifactState).
+                            const findArgs = buildFindArgs(args, args.fieldName);
+                            request(fieldOptionsFindLink.rel, null, findArgs, artifactState).
                                 then((state: State) => {
                                     const rows = state.getEmbedded().map((e: any) => {
                                         if (args?.includeLinksInRows) {
@@ -734,28 +726,19 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
         });
     }, [request]);
     const fieldOptionsFields = React.useCallback((args: ResourceApiFieldArgs): Promise<any[]> => {
-        const requestArgs = {
-            ...args,
-            data: { fieldName: args.fieldName },
-            refresh: args?.refresh ?? true,
-        };
         return new Promise((resolve, reject) => {
-            request('fieldOptionsFind', null, requestArgs).
+            request('fieldOptionsFind', null, { data: { fieldName: args.fieldName } }).
                 then((state: State) => {
-                    console.log('>>> fieldOptionsFields', state)
-                    resolve([]);
+                    const processedFields = processApiFields(state.action().fields);
+                    resolve(processedFields);
                 }).
                 catch(reject);
         });
     }, [request]);
     const fieldOptionsFind = React.useCallback((args: ResourceApiFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
-        const requestArgs = {
-            ...args,
-            data: { fieldName: args.fieldName },
-            refresh: args?.refresh ?? true,
-        };
         return new Promise((resolve, reject) => {
-            request('fieldOptionsFind', null, requestArgs).
+            const findArgs = buildFindArgs(args, args.fieldName);
+            request('fieldOptionsFind', null, findArgs).
                 then((state: State) => {
                     const rows = state.getEmbedded().map((e: any) => {
                         if (args?.includeLinksInRows) {
