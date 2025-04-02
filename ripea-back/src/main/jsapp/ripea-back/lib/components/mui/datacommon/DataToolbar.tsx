@@ -26,7 +26,7 @@ export const useDataToolbar = (
     apiCurrentError: any,
     quickFilterComponent: React.ReactElement,
     doRefresh: () => void,
-    doExport?: (type?: string, forceUnpaged?: boolean) => void,
+    doExport: () => void,
     toolbarHideExport?: boolean,
     toolbarHideRefresh?: boolean,
     toolbarHideQuickFilter?: boolean,
@@ -40,7 +40,7 @@ export const useDataToolbar = (
         position: toolbarNodesPosition,
         element: toToolbarIcon('file_download', {
             title: t('datacommon.export.title'),
-            onClick: () => doExport?.(undefined, true),
+            onClick: () => doExport(),
         }),
     });
     !toolbarHideRefresh && elementsWithPosition.push({

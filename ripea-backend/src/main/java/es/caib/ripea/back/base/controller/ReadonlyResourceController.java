@@ -6,7 +6,6 @@ import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.model.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
@@ -70,8 +69,8 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	 *            la llista de noms de consultes a aplicar.
 	 * @param perspectives
 	 *            la llista de perspectives a aplicar.
-	 * @param sort
-	 *            ordenació dels resultats.
+	 * @param pageable
+	 *            paràmetres de paginació i ordenació.
 	 * @param fields
 	 *            camps a exportar (tots si no s'especifica).
 	 * @param fileType
@@ -85,7 +84,7 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String filter,
 			final String[] namedQueries,
 			final String[] perspectives,
-			final Sort sort,
+			final Pageable pageable,
 			final String[] fields,
 			final ExportFileType fileType) throws IOException;
 

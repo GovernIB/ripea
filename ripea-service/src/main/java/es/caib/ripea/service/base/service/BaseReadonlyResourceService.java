@@ -139,7 +139,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String filter,
 			String[] namedQueries,
 			String[] perspectives,
-			Sort sort,
+			Pageable pageable,
 			ExportField[] fields,
 			ExportFileType fileType,
 			OutputStream out) {
@@ -147,15 +147,14 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		log.debug(
 				"Querying entities for export with filter and pagination (" +
 						"quickFilter={}, filter={}, namedQueries={}, " +
-						"perspectives={}, sort={}, fields={}, fileType={})",
+						"perspectives={}, pageable={}, fields={}, fileType={})",
 				quickFilter,
 				filter,
 				Arrays.toString(namedQueries),
 				Arrays.toString(perspectives),
-				sort,
+				pageable,
 				fields,
 				fileType);
-		Pageable pageable = new UnpagedButSorted(sort);
 		beforeFind(
 				quickFilter,
 				filter,

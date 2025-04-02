@@ -18,14 +18,16 @@ import ResourceApiContext, {
     OpenAnswerRequiredDialogFn,
     ResourceApiUserSessionValuePair,
     ResourceType,
+    ExportFileType,
 } from './ResourceApiContext';
 
 const LOG_PREFIX = 'RAPI';
 const OFFLINE_CHECK_TIMEOUT = 5000; // en milisegons
 
 type ResourceApiMethods = {
-    find: (args: ResourceApiFindArgs) => Promise<ResourceApiFindResponse>;
     getOne: (id: any, args?: ResourceApiGetOneArgs) => Promise<any>;
+    find: (args: ResourceApiFindArgs) => Promise<ResourceApiFindResponse>;
+    exportt: (args: ResourceApiExportArgs) => Promise<ResourceApiBlobResponse>;
     create: (args: ResourceApiRequestArgs) => Promise<any>;
     update: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     patch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
@@ -92,6 +94,11 @@ export type ResourceApiFindCommonArgs = ResourceApiRequestArgs & {
     perspectives?: string[];
 };
 
+export type ResourceApiGetOneArgs = ResourceApiRequestArgs & {
+    perspectives?: string[];
+    includeLinks?: boolean;
+};
+
 export type ResourceApiFindArgs = ResourceApiFindCommonArgs & {
     includeLinksInRows?: boolean;
 };
@@ -99,6 +106,11 @@ export type ResourceApiFindArgs = ResourceApiFindCommonArgs & {
 export type ResourceApiFindResponse = {
     rows: any[];
     page: any;
+};
+
+export type ResourceApiExportArgs = ResourceApiFindCommonArgs & {
+    fields?: string[];
+    fileType?: ExportFileType;
 };
 
 export type ResourceApiBlobResponse = {
@@ -111,11 +123,6 @@ export type ResourceApiArtifact = {
     code: string;
     formClassActive: boolean;
     fields?: any[];
-};
-
-export type ResourceApiGetOneArgs = ResourceApiRequestArgs & {
-    perspectives?: string[];
-    includeLinks?: boolean;
 };
 
 export type ResourceApiOnChangeArgs = ResourceApiRequestArgs & {
@@ -147,7 +154,7 @@ export type ResourceApiActionArgs = ResourceApiRequestArgs & {
 
 export type ResourceApiReportArgs = ResourceApiRequestArgs & {
     code: string;
-    //outputFormat?: 'PDF' | 'XLS' | 'CSV' | 'ODS' | 'XLSX' | 'ODT' | 'RTF' | 'DOCX' | 'PPTX';
+    //outputFormat?: ReportOutputFormat;
 };
 
 export type ResourceApiFieldArgs = ResourceApiRequestArgs & {
@@ -355,48 +362,24 @@ const processAnswerRequiredError = (
     }
 }
 
-const buildFindArgs = (args?: ResourceApiFindArgs, fieldName?: string) => {
+const buildFindArgs = (args?: ResourceApiFindArgs, additionalData?: any) => {
     const pageArgs = args?.unpaged ? { page: 'UNPAGED' } : { page: args?.page, size: args?.size };
     return {
         ...args,
         data: {
-            fieldName,
             ...pageArgs,
             sort: args?.sorts,
             filter: args?.filter,
             quickFilter: args?.quickFilter,
             namedQuery: args?.namedQueries,
             perspective: args?.perspectives,
+            ...additionalData,
         },
         refresh: args?.refresh ?? true,
     };
 }
 
 const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDialog: Function): ResourceApiMethods => {
-    const find = React.useCallback((args?: ResourceApiFindArgs): Promise<ResourceApiFindResponse> => {
-        const findArgs = buildFindArgs(args);
-        return new Promise((resolve, reject) => {
-            request('find', null, findArgs).
-                then((state: State) => {
-                    const rows = state.getEmbedded().map((e: any) => {
-                        if (args?.includeLinksInRows) {
-                            return {
-                                ...e.data,
-                                '_links': processStateLinks(e.links),
-                                '_actions': processStateActions(e.actions()),
-                            };
-                        } else {
-                            return e.data;
-                        }
-                    });
-                    const page = state.data.page;
-                    resolve({ rows, page });
-                }).
-                catch((error: ResourceApiError) => {
-                    reject(error);
-                });
-        });
-    }, [request]);
     const getOne = React.useCallback((id: any, args?: ResourceApiGetOneArgs): Promise<any> => {
         const argsData = args?.data;
         const requestArgs = {
@@ -420,6 +403,44 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     } else {
                         resolve(state.data);
                     }
+                }).
+                catch((error: ResourceApiError) => {
+                    reject(error);
+                });
+        });
+    }, [request]);
+    const find = React.useCallback((args?: ResourceApiFindArgs): Promise<ResourceApiFindResponse> => {
+        return new Promise((resolve, reject) => {
+            request('find', null, buildFindArgs(args)).
+                then((state: State) => {
+                    const rows = state.getEmbedded().map((e: any) => {
+                        if (args?.includeLinksInRows) {
+                            return {
+                                ...e.data,
+                                '_links': processStateLinks(e.links),
+                                '_actions': processStateActions(e.actions()),
+                            };
+                        } else {
+                            return e.data;
+                        }
+                    });
+                    const page = state.data.page;
+                    resolve({ rows, page });
+                }).
+                catch((error: ResourceApiError) => {
+                    reject(error);
+                });
+        });
+    }, [request]);
+    const exportt = React.useCallback((args?: ResourceApiExportArgs): Promise<ResourceApiBlobResponse> => {
+        const additionalData = {
+            field: args?.fields,
+            fileType: args?.fileType
+        };
+        return new Promise((resolve, reject) => {
+            request('export', null, buildFindArgs(args, additionalData)).
+                then((state: State) => {
+                    resolve(stateToBlobResponse(state));
                 }).
                 catch((error: ResourceApiError) => {
                     reject(error);
@@ -653,8 +674,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     if (artifactState != null) {
                         const fieldOptionsFindLink = artifactState.links.get('artifactFieldOptionsFind');
                         if (fieldOptionsFindLink != null) {
-                            const findArgs = buildFindArgs(args, args.fieldName);
-                            request(fieldOptionsFindLink.rel, null, findArgs, artifactState).
+                            const additionalData = { fieldName: args.fieldName };
+                            request(fieldOptionsFindLink.rel, null, buildFindArgs(args, additionalData), artifactState).
                                 then((state: State) => {
                                     const rows = state.getEmbedded().map((e: any) => {
                                         if (args?.includeLinksInRows) {
@@ -737,8 +758,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const fieldOptionsFind = React.useCallback((args: ResourceApiFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
         return new Promise((resolve, reject) => {
-            const findArgs = buildFindArgs(args, args.fieldName);
-            request('fieldOptionsFind', null, findArgs).
+            const additionalData = { fieldName: args.fieldName };
+            request('fieldOptionsFind', null, buildFindArgs(args, additionalData)).
                 then((state: State) => {
                     const rows = state.getEmbedded().map((e: any) => {
                         if (args?.includeLinksInRows) {
@@ -772,8 +793,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
         });
     }, [request]);
     return {
-        find,
         getOne,
+        find,
+        exportt,
         create,
         update,
         patch,

@@ -3,6 +3,7 @@ import { GridRowSelectionModel } from '@mui/x-data-grid-pro';
 
 export type MuiDataGridApi = {
     refresh: () => void;
+    export: () => void;
     showCreateDialog: (row?: any) => void;
     showUpdateDialog: (id: any, row?: any) => void;
     setFilter: (filter: string | undefined) => void;
