@@ -396,6 +396,115 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	@Override
+	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/options")
+	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference " +
+			"que pertany al formulari d'un artefacte.")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public <RR extends Resource<?>> ResponseEntity<PagedModel<EntityModel<RR>>> artifactFieldOptionsFind(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName,
+			@RequestParam(value = "quickFilter", required = false)
+			@Parameter(description = "Filtre ràpid (text)")
+			final String quickFilter,
+			@RequestParam(value = "filter", required = false)
+			@Parameter(description = "Consulta en format Spring Filter")
+			final String filter,
+			@RequestParam(value = "namedQuery", required = false)
+			@Parameter(description = "Consultes predefinides")
+			final String[] namedQueries,
+			@RequestParam(value = "perspective", required = false)
+			@Parameter(description = "Perspectives de la consulta")
+			final String[] perspectives,
+			@Parameter(description = "Paginació dels resultats")
+			final Pageable pageable) {
+		log.debug("Consultant possibles valors del camp de formulari de l'artefacte amb filtre i paginació (" +
+						"type={}, code={}, fieldName={}, quickFilter={}, filter={}, namedQueries={}, perspectives={}, pageable={})",
+				type,
+				code,
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable);
+		Link resourceCollectionBaseSelfLink = linkTo(methodOn(getClass()).artifactFieldOptionsFind(
+				type,
+				code,
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable)).withSelfRel();
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).artifactFieldOptionsGetOne(
+				type,
+				code,
+				fieldName,
+				SELF_RESOURCE_ID_TOKEN,
+				null)).withSelfRel();
+		return fieldOptionsFind(
+				fieldName,
+				quickFilter,
+				filter,
+				namedQueries,
+				perspectives,
+				pageable,
+				type,
+				code,
+				resourceCollectionBaseSelfLink,
+				singleResourceBaseSelfLink);
+	}
+
+	@Override
+	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/options/{id}")
+	@Operation(summary = "Consulta una de les opcions disponibles per a emplenar un camp de tipus ResourceReference " +
+			"que pertany al formulari d'un artefacte")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ARTIFACT'))")
+	public <RR extends Resource<RID>, RID extends Serializable> ResponseEntity<EntityModel<RR>> artifactFieldOptionsGetOne(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName,
+			@PathVariable
+			@Parameter(description = "Id de l'element")
+			final RID id,
+			@RequestParam(value = "perspective", required = false)
+			@Parameter(description = "Perspectives de la consulta")
+			final String[] perspectives) {
+		log.debug("Consultant un dels possibles valors del camp (type={}, code={}, fieldName={}, id={}, perspectives={})",
+				type,
+				code,
+				fieldName,
+				id,
+				perspectives);
+		Link singleResourceBaseSelfLink = linkTo(methodOn(getClass()).artifactFieldOptionsGetOne(
+				type,
+				code,
+				fieldName,
+				SELF_RESOURCE_ID_TOKEN,
+				null)).withSelfRel();
+		return fieldOptionsGetOne(
+				fieldName,
+				id,
+				perspectives,
+				type,
+				code,
+				singleResourceBaseSelfLink);
+	}
+
+	@Override
 	@PostMapping("/artifacts/report/{code}")
 	@Operation(summary = "Generació de l'informe associat a un recurs")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
@@ -809,8 +918,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			String artifactCode,
 			Link resourceCollectionBaseSelfLink,
 			Link singleResourceBaseSelfLink) {
+		Class<?> artifactFormClass = getArtifactAwareResourceClass(artifactType, artifactCode);
 		Optional<FieldAndClass> referencedResourceFieldAndClass = findReferenceFieldAndClass(
-				getArtifactAwareResourceClass(artifactType, artifactCode),
+				artifactFormClass,
 				fieldName);
 		if (referencedResourceFieldAndClass.isPresent()) {
 			if (pageable != null) {
@@ -838,6 +948,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 								singleResourceBaseSelfLink,
 								ResourcePermissions.readOnly(),
 								buildOptionsLinks(
+										artifactFormClass,
 										quickFilter,
 										filter,
 										namedQueries,
@@ -852,6 +963,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				return ResponseEntity.ok(
 						PagedModel.empty(
 								buildOptionsLinks(
+										artifactFormClass,
 										quickFilter,
 										filter,
 										namedQueries,
@@ -1160,6 +1272,22 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Link selfLink = linkTo(methodOn(getClass()).artifactGetOne(artifact.getType(), artifact.getCode())).withSelfRel();
 		links.add(selfLink);
 		if (artifact.getFormClass() != null) {
+			Link artifactFieldOptionsFind = linkTo(methodOn(getClass()).artifactFieldOptionsFind(
+					artifact.getType(),
+					artifact.getCode(),
+					null,
+					null,
+					null,
+					null,
+					null,
+					null)).withRel("artifactFieldOptionsFind");
+			links.add(buildFindLinkWithParams(
+					artifactFieldOptionsFind,
+					null,
+					null,
+					null,
+					null,
+					null));
 			Link onChangeLink = Affordances.
 					of(linkTo(methodOn(getClass()).artifactFormOnChange(artifact.getType(), artifact.getCode(), null)).withRel("formOnChange")).
 					afford(HttpMethod.PATCH).
@@ -1239,6 +1367,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	private List<Link> buildOptionsLinks(
+			Class<?> artifactFormClass,
 			String quickFilter,
 			String filter,
 			String[] namedQuery,
@@ -1260,7 +1389,12 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 					filter(l -> !l.getRel().value().equals("getOne")).
 					collect(Collectors.toList());
 		} else {
-			return Collections.singletonList(resourceCollectionBaseSelfLink);
+			return Collections.singletonList(
+					Affordances.of(resourceCollectionBaseSelfLink).
+							afford(HttpMethod.GET).
+							withInputAndOutput(artifactFormClass).
+							withName(resourceCollectionBaseSelfLink.getRel().value()).
+							toLink());
 		}
 	}
 

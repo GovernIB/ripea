@@ -103,8 +103,7 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 			final OnChangeEvent onChangeEvent) throws JsonProcessingException;
 
 	/**
-	 * Consulta paginada de les opcions disponibles per a emplenar un camp de
-	 * tipus ResourceReference.
+	 * Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference.
 	 *
 	 * @param <RR>
 	 *            Classe del recurs (ha d'estendre de Resource).
@@ -131,8 +130,7 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 			final Pageable pageable);
 
 	/**
-	 * Consulta d'una de les opcions disponibles per a emplenar un camp de
-	 * tipus ResourceReference.
+	 * Consulta una de les opcions disponibles per a emplenar un camp de tipus ResourceReference.
 	 *
 	 * @param <RR>
 	 *            Classe del recurs (ha d'estendre de Resource).
