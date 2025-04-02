@@ -27,11 +27,11 @@ public class BaseApiInternaSecurityConfig {
 		return new RequestMatcher[] {
 				new AntPathRequestMatcher("/"),
 				new AntPathRequestMatcher("/index.html"),
-				new AntPathRequestMatcher("/swagger-ui"),
-				new AntPathRequestMatcher("/swagger-ui/**/*"),
-				new AntPathRequestMatcher("/apidocs"),
-				new AntPathRequestMatcher("/rest/portafib/v1/**/*"),
-				new AntPathRequestMatcher("/apidocs/**/*"),
+				new AntPathRequestMatcher("/swagger-ui.html"),
+				new AntPathRequestMatcher("/swagger-ui/**"),
+				new AntPathRequestMatcher("/v3/api-docs"),
+				new AntPathRequestMatcher("/v3/api-docs/**"),
+				new AntPathRequestMatcher("/rest/portafib/v1/**/*")
 		};
 	}
 

@@ -26,18 +26,23 @@ import es.caib.ripea.service.intf.dto.PortafirmesCalbackDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.Utils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 @RequestMapping("/rest/portafib/v1")
+@Tag(name = "Integració portafib - RIPEA", description = "Recepció de canvi de estat de firma")
 public class PortafibRestController {
 
 	@Autowired private DocumentService documentService;
-//	@Autowired private AplicacioService aplicacioService;
 	
 	@RequestMapping(value = "/event", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
+	@Operation(
+			summary = "Recepció de canvi de estat de firma enviada previament a portafib: (Identificador, estat, etc.)",
+			description = "Realitza les operacions necessaries a RIPEA depenent del estat y actualitza el document a Arxiu.")
 	public ResponseEntity<String> event(@RequestBody PortaFIBEvent event) {
 
 		try {
@@ -97,7 +102,6 @@ public class PortafibRestController {
 		}
 	}
   
-  
 	private PortafirmesCalbackDto getPortafirmesCallback(PortaFIBEvent event) {
 		PortafirmesCalbackDto portafirmesCalbackDto = new PortafirmesCalbackDto();
 
@@ -107,7 +111,6 @@ public class PortafibRestController {
 			portafirmesCalbackDto.setTitle(signingRequest.getTitle());
 			portafirmesCalbackDto.setAdditionalInformation(signingRequest.getAdditionalInformation());
 			portafirmesCalbackDto.setCustodyURL(signingRequest.getCustodyURL());
-			
 		}
 
 		portafirmesCalbackDto.setEstat(event.getEventTypeID());
@@ -121,7 +124,6 @@ public class PortafibRestController {
 		portafirmesCalbackDto.setEventDate(event.getEventDate());
 		portafirmesCalbackDto.setApplicationID(event.getApplicationID());
 		portafirmesCalbackDto.setEntityID(event.getEntityID());
-		
 
 		switch (event.getEventTypeID()) {
 		case 0:
@@ -190,15 +192,6 @@ public class PortafibRestController {
 		if (Utils.isNotEmpty(portafirmesCalback.getTitle())) {
 			accioParams.put("títol",portafirmesCalback.getTitle());
 		}
-//		if (Utils.isNotEmpty(portafirmesCalback.getAdditionalInformation())) {
-//			accioParams.put("additionalInformation", String.valueOf(portafirmesCalback.getAdditionalInformation()));
-//		}
-//		if (Utils.isNotEmpty(portafirmesCalback.getCustodyURL())) {
-//			accioParams.put("custodyURL", String.valueOf(portafirmesCalback.getCustodyURL()));
-//		}
-		
 		return new IntegracioAccioBuilderDto("Processar petició rebuda al callback rest de portafirmes", accioParams);
 	}
-  
-
 }

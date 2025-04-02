@@ -71,11 +71,6 @@ public class JBossApiInternaSecurityConfig extends BaseApiInternaSecurityConfig 
 				preAuthenticatedProcessingFilter(),
 				BasicAuthenticationFilter.class);
 		http.authenticationProvider(preauthAuthProvider());
-//		http.logout((lo) -> lo.addLogoutHandler(getLogoutHandler()).
-//				logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_URL)).
-//				invalidateHttpSession(true).
-//				logoutSuccessUrl("/").
-//				permitAll(false));
 		http.authorizeHttpRequests().
 				requestMatchers(publicRequestMatchers()).permitAll().
 				anyRequest().authenticated();

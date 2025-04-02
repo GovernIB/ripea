@@ -15,10 +15,7 @@ import java.util.jar.Manifest;
 
 @Slf4j
 @Configuration("apiInternaOpenApiConfig")
-@SecurityScheme(
-		type = SecuritySchemeType.HTTP,
-		name = "basicAuth",
-		scheme = "basic")
+@SecurityScheme(type = SecuritySchemeType.HTTP)
 public class OpenApiConfig {
 
 	@Bean
@@ -34,8 +31,8 @@ public class OpenApiConfig {
 		OpenAPI openapi = new OpenAPI().info(
 				new Info().
 				title("API interna de RIPEA").
-				description("API REST interna de RIPEA").
-				contact(new Contact().email("limit@limit.es")).
+				description("API REST per integració amb aplicacions de la CAIB i consulta de dades obertes.").
+				contact(new Contact().email("ripea.suport@limit.es")).
 				version(version));
 		return openapi;
 	}

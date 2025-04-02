@@ -16,11 +16,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 @RequestMapping("/distribucio")
+@Tag(name = "Integració distribució - RIPEA", description = "Recepció d'anotacions de registre")
 public class DistribucioRestController {
 
 	@Autowired private ExpedientPeticioService expedientPeticioService;
@@ -28,6 +33,10 @@ public class DistribucioRestController {
 	
 	@RequestMapping(value = "/comunicarAnotacionsPendents", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
+	@Operation(
+			summary = "Recepció d'anotacions de registre (referencia i número de registre)",
+			description = "Guarda a la Base de dades les dades de identificació de la anotació, per posteriorment processarles i descarregar la informació completa.",
+			security = { @SecurityRequirement(name = "basicAuth") })
 	public ResponseEntity<String> event(@RequestBody List<AnotacioRegistreId> event) {
 		try {
 			//Guardam el usuari a la taula de BBDD, aquest en concret ha de existir a Keycloak, i tendrem les dades de auditoria correctes.

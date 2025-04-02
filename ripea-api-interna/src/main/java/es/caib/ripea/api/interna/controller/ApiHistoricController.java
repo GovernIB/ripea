@@ -30,30 +30,16 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("api/historic")
-@Tag(
-		name = "Consulta d'històrics",
-		description = "API de consulta dels històrics d'ús de l'aplicació")
+@Tag(name = "Consulta d'històrics", description = "API de consulta dels històrics d'ús de l'aplicació")
 public class ApiHistoricController {
 
 	@Autowired
 	private HistoricService historicService;
-	
-//	@RequestMapping(value = "/generate", method = RequestMethod.GET, produces = "application/json")
-//	public String generate() {
-//		historicService.generateOldHistorics();
-//		return "";
-//	}
-	
-	
-	/*
-	 * DADES PER ENTITAT
-	*/
-	
+
 	@RequestMapping(value = "/entitat/{entitatId}", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació d'una entitat concreta",
-			description = "Retorna una llista amb la suma dels històrics agrupats per data segons el tipus d'agrupament",
-			tags = "HistoricsEntitat")
+			description = "Retorna una llista amb la suma dels històrics agrupats per data segons el tipus d'agrupament")
 	@ResponseBody
 	public HistoricApiResponse getHistoricEntitat(
 			HttpServletRequest request,
@@ -100,8 +86,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/entitat/{entitatId}/actuals", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació per cada procediment per una entitat concreta",
-			description = "Retorna una llista dels històrics del dia d'avui per cada procediment ",
-			tags = "HistoricsEntitat")
+			description = "Retorna una llista dels històrics del dia d'avui per cada procediment ")
 	@ResponseBody
 	public List<HistoricExpedientDto> getHistoricEntitatActual(
 			HttpServletRequest request,
@@ -134,8 +119,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/organgestors", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació pels distints organs gestors de l'aplicació",
-			description = "Retorna els històrics agrupats per data segons el tipus d'agrupament per a cada organ gestor consultat ",
-			tags = "HistoricsOrganGestor")
+			description = "Retorna els històrics agrupats per data segons el tipus d'agrupament per a cada organ gestor consultat ")
 	@ResponseBody
 	public HistoricApiResponse getHistoricsByOrganGestor(
 			HttpServletRequest request,
@@ -198,8 +182,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/organgestors/actual", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació del dia d'avui pels distints organs gestors de l'aplicació",
-			description = "Retorna els històrics d'ús del dia d'avui per a cada organ gestor consultat ",
-			tags = "HistoricsOrganGestor")
+			description = "Retorna els històrics d'ús del dia d'avui per a cada organ gestor consultat ")
 	@ResponseBody
 	public List<RegistreOrganGestor> getHistoricsActualsByOrganGestor(
 			HttpServletRequest request,
@@ -235,8 +218,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/usuaris", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació pels distints usuaris de l'aplicació",
-			description = "Retorna els històrics agrupats per data segons el tipus d'agrupament per a cada usuari consultat ",
-			tags = "HistoricsUsuaris")
+			description = "Retorna els històrics agrupats per data segons el tipus d'agrupament per a cada usuari consultat ")
 	@ResponseBody
 	public HistoricApiResponse getHistoricsByUsuari(
 			HttpServletRequest request,
@@ -291,8 +273,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/usuaris/actual", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació del dia d'avui pels distints usuaris de l'aplicació",
-			description = "Retorna els històrics del dia d'avui per a cada usuari consultat ",
-			tags = "HistoricsUsuaris")
+			description = "Retorna els històrics del dia d'avui per a cada usuari consultat ")
 	@ResponseBody
 	public Map<String, List<HistoricUsuariDto>> getHistoricsActualsByUsuari(
 			HttpServletRequest request,
@@ -343,8 +324,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/interessats", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació pels distints interessats de l'aplicació",
-			description = "Retorna els històrics agrupats per data segons el tipus d'agrupament per a cada interessat consultat ",
-			tags = "HistoricsIteressats")
+			description = "Retorna els històrics agrupats per data segons el tipus d'agrupament per a cada interessat consultat ")
 	@ResponseBody
 	public HistoricApiResponse getHistoricsByInteressat(
 			HttpServletRequest request,
@@ -406,8 +386,7 @@ public class ApiHistoricController {
 	@RequestMapping(value = "/interessats/actual", method = RequestMethod.GET, produces = "application/json")
 	@Operation(
 			summary = "Consulta l'històric d'ús de l'aplicació del dia d'avui pels distints interessats de l'aplicació",
-			description = "Retorna els històrics del dia d'avui per a cada interessat consultat ",
-			tags = "HistoricsIteressats")
+			description = "Retorna els històrics del dia d'avui per a cada interessat consultat ")
 	@ResponseBody
 	public Map<String, List<HistoricInteressatDto>> getHistoricsActualsByInteressat(
 			HttpServletRequest request,
