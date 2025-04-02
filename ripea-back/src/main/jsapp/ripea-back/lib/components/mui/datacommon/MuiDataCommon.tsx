@@ -48,7 +48,7 @@ export const useApiDataCommon = (
         isReady: apiIsReady,
         currentFields: apiCurrentFields,
         find: apiFind,
-        exportt: apiExport,
+        export: apiExport,
         artifacts: apiArtifacts,
         artifactFieldOptionsFields: apiArtifactFieldOptionsFields,
         artifactFieldOptionsFind: apiArtifactFieldOptionsFind,
@@ -155,7 +155,7 @@ export const useApiDataCommon = (
         pageInfo,
         artifacts,
         refresh,
-        exportt,
+        export: exportt,
         quickFilterComponent,
     };
 }

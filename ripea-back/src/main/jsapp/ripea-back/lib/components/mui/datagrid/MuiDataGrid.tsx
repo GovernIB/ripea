@@ -341,7 +341,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
-        delette: apiDelete,
+        delete: apiDelete,
     } = useResourceApiService(resourceName);
     if (datagridApiRefProp) {
         datagridApiRefProp.current = datagridApiRef.current as any;
@@ -376,7 +376,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         pageInfo,
         artifacts,
         refresh,
-        exportt,
+        export: exportt,
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,

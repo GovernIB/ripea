@@ -27,11 +27,11 @@ const OFFLINE_CHECK_TIMEOUT = 5000; // en milisegons
 type ResourceApiMethods = {
     getOne: (id: any, args?: ResourceApiGetOneArgs) => Promise<any>;
     find: (args: ResourceApiFindArgs) => Promise<ResourceApiFindResponse>;
-    exportt: (args: ResourceApiExportArgs) => Promise<ResourceApiBlobResponse>;
+    export: (args: ResourceApiExportArgs) => Promise<ResourceApiBlobResponse>;
     create: (args: ResourceApiRequestArgs) => Promise<any>;
     update: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
     patch: (id: any, args: ResourceApiRequestArgs) => Promise<any>;
-    delette: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
+    delete: (id: any, args?: ResourceApiRequestArgs) => Promise<void>;
     onChange: (id: any, args: ResourceApiOnChangeArgs) => Promise<any>;
     artifacts: (args: ResourceApiArtifactsArgs) => Promise<ResourceApiArtifact[]>;
     artifactFormOnChange: (args: ResourceApiArtifactOnChangeArgs) => Promise<any>;
@@ -795,11 +795,11 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     return {
         getOne,
         find,
-        exportt,
+        export: exportt,
         create,
         update,
         patch,
-        delette,
+        delete: delette,
         onChange,
         artifacts,
         artifactFormOnChange,
