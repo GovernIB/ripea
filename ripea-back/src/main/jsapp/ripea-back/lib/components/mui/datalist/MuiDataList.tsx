@@ -50,6 +50,8 @@ export type MuiDataListProps = {
     namedQueries?: string[];
     perspectives?: string[];
     formAdditionalData?: any;
+    toolbarHide?: true;
+    toolbarHideExport?: false;
     toolbarHideCreate?: boolean;
     toolbarHideRefresh?: boolean;
     toolbarHideQuickFilter?: boolean;
@@ -152,6 +154,8 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         namedQueries,
         perspectives,
         formAdditionalData,
+        toolbarHide,
+        toolbarHideExport = true,
         toolbarHideCreate,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
@@ -176,7 +180,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
-        delette: apiDelete,
+        delete: apiDelete,
     } = useResourceApiService(resourceName);
     const findArgs = React.useMemo(() => ({
         filter,
@@ -189,6 +193,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         fields,
         rows,
         refresh,
+        export: exportt,
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
@@ -231,7 +236,6 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         position: toolbarNodesPosition,
         element: !toolbarHideCreate ? toolbarAddElement : <span/>,
     });
-    const toolbarHideExport = true;
     const toolbarNumElements = toolbarNodesPosition + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
     const joinedElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
         toolbarNumElements,
@@ -245,12 +249,13 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         apiCurrentError,
         quickFilterComponent,
         refresh,
-        undefined,
-        true, // toolbarHideExport
+        exportt,
+        toolbarHideExport,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
         joinedElementsWithPositions);
     return <>
+        {!toolbarHide && toolbar}
         {toolbar}
         {toolbarAdditionalRow ? <Box sx={{ mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
         {formDialogComponent}
