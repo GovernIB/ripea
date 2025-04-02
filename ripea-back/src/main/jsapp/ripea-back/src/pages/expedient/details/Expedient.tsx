@@ -13,9 +13,9 @@ import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import TasquesGrid from "../../tasca/TasquesGrid.tsx";
 import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
-import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
+import {CommentDialog} from "../../CommentDialog.tsx";
 
 const ContenidoData = (props :any) => {
     const { title, children, ...other } = props;
@@ -195,7 +195,12 @@ const Expedient = () => {
                             aria-label="scrollable force tabs"
                             tabs={tabs}
                             variant="scrollable"
-                            headerAdditionalData={<CommentDialog entity={expedient}/>}
+                            headerAdditionalData={<CommentDialog
+                                entity={expedient}
+                                title={`${t('page.comment.expedient')}: ${expedient?.nom}`}
+                                resourceName={'expedientComentariResource'}
+                                resourceReference={'expedient'}
+                            />}
                         />
                     </Grid>
                 </Grid>

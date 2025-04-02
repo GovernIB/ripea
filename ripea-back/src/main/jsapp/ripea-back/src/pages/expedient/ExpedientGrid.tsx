@@ -7,11 +7,11 @@ import {
 import {Typography, Icon, Grid, Card, CardContent} from "@mui/material";
 import { formatDate } from '../../util/dateUtils';
 import { useNavigate } from "react-router-dom";
-import { ExpedientCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import { useCommonActions } from "./details/CommonActions.tsx";
 import { useTranslation } from "react-i18next";
 import useExpedientFilter from "./ExpedientFilter.tsx";
+import {CommentDialog} from "../CommentDialog.tsx";
 
 const ExpedientGridForm = () => {
     const { data }  = useFormContext();
@@ -75,96 +75,6 @@ export const StyledPrioritat = (props:any) => {
     </Typography>
 }
 
-const columns = [
-    {
-        field: 'numero',
-        flex: 0.75,
-    },
-    {
-        field: 'nom',
-        flex: 1,
-    },
-    {
-        field: 'avisos',
-        headerName: 'Avisos',
-        sortable: false,
-        disableColumnMenu: true,
-        flex: 0.5,
-        renderCell: (params: any) => (<>
-            {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
-            {params.row.errorLastEnviament && <Icon color={"error"} title="enviaments">mode_square</Icon>}
-            {params.row.errorLastNotificacio && <Icon color={"error"} title="notificacions">email_square</Icon>}
-            {params.row.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments">mode_square</Icon>}
-            {params.row.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">email_square</Icon>}
-            {params.row.alerta && <Icon color={"error"} title="alertes">warning_circle</Icon>}
-            {params.row.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning_triangle</Icon>}
-        </>),
-    },
-    {
-        field: 'tipusStr',
-        flex: 1,
-    },
-    {
-        field: 'createdDate',
-        flex: 1,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'estat',
-        flex: 0.75,
-        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}/>
-    },
-    {
-        field: 'prioritat',
-        flex: 0.75,
-        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
-    },
-    {
-        field: 'agafatPer',
-        flex: 0.75,
-    },
-    {
-        field: 'interessats',
-        flex: 1,
-        valueFormatter: (value: any) => {
-            let resum = '';
-            for (const interessat of value) {
-                switch (interessat.tipus) {
-                    case 'InteressatPersonaFisicaEntity':
-                        resum += interessat?.nom == null ? "" : interessat?.nom + " ";
-                        resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
-                        resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
-                        resum += "(" + interessat?.documentNum + ")" + "\n";
-                        break;
-                    case 'InteressatPersonaJuridicaEntity':
-                        resum += interessat?.raoSocial + " ";
-                        resum += "(" + interessat?.documentNum + ")" + "\n";
-                        break;
-                    case 'InteressatAdministracioEntity':
-                        resum += interessat?.nomComplet + " ";
-                        resum += "(" + interessat?.documentNum + ")" + "\n";
-                        break;
-                }
-            }
-            return resum;
-        }
-    },
-    {
-        field: 'grup',
-        flex: 0.5,
-        sortable: false,
-        disableColumnMenu: true,
-    },
-    {
-        field: 'numComentaris',
-        headerName: '',
-        sortable: false,
-        disableColumnMenu: true,
-        flex: 0.5,
-        renderCell: (params: any) => <CommentDialog entity={params?.row} />
-    },
-];
-
 const ExpedientGrid = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -176,6 +86,101 @@ const ExpedientGrid = () => {
 
     const {actions, components} = useCommonActions(refresh);
     const { springFilter, content } = useExpedientFilter();
+
+    const columns = [
+        {
+            field: 'numero',
+            flex: 0.75,
+        },
+        {
+            field: 'nom',
+            flex: 1,
+        },
+        {
+            field: 'avisos',
+            headerName: 'Avisos',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.5,
+            renderCell: (params: any) => (<>
+                {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
+                {params.row.errorLastEnviament && <Icon color={"error"} title="enviaments">mode_square</Icon>}
+                {params.row.errorLastNotificacio && <Icon color={"error"} title="notificacions">email_square</Icon>}
+                {params.row.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments">mode_square</Icon>}
+                {params.row.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">email_square</Icon>}
+                {params.row.alerta && <Icon color={"error"} title="alertes">warning_circle</Icon>}
+                {params.row.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning_triangle</Icon>}
+            </>),
+        },
+        {
+            field: 'tipusStr',
+            flex: 1,
+        },
+        {
+            field: 'createdDate',
+            flex: 1,
+            valueFormatter: (value: any) => formatDate(value)
+        },
+        {
+            field: 'estat',
+            flex: 0.75,
+            renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}/>
+        },
+        {
+            field: 'prioritat',
+            flex: 0.75,
+            renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
+        },
+        {
+            field: 'agafatPer',
+            flex: 0.75,
+        },
+        {
+            field: 'interessats',
+            flex: 1,
+            valueFormatter: (value: any) => {
+                let resum = '';
+                for (const interessat of value) {
+                    switch (interessat.tipus) {
+                        case 'InteressatPersonaFisicaEntity':
+                            resum += interessat?.nom == null ? "" : interessat?.nom + " ";
+                            resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
+                            resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
+                            resum += "(" + interessat?.documentNum + ")" + "\n";
+                            break;
+                        case 'InteressatPersonaJuridicaEntity':
+                            resum += interessat?.raoSocial + " ";
+                            resum += "(" + interessat?.documentNum + ")" + "\n";
+                            break;
+                        case 'InteressatAdministracioEntity':
+                            resum += interessat?.nomComplet + " ";
+                            resum += "(" + interessat?.documentNum + ")" + "\n";
+                            break;
+                    }
+                }
+                return resum;
+            }
+        },
+        {
+            field: 'grup',
+            flex: 0.5,
+            sortable: false,
+            disableColumnMenu: true,
+        },
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.5,
+            renderCell: (params: any) => <CommentDialog
+                entity={params?.row}
+                title={`${t('page.comment.expedient')}: ${params?.row?.nom}`}
+                resourceName={'expedientComentariResource'}
+                resourceReference={'expedient'}
+            />
+        },
+    ];
 
     return <GridPage>
         <Card sx={{border: '1px solid #e3e3e3', borderRadius: '10px', height: '100%' }}>

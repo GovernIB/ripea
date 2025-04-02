@@ -1,9 +1,9 @@
 import {MuiFormDialog, useResourceApiService} from "reactlib";
-import React, {useState} from "react";
-import {Badge, Grid, Icon, IconButton} from "@mui/material";
+import {useEffect, useRef, useState} from "react";
+import {Badge, Grid, Icon, IconButton, Typography} from "@mui/material";
 import GridFormField from "../components/GridFormField.tsx";
 import {DataFormDialogApi} from "../../lib/components/mui/datacommon/DataFormDialog.tsx";
-import {useTranslation} from "react-i18next";
+import {formatDate} from "../util/dateUtils.ts";
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -11,65 +11,21 @@ const CommentForm = () => {
     </Grid>
 }
 
-const CommentDialog = (props:any) => {
-    const { numComm, handleOpen } = props;
+const comment = {borderRadius: 2, px: 2, py: 1}
+const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
+const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
-    return <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
-        <Badge badgeContent={numComm} color="primary">
-            <Icon>forum</Icon>
-        </Badge>
-    </IconButton>
-}
+const Comment = (props:any) => {
+    const { entity, resourceName, resourceReference } = props;
+    const [comentarios, setComentarios] = useState<any[]>([]);
 
-export const ExpedientCommentDialog = (props:any) => {
-    const { entity } = props;
-    const { t } = useTranslation();
-    const {numComm, handleOpen, dialog} = useCommentDialog({
-        row: entity,
-        title: `${t('page.comment.expedient')}: ${entity?.nom}`,
-        resourceName: 'expedientComentariResource',
-        resourceReference: 'expedient',
-    });
-
-    return <>
-        <CommentDialog numComm={numComm ?? entity?.numComentaris} handleOpen={handleOpen}/>
-        {dialog}
-    </>
-}
-
-export const TascaCommentDialog = (props:any) => {
-    const { entity } = props;
-    const { t } = useTranslation();
-    const {numComm, handleOpen, dialog} = useCommentDialog({
-        row: entity,
-        title: `${t('page.comment.tasca')}: ${entity?.titol}`,
-        resourceName: 'expedientTascaComentariResource',
-        resourceReference: 'expedientTasca',
-    });
-
-    return <>
-        <CommentDialog numComm={numComm ?? entity?.numComentaris} handleOpen={handleOpen}/>
-        {dialog}
-    </>
-}
-
-const useCommentDialog = (props:any) => {
-    const { row, title, resourceName, resourceReference } = props;
     const {
         isReady: appApiIsReady,
         find: findAll,
     } = useResourceApiService(resourceName);
-    const [entity] = useState<any>(row);
-    const [comentarios, setComentarios] = useState<any[]>();
-    const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
 
-    const comment = {borderRadius: 2, px: 2, py: 1}
-    const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
-    const otherComment = {...comment, bgcolor: '#e0e0e0'}
-    const formApiRef = React.useRef<DataFormDialogApi>()
-
-    const handleOpen = () => {
-        if (appApiIsReady){
+    useEffect(() => {
+        if (appApiIsReady && comentarios?.length == 0){
             findAll({
                 filter: `${resourceReference}.id:${entity?.id}`,
                 includeLinksInRows: true,
@@ -78,11 +34,40 @@ const useCommentDialog = (props:any) => {
                 sorts: ['createdDate', 'desc']
             })
                 .then((app) => {
-                    setComentarios(app.rows)
-                    setNumComm(app.rows.length)
+                    // console.log(">>>> rows", app.rows)
+                    setComentarios(app.rows);
                 })
         }
+    }, [appApiIsReady]);
 
+    return <Grid
+        container
+        direction="column"
+        sx={{
+            justifyContent: "center",
+            alignItems: "flex-start",
+            columnSpacing: 1,
+            rowSpacing: 1,
+            pb: 1,
+        }}
+    >
+        {comentarios?.map((a:any)=>
+            // TODO: check my comment
+            <Grid item key={a?.id} sx={a?.createdBy=="rip_admin" ?myComment :otherComment}>
+                <Typography variant={"subtitle2"} color={"textDisabled"}>{a?.createdBy}</Typography>
+                <Typography variant={"body2"}>{a?.text}</Typography>
+                <Typography variant={"caption"} color={"textDisabled"}>{formatDate(a?.createdDate)}</Typography>
+            </Grid>
+        )}
+    </Grid>
+}
+
+export const CommentDialog = (props:any) => {
+    const { entity, title, resourceName, resourceReference } = props;
+    const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
+    const formApiRef = useRef<DataFormDialogApi>()
+
+    const handleOpen = () => {
         formApiRef.current?.show(undefined, {
             [resourceReference]: {
                 id: entity?.id
@@ -93,35 +78,24 @@ const useCommentDialog = (props:any) => {
             })
     }
 
-    const dialog =
+    return <>
+        <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
+            <Badge badgeContent={numComm ?? entity?.numComentaris} color="primary">
+                <Icon>forum</Icon>
+            </Badge>
+        </IconButton>
+
         <MuiFormDialog
             resourceName={resourceName}
             title={title}
             apiRef={formApiRef}
         >
-            <Grid
-                container
-                direction="column"
-                sx={{
-                    justifyContent: "center",
-                    alignItems: "flex-start",
-                    columnSpacing: 1,
-                    rowSpacing: 1,
-                    pb: 1,
-                }}
-            >
-                {comentarios?.map((a)=>
-                    <Grid item key={a?.id} sx={a.createdBy=="rip_admin" ?myComment :otherComment}>
-                        {a?.text}
-                    </Grid>
-                )}
-            </Grid>
+            <Comment
+                entity={entity}
+                resourceName={resourceName}
+                resourceReference={resourceReference}
+            />
             <CommentForm/>
         </MuiFormDialog>
-
-    return {
-        numComm,
-        handleOpen,
-        dialog
-    }
+    </>
 }

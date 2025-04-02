@@ -7,10 +7,10 @@ import { formatDate } from "../../util/dateUtils.ts";
 import { Grid } from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
-import { TascaCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import useTascaActions from "./details/TascaActions.tsx";
 import {useTranslation} from "react-i18next";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
+import {CommentDialog} from "../CommentDialog.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -33,61 +33,65 @@ const TasquesGridForm = () => {
     </Grid>
 }
 
-const columns = [
-    {
-        field: 'metaExpedientTasca',
-        flex: 0.5,
-    },
-    {
-        field: 'dataInici',
-        flex: 0.5,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'dataLimit',
-        flex: 0.5,
-        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
-    },
-    {
-        field: 'titol',
-        flex: 0.5,
-    },
-    {
-        field: 'observacions',
-        flex: 0.5,
-    },
-    {
-        field: 'responsablesStr',
-        flex: 0.5,
-    },
-    {
-        field: 'responsableActual',
-        flex: 0.5,
-    },
-    {
-        field: 'estat',
-        flex: 0.5,
-    },
-    {
-        field: 'prioritat',
-        flex: 0.5,
-        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
-    },
-    {
-        field: 'numComentaris',
-        headerName: '',
-        sortable: false,
-        disableColumnMenu: true,
-        flex: 0.25,
-        renderCell: (params: any) => <CommentDialog entity={params?.row} />
-    },
-];
-
 const TasquesGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
 
+    const columns = [
+        {
+            field: 'metaExpedientTasca',
+            flex: 0.5,
+        },
+        {
+            field: 'dataInici',
+            flex: 0.5,
+            valueFormatter: (value: any) => formatDate(value)
+        },
+        {
+            field: 'dataLimit',
+            flex: 0.5,
+            valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
+        },
+        {
+            field: 'titol',
+            flex: 0.5,
+        },
+        {
+            field: 'observacions',
+            flex: 0.5,
+        },
+        {
+            field: 'responsablesStr',
+            flex: 0.5,
+        },
+        {
+            field: 'responsableActual',
+            flex: 0.5,
+        },
+        {
+            field: 'estat',
+            flex: 0.5,
+        },
+        {
+            field: 'prioritat',
+            flex: 0.5,
+            renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
+        },
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.25,
+            renderCell: (params: any) => <CommentDialog
+                entity={params?.row}
+                title={`${t('page.comment.tasca')}: ${params?.row?.metaExpedientTascaDescription}`}
+                resourceName={'expedientTascaComentariResource'}
+                resourceReference={'expedientTasca'}
+            />
+        },
+    ];
     const { actions, components } = useTascaActions(apiRef?.current?.refresh);
 
     return <GridPage>
