@@ -39,10 +39,9 @@ const Resum = (props:any) => {
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
 
-            {/*{ isIncorporacioJustificantActiva false &&*/}
-            {/*    <ContenidoData title={'numero'} xs={6}>{registre?.identificador}</ContenidoData>*/}
-            {/*    <ContenidoData title={'data'} xs={6}>{formatDate(registre?.data)}</ContenidoData>*/}
-            {/*}*/}
+            {/* TODO: isIncorporacioJustificantActiva && descarregarJustificant */}
+                {/*<ContenidoData title={t('page.registre.detall.identificador')} xs={6}>{registre?.identificador}</ContenidoData>*/}
+                {/*<ContenidoData title={t('page.registre.detall.data')} xs={6}>{formatDate(registre?.data)}</ContenidoData>*/}
 
             <ContenidoData title={t('page.registre.detall.oficina')}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</ContenidoData>
             <ContenidoData title={t('page.registre.detall.extracte')}>{registre?.extracte}</ContenidoData>

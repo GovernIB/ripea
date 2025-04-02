@@ -3,6 +3,7 @@ import {useState} from "react";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
+import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
@@ -60,7 +61,7 @@ const useTascaDetail = () => {
                 <ContenidoData title={t('page.tasca.detall.duracio')}>{entity?.duracio}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.dataLimit')}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.estat')}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.prioritat')}>{entity?.prioritat}</ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.prioritat')}><StyledPrioritat entity={entity}/></ContenidoData>
             </Grid>
         </Dialog>
 

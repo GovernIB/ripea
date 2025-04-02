@@ -5,7 +5,7 @@ import {
     useResourceApiService,
 } from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Card, CardContent, Grid, Icon, IconButton} from '@mui/material';
+import {Typography, Card, CardContent, Grid, Icon, IconButton, Link} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -15,6 +15,7 @@ import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import {ExpedientCommentDialog as CommentDialog} from "../../CommentDialog.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
+import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
 
 const ContenidoData = (props :any) => {
     const { title, children, ...other } = props;
@@ -24,6 +25,59 @@ const ContenidoData = (props :any) => {
         </Typography>
         <Typography variant="body2" {...other}>{children}</Typography>
     </>;
+}
+
+const border= { border: '1px solid #e3e3e3', borderRadius: '10px' };
+const backgroundColor= { backgroundColor: '#f5f5f5' };
+
+const ExpedientsRelacionats = (props:any) => {
+    const { entity: expedient } = props;
+
+    return <Card sx={{ backgroundColor, border }} hidden={expedient?.relacionatsPer?.length == 0}>
+        <CardContent>
+            <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
+                Expedients relacionats
+            </Typography>
+            {
+                expedient?.relacionatsPer?.map((relacionat:any) => {
+                    return <Typography key={relacionat?.id} variant={"caption"}>
+                        <Icon fontSize={"inherit"}>folder</Icon>
+                        <Link href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
+                    </Typography>
+                })
+            }
+        </CardContent>
+    </Card>
+}
+
+const ExpedientInfo = (props:any) => {
+    const {entity: expedient} = props;
+    const { t } = useTranslation();
+
+    return <Card sx={{ backgroundColor, border }}>
+        <CardContent>
+            <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
+                Informació de l'expedient
+            </Typography>
+
+            <ContenidoData title={t('page.contingut.detalle.numero')}>{expedient?.numero}</ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.titol')}>{expedient?.nom}</ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.estat')}>
+                <StyledEstat entity={expedient}/>
+            </ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.prioritat')}>
+                <StyledPrioritat entity={expedient}/>
+            </ContenidoData>
+            <ContenidoData title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</ContenidoData>
+
+            <ExpedientsRelacionats entity={expedient}/>
+
+            <ExpedientActionButton entity={expedient}/>
+        </CardContent>
+    </Card>
 }
 
 const Expedient = () => {
@@ -38,12 +92,10 @@ const Expedient = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id, {perspectives: ['COUNT', 'ESTAT']}).then((app) => setExpedient(app))
+            appGetOne(id, {perspectives: ['COUNT', 'ESTAT', 'RELACIONAT']}).then((app) => setExpedient(app))
         }
     },[apiIsReady])
 
-    const border= { border: '1px solid #e3e3e3', borderRadius: '10px' };
-    const backgroundColor= { backgroundColor: '#f5f5f5' };
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
@@ -133,30 +185,7 @@ const Expedient = () => {
             <CardContent>
                 <Grid container direction={'row'} columnSpacing={1} sx={{ alignItems: "stretch" }}>
                     <Grid item xs={3}>
-                        <Card sx={{ backgroundColor, border }}>
-                            <CardContent>
-                                <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
-                                    Informació de l'expedient
-                                </Typography>
-
-                                <ContenidoData title={t('page.contingut.detalle.numero')}>{expedient?.numero}</ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.titol')}>{expedient?.nom}</ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.estat')}
-                                          sx={{borderLeft: `3px solid ${expedient?.estatAdditionalInfo?.color ?? 'grey'}`, pl: 1}}>
-                                    {expedient?.estatAdditionalInfo?.nom ?? expedient?.estat}
-                                </ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.prioritat')}
-                                          sx={{borderLeft: `3px solid ${'green'}`, pl: 1}}>
-                                    {expedient?.prioritat}
-                                </ContenidoData>
-                                <ContenidoData title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</ContenidoData>
-
-                                <ExpedientActionButton entity={expedient}/>
-                            </CardContent>
-                        </Card>
+                        <ExpedientInfo entity={expedient}/>
                     </Grid>
 
                     <Grid item xs={9}>

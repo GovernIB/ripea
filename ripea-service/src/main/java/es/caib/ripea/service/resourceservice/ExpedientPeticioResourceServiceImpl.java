@@ -9,6 +9,7 @@ import es.caib.ripea.service.intf.model.RegistreResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -33,7 +34,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     private class RegistrePerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
         @Override
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
-            resource.setRegistreInfo(objectMappingHelper.newInstanceMap(entity.getRegistre(), RegistreResource.class));
+            resource.setRegistreInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class));
         }
     }
 

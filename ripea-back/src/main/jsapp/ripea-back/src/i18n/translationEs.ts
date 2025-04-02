@@ -262,6 +262,16 @@ const translationEs = {
                 annexos: "Anexos",
             },
         },
+        prioritat: {
+            D_MOLT_ALTA: "Muy alta",
+            C_ALTA: "Alta",
+            B_NORMAL: "Normal",
+            A_BAIXA: "Baja",
+        },
+        estat: {
+            TANCAT: 'Cerrado',
+            OBERT: 'Abierto',
+        },
         notFound: "No encontrado",
     }
 };

@@ -262,6 +262,16 @@ const translationCa = {
                 annexos: "Annexos",
             },
         },
+        prioritat: {
+            D_MOLT_ALTA: "Molt alta",
+            C_ALTA: "Alta",
+            B_NORMAL: "Normal",
+            A_BAIXA: "Baixa",
+        },
+        estat: {
+            TANCAT: "Tancat",
+            OBERT: "Obert",
+        },
         notFound: "No trobat",
     }
 };

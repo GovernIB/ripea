@@ -50,12 +50,7 @@ const springFilterBuilder = (data: any) :string => {
 
 const useExpedientFilter = () => {
     const filterRef = useFilterApiRef();
-    const [springFilter, setSpringFilter] = useState<string>(
-        // springFilterBuilder({
-        //     estat: 'OBERT',
-        //     dataCreacioInici: new Date(),
-        // })
-    );
+    const [springFilter, setSpringFilter] = useState<string>();
 
     const cercar = ()=> {
         filterRef.current.filter()
@@ -73,7 +68,7 @@ const useExpedientFilter = () => {
             sx: {mb: 3, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '10px'}
         }}
         apiRef={filterRef}
-        onSpringFilterChange={(value?:string)=>value && setSpringFilter(value)}
+        onSpringFilterChange={setSpringFilter}
         buttonControlled
     >
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>

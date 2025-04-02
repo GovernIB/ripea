@@ -125,7 +125,7 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			orphanRemoval = true)
 	private List<ExpedientComentariResourceEntity> comentaris = new ArrayList<ExpedientComentariResourceEntity>();
 
-	@ManyToOne(optional = true)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "expedient_estat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_expedient_fk"))

@@ -10,6 +10,7 @@ import * as builder from "../../util/springFilterUtils.ts";
 import { TascaCommentDialog as CommentDialog } from "../CommentDialog.tsx";
 import useTascaActions from "./details/TascaActions.tsx";
 import {useTranslation} from "react-i18next";
+import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -70,6 +71,7 @@ const columns = [
     {
         field: 'prioritat',
         flex: 0.5,
+        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
     },
     {
         field: 'numComentaris',

@@ -19,7 +19,7 @@ const ExpedientGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id} />
         <GridFormField xs={12} name="nom" />
-        <GridFormField xs={12} name="organGestor" disabled={!!data?.id || data?.disableOrganGestor} /*filter={'organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre'}*/ />
+        <GridFormField xs={12} name="organGestor" disabled={!!data?.id || data?.disableOrganGestor} /*TODO: filter={'organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre'}*/ />
         <GridFormField xs={12} name="sequencia" disabled />
         <GridFormField xs={12} name="any" />
         <GridFormField xs={12} name="prioritat" required />
@@ -27,10 +27,58 @@ const ExpedientGridForm = () => {
     </Grid>
 }
 
+const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
+
+export const StyledEstat = (props:any) => {
+    const { entity: expedient, icon } = props;
+    const { t } = useTranslation();
+
+    const obertStyle = { border: '1px dashed #AAA' }
+    const tancatStyle = { backgroundColor: 'grey', color: 'white' }
+    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color }
+
+    const style = expedient?.estatAdditionalInfo
+        ? additionalStyle
+        : expedient?.estat == 'TANCAT'
+            ? tancatStyle
+            :obertStyle;
+
+    return <Typography variant="caption" sx={{...commonStyle, ...style }}>
+        { icon && <Icon fontSize={"inherit"}>{icon}</Icon>}
+        {expedient?.estatAdditionalInfo?.nom ?? t(`page.estat.${expedient?.estat}`)}
+    </Typography>
+}
+
+export const StyledPrioritat = (props:any) => {
+    const { entity: expedient } = props;
+    const { t } = useTranslation();
+
+    let style;
+
+    switch (expedient?.prioritat){
+        case "D_MOLT_ALTA":
+            style = {backgroundColor: '#d99b9d', color: 'white'}
+            break;
+        case "C_ALTA":
+            style = {backgroundColor: '#ffebae'}
+            break;
+        case "B_NORMAL":
+            style = {border: '1px dashed #AAA'}
+            break;
+        case "A_BAIXA":
+            style = {backgroundColor: '#c3e8d1'}
+            break;
+    }
+
+    return <Typography variant="caption" sx={{...commonStyle, ...style }}>
+        {t(`page.prioritat.${expedient?.prioritat}`)}
+    </Typography>
+}
+
 const columns = [
     {
         field: 'numero',
-        flex: 1,
+        flex: 0.75,
     },
     {
         field: 'nom',
@@ -63,15 +111,17 @@ const columns = [
     },
     {
         field: 'estat',
-        flex: 0.5,
+        flex: 0.75,
+        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}/>
     },
     {
         field: 'prioritat',
-        flex: 0.5,
+        flex: 0.75,
+        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
     },
     {
         field: 'agafatPer',
-        flex: 1,
+        flex: 0.75,
     },
     {
         field: 'interessats',
@@ -134,27 +184,28 @@ const ExpedientGrid = () => {
             </CardContent>
 
             <CardContent sx={{height: '58%'}} >
-                    {content}
+                {content}
 
-                    <MuiGrid
-                        resourceName="expedientResource"
-                        popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                        columns={columns}
-                        paginationActive
-                        filter={springFilter}
-                        sortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                        perspectives={["INTERESSATS_RESUM"]}
-                        titleDisabled
-                        popupEditCreateActive
-                        apiRef={apiRef}
-                        // popupEditFormDialogTitle={"Crear nuevo expediente"}
-                        popupEditFormContent={<ExpedientGridForm />}
-                        onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
-                        rowAdditionalActions={actions}
-                        rowHideDeleteButton
-                    />
+                <MuiGrid
+                    resourceName="expedientResource"
+                    popupEditFormDialogResourceTitle={t('page.expedient.title')}
+                    columns={columns}
+                    paginationActive
+                    filter={springFilter}
+                    sortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                    perspectives={["INTERESSATS_RESUM", "ESTAT"]}
+                    titleDisabled
+                    popupEditCreateActive
+                    apiRef={apiRef}
+                    // popupEditFormDialogTitle={"Crear nuevo expediente"}
+                    popupEditFormContent={<ExpedientGridForm />}
+                    onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
+                    rowAdditionalActions={actions}
+                    rowHideDeleteButton
+                    disableColumnMenu
+                />
 
-                    {components}
+                {components}
             </CardContent>
         </Card>
     </GridPage>
