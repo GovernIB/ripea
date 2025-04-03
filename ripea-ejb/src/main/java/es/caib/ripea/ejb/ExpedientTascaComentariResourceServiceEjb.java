@@ -115,8 +115,8 @@ public class ExpedientTascaComentariResourceServiceEjb extends AbstractServiceEj
 	}
 
 	@Override
-	public <P extends Serializable> List<?> artifactReportGenerate(Long id, String code, P params)
+	public <P extends Serializable> List<?> artifactReportGenerateData(Long id, String code, P params)
 			throws ArtifactNotFoundException, ReportGenerationException {
-		return delegateService.artifactReportGenerate(id, code, params);
+		return delegateService.artifactReportGenerateData(id, code, params);
 	}
 }
