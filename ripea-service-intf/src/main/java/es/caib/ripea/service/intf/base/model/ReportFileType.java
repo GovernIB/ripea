@@ -1,11 +1,11 @@
 package es.caib.ripea.service.intf.base.model;
 
 /**
- * Els tipus de fitxers suportats en l'exportació.
+ * Els tipus de fitxers suportats en la generació d'informes.
  * 
  * @author Limit Tecnologies
  */
-public enum ExportFileType {
+public enum ReportFileType {
 	CSV,
 	ODS,
 	ODT,

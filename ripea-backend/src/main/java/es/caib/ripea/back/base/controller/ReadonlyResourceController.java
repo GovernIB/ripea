@@ -86,7 +86,7 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String[] perspectives,
 			final Pageable pageable,
 			final String[] fields,
-			final ExportFileType fileType) throws IOException;
+			final ReportFileType fileType) throws IOException;
 
 	/**
 	 * Descàrrega de l'arxiu associat a un camp del recurs.
@@ -231,10 +231,12 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			final String[] perspectives);
 
 	/**
-	 * Generació d'un informe associat a un recurs.
+	 * Generació d'un informe associat a un tipus de recurs.
 	 *
 	 * @param code
 	 *            codi de l'informe a generar.
+	 * @param fileType
+	 *            tipus d'arxiu a generar (si no s'especifica es retornarà el resultat en format JSON).
 	 * @param params
 	 *            paràmetres per a generar l'informe.
 	 * @param bindingResult
@@ -242,23 +244,26 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	 * @return les dades de l'informe.
 	 * @throws ArtifactNotFoundException
 	 *             si no es troba l'informe amb el codi especificat.
-	 * @throws JsonProcessingException
-	 *             si es produeix algun error al extreure els paràmetres.
+	 * @throws IOException
+	 *             si es produeix algun error al extreure els paràmetres o al escriure la resposta.
 	 * @throws MethodArgumentNotValidException
 	 *             si es troben errors de validació en els paràmetres.
 	 */
-	ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+	ResponseEntity<InputStreamResource> artifactReportGenerate(
 			final String code,
+			final ReportFileType fileType,
 			final JsonNode params,
-			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
+			BindingResult bindingResult) throws ArtifactNotFoundException, IOException, MethodArgumentNotValidException;
 
 	/**
-	 * Generació d'un informe associat a un recurs.
+	 * Generació d'un informe associat a un recurs determinat.
 	 *
 	 * @param id
 	 *            id de l'element sobre el qual es vol generar l'informe.
 	 * @param code
 	 *            codi de l'informe a generar.
+	 * @param fileType
+	 *            tipus d'arxiu a generar (si no s'especifica es retornarà el resultat en format JSON).
 	 * @param params
 	 *            paràmetres per a generar l'informe.
 	 * @param bindingResult
@@ -266,16 +271,17 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	 * @return les dades de l'informe.
 	 * @throws ArtifactNotFoundException
 	 *             si no es troba l'informe amb el codi especificat.
-	 * @throws JsonProcessingException
-	 *             si es produeix algun error al extreure els paràmetres.
+	 * @throws IOException
+	 *             si es produeix algun error al extreure els paràmetres o al escriure la resposta.
 	 * @throws MethodArgumentNotValidException
 	 *             si es troben errors de validació en els paràmetres.
 	 */
-	ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+	ResponseEntity<InputStreamResource> artifactReportGenerate(
 			final ID id,
 			final String code,
+			final ReportFileType fileType,
 			final JsonNode params,
-			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
+			BindingResult bindingResult) throws ArtifactNotFoundException, IOException, MethodArgumentNotValidException;
 
 	/**
 	 * Consulta paginada de les opcions disponibles per a emplenar un camp de

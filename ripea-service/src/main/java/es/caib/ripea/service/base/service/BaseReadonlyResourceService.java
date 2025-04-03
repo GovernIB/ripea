@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -141,7 +143,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String[] perspectives,
 			Pageable pageable,
 			ExportField[] fields,
-			ExportFileType fileType,
+			ReportFileType fileType,
 			OutputStream out) {
 		long t0 = System.currentTimeMillis();
 		log.debug(
@@ -327,18 +329,56 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
-	public <P extends Serializable> List<?> artifactReportGenerate(
+	public <P extends Serializable> List<?> artifactReportGenerateData(
 			ID id,
 			String code,
 			P params) throws ArtifactNotFoundException, ReportGenerationException {
-		log.debug("Generating report (id={}, code={}, params={})", id, code, params);
+		log.debug("Generating report data (id={}, code={}, params={})", id, code, params);
 		ReportDataGenerator<E, P, ?> generator = (ReportDataGenerator<E, P, ?>)reportDataGeneratorMap.get(code);
 		if (generator != null) {
 			E entity = null;
 			if (id != null) {
 				entity = getEntity(id, null);
 			}
-			return generator.generate(code, entity, params);
+			return generator.generateData(code, entity, params);
+		} else {
+			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.REPORT, code);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DownloadableFile artifactReportGenerateFile(
+			String code,
+			List<?> data,
+			ReportFileType fileType,
+			OutputStream out) throws ArtifactNotFoundException, ReportGenerationException {
+		log.debug("Generating report file (code={}, data={}, fileType={})", code, data, fileType);
+		ReportDataGenerator<E, ?, ?> generator = reportDataGeneratorMap.get(code);
+		if (generator != null) {
+			DownloadableFile downloadableFile = generator.generateFile(code, data, fileType, out);
+			if (downloadableFile != null) {
+				return downloadableFile;
+			} else {
+				URL reportUrl = generator.getJasperReportUrl(code, fileType);
+				if (reportUrl != null) {
+					return jasperReportsHelper.generate(
+							getResourceClass(),
+							code,
+							reportUrl,
+							data,
+							LocaleContextHolder.getLocale(),
+							null,
+							fileType,
+							out);
+				} else {
+					throw new ReportGenerationException(
+							getResourceClass(),
+							null,
+							code,
+							"Couldn't generate report file: both generateFile and getJasperReportUrl methods returned null (fileType=" + fileType + ")");
+				}
+			}
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.REPORT, code);
 		}
@@ -1194,10 +1234,42 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		 * @throws ReportGenerationException
 		 *             si es produeix algun error generant les dades.
 		 */
-		List<R> generate(
+		List<R> generateData(
 				String code,
 				E entity,
 				P params) throws ReportGenerationException;
+		/**
+		 * Genera el fitxer amb l'informe.
+		 *
+		 * @param code
+		 *            el codi de l'informe.
+		 * @param data
+		 *            les dades de l'informe.
+		 * @param fileType
+		 *            tipus de fitxer que s'ha de generar.
+		 * @param out
+		 *            stream a on posar el fitxer generat.
+		 * @return el fitxer generat o null si aquest generador no implementa aquesta funcionalitat.
+		 */
+		default DownloadableFile generateFile(
+				String code,
+				List<?> data,
+				ReportFileType fileType,
+				OutputStream out) {
+			return null;
+		}
+		/**
+		 * Retorna la ubicació del recurs amb l'informe de JasperReports.
+		 *
+		 * @param code
+		 *            el codi de l'informe.
+		 * @param fileType
+		 *            tipus de fitxer que s'ha de generar.
+		 * @return la ubicació de l'informe.
+		 */
+		default URL getJasperReportUrl(String code, ReportFileType fileType) {
+			return null;
+		}
 	}
 
 	/**

@@ -19,10 +19,7 @@ import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
 import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.definition.datatype.DRIDataType;
 import net.sf.dynamicreports.report.exception.DRException;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
@@ -36,16 +33,17 @@ import org.springframework.util.ReflectionUtils;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
 
 import static net.sf.dynamicreports.report.builder.DynamicReports.*;
 
@@ -64,7 +62,7 @@ public class JasperReportsHelper {
 			Class<?> resourceClass,
 			List<?> resultats,
 			ExportField[] fields,
-			ExportFileType fileType,
+			ReportFileType fileType,
 			OutputStream out) throws ReportGenerationException {
 		try {
 			//InputStream is = getClass().getResourceAsStream("/dynamic_template.jrxml");
@@ -99,6 +97,46 @@ public class JasperReportsHelper {
 		} catch (DRException | JRException ex) {
 			throw new ReportGenerationException(
 					resourceClass,
+					"Couldn't generate export file",
+					ex);
+		}
+	}
+
+	public DownloadableFile generate(
+			Class<?> resourceClass,
+			String code,
+			URL reportUrl,
+			List<?> data,
+			Locale locale,
+			String i18nResourceBundlePath,
+			ReportFileType fileType,
+			OutputStream out) {
+		try {
+			JasperReport jasperReport = getJasperReportCompiled(reportUrl);
+			Map<String, Object> jasperReportParams = new HashMap<>();
+			if (locale != null) {
+				jasperReportParams.put(JRParameter.REPORT_LOCALE, locale);
+			}
+			if (i18nResourceBundlePath != null) {
+				jasperReportParams.put(
+						JRParameter.REPORT_RESOURCE_BUNDLE,
+						(locale != null) ? ResourceBundle.getBundle(i18nResourceBundlePath, locale) : ResourceBundle.getBundle(i18nResourceBundlePath));
+			}
+			JRDataSource dataSource = new JRBeanCollectionDataSource(data);
+			JasperPrint jasperPrint = JasperFillManager.fillReport(
+					jasperReport,
+					jasperReportParams,
+					dataSource);
+			return generateDownloadableFile(
+					resourceClass,
+					jasperPrint,
+					fileType,
+					out);
+		} catch (JRException | IOException ex) {
+			throw new ReportGenerationException(
+					resourceClass,
+					null,
+					code,
 					"Couldn't generate export file",
 					ex);
 		}
@@ -187,22 +225,27 @@ public class JasperReportsHelper {
 		}
 	}
 
+	private JasperReport getJasperReportCompiled(URL reportUrl) throws JRException, IOException {
+		URLConnection urlConnection = reportUrl.openConnection();
+		return JasperCompileManager.compileReport(urlConnection.getInputStream());
+	}
+
 	private DownloadableFile generateDownloadableFile(
 			Class<?> resourceClass,
 			JasperPrint jasperPrint,
-			ExportFileType fileType,
+			ReportFileType fileType,
 			OutputStream out) throws JRException, ReportGenerationException {
-		if (ExportFileType.CSV.equals(fileType)) {
+		if (ReportFileType.CSV.equals(fileType)) {
 			return generateCSVDownloadableFile(resourceClass, jasperPrint, out);
-		} else if (ExportFileType.ODS.equals(fileType)) {
+		} else if (ReportFileType.ODS.equals(fileType)) {
 			return generateOdsDownloadableFile(resourceClass, jasperPrint, out);
-		} else if (ExportFileType.ODT.equals(fileType)) {
+		} else if (ReportFileType.ODT.equals(fileType)) {
 			return generateOdtDownloadableFile(resourceClass, jasperPrint, out);
-		} else if (ExportFileType.XLSX.equals(fileType)) {
+		} else if (ReportFileType.XLSX.equals(fileType)) {
 			return generateXlsxDownloadableFile(resourceClass, jasperPrint, out);
-		} else if (ExportFileType.DOCX.equals(fileType)) {
+		} else if (ReportFileType.DOCX.equals(fileType)) {
 			return generateDocxDownloadableFile(resourceClass, jasperPrint, out);
-		} else if (ExportFileType.PDF.equals(fileType)) {
+		} else if (ReportFileType.PDF.equals(fileType)) {
 			return generatePdfDownloadableFile(resourceClass, jasperPrint, out);
 		} else {
 			throw new ReportGenerationException(

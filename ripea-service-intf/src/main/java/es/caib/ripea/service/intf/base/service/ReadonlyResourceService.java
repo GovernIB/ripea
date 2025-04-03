@@ -86,7 +86,7 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 			String[] perspectives,
 			Pageable pageable,
 			ExportField[] fields,
-			ExportFileType fileType,
+			ReportFileType fileType,
 			OutputStream out);
 
 	/**
@@ -169,7 +169,7 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException;
 
 	/**
-	 * Genera l'informe amb el codi especificat.
+	 * Genera les dades de l'informe.
 	 *
 	 * @param id
 	 *            identificació del recurs (pot ser null si l'informe no es genera sobre un recurs determinat).
@@ -184,9 +184,32 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 * @throws ReportGenerationException
 	 *             si es produeix algun error generant l'informe.
 	 */
-	<P extends Serializable> List<?> artifactReportGenerate(
+	<P extends Serializable> List<?> artifactReportGenerateData(
 			ID id,
 			String code,
 			P params) throws ArtifactNotFoundException, ReportGenerationException;
+
+	/**
+	 * Genera el fitxer de l'informe.
+	 *
+	 * @param code
+	 *            el codi de l'informe.
+	 * @param data
+	 *            les dades de l'informe.
+	 * @param fileType
+	 *            tipus de fitxer que s'ha de generar.
+	 * @param out
+	 *            stream a on posar el fitxer generat.
+	 * @return el fitxer de l'informe en el format especificat.
+	 * @throws ArtifactNotFoundException
+	 *             si no es troba l'informe amb el codi especificat.
+	 * @throws ReportGenerationException
+	 *             si es produeix algun error generant el fitxer.
+	 */
+	DownloadableFile artifactReportGenerateFile(
+			String code,
+			List<?> data,
+			ReportFileType fileType,
+			OutputStream out) throws ArtifactNotFoundException, ReportGenerationException;
 
 }

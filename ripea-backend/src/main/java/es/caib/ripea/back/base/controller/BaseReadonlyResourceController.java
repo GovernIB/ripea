@@ -252,7 +252,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			final String[] fields,
 			@RequestParam(value = "fileType", required = false)
 			@Parameter(description = "Tipus de fitxer que s'ha de generar")
-			final ExportFileType fileType) throws IOException {
+			final ReportFileType fileType) throws IOException {
 		log.debug("Exportant recursos amb filtre i paginació (" +
 						"quickFilter={}, filter={}, namedQueries={}, perspectives={}, " +
 						"pageable={}, fields={}, fileType={})",
@@ -509,50 +509,79 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	@PostMapping("/artifacts/report/{code}")
 	@Operation(summary = "Generació de l'informe associat a un recurs")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
-	public ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+	public ResponseEntity<InputStreamResource> artifactReportGenerate(
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
 			final String code,
+			@RequestParam(value = "fileType", required = false)
+			@Parameter(description = "Tipus d'arxiu generat")
+			final ReportFileType fileType,
 			@RequestBody(required = false)
 			final JsonNode params,
-			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		return artifactReportGenerate(null, code, params, bindingResult);
+			BindingResult bindingResult) throws ArtifactNotFoundException, IOException, MethodArgumentNotValidException {
+		return artifactReportGenerate(null, code, fileType, params, bindingResult);
 	}
 
 	@Override
 	@PostMapping("/{id}/artifacts/report/{code}")
 	@Operation(summary = "Generació de l'informe associat a un recurs amb id")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('REPORT'))")
-	public ResponseEntity<CollectionModel<EntityModel<?>>> artifactReportGenerate(
+	public ResponseEntity<InputStreamResource> artifactReportGenerate(
 			@PathVariable(required = false)
 			@Parameter(description = "Identificador del recurs")
 			final ID id,
 			@PathVariable
 			@Parameter(description = "Codi de l'informe")
 			final String code,
+			@RequestParam(value = "fileType", required = false)
+			@Parameter(description = "Tipus d'arxiu generat")
+			final ReportFileType fileType,
 			@RequestBody(required = false)
 			final JsonNode params,
-			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException {
-		log.debug("Generació de l'informe associat al recurs (id={}, code={}, params={})", id, code, params);
+			BindingResult bindingResult) throws ArtifactNotFoundException, IOException, MethodArgumentNotValidException {
+		log.debug("Generació de l'informe associat al recurs (id={}, code={}, fileType={}, params={})",
+				id,
+				code,
+				fileType,
+				params);
 		Class<?> formClass = getArtifactFormClass(ResourceArtifactType.REPORT, code);
 		Serializable paramsObject = getArtifactParamsAsObjectWithFormClass(
 				formClass,
 				params,
 				bindingResult);
-		List<?> items = getReadonlyResourceService().artifactReportGenerate(id, code, paramsObject);
-		List<EntityModel<?>> itemsAsEntities = items.stream().
-				map(i -> EntityModel.of(i, buildReportItemLink(code, items.indexOf(i)))).
-				collect(Collectors.toList());
-		Link reportLink;
-		if (id != null) {
-			reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(id, code, null, null)).withSelfRel();
+		List<?> items = getReadonlyResourceService().artifactReportGenerateData(id, code, paramsObject);
+		if (fileType == null) {
+			List<EntityModel<?>> itemsAsEntities = items.stream().
+					map(i -> EntityModel.of(i, buildReportItemLink(code, items.indexOf(i)))).
+					collect(Collectors.toList());
+			Link reportLink;
+			if (id != null) {
+				reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(id, code, null, null, null)).withSelfRel();
+			} else {
+				reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(code, null, null, null)).withSelfRel();
+			}
+			CollectionModel<EntityModel<?>> responseCollection = CollectionModel.of(
+					itemsAsEntities,
+					Link.of(reportLink.toUri().toString()).withSelfRel());
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			objectMapper.writeValue(baos, responseCollection);
+			ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.ok();
+			bodyBuilder.contentType(MediaType.APPLICATION_JSON);
+			bodyBuilder.contentLength(baos.size());
+			return bodyBuilder.body(new InputStreamResource(new ByteArrayInputStream(baos.toByteArray())));
 		} else {
-			reportLink = linkTo(methodOn(getClass()).artifactReportGenerate(code, null, null)).withSelfRel();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			DownloadableFile file = getReadonlyResourceService().artifactReportGenerateFile(
+					code,
+					items,
+					fileType,
+					baos);
+			if (file.getContent() != null && baos.size() == 0) {
+				baos.write(file.getContent());
+			}
+			InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(baos.toByteArray()));
+			return writeDownloadableFileToResponse(file, resource);
 		}
-		return ResponseEntity.ok(
-				CollectionModel.of(
-						itemsAsEntities,
-						Link.of(reportLink.toUri().toString()).withSelfRel()));
 	}
 
 	@Override
@@ -1361,9 +1390,9 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	private Link buildReportLink(ResourceArtifact artifact, Serializable id) {
 		String rel = "generate_" + artifact.getCode();
 		if (artifact.getRequiresId() != null && artifact.getRequiresId()) {
-			return linkTo(methodOn(getClass()).artifactReportGenerate(id, artifact.getCode(), null, null)).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactReportGenerate(id, artifact.getCode(), null, null, null)).withRel(rel);
 		} else {
-			return linkTo(methodOn(getClass()).artifactReportGenerate(artifact.getCode(), null, null)).withRel(rel);
+			return linkTo(methodOn(getClass()).artifactReportGenerate(artifact.getCode(), null, null, null)).withRel(rel);
 		}
 	}
 	private Link buildReportLinkWithAffordances(ResourceArtifact artifact, Serializable id) {
@@ -1676,7 +1705,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 
 	protected ResponseEntity<InputStreamResource> writeDownloadableFileToResponse(
 			DownloadableFile file,
-			InputStreamResource resource) throws IOException {
+			InputStreamResource resource) {
 		ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.ok();
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Disposition", "attachment; filename=" + file.getName());
