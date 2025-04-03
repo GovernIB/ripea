@@ -1,35 +1,11 @@
-import {Card, CardContent, Grid, Typography} from "@mui/material";
+import {Grid} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {useState} from "react";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import {BasePage, MuiGrid, useResourceApiService} from "reactlib";
 import {formatDate} from "../../../util/dateUtils.ts";
-
-const cardBorder= { border: '1px solid #e3e3e3', borderRadius: '10px' };
-const cardHeader= { backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3' };
-
-const CardData = (props:any) => {
-    const {title, children, xs} = props;
-
-    return <Grid item xs={xs}>
-        <Card sx={cardBorder}>
-            <CardContent sx={cardHeader}>
-                <Typography variant={"h5"}>{title}</Typography>
-            </CardContent>
-            <CardContent>{children}</CardContent>
-        </Card>
-    </Grid>
-}
-
-const ContenidoData = (props:any) => {
-    const {title, titleXs, children, childrenXs, xs} = props;
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} item xs={xs ?? 12}>
-        <Grid item xs={titleXs ?? 4}><Typography variant={"body1"} color={'black'}>{title}</Typography></Grid>
-        <Grid item xs={childrenXs ?? 8}><Typography variant={"inherit"} color={'textSecondary'}>{children}</Typography></Grid>
-    </Grid>
-}
+import {CardData, ContenidoData} from "../../../components/DetailComponents.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -51,13 +27,11 @@ const Resum = (props:any) => {
             <ContenidoData title={t('page.registre.detall.oficinaDescripcio')} xs={4}>{registre?.oficinaDescripcio}</ContenidoData>
 
             <CardData xs={12} title={t('page.registre.detall.infoResumida')}>
-                <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                    <ContenidoData title={t('page.registre.detall.docFisica')}>{registre?.docFisicaCodi} - {registre?.docFisicaDescripcio}</ContenidoData>
-                    <ContenidoData title={t('page.registre.detall.desti')}>{registre?.destiDescripcio} ({registre?.destiCodi})</ContenidoData>
-                    <ContenidoData title={t('page.registre.detall.refExterna')}>{registre?.refExterna}</ContenidoData>
-                    <ContenidoData title={t('page.registre.detall.expedientNumero')} xs={6}>{registre?.expedientNumero}</ContenidoData>
-                    <ContenidoData title={t('page.registre.detall.procediment')} xs={6}>{registre?.procedimentCodi} - {entity?.metaExpedient?.description}</ContenidoData>
-                </Grid>
+                <ContenidoData title={t('page.registre.detall.docFisica')}>{registre?.docFisicaCodi} - {registre?.docFisicaDescripcio}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.desti')}>{registre?.destiDescripcio} ({registre?.destiCodi})</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.refExterna')}>{registre?.refExterna}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.expedientNumero')} xs={6}>{registre?.expedientNumero}</ContenidoData>
+                <ContenidoData title={t('page.registre.detall.procediment')} xs={6}>{registre?.procedimentCodi} - {entity?.metaExpedient?.description}</ContenidoData>
             </CardData>
 
             <CardData xs={12} title={t('page.registre.detall.interessats')}>

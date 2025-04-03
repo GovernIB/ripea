@@ -15,7 +15,7 @@ const comment = {borderRadius: 2, px: 2, py: 1}
 const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
 const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
-const Comment = (props:any) => {
+const Comments = (props:any) => {
     const { entity, resourceName, resourceReference } = props;
     const [comentarios, setComentarios] = useState<any[]>([]);
 
@@ -43,11 +43,10 @@ const Comment = (props:any) => {
     return <Grid
         container
         direction="column"
+        rowGap={1}
         sx={{
             justifyContent: "center",
             alignItems: "flex-start",
-            columnSpacing: 1,
-            rowSpacing: 1,
             pb: 1,
         }}
     >
@@ -90,7 +89,7 @@ export const CommentDialog = (props:any) => {
             title={title}
             apiRef={formApiRef}
         >
-            <Comment
+            <Comments
                 entity={entity}
                 resourceName={resourceName}
                 resourceReference={resourceReference}

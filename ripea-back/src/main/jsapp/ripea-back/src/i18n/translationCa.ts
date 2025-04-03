@@ -8,6 +8,11 @@ const translationCa = {
         expand: "Expandir",
         contract: "Contraure",
         download: "Descarregar",
+        detail: "Detall",
+        siNO: {
+            true: 'Sí',
+            false: 'No',
+        }
     },
     page: {
         comment: {
@@ -98,6 +103,14 @@ const translationCa = {
         interessat: {
             title: "Interessat",
             rep: "Representant",
+            detall: {
+                nif: 'NIF',
+                nom: 'Nom',
+                llinatges: 'Cognoms',
+                telefon: 'Telèfon',
+                email: 'Email',
+                entregaDehObligat: 'DEH obligat?',
+            },
             actions: {
                 delete: "Esborrar Interessat",
                 createRep: "Afegir Representant",
@@ -118,6 +131,10 @@ const translationCa = {
             },
             detall: {
                 agafatPer: "Agafat per",
+            },
+            estat: {
+                TANCAT: "Tancat",
+                OBERT: "Obert",
             },
             acciones: {
                 detall: "Gestionar",
@@ -142,6 +159,9 @@ const translationCa = {
                 changeEstat: "Modificar estat de l'expedient",
                 assignar: "Assignar expedient a usuari",
             },
+            modal: {
+                seguidors: "Seguidors del expedient",
+            }
         },
         arxiu: {
             detall: {
@@ -268,9 +288,63 @@ const translationCa = {
             B_NORMAL: "Normal",
             A_BAIXA: "Baixa",
         },
-        estat: {
-            TANCAT: "Tancat",
-            OBERT: "Obert",
+        notificacio: {
+            tabs: {
+                dades: 'Dades',
+                errors: 'Errors',
+            },
+            detall: {
+                title: 'Detalls de la notificació',
+                notificacioDades: 'Dades de la notificació',
+                notificacioDocument: 'Document de la notificació',
+
+                emisor: 'Emissor',
+                assumpte: 'Concepte',
+                observacions: 'Descripció',
+                notificacioEstat: 'Estat',
+                createdDate: 'Enviada el',
+                processatData: 'Finalitzada el',
+                tipus: 'Tipus',
+                entregaPostal: 'Entrega postal',
+                fitxerNom: 'Nom del fitxer',
+                serveiTipusEnum: 'Tipus de servei',
+                notificacioIdentificador: 'Identificador',
+            },
+            acciones: {
+                actualitzarEstat: 'Actualitzar estat',
+                notificacioInteressat: 'Enviaments',
+                justificant: 'Justificant d’enviament',
+                documentEnviat: 'Document enviat',
+                certificat: 'Certificació',
+            },
+        },
+        notificacioInteressat: {
+            tabs: {
+                dades: 'Dades',
+                notif: 'Notific@',
+            },
+            detall: {
+                title: 'Detall de l’enviament',
+                datat: 'Datat',
+                certificacio: 'Certificació',
+                enviament: 'Dades de l’enviament',
+                interessat: 'Dades del titular',
+                representant: 'Dades del destinatari',
+
+                enviamentCertificacioData: 'Data',
+                enviamentCertificacioOrigen: 'Origen',
+                enviamentReferencia: 'Referència',
+                entregaNif: 'DEH NIF',
+                classificacio: 'DEH procediment',
+                enviamentDatatEstat: 'Estat',
+            },
+            acciones: {
+                ampliarPlac: 'Amplia el termini',
+                downloadDoc: 'Descarregar document',
+            },
+            action: {
+                ampliarPlac: 'Ampliació del termini dels enviaments de la remesa',
+            },
         },
         notFound: "No trobat",
     }

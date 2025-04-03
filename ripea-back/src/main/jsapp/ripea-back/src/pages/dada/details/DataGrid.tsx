@@ -61,7 +61,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
         <Dialog
             open={open}
             closeCallback={handleClose}
-            componentProps={{ fullWidth: true, maxWidth: 'md', height: '100%', }}
+            componentProps={{ fullWidth: true, maxWidth: 'md' }}
             buttons={[
                 {
                     value: 'close',

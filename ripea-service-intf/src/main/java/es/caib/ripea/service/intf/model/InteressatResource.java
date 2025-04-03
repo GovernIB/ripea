@@ -23,7 +23,7 @@ import org.springframework.data.annotation.Transient;
 @Setter
 @NoArgsConstructor
 @InteressatValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
-@ResourceConfig(quickFilterFields = { "documentNum", "nom" }, descriptionField = "nom")
+@ResourceConfig(quickFilterFields = { "documentNum", "nom" }, descriptionField = "nomComplet")
 public class InteressatResource extends BaseAuditableResource<Long> {
 
 	@NotNull

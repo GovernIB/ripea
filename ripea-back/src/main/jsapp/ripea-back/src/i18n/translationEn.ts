@@ -8,6 +8,11 @@ const translationEn = {
         expand: "Expand",
         contract: "Contract",
         download: "Download",
+        detail: "Detail",
+        siNO: {
+            true: 'Yes',
+            false: 'No',
+        }
     },
     page: {
         comment: {
@@ -98,6 +103,14 @@ const translationEn = {
         interessat: {
             title: "Interested Party",
             rep: "Representative",
+            detall: {
+                nif: 'NIF',
+                nom: 'Name',
+                llinatges: 'Surnames',
+                telefon: 'Phone',
+                email: 'Email',
+                entregaDehObligat: 'DEH required?',
+            },
             actions: {
                 delete: "Delete Interested Party",
                 createRep: "Add Representative",
@@ -118,6 +131,10 @@ const translationEn = {
             },
             detall: {
                 agafatPer: "Taken by",
+            },
+            estat: {
+                TANCAT: "Closed",
+                OBERT: "Open",
             },
             acciones: {
                 detall: "Manage",
@@ -142,6 +159,9 @@ const translationEn = {
                 changeEstat: "Modify Expedient Status",
                 assignar: "Assign Expedient to User",
             },
+            modal: {
+                seguidors: "Expedient followers",
+            }
         },
         arxiu: {
             detall: {
@@ -254,6 +274,7 @@ const translationEn = {
                 transportNumero: "Transport Number",
                 origenRegistreNumero: "Origin Number",
                 origenData: "Origin Date",
+
                 required: "Mandatory Data",
                 optional: "Optional Data",
                 infoResumida: "Summarized Registration Information",
@@ -267,9 +288,63 @@ const translationEn = {
             B_NORMAL: "Normal",
             A_BAIXA: "Low",
         },
-        estat: {
-            TANCAT: "Closed",
-            OBERT: "Open",
+        notificacio: {
+            tabs: {
+                dades: 'Data',
+                errors: 'Errors',
+            },
+            detall: {
+                title: 'Notification details',
+                notificacioDades: 'Notification data',
+                notificacioDocument: 'Notification document',
+
+                emisor: 'Sender',
+                assumpte: 'Subject',
+                observacions: 'Description',
+                notificacioEstat: 'Status',
+                createdDate: 'Sent on',
+                processatData: 'Completed on',
+                tipus: 'Types',
+                entregaPostal: 'Postal delivery',
+                fitxerNom: 'File name',
+                serveiTipusEnum: 'Service type',
+                notificacioIdentificador: 'Identifier',
+            },
+            acciones: {
+                actualitzarEstat: 'Update status',
+                notificacioInteressat: 'Shipments',
+                justificant: 'Shipping receipt',
+                documentEnviat: 'Sent document',
+                certificat: 'Certification',
+            },
+        },
+        notificacioInteressat: {
+            tabs: {
+                dades: 'Data',
+                notif: 'Notific@',
+            },
+            detall: {
+                title: 'Shipping details',
+                datat: 'Dated',
+                certificacio: 'Certification',
+                enviament: 'Shipping data',
+                interessat: 'Holder data',
+                representant: 'Recipient data',
+
+                enviamentCertificacioData: 'Date',
+                enviamentCertificacioOrigen: 'Origin',
+                enviamentReferencia: 'Reference',
+                entregaNif: 'DEH NIF',
+                classificacio: 'DEH procedure',
+                enviamentDatatEstat: 'Status',
+            },
+            acciones: {
+                ampliarPlac: 'Extend deadline',
+                downloadDoc: 'Download document',
+            },
+            action: {
+                ampliarPlac: 'Extension of the shipping batch deadlines',
+            },
         },
         notFound: "Not Found",
     }

@@ -17,7 +17,7 @@ const useTascaActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const {
-        action: apiAction
+        artifactAction: apiAction
     } = useResourceApiService('expedientTascaResource');
 
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);

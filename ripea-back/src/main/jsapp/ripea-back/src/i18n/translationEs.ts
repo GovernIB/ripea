@@ -8,6 +8,11 @@ const translationEs = {
         expand: "Expandir",
         contract: "Contraer",
         download: "Descargar",
+        detail: "Detalle",
+        siNO: {
+            true: 'Si',
+            false: 'No',
+        }
     },
     page: {
         comment: {
@@ -98,6 +103,14 @@ const translationEs = {
         interessat: {
             title: "Interesado",
             rep: "Representante",
+            detall: {
+                nif: 'NIF',
+                nom: 'Nombre',
+                llinatges: 'Apellidos',
+                telefon: 'Telefono',
+                email: 'Email',
+                entregaDehObligat: 'DEH obligada?',
+            },
             actions: {
                 delete: "Borrar Interesado",
                 createRep: "Añadir Representante",
@@ -118,6 +131,10 @@ const translationEs = {
             },
             detall: {
                 agafatPer: "Cogido por",
+            },
+            estat: {
+                TANCAT: 'Cerrado',
+                OBERT: 'Abierto',
             },
             acciones: {
                 detall: "Gestionar",
@@ -143,7 +160,7 @@ const translationEs = {
                 assignar: "Assignar expediente a usuario",
             },
 			modal: {
-				seguidors: "Seguidors del expedient",
+				seguidors: "Seguidores del expediente",
 			}
         },
         arxiu: {
@@ -271,9 +288,63 @@ const translationEs = {
             B_NORMAL: "Normal",
             A_BAIXA: "Baja",
         },
-        estat: {
-            TANCAT: 'Cerrado',
-            OBERT: 'Abierto',
+        notificacio: {
+            tabs: {
+                dades: 'Datos',
+                errors: 'Errores',
+            },
+            detall: {
+                title: 'Detalles de la notificación',
+                notificacioDades: 'Datos de la notificación',
+                notificacioDocument: 'Documento de la notificación',
+
+                emisor: 'Emisor',
+                assumpte: 'Concepto',
+                observacions: 'Descripción',
+                notificacioEstat: 'Estado',
+                createdDate: 'Enviada el',
+                processatData: 'Finalitzada el',
+                tipus: 'Tipos',
+                entregaPostal: 'Entrega postal',
+                fitxerNom: 'Nombre de archivo',
+                serveiTipusEnum: 'Tipo de servicio',
+                notificacioIdentificador: 'Identificador',
+            },
+            acciones: {
+                actualitzarEstat: 'Actualizar estado',
+                notificacioInteressat: 'Envios',
+                justificant: 'Justificante de envio',
+                documentEnviat: 'Documento enviado',
+                certificat: 'Certificación',
+            },
+        },
+        notificacioInteressat: {
+            tabs: {
+                dades: 'Datos',
+                notif: 'Notific@',
+            },
+            detall: {
+                title: 'Detalle de envio',
+                datat: 'Datado',
+                certificacio: 'Certificación',
+                enviament: 'Datos del envio',
+                interessat: 'Datos del titular',
+                representant: 'Datos del destinatario',
+
+                enviamentCertificacioData: 'Fecha',
+                enviamentCertificacioOrigen: 'Origen',
+                enviamentReferencia: 'Referencia',
+                entregaNif: 'DEH NIF',
+                classificacio: 'DEH procedimiento',
+                enviamentDatatEstat: 'Estado',
+            },
+            acciones: {
+                ampliarPlac: 'Ampliar plazo',
+                downloadDoc: 'Descargar documento',
+            },
+            action: {
+                ampliarPlac: 'Ampliación del plazo de los envíos de la remesa',
+            },
         },
         notFound: "No encontrado",
     }

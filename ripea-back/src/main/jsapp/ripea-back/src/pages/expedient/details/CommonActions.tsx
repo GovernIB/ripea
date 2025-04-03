@@ -13,7 +13,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {
         patch: apiPatch,
-        delette: apiDelete
+        delete: apiDelete
     } = useResourceApiService('expedientResource');
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();

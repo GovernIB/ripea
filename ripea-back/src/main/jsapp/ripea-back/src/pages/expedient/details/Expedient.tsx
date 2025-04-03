@@ -16,6 +16,7 @@ import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
 import {CommentDialog} from "../../CommentDialog.tsx";
+import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 
 const ContenidoData = (props :any) => {
     const { title, children, ...other } = props;
@@ -33,18 +34,23 @@ const backgroundColor= { backgroundColor: '#f5f5f5' };
 const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
 
-    return <Card sx={{ backgroundColor, border }} hidden={expedient?.relacionatsPer?.length == 0}>
+    const relacionats :any[] = [
+        ...expedient?.relacionatsPer ?? [],
+        ...expedient?.relacionatsAmb ?? []
+    ];
+
+    return <Card sx={{ backgroundColor, border }} hidden={relacionats?.length == 0}>
         <CardContent>
             <Typography gutterBottom variant="h5" component="div" sx={{ borderBottom: '1px solid #e3e3e3' }}>
                 Expedients relacionats
             </Typography>
             {
-                expedient?.relacionatsPer?.map((relacionat:any) => {
-                    return <Typography key={relacionat?.id} variant={"caption"}>
+                relacionats?.map((relacionat:any) =><>
+                    <Typography key={relacionat?.id} variant={"caption"}>
                         <Icon fontSize={"inherit"}>folder</Icon>
                         <Link href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
-                    </Typography>
-                })
+                    </Typography><br/></>
+                )
             }
         </CardContent>
     </Card>
@@ -130,9 +136,9 @@ const Expedient = () => {
         {
             value: "remeses",
             label: t('page.contingut.tabs.remeses'),
-            content: <Typography>{t('page.contingut.tabs.remeses')}</Typography>,
+            content: <RemesaGrid id={id}/>,
             badge: expedient?.numRemeses,
-            hidden: !isExperientOrCarpeta(expedient) || expedient?.numRemeses == 0,
+            // hidden: !isExperientOrCarpeta(expedient) || expedient?.numRemeses == 0,
         },
         {
             value: "publicacions",

@@ -142,7 +142,7 @@ export const StyledEstat = (props:any) => {
 
     return <Typography variant="caption" sx={{...commonStyle, ...style }}>
         { icon && <Icon fontSize={"inherit"}>{icon}</Icon>}
-        {expedient?.estatAdditionalInfo?.nom ?? t(`page.estat.${expedient?.estat}`)}
+        {expedient?.estatAdditionalInfo?.nom ?? t(`page.expedient.estat.${expedient?.estat}`)}
     </Typography>
 }
 

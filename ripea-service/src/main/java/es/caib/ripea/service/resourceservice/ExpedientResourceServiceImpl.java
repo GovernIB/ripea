@@ -167,7 +167,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
                             .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
                                     expedientResource.getId(),
-                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"]"+ expedientResource.getNom()
+                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
                             ))
                     .collect(Collectors.toList());
             resource.setRelacionatsAmb(relacionatsAmb);
@@ -176,7 +176,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
                             .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
                                     expedientResource.getId(),
-                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"]"+ expedientResource.getNom()
+                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
                             ))
                     .collect(Collectors.toList());
             resource.setRelacionatsPer(relacionatsPer);

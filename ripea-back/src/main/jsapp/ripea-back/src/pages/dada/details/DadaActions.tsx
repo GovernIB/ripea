@@ -11,7 +11,8 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
             title: t('page.metaDada.acciones.detail'),
             icon: "info",
             showInMenu: true,
-            onClick: handleOpen
+            onClick: handleOpen,
+            hidden: (row:any) => row?.readOnly,
         }
     ]
 

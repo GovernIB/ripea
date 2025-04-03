@@ -11,7 +11,7 @@ import {useTranslation} from "react-i18next";
 const useInteressatActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {
-        delette: apiDelete,
+        delete: apiDelete,
         patch: apiPatch,
         getOne
     } = useResourceApiService('interessatResource');

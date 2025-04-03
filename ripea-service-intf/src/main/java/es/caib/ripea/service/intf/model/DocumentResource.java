@@ -27,8 +27,8 @@ import java.util.List;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        quickFilterFields = { "fitxerNom" },
-        descriptionField = "fitxerNom",
+        quickFilterFields = { "nom", "fitxerNom" },
+        descriptionField = "nom",
         artifacts = {
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,

@@ -14,7 +14,7 @@ export const useContingutActions = (dataGridApiRef: MutableRefObject<MuiDataGrid
     const { t } = useTranslation();
     const {
         fieldDownload: apiDownload,
-        delette: apiDelete,
+        delete: apiDelete,
     } = useResourceApiService('documentResource');
 
     const refresh = () => {

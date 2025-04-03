@@ -35,7 +35,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
     const {
         isReady: apiIsReady,
         artifacts: apiArtifacts,
-        action: apiAction,
+        artifactAction: apiAction,
     } = useResourceApiService(resourceName);
     const execAction = (data: any) :Promise<any> => new Promise<any>( (resolve, reject) => {
         const requestArgs = { code: action, data };
