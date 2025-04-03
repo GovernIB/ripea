@@ -18,6 +18,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,9 @@ import java.util.List;
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_ESTAT_CODE),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_RELACIONAT_CODE),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class)
@@ -49,6 +53,7 @@ public class ExpedientResource extends NodeResource {
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
+	public static final String PERSPECTIVE_RELACIONAT_CODE = "RELACIONAT";
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
 	@NotNull
@@ -128,7 +133,6 @@ public class ExpedientResource extends NodeResource {
 
     @Transient private List<InteressatResource> interessats;
     @Transient private List<UsuariResource> seguidors;
-    @Transient private List<ExpedientResource> relacionatsAmb;
     @Transient private int numComentaris;
     @Transient private int numSeguidors;
     @Transient private int numContingut;
@@ -144,11 +148,15 @@ public class ExpedientResource extends NodeResource {
         return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
     }
 
+    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
+    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
+
     @Getter
 	@Setter
     @NoArgsConstructor
     @FieldNameConstants
 	public static class ExpedientFilterForm implements Serializable {
+		private static final long serialVersionUID = 647178646210565833L;
 		private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
@@ -156,7 +164,7 @@ public class ExpedientResource extends NodeResource {
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
         @ResourceField(onChangeActive = true)
-        private LocalDateTime dataCreacioInici = LocalDateTime.now();
+        private LocalDateTime dataCreacioInici = LocalDateTime.now().withDayOfMonth(1).withMonth(LocalDateTime.now().getMonth().getValue()-3);
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
 

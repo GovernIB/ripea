@@ -9,7 +9,7 @@ type FormDialogProps = DialogProps & {
     resourceName: string;
     id?: any;
     additionalData?: any;
-    apiRef?: React.MutableRefObject<FormApi>;
+    apiRef?: React.RefObject<FormApi>;
     dialogComponentProps?: any;
     formComponentProps?: any;
     noForm?: boolean;

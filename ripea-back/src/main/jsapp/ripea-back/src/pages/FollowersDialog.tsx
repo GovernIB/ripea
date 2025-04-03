@@ -1,47 +1,30 @@
-import {MuiFormDialog, useResourceApiService} from "reactlib";
-import React, {useState} from "react";
-import {Badge, Grid, Snackbar, Icon, IconButton} from "@mui/material";
-import {useTranslation} from "react-i18next";
+import {useResourceApiService} from "reactlib";
+import {useEffect, useState} from "react";
+import {Badge, Icon, IconButton, Typography} from "@mui/material";
+import Dialog from "../../lib/components/mui/Dialog.tsx";
+import {useTranslation} from 'react-i18next';
 
-const FollowersDialog = (props:any) => {
-    const { numFollowers, handleOpen } = props;
+const followerStyle = {
+	borderRadius: 2,
+	px: 2,
+	py: 1,
+	bgcolor: '#e0e0e0',
+	color: 'rgba(0, 0, 0, 0.38)'}
 
-    return <IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
-        <Badge badgeContent={numFollowers} color="primary">
-            <Icon>people</Icon>
-        </Badge>
-    </IconButton>
-}
-
-export const ExpedientFollowersDialog = (props:any) => {
+const Follower = (props:any) => {
+	
     const { entity } = props;
-    const { t } = useTranslation();
-    const {numFollowers, handleOpen, dialog} = useFollowerstDialog({
-        row: entity,
-        title: `${t('page.expedient.modal.seguidors')}: ${entity?.nom}`,
-        resourceName: 'expedientSeguidorResource',
-        resourceReference: 'expedient',
-    });
-
-    return <>
-        <FollowersDialog numFollowers={numFollowers ?? entity?.numSeguidors} handleOpen={handleOpen}/>
-        {dialog}
-    </>
-}
-
-const useFollowerstDialog = (props:any) => {
-    const { row, title, resourceName, resourceReference } = props;
+    const [comentarios, setComentarios] = useState<any[]>([]);
+	const resourceName = 'expedientSeguidorResource';
+	const resourceReference = 'expedient';
+	
     const {
         isReady: appApiIsReady,
         find: findAll,
     } = useResourceApiService(resourceName);
-    const [entity] = useState<any>(row);
-    const [comentarios, setComentarios] = useState<any[]>();
-    const [numFollowers, setnumFollowers] = useState<number>(entity?.numSeguidors);
-    const formApiRef = React.useRef<DataFormDialogApi>()
 
-    const handleOpen = () => {
-        if (appApiIsReady){
+    useEffect(() => {
+        if (appApiIsReady && comentarios?.length == 0){
             findAll({
                 filter: `${resourceReference}.id:${entity?.id}`,
                 includeLinksInRows: true,
@@ -50,47 +33,61 @@ const useFollowerstDialog = (props:any) => {
                 sorts: ['seguidor.nom', 'desc']
             })
                 .then((app) => {
-                    setComentarios(app.rows)
-                    setnumFollowers(app.rows.length)
+                    setComentarios(app.rows);
+					//TODO: actualizar numComm
                 })
         }
+    }, [appApiIsReady]);
 
-        formApiRef.current?.show(undefined, {
-            [resourceReference]: {
-                id: entity?.id
-            },
-        })
-            .then(() => {
-                setnumFollowers(numFollowers + 1);
-            })
+    return <>
+        {comentarios?.map((a:any)=><>
+			<Typography sx={followerStyle} color="primary">{a?.seguidor?.description}</Typography>
+       	</>
+	   )}
+    </>
+}
+
+export const FollowersDialog = (props:any) => {
+
+	const { entity } = props;
+    const [numComm] = useState<number>(entity?.numSeguidors);
+	const [open, setOpen] = useState(false);
+	const { t } = useTranslation();
+	const title = t('page.expedient.modal.seguidors') +': '+ entity?.nom;
+	
+    const handleOpen = () => {
+		setOpen(true);
     }
 
-    const dialog =
-        <MuiFormDialog
-            resourceName={resourceName}
-            title={title}
-            apiRef={formApiRef}
-        >
-            <Grid
-                container
-                direction="column"
-                sx={{
-                    justifyContent: "center",
-                    alignItems: "flex-start",
-                    columnSpacing: 1,
-                    rowSpacing: 1,
-                    pb: 1,
-                }}
-            >
-                {comentarios?.map((a)=>
-					<Snackbar message={a?.seguidor.codiAndNom} />
-                )}
-            </Grid>
-        </MuiFormDialog>
-
-    return {
-        numFollowers,
-        handleOpen,
-        dialog
-    }
+	const handleClose = () => { setOpen(false);	};
+	
+    return <>
+	
+		<IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
+	        <Badge badgeContent={numComm} color="primary">
+	            <Icon>people</Icon>
+	        </Badge>
+	    </IconButton>	
+	
+		<Dialog
+		    open={open}
+			closeCallback={handleClose}
+			title={title}
+			key={entity?.id}
+		    componentProps={{ fullWidth: true, maxWidth: 'md', height: '100%', }}
+		    buttons={[
+		        {
+		            value: 'close',
+		            text: t('common.close'),
+		            icon: 'close'
+		        },
+		    ]}
+		    buttonCallback={(value :any) :void=>{
+		        if (value=='close') {
+		            handleClose();
+		        }
+		    }}>
+            <Follower entity={entity} />
+        </Dialog>
+    </>
 }

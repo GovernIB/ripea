@@ -63,7 +63,7 @@ public class ExpedientPeticioResourceEntity extends BaseAuditableEntity<Expedien
     @Column(name = "exp_peticio_accio", length = 20)
     private ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto;
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "registre_id")
     protected RegistreResourceEntity registre;
 

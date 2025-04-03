@@ -245,8 +245,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestParam(value = "perspective", required = false)
 			@Parameter(description = "Perspectives de la consulta")
 			final String[] perspectives,
-			@Parameter(description = "Ordenació dels resultats")
-			final Sort sort,
+			@Parameter(description = "Paginació dels resultats")
+			final Pageable pageable,
 			@RequestParam(value = "field", required = false)
 			@Parameter(description = "Camps a exportar (tots si no s'especifica)")
 			final String[] fields,
@@ -254,12 +254,13 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@Parameter(description = "Tipus de fitxer que s'ha de generar")
 			final ExportFileType fileType) throws IOException {
 		log.debug("Exportant recursos amb filtre i paginació (" +
-						"quickFilter={}, filter={}, namedQueries={}, " +
-						"perspectives={}, fields={}, fileType={})",
+						"quickFilter={}, filter={}, namedQueries={}, perspectives={}, " +
+						"pageable={}, fields={}, fileType={})",
 				quickFilter,
 				filter,
 				Arrays.toString(namedQueries),
 				Arrays.toString(perspectives),
+				pageable,
 				fields,
 				fileType);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -268,7 +269,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				filter,
 				namedQueries,
 				perspectives,
-				sort,
+				pageable,
 				toExportFields(fields),
 				fileType,
 				baos);
@@ -918,9 +919,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			String artifactCode,
 			Link resourceCollectionBaseSelfLink,
 			Link singleResourceBaseSelfLink) {
-		Class<?> artifactFormClass = getArtifactAwareResourceClass(artifactType, artifactCode);
 		Optional<FieldAndClass> referencedResourceFieldAndClass = findReferenceFieldAndClass(
-				artifactFormClass,
+				getArtifactAwareResourceClass(artifactType, artifactCode),
 				fieldName);
 		if (referencedResourceFieldAndClass.isPresent()) {
 			if (pageable != null) {
@@ -948,7 +948,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 								singleResourceBaseSelfLink,
 								ResourcePermissions.readOnly(),
 								buildOptionsLinks(
-										artifactFormClass,
+										referencedResourceFieldAndClass.get().getClazz(),
 										quickFilter,
 										filter,
 										namedQueries,
@@ -963,7 +963,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				return ResponseEntity.ok(
 						PagedModel.empty(
 								buildOptionsLinks(
-										artifactFormClass,
+										referencedResourceFieldAndClass.get().getClazz(),
 										quickFilter,
 										filter,
 										namedQueries,
@@ -1034,6 +1034,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		return ls;
 	}
 
+	@SneakyThrows
 	protected List<Link> buildResourceCollectionLinks(
 			String quickFilter,
 			String filter,
@@ -1058,10 +1059,27 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				// Els enllaços de les accions find, getOne i create només es
 				// retornen si a la petició s'ha especificat informació de
 				// paginació.
-				ls.add(buildFindLink(resourceCollectionBaseSelfLink));
 				Link getOneLink = linkTo(methodOn(getClass()).getOne(null, null)).withRel("getOne");
 				String getOneLinkHref = getOneLink.getHref().replace("perspective", "perspective*");
 				ls.add(Link.of(UriTemplate.of(getOneLinkHref), "getOne"));
+				ls.add(buildFindLink(resourceCollectionBaseSelfLink));
+				Link exportLink = linkTo(methodOn(getClass()).export(
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null)).withRel("export");
+				ls.add(buildFindLinkWithParams(
+						exportLink,
+						null,
+						null,
+						null,
+						null,
+						null,
+						TemplateVariable.requestParameter("field").composite(),
+						TemplateVariable.requestParameter("fileType")));
 				ls.add(linkTo(methodOn(getClass()).artifacts()).withRel("artifacts"));
 				ls.addAll(buildResourceCollectionArtifactLinks());
 			} else {
@@ -1193,7 +1211,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			String filter,
 			String[] namedQuery,
 			String[] perspective,
-			Pageable pageable) {
+			Pageable pageable,
+			TemplateVariable... additionalTemplateVariables) {
 		Map<String, Object> expandMap = new HashMap<>();
 		if (pageable != null) {
 			if (pageable.isPaged()) {
@@ -1227,18 +1246,20 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		if (linkTemplateGroupIndex != -1) {
 			linkTemplate = baseLink.getHref().substring(0, linkTemplateGroupIndex);
 		}
+		List<TemplateVariable> mergedTemplateVariables = new ArrayList<>(Arrays.asList(
+				TemplateVariable.requestParameter("page"),
+				TemplateVariable.requestParameter("size"),
+				TemplateVariable.requestParameter("sort").composite(),
+				TemplateVariable.requestParameter("quickFilter"),
+				TemplateVariable.requestParameter("filter"),
+				TemplateVariable.requestParameter("namedQuery").composite(),
+				TemplateVariable.requestParameter("perspective").composite()
+		));
+		if (additionalTemplateVariables != null) {
+			mergedTemplateVariables.addAll(Arrays.asList(additionalTemplateVariables));
+		}
 		Link link = Link.of(
-				UriTemplate.of(
-						linkTemplate,
-						new TemplateVariables(
-								TemplateVariable.requestParameter("page"),
-								TemplateVariable.requestParameter("size"),
-								TemplateVariable.requestParameter("sort").composite(),
-								TemplateVariable.requestParameter("quickFilter"),
-								TemplateVariable.requestParameter("query"),
-								TemplateVariable.requestParameter("filter"),
-								TemplateVariable.requestParameter("namedQuery").composite(),
-								TemplateVariable.requestParameter("perspective").composite())),
+				UriTemplate.of(linkTemplate, new TemplateVariables(mergedTemplateVariables)),
 				baseLink.getRel());
 		return expandMap.isEmpty() ? link : link.expand(expandMap);
 	}

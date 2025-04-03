@@ -11,7 +11,6 @@ import javax.ejb.Stateless;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -27,8 +26,6 @@ import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.ExportField;
-import es.caib.ripea.service.intf.base.model.ExportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.model.RegistreAnnexResource;
@@ -96,13 +93,6 @@ public class RegistreAnnexResourceServiceEjb extends AbstractServiceEjb<Registre
 	public Page<RegistreAnnexResource> findPage(String quickFilter, String filter, String[] namedQueries,
 			String[] perspectives, Pageable pageable) {
 		return delegateService.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public DownloadableFile export(String quickFilter, String filter, String[] namedQueries, String[] perspectives,
-			Sort sort, ExportField[] fields, ExportFileType fileType, OutputStream out) {
-		return delegateService.export(quickFilter, filter, namedQueries, perspectives, sort, fields, fileType, out);
 	}
 
 	@Override

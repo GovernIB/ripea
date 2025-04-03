@@ -13,6 +13,8 @@ export type ResourceApiUserSessionValuePair = {
 };
 
 export type ResourceType = 'ACTION' | 'REPORT' | 'FILTER';
+export type ExportFileType = 'CSV' | 'ODS' | 'ODT' | 'XLSX' | 'DOCX' | 'PDF';
+export type ReportOutputFormat = 'PDF' | 'XLS' | 'CSV' | 'ODS' | 'XLSX' | 'ODT' | 'RTF' | 'DOCX' | 'PPTX';
 
 export type ResourceApiContextType = {
     isLoading: boolean;

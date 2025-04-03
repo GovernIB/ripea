@@ -14,7 +14,7 @@ export type DialogProps = React.PropsWithChildren & {
     buttons?: DialogButton[];
     buttonCallback?: (value: any) => void;
     componentProps?: any;
-    ref: React.RefObject<HTMLDivElement | null>;
+    ref?: React.RefObject<HTMLDivElement | null>;
 };
 
 export const useContentDialog: ((

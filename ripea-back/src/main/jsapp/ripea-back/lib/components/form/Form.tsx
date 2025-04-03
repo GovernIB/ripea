@@ -141,7 +141,7 @@ export const Form: React.FC<FormProps> = (props) => {
         onChange: apiOnChange,
         create: apiCreate,
         update: apiUpdate,
-        delette: apiDelete,
+        delete: apiDelete,
         artifacts: apiArtifacts,
         artifactFormOnChange: apiArtifactFormOnChange,
         artifactFormValidate: apiArtifactFormValidate

@@ -1,23 +1,36 @@
 package es.caib.ripea.ejb;
 
-import es.caib.ripea.ejb.base.AbstractServiceEjb;
-import es.caib.ripea.service.intf.base.exception.*;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
-import es.caib.ripea.service.intf.base.model.*;
-import es.caib.ripea.service.intf.model.DadaResource;
-import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
-import lombok.experimental.Delegate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.caib.ripea.ejb.base.AbstractServiceEjb;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
+import es.caib.ripea.service.intf.base.exception.FieldArtifactNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceAlreadyExistsException;
+import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.ResourceArtifact;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.model.DadaResource;
+import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
+import lombok.experimental.Delegate;
 
 @Stateless
 public class DadaResourceServiceEjb extends AbstractServiceEjb<DadaResourceService> implements DadaResourceService {
@@ -80,13 +93,6 @@ public class DadaResourceServiceEjb extends AbstractServiceEjb<DadaResourceServi
 	public Page<DadaResource> findPage(String quickFilter, String filter, String[] namedQueries, String[] perspectives,
 			Pageable pageable) {
 		return delegateService.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public DownloadableFile export(String quickFilter, String filter, String[] namedQueries, String[] perspectives,
-			Sort sort, ExportField[] fields, ExportFileType fileType, OutputStream out) {
-		return delegateService.export(quickFilter, filter, namedQueries, perspectives, sort, fields, fileType, out);
 	}
 
 	@Override

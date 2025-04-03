@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientEstatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -27,7 +27,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +43,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
-    private final ExpedientEstatResourceRepository expedientEstatResourceRepository;
 
     @PostConstruct
     public void init() {
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_ESTAT_CODE, new EstatPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_RELACIONAT_CODE, new RelacionatPerspectiveApplicator());
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
@@ -156,8 +155,31 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             if (entity.getEstatAdditional()!=null) {
-                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(entity.getEstatAdditional(), ExpedientEstatResource.class));
+                resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getEstatAdditional()), ExpedientEstatResource.class));
             }
+        }
+    }
+
+    private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = entity.getRelacionatsAmb().stream()
+                    .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
+                            .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
+                                    expedientResource.getId(),
+                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"]"+ expedientResource.getNom()
+                            ))
+                    .collect(Collectors.toList());
+            resource.setRelacionatsAmb(relacionatsAmb);
+
+            List<ResourceReference<ExpedientResource, Long>> relacionatsPer = entity.getRelacionatsPer().stream()
+                    .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
+                            .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
+                                    expedientResource.getId(),
+                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"]"+ expedientResource.getNom()
+                            ))
+                    .collect(Collectors.toList());
+            resource.setRelacionatsPer(relacionatsPer);
         }
     }
 

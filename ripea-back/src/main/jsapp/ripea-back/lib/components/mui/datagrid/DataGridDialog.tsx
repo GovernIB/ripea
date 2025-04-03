@@ -1,11 +1,14 @@
 import React from 'react';
 import { GridColDef, GridRowParams } from '@mui/x-data-grid-pro';
+import { ResourceType } from '../../ResourceApiContext';
 import Dialog, { DialogProps } from '../Dialog';
-import MuiGrid from './MuiDataGrid';
+import MuiDataGrid from './MuiDataGrid';
 
 type DataGridDialogProps = DialogProps & {
     resourceName: string;
     columns: GridColDef[];
+    resourceType?: ResourceType;
+    resourceTypeCode?: string;
     resourceFieldName?: string;
     onRowClick?: (params: GridRowParams) => void;
     height?: number | null;
@@ -13,9 +16,19 @@ type DataGridDialogProps = DialogProps & {
 
 export type DataGridDialogShowFn = (title: string | null, height?: number | null, componentProps?: any) => Promise<string>;
 
-export type UseDataGridDialogFn = (resourceName: string, columns: GridColDef[], resourceFieldName?: string) => [DataGridDialogShowFn, React.ReactElement];
+export type UseDataGridDialogFn = (
+    resourceName: string,
+    columns: GridColDef[],
+    resourceType?: ResourceType,
+    resourceTypeCode?: string,
+    resourceFieldName?: string) => [DataGridDialogShowFn, React.ReactElement];
 
-export const useDataGridDialog: UseDataGridDialogFn = (resourceName: string, columns: GridColDef[], resourceFieldName?: string) => {
+export const useDataGridDialog: UseDataGridDialogFn = (
+    resourceName: string,
+    columns: GridColDef[],
+    resourceType?: ResourceType,
+    resourceTypeCode?: string,
+    resourceFieldName?: string) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
     const [height, setHeight] = React.useState<number | undefined | null>();
@@ -44,6 +57,8 @@ export const useDataGridDialog: UseDataGridDialogFn = (resourceName: string, col
     const dialogComponent = <DataGridDialog
         resourceName={resourceName}
         columns={columns}
+        resourceType={resourceType}
+        resourceTypeCode={resourceTypeCode}
         resourceFieldName={resourceFieldName}
         onRowClick={handleRowClick}
         height={height}
@@ -56,24 +71,29 @@ export const useDataGridDialog: UseDataGridDialogFn = (resourceName: string, col
 
 export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
     const {
-        resourceName,
-        resourceFieldName,
         columns,
+        resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
         onRowClick,
         height,
         children,
         ...otherProps
     } = props;
     return <Dialog {...otherProps}>
-        <MuiGrid
-            resourceName={resourceName}
-            resourceFieldName={resourceFieldName}
+        <MuiDataGrid
             columns={columns}
+            resourceName={resourceName}
+            resourceType={resourceType}
+            resourceTypeCode={resourceTypeCode}
+            resourceFieldName={resourceFieldName}
             paginationActive
             titleDisabled
             quickFilterFullWidth
-            //toolbarHideExport
+            toolbarHideExport
             toolbarHideRefresh
+            readOnly
             onRowClick={onRowClick}
             height={height ?? 370} />
     </Dialog>;

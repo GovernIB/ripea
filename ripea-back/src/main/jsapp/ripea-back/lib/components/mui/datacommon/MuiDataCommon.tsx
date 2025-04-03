@@ -2,8 +2,9 @@ import React from 'react';
 import {
     useResourceApiService,
     ResourceApiFindCommonArgs,
-    ResourceApiError
+    ResourceApiError,
 } from '../../ResourceApiProvider';
+import { ResourceType, ExportFileType } from '../../ResourceApiContext';
 import { useDataQuickFilter } from './DataQuickFilter';
 import { toToolbarIcon } from '../ToolbarIcon';
 import DataFormDialog, { DataFormDialogApi } from './DataFormDialog';
@@ -28,25 +29,37 @@ export type DataCommonAdditionalAction = {
     onClick?: (id: any, row: any, event: React.MouseEvent) => void;
 };
 
+export type DataCommonExportFn = (fields?: string[], fileType?: ExportFileType, forceUnpaged?: boolean) => void;
 export type DataCommonShowCreateDialogFn = (row?: any) => void;
 export type DataCommonShowUpdateDialogFn = (id: any, row?: any) => void;
 
 export const useApiDataCommon = (
     resourceName: string,
+    resourceType?: ResourceType,
+    resourceTypeCode?: string,
+    resourceFieldName?: string,
     findDisabled?: boolean,
     findArgs?: DataCommonFindArgs,
     quickFilterInitialValue?: string,
     quickFilterProps?: any,
     getArtifacts?: boolean) => {
+    const { saveAs } = useBaseAppContext();
+    const {
+        isReady: apiIsReady,
+        currentFields: apiCurrentFields,
+        find: apiFind,
+        export: apiExport,
+        artifacts: apiArtifacts,
+        artifactFieldOptionsFields: apiArtifactFieldOptionsFields,
+        artifactFieldOptionsFind: apiArtifactFieldOptionsFind,
+        fieldOptionsFields: apiFieldOptionsFields,
+        fieldOptionsFind: apiFieldOptionsFind,
+    } = useResourceApiService(resourceName);
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [fields, setFields] = React.useState<any[]>([]);
     const [rows, setRows] = React.useState<any[]>([]);
     const [pageInfo, setPageInfo] = React.useState<any>();
     const [artifacts, setArtifacts] = React.useState<any[]>();
-    const {
-        isReady: apiIsReady,
-        find: apiFind,
-        artifacts: apiArtifacts,
-    } = useResourceApiService(resourceName);
     const {
         value: quickFilterValue,
         component: quickFilterComponent
@@ -59,14 +72,63 @@ export const useApiDataCommon = (
                 includeLinksInRows: true,
             };
             setLoading(true);
-            apiFind(processedFindArgs).then((response) => {
-                setRows(response.rows);
-                setPageInfo(response.page);
-            }).finally(() => setLoading(false));
+            if (resourceFieldName == null) {
+                apiFind(processedFindArgs).then((response) => {
+                    setRows(response.rows);
+                    setPageInfo(response.page);
+                }).finally(() => setLoading(false));
+            } else if (resourceType == null) {
+                apiFieldOptionsFind({ fieldName: resourceFieldName, ...processedFindArgs }).then((response) => {
+                    setRows(response.rows);
+                    setPageInfo(response.page);
+                }).finally(() => setLoading(false));
+            } else {
+                const args = {
+                    type: resourceType,
+                    code: resourceTypeCode ?? '',
+                    fieldName: resourceFieldName,
+                    ...processedFindArgs
+                };
+                apiArtifactFieldOptionsFind(args).then((response) => {
+                    setRows(response.rows);
+                    setPageInfo(response.page);
+                }).finally(() => setLoading(false));
+            }
         }
+    }
+    const exportt: DataCommonExportFn = (fields?: string[], fileType?: ExportFileType, forceUnpaged?: boolean) => {
+        const args = {
+            ...(findArgs ?? {}),
+            quickFilter: quickFilterValue?.length ? quickFilterValue : undefined,
+            fields,
+            fileType,
+        };
+        apiExport(forceUnpaged ? { ...args, unpaged: true } : args).then(response => {
+            if (saveAs) {
+                saveAs(response.blob, response.fileName);
+            } else {
+                console.error('Couldn\'t save export file ' + response.fileName + ': saveAs not available in BaseAppContext');
+            }
+        })
     }
     React.useEffect(() => {
         if (apiIsReady) {
+            if (resourceFieldName == null) {
+                setFields(apiCurrentFields ?? []);
+            } else if (resourceType == null) {
+                apiFieldOptionsFields({ fieldName: resourceFieldName }).then(fields => {
+                    setFields(fields);
+                });
+            } else {
+                const args = {
+                    type: resourceType,
+                    code: resourceTypeCode ?? '',
+                    fieldName: resourceFieldName
+                };
+                apiArtifactFieldOptionsFields(args).then(fields => {
+                    setFields(fields);
+                });
+            }
             refresh();
         }
     }, [
@@ -88,10 +150,12 @@ export const useApiDataCommon = (
     }, [apiIsReady, getArtifacts]);
     return {
         loading,
+        fields,
         rows: findDisabled ? [] : rows,
         pageInfo,
         artifacts,
         refresh,
+        export: exportt,
         quickFilterComponent,
     };
 }

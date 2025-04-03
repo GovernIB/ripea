@@ -4,7 +4,6 @@ import es.caib.ripea.service.intf.base.exception.*;
 import es.caib.ripea.service.intf.base.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -70,8 +69,8 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 *            llista de noms de consultes a aplicar.
 	 * @param perspectives
 	 *            llista de perspectives a aplicar.
-	 * @param sort
-	 *            ordenació dels resultats.
+	 * @param pageable
+	 *            paràmetres de paginació i ordenació.
 	 * @param fields
 	 *            camps a exportar (tots si no s'especifica).
 	 * @param fileType
@@ -85,7 +84,7 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 			String filter,
 			String[] namedQueries,
 			String[] perspectives,
-			Sort sort,
+			Pageable pageable,
 			ExportField[] fields,
 			ExportFileType fileType,
 			OutputStream out);

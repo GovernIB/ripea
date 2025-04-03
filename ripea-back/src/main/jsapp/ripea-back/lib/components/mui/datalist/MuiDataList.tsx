@@ -22,6 +22,7 @@ import {
     ReactElementWithPosition,
     joinReactElementsWithPositionWithReactElementsWithPositions
 } from '../../../util/reactNodePosition';
+import { ResourceType } from '../../ResourceApiContext';
 import { useResourceApiService } from '../../ResourceApiProvider';
 
 type MuiDataListFieldRendererArgs = {
@@ -35,6 +36,9 @@ export type MuiDataListProps = {
     titleDisabled?: true;
     subtitle?: string;
     resourceName: string;
+    resourceType?: ResourceType;
+    resourceTypeCode?: string;
+    resourceFieldName?: string;
     primaryField: string;
     secondaryField?: string;
     primaryFieldRenderer?: (args: MuiDataListFieldRendererArgs) => React.ReactElement;
@@ -46,6 +50,8 @@ export type MuiDataListProps = {
     namedQueries?: string[];
     perspectives?: string[];
     formAdditionalData?: any;
+    toolbarHide?: true;
+    toolbarHideExport?: false;
     toolbarHideCreate?: boolean;
     toolbarHideRefresh?: boolean;
     toolbarHideQuickFilter?: boolean;
@@ -134,6 +140,9 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         titleDisabled,
         subtitle,
         resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
         primaryField,
         secondaryField,
         primaryFieldRenderer,
@@ -145,6 +154,8 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         namedQueries,
         perspectives,
         formAdditionalData,
+        toolbarHide,
+        toolbarHideExport = true,
         toolbarHideCreate,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
@@ -169,8 +180,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     const {
         currentActions: apiCurrentActions,
         currentError: apiCurrentError,
-        currentFields: apiCurrentFields,
-        delette: apiDelete,
+        delete: apiDelete,
     } = useResourceApiService(resourceName);
     const findArgs = React.useMemo(() => ({
         filter,
@@ -180,11 +190,16 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
     }), [filter, namedQueries, perspectives]);
     const {
         loading: _loading,
+        fields,
         rows,
         refresh,
+        export: exportt,
         quickFilterComponent
     } = useApiDataCommon(
         resourceName,
+        resourceType,
+        resourceTypeCode,
+        resourceFieldName,
         findDisabled,
         findArgs,
         quickFilterInitialValue,
@@ -221,7 +236,6 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         position: toolbarNodesPosition,
         element: !toolbarHideCreate ? toolbarAddElement : <span/>,
     });
-    const toolbarHideExport = true;
     const toolbarNumElements = toolbarNodesPosition + (toolbarHideExport ? 0 : 1) + (toolbarHideRefresh ? 0 : 1) + (toolbarHideQuickFilter ? 0 : 1);
     const joinedElementsWithPositions = joinReactElementsWithPositionWithReactElementsWithPositions(
         toolbarNumElements,
@@ -235,12 +249,13 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         apiCurrentError,
         quickFilterComponent,
         refresh,
-        undefined,
-        true, // toolbarHideExport
+        exportt,
+        toolbarHideExport,
         toolbarHideRefresh,
         toolbarHideQuickFilter,
         joinedElementsWithPositions);
     return <>
+        {!toolbarHide && toolbar}
         {toolbar}
         {toolbarAdditionalRow ? <Box sx={{ mb: 0 }}>{toolbarAdditionalRow}</Box> : null}
         {formDialogComponent}
@@ -248,8 +263,8 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
             disablePadding
             sx={{ border: '1px solid ' + theme.palette.divider, borderRadius: '4px' }}>
             {rows.map((r, i) => {
-                const primary = fieldDescription(primaryField, r[primaryField], apiCurrentFields);
-                const secondary = secondaryField ? fieldDescription(secondaryField, r[secondaryField], apiCurrentFields) : undefined;
+                const primary = fieldDescription(primaryField, r[primaryField], fields);
+                const secondary = secondaryField ? fieldDescription(secondaryField, r[secondaryField], fields) : undefined;
                 const primaryFieldRendererArgs = {
                     value: r[primaryField],
                     row: r,
