@@ -26,17 +26,23 @@ const CardButton = (props:any) => {
 }
 
 export const CardData = (props:any) => {
-    const {title, children, xs, hidden, buttons} = props;
+    const {title, header, children, xs, hidden, data, buttons, ...other} = props;
 
-    return <Grid item xs={xs ?? 12} hidden={hidden}>
+    if (hidden){
+        return <></>
+    }
+
+    return <Grid item xs={xs ?? 12}>
         <Card sx={cardBorder}>
             <CardContent sx={cardHeader}>
-                <Typography variant={"h5"}>{title}</Typography>
+                {title && <Typography variant={"h5"}>{title}</Typography>}
+                {header}
             </CardContent>
 
-            <CardContent hidden={!children}>
-                <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <CardContent hidden={!children && !data}>
+                <Grid container columnSpacing={1} rowSpacing={1} item xs={12} {...other}>
                     {children}
+                    {data?.map((d:any) => <ContenidoData {...d}/>)}
                     {buttons?.map((button:any) => <CardButton {...button}/>)}
                 </Grid>
             </CardContent>
@@ -45,13 +51,13 @@ export const CardData = (props:any) => {
 }
 
 export const ContenidoData = (props:any) => {
-    const {title, titleXs, children, textXs, xs, componentTitleProps, componentTextProps, hidden, hiddeIfEmpty} = props;
+    const {title, titleXs, children, textXs, xs, componentTitleProps, componentTextProps, hidden, hiddeIfEmpty, ...other} = props;
 
     if (hidden || (hiddeIfEmpty && children == null)){
         return <></>
     }
 
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} item xs={xs ?? 12}>
+    return <Grid container direction={"row"} columnSpacing={1} item xs={xs ?? 12} {...other}>
         <Grid item xs={titleXs ?? 4}><Typography variant={"body1"} color={'black'} sx={componentTitleProps}>{title}</Typography></Grid>
         <Grid item xs={textXs ?? 8}><Typography variant={"inherit"} color={'textSecondary'} sx={componentTextProps}>{children}</Typography></Grid>
     </Grid>

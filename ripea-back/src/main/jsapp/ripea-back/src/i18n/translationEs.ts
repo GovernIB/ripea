@@ -346,6 +346,24 @@ const translationEs = {
                 ampliarPlac: 'Ampliación del plazo de los envíos de la remesa',
             },
         },
+        publicacio: {
+            detall: {
+                title: 'Detalle de la publicación',
+                document: 'Documento',
+                enviatData: 'Fecha de envio',
+                estat: 'Estado',
+                tipus: 'Tipo',
+                assumpte: 'Asunto',
+                observacions: 'Observaciones',
+            },
+            action: {
+                update: 'Modificar publicación',
+                delete: {
+                    title: 'Borrar publicación',
+                    message: 'Una vez borrada la publicación no se podra recuperar',
+                }
+            },
+        },
         notFound: "No encontrado",
     }
 };

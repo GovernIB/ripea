@@ -1,28 +1,30 @@
 import {GridPage, MuiGrid, useMuiDataGridApiRef} from "reactlib";
-import {formatDate} from "../../util/dateUtils.ts";
-import {Typography} from "@mui/material";
-import useRemesaActions from "./details/RemesaActions.tsx";
-import Icon from "@mui/material/Icon";
 import * as builder from "../../util/springFilterUtils.ts";
+import {formatDate} from "../../util/dateUtils.ts";
+import Icon from "@mui/material/Icon";
+import usePublicacioActions from "./details/PublicacioActions.tsx";
 
 const StyledEstat = (props:any) => {
-    const { entity } = props;
+    const { entity: publicacio } = props;
 
-    const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
-    const style = entity?.error
-        ? { backgroundColor: '#d99b9d' }
-        : { backgroundColor: '#c3e8d1' }
+    switch (publicacio?.estat) {
+        case 'PENDENT':
+            return <Icon color={'warning'}>schedule</Icon>;
+        case 'ENVIAT':
+            return <Icon color={'info'}>mail</Icon>;
+        case 'REBUTJAT':
+            return <Icon color={'disabled'}>close</Icon>;
+        case 'PROCESSAT':
+            return <Icon color={'error'}>check</Icon>;
+    }
 
-    return <Typography variant="caption" sx={{ ...commonStyle, ...style }}>
-        <Icon fontSize={"inherit"}>{entity?.error ?'close' :'check'}</Icon>
-        {entity?.notificacioEstat}
-    </Typography>
+    return <></>;
 }
 
 const columns = [
     {
         field: 'tipus',
-        flex: 0.5
+        flex: 0.5,
     },
     {
         field: 'createdDate',
@@ -30,12 +32,7 @@ const columns = [
         valueFormatter: (value: any) => formatDate(value)
     },
     {
-        field: 'dataEnviada',
-        flex: 0.75,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'dataFinalitzada',
+        field: 'processatData',
         flex: 0.75,
         valueFormatter: (value: any) => formatDate(value)
     },
@@ -48,13 +45,13 @@ const columns = [
         flex: 0.5,
     },
     {
-        field: 'notificacioEstat',
+        field: 'estat',
         flex: 0.5,
-        renderCell: (params:any) => <StyledEstat entity={params?.row}/>
+        renderCell: (params: any) => <StyledEstat entity={params?.row}/>
     },
 ]
 
-const RemesaGrid = (props:any) => {
+const PublicacioGrid = (props:any) => {
     const { id, onRowCountChange } = props;
 
     const apiRef = useMuiDataGridApiRef()
@@ -62,11 +59,11 @@ const RemesaGrid = (props:any) => {
         apiRef?.current?.refresh?.();
     }
 
-    const {actions, components} = useRemesaActions(refresh);
+    const {actions, components} = usePublicacioActions(refresh);
 
     return <GridPage>
         <MuiGrid
-            resourceName="documentNotificacioResource"
+            resourceName="documentPublicacioResource"
             // perspectives={['']}
             columns={columns}
             rowAdditionalActions={actions}
@@ -85,4 +82,4 @@ const RemesaGrid = (props:any) => {
         {components}
     </GridPage>
 }
-export default RemesaGrid;
+export default PublicacioGrid;

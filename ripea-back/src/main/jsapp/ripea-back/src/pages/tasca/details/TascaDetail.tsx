@@ -1,17 +1,10 @@
-import {Grid, Typography} from "@mui/material";
+import {Grid} from "@mui/material";
 import {useState} from "react";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
-
-const ContenidoData = (props:any) => {
-    const {title, children} = props;
-    return <>
-        <Grid item xs={6}><Typography variant={"subtitle2"}>{title}</Typography></Grid>
-        <Grid item xs={6}><Typography variant={"body2"}>{children}</Typography></Grid>
-    </>
-}
+import {ContenidoData} from "../../../components/DetailComponents.tsx";
 
 const useTascaDetail = () => {
     const [open, setOpen] = useState(false);

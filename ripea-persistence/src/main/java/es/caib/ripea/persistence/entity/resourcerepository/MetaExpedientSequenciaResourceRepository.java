@@ -19,7 +19,7 @@ public interface MetaExpedientSequenciaResourceRepository extends BaseRepository
 
     Optional<MetaExpedientSequenciaResourceEntity> findByMetaExpedientAndAny(MetaExpedientResourceEntity metaExpedient, int any);
 
-    @Query("select metaexp_seq.valor from MetaExpedientSequenciaResourceEntity metaexp_seq where metaexp_seq.metaExpedient = :metaExpedient or metaexp_seq.any = :any")
+    @Query("select metaexp_seq.valor from MetaExpedientSequenciaResourceEntity metaexp_seq where metaexp_seq.metaExpedient = :metaExpedient and metaexp_seq.any = :any")
     Optional<Long> findValorByMetaExpedientAndAny(
             @Param("metaExpedient") MetaExpedientResourceEntity metaExpedient,
             @Param("any") int any);

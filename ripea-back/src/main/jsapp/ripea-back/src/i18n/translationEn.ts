@@ -346,6 +346,24 @@ const translationEn = {
                 ampliarPlac: 'Extension of the shipping batch deadlines',
             },
         },
+        publicacio: {
+            detall: {
+                title: 'Publication Details',
+                document: 'Document',
+                enviatData: 'Sending Date',
+                estat: 'Status',
+                tipus: 'Type',
+                assumpte: 'Subject',
+                observacions: 'Observations',
+            },
+            action: {
+                update: 'Edit Publication',
+                delete: {
+                    title: 'Delete Publication',
+                    message: 'Once deleted, the publication cannot be recovered',
+                }
+            },
+        },
         notFound: "Not Found",
     }
 };

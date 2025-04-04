@@ -11,60 +11,43 @@ const followerStyle = {
 	bgcolor: '#e0e0e0',
 	color: 'rgba(0, 0, 0, 0.38)'}
 
-const Follower = (props:any) => {
-	
-    const { entity } = props;
-    const [comentarios, setComentarios] = useState<any[]>([]);
-	const resourceName = 'expedientSeguidorResource';
-	const resourceReference = 'expedient';
-	
+export const FollowersDialog = (props:any) => {
+	const { entity } = props;
+    const { t } = useTranslation();
+
     const {
         isReady: appApiIsReady,
         find: findAll,
-    } = useResourceApiService(resourceName);
+    } = useResourceApiService('expedientSeguidorResource');
+
+    const [numFollowes, setNumFollowes] = useState<number>(entity?.numSeguidors);
+    const [followes, setFollowes] = useState<any[]>([]);
+	const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        if (appApiIsReady && comentarios?.length == 0){
+        if (appApiIsReady && !followes?.length){
             findAll({
-                filter: `${resourceReference}.id:${entity?.id}`,
-                includeLinksInRows: true,
-                page: 0,
-                size: 0,
+                filter: `expedient.id:${entity?.id}`,
                 sorts: ['seguidor.nom', 'desc']
             })
                 .then((app) => {
-                    setComentarios(app.rows);
-					//TODO: actualizar numComm
+                    setFollowes(app.rows);
+                    setNumFollowes?.(app.rows.length)
                 })
         }
     }, [appApiIsReady]);
-
-    return <>
-        {comentarios?.map((a:any)=><>
-			<Typography sx={followerStyle} color="primary">{a?.seguidor?.description}</Typography>
-       	</>
-	   )}
-    </>
-}
-
-export const FollowersDialog = (props:any) => {
-
-	const { entity } = props;
-    const [numComm] = useState<number>(entity?.numSeguidors);
-	const [open, setOpen] = useState(false);
-	const { t } = useTranslation();
-	const title = t('page.expedient.modal.seguidors') +': '+ entity?.nom;
 	
     const handleOpen = () => {
 		setOpen(true);
     }
 
-	const handleClose = () => { setOpen(false);	};
+	const handleClose = () => {
+        setOpen(false);
+    };
 	
     return <>
-	
 		<IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
-	        <Badge badgeContent={numComm} color="primary">
+	        <Badge badgeContent={numFollowes} color="primary">
 	            <Icon>people</Icon>
 	        </Badge>
 	    </IconButton>	
@@ -72,9 +55,9 @@ export const FollowersDialog = (props:any) => {
 		<Dialog
 		    open={open}
 			closeCallback={handleClose}
-			title={title}
+			title={t('page.expedient.modal.seguidors') +': '+ entity?.nom}
 			key={entity?.id}
-		    componentProps={{ fullWidth: true, maxWidth: 'md', height: '100%', }}
+		    componentProps={{ fullWidth: true, maxWidth: 'sm' }}
 		    buttons={[
 		        {
 		            value: 'close',
@@ -87,7 +70,7 @@ export const FollowersDialog = (props:any) => {
 		            handleClose();
 		        }
 		    }}>
-            <Follower entity={entity} />
+            {followes?.map((a:any)=><Typography key={a?.seguidor?.id} sx={followerStyle}>{a?.seguidor?.description}</Typography>)}
         </Dialog>
     </>
 }

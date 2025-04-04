@@ -118,6 +118,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
             resource.setNumTasques(entity.getTasques().size());
             resource.setNumAnotacions(entity.getPeticions().size());
+            resource.setNumPublicacions(entity.getPublicacions().size());
+            resource.setNumRemeses(entity.getNotificacions().size());
+            resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
         }
     }
 

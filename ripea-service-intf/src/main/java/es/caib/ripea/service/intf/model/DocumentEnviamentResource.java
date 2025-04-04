@@ -16,7 +16,6 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@InteressatValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
 @ResourceConfig(quickFilterFields = { "documentNum", "nom" }, descriptionField = "nom")
 public abstract class DocumentEnviamentResource extends BaseAuditableResource<Long> {
 

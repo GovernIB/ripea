@@ -137,6 +137,7 @@ public class ExpedientResource extends NodeResource {
     @Transient private int numSeguidors;
     @Transient private int numContingut;
     @Transient private int numDades;
+    @Transient private int numMetaDades;
     @Transient private int numInteressats;
     @Transient private int numRemeses;
     @Transient private int numPublicacions;

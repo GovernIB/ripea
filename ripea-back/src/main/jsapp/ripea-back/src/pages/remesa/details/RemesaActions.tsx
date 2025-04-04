@@ -60,7 +60,7 @@ const useRemesaActions = (refresh?: () => void) => {
         apiRef.current?.show(id)
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, 'Elemento creado', 'success');
+                temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
                 temporalMessageShow('Error', error.message, 'error');
@@ -68,8 +68,8 @@ const useRemesaActions = (refresh?: () => void) => {
     }
     const delette = (id: any) => {
         messageDialogShow(
-            t('page.interessat.dialog.deleteTitle'),
-            t('page.interessat.dialog.deleteMessage'),
+            t('page.notificacio.dialog.delete.title'),
+            t('page.notificacio.dialog.delete.message'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -77,7 +77,7 @@ const useRemesaActions = (refresh?: () => void) => {
                     apiDelete(id)
                         .then(() => {
                             refresh?.();
-                            temporalMessageShow(null, 'Elemento borrado', 'success');
+                            temporalMessageShow(null, '', 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow('Error', error.message, 'error');

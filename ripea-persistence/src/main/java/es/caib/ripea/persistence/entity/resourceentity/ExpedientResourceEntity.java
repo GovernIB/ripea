@@ -27,6 +27,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "expedient")
@@ -88,7 +89,6 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			mappedBy = "expedient",
 			fetch = FetchType.LAZY,
             cascade = {CascadeType.REMOVE}
-//			orphanRemoval = true
     )
 	protected List<InteressatResourceEntity> interessats = new ArrayList<InteressatResourceEntity>();
 	@ManyToMany(
@@ -124,8 +124,14 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_rel_rel_fk"))
 	protected List<ExpedientResourceEntity> relacionatsPer = new ArrayList<>();
 
-	@OneToMany(mappedBy = "expedient")
+	@OneToMany(mappedBy = "expedient", fetch = FetchType.LAZY)
 	private List<ExpedientPeticioResourceEntity> peticions = new ArrayList<ExpedientPeticioResourceEntity>();
+	@OneToMany(mappedBy = "expedient", fetch = FetchType.LAZY)
+    @Where(clause = "dtype = 'DocumentPublicacioEntity'")
+	private List<DocumentPublicacioResourceEntity> publicacions = new ArrayList<>();
+	@OneToMany(mappedBy = "expedient", fetch = FetchType.LAZY)
+    @Where(clause = "dtype = 'DocumentNotificacioEntity'")
+	private List<DocumentNotificacioResourceEntity> notificacions = new ArrayList<>();
 
 	@OneToMany(
 			mappedBy = "expedient",

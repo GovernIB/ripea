@@ -2,26 +2,18 @@ package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.annotation.ResourceField;
-import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
-import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Transient;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@InteressatValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
 @ResourceConfig(
         quickFilterFields = { "nom" },
         descriptionField = "nom",

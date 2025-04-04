@@ -2,7 +2,7 @@ package es.caib.ripea.back.resourcecontroller;
 
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
 import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
+import es.caib.ripea.service.intf.model.DocumentPublicacioResource;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Límit Tecnologies
  */
 @RestController
-@RequestMapping(BaseConfig.API_PATH + "/documentNotificacions")
-@Tag(name = "DocumentNotificacios", description = "Servei de gestió de notificacions")
-public class DocumentNotificacioResourceController extends BaseMutableResourceController<DocumentNotificacioResource, Long> {
+@RequestMapping(BaseConfig.API_PATH + "/documentPublicacions")
+@Tag(name = "DocumentPublicacios", description = "Servei de gestió de publicacions")
+public class DocumentPublicacioResourceController extends BaseMutableResourceController<DocumentPublicacioResource, Long> {
 
 }

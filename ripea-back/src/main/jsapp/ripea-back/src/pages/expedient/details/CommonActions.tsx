@@ -3,7 +3,7 @@ import {
     useBaseAppContext,
     useConfirmDialogButtons
 } from 'reactlib';
-import useInformacioArxiu from "../actions/InformacioArxiu.tsx";
+import useInformacioArxiu from "./InformacioArxiu.tsx";
 import useAssignar from "../actions/Assignar.tsx";
 import useCambiarEstat from "../actions/CambiarEstat.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";

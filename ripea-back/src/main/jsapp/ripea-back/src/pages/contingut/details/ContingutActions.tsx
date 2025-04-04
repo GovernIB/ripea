@@ -1,5 +1,5 @@
 import useDocumentDetail from "./DocumentDetail.tsx";
-import useInformacioArxiu from "../../expedient/actions/InformacioArxiu.tsx";
+import useInformacioArxiu from "../../expedient/details/InformacioArxiu.tsx";
 import {useTranslation} from "react-i18next";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import {MuiDataGridApi, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";

@@ -11,7 +11,7 @@ import {useState} from "react";
 const springFilterBuilder = (data: any) :string => {
     let filterStr :string = '';
     filterStr += builder.and(
-        builder.like("numero", data?.numero),
+        builder.like("numero", data.numero),
         builder.like("nom", data.nom),
         data.estat && builder.equals("estat",`'TANCAT'`, (data.estat==='TANCAT')),
         builder.exists(

@@ -5,14 +5,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
-
-const ContenidoData = (props:any) => {
-    const {title, children} = props;
-    return <>
-        <Grid item xs={6}><Typography variant={"h6"}>{title}</Typography></Grid>
-        <Grid item xs={6}>{children}</Grid>
-    </>
-}
+import {ContenidoData} from "../../../components/DetailComponents.tsx";
 
 const Contenido = (props:any) => {
     const {entity} = props;

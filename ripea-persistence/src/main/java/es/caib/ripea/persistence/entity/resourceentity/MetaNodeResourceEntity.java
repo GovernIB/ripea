@@ -6,11 +6,14 @@ package es.caib.ripea.persistence.entity.resourceentity;
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.MetaNodeTipusEnum;
+import es.caib.ripea.service.intf.model.MetaDadaResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe del model de dades que representa un meta-node.
@@ -41,13 +44,13 @@ public abstract class MetaNodeResourceEntity<R> extends BaseAuditableEntity<R> {
 			name = "entitat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_metanode_fk"))
 	protected EntitatResourceEntity entitat;
-//	@OneToMany(
-//			mappedBy = "metaNode",
-//			fetch = FetchType.LAZY,
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//	@OrderBy("ordre asc")
-//	private Set<MetaDadaEntity> metaDades = new HashSet<MetaDadaEntity>();
+	@OneToMany(
+			mappedBy = "metaNode",
+			fetch = FetchType.LAZY,
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	@OrderBy("ordre asc")
+	private List<MetaDadaResourceEntity> metaDades = new ArrayList<>();
 //	@OneToMany(
 //			mappedBy = "metaNode",
 //			fetch = FetchType.LAZY)

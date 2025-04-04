@@ -346,6 +346,24 @@ const translationCa = {
                 ampliarPlac: 'Ampliació del termini dels enviaments de la remesa',
             },
         },
+        publicacio: {
+            detall: {
+                title: 'Detall de la publicació',
+                document: 'Document',
+                enviatData: 'Data d\'enviament',
+                estat: 'Estat',
+                tipus: 'Tipus',
+                assumpte: 'Assumpte',
+                observacions: 'Observacions',
+            },
+            action: {
+                update: 'Modificar publicació',
+                delete: {
+                    title: 'Esborrar publicació',
+                    message: 'Un cop esborrada la publicació no es podrà recuperar',
+                }
+            },
+        },
         notFound: "No trobat",
     }
 };

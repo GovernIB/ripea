@@ -1,0 +1,61 @@
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
+import Dialog from "../../../../lib/components/mui/Dialog.tsx";
+import {Grid} from "@mui/material";
+import {BasePage} from "reactlib";
+import {ContenidoData} from "../../../components/DetailComponents.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
+
+const usePublicacioDetail = () => {
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+    const { t } = useTranslation();
+
+    const handleOpen = (id:any, row:any) => {
+        console.log(id, row)
+        setEntity(row);
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const dialog =
+        <Dialog
+            open={open}
+            closeCallback={handleClose}
+            title={t('page.publicacio.detall.title')}
+            componentProps={{ fullWidth: true, maxWidth: 'sm'}}
+            buttons={[
+                {
+                    value: 'close',
+                    text: t('common.close'),
+                    icon: 'close'
+                },
+            ]}
+            buttonCallback={(value :any) :void=>{
+                if (value=='close') {
+                    handleClose();
+                }
+            }}
+        >
+            <BasePage>
+                <Grid container direction={"row"} columnSpacing={1}>
+                    <ContenidoData title={t('page.publicacio.detall.document')}>{entity?.document?.description}</ContenidoData>
+                    <ContenidoData title={t('page.publicacio.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
+                    <ContenidoData title={t('page.publicacio.detall.estat')}>{entity?.estat}</ContenidoData>
+                    <ContenidoData title={t('page.publicacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
+                    <ContenidoData title={t('page.publicacio.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
+                    <ContenidoData title={t('page.publicacio.detall.observacions')} hiddeIfEmpty>{entity?.observacions}</ContenidoData>
+                </Grid>
+            </BasePage>
+        </Dialog>
+
+    return {
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}
+export default usePublicacioDetail;
