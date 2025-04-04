@@ -1,8 +1,35 @@
 package es.caib.ripea.service.resourceservice;
 
-import es.caib.ripea.persistence.entity.resourceentity.*;
+import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.stereotype.Service;
+
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -10,41 +37,34 @@ import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.model.MetaDocumentResource;
-import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.stereotype.Service;
-
-import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
+import es.caib.ripea.service.resourcehelper.PermisosResourceHelper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.PostConstruct;
-import java.io.OutputStream;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
-/**
- * Implementació del servei de gestió d'expedients.
- *
- * @author Límit Tecnologies
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
     private final DocumentResourceHelper documentResourceHelper;
+    private final PermisosResourceHelper permisosResourceHelper;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
+    private final DocumentRepository documentRepository;
+    
     private final EmailHelper emailHelper;
+    private final DocumentHelper documentHelper;
+    private final PermisosHelper permisosHelper;
+    private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 
     @PostConstruct
     public void init() {
@@ -384,7 +404,40 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {
-            return null;
+        	/*if (permisosResourceHelper.comprovarPermisDocument(entity, ExtendedPermission.WRITE, true)) {
+        		 documentResourceHelper.portafirmesEnviar(null, entity, code, null, null, code, null, null, null, null, code, false, false);
+        	}*/
+        	
+        	Long entitatId  = entity.getEntitat().getId();
+        	Long documentId = entity.getId();
+        	String rolActual = ""; //TODO ha de arribar el controlador
+        	
+        	DocumentEntity document = documentHelper.comprovarDocument(
+        			entitatId,
+					documentId,
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					rolActual);
+        	
+			/*firmaPortafirmesHelper.portafirmesEnviar(
+					entitatId,
+					document,
+					params.getMotiu(),
+					params.getPrioritat(),
+					null,
+					portafirmesFluxId,
+					portafirmesResponsables,
+					portafirmesSeqTipus,
+					portafirmesFluxTipus,
+					annexosIds,
+					transaccioId,
+					avisFirmaParcial,
+					firmaParcial);*/
+        	
+        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
         }
 
         @Override
@@ -392,5 +445,4 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         }
     }
-
 }

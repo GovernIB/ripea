@@ -1,20 +1,14 @@
 package es.caib.ripea.persistence.entity.resourcerepository;
 
-import es.caib.ripea.persistence.base.repository.BaseRepository;
-import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import es.caib.ripea.persistence.base.repository.BaseRepository;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
 
-/**
- * Repositori per a la gestió d'expedients.
- *
- * @author Límit Tecnologies
- */
 public interface MetaExpedientSequenciaResourceRepository extends BaseRepository<MetaExpedientSequenciaResourceEntity, Long> {
 
     Optional<MetaExpedientSequenciaResourceEntity> findByMetaExpedientAndAny(MetaExpedientResourceEntity metaExpedient, int any);

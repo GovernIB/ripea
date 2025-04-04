@@ -1,24 +1,28 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.apache.commons.lang3.StringUtils;
+
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.DocumentEnviamentAnnexEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "document_enviament")
@@ -65,12 +69,39 @@ public abstract class DocumentEnviamentResourceEntity<R extends DocumentEnviamen
     @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "document_docenv_fk")
     protected DocumentResourceEntity document;
 
-//    @OneToMany(
-//            cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY,
-//            mappedBy = "documentEnviament",
-//            orphanRemoval = true)
-//    protected List<DocumentEnviamentAnnexEntity> annexos;
+	public void updateEnviat(
+			Date enviatData) {
+		this.estat = DocumentEnviamentEstatEnumDto.ENVIAT;
+		this.enviatData = enviatData;
+		this.error = false;
+		this.errorDescripcio = null;
+		this.intentNum = 0;
+		this.intentData = null;
+		this.intentProximData = null;
+	}
+	public void updateEnviatError(
+			String errorDescripcio,
+			Date intentProximData) {
+		this.estat = DocumentEnviamentEstatEnumDto.PENDENT;
+		this.error = true;
+		this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_TAMANY);
+		this.enviatData = null;
+		this.intentNum = intentNum++;
+		this.intentData = new Date();
+		this.intentProximData = intentProximData;
+	}
 
+	protected void inicialitzar() {
+		this.estat = DocumentEnviamentEstatEnumDto.PENDENT;
+		this.enviatData = null;
+		this.processatData = null;
+		this.cancelatData = null;
+		this.error = false;
+		this.errorDescripcio = null;
+		this.intentNum = 0;
+		this.intentData = null;
+		this.intentProximData = null;
+	}
+	
     private static final int ERROR_DESC_TAMANY = 2000;
 }

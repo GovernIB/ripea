@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
@@ -17,11 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Classe del model de dades que representa un meta-node.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "metaexpedient")
 @Getter
@@ -44,34 +36,12 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 
 	@Column(name = "PERMET_METADOCS_GENERALS", nullable = false)
 	private boolean permetMetadocsGenerals;
-
-//	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-//	@JoinColumn(
-//			name = "pare_id",
-//			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "pare_metaexp_fk"))
-//	private MetaExpedientResourceEntity pare;
-
-//	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-//	protected Set<MetaExpedientSequenciaEntity> sequencies;
-
-//	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-//	protected Set<MetaDocumentEntity> metaDocuments;
+    @Column(name = "PERMIS_DIRECTE")
+    private boolean permisDirecte = false;
 
 	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
 	protected Set<ExpedientEstatResourceEntity> estats;
 
-//	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-//	protected Set<MetaExpedientTascaEntity> tasques;
-
-//	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-//	protected Set<HistoricEntity> historics;
-
-
-//	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-//	@JoinColumn(
-//			name = "entitat_id",
-//			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_metaexp_fk"))
-//	private EntitatResourceEntity entitatPropia;
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codiPropi;
 
@@ -80,9 +50,6 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 			name = "organ_gestor_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "organ_gestor_metaexp_fk"))
 	private OrganGestorResourceEntity organGestor;
-
-//	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
-//	protected Set<MetaExpedientOrganGestorEntity> metaExpedientOrganGestors;
 
 	@Column(name = "gestio_amb_grups_activa", nullable = false)
 	private boolean gestioAmbGrupsActiva;
@@ -95,26 +62,17 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexpgrup_fk"))
 	private List<GrupResourceEntity> grups = new ArrayList<>();
 
-
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "grup_per_defecte",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "grup_metaexp_fk"))
 	private GrupResourceEntity grupPerDefecte;
 
-
 	@Column(name = "revisio_estat", length = 8)
 	@Enumerated(EnumType.STRING)
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	@Column(name = "revisio_comentari", length = 1024)
 	private String revisioComentari; // TODO to delete in next version
-
-//	@OneToMany(
-//			mappedBy = "metaExpedient",
-//			cascade = CascadeType.ALL,
-//			orphanRemoval = true)
-//	private List<MetaExpedientComentariEntity> comentaris = new ArrayList<MetaExpedientComentariEntity>();
-
 
 	@Column(name = "crear_regla_dist_estat", length = 10)
 	@Enumerated(EnumType.STRING)
@@ -128,4 +86,11 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 	@Column(name = "interessat_obligatori", nullable = false)
 	private boolean interessatObligatori;
 
+	public boolean isComu() {
+		if (organGestor == null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

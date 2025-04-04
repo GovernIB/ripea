@@ -146,4 +146,15 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 			name = "expedient_estat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_document_fk"))	
 	private ExpedientEstatResourceEntity expedientEstatAdditional;
+	
+	public MetaDocumentResourceEntity getMetaDocument() {
+		return (MetaDocumentResourceEntity)getMetaNode();
+	}
+	
+	public void updateEstat(DocumentEstatEnumDto estat) {
+		this.estat = estat;
+		if (!validacioFirmaCorrecte && !DocumentEstatEnumDto.REDACCIO.equals(estat)) {
+			this.validacioFirmaCorrecte = true;
+		}
+	}
 }

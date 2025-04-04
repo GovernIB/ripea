@@ -7,7 +7,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -51,13 +56,18 @@ public class DocumentNotificacioResourceEntity extends DocumentEnviamentResource
     @Column(name = "not_data_finalitzada")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataFinalitzada;
-//    @OneToMany(
-//            mappedBy = "notificacio",
-//            fetch = FetchType.LAZY,
-//            orphanRemoval = true)
-//    private Set<DocumentEnviamentInteressatEntity> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatEntity>();
     @Column(name = "notificacio_estat")
     @Enumerated(EnumType.STRING)
     protected DocumentNotificacioEstatEnumDto notificacioEstat;
-
+    
+	public boolean isNotificacioFinalitzada() {
+		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
+				DocumentNotificacioEstatEnumDto.FINALITZADA, 
+				DocumentNotificacioEstatEnumDto.PROCESSADA));
+		return estatsFinals.contains(this.getNotificacioEstat());
+	}
+	
+	public boolean isCaducada() {
+		return (this.getDataCaducitat()!=null && this.getDataCaducitat().before(Calendar.getInstance().getTime()));
+	}
 }
