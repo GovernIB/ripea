@@ -3,10 +3,11 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
+    "homepage": "/ripeaback/reactapp",
     "scripts": {
         "dev": "vite --open",
         "build": "tsc -b && vite build",
-        "build-jboss": "tsc && vite build --base=/ripeaback/",
+        "build-jboss": "tsc && vite build --base=/ripeaback/reactapp/",
         "lint": "eslint .",
         "preview": "vite preview",
         "postinstall": "patch-package"

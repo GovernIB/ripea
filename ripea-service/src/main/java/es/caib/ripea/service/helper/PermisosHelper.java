@@ -1,15 +1,19 @@
 package es.caib.ripea.service.helper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import es.caib.ripea.persistence.entity.AclClassEntity;
+import es.caib.ripea.persistence.entity.AclEntryEntity;
+import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
+import es.caib.ripea.persistence.entity.AclSidEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.repository.AclClassRepository;
+import es.caib.ripea.persistence.repository.AclEntryRepository;
+import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
+import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
+import es.caib.ripea.service.intf.dto.PermisDto;
+import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
+import es.caib.ripea.service.permission.ExtendedPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -30,20 +34,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.persistence.entity.AclClassEntity;
-import es.caib.ripea.persistence.entity.AclEntryEntity;
-import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
-import es.caib.ripea.persistence.entity.AclSidEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.repository.AclClassRepository;
-import es.caib.ripea.persistence.repository.AclEntryRepository;
-import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
-import es.caib.ripea.persistence.repository.AclSidRepository;
-import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
-import es.caib.ripea.service.intf.dto.PermisDto;
-import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
-import es.caib.ripea.service.permission.ExtendedPermission;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class PermisosHelper {
@@ -144,6 +143,10 @@ public class PermisosHelper {
 	 */
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission permission) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			return new ArrayList<>();
+		}
+
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
@@ -179,6 +182,10 @@ public class PermisosHelper {
 	 */
 	public List<Long> getObjectsIdsWithTwoPermissions(Class<?> clazz, Permission permission1, Permission permission2) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			return new ArrayList<>();
+		}
+
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
@@ -681,6 +688,9 @@ public class PermisosHelper {
 
 	private List<Sid> getAuthSids(Authentication auth) {
 		List<Sid> sids = new ArrayList<Sid>();
+		if (auth == null)
+			return sids;
+
 		sids.add(new PrincipalSid(auth.getName()));
 		for (GrantedAuthority ga : auth.getAuthorities())
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));

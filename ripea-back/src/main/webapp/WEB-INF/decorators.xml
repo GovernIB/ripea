@@ -9,6 +9,7 @@
 		<pattern>/webdav*</pattern>
 		<pattern>/rest/notib*</pattern>
 		<pattern>*/tag*</pattern>
+		<pattern>*/react*</pattern>
 	</excludes>
 	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
 		<pattern>/scanweb*</pattern>

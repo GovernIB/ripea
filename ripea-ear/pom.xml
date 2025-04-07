@@ -73,6 +73,7 @@
 								<maintainer>limit@limit.es</maintainer>
 								<ports>
 									<port>8080</port>
+									<port>8787</port>
 								</ports>
 								<assemblies>
 									<assembly>
@@ -149,6 +150,16 @@
 									<tag>${project.version}</tag>
 								</tags>
 							</build>
+							<run>
+								<ports>
+									<!-- Mapeig del port de debug -->
+									<port>8787:8787</port>
+								</ports>
+								<env>
+									<!-- Defineix les JAVA_OPTS per habilitar el debug -->
+									<JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</JAVA_OPTS>
+								</env>
+							</run>
 						</image>
 					</images>
 				</configuration>

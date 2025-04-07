@@ -5,6 +5,7 @@ package es.caib.ripea.back.config;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
+import es.caib.ripea.back.base.security.PreauthOidcUserDetails;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -28,9 +29,6 @@ import org.springframework.security.core.authority.mapping.SimpleAttributes2Gran
 import org.springframework.security.core.authority.mapping.SimpleMappableAttributesRetriever;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
@@ -43,8 +41,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Configuració de Spring Security per a desplegar l'aplicació sobre JBoss.
@@ -81,12 +83,13 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 				invalidateHttpSession(true).
 				logoutSuccessUrl("/").
 				permitAll(false));
-		http.authorizeHttpRequests().
-				requestMatchers(publicRequestMatchers()).permitAll().
+		http.authorizeHttpRequests()
+				.requestMatchers(publicRequestMatchers()).permitAll()
+				.requestMatchers(reactRequestMatchers()).authenticated()
 //				requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER).
 //				requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN).
 //				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).
-				anyRequest().authenticated();
+				.anyRequest().authenticated();
 		http.headers().frameOptions().sameOrigin();
 		http.csrf().disable();
 		http.cors();
@@ -209,38 +212,6 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 				String jwtIdToken) {
 			super(request, authorities);
 			this.jwtIdToken = jwtIdToken;
-		}
-	}
-
-	@Getter
-	public static class PreauthOidcUserDetails extends User implements OidcUser {
-		private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
-		private final OidcIdToken idToken;
-		private final OidcUserInfo userInfo;
-		private final Map<String, Object> attributes;
-		private final Map<String, Object> claims;
-		private final String nameAttributeKey;
-		public PreauthOidcUserDetails(
-				String jwtIdToken,
-				String username,
-				Instant issueTime,
-				Instant expirationTime,
-				Map<String, Object> claims,
-				String nameAttributeKey,
-				Collection<? extends GrantedAuthority> authorities) {
-			super(username, "N/A", true, true, true, true, authorities);
-			this.idToken = new OidcIdToken(
-					jwtIdToken,
-					issueTime,
-					expirationTime,
-					claims);
-			this.userInfo = new OidcUserInfo(claims);
-			this.attributes = claims;
-			this.claims = claims;
-			this.nameAttributeKey = nameAttributeKey;
-		}
-		public String getName() {
-			return getUsername();
 		}
 	}
 

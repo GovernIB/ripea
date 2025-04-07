@@ -25,6 +25,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -70,6 +72,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	}
 
 	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry
+				.addResourceHandler("/reactapp/**")
+				.addResourceLocations("/reactapp/");
+	}
+
+	@Override
+	public void configureViewResolvers(ViewResolverRegistry registry) {
+		// Evita que el ViewResolver interpreti HTMLs com JSPs
+		registry.jsp("/WEB-INF/jsp/", ".jsp");
+	}
+
+	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
 	}
@@ -104,7 +119,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/**/api-docs/",
 				"/public/**",
 				"/api",
-				"/api/**"
+				"/api/**",
+				"/error"
 		};
 		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);

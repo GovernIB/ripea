@@ -1,5 +1,6 @@
 package es.caib.ripea.api.interna.config;
 
+import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.service.*;
@@ -43,6 +44,12 @@ public class EjbClientApiIntConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean resourceApiService() {
 		return getLocalEjbFactoyBean(ResourceApiService.class);
+	}
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean permissionEvaluatorService() {
+		return getLocalEjbFactoyBean(PermissionEvaluatorService.class);
 	}
 	
 	@Bean
