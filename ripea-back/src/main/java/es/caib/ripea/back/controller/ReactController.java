@@ -1,6 +1,7 @@
 package es.caib.ripea.back.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.Objects;
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 public class ReactController {
@@ -51,6 +53,7 @@ public class ReactController {
                     .body(new InputStreamResource(Objects.requireNonNull(indexHtml)));
 
         } catch (Exception e) {
+            log.error("Error carregant recurs", e);
             return ResponseEntity.internalServerError().body("Error carregant recurs");
         }
     }

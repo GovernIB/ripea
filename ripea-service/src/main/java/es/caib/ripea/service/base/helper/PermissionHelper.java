@@ -3,6 +3,7 @@ package es.caib.ripea.service.base.helper;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class PermissionHelper {
+
+	@Value("${es.caib.ripea.develope.mode:false}")
+	private boolean developmentMode;
 
 	/**
 	 * Comprova els permisos per a accedir a un recurs.
@@ -70,6 +74,9 @@ public class PermissionHelper {
 	 * - permission: permís requerit.
 	 */
 	private boolean hasPermission(Permissions userPermissions, @Nullable BasePermission permission) {
+		if (developmentMode)
+			return true;
+
 		// TODO: tot el tema de controlar permisos de RIPEA
 		boolean readPermissionAllowed = isReadOperation(permission) && userPermissions.isConsulta();
 		boolean writePermissionAllowed = isWriteOperation(permission) && userPermissions.isAdmin();
@@ -113,6 +120,9 @@ public class PermissionHelper {
 		 * @return Una instància de Permissions.
 		 */
 		public static Permissions fromAuthentication(Authentication auth) {
+			if (auth == null)
+				return Permissions.builder().build();
+
 			Set<String> roles = auth.getAuthorities().stream()
 					.map(GrantedAuthority::getAuthority)
 					.collect(Collectors.toSet());

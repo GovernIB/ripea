@@ -14,3 +14,4 @@ target/
 /ripea-back/application.properties
 /jboss.profile
 /boot.profile
+/ripea-back/src/main/webapp/reactapp/

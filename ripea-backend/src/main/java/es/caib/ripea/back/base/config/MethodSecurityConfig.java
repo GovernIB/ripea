@@ -2,6 +2,7 @@ package es.caib.ripea.back.base.config;
 
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
  * 
  * @author Límit Tecnologies
  */
+@ConditionalOnWarDeployment
 @Configuration
 @DependsOn({ "permissionEvaluatorService" })
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
