@@ -1,21 +1,5 @@
 package es.caib.ripea.service.helper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
@@ -59,6 +43,21 @@ import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class EntityComprovarHelper {
@@ -139,14 +138,14 @@ public class EntityComprovarHelper {
 		}
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisUsuari) {
-			boolean esLectorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
+			boolean esLectorEntitat = auth != null && permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.READ }, auth);
 			if (!esLectorEntitat) {
 				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), "READ");
 			}
 		}
 		if (comprovarPermisAdmin) {
-			boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
+			boolean esAdministradorEntitat = auth != null && permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
 			if (!esAdministradorEntitat) {
 				throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
@@ -154,7 +153,7 @@ public class EntityComprovarHelper {
 			}
 		}
 		if (comprovarPermisUsuariOrAdmin) {
-			boolean esAdministradorOLectorEntitat = permisosHelper.isGrantedAny(entitatId,
+			boolean esAdministradorOLectorEntitat = auth != null && permisosHelper.isGrantedAny(entitatId,
 			        EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.READ }, auth);
 			if (!esAdministradorOLectorEntitat) {
@@ -163,7 +162,7 @@ public class EntityComprovarHelper {
 			}
 		}
 		if (comprovarPermisUsuariOrAdminOrOrgan) {
-			boolean esAdministradorOLectorEntitat = permisosHelper.isGrantedAny(entitatId,
+			boolean esAdministradorOLectorEntitat = auth != null && permisosHelper.isGrantedAny(entitatId,
 			        EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.READ }, auth);
 			List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(
@@ -176,7 +175,7 @@ public class EntityComprovarHelper {
 		}
 		
 		if (comprovarPermisAdminOrOrgan) {
-			boolean esAdministradorEntitat = permisosHelper.isGrantedAny(entitatId,
+			boolean esAdministradorEntitat = auth != null && permisosHelper.isGrantedAny(entitatId,
 			        EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.ADMINISTRATION}, auth);
 			List<OrganGestorEntity> organs = organGestorHelper.findAmbEntitatPermis(

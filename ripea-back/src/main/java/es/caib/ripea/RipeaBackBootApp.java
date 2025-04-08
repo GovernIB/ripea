@@ -2,7 +2,6 @@ package es.caib.ripea;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 
 /**
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.PropertySource;
  * @author Límit Tecnologies
  */
 @SpringBootApplication
-@ComponentScan
 @PropertySource(
 		ignoreResourceNotFound = true,
 		value = { "classpath:application.properties" })

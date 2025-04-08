@@ -1,4 +1,4 @@
-package es.caib.ripea.back.base.config;
+package es.caib.ripea.back.base.security;
 
 /**
  * Classe de conversió entre un token JWT i un token d'autenticació de Spring Security.

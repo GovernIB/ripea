@@ -7,7 +7,6 @@ import com.nimbusds.jose.shaded.json.JSONArray;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWarDeployment;
@@ -25,6 +24,8 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.text.ParseException;
 import java.util.HashSet;
@@ -42,17 +43,8 @@ import java.util.Set;
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 
-	//protected final JwtAuthConverter jwtAuthConverter;
-
-	/*public WebSecurityConfig(JwtAuthConverter jwtAuthConverter) {
-		this.jwtAuthConverter = jwtAuthConverter;
-	}*/
-
 	@Bean
 	public SecurityFilterChain oauth2LoginSecurityFilterChain(HttpSecurity http) throws Exception {
-		/*if (jwtAuthConverter != null) {
-			http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthConverter);
-		}*/
 		http.oauth2Login().
 			userInfoEndpoint().userService(oauth2UserService());
 		http.logout().
@@ -66,12 +58,29 @@ public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 				requestMatchers(publicRequestMatchers()).permitAll().
 				requestMatchers(superRequestMatchers()).hasRole(BaseConfig.ROLE_SUPER).
 				requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN).
-				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).				
+				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).
 				anyRequest().authenticated();
 		http.headers().frameOptions().sameOrigin();
 		http.csrf().disable();
 		http.cors();
 		return http.build();
+	}
+
+	@Override
+	protected RequestMatcher[] publicRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher("/api"),
+				new AntPathRequestMatcher("/api/**"),
+				new AntPathRequestMatcher("/api/auth/**"),
+				new AntPathRequestMatcher("/public/**"),
+				new AntPathRequestMatcher("/api-docs"),
+				new AntPathRequestMatcher("/api-docs/**/*"),
+				new AntPathRequestMatcher("/css/**/*"),
+				new AntPathRequestMatcher("/fonts/**/*"),
+				new AntPathRequestMatcher("/img/**/*"),
+				new AntPathRequestMatcher("/js/**/*"),
+				new AntPathRequestMatcher("/webjars/**/*"),
+		};
 	}
 
 	private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {

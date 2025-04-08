@@ -33,8 +33,9 @@ public class BaseWebSecurityConfig {
 
 	protected RequestMatcher[] publicRequestMatchers() {
 		return new RequestMatcher[] {
-				new AntPathRequestMatcher("/api"),
-				new AntPathRequestMatcher("/api/**"),
+//				new AntPathRequestMatcher("/api"),
+//				new AntPathRequestMatcher("/api/**"),
+				new AntPathRequestMatcher("/api/auth/**"),
 				new AntPathRequestMatcher("/public/**"),
 				new AntPathRequestMatcher("/api-docs"),
 				new AntPathRequestMatcher("/api-docs/**/*"),
@@ -63,6 +64,14 @@ public class BaseWebSecurityConfig {
 	protected RequestMatcher[] procedimentRequestMatchers() {
 		return new RequestMatcher[] {
 				new AntPathRequestMatcher("/metaExpedient*"),
+		};
+	}
+
+	protected RequestMatcher[] reactRequestMatchers() {
+		return new RequestMatcher[] {
+				new AntPathRequestMatcher("/react"),
+				new AntPathRequestMatcher("/react/**"),
+				new AntPathRequestMatcher("/api/**"),
 		};
 	}
 }

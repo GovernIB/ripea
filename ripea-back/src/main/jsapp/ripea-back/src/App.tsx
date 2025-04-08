@@ -1,7 +1,7 @@
 import React from 'react';
 import { BaseApp } from './components/BaseApp';
 import logo from './assets/logo.png';
-import govern_logo from './assets/goib_logo_v.svg';
+import govern_logo from './assets/govern-logo.png';
 import AppRoutes from './AppRoutes';
 
 export const App: React.FC = () => {
