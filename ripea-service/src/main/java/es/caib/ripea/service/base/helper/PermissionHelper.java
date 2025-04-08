@@ -65,7 +65,7 @@ public class PermissionHelper {
 		// Crear una instància de Permissions a partir dels roles de l'usuari
 		Permissions userPermissions = Permissions.fromAuthentication(auth);
 		// Determina si es tenen permisos
-		return hasPermission(userPermissions, permission);
+		return hasPermission(userPermissions, permission, targetType);
 
 	}
 
@@ -73,17 +73,34 @@ public class PermissionHelper {
 	 * - userPermissions: permisos de l'usuari.
 	 * - permission: permís requerit.
 	 */
-	private boolean hasPermission(Permissions userPermissions, @Nullable BasePermission permission) {
-		if (developmentMode)
-			return true;
-
-		// TODO: tot el tema de controlar permisos de RIPEA
+	private boolean hasPermission(Permissions userPermissions, @Nullable BasePermission permission, String targetType) {
+		if (developmentMode) return true;
 		boolean readPermissionAllowed = isReadOperation(permission) && userPermissions.isConsulta();
 		boolean writePermissionAllowed = isWriteOperation(permission) && userPermissions.isAdmin();
-
-		return readPermissionAllowed || writePermissionAllowed;
+		boolean resourcePermissionAllowed = isResourcePermissionAllowed(targetType, userPermissions);
+		return (readPermissionAllowed || writePermissionAllowed) && resourcePermissionAllowed;
 	}
 
+	private boolean isResourcePermissionAllowed(String targetType, Permissions userPermissions) {
+		if (targetType!=null) {
+			//Exclusius super admin
+			if (targetType.endsWith(".EntitatResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".PinbalServeiResource")) { return userPermissions.isSuperAdmin(); }
+			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
+			//Exclusius administradors
+			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".HistoricResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".MetaExpedientOrganGestorResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".MetaExpedientTascaValidacioResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".ExecucioMassivaResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".DominiResource")) { return userPermissions.isAdmin(); }
+			if (targetType.endsWith(".TipusDocumentalResource")) { return userPermissions.isAdmin(); }
+		}
+		return true;
+	}
 
 	private boolean isReadOperation(BasePermission permission) {
 		// Si el permís es null s'assumeix que s'està verificant l'accés al recurs per a qualsevol permís
