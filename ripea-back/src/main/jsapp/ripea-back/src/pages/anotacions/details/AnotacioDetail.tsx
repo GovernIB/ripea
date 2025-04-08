@@ -5,7 +5,7 @@ import {useState} from "react";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import {BasePage, MuiGrid, useResourceApiService} from "reactlib";
 import {formatDate} from "../../../util/dateUtils.ts";
-import {CardData, ContenidoData} from "../../../components/DetailComponents.tsx";
+import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;

@@ -8,6 +8,7 @@ import useAssignar from "../actions/Assignar.tsx";
 import useCambiarEstat from "../actions/CambiarEstat.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import {useTranslation} from "react-i18next";
+import useRelacionar from "../actions/Relacionar.tsx";
 
 export const useCommonActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -23,6 +24,59 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
+
+    const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
+
+    const agafar = (id: any): void => {
+        apiPatch(id, {
+            data: {
+                agafatPer: {
+                    // TODO: change for user session
+                    id: "rip_admin"
+                },
+            }
+        })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+    const lliberar = (id: any): void => {
+        apiPatch(id, {
+            data: {
+                agafatPer: null,
+            }
+        })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+    const delette = (id:any) => {
+        messageDialogShow(
+            'Title',
+            'Message',
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    apiDelete(id)
+                        .then(() => {
+                            refresh?.();
+                            temporalMessageShow(null, '', 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow('Error', error.message, 'error');
+                        });
+                }
+            });
+    }
 
     const actions = [
         {
@@ -54,36 +108,14 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.agafar'),
             icon: "lock",
             showInMenu: true,
-            onClick: (id: any): void => {
-                apiPatch(id, {
-                    data: {
-                        agafatPer: {
-                            // TODO: change user from session
-                            id: "rip_admin"
-                        },
-                    }
-                })
-                    .then(() => {
-                        refresh?.();
-                        temporalMessageShow(null, '', 'success');
-                    })
-            }
+            onClick: agafar,
         },
         {
             title: t('page.expedient.acciones.lliberar'),
             icon: "lock_open",
             showInMenu: true,
-            onClick: (id: any): void => {
-                apiPatch(id, {
-                    data: {
-                        agafatPer: null,
-                    }
-                })
-                    .then(() => {
-                        refresh?.();
-                        temporalMessageShow(null, '', 'success');
-                    })
-            }
+            onClick: lliberar,
+            hidden: (row:any) => !row?.agafatPer,
         },
         {
             title: t('page.expedient.acciones.upPrioritat'),
@@ -102,6 +134,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.relacio'),
             icon: "link",
             showInMenu: true,
+            onClick: hanldeRelacionar,
         },
         {
             title: t('page.expedient.acciones.close'),
@@ -113,25 +146,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('common.delete'),
             icon: "delete",
             showInMenu: true,
-            onClick: (rowId:any) => {
-                messageDialogShow(
-                    'Title',
-                    'Message',
-                    confirmDialogButtons,
-                    confirmDialogComponentProps)
-                    .then((value: any) => {
-                        if (value) {
-                            apiDelete(rowId)
-                                .then(() => {
-                                    refresh?.();
-                                    temporalMessageShow(null, 'Elemento borrado', 'success');
-                                })
-                                .catch((error) => {
-                                    temporalMessageShow('Error', error.message, 'error');
-                                });
-                        }
-                    });
-            },
+            onClick: delette,
             disabled: (row:any) => row?.estat == "TANCAT",
         },
         {
@@ -172,7 +187,9 @@ export const useCommonActions = (refresh?: () => void) => {
         {cambiarEstadoContent}
         {arxiuDialog}
         {assignarContent}
+        {cambiarRelacionar}
     </>;
+
     return {
         actions,
         components

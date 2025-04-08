@@ -4,7 +4,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
-import {ContenidoData} from "../../../components/DetailComponents.tsx";
+import {ContenidoData} from "../../../components/CardData.tsx";
 
 const useTascaDetail = () => {
     const [open, setOpen] = useState(false);

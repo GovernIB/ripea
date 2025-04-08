@@ -6,7 +6,8 @@ import {Button, Grid, Icon} from "@mui/material";
 import {formatIso} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
-import {useState} from "react";
+
+const filterStyle = {mb: 2, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '10px'}
 
 const springFilterBuilder = (data: any) :string => {
     let filterStr :string = '';
@@ -32,25 +33,25 @@ const springFilterBuilder = (data: any) :string => {
         builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
 
         data.agafat && builder.equals("agafatPer", null, (data.agafat === 'false')),
-        // data.pendentFirmar && (
-        //     builder.exists(
-        //         builder.and(
-        //             builder.or(
-        //                 builder.equals("DocumentPortafirmesEntity.estat", `'PENDENT'`, (data.pendentFirmar === 'true')),
-        //                 builder.equals("DocumentPortafirmesEntity.estat", `'ENVIAT'`, (data.pendentFirmar === 'true')),
-        //             ),
-        //             builder.equals("DocumentPortafirmesEntity.error", false, (data.pendentFirmar === 'true')),
-        //         )
-        //     )
-        // )
+        data.pendentFirmar && (
+            builder.exists(
+                builder.and(
+                    builder.or(
+                        builder.equals("portafirmes.estat", `'PENDENT'`, (data.pendentFirmar === 'true')),
+                        builder.equals("portafirmes.estat", `'ENVIAT'`, (data.pendentFirmar === 'true')),
+                    ),
+                    builder.eq("portafirmes.error", (data.pendentFirmar === 'false')),
+                )
+            )
+        )
     )
     // console.log('>>> springFilterBuilder:', filterStr)
     return filterStr;
 }
 
-const useExpedientFilter = () => {
+const ExpedientFilter = (props:any) => {
+    const {onSpringFilterChange} = props;
     const filterRef = useFilterApiRef();
-    const [springFilter, setSpringFilter] = useState<string>();
 
     const cercar = ()=> {
         filterRef.current.filter()
@@ -59,16 +60,14 @@ const useExpedientFilter = () => {
         filterRef.current.clear()
     }
 
-    const content = <MuiFilter
+    return <MuiFilter
         resourceName="expedientResource"
         code="EXPEDIENT_FILTER"
         springFilterBuilder={springFilterBuilder}
-        commonFieldComponentProps={{size: 'small'}}
-        componentProps={{
-            sx: {mb: 3, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '10px'}
-        }}
+        commonFieldComponentProps={{ size: 'small' }}
+        componentProps={{ sx: filterStyle }}
         apiRef={filterRef}
-        onSpringFilterChange={setSpringFilter}
+        onSpringFilterChange={onSpringFilterChange}
         buttonControlled
     >
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -89,16 +88,11 @@ const useExpedientFilter = () => {
             <GridFormField xs={2} name="pendentFirmar"/>
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-                <Button onClick={netejar}><Icon>eraser</Icon>Netejar</Button>
-                <Button onClick={cercar} variant="contained" sx={{borderRadius: 1}}><Icon>filter_alt</Icon> Cercar</Button>
+                <Button onClick={netejar}>Netejar</Button>
+                <Button onClick={cercar} variant="contained" sx={{borderRadius: 1}}><Icon>filter_alt</Icon>Cercar</Button>
             </Grid>
         </Grid>
     </MuiFilter>
-
-    return {
-        springFilter,
-        content
-    }
 }
 
-export default useExpedientFilter;
+export default ExpedientFilter;

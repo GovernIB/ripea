@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import {Grid} from "@mui/material";
 import {BasePage} from "reactlib";
-import {ContenidoData} from "../../../components/DetailComponents.tsx";
+import {ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 
 const usePublicacioDetail = () => {
@@ -47,7 +47,7 @@ const usePublicacioDetail = () => {
                     <ContenidoData title={t('page.publicacio.detall.estat')}>{entity?.estat}</ContenidoData>
                     <ContenidoData title={t('page.publicacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
                     <ContenidoData title={t('page.publicacio.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
-                    <ContenidoData title={t('page.publicacio.detall.observacions')} hiddeIfEmpty>{entity?.observacions}</ContenidoData>
+                    <ContenidoData title={t('page.publicacio.detall.observacions')} hiddenIfEmpty>{entity?.observacions}</ContenidoData>
                 </Grid>
             </BasePage>
         </Dialog>

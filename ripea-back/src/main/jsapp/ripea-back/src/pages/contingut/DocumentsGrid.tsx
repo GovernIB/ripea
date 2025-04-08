@@ -34,21 +34,25 @@ const DocumentsGridForm = () => {
     </Grid>
 }
 
-const ExpandButton = (props:{value:any, onChange:(value:any) => void}) => {
+const ExpandButton = (props:{value:any, onChange:(value:any) => void, hidden: boolean}) => {
+    const {value, onChange, hidden} = props;
     const { t } = useTranslation();
-    const {value, onChange} = props;
+
+    if (hidden){
+        return <></>
+    }
 
     return <FormControlLabel control={<Checkbox
         checked={value}
         onChange={(event) => onChange(event.target.checked)}
         icon={<Icon>arrow_right</Icon>}
         checkedIcon={<Icon>arrow_drop_down</Icon>}
-    />} label={value ? t("common.contract") : t("common.expand")} />
+    />} label={value ? t("common.contract") : t("common.expand")}/>
 }
 
 const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) => {
-    const { t } = useTranslation();
     const {value, onChange} = props;
+    const { t } = useTranslation();
 
     return <Grid item xs={3}>
         <FormControl fullWidth size="small">
@@ -94,18 +98,14 @@ const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
     const dataGridApiRef = useMuiDataGridApiRef()
+    const [treeView, setTreeView] = useState<boolean>(true);
+    const [expand, setExpand] = useState<boolean>(true);
+    const [vista, setVista] = useState<string>("carpeta");
 
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {
-        actions: commonActionsActions,
-        components: commonActionsComponents
-    } = useContingutActions(dataGridApiRef);
-
-    const [treeView, setTreeView] = useState<boolean>(true);
-    const [expand, setExpand] = useState<boolean>(true);
-    const [vista, setVista] = useState<string>("carpeta");
+    const {actions, components} = useContingutActions(dataGridApiRef);
 
     return <GridPage>
         <MuiGrid
@@ -126,7 +126,7 @@ const DocumentsGrid = (props:any) => {
             disableColumnMenu
             rowHideDeleteButton
             apiRef={dataGridApiRef}
-            rowAdditionalActions={commonActionsActions}
+            rowAdditionalActions={actions}
             onRowsChange={(rows) => onRowCountChange?.(rows.filter((a) => a?.tipus == "DOCUMENT").length)}
             // checkboxSelection
             treeData={treeView}
@@ -161,7 +161,7 @@ const DocumentsGrid = (props:any) => {
             toolbarElementsWithPositions={[
                 {
                     position: 0,
-                    element: treeView ? <ExpandButton value={expand} onChange={setExpand} /> :<></>,
+                    element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView}/>,
                 },
                 {
                     position: 3,
@@ -172,7 +172,7 @@ const DocumentsGrid = (props:any) => {
                 }
             ]}
         />
-        {commonActionsComponents}
+        {components}
     </GridPage>
 }
 

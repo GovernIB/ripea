@@ -132,6 +132,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	@OneToMany(mappedBy = "expedient", fetch = FetchType.LAZY)
     @Where(clause = "dtype = 'DocumentNotificacioEntity'")
 	private List<DocumentNotificacioResourceEntity> notificacions = new ArrayList<>();
+    @OneToMany(mappedBy = "expedient", fetch = FetchType.LAZY)
+    @Where(clause = "dtype = 'DocumentPortafirmesEntity'")
+	private List<DocumentPortafirmesResourceEntity> portafirmes = new ArrayList<>();
 
 	@OneToMany(
 			mappedBy = "expedient",

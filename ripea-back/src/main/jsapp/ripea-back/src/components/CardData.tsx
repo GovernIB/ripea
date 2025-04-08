@@ -4,6 +4,7 @@ import Icon from "@mui/material/Icon";
 
 const cardBorder= { border: '1px solid #e3e3e3', borderRadius: '10px' };
 const cardHeader= { backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3' };
+const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
 const CardButton = (props:any) => {
     const {text, icon, onClick, flex, buttonProps, hidden} = props;
@@ -13,10 +14,7 @@ const CardButton = (props:any) => {
     }
 
     return <Grid item xs={flex ?? 12} display={'flex'} justifyContent={'end'}>
-        <IconButton sx={{p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey', ...buttonProps}}
-                    title={text}
-                    onClick={onClick}
-        >
+        <IconButton sx={{...iconButton, ...buttonProps}} title={text} onClick={onClick}>
             <Typography sx={{display: 'flex', alignItems: 'center'}} variant={'caption'} color={'textPrimary'}>
                 <Icon fontSize={'inherit'} hidden={!icon}>{icon}</Icon>
                 {text}
@@ -26,9 +24,9 @@ const CardButton = (props:any) => {
 }
 
 export const CardData = (props:any) => {
-    const {title, header, children, xs, hidden, data, buttons, ...other} = props;
+    const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, ...other} = props;
 
-    if (hidden){
+    if (hidden || (hiddenIfEmpty && children == null)){
         return <></>
     }
 
@@ -39,10 +37,9 @@ export const CardData = (props:any) => {
                 {header}
             </CardContent>
 
-            <CardContent hidden={!children && !data}>
+            <CardContent hidden={!children}>
                 <Grid container columnSpacing={1} rowSpacing={1} item xs={12} {...other}>
                     {children}
-                    {data?.map((d:any) => <ContenidoData {...d}/>)}
                     {buttons?.map((button:any) => <CardButton {...button}/>)}
                 </Grid>
             </CardContent>
@@ -51,9 +48,9 @@ export const CardData = (props:any) => {
 }
 
 export const ContenidoData = (props:any) => {
-    const {title, titleXs, children, textXs, xs, componentTitleProps, componentTextProps, hidden, hiddeIfEmpty, ...other} = props;
+    const {title, titleXs, children, textXs, xs, componentTitleProps, componentTextProps, hidden, hiddenIfEmpty, ...other} = props;
 
-    if (hidden || (hiddeIfEmpty && children == null)){
+    if (hidden || (hiddenIfEmpty && children == null)){
         return <></>
     }
 

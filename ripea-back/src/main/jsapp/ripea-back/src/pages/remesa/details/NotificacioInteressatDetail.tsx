@@ -4,7 +4,7 @@ import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {Grid, Typography} from "@mui/material";
 import {BasePage} from "reactlib";
-import {CardData, ContenidoData} from "../../../components/DetailComponents.tsx";
+import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 
 const Dades = (props:any) => {
@@ -20,7 +20,7 @@ const Dades = (props:any) => {
 
                 <ContenidoData title={t('page.notificacioInteressat.detall.entregaNif')}>{entity?.entregaNif}</ContenidoData>
                 <ContenidoData title={t('page.notificacioInteressat.detall.classificacio')}>{entity?.classificacio}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.entregaDehObligat')}>{t(`common.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.entregaDehObligat')}>{t(`enum.siNO.${entity?.interessatInfo?.entregaDehObligat}`)}</ContenidoData>
                 <ContenidoData title={t('page.notificacio.detall.serveiTipusEnum')}>{entity?.notificacioInfo?.serveiTipusEnum ?? 'NORMAL'}</ContenidoData>
                 <ContenidoData title={t('page.notificacioInteressat.detall.enviamentDatatEstat')}>{entity?.enviamentDatatEstat}</ContenidoData>
             </CardData>
@@ -29,24 +29,24 @@ const Dades = (props:any) => {
                 <ContenidoData title={t('page.interessat.detall.nif')}>{entity?.interessatInfo?.documentNum}</ContenidoData>
 
                 <ContenidoData title={t('page.interessat.detall.nom')} hidden={entity?.interessatInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddeIfEmpty>{entity?.interessatInfo?.nom}</ContenidoData>
+                               hiddenIfEmpty>{entity?.interessatInfo?.nom}</ContenidoData>
                 <ContenidoData title={t('page.interessat.detall.llinatges')} hidden={entity?.interessatInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddeIfEmpty>{entity?.interessatInfo?.llinatge1} {entity?.interessatInfo?.llinatge2}</ContenidoData>
+                               hiddenIfEmpty>{entity?.interessatInfo?.llinatge1} {entity?.interessatInfo?.llinatge2}</ContenidoData>
 
-                <ContenidoData title={t('page.interessat.detall.telefon')} hiddeIfEmpty>{entity?.interessatInfo?.telefon}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.email')} hiddeIfEmpty>{entity?.interessatInfo?.email}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.interessatInfo?.telefon}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.interessatInfo?.email}</ContenidoData>
             </CardData>
 
             <CardData title={t('page.notificacioInteressat.detall.representant')} hidden={!entity?.representantInfo}>
                 <ContenidoData title={t('page.interessat.detall.nif')}>{entity?.representantInfo?.documentNum}</ContenidoData>
 
                 <ContenidoData title={t('page.interessat.detall.nom')} hidden={entity?.representantInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddeIfEmpty>{entity?.representantInfo?.nom}</ContenidoData>
+                               hiddenIfEmpty>{entity?.representantInfo?.nom}</ContenidoData>
                 <ContenidoData title={t('page.interessat.detall.llinatges')} hidden={entity?.representantInfo?.tipus != 'InteressatPersonaFisicaEntity'}
-                               hiddeIfEmpty>{entity?.representantInfo?.llinatge1} {entity?.representantInfo?.llinatge2}</ContenidoData>
+                               hiddenIfEmpty>{entity?.representantInfo?.llinatge1} {entity?.representantInfo?.llinatge2}</ContenidoData>
 
-                <ContenidoData title={t('page.interessat.detall.telefon')} hiddeIfEmpty>{entity?.representantInfo?.telefon}</ContenidoData>
-                <ContenidoData title={t('page.interessat.detall.email')} hiddeIfEmpty>{entity?.representantInfo?.email}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.telefon')} hiddenIfEmpty>{entity?.representantInfo?.telefon}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.email')} hiddenIfEmpty>{entity?.representantInfo?.email}</ContenidoData>
             </CardData>
         </Grid>
     </BasePage>

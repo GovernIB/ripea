@@ -4,7 +4,7 @@ import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {Grid} from "@mui/material";
 import {BasePage, MuiGrid} from "reactlib";
-import {CardData, ContenidoData} from "../../../components/DetailComponents.tsx";
+import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 
@@ -91,7 +91,7 @@ const Dades = (props:any) => {
                                hidden={!(entity.notificacioEstat=='FINALITZADA' || entity.notificacioEstat=='PROCESSADA')}>
                     {formatDate(entity?.processatData)}</ContenidoData>
                 <ContenidoData title={t('page.notificacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
-                <ContenidoData title={t('page.notificacio.detall.entregaPostal')}>{t(`common.siNO.${entity?.entregaPostal}`)}</ContenidoData>
+                <ContenidoData title={t('page.notificacio.detall.entregaPostal')}>{t(`enum.siNO.${entity?.entregaPostal}`)}</ContenidoData>
             </CardData>
             <CardData title={t('page.notificacio.detall.notificacioDocument')}
                       buttons={[

@@ -5,7 +5,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
-import {ContenidoData} from "../../../components/DetailComponents.tsx";
+import {ContenidoData} from "../../../components/CardData.tsx";
 
 const Contenido = (props:any) => {
     const {entity} = props;
@@ -18,12 +18,12 @@ const Contenido = (props:any) => {
             <ContenidoData title={t('page.document.detall.createdDate')}>{formatDate(entity?.createdDate)}</ContenidoData>
             <ContenidoData title={t('page.document.detall.estat')}>{entity?.estat}</ContenidoData>
             <ContenidoData title={t('page.document.detall.dataCaptura')}>{formatDate(entity?.dataCaptura)}</ContenidoData>
-            <ContenidoData title={t('page.document.detall.origen')}>{entity?.ntiOrigen}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.origen')}>{t(`enum.origen.${entity?.ntiOrigen}`)}</ContenidoData>
             <ContenidoData title={t('page.document.detall.tipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
-            <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{entity?.ntiEstadoElaboracion}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</ContenidoData>
             <ContenidoData title={t('page.document.detall.csv')}>{entity?.ntiCsv}</ContenidoData>
             <ContenidoData title={t('page.document.detall.csvRegulacion')}>{entity?.ntiCsvRegulacion}</ContenidoData>
-            <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.tipoFirma')}>{t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
         </Grid>
     </BasePage>
 }

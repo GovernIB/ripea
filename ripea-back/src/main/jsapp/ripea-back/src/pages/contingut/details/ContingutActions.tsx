@@ -164,6 +164,7 @@ export const useContingutActions = (dataGridApiRef: MutableRefObject<MuiDataGrid
             icon: "info",
             showInMenu: true,
             onClick: arxiuhandleOpen,
+            disabled: (row:any) => !row?.arxiuUuid,
             hidden: hideIfNotDocument,
         },
         {

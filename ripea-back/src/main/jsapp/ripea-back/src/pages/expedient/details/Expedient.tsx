@@ -1,7 +1,7 @@
 import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {
-    BasePage, GridPage,
+    GridPage,
     useResourceApiService,
 } from 'reactlib';
 import {useState, useEffect} from "react";
@@ -18,7 +18,7 @@ import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
 import {CommentDialog} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
-import {CardData, ContenidoData} from "../../../components/DetailComponents.tsx";
+import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 
 const Contenido = (props :any) => {
     const { title, children } = props;
@@ -55,10 +55,10 @@ const ExpedientsRelacionats = (props:any) => {
 }
 
 const ExpedientInfo = (props:any) => {
-    const {entity: expedient} = props;
+    const {entity: expedient, xs} = props;
     const { t } = useTranslation();
 
-    return <CardData title={"Informació de l'expedient"} direction={'column'}>
+    return <CardData title={"Informació de l'expedient"} direction={'column'} xs={xs}>
         <Contenido title={t('page.contingut.detalle.numero')} direction={'column'}>{expedient?.numero}</Contenido>
         <Contenido title={t('page.contingut.detalle.titol')} direction={'column'}>{expedient?.nom}</Contenido>
         <Contenido title={t('page.contingut.detalle.metaExpedient')} direction={'column'}>{expedient?.metaExpedient?.description}</Contenido>
@@ -169,23 +169,21 @@ const Expedient = () => {
     return <GridPage>
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
-                <Grid item xs={7}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
                     <Icon>folder</Icon>{expedient?.nom}</Typography>
                 </Grid>
-                {expedient?.agafatPer && <Grid item xs={4}>
-                    <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1}>
+                <Grid item xs={4} display={'flex'} justifyContent={'end'}>
+                    <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
                         {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
 
                         <IconButton aria-label="lock_open" color={"inherit"}>
                             <Icon>lock_open</Icon>
                         </IconButton>
                     </Typography>
-                </Grid>}
+                </Grid>
             </Grid>
         }>
-            <Grid item xs={3}>
-                <ExpedientInfo entity={expedient}/>
-            </Grid>
+            <ExpedientInfo entity={expedient} xs={3}/>
 
             <Grid item xs={9}>
                 <TabComponent
