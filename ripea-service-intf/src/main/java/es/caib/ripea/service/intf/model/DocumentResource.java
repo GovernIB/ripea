@@ -269,6 +269,21 @@ public class DocumentResource extends NodeResource {
         @NotNull
         private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
 
+        private boolean firmaParcial;
+        private boolean avisFirmaParcial;
+
+        @Transient
+        private boolean mostrarFirmaParcial;
+        @Transient
+        private boolean mostrarAvisFirmaParcial;
+        @Transient
+        private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+
+        // SIMPLE
+        private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+        private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
+
+        // PORTAFIB
 //        private List<ResourceReference<>> annexos;
 //        private ResourceReference<> fluxFirma;
     }

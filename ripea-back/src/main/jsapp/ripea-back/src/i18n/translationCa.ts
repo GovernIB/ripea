@@ -263,6 +263,7 @@ const translationCa = {
             },
             action: {
                 enviarEmail: "Enviar document per email",
+                enviarPortafirmes: "Enviar document a portafirmes",
                 move: "Moure contingut",
                 notificar: "Crear notificació document",
                 publicar: "Crear publicació",

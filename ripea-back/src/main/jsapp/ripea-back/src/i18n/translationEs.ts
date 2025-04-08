@@ -263,6 +263,7 @@ const translationEs = {
             },
             action: {
                 enviarEmail: "Enviar documento por email",
+                enviarPortafirmes: "Enviar documento a portafirmas",
                 move: "Mover contenido",
                 notificar: "Crear notificación documento",
                 publicar: "Crear publicación",

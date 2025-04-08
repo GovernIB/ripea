@@ -263,6 +263,7 @@ const translationEn = {
             },
             action: {
                 enviarEmail: "Send Document via Email",
+                enviarPortafirmes: "Send document to signature folder",
                 move: "Move Content",
                 notificar: "Create Document Notification",
                 publicar: "Create Publication",

@@ -1,4 +1,4 @@
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
@@ -6,11 +6,22 @@ import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const EviarPortafirmesForm = () => {
+    const {data} = useFormContext();
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="motiu"/>
-        <GridFormField xs={12} name="prioritat"/>
-        <GridFormField xs={12} name="annexos"/>
-        <GridFormField xs={12} name="fluxFirma"/>
+        <GridFormField xs={12} name="prioritat" required/>
+
+        {/* SIMPLE */}
+        <GridFormField xs={12} name="responsables" multiple hidden={data?.portafirmesFluxTipus!='SIMPLE'} required/>
+        <GridFormField xs={12} name="portafirmesSequenciaTipus" hidden={data?.portafirmesFluxTipus!='SIMPLE'} required/>
+
+        {/* PORTAFIB */}
+        <GridFormField xs={12} name="annexos" multiple hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+        <GridFormField xs={12} name="fluxFirma" hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+
+        <GridFormField xs={12} name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
+        <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
     </Grid>
 }
 
