@@ -16,9 +16,9 @@ export type DataCommonFindArgs = ResourceApiFindCommonArgs;
 export type DataCommonAdditionalAction = {
     title?: string;
     icon?: string;
-    showInMenu?: ((row: any) => boolean) | boolean;
-    disabled?: ((row: any) => boolean) | boolean;
-    hidden?: ((row: any) => boolean) | boolean;
+    showInMenu?: boolean | ((row: any) => boolean);
+    disabled?: boolean | ((row: any) => boolean);
+    hidden?: boolean | ((row: any) => boolean);
     linkTo?: ((row: any) => string) | string;
     linkState?: ((row: any) => any) | any;
     rowLink?: string;
@@ -167,9 +167,12 @@ export const useDataCommonEditable = (
     toolbarCreateLink: string | undefined,
     rowDetailLink: string | undefined,
     rowUpdateLink: string | undefined,
-    rowHideUpdateButton: boolean | undefined,
-    rowHideDeleteButton: boolean | undefined,
-    rowHideDetailsButton: boolean | undefined,
+    rowDisableUpdateButton: boolean | ((row: any) => boolean) | undefined,
+    rowDisableDeleteButton: boolean | ((row: any) => boolean) | undefined,
+    rowDisableDetailsButton: boolean | ((row: any) => boolean) | undefined,
+    rowHideUpdateButton: boolean | ((row: any) => boolean) | undefined,
+    rowHideDeleteButton: boolean | ((row: any) => boolean) | undefined,
+    rowHideDetailsButton: boolean | ((row: any) => boolean) | undefined,
     popupEditActive: boolean | undefined,
     popupEditCreateActive: boolean | undefined,
     popupEditUpdateActive: boolean | undefined,
@@ -242,25 +245,31 @@ export const useDataCommonEditable = (
         onClick: !toolbarCreateLink ? showCreateDialog : undefined,
     }) : undefined;
     const rowEditActions: DataCommonAdditionalAction[] = [];
-    !readOnly && !rowHideUpdateButton && rowEditActions.push({
+    !readOnly && rowEditActions.push({
         title: t('datacommon.update.title'),
         rowLink: 'update',
         icon: 'edit',
         linkTo: rowUpdateLink,
         linkState: rowUpdateLink != null && formAdditionalData != null ? { additionalData: formAdditionalData } : undefined,
+        disabled: rowDisableUpdateButton,
+        hidden: rowHideUpdateButton,
         clickShowUpdateDialog: rowUpdateLink == null,
     });
-    !readOnly && !rowHideDeleteButton && rowEditActions.push({
+    !readOnly && rowEditActions.push({
         title: t('datacommon.delete.title'),
         icon: 'delete',
         onClick: doDelete,
+        disabled: rowDisableDeleteButton,
+        hidden: rowHideDeleteButton,
         showInMenu: true,
         rowLink: 'delete',
     });
-    rowDetailLink && !rowHideDetailsButton && rowEditActions.push({
+    rowDetailLink && rowEditActions.push({
         title: t('datacommon.details.title'),
         icon: 'info',
         linkTo: rowDetailLink,
+        disabled: rowDisableDetailsButton,
+        hidden: rowHideDetailsButton,
         rowLink: readOnly ? undefined : '!update',
     });
     const formDialogComponent = !readOnly && (isPopupEditCreate || isPopupEditUpdate) ? <DataFormDialog

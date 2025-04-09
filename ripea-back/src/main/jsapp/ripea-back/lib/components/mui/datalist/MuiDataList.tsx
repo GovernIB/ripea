@@ -60,9 +60,12 @@ export type MuiDataListProps = {
     toolbarAdditionalRow?: React.ReactElement;
     rowUpdateLink?: string;
     rowDetailLink?: string;
-    rowHideUpdateButton?: boolean;
-    rowHideDeleteButton?: boolean;
-    rowHideDetailsButton?: boolean;
+    rowDisableUpdateButton?: boolean | ((row: any) => boolean);
+    rowDisableDeleteButton?: boolean | ((row: any) => boolean);
+    rowDisableDetailsButton?: boolean | ((row: any) => boolean);
+    rowHideUpdateButton?: boolean | ((row: any) => boolean);
+    rowHideDeleteButton?: boolean | ((row: any) => boolean);
+    rowHideDetailsButton?: boolean | ((row: any) => boolean);
     rowAdditionalActions?: DataCommonAdditionalAction[];
     popupEditActive?: boolean;
     popupEditCreateActive?: boolean;
@@ -164,6 +167,9 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         toolbarAdditionalRow,
         rowUpdateLink,
         rowDetailLink,
+        rowDisableUpdateButton,
+        rowDisableDeleteButton,
+        rowDisableDetailsButton,
         rowHideUpdateButton,
         rowHideDeleteButton,
         rowHideDetailsButton,
@@ -217,6 +223,9 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         toolbarCreateLink,
         rowUpdateLink,
         rowDetailLink,
+        rowDisableUpdateButton,
+        rowDisableDeleteButton,
+        rowDisableDetailsButton,
         rowHideUpdateButton,
         rowHideDeleteButton,
         rowHideDetailsButton,

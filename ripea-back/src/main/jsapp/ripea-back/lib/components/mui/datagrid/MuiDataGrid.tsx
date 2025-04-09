@@ -90,11 +90,15 @@ export type MuiDataGridProps = {
     rowLink?: string;
     rowDetailLink?: string;
     rowUpdateLink?: string;
-    rowHideUpdateButton?: boolean;
-    rowHideDeleteButton?: boolean;
-    rowHideDetailsButton?: boolean;
+    rowDisableUpdateButton?: boolean | ((row: any) => boolean);
+    rowDisableDeleteButton?: boolean | ((row: any) => boolean);
+    rowDisableDetailsButton?: boolean | ((row: any) => boolean);
+    rowHideUpdateButton?: boolean | ((row: any) => boolean);
+    rowHideDeleteButton?: boolean | ((row: any) => boolean);
+    rowHideDetailsButton?: boolean | ((row: any) => boolean);
     rowActionsColumnProps?: any;
     rowAdditionalActions?: DataCommonAdditionalAction[];
+    rowSelectionModel?: GridRowSelectionModel,
     popupEditActive?: boolean;
     popupEditCreateActive?: boolean;
     popupEditUpdateActive?: boolean;
@@ -304,11 +308,15 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         rowLink,
         rowDetailLink,
         rowUpdateLink,
+        rowDisableUpdateButton,
+        rowDisableDeleteButton,
+        rowDisableDetailsButton,
         rowHideUpdateButton,
         rowHideDeleteButton,
         rowHideDetailsButton,
         rowActionsColumnProps,
         rowAdditionalActions = [],
+        rowSelectionModel: rowSelectionModelProp = [],
         popupEditActive,
         popupEditCreateActive,
         popupEditUpdateActive,
@@ -336,7 +344,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const [internalSortModel, setInternalSortModel] = React.useState<GridSortModel>(sortModel ?? []);
     const [internalFilter, setInternalFilter] = React.useState<string | undefined>(filterProp);
     const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>();
-    const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>();
+    const [rowSelectionModel, setRowSelectionModel] = React.useState<GridRowSelectionModel>(rowSelectionModelProp);
     const [additionalRows, setAdditionalRows] = React.useState<any[]>(!treeDataAdditionalRowsIsFunction ? [] : treeDataAdditionalRows as any[]);
     const {
         currentActions: apiCurrentActions,
@@ -412,6 +420,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         toolbarCreateLink,
         rowDetailLink,
         rowUpdateLink,
+        rowDisableUpdateButton,
+        rowDisableDeleteButton,
+        rowDisableDetailsButton,
         rowHideUpdateButton,
         rowHideDeleteButton,
         rowHideDetailsButton,
