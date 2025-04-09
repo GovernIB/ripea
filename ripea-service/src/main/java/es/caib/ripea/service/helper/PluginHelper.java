@@ -955,25 +955,28 @@ public class PluginHelper {
 
 	public Expedient arxiuExpedientConsultar(
 			ExpedientEntity expedient) {
+        return arxiuExpedientConsultar(expedient.getId(), expedient.getNom(), expedient.getMetaExpedient().getNom(), expedient.getArxiuUuid());
+	}
+	public Expedient arxiuExpedientConsultar(Long id, String nom, String metaExpedientNom, String arxiuUuid) {
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
-						expedient.getId()));
+						id));
 		String accioDescripcio = "Consulta d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put(
 				"id",
-				expedient.getId().toString());
+				id.toString());
 		accioParams.put(
 				"títol",
-				expedient.getNom());
+                nom);
 		accioParams.put(
 				"tipus",
-				expedient.getMetaExpedient().getNom());
+                metaExpedientNom);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
-					expedient.getArxiuUuid(),
+                    arxiuUuid,
 					null);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
@@ -1968,6 +1971,17 @@ public class PluginHelper {
 			boolean ambContingut,
 			boolean ambVersioImprimible) {
 
+        return arxiuDocumentConsultar(
+                document.getId(), document.getNom(), document.getArxiuUuid(), document.getEntitat().getCodi(),
+                arxiuUuid, versio, ambContingut, ambVersioImprimible);
+	}
+	public Document arxiuDocumentConsultar(
+			Long documentId, String documentNom, String documentArxiuUuid, String documentEntitatCodi,
+			String arxiuUuid,
+			String versio,
+			boolean ambContingut,
+			boolean ambVersioImprimible) {
+
 		boolean throwException = false; // throwException = true;
 		if (throwException) {
 			throw new RuntimeException("Mock exception al consultar document arxiu");
@@ -1979,16 +1993,16 @@ public class PluginHelper {
         IArxiuPluginWrapper arxiuPluginWrapper = null;
         String arxiuUuidConsulta = null;
 
-        if (document != null) {
-            accioParams.put("contingutId", document.getId().toString());
-            accioParams.put("contingutNom", document.getNom());
-            arxiuUuidConsulta  = document.getArxiuUuid();
+        if (documentId != null) {
+            accioParams.put("contingutId", documentId.toString());
+            accioParams.put("contingutNom", documentNom);
+            arxiuUuidConsulta  = documentArxiuUuid;
             String entitatCodi = configHelper.getEntitatActualCodi();
             if (entitatCodi!=null) {
                 arxiuPluginWrapper = getArxiuPlugin(entitatCodi);
             } else {
                 //Cas de enviament de email en segon pla, no disposam de entitat en sessió
-                arxiuPluginWrapper = getArxiuPlugin(document.getEntitat().getCodi());
+                arxiuPluginWrapper = getArxiuPlugin(documentEntitatCodi);
             }
         } else {
             arxiuPluginWrapper = getArxiuPlugin();

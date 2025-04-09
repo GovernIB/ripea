@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -32,6 +33,9 @@ import java.util.List;
         artifacts = {
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_PATH_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -61,6 +65,7 @@ import java.util.List;
         })
 public class DocumentResource extends NodeResource {
 
+    public static final String PERSPECTIVE_ARXIU_DOCUMENT_CODE = "ARXIU_DOCUMENT";
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
@@ -173,6 +178,9 @@ public class DocumentResource extends NodeResource {
     @Transient
     @ResourceField(onChangeActive = true)
     public Boolean hasFirma;
+
+    @Transient
+    private ArxiuDetallDto arxiu;
 
     @Getter
     @Setter

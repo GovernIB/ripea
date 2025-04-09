@@ -5,8 +5,8 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 
 const CambiarPrioritatForm = () => {
-    const formContext = useFormContext();
-    const {data} = formContext;
+    const {data} = useFormContext();
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" readOnly/>
         <GridFormField xs={12} name="prioritat" required/>

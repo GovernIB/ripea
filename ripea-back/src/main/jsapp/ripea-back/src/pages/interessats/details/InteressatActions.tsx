@@ -20,13 +20,13 @@ const useInteressatActions = (refresh?: () => void) => {
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
     const apiRef = useRef<MuiFormDialogApi>();
 
-    const createRepresentent = (rowId: any, row:any) => {
+    const createRepresentent = (id: any, row:any) => {
         apiRef.current?.show(undefined, {
             expedient: {
                 id: row?.expedient?.id
             },
             representat: {
-                id: rowId
+                id: id
             },
             esRepresentant: true,
         })
@@ -38,7 +38,7 @@ const useInteressatActions = (refresh?: () => void) => {
                 temporalMessageShow('Error', error.message, 'error');
             });
     }
-    const updateRepresentent = (rowId: any, row: any) => {
+    const updateRepresentent = (id: any, row: any) => {
         apiRef.current?.show(row?.representant?.id)
             .then(() => {
                 refresh?.();
@@ -48,7 +48,7 @@ const useInteressatActions = (refresh?: () => void) => {
                 temporalMessageShow('Error', error.message, 'error');
             });
     }
-    const deleteRepresentent = (rowId: any, row: any) => {
+    const deleteRepresentent = (id: any, row: any) => {
         getOne(row?.representant?.id)
             .then((representant) => {
                 messageDialogShow(
@@ -68,7 +68,7 @@ const useInteressatActions = (refresh?: () => void) => {
                                         temporalMessageShow('Error', error.message, 'error');
                                     });
                             } else {
-                                apiPatch(rowId, {
+                                apiPatch(id, {
                                     data: {
                                         representant: null,
                                     }
@@ -82,7 +82,7 @@ const useInteressatActions = (refresh?: () => void) => {
                     });
             })
     }
-    const deleteInteressat = (rowId: any, row: any) => {
+    const deleteInteressat = (id: any, row: any) => {
         messageDialogShow(
             t('page.interessat.dialog.deleteTitle'),
             t('page.interessat.dialog.deleteMessage'),
@@ -91,7 +91,7 @@ const useInteressatActions = (refresh?: () => void) => {
             .then((value: any) => {
                 if (value) {
                     if (row?.hasRepresentats) {
-                        apiPatch(rowId, {
+                        apiPatch(id, {
                             data: {
                                 esRepresentant: true,
                             }
@@ -101,7 +101,7 @@ const useInteressatActions = (refresh?: () => void) => {
                                 temporalMessageShow(null, 'Elemento borrado', 'success');
                             })
                     } else {
-                        apiDelete(rowId)
+                        apiDelete(id)
                             .then(() => {
                                 refresh?.();
                                 temporalMessageShow(null, 'Elemento borrado', 'success');

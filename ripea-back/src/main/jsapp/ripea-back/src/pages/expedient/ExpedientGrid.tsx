@@ -219,9 +219,10 @@ const ExpedientGrid = () => {
                 onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
                 rowAdditionalActions={actions}
                 paginationActive
-                rowHideDeleteButton
+                rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
                 disableColumnMenu
-                height={'calc(162px + calc(52px * 4))'}
+                // height={'calc(162px + calc(52px * 4))'}
+                height={162 + 52 * 4}
             />
 
             {components}

@@ -16,6 +16,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +29,9 @@ import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
-import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EmailHelper;
-import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -37,17 +39,12 @@ import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
-import es.caib.ripea.service.resourcehelper.PermisosResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,17 +54,16 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
     private final DocumentResourceHelper documentResourceHelper;
-    private final PermisosResourceHelper permisosResourceHelper;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
-    private final DocumentRepository documentRepository;
-    
+    private final ContingutResourceHelper contingutResourceHelper;
+    private final PluginHelper pluginHelper;
+
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
-    private final PermisosHelper permisosHelper;
-    private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 
     @PostConstruct
     public void init() {
+        register(DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE, new ArxiuDocumentPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.metaDocument, new MetaDocumentOnchangeLogicProcessor());
@@ -179,6 +175,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 arrayIndex++;
             }
             entity.setTreePath(result);
+        }
+    }
+    private class ArxiuDocumentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+                    entity.getId(), entity.getNom(), entity.getArxiuUuid(), entity.getEntitat().getCodi(),
+                    null, null, true, false);
+            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDocumentDetall(arxiuDocument,entity.getEntitat().getId());
+//            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDetall(entity.getEntitat().getId(), entity.getId());
+            resource.setArxiu(arxiu);
         }
     }
 

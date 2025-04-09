@@ -1,10 +1,12 @@
 package es.caib.ripea.service.intf.model;
 
+import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
@@ -43,6 +45,9 @@ import java.util.List;
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_RELACIONAT_CODE),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_ARXIU_EXPEDIENT),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
 						formClass = ExpedientResource.ExpedientFilterForm.class)
@@ -50,6 +55,7 @@ import java.util.List;
 public class ExpedientResource extends NodeResource {
 
 	private static final long serialVersionUID = 7440910672703796468L;
+	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
@@ -148,6 +154,9 @@ public class ExpedientResource extends NodeResource {
     public String getTipusStr() {
         return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
     }
+
+    @Transient
+    private ArxiuDetallDto arxiu;
 
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();

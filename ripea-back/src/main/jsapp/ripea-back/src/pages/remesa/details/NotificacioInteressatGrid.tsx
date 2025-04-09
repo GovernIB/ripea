@@ -43,7 +43,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
         setOpen(false);
     };
 
-    const content =
+    const dialog =
         <Dialog
             open={open}
             title={t('page.notificacio.acciones.notificacioInteressat')}
@@ -84,7 +84,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
     return {
         handleOpen,
         handleClose,
-        content,
+        dialog,
     }
 }
 export default useNotificacioInteressatGrid;

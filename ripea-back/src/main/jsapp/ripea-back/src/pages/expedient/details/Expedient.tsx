@@ -37,18 +37,18 @@ const border= { border: '1px solid #e3e3e3', borderRadius: '10px' };
 const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
 
-    const relacionats :any[] = [
+    const relacionats :any[] = [...new Set([
         ...expedient?.relacionatsPer ?? [],
         ...expedient?.relacionatsAmb ?? []
-    ];
+    ])];
 
-    return <CardData title={'Expedients relacionats'} hidden={relacionats?.length==0}>
+    return <CardData title={'Expedients relacionats'} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
         {
-            relacionats?.map((relacionat:any) =><>
+            relacionats?.map((relacionat:any) =>
                 <Typography key={relacionat?.id} variant={"caption"}>
                     <Icon fontSize={"inherit"}>folder</Icon>
                     <Link href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
-                </Typography><br/></>
+                </Typography>
             )
         }
     </CardData>

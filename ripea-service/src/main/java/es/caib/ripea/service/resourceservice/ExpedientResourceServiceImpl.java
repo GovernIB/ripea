@@ -9,6 +9,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +48,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+    private final ContingutResourceHelper contingutResourceHelper;
+    private final PluginHelper pluginHelper;
 
     @PostConstruct
     public void init() {
@@ -50,6 +57,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_ESTAT_CODE, new EstatPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_RELACIONAT_CODE, new RelacionatPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_ARXIU_EXPEDIENT, new ArxiuExpedientPerspectiveApplicator());
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
@@ -133,27 +141,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setInteressats(interessats);
         }
     }
-    /*
-    private class SeguidorsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-        @Override
-        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            List<UsuariResource> seguidors = entity.getSeguidors().stream()
-                    .map(usuariResourceEntity -> objectMappingHelper.newInstanceMap(usuariResourceEntity, UsuariResource.class))
-                    .collect(Collectors.toList());
-            resource.setSeguidors(seguidors);
-        }
-    }
-    
-    private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-        @Override
-        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            List<ExpedientResource> relacionats = entity.getRelacionatsAmb().stream()
-                    .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
-                    .collect(Collectors.toList());
-            resource.setRelacionatsAmb(relacionats);
-        }
-    }
-     */
+
     private class EstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -183,6 +171,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                             ))
                     .collect(Collectors.toList());
             resource.setRelacionatsPer(relacionatsPer);
+        }
+    }
+    private class ArxiuExpedientPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(
+                    entity.getId(), entity.getNom(), entity.getMetaExpedient().getNom(), entity.getArxiuUuid());
+            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuExpedientDetall(arxiuExpedient);
+//            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDetall(entity.getEntitat().getId(), entity.getId());
+            resource.setArxiu(arxiu);
         }
     }
 

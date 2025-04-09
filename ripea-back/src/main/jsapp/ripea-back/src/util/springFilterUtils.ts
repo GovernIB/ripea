@@ -4,10 +4,12 @@ const filter = (options :any[]) :any[] => {
         !(a.includes("null") && !(a.includes("is not null") || a.includes("is null"))));
 }
 export const and = (...options :any[]) :string => {
-    return filter(options).join(" AND ");
+    const joinedValues = filter(options).join(' AND ')
+    return joinedValues.includes(' AND ') ? `(${joinedValues})` : joinedValues;
 }
 export const or = (...options :any[]) :string => {
-    return filter(options).join(" OR ");
+    const joinedValues = filter(options).join(' OR ')
+    return joinedValues.includes(' OR ') ? `(${joinedValues})` : joinedValues;
 }
 
 export const like = (option :string, value :string) :string => {
