@@ -1,6 +1,5 @@
 package es.caib.ripea.service.intf.model;
 
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -31,6 +30,12 @@ import java.util.List;
         quickFilterFields = { "nom", "fitxerNom" },
         descriptionField = "nom",
         artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_COUNT_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = DocumentResource.PERSPECTIVE_VERSIONS_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE),
@@ -65,6 +70,8 @@ import java.util.List;
         })
 public class DocumentResource extends NodeResource {
 
+    public static final String PERSPECTIVE_COUNT_CODE = "COUNT";
+    public static final String PERSPECTIVE_VERSIONS_CODE = "VERSIONS";
     public static final String PERSPECTIVE_ARXIU_DOCUMENT_CODE = "ARXIU_DOCUMENT";
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
@@ -181,6 +188,10 @@ public class DocumentResource extends NodeResource {
 
     @Transient
     private ArxiuDetallDto arxiu;
+    @Transient
+    private List<DocumentVersioDto> versions;
+    @Transient
+    private int NumMetaDades;
 
     @Getter
     @Setter

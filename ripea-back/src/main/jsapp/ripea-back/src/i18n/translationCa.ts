@@ -271,6 +271,7 @@ const translationCa = {
                 export: "Exportació EIN...",
                 notificar: "Notificar o comunicar...",
                 publicar: "Publicar...",
+                descarregarImprimible: "Descarregar versió imprimible",
             },
             action: {
                 enviarEmail: "Enviar document per email",
@@ -278,6 +279,11 @@ const translationCa = {
                 move: "Moure contingut",
                 notificar: "Crear notificació document",
                 publicar: "Crear publicació",
+            },
+            versio: {
+                title: "Versió",
+                data: "Data",
+                arxiuUuid: "Arxiu UUID",
             },
         },
         dada: {

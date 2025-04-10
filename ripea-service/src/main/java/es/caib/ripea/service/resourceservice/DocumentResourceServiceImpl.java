@@ -17,8 +17,10 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.apache.commons.lang3.time.DateUtils;
@@ -63,6 +65,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @PostConstruct
     public void init() {
+        register(DocumentResource.PERSPECTIVE_COUNT_CODE, new CountPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_VERSIONS_CODE, new ArxiuVersionsPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE, new ArxiuDocumentPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
@@ -186,6 +190,19 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDocumentDetall(arxiuDocument,entity.getEntitat().getId());
 //            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDetall(entity.getEntitat().getId(), entity.getId());
             resource.setArxiu(arxiu);
+        }
+    }
+    private class ArxiuVersionsPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            List<DocumentVersioDto> versions = contingutResourceHelper.getVersions(entity);
+            resource.setVersions(versions);
+        }
+    }
+    private class CountPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+            resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
         }
     }
 

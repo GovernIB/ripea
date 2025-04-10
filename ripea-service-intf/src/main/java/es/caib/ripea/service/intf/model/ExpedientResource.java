@@ -1,6 +1,5 @@
 package es.caib.ripea.service.intf.model;
 
-import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -148,7 +147,6 @@ public class ExpedientResource extends NodeResource {
     @Transient private int numRemeses;
     @Transient private int numPublicacions;
     @Transient private int numAnotacions;
-    @Transient private int numVersions;
     @Transient private int numTasques;
     @Transient private boolean disableOrganGestor = false;
     public String getTipusStr() {
@@ -174,7 +172,7 @@ public class ExpedientResource extends NodeResource {
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
         @ResourceField(onChangeActive = true)
-        private LocalDateTime dataCreacioInici = LocalDateTime.now().withDayOfMonth(1).withMonth(LocalDateTime.now().getMonth().getValue()-3);
+        private LocalDateTime dataCreacioInici = LocalDateTime.now().withMonth(LocalDateTime.now().getMonth().getValue()-3);
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
 

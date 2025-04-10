@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourcehelper;
 
 import es.caib.plugins.arxiu.api.*;
 import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.helper.*;
@@ -316,5 +317,25 @@ public class ContingutResourceHelper {
         }
 
         return organsCodisNoms;
+    }
+
+    public List<DocumentVersioDto> getVersions(DocumentResourceEntity document) {
+        List<DocumentVersioDto> versions = new ArrayList<>();
+        List<ContingutArxiu> arxiuVersions = pluginHelper.arxiuDocumentObtenirVersions(
+                document.getId(),
+                document.getNom(),
+                document.getArxiuUuid(),
+                document.getExpedient().getArxiuUuid()
+        );
+
+        if (arxiuVersions != null) {
+            for (ContingutArxiu arxiuVersio : arxiuVersions) {
+                DocumentVersioDto versio = new DocumentVersioDto();
+                versio.setArxiuUuid(arxiuVersio.getIdentificador());
+                versio.setId(arxiuVersio.getVersio());
+                versions.add(versio);
+            }
+        }
+        return versions;
     }
 }

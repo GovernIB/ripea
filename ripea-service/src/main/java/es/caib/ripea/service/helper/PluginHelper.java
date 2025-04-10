@@ -2145,22 +2145,35 @@ public class PluginHelper {
 
 	public List<ContingutArxiu> arxiuDocumentObtenirVersions(
 			DocumentEntity document) {
+		return arxiuDocumentObtenirVersions(
+                document.getId(),
+                document.getNom(),
+                document.getArxiuUuid(),
+                document.getExpedient().getArxiuUuid()
+        );
+	}
+	public List<ContingutArxiu> arxiuDocumentObtenirVersions(
+			Long documentId,
+            String documentNom,
+            String documentArxiuUuid,
+            String expedientArxiuUuid
+    ) {
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
-						document.getId()));
+                        documentId));
 		String accioDescripcio = "Obtenir versions del document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put(
 				"id",
-				document.getId().toString());
+                documentId.toString());
 		accioParams.put(
 				"títol",
-				document.getNom());
+                documentNom);
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
-					document.getExpedient().getArxiuUuid(),
+                    expedientArxiuUuid,
 					null);
 			boolean isOpen = false;
 			ExpedientMetadades metadades = arxiuExpedient.getMetadades();
@@ -2171,7 +2184,7 @@ public class PluginHelper {
 			if (isOpen) { // currently it is not possible to get versions of documents from arxiu caib if
 							// the expedient is closed
 				versions = arxiuPluginWrapper.getPlugin().documentVersions(
-						document.getArxiuUuid());
+                        documentArxiuUuid);
 			}
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,

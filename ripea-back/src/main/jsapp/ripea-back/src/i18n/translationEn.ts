@@ -271,6 +271,7 @@ const translationEn = {
                 export: "EIN Export...",
                 notificar: "Notify or Communicate...",
                 publicar: "Publish...",
+                descarregarImprimible: "Download printable version",
             },
             action: {
                 enviarEmail: "Send Document via Email",
@@ -278,6 +279,11 @@ const translationEn = {
                 move: "Move Content",
                 notificar: "Create Document Notification",
                 publicar: "Create Publication",
+            },
+            versio: {
+                title: "Version",
+                data: "Date",
+                arxiuUuid: "File UUID",
             },
         },
         dada: {

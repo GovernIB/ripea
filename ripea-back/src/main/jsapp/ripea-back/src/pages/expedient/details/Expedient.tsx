@@ -26,7 +26,7 @@ const Contenido = (props :any) => {
         title={title}
         componentTitleProps={{ color: 'text.secondary', fontSize: 14, fontStyle: "italic" }}
         componentTextProps={{ color: 'text.primary', wordWrap: "break-word" }}
-        direction={'column'}
+        sx={{ display: 'flex', flexDirection:'column' }}
     >
         {children}
     </ContenidoData>
@@ -64,12 +64,8 @@ const ExpedientInfo = (props:any) => {
         <Contenido title={t('page.contingut.detalle.metaExpedient')} direction={'column'}>{expedient?.metaExpedient?.description}</Contenido>
         <Contenido title={t('page.contingut.detalle.organGestor')} direction={'column'}>{expedient?.organGestor?.description}</Contenido>
         <Contenido title={t('page.contingut.detalle.fechaApertura')} direction={'column'}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
-        <Contenido title={t('page.contingut.detalle.estat')} direction={'column'}>
-            <StyledEstat entity={expedient}/>
-        </Contenido>
-        <Contenido title={t('page.contingut.detalle.prioritat')} direction={'column'}>
-            <StyledPrioritat entity={expedient}/>
-        </Contenido>
+        <Contenido title={t('page.contingut.detalle.estat')} direction={'column'}><StyledEstat entity={expedient}/></Contenido>
+        <Contenido title={t('page.contingut.detalle.prioritat')} direction={'column'}><StyledPrioritat entity={expedient}/></Contenido>
         <Contenido title={t('page.contingut.detalle.clasificacio')} direction={'column'}>{expedient?.ntiClasificacionSia}</Contenido>
 
         <ExpedientsRelacionats entity={expedient}/>
@@ -92,15 +88,15 @@ const Expedient = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id, {perspectives: ['COUNT', 'ESTAT', 'RELACIONAT', 'INTERESSATS_RESUM']}).then((app) => setExpedient(app))
+            appGetOne(id, {perspectives: ['COUNT', 'ESTAT', 'RELACIONAT']}).then((app) => setExpedient(app))
         }
     },[apiIsReady])
 
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
-    const [numDades, setNumDades] = useState<number>(expedient?.numTasques);
-    const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numTasques);
+    const [numDades, setNumDades] = useState<number>(expedient?.numDades);
+    const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numAnotacions);
     const [numRemeses, setNumRemeses] = useState<number>(expedient?.numRemeses);
     const [numPublicacions, setNumPublicacions] = useState<number>(expedient?.numPublicacions);
 
@@ -149,13 +145,6 @@ const Expedient = () => {
             content: <AnotacionsGrid id={id} onRowCountChange={setNumAnotacions}/>,
             badge: numAnotacions ?? expedient?.numAnotacions,
             hidden: !isExperientOrCarpeta(expedient) || !expedient?.numAnotacions,
-        },
-        {
-            value: "versions",
-            label: t('page.contingut.tabs.versions'),
-            content: <Typography>{t('page.contingut.tabs.versions')}</Typography>,
-            badge: expedient?.numVersions,
-            hidden: expedient?.tipus != "DOCUMENT" || !expedient?.numVersions,
         },
         {
             value: "tasques",

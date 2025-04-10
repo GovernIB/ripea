@@ -201,29 +201,33 @@ const ExpedientGrid = () => {
         <CardData
             title={t('page.expedient.filter.title')}
             display={'flex'}
-            flexDirection={'column'}
+            flexDirection={'row'}
         >
-            <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
+            <Grid item xs={12}>
+                <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
+            </Grid>
 
-            <MuiGrid
-                titleDisabled
-                resourceName="expedientResource"
-                popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                columns={columnsAddition}
-                filter={springFilter}
-                sortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                perspectives={["INTERESSATS_RESUM", "ESTAT"]}
-                apiRef={apiRef}
-                popupEditCreateActive
-                popupEditFormContent={<ExpedientGridForm />}
-                onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
-                rowAdditionalActions={actions}
-                paginationActive
-                rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
-                disableColumnMenu
-                // height={'calc(162px + calc(52px * 4))'}
-                height={162 + 52 * 4}
-            />
+            <Grid item xs={12}>
+                <MuiGrid
+                    titleDisabled
+                    resourceName="expedientResource"
+                    popupEditFormDialogResourceTitle={t('page.expedient.title')}
+                    columns={columnsAddition}
+                    filter={springFilter}
+                    sortModel={[{ field: 'createdDate', sort: 'desc' }]}
+                    perspectives={["INTERESSATS_RESUM", "ESTAT"]}
+                    apiRef={apiRef}
+                    popupEditCreateActive
+                    popupEditFormContent={<ExpedientGridForm />}
+                    onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
+                    rowAdditionalActions={actions}
+                    paginationActive
+                    rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
+                    disableColumnMenu
+                    // height={'calc(162px + calc(52px * 4))'}
+                    height={162 + 52 * 4}
+                />
+            </Grid>
 
             {components}
         </CardData>

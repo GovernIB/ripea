@@ -49,7 +49,6 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
     const handleOpen = (id:any, row:any) => {
         console.log(id, row)
         setEntity(row);
-        setNumDades(entity?.dades?.length)
         setOpen(true);
     }
 
