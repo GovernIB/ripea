@@ -30,7 +30,7 @@ public interface ExpedientEstatRepository extends JpaRepository<ExpedientEstatEn
  			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
- 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	
 	@Modifying
  	@Query(value = "UPDATE IPA_EXPEDIENT_FILTRE " +
@@ -38,9 +38,9 @@ public interface ExpedientEstatRepository extends JpaRepository<ExpedientEstatEn
  			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
- 	void updateUsuariAuditoriaFiltre(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	public int updateUsuariAuditoriaFiltre(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_ESTAT SET RESPONSABLE_CODI = :codiNou WHERE RESPONSABLE_CODI = :codiAntic", nativeQuery = true)
-     void updateExpEstatResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateExpEstatResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

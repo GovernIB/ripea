@@ -38,7 +38,7 @@ public class AplicacioServiceBean implements AplicacioService {
 	@Override
  	@RolesAllowed({"IPA_SUPER"})
 // 	@TransactionTimeout(value = 1200)
-    public String updateUsuariCodi(String codiAntic, String codiNou) {
+    public Long updateUsuariCodi(String codiAntic, String codiNou) {
 		return delegate.updateUsuariCodi(codiAntic, codiNou);
 	}
 	

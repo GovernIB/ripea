@@ -53,6 +53,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.EnviarDocumentCommand;
 import es.caib.ripea.war.command.FirmaSimpleWebCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
@@ -684,9 +685,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String getUrlValidacio(HttpServletRequest request, @PathVariable Long documentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String urlValidacio = aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url");
-		DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
-		if (documentDto!=null && documentDto.getNtiCsv()!=null) {
-			return urlValidacio + documentDto.getNtiCsv();
+		String ntiCsv = contingutService.findNtiCsvByDocumentId(entitatActual.getId(), documentId);
+		if (Utils.hasValue(ntiCsv)) {
+			return urlValidacio + ntiCsv;
 		}
 		return urlValidacio;
 	}

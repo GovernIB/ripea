@@ -247,9 +247,10 @@ public interface ContingutService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public ContingutDto findAmbIdAdmin(
-			Long entitatId,
-			Long contingutId) throws NotFoundException;
+	public ContingutDto findAmbIdAdmin(Long entitatId, Long contingutId) throws NotFoundException;
+	
+	@PreAuthorize("hasRole('tothom')")
+	public String findNtiCsvByDocumentId(Long entitatId, Long documentId) throws NotFoundException;
 
 	/**
 	 * Obté els errors de validació associades a un contingut.

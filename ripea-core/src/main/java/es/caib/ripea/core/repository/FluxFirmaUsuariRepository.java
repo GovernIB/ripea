@@ -50,13 +50,13 @@ public interface FluxFirmaUsuariRepository extends JpaRepository<FluxFirmaUsuari
 	
 	 @Modifying
      @Query(value = "UPDATE IPA_FLUX_FIRMA_USUARI SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
-     void updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	 
-		@Modifying
-	 	@Query(value = "UPDATE IPA_FLUX_FIRMA_USUARI " +
-	 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
-	 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
-	 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
-	 			nativeQuery = true)
-	 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	@Modifying
+ 	@Query(value = "UPDATE IPA_FLUX_FIRMA_USUARI " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

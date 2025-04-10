@@ -1,9 +1,7 @@
 package es.caib.ripea.war.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -34,10 +32,11 @@ import es.caib.ripea.war.command.UsuariCodiCommand;
 import es.caib.ripea.war.command.UsuariCommand;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * Controlador per al manteniment de regles.
@@ -263,122 +262,67 @@ public class UsuariController  extends BaseAdminController {
 	@RequestMapping(value = "/username", method = RequestMethod.GET)
  	public String canviCodiGet(
  			HttpServletRequest request,
- 			UsuariCodiCommand command, 
  			Model model) {
-		if (command==null) {
-			command = new UsuariCodiCommand();
-		}
+		UsuariCodiCommand command = new UsuariCodiCommand();
+		command.setUsuariActualCodi(aplicacioService.getUsuariActual().getCodi());
  		model.addAttribute(command);
  		return "usuariCodiForm";
  	}
 	
-	@RequestMapping(value = "/username/validar", method = RequestMethod.POST)
+	@RequestMapping(value = "/username/{codiAntic}/validateTo/{codiNou}", method = RequestMethod.POST, produces = "application/json" )
 	@ResponseBody
-	public String canviCodiValidar(
-			HttpServletRequest request,
-			Model model) {
-		String usuarisBatch = request.getParameter("usuarisBatch");
-		String usuarisValidacions = "";
-		Map<String, String> usuarisMap = processTextArea(usuarisBatch);
-		if (usuarisMap.size()>0) {
-			int linia = usuarisMap.size();
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			for (Map.Entry<String, String> entry : usuarisMap.entrySet()) {
-				
-				String codiActual	= entry.getKey();
-				String codiNou		= entry.getValue();
-				
-				if (Utils.hasValue(codiActual) && Utils.hasValue(codiNou)) {
-					UsuariDto usuariAntic = aplicacioService.findUsuariAmbCodi(codiActual);
-					boolean validat = false;
-		 			if (usuariAntic == null) {
-		 				usuarisValidacions += "- ERROR [linia "+linia+"]: El usuari origen '"+codiActual+"' no existeix. No es processarà si continuau.\n";
-		 				validat = true;
-		 			} else if (usuariAntic.getCodi().equals(usuariActual.getCodi())) {
-		 				usuarisValidacions += "- ERROR [linia "+linia+"]: No es pot canviar el codi del usuari actualment loguejat. No es processarà si continuau.\n";
-		 				validat = true;
-		 			}
-		 			
-		 			//Si ja no es processará perque el usuari origen no existeix, no fa falta revisar el desti
-		 			if (!validat) {
-			 			UsuariDto usuariNou = aplicacioService.findUsuariAmbCodi(codiNou);
-			 			if (usuariNou != null) {
-			 				usuarisValidacions += "- WARN  [linia "+linia+"]: El usuari destí '"+codiNou+"' ja existeix. Es sobreescriurà si continuau.\n";
-			 				validat = true;
-			 			}
-		 			}
-		 			
-		 			if (!validat) {
-		 				usuarisValidacions += "- OK    [linia "+linia+"]: El usuari origen '"+codiActual+"' s'actualitzarà a '"+codiNou+"'.\n";
-		 			}
-		 			
-				} else {
-						usuarisValidacions += "- ERROR [linia "+linia+"]: Format incorrecte de les dades: ("+codiActual+"="+codiNou+"). No es processarà si continuau.\n";
-				}
-				linia--;
-			}
-		}
-		return usuarisValidacions;
-	}
-	
-	@RequestMapping(value = "/username", method = RequestMethod.POST)
- 	public String canviCodiPost(
+	public UsuariChangeValidation validarCodiPost(
  			HttpServletRequest request,
  			HttpServletResponse response,
- 			UsuariCodiCommand command,
- 			BindingResult bindingResult,
- 			Model model) {
- 		try {
- 			Long t0 = System.currentTimeMillis();
- 			Map<String, String> usuarisMap = processTextArea(command.getUsuarisBatch());
- 			String resultat = "<h4><strong>Resultat del procés d'actualització dels codis de "+usuarisMap.size()+" usuari/s.</strong></h4>";
- 			if (usuarisMap.size()>0) {
-	 			for (Map.Entry<String, String> entry : usuarisMap.entrySet()) {
-	 				resultat+= "<h4>Update del usuari <span style='color: brown;'>'"+entry.getKey()+"'</span> per <span style='color: forestgreen;'>'"+entry.getValue()+"'</span></h4><ul>";
-	 				try {
-	 					resultat+=aplicacioService.updateUsuariCodi(entry.getKey(), entry.getValue());
-	 				} catch (Exception e) {
-	 					resultat+="<li>Error actualitzant el codi del usuari '"+entry.getKey()+"' per '"+entry.getValue()+"': <span style='color: salmon;'>"+e.getMessage()+"</span></li>";
-	 					e.printStackTrace();
-	 				}
-	 				resultat+="</ul>";
-	 			}
-	 			resultat += "Finalitzat procés despres de "+((System.currentTimeMillis()-t0)/1000)+" segons.";
-	 			command.setResultat(resultat);
-	 			model.addAttribute(command);
-	 			request.setAttribute(ModalHelper.REQUEST_ATTRIBUTE_MODAL, new Boolean(true));
-	 			return "usuariCodiForm";
- 			} else {
- 				return getModalControllerReturnValueError(request, "usuariCodiForm", "usuari.controller.codi.modificat.error", null);
- 			}
- 		} catch (Exception e) {
- 			return getModalControllerReturnValueError(request, "usuariCodiForm", "usuari.controller.codi.modificat.error", e);
- 		}
- 	}
+ 			@PathVariable("codiAntic") String codiAntic,
+ 			@PathVariable("codiNou") String codiNou) {
+		UsuariDto usuariAntic = aplicacioService.findUsuariAmbCodi(codiAntic);
+		UsuariDto usuariNou = aplicacioService.findUsuariAmbCodi(codiNou);
+		return UsuariChangeValidation.builder()
+				.usuariAnticExists(usuariAntic != null)
+				.usuariNouExists(usuariNou != null)
+				.build();
+	}
 	
-	private Map<String, String> processTextArea(String input) {
-        Map<String, String> usuarisMap = new HashMap<>();
+	@RequestMapping(value = "/username/{codiAntic}/changeTo/{codiNou}", method = RequestMethod.POST, produces = "application/json" )
+	@ResponseBody
+	public UsuariChangeResponse canviCodiPost(
+ 			HttpServletRequest request,
+ 			HttpServletResponse response,
+ 			@PathVariable("codiAntic") String codiAntic,
+ 			@PathVariable("codiNou") String codiNou) {
+		Long t0 = System.currentTimeMillis();
+		try {
+			Long registresModificats = aplicacioService.updateUsuariCodi(codiAntic, codiNou);
+			return UsuariChangeResponse.builder()
+					.estat(ResultatEstatEnum.OK)
+					.registresModificats(registresModificats)
+					.duracio(System.currentTimeMillis() - t0)
+					.build();
+		} catch (Exception e) {
+			return UsuariChangeResponse.builder()
+					.estat(ResultatEstatEnum.ERROR)
+					.errorMessage(getMessage(request, "usuari.controller.codi.modificat.error", null) + ": " + e.getMessage())
+					.duracio(System.currentTimeMillis() - t0)
+					.build();
+		}
+	}
+	
+	@Data
+	@Builder
+	public static class UsuariChangeValidation {
+		private boolean usuariAnticExists;
+		private boolean usuariNouExists;
+	}
 
-        if (Utils.hasValue(input)) {
-        
-	        // Divide el texto en líneas
-	        String[] lines = input.split("\n");
-	
-	        for (String line : lines) {
-	            // Eliminar espacios innecesarios alrededor de la línea
-	            line = line.trim();
-	
-	            // Comprobar el formato clave=valor
-	            if (line.contains("=")) {
-	                String[] parts = line.split("=", 2); // Dividir en máximo 2 partes
-	                if (parts.length == 2) {
-	                    String key = parts[0].trim(); // Eliminar espacios de la clave
-	                    String value = parts[1].trim(); // Eliminar espacios del valor
-	                    usuarisMap.put(key, value);
-	                }
-	            }
-	        }
-        }
-        return usuarisMap;
-    }
+	@Data
+	@Builder
+	public static class UsuariChangeResponse {
+		private ResultatEstatEnum estat;
+		private String errorMessage;
+		private Long registresModificats;
+		private Long duracio;
+	}
+
+	public enum ResultatEstatEnum { OK, ERROR }
 }

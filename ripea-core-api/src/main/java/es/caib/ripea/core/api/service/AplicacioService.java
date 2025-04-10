@@ -30,7 +30,7 @@ public interface AplicacioService {
 	void actualitzarEntiatThreadLocal(EntitatDto entitat);
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
-	public String updateUsuariCodi(String codiAntic, String codiNou);
+	public Long updateUsuariCodi(String codiAntic, String codiNou);
 	
 	/**
 	 * Processa l'autenticació d'un usuari.

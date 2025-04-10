@@ -442,4 +442,11 @@ public class ContingutServiceBean implements ContingutService {
 				resultEnum);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public String findNtiCsvByDocumentId(
+			Long entitatId,
+			Long documentId) throws NotFoundException {
+		return delegate.findNtiCsvByDocumentId(entitatId, documentId);
+	}
 }

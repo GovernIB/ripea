@@ -30,7 +30,7 @@ public interface MetaExpedientCarpetaRepository extends JpaRepository<MetaExpedi
  			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
- 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	
 	@Modifying
  	@Query(value = "UPDATE IPA_METAEXPEDIENT_METADOCUMENT " +
@@ -38,5 +38,5 @@ public interface MetaExpedientCarpetaRepository extends JpaRepository<MetaExpedi
  			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
- 	void updateUsuariAuditoriaMetaDoc(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	public int updateUsuariAuditoriaMetaDoc(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

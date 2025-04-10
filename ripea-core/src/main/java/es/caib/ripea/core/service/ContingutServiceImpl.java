@@ -978,6 +978,16 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				false);
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public String findNtiCsvByDocumentId(
+			Long entitatId,
+			Long documentId) throws NotFoundException {
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(documentId);
+		if (contingut!=null) return ((DocumentEntity)contingut).getNtiCsv();
+		return null;
+	}
 
 	@Transactional(readOnly = true)
 	@Override
@@ -2699,5 +2709,4 @@ public class ContingutServiceImpl implements ContingutService {
 	}
 	
     private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
-
 }

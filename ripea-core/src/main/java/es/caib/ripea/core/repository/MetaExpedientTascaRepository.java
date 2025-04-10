@@ -40,11 +40,11 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
  			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
- 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 	 @Modifying
      @Query(value = "UPDATE IPA_METAEXP_TASCA SET RESPONSABLE = :codiNou WHERE RESPONSABLE = :codiAntic", nativeQuery = true)
-     void updateUsuariResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateUsuariResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	
 	int deleteByCodi(String codi);
 

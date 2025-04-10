@@ -86,5 +86,5 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
     
 	 @Modifying
      @Query(value = "UPDATE IPA_CONFIG SET LASTMODIFIEDBY_CODI = :codiNou WHERE LASTMODIFIEDBY_CODI = :codiAntic", nativeQuery = true)
-     void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

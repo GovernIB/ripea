@@ -697,118 +697,101 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	 @Override
-     public String updateUsuariCodi(String codiAntic, String codiNou) {
+     public Long updateUsuariCodi(String codiAntic, String codiNou) {
 		 
 		 Long t0 = System.currentTimeMillis();
-		 String resultat = "";
+		 Long registresModificats = 0l;
 		 
 		 UsuariEntity usuariAntic = usuariRepository.findByCodi(codiAntic);
 		 
-		 if (usuariAntic == null) {
-			 resultat += "<li>Usuari amb codi '"+codiAntic+"' no trobat.</li>";
-		 } else {
-			 
-			 UsuariDto usuariActual = getUsuariActual();
-			 
-			 if (codiAntic.equals(usuariActual.getCodi())) {
-				 resultat += "<li>Usuari amb codi '"+codiAntic+"' actualment autenticat, no s'actualitza.</li>";
-			 } else {
-			 
-				resultat += createOrUpdateUsuari(codiNou, usuariAntic);
-				 
-				// Actualitzam la informació de auditoria de les taules:
-				resultat += updateUsuariAuditoria(codiAntic, codiNou);
-		 
-		 		// Actualitazam els permisos assignats per ACL
-				resultat += updateUsuariPermisos(codiAntic, codiNou);
-		 
-		 		// Actualitzam les referencis a l'usuari a taules:
-				resultat += updateUsuariReferencies(codiAntic, codiNou);
-		 
-		 		// Eliminam l'usuari antic
-		 		usuariRepository.delete(usuariAntic);
-			 }
+		 if (usuariAntic != null) {
+			 createOrUpdateUsuari(codiNou, usuariAntic);
+			 //Actualitzam la informació de auditoria de les taules:
+			 registresModificats += updateUsuariAuditoria(codiAntic, codiNou);
+			 // Actualitazam els permisos assignats per ACL
+			 registresModificats += updateUsuariPermisos(codiAntic, codiNou);
+			 //Actualitzam les referencis a l'usuari a taules:
+			 registresModificats += updateUsuariReferencies(codiAntic, codiNou);
+			 //Eliminam l'usuari antic
+			 usuariRepository.delete(usuariAntic);
 		 }
-		resultat += "<li>Completats canvis d'usuari '"+codiAntic+"' per '"+codiNou+"' després de "+((System.currentTimeMillis()-t0)/1000)+" segons.</li>";
- 		return resultat;
+ 		return registresModificats;
 	 }
 	 
-	 private String updateUsuariAuditoria(String codiAntic, String codiNou) {
-		 Long t0 = System.currentTimeMillis();
-		 alertaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ALERTA **
-		 avisRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_AVIS **
-		 configRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONFIG **
-		 consultaPinbalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONSULTA_PINBAL **
-		 contingutRepository.updateUsuariAuditoriaComment(codiAntic, codiNou);//IPA_CONT_COMMENT **
-		 contingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONTINGUT **
-		 contingutLogRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_LOG **
-		 contingutMovimentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_MOV **
-		 dadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DADA **
-		 documentEnviamentInteressatRepository.updateUsuariAuditoriaDocEnv(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT **
-		 dispositiuEnviamentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT_DIS **
-		 documentEnviamentInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT_INTER **
-		 dominiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOMINI **
-		 emailPendentEnviarRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EMAIL_PENDENT_ENVIAR **
-		 entitatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ENTITAT **
-		 execucioMassivaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXECUCIO_MASSIVA **
-		 expedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_COMMENT **
-		 expedientEstatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ESTAT **
-		 expedientEstatRepository.updateUsuariAuditoriaFiltre(codiAntic, codiNou);//IPA_EXPEDIENT_FILTRE **
-		 expedientOrganPareRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ORGANPARE **
-		 expedientPeticioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_PETICIO **
-		 expedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_TASCA **
-		 expedientTascaComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_TASCA_COMMENT **
-		 fluxFirmaUsuariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_FLUX_FIRMA_USUARI **
-		 grupRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_GRUP **
-		 entitatRepository.updateUsuariAuditoriaHistoric(codiAntic, codiNou);//IPA_HISTORIC **
-		 interessatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_INTERESSAT **
-		 execucioMassivaContingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_MASSIVA_CONTINGUT **
-		 metaDadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METADADA **
-		 metaExpedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_COMMENT **
-		 metaExpedientCarpetaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXPEDIENT_CARPETA **
-		 metaExpedientCarpetaRepository.updateUsuariAuditoriaMetaDoc(codiAntic, codiNou);//IPA_METAEXPEDIENT_METADOCUMENT **
-		 metaExpedientOrganGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_ORGAN **
-		 metaExpedientSequenciaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_SEQ **
-		 metaExpedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA **
-		 metaExpedientTascaValidacioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA_VALIDACIO **
-		 metaNodeRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METANODE **
-		 metaNodeRepository.updateUsuariAuditoriaMetaDada(codiAntic, codiNou);//IPA_METANODE_METADADA **
-		 organGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ORGAN_GESTOR **
-		 pinbalServeiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PINBAL_SERVEI
-		 portafirmesBlockRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK **
-		 portafirmesBlockInfoRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK_INFO **
-		 registreRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE **
-		 registreAnnexRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_ANNEX **
-		 registreInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_INTERESSAT **
-		 tipusDocumentalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_TIPUS_DOCUMENTAL **
-		 uRLInstruccioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_URL_INSTRUCCIO
-		 return "<li>Actualitzades dades de auditoria en "+(System.currentTimeMillis()-t0)+" ms.</li>";
+	 private Long updateUsuariAuditoria(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 registresModificats += alertaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ALERTA **
+		 registresModificats += avisRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_AVIS **
+		 registresModificats += configRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONFIG **
+		 registresModificats += consultaPinbalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONSULTA_PINBAL **
+		 registresModificats += contingutRepository.updateUsuariAuditoriaComment(codiAntic, codiNou);//IPA_CONT_COMMENT **
+		 registresModificats += contingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONTINGUT **
+		 registresModificats += contingutLogRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_LOG **
+		 registresModificats += contingutMovimentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_MOV **
+		 registresModificats += dadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DADA **
+		 registresModificats += documentEnviamentInteressatRepository.updateUsuariAuditoriaDocEnv(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT **
+		 registresModificats += dispositiuEnviamentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT_DIS **
+		 registresModificats += documentEnviamentInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT_INTER **
+		 registresModificats += dominiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOMINI **
+		 registresModificats += emailPendentEnviarRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EMAIL_PENDENT_ENVIAR **
+		 registresModificats += entitatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ENTITAT **
+		 registresModificats += execucioMassivaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXECUCIO_MASSIVA **
+		 registresModificats += expedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_COMMENT **
+		 registresModificats += expedientEstatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ESTAT **
+		 registresModificats += expedientEstatRepository.updateUsuariAuditoriaFiltre(codiAntic, codiNou);//IPA_EXPEDIENT_FILTRE **
+		 registresModificats += expedientOrganPareRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ORGANPARE **
+		 registresModificats += expedientPeticioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_PETICIO **
+		 registresModificats += expedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_TASCA **
+		 registresModificats += expedientTascaComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_TASCA_COMMENT **
+		 registresModificats += fluxFirmaUsuariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_FLUX_FIRMA_USUARI **
+		 registresModificats += grupRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_GRUP **
+		 registresModificats += entitatRepository.updateUsuariAuditoriaHistoric(codiAntic, codiNou);//IPA_HISTORIC **
+		 registresModificats += interessatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_INTERESSAT **
+		 registresModificats += execucioMassivaContingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_MASSIVA_CONTINGUT **
+		 registresModificats += metaDadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METADADA **
+		 registresModificats += metaExpedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_COMMENT **
+		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXPEDIENT_CARPETA **
+		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoriaMetaDoc(codiAntic, codiNou);//IPA_METAEXPEDIENT_METADOCUMENT **
+		 registresModificats += registresModificats += metaExpedientOrganGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_ORGAN **
+		 registresModificats += metaExpedientSequenciaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_SEQ **
+		 registresModificats += metaExpedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA **
+		 registresModificats += metaExpedientTascaValidacioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA_VALIDACIO **
+		 registresModificats += metaNodeRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METANODE **
+		 registresModificats += metaNodeRepository.updateUsuariAuditoriaMetaDada(codiAntic, codiNou);//IPA_METANODE_METADADA **
+		 registresModificats += organGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ORGAN_GESTOR **
+		 registresModificats += pinbalServeiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PINBAL_SERVEI
+		 registresModificats += portafirmesBlockRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK **
+		 registresModificats += portafirmesBlockInfoRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK_INFO **
+		 registresModificats += registreRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE **
+		 registresModificats += registreAnnexRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_ANNEX **
+		 registresModificats += registreInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_INTERESSAT **
+		 registresModificats += tipusDocumentalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_TIPUS_DOCUMENTAL **
+		 registresModificats += uRLInstruccioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_URL_INSTRUCCIO
+		 return registresModificats;
 	 }
 	 
-	 private String updateUsuariPermisos(String codiAntic, String codiNou) {
-		 Long t0 = System.currentTimeMillis();
-		usuariRepository.updateUsuariPermis(codiAntic, codiNou);
+	 private Long updateUsuariPermisos(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 registresModificats += usuariRepository.updateUsuariPermis(codiAntic, codiNou);
 	 	usuariRepository.flush();
-	 	return "<li>Actualitzades dades de permisos en "+(System.currentTimeMillis()-t0)+" ms.</li>";
+	 	return registresModificats;
 	 }
 	 
-	 private String updateUsuariReferencies(String codiAntic, String codiNou) {
-		 Long t0 = System.currentTimeMillis();
-		 expedientRepository.updateAgaftPer(codiAntic, codiNou);
-		 expedientRepository.updateExpTasca(codiAntic, codiNou);
-		 expedientRepository.updateExpTascaResponsable(codiAntic, codiNou);
-		 expedientRepository.updateExpTascaObservador(codiAntic, codiNou);
-		 expedientEstatRepository.updateExpEstatResponsable(codiAntic, codiNou);
-		 contingutMovimentRepository.updateRemitentCodi(codiAntic, codiNou);
-		 expedientRepository.updateExpSeguidorCodi(codiAntic, codiNou);
-		 expedientRepository.updateExpPeticio(codiAntic, codiNou);
-		 fluxFirmaUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
-		 historicUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
-		 usuariRepository.updateUsuariViaFirma(codiAntic, codiNou);
-		 metaExpedientTascaRepository.updateUsuariResponsable(codiAntic, codiNou);
-//		 viaFirmaUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
-//		 documentEnviamentInteressatRepository.updateUsuariViaFirma(codiAntic, codiNou); //VF_CODI_USUARI
-		 return "<li>Actualitzades referencies en "+(System.currentTimeMillis()-t0)+" ms.</li>";
+	 private Long updateUsuariReferencies(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 registresModificats += expedientRepository.updateAgaftPer(codiAntic, codiNou);
+		 registresModificats += registresModificats += expedientRepository.updateExpTasca(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpTascaResponsable(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpTascaObservador(codiAntic, codiNou);
+		 registresModificats += expedientEstatRepository.updateExpEstatResponsable(codiAntic, codiNou);
+		 registresModificats += contingutMovimentRepository.updateRemitentCodi(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpSeguidorCodi(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpPeticio(codiAntic, codiNou);
+		 registresModificats += fluxFirmaUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
+		 registresModificats += historicUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
+		 registresModificats += usuariRepository.updateUsuariViaFirma(codiAntic, codiNou);
+		 registresModificats += metaExpedientTascaRepository.updateUsuariResponsable(codiAntic, codiNou);
+		 return registresModificats;
 	 }
 	
 	 private String createOrUpdateUsuari(String codiNou, UsuariEntity usuariAntic) {

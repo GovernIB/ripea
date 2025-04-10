@@ -863,28 +863,28 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT SET AGAFAT_PER_CODI = :codiNou WHERE AGAFAT_PER_CODI = :codiAntic", nativeQuery = true)
-     void updateAgaftPer(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateAgaftPer(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	 
 	 @Modifying
 	 @Query(value = "UPDATE IPA_EXPEDIENT_TASCA " +
 	 			"SET RESPONSABLE_ACTUAL_CODI = CASE WHEN RESPONSABLE_ACTUAL_CODI = :codiAntic THEN :codiNou ELSE RESPONSABLE_ACTUAL_CODI END, " +
 	 			"    DELEGAT = CASE WHEN DELEGAT = :codiAntic THEN :codiNou ELSE DELEGAT END " +
 	 			"WHERE RESPONSABLE_ACTUAL_CODI = :codiAntic OR DELEGAT = :codiAntic", nativeQuery = true)
-     void updateExpTasca(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateExpTasca(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	 
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_TASCA_RESP SET RESPONSABLE_CODI = :codiNou WHERE RESPONSABLE_CODI = :codiAntic", nativeQuery = true)
-     void updateExpTascaResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateExpTascaResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	 
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_TASCA_OBSE SET OBSERVADOR_CODI = :codiNou WHERE OBSERVADOR_CODI = :codiAntic", nativeQuery = true)
-     void updateExpTascaObservador(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateExpTascaObservador(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	 
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_SEGUIDOR SET SEGUIDOR_CODI = :codiNou WHERE SEGUIDOR_CODI = :codiAntic", nativeQuery = true)
-     void updateExpSeguidorCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateExpSeguidorCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 	 
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_PETICIO SET USUARI_ACTUALITZACIO = :codiNou WHERE USUARI_ACTUALITZACIO = :codiAntic", nativeQuery = true)
-     void updateExpPeticio(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 public int updateExpPeticio(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }
