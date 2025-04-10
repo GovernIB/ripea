@@ -6,6 +6,9 @@ package es.caib.ripea.core.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -20,4 +23,19 @@ public interface MetaNodeRepository extends JpaRepository<MetaNodeEntity, Long> 
 
 	List<MetaNodeEntity> findByEntitat(EntitatEntity entitat);
 
+	@Modifying
+ 	@Query(value = "UPDATE IPA_METANODE " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+ 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	
+	@Modifying
+ 	@Query(value = "UPDATE IPA_METANODE_METADADA " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+ 	void updateUsuariAuditoriaMetaDada(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,4 +81,8 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi, 
 			Pageable pageable);
+	
+	 @Modifying
+     @Query(value = "UPDATE IPA_HIST_EXP_USUARI SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+     void updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

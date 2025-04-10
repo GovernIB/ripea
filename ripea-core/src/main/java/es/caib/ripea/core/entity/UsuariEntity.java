@@ -284,6 +284,23 @@ public class UsuariEntity implements Serializable {
 	}
 
 
+	public void setInicialitzat(
+			boolean inicialitzat) {
+		this.inicialitzat = inicialitzat;
+	}
+
+	public void setRolActual(
+			String rolActual) {
+		this.rolActual = rolActual;
+	}
+
+
+	public void setVersion(
+			long version) {
+		this.version = version;
+	}
+
+
 	private static final long serialVersionUID = -6657066865382086237L;
 
 }

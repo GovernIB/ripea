@@ -17,10 +17,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class ModalHelper {
 
-	private static final String PREFIX_MODAL = "/modal";
-	private static final String REQUEST_ATTRIBUTE_MODAL = "ModalHelper.Modal";
-	private static final String SESSION_ATTRIBUTE_REQUESTPATHSMAP = "ModalHelper.RequestPathsMap";
-
+	public static final String PREFIX_MODAL = "/modal";
+	public static final String REQUEST_ATTRIBUTE_MODAL = "ModalHelper.Modal";
+	public static final String SESSION_ATTRIBUTE_REQUESTPATHSMAP = "ModalHelper.RequestPathsMap";
 	public static final String ACCIO_MODAL_TANCAR = PREFIX_MODAL + "/tancar";
 
 	public static String getString(HttpServletRequest request) {

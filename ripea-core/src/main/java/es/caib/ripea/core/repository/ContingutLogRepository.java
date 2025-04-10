@@ -183,7 +183,13 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
                 @Param("createdDateIni") Date createdDateIni,
                 @Param("createdDateEnd") Date createdDateEnd);
 
-
+	@Modifying
+ 	@Query(value = "UPDATE IPA_CONT_LOG " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+ 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 
 	// Mètodes per evitar errors al tenir continguts orfes en base de dades

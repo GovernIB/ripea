@@ -19,8 +19,6 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
-
-
 	
 	List<AlertaEntity> findByLlegidaAndContingutId(
 			boolean llegida,
@@ -39,22 +37,15 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 			@Param("llegida") boolean llegida,
 			@Param("id") Long id);
 
-
-
-	// Mètodes per evitar errors al tenir continguts orfes en base de dades
-	// ////////////////////////////////////////////////////////////////////
-
-//	@Modifying
-//	@Query(value = "delete from ipa_alerta " +
-//			" where contingut_id in (" +
-//			"	select c.id " +
-//			"	  from ipa_contingut n " +
-//			"	 where c.id not in (select id from ipa_node) " +
-//			"	   and c.id not in (select id from ipa_carpeta))", nativeQuery = true)
-//    int deleteAlertesFromContingutsOrfes();
-
 	@Modifying
 	@Query(value = "delete from ipa_alerta where contingut_id = :contingutId ", nativeQuery = true)
 	int deleteAlertesFromContingutsOrfes(@Param("contingutId") Long contingutId);
 
+	@Modifying
+ 	@Query(value = "UPDATE IPA_ALERTA " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+ 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

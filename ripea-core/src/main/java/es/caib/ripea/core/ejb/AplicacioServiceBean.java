@@ -36,6 +36,13 @@ public class AplicacioServiceBean implements AplicacioService {
 	AplicacioService delegate;
 
 	@Override
+ 	@RolesAllowed({"IPA_SUPER"})
+// 	@TransactionTimeout(value = 1200)
+    public String updateUsuariCodi(String codiAntic, String codiNou) {
+		return delegate.updateUsuariCodi(codiAntic, codiNou);
+	}
+	
+	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
 		delegate.actualitzarEntiatThreadLocal(entitat);
 	}

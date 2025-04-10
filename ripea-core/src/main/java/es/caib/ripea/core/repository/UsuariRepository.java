@@ -5,10 +5,12 @@ package es.caib.ripea.core.repository;
 
 import java.util.List;
 
-import es.caib.ripea.core.entity.MetaExpedientEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 
 /**
@@ -35,4 +37,11 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 			+ "    u.nom desc")
 	public List<UsuariEntity> findByText(String text);
 
+	@Modifying
+ 	@Query(value = "UPDATE IPA_ACL_SID SET SID = :codiNou WHERE SID = :codiAntic AND PRINCIPAL = 1", nativeQuery = true)
+ 	void updateUsuariPermis(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	
+	 @Modifying
+     @Query(value = "UPDATE IPA_USUARI_VIAFIRMA_RIPEA SET RIPEA_USER_CODI = :codiNou WHERE RIPEA_USER_CODI = :codiAntic", nativeQuery = true)
+     void updateUsuariViaFirma(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

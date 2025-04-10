@@ -40,7 +40,13 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 			"	and	e.dataFi is null ")
 	public Long findExecucioMassivaContingutId(@Param("ara") Date ara);
 
-
+	@Modifying
+ 	@Query(value = "UPDATE IPA_MASSIVA_CONTINGUT " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+ 	void updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
 	// Mètodes per evitar errors al tenir continguts orfes en base de dades
 	// ////////////////////////////////////////////////////////////////////

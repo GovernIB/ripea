@@ -1,20 +1,17 @@
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.IdNomDto;
-import es.caib.ripea.core.api.dto.IdiomaEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.war.command.UsuariCommand;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.helper.SessioHelper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,14 +21,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.IdNomDto;
+import es.caib.ripea.core.api.dto.IdiomaEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.war.command.UsuariCodiCommand;
+import es.caib.ripea.war.command.UsuariCommand;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ModalHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
+import es.caib.ripea.war.helper.SessioHelper;
 
 /**
  * Controlador per al manteniment de regles.
@@ -253,4 +259,126 @@ public class UsuariController  extends BaseAdminController {
 		}
 		return "redirect:/";
 	}
+	
+	@RequestMapping(value = "/username", method = RequestMethod.GET)
+ 	public String canviCodiGet(
+ 			HttpServletRequest request,
+ 			UsuariCodiCommand command, 
+ 			Model model) {
+		if (command==null) {
+			command = new UsuariCodiCommand();
+		}
+ 		model.addAttribute(command);
+ 		return "usuariCodiForm";
+ 	}
+	
+	@RequestMapping(value = "/username/validar", method = RequestMethod.POST)
+	@ResponseBody
+	public String canviCodiValidar(
+			HttpServletRequest request,
+			Model model) {
+		String usuarisBatch = request.getParameter("usuarisBatch");
+		String usuarisValidacions = "";
+		Map<String, String> usuarisMap = processTextArea(usuarisBatch);
+		if (usuarisMap.size()>0) {
+			int linia = usuarisMap.size();
+			UsuariDto usuariActual = aplicacioService.getUsuariActual();
+			for (Map.Entry<String, String> entry : usuarisMap.entrySet()) {
+				
+				String codiActual	= entry.getKey();
+				String codiNou		= entry.getValue();
+				
+				if (Utils.hasValue(codiActual) && Utils.hasValue(codiNou)) {
+					UsuariDto usuariAntic = aplicacioService.findUsuariAmbCodi(codiActual);
+					boolean validat = false;
+		 			if (usuariAntic == null) {
+		 				usuarisValidacions += "- ERROR [linia "+linia+"]: El usuari origen '"+codiActual+"' no existeix. No es processarà si continuau.\n";
+		 				validat = true;
+		 			} else if (usuariAntic.getCodi().equals(usuariActual.getCodi())) {
+		 				usuarisValidacions += "- ERROR [linia "+linia+"]: No es pot canviar el codi del usuari actualment loguejat. No es processarà si continuau.\n";
+		 				validat = true;
+		 			}
+		 			
+		 			//Si ja no es processará perque el usuari origen no existeix, no fa falta revisar el desti
+		 			if (!validat) {
+			 			UsuariDto usuariNou = aplicacioService.findUsuariAmbCodi(codiNou);
+			 			if (usuariNou != null) {
+			 				usuarisValidacions += "- WARN  [linia "+linia+"]: El usuari destí '"+codiNou+"' ja existeix. Es sobreescriurà si continuau.\n";
+			 				validat = true;
+			 			}
+		 			}
+		 			
+		 			if (!validat) {
+		 				usuarisValidacions += "- OK    [linia "+linia+"]: El usuari origen '"+codiActual+"' s'actualitzarà a '"+codiNou+"'.\n";
+		 			}
+		 			
+				} else {
+						usuarisValidacions += "- ERROR [linia "+linia+"]: Format incorrecte de les dades: ("+codiActual+"="+codiNou+"). No es processarà si continuau.\n";
+				}
+				linia--;
+			}
+		}
+		return usuarisValidacions;
+	}
+	
+	@RequestMapping(value = "/username", method = RequestMethod.POST)
+ 	public String canviCodiPost(
+ 			HttpServletRequest request,
+ 			HttpServletResponse response,
+ 			UsuariCodiCommand command,
+ 			BindingResult bindingResult,
+ 			Model model) {
+ 		try {
+ 			Long t0 = System.currentTimeMillis();
+ 			Map<String, String> usuarisMap = processTextArea(command.getUsuarisBatch());
+ 			String resultat = "<h4><strong>Resultat del procés d'actualització dels codis de "+usuarisMap.size()+" usuari/s.</strong></h4>";
+ 			if (usuarisMap.size()>0) {
+	 			for (Map.Entry<String, String> entry : usuarisMap.entrySet()) {
+	 				resultat+= "<h4>Update del usuari <span style='color: brown;'>'"+entry.getKey()+"'</span> per <span style='color: forestgreen;'>'"+entry.getValue()+"'</span></h4><ul>";
+	 				try {
+	 					resultat+=aplicacioService.updateUsuariCodi(entry.getKey(), entry.getValue());
+	 				} catch (Exception e) {
+	 					resultat+="<li>Error actualitzant el codi del usuari '"+entry.getKey()+"' per '"+entry.getValue()+"': <span style='color: salmon;'>"+e.getMessage()+"</span></li>";
+	 					e.printStackTrace();
+	 				}
+	 				resultat+="</ul>";
+	 			}
+	 			resultat += "Finalitzat procés despres de "+((System.currentTimeMillis()-t0)/1000)+" segons.";
+	 			command.setResultat(resultat);
+	 			model.addAttribute(command);
+	 			request.setAttribute(ModalHelper.REQUEST_ATTRIBUTE_MODAL, new Boolean(true));
+	 			return "usuariCodiForm";
+ 			} else {
+ 				return getModalControllerReturnValueError(request, "usuariCodiForm", "usuari.controller.codi.modificat.error", null);
+ 			}
+ 		} catch (Exception e) {
+ 			return getModalControllerReturnValueError(request, "usuariCodiForm", "usuari.controller.codi.modificat.error", e);
+ 		}
+ 	}
+	
+	private Map<String, String> processTextArea(String input) {
+        Map<String, String> usuarisMap = new HashMap<>();
+
+        if (Utils.hasValue(input)) {
+        
+	        // Divide el texto en líneas
+	        String[] lines = input.split("\n");
+	
+	        for (String line : lines) {
+	            // Eliminar espacios innecesarios alrededor de la línea
+	            line = line.trim();
+	
+	            // Comprobar el formato clave=valor
+	            if (line.contains("=")) {
+	                String[] parts = line.split("=", 2); // Dividir en máximo 2 partes
+	                if (parts.length == 2) {
+	                    String key = parts[0].trim(); // Eliminar espacios de la clave
+	                    String value = parts[1].trim(); // Eliminar espacios del valor
+	                    usuarisMap.put(key, value);
+	                }
+	            }
+	        }
+        }
+        return usuarisMap;
+    }
 }
