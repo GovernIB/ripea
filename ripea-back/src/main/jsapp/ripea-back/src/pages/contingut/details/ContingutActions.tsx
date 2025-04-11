@@ -1,38 +1,18 @@
 import useDocumentDetail from "./DocumentDetail.tsx";
-import useInformacioArxiu from "../../expedient/details/InformacioArxiu.tsx";
 import {useTranslation} from "react-i18next";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
-import {MuiDataGridApi, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
+import {useResourceApiService} from "reactlib";
 import useMoure from "../actions/Moure.tsx";
 import useHistoric from "./Historic.tsx";
 import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
 import useEviarPortafirmes from "../actions/EviarPortafirmes.tsx";
-import {MutableRefObject} from "react";
+import useInformacioArxiu from "../../InformacioArxiu.tsx";
 
-export const useContingutActions = (dataGridApiRef: MutableRefObject<MuiDataGridApi>) => {
-    const { t } = useTranslation();
+const useActions = (refresh?: () => void) => {
     const {
         fieldDownload: apiDownload,
-        delete: apiDelete,
     } = useResourceApiService('documentResource');
-
-    const refresh = () => {
-        dataGridApiRef.current?.refresh?.();
-    }
-
-    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
-    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
-
-    const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
-    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
-    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("archivo");
-    const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
-    const {handleShow: handleEnviarViaEmailShow, content: contentEnviarViaEmail} = useEnviarViaEmail(refresh);
-    const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
-    const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
-    const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEviarPortafirmes(refresh);
 
     const downloadAdjunt = (id:any) :void => {
         apiDownload(id,{fieldName: 'adjunt'})
@@ -47,42 +27,32 @@ export const useContingutActions = (dataGridApiRef: MutableRefObject<MuiDataGrid
                 // Limpieza
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
+                refresh?.();
             })
     }
-    const deleteDocument = (id:any) :void => {
-        messageDialogShow(
-            t('page.document.dialog.deleteTitle'),
-            t('page.document.dialog.deleteMessage'),
-            confirmDialogButtons,
-            confirmDialogComponentProps)
-            .then((value: any) => {
-                if (value) {
-                    apiDelete(id)
-                        .then(() => {
-                            refresh?.();
-                            temporalMessageShow(null, 'Elemento borrado', 'success');
-                        })
-                        .catch((error) => {
-                            temporalMessageShow('Error', error.message, 'error');
-                        });
-                }
-            });
-    }
 
-    const hideIfNotDocument = (row:any) => {
-        return !(row?.id && row?.tipus=="DOCUMENT")
+    return {
+        apiDownload: downloadAdjunt,
     }
+}
+
+export const useContingutActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
+
+    const {apiDownload} = useActions(refresh)
+
+    const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
+    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
+    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
+    const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
+    const {handleShow: handleEnviarViaEmailShow, content: contentEnviarViaEmail} = useEnviarViaEmail(refresh);
+    const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
+    const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
+    const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEviarPortafirmes(refresh);
+
+    const hideIfNotDocument = (row:any) => row?.tipus!="DOCUMENT";
 
     const actions = [
-        {
-            title: t('common.update'),
-            icon: 'edit',
-            onClick: dataGridApiRef.current.showUpdateDialog,
-            hidden: hideIfNotDocument,
-        },
-
-        ///////////////////////////////
-
         {
             title: t('page.document.acciones.detall'),
             icon: "folder",
@@ -98,17 +68,10 @@ export const useContingutActions = (dataGridApiRef: MutableRefObject<MuiDataGrid
             hidden: hideIfNotDocument,
         },
         {
-            title: t('common.delete'),
-            icon: "delete",
-            showInMenu: true,
-            onClick: deleteDocument,
-            hidden: hideIfNotDocument,
-        },
-        {
             title: t('common.download'),
             icon: "download",
             showInMenu: true,
-            onClick: downloadAdjunt,
+            onClick: apiDownload,
             hidden: hideIfNotDocument,
         },
         {

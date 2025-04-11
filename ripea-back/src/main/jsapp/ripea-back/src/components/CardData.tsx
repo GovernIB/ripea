@@ -32,8 +32,8 @@ export const CardData = (props:any) => {
 
     return <Grid item xs={xs ?? 12}>
         <Card sx={cardBorder}>
-            <CardContent sx={cardHeader}>
-                {title && <Typography variant={"h5"}>{title}</Typography>}
+            <CardContent sx={cardHeader} hidden={!title && !header}>
+                <Typography variant={"h5"} hidden={!title}>{title}</Typography>
                 {header}
             </CardContent>
 

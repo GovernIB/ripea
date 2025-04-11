@@ -21,7 +21,7 @@ const ExpedientActionButton = (props:{entity:any}) => {
             sx: {borderRadius: 1},
             size: 'small',
             variant: "contained",
-            // disableElevation: true,
+            disableElevation: true,
         }}
     >
         {commonActionsActions.map((action:any) =>

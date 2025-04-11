@@ -1,9 +1,10 @@
 import {GridPage, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {formatDate} from "../../util/dateUtils.ts";
-import {Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import Icon from "@mui/material/Icon";
 import * as builder from "../../util/springFilterUtils.ts";
+import GridFormField from "../../components/GridFormField.tsx";
 
 const StyledEstat = (props:any) => {
     const { entity } = props;
@@ -17,6 +18,24 @@ const StyledEstat = (props:any) => {
         <Icon fontSize={"inherit"}>{entity?.error ?'close' :'check'}</Icon>
         {entity?.notificacioEstat}
     </Typography>
+}
+
+const RemesaGridForm = () => {
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="tipus"/>
+        <GridFormField xs={12} name="estat" disabled readOnly/>
+        <GridFormField xs={12} name="interessats" multiple/>
+        <GridFormField xs={12} name="assumpte"/>
+        <GridFormField xs={12} name="serveiTipusEnum"/>
+        <GridFormField xs={12} name="observacions"/>
+        <GridFormField xs={12} name="dataProgramada" type={'date'}/>
+
+        <GridFormField xs={12} name="caducitatDiesNaturals"/>
+        <GridFormField xs={12} name="dataCaducitat" type={'date'}/>
+
+        <GridFormField xs={12} name="retard"/>
+        <GridFormField xs={12} name="entregaPostal" disabled/>
+    </Grid>
 }
 
 const columns = [
@@ -67,6 +86,8 @@ const RemesaGrid = (props:any) => {
     return <GridPage>
         <MuiGrid
             resourceName="documentNotificacioResource"
+            popupEditActive
+            popupEditFormContent={<RemesaGridForm/>}
             // perspectives={['']}
             columns={columns}
             rowAdditionalActions={actions}
@@ -80,7 +101,9 @@ const RemesaGrid = (props:any) => {
             onRowsChange={(rows) => onRowCountChange?.(rows.length)}
             disableColumnMenu
             disableColumnSorting
-            readOnly
+            toolbarHideCreate
+            rowHideUpdateButton={(row:any) => row.tipus != 'MANUAL'}
+            rowHideDeleteButton={(row:any) => row.tipus != 'MANUAL'}
         />
         {components}
     </GridPage>

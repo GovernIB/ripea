@@ -215,10 +215,21 @@ const translationEs = {
                 clasificacion: "Clasificació",
                 estat: "Estado",
                 interessats: "Interesados",
+                firmes: 'Tipo de firma',
+                documentOrigen: "Documento origen id",
+            },
+            firma: {
+                title: 'Firma',
+                perfil: 'Perfil de firma',
+                fitxerNom: 'Nombre del fichero',
+                tipusMime: 'Tipo MIME',
+                contingut: 'CSV',
+                csvRegulacio: 'Regulación CSV',
             },
             tabs: {
                 resum: "Información",
                 fills: "Hijos",
+                firmes: 'Firmas',
                 data: "Metadatos",
             },
         },
@@ -260,6 +271,7 @@ const translationEs = {
                 export: "Exportación EIN...",
                 notificar: "Notificar o comunicar...",
                 publicar: "Publicar...",
+                descarregarImprimible: "Descarregar versión imprimible",
             },
             action: {
                 enviarEmail: "Enviar documento por email",
@@ -267,6 +279,11 @@ const translationEs = {
                 move: "Mover contenido",
                 notificar: "Crear notificación documento",
                 publicar: "Crear publicación",
+            },
+            versio: {
+                title: "Versión",
+                data: "Fecha",
+                arxiuUuid: "Archivo UUID",
             },
         },
         dada: {

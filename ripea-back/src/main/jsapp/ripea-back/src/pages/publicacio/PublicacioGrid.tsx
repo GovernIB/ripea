@@ -3,6 +3,8 @@ import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
 import Icon from "@mui/material/Icon";
 import usePublicacioActions from "./details/PublicacioActions.tsx";
+import {Grid} from "@mui/material";
+import GridFormField from "../../components/GridFormField.tsx";
 
 const StyledEstat = (props:any) => {
     const { entity: publicacio } = props;
@@ -19,6 +21,17 @@ const StyledEstat = (props:any) => {
     }
 
     return <></>;
+}
+
+const PublicacioGridForm = () => {
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="tipus" required/>
+        <GridFormField xs={12} name="estat" required/>
+        <GridFormField xs={12} name="assumpte" required/>
+        <GridFormField xs={12} name="dataPublicacio" type={"date"}/>
+        <GridFormField xs={12} name="enviatData" type={"date"} required/>
+        <GridFormField xs={12} name="observacions" type={"textarea"}/>
+    </Grid>
 }
 
 const columns = [
@@ -65,6 +78,8 @@ const PublicacioGrid = (props:any) => {
         <MuiGrid
             resourceName="documentPublicacioResource"
             // perspectives={['']}
+            popupEditActive
+            popupEditFormContent={<PublicacioGridForm/>}
             columns={columns}
             rowAdditionalActions={actions}
             paginationActive
@@ -77,7 +92,7 @@ const PublicacioGrid = (props:any) => {
             onRowsChange={(rows) => onRowCountChange?.(rows.length)}
             disableColumnMenu
             disableColumnSorting
-            readOnly
+            toolbarHideCreate
         />
         {components}
     </GridPage>

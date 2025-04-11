@@ -32,19 +32,19 @@ export const InteressatsGridForm = () => {
 const columns = [
     {
         field: 'tipus',
-        flex: 1,
+        flex: 0.5,
     },
     {
         field: 'documentNum',
         flex: 0.5,
     },
     {
-        field: 'nomComplet',
-        flex: 0.5,
+        field: 'organNom',
+        flex: 1,
     },
     {
         field: 'representant',
-        flex: 0.5,
+        flex: 0.75,
     },
 ];
 

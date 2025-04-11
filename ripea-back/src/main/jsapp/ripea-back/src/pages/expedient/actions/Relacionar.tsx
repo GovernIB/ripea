@@ -17,10 +17,6 @@ import IconButton from "@mui/material/IconButton";
 
 const columns = [
     {
-        field: 'id',
-        flex: 0.5,
-    },
-    {
         field: 'metaExpedient',
         flex: 0.5,
     },
@@ -118,7 +114,6 @@ const useRelacionar= (refresh?: () => void) => {
     }
 
     const relacionar = (ids:any[]) => {
-        console.log(ids)
         if (apiIsReady) {
             apiPatch(entity?.id, {data: {relacionatsAmb: ids}})
                 .then(() => {
@@ -163,7 +158,8 @@ const useRelacionar= (refresh?: () => void) => {
                 )}
 
                 selectionActive
-                // rowSelectionModel={entity?.relacionatsAmb?.map((a:any)=>a.id)}
+                // TODO: check
+                rowSelectionModel={entity?.relacionatsAmb?.map((a:any)=>a.id)}
                 toolbarElementsWithPositions={[
                     {
                         position: 3,
@@ -174,7 +170,8 @@ const useRelacionar= (refresh?: () => void) => {
                     },
                 ]}
 
-                height={'calc(162px + calc(52px * 4))'}
+                // height={'calc(162px + calc(52px * 4))'}
+                height={162 + 52 * 4}
                 paginationActive
                 readOnly
             />

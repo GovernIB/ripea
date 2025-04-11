@@ -1,31 +1,20 @@
 import {
     useResourceApiService,
     useBaseAppContext,
-    useConfirmDialogButtons
 } from 'reactlib';
-import useInformacioArxiu from "./InformacioArxiu.tsx";
 import useAssignar from "../actions/Assignar.tsx";
 import useCambiarEstat from "../actions/CambiarEstat.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import {useTranslation} from "react-i18next";
 import useRelacionar from "../actions/Relacionar.tsx";
+import useInformacioArxiu from "../../InformacioArxiu.tsx";
 
-export const useCommonActions = (refresh?: () => void) => {
-    const { t } = useTranslation();
+const useActions = (refresh?: () => void) =>{
+    const {temporalMessageShow} = useBaseAppContext();
+
     const {
         patch: apiPatch,
-        delete: apiDelete
     } = useResourceApiService('expedientResource');
-    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
-    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
-
-    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu("expediente");
-    const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
-    const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
-    const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
-
-    const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
 
     const agafar = (id: any): void => {
         apiPatch(id, {
@@ -58,25 +47,20 @@ export const useCommonActions = (refresh?: () => void) => {
                 error && temporalMessageShow('Error', error.message, 'error');
             });
     }
-    const delette = (id:any) => {
-        messageDialogShow(
-            'Title',
-            'Message',
-            confirmDialogButtons,
-            confirmDialogComponentProps)
-            .then((value: any) => {
-                if (value) {
-                    apiDelete(id)
-                        .then(() => {
-                            refresh?.();
-                            temporalMessageShow(null, '', 'success');
-                        })
-                        .catch((error) => {
-                            temporalMessageShow('Error', error.message, 'error');
-                        });
-                }
-            });
-    }
+
+    return {agafar, lliberar}
+}
+
+export const useCommonActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
+
+    const {agafar, lliberar} = useActions(refresh);
+
+    const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
+    const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
+    const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
+    const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
+    const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
 
     const actions = [
         {
@@ -143,13 +127,6 @@ export const useCommonActions = (refresh?: () => void) => {
             disabled: (row:any) => row?.estat != "OBERT",
         },
         {
-            title: t('common.delete'),
-            icon: "delete",
-            showInMenu: true,
-            onClick: delette,
-            disabled: (row:any) => row?.estat == "TANCAT",
-        },
-        {
             title: t('page.expedient.acciones.history'),
             icon: "list",
             showInMenu: true,
@@ -174,7 +151,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.infoArxiu'),
             icon: "info",
             showInMenu: true,
-            onClick: arxiuhandleOpen
+            onClick: handleArxiuOpen
         },
         {
             title: t('page.expedient.acciones.sincronitzar'),
@@ -182,6 +159,7 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
     ]
+
     const components = <>
         {cambiarPrioridadContent}
         {cambiarEstadoContent}

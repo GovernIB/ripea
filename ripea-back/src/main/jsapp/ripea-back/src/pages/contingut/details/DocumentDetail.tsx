@@ -1,17 +1,24 @@
-import {Grid, Typography} from "@mui/material";
-import {BasePage, useResourceApiService} from "reactlib";
+import {Box, Grid} from "@mui/material";
+import {BasePage, GridPage, useResourceApiService} from "reactlib";
 import {useState} from "react";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useTranslation} from "react-i18next";
 import Dialog from "../../../../lib/components/mui/Dialog.tsx";
-import {ContenidoData} from "../../../components/CardData.tsx";
+import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import Load from "../../Load.tsx";
+import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 
 const Contenido = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
+
+    if (!entity){
+        return <Load/>
+    }
+
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <Grid container sx={{ display:'flex', flexDirection: "row", wordWrap: "break-word" }} columnSpacing={1} rowSpacing={1}>
             <ContenidoData title={t('page.document.detall.fitxerNom')}>{entity?.fitxerNom}</ContenidoData>
             <ContenidoData title={t('page.document.detall.fitxerContentType')}>{entity?.fitxerContentType}</ContenidoData>
             <ContenidoData title={t('page.document.detall.metaDocument')}>{entity?.metaDocument?.description}</ContenidoData>
@@ -23,32 +30,68 @@ const Contenido = (props:any) => {
             <ContenidoData title={t('page.document.detall.estadoElaboracion')}>{t(`enum.estatElaboracio.${entity?.ntiEstadoElaboracion}`)}</ContenidoData>
             <ContenidoData title={t('page.document.detall.csv')}>{entity?.ntiCsv}</ContenidoData>
             <ContenidoData title={t('page.document.detall.csvRegulacion')}>{entity?.ntiCsvRegulacion}</ContenidoData>
-            <ContenidoData title={t('page.document.detall.tipoFirma')}>{t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
+            <ContenidoData title={t('page.document.detall.tipoFirma')}>{entity?.ntiTipoFirma && t(`enum.tipoFirma.${entity?.ntiTipoFirma}`)}</ContenidoData>
         </Grid>
     </BasePage>
 }
 
-const Versiones = () => {
-    return <Typography>Versiones</Typography>;
+const Dada = (props:any) => {
+    const { entity, onRowCountChange } = props
+
+    return <GridPage>
+        <Box width={'100%'} height={'calc(162px + calc(52px * 4))'}>
+            <MetaDadaGrid entity={entity} onRowCountChange={onRowCountChange}/>
+        </Box>
+    </GridPage>
+}
+
+const Versiones = (props:any) => {
+    const {versions, downloadable} = props;
+    const { t } = useTranslation();
+
+    return <BasePage>
+        {
+            versions?.map((version:any) =>
+                <CardData key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
+                    buttons={[
+                        {
+                            text: t('common.download'),
+                            icon: 'download',
+                            onClick: ()=>{},
+                            hidden: !downloadable,
+                        }
+                    ]}
+                >
+                    <ContenidoData title={t('page.document.versio.data')}>{!version?.data && formatDate(version?.data)}</ContenidoData>
+                    <ContenidoData title={t('page.document.versio.arxiuUuid')}>{version?.arxiuUuid}</ContenidoData>
+                </CardData>
+            )
+        }
+    </BasePage>;
 }
 
 const useDocumentDetail = () => {
     const { t } = useTranslation();
 
     const {
-        fieldDownload: apiDownload,
+        isReady: apiIsReady,
+        getOne: apiGetOne,
     } = useResourceApiService('documentResource');
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
+    const [numDades, setNumDades] = useState<number>(entity?.numDades);
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row);
-        setEntity(row);
+    const handleOpen = (id:any) => {
+        if(apiIsReady && id){
+            apiGetOne(id, {perspectives: ['VERSIONS', 'COUNT']})
+                .then((app) => setEntity(app))
+        }
         setOpen(true);
     }
 
     const handleClose = () => {
+        setEntity(undefined);
         setOpen(false);
     };
 
@@ -59,43 +102,62 @@ const useDocumentDetail = () => {
             content: <Contenido entity={entity}/>,
         },
         {
+            value: "dades",
+            label: t('page.contingut.tabs.dades'),
+            content: <Dada entity={entity} onRowCountChange={setNumDades}/>,
+            badge: numDades ?? entity?.numDades,
+            hidden: !entity?.numMetaDades,
+        },
+        {
             value: "version",
             label: t('page.document.tabs.version'),
-            content: <Versiones/>,
-            badge: entity?.versioCount,
+            content: <Versiones versions={entity?.versions} downloadable={entity?.documentTipus != 'FISIC'}/>,
+            badge: entity?.versions?.length,
+            hidden: !entity?.versions || entity?.versions?.length == 0,
         },
     ]
+
+    let buttons :any[] = []
+
+    if (entity?.documentTipus != 'FISIC') {
+        buttons = [
+            ...buttons,
+            {
+                value: 'download',
+                text: t('common.download'),
+                icon: 'download',
+                // hidden: contingut.documentTipus == 'FISIC'
+            },
+        ]
+    }
+
+    if (entity?.estat == 'CUSTODIAT') {
+        buttons = [
+            ...buttons,
+            {
+                value: 'descarregarImprimible',
+                text: t('page.document.acciones.descarregarImprimible'),
+                icon: 'download',
+                // hidden: contingut.estat != 'CUSTODIAT'
+            },
+        ]
+    }
 
     const dialog =
         <Dialog
             open={open}
             closeCallback={handleClose}
             title={entity?.nom}
-            componentProps={{ fullWidth: true, maxWidth: 'xl'}}
-            buttons={[
-                {
-                    value: 'download',
-                    text: t('common.download'),
-                    icon: 'download'
-                },
-            ]}
+            componentProps={{ fullWidth: true, maxWidth: 'md'}}
+            buttons={buttons}
             buttonCallback={(value :any) :void=>{
-                if (value=='download') {
-                    apiDownload(entity?.id,{fieldName: 'adjunt'})
-                        .then((result:any)=>{
-                            const url = URL.createObjectURL(result.blob);
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.download = result.fileName; // Usa el nombre recibido
-                            document.body.appendChild(link);
-                            link.click();
-
-                            // Limpieza
-                            document.body.removeChild(link);
-                            URL.revokeObjectURL(url);
-                        })
-                    handleClose();
+                switch (value){
+                    case 'download':
+                        break;
+                    case 'descarregarImprimible':
+                        break;
                 }
+                handleClose();
             }}
         >
             <TabComponent

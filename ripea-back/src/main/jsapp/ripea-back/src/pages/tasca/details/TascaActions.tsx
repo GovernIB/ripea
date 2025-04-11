@@ -12,13 +12,32 @@ import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
 import {useTranslation} from "react-i18next";
 
-const useTascaActions = (refresh?: () => void) => {
-    const { t } = useTranslation();
+const useActions = (refresh?: () => void) => {
+
     const {temporalMessageShow} = useBaseAppContext();
 
     const {
         artifactAction: apiAction
     } = useResourceApiService('expedientTascaResource');
+
+    const changeEstat = (id:any, estat:string) => {
+        apiAction(id,{code:'ACTION_CHANGE_ESTAT', data:{estat}})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+
+    return {changeEstat}
+}
+
+const useTascaActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
+
+    const {changeEstat} = useActions(refresh)
 
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
     const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
@@ -34,17 +53,6 @@ const useTascaActions = (refresh?: () => void) => {
     }
     const hideByEstat = (row: any): boolean => {
         return row?.estat == 'CANCELLADA' || row?.estat == 'FINALITZADA' || row?.estat == 'REBUTJADA';
-    }
-
-    const changeEstat = (id:any, estat:string) => {
-        apiAction(id,{code:'ACTION_CHANGE_ESTAT', data:{estat}})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow('Error', error.message, 'error');
-            });
     }
 
     const actions = [

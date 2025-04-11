@@ -105,7 +105,7 @@ const DocumentsGrid = (props:any) => {
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {actions, components} = useContingutActions(dataGridApiRef);
+    const {actions, components} = useContingutActions(refresh);
 
     return <GridPage>
         <MuiGrid
@@ -115,6 +115,7 @@ const DocumentsGrid = (props:any) => {
             paginationActive
             filter={`expedient.id:${entity?.id}`}
             perspectives={["PATH"]}
+            staticSortModel={[{field: 'id', sort: 'desc'}]}
             titleDisabled
             popupEditCreateActive
             popupEditFormContent={<DocumentsGridForm/>}
@@ -124,7 +125,8 @@ const DocumentsGrid = (props:any) => {
             }}
             disableColumnSorting
             disableColumnMenu
-            rowHideDeleteButton
+            rowHideUpdateButton={(row:any) => row?.tipus!="DOCUMENT"}
+            rowHideDeleteButton={(row:any) => row?.tipus!="DOCUMENT"}
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
             onRowsChange={(rows) => onRowCountChange?.(rows.filter((a) => a?.tipus == "DOCUMENT").length)}
@@ -155,9 +157,8 @@ const DocumentsGrid = (props:any) => {
                     default: return row.treePath;
                 }
             }}
-            isGroupExpandedByDefault={() => expand}
-            rowHideUpdateButton
 
+            isGroupExpandedByDefault={() => expand}
             toolbarElementsWithPositions={[
                 {
                     position: 0,
