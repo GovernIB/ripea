@@ -5,6 +5,7 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
@@ -46,7 +47,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 
         String usuariNom = usuari.getNom();
         boolean superusuari = RolHelper.doesCurrentUserHasRol(BaseConfig.ROLE_SUPER);
-        Map<UserPermissionInfo.Ent, UserPermissionInfo.PermisEnt> permisosEntitat = usuariResourceHelper.getPermisosEntitat(usuariCodi);
+        Map<Long, PermisosEntitat> permisosEntitat = usuariResourceHelper.getPermisosEntitat(usuariCodi);
 
         return UserPermissionInfo.builder()
                 .codi(usuariCodi)

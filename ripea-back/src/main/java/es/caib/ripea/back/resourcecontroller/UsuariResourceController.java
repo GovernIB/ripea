@@ -3,7 +3,7 @@ package es.caib.ripea.back.resourcecontroller;
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.Ent;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisEnt;
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
@@ -47,22 +47,28 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                     .nom("Administrador Ripea")
                     .superusuari(true)
                     .permisosEntitat(Map.of(
-                            Ent.builder().id(1L).codi("GOIB").nom("Govern de les Illes Balears").build(),
-                            PermisEnt.builder()
-                                    .usuari(true)
-                                    .administrador(true)
-                                    .organAdministrador(true)
+                            1L,
+                            PermisosEntitat.builder()
+                                    .entitatId(1L)
+                                    .entitatCodi("GOIB")
+                                    .entitatNom("Govern de les Illes Balears")
+                                    .permisUsuari(true)
+                                    .permisAdministrador(true)
+                                    .permisAdministradorOrgan(true)
                                     .organs(List.of(
                                             Ent.builder().id(73L).codi("A04026973").nom("Direcció General d' Innovació i Transformació Digital").build(),
                                             Ent.builder().id(118L).codi("A04013554").nom("Direcció General de Medi Natural i Gestió Forestal").build()
                                     ))
                                     .build(),
 
-                            Ent.builder().id(3721L).codi("GONA").nom("Gobierno de Navarra").build(),
-                            PermisEnt.builder()
-                                    .usuari(true)
-                                    .administrador(false)
-                                    .organAdministrador(false)
+                            3721L,
+                            PermisosEntitat.builder()
+                                    .entitatId(3721L)
+                                    .entitatCodi("GONA")
+                                    .entitatNom("Gobierno de Navarra")
+                                    .permisUsuari(true)
+                                    .permisAdministrador(false)
+                                    .permisAdministradorOrgan(false)
                                     .build()
                     ))
                     .build());

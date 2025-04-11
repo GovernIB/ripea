@@ -2,7 +2,7 @@ package es.caib.ripea.service.resourcehelper;
 
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.Ent;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisEnt;
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,18 +17,17 @@ public class UsuariResourceHelper {
 
     private final CacheHelper cacheHelper;
 
-    public Map<Ent, PermisEnt> getPermisosEntitat(String usuariCodi) {
+    public Map<Long, PermisosEntitat> getPermisosEntitat(String usuariCodi) {
         List<EntitatDto> entitatsAccessiblesUsuari = cacheHelper.findEntitatsAccessiblesUsuari(usuariCodi);
         return entitatsAccessiblesUsuari.stream().collect(Collectors.toMap(
-                entitatDto -> Ent.builder()
-                        .id(entitatDto.getId())
-                        .codi(entitatDto.getCodi())
-                        .nom(entitatDto.getNom())
-                        .build(),
-                entitatDto -> PermisEnt.builder()
-                        .usuari(entitatDto.isUsuariActualRead())
-                        .administrador(entitatDto.isUsuariActualAdministration())
-                        .organAdministrador(entitatDto.isUsuariActualTeOrgans())
+                entitatDto -> entitatDto.getId(),
+                entitatDto -> PermisosEntitat.builder()
+                        .entitatId(entitatDto.getId())
+                        .entitatCodi(entitatDto.getCodi())
+                        .entitatNom(entitatDto.getNom())
+                        .permisUsuari(entitatDto.isUsuariActualRead())
+                        .permisAdministrador(entitatDto.isUsuariActualAdministration())
+                        .permisAdministradorOrgan(entitatDto.isUsuariActualTeOrgans())
                         .organs(entitatDto.getOrgansGestors() != null
                                 ? entitatDto.getOrgansGestors().stream().map(
                                         organ -> Ent.builder()

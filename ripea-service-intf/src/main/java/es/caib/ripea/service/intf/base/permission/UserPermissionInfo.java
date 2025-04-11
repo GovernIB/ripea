@@ -12,17 +12,18 @@ public class UserPermissionInfo {
     private String codi;
     private String nom;
     private boolean superusuari;
-    Map<Ent, PermisEnt> permisosEntitat;
+    Map<Long, PermisosEntitat> permisosEntitat;
 
 
     @Data
     @Builder
-    public static class PermisEnt {
-        private boolean usuari;
-        private boolean administrador;
-        private boolean organAdministrador;
-//        private boolean dissenyador;
-//        private boolean revisio;
+    public static class PermisosEntitat {
+        private Long entitatId;
+        private String entitatCodi;
+        private String entitatNom;
+        private boolean permisUsuari;
+        private boolean permisAdministrador;
+        private boolean permisAdministradorOrgan;
         private List<Ent> organs;
     }
 
