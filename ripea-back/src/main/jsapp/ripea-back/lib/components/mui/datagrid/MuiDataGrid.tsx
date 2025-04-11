@@ -106,7 +106,7 @@ export type MuiDataGridProps = {
     popupEditFormDialogTitle?: string;
     popupEditFormDialogResourceTitle?: string;
     popupEditFormDialogComponentProps?: any;
-    onRowsChange?: (rows: GridRowsProp) => void;
+    onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     onRowOrderChange?: GridEventListener<"rowOrderChange">;
     apiRef?: MuiDataGridApiRef;
     datagridApiRef?: React.MutableRefObject<GridApiPro>;
@@ -399,7 +399,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const isUpperToolbarType = toolbarType === 'upper';
     const gridMargins = isUpperToolbarType ? { m: 2 } : null;
     React.useEffect(() => {
-        onRowsChange?.(rows);
+        onRowsChange?.(rows, pageInfo);
         if (treeDataAdditionalRowsIsFunction) {
             setAdditionalRows((treeDataAdditionalRows as ((rows: any[]) => any[]))(rows));
         }
