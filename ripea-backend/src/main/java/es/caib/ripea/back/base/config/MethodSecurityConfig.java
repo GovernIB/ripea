@@ -32,6 +32,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 		DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
 		expressionHandler.setApplicationContext(applicationContext);
 		expressionHandler.setPermissionEvaluator(permissionEvaluatorService);
+		expressionHandler.setDefaultRolePrefix("");
 		return expressionHandler;
 	}
 
