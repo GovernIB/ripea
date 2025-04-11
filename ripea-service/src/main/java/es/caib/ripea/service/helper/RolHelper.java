@@ -1,13 +1,13 @@
 package es.caib.ripea.service.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RolHelper {
@@ -43,17 +43,9 @@ public class RolHelper {
 		return rolsCurrentUser;
 	}
 	
-	public boolean doesCurrentUserHasRol(String rolToCheck) {
+	public static boolean doesCurrentUserHasRol(String rolToCheck) {
 		boolean hasRol = false;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		List<String> rols = cacheHelper.findRolsAmbCodi(auth.getName());
-//		if (rols != null) {
-//			for (String rol : rols) {
-//				if (rol.equals(rolToCheck)) {
-//					hasRol = true;
-//				}
-//			}
-//		}
 		if (auth.getAuthorities() != null) {
 			for (GrantedAuthority rol : auth.getAuthorities()) {
 				if (rol.getAuthority().equals(rolToCheck)) {

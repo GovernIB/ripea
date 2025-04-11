@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.resourceservice;
 
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.model.UsuariResource;
 
@@ -8,4 +9,8 @@ import es.caib.ripea.service.intf.model.UsuariResource;
  *
  * @author Límit Tecnologies
  */
-public interface UsuariResourceService extends MutableResourceService<UsuariResource, String> {}
+public interface UsuariResourceService extends MutableResourceService<UsuariResource, String> {
+
+    UserPermissionInfo getCurrentUserPermissionInfo();
+
+}
