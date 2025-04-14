@@ -12,8 +12,10 @@ public class UserPermissionInfo {
     private String codi;
     private String nom;
     private boolean superusuari;
-    Map<Long, PermisosEntitat> permisosEntitat;
-
+    private Map<Long, PermisosEntitat> permisosEntitat;
+    private Long entitatActualId;
+    private Long organActualId;
+    private String rolActual;
 
     @Data
     @Builder

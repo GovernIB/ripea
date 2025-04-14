@@ -1,10 +1,14 @@
 package es.caib.ripea.back.resourcecontroller;
 
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.Ent;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -41,11 +45,18 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> getUsauriActualSecurityInfo(HttpServletRequest request) throws MethodArgumentNotValidException {
 
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+        String rolActual = RolHelper.getRolActual(request);
+
         if (developmentMode) {
             return ResponseEntity.ok(UserPermissionInfo.builder()
                     .codi("rip_admin")
                     .nom("Administrador Ripea")
                     .superusuari(true)
+                    .entitatActualId(entitatActual != null ? entitatActual.getId() : null)
+                    .organActualId(organActual != null ? organActual.getId() : null)
+                    .rolActual(rolActual)
                     .permisosEntitat(Map.of(
                             1L,
                             PermisosEntitat.builder()
@@ -79,6 +90,9 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         UserPermissionInfo userPermissionInfo = ((UsuariResourceService) readonlyResourceService).getCurrentUserPermissionInfo();
+        userPermissionInfo.setEntitatActualId(entitatActual != null ? entitatActual.getId() : null);
+        userPermissionInfo.setOrganActualId(organActual != null ? organActual.getId() : null);
+        userPermissionInfo.setRolActual(rolActual);
         return ResponseEntity.ok(userPermissionInfo);
     }
 
