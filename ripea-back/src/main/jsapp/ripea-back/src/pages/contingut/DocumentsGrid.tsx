@@ -129,7 +129,7 @@ const DocumentsGrid = (props:any) => {
             rowHideDeleteButton={(row:any) => row?.tipus!="DOCUMENT"}
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
-            onRowsChange={(rows) => onRowCountChange?.(rows.filter((a) => a?.tipus == "DOCUMENT").length)}
+            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {

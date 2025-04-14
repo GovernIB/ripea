@@ -24,15 +24,15 @@ const CardButton = (props:any) => {
 }
 
 export const CardData = (props:any) => {
-    const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, ...other} = props;
+    const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = cardHeader, ...other} = props;
 
     if (hidden || (hiddenIfEmpty && children == null)){
         return <></>
     }
 
     return <Grid item xs={xs ?? 12}>
-        <Card sx={cardBorder}>
-            <CardContent sx={cardHeader} hidden={!title && !header}>
+        <Card sx={{...cardBorder, ...cardProps}}>
+            <CardContent sx={headerProps} hidden={!title && !header}>
                 <Typography variant={"h5"} hidden={!title}>{title}</Typography>
                 {header}
             </CardContent>

@@ -37,6 +37,13 @@ public class UsuariController  extends BaseAdminController {
 	public String getConfiguracio(HttpServletRequest request, Model model) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		UsuariCommand usuariCommand = UsuariCommand.asCommand(usuari);
+		List<String> filteredRoles = new ArrayList<>();
+        for (String role : usuari.getRols()) {
+            if (role.startsWith("IPA") || role.equalsIgnoreCase("tothom")) {
+                filteredRoles.add(role);
+            }
+        }
+        usuariCommand.setRols(filteredRoles.toArray(new String[0]));
 		model.addAttribute(usuariCommand);
 		emplenaModel(request, model, usuariCommand);
         model.addAttribute("editEmailsCanviEstatRevisio", RolHelper.hasRolAdministrador(request) || RolHelper.hasRolRevisor(request));

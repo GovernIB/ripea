@@ -143,7 +143,7 @@ const Interessats = (props:any) => {
         titleDisabled
         readOnly
         autoHeight
-        onRowsChange={(rows) => onRowCountChange?.(rows.length)}
+        onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
     />
 }
 
@@ -224,7 +224,7 @@ const Annexos = (props:any) => {
         readOnly
         autoHeight
 
-        onRowsChange={(rows) => onRowCountChange?.(rows.length)}
+        onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
     />
 }
 

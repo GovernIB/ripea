@@ -99,7 +99,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
-								dadesUsuari.getNom(),
+								dadesUsuari.getNomSencer(),
 								dadesUsuari.getNif(),
 								dadesUsuari.getEmail(),
 								getIdiomaPerDefecte()).build());
@@ -114,7 +114,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
 				usuari.update(
-						dadesUsuari.getNom(),
+						dadesUsuari.getNomSencer(),
 						dadesUsuari.getNif(),
 						dadesUsuari.getEmail());
 			} else {

@@ -101,6 +101,8 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Enumerated(EnumType.STRING)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
 
+    @Column(name = "codi", insertable = false, updatable = false)
+    private String id;
 	@Override
 	public String getId() {
 		return this.codi;
@@ -114,7 +116,7 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Transient
 	private String codiAndNom;
 	public String getCodiAndNom() {
-		return nom + " (" + codi + ")";
+		return codi + " - " + nom;
 	}
 
 }
