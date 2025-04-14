@@ -1,13 +1,5 @@
 package es.caib.ripea.service.resourcehelper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
@@ -24,6 +16,13 @@ import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -50,7 +49,7 @@ public class PermisosResourceHelper {
 	/**
 	 * Comprova permisos sobre 
 	 * @param expedientResourceEntity
-	 * @param permissions
+	 * @param permission
 	 * @param comprovarAgafatPerUsuariActual
 	 * @return
 	 */
