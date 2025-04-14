@@ -302,7 +302,7 @@ public class ContingutHelper {
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		if (contingut.getCreatedDate()!=null)
-			resposta.setCreatedDate(Date.from(contingut.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));;
+			resposta.setCreatedDate(Date.from(contingut.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
 	}
 
 	private void setAlerta(ContingutDto resposta, ContingutEntity contingut) {
@@ -354,10 +354,12 @@ public class ContingutHelper {
 
 	private void setAuditInfo(ContingutDto resposta, ContingutEntity contingut) {
 		long t1 = System.currentTimeMillis();
-		resposta.setCreatedBy(conversioTipusHelper.convertir(contingut.getCreatedBy(), UsuariDto.class));
-		resposta.setLastModifiedBy(conversioTipusHelper.convertir(contingut.getLastModifiedBy(), UsuariDto.class));
-		resposta.setLastModifiedDate(
-				Date.from(contingut.getLastModifiedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+		if (contingut.getCreatedBy()!=null)
+			resposta.setCreatedBy(conversioTipusHelper.convertir(contingut.getCreatedBy(), UsuariDto.class));
+		if (contingut.getLastModifiedBy()!=null)
+			resposta.setLastModifiedBy(conversioTipusHelper.convertir(contingut.getLastModifiedBy(), UsuariDto.class));
+		if (contingut.getLastModifiedDate()!=null)
+			resposta.setLastModifiedDate(Date.from(contingut.getLastModifiedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
 		logMsg("setAuditInfo time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
