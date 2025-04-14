@@ -39,8 +39,9 @@ const columns = [
         flex: 0.5,
     },
     {
-        field: 'organNom',
+        field: 'nomComplet',//organNom
         flex: 1,
+        valueFormatter: (value: any, row:any) => row?.organNom ?? value
     },
     {
         field: 'representant',
@@ -77,7 +78,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 expedient: {id: id},
             }}
             rowAdditionalActions={actions}
-            onRowsChange={(rows) => onRowCountChange?.(rows.length)}
+            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
             rowHideDeleteButton
         />
 

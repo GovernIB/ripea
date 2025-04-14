@@ -1,6 +1,6 @@
 import {Box, Tab, Tabs} from "@mui/material";
 import React from "react";
-import Badge from "@mui/material/Badge";
+import {StyledBadge} from "./StyledBadge.tsx";
 
 type TabProps = {
     value: string;
@@ -51,7 +51,7 @@ const TabComponent = (props :any) => {
                 const {value, label , content, badge, badgeColor= 'primary'} = tab;
 
                 return <Tab value={value} content={content} key={"tab-" + value} label={
-                    <Badge badgeContent={badge} color={badgeColor} sx={{px: 1}}>{label}</Badge>}/>
+                    <StyledBadge badgeContent={badge} badgecolor={badgeColor}>{label}</StyledBadge>}/>
             })}
 
             {headerAdditionalData}

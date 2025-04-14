@@ -104,7 +104,7 @@ const TasquesGrid = (props: any) => {
             filter={`expedient.id:${entity?.id}`}
             titleDisabled
             perspectives={["RESPONSABLES_RESUM"]}
-            onRowsChange={(rows) => onRowCountChange?.(rows.length)}
+            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
             popupEditCreateActive
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
