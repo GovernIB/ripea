@@ -1691,16 +1691,16 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Method createPropertiesMethod = ReflectionUtils.findMethod(halFormsPropertyFactory.getClass(), "createProperties", halFormsModel.getClass());
 		ReflectionUtils.makeAccessible(createPropertiesMethod);
 		List<?> properties = (List<?>)ReflectionUtils.invokeMethod(createPropertiesMethod, halFormsPropertyFactory, halFormsModel);
-		ExportField[] exportFields = properties.stream().
-				filter(p -> {
-					String name = (String)TypeUtil.getFieldValue(p, "name");
-					return Arrays.asList(fieldNames).contains(name);
-				}).
-				map(p -> new ExportField(
-						TypeUtil.getFieldValue(p, "name"),
-						TypeUtil.getFieldValue(p, "prompt"))).
+		return Arrays.stream(fieldNames).
+				map(name -> properties != null ? properties.stream().
+						filter(p -> name.equals(TypeUtil.getFieldValue(p, "name"))).
+						findFirst().
+						map(p -> new ExportField(
+								TypeUtil.getFieldValue(p, "name"),
+								TypeUtil.getFieldValue(p, "prompt"))).
+						orElse(null) : null).
+				filter(Objects::nonNull).
 				toArray(ExportField[]::new);
-		return exportFields;
 	}
 
 	protected ResponseEntity<InputStreamResource> writeDownloadableFileToResponse(
