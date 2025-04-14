@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.AclCache;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -153,6 +154,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private RegistreInteressatRepository registreInteressatRepository;
     @Autowired private TipusDocumentalRepository tipusDocumentalRepository;
     @Autowired private URLInstruccioRepository uRLInstruccioRepository;
+    @Autowired private AclCache aclCache;
 
 	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
@@ -697,13 +699,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	 @Override
+	 @Transactional
      public Long updateUsuariCodi(String codiAntic, String codiNou) {
-		 
-		 Long t0 = System.currentTimeMillis();
 		 Long registresModificats = 0l;
-		 
 		 UsuariEntity usuariAntic = usuariRepository.findByCodi(codiAntic);
-		 
 		 if (usuariAntic != null) {
 			 createOrUpdateUsuari(codiNou, usuariAntic);
 			 //Actualitzam la informació de auditoria de les taules:
@@ -714,6 +713,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 			 registresModificats += updateUsuariReferencies(codiAntic, codiNou);
 			 //Eliminam l'usuari antic
 			 usuariRepository.delete(usuariAntic);
+			 //Netejam caches per que es tornin a consultar les dades la proxima vegada.
+			 cacheHelper.evictEntitatsAccessiblesUsuari(codiAntic);
+			 cacheHelper.evictEntitatsAccessiblesUsuari(codiNou);
+			 cacheHelper.evictAllReadAclById();
+			 cacheHelper.evictFindRolsAmbCodi(codiAntic);
+			 cacheHelper.evictFindRolsAmbCodi(codiNou);
+			 aclCache.clearCache();
 		 }
  		return registresModificats;
 	 }

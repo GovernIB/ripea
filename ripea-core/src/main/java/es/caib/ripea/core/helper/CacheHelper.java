@@ -751,6 +751,9 @@ public class CacheHelper {
 	public void evictReadAclById(ObjectIdentity oid) {
 	}
 	
+	@CacheEvict(value = "readAclById", allEntries = true)
+	public void evictAllReadAclById() {
+	}
 	
 	
 
