@@ -28,8 +28,8 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 	@Override
 	@PermitAll
-	public void processarAutenticacioUsuari() {
-		delegateService.processarAutenticacioUsuari();
+	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
+		delegateService.processarAutenticacioUsuari(comprovaAmbUsuariPlugin);
 	}
 
 	@Override

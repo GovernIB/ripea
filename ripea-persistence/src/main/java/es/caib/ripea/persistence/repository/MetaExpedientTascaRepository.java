@@ -21,13 +21,12 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 			"    met.metaExpedient.entitat = :entitat " +
 			"and met.metaExpedient = :metaExpedient " +
 			"and (:esNullFiltre = true or lower(met.codi) like lower('%'||:filtre||'%') or lower(met.nom) like lower('%'||:filtre||'%')) ")
-	Page<MetaExpedientEntity> findByEntitatAndMetaExpedientAndFiltre(
+	Page<MetaExpedientTascaEntity> findByEntitatAndMetaExpedientAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient, 
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Pageable pageable);
-
 
 	int deleteByCodi(String codi);
 

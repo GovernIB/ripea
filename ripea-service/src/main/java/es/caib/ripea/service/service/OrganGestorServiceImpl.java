@@ -381,8 +381,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
 
 			// Distinció entre divisió i (substitució o fusió)
-			MultiValuedMap splitMap = new ArrayListValuedHashMap();
-			MultiValuedMap mergeOrSubstMap = new ArrayListValuedHashMap();
+			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> splitMap 		= new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
+			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeOrSubstMap = new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
 
 			for (UnitatOrganitzativaDto vigentObsolete : unitatsVigentObsoleteDto) {
 				// Comprovam que no estigui extingida
@@ -429,11 +429,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Distinció entre substitució i fusió
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
-			MultiValuedMap mergeMap = new ArrayListValuedHashMap();
-			MultiValuedMap substMap = new ArrayListValuedHashMap();
+			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeMap = new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
+			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> substMap = new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
-				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap
-						.get(mergeOrSubstKey);
+				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap.get(mergeOrSubstKey);
 
 				// ==================== FUSIONS ===================
 				if (values.size() > 1) {
@@ -481,33 +480,24 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					"No ha estat possible obtenir la predicció de canvis de unitats organitzatives",
 					ex);
 		}
-
 	}
-	
-	
 	
 	@SuppressWarnings("unchecked")
 	private boolean isAlreadyAddedToMap(
-			MultiValuedMap mergeMap,
+			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeMap,
 			UnitatOrganitzativaDto key,
 			UnitatOrganitzativaDto value) {
 
 		boolean contains = false;
-		List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeMap.get(key);
-		if (values != null) {
-			for (UnitatOrganitzativaDto unitat : values) {
-				if (unitat.getCodi().equals(value.getCodi())) {
-					contains = true;
-				}
+		UnitatOrganitzativaDto unitat = (UnitatOrganitzativaDto) mergeMap.get(key);
+		if (unitat != null) {
+			if (unitat.getCodi().equals(value.getCodi())) {
+				contains = true;
 			}
 		}
 
 		return contains;
-
 	}
-			
-
-	
 
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi) {

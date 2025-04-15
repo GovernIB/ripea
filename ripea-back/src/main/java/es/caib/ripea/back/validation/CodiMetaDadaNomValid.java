@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy=CodiMetaDadaNomValidValidator.class)
 public @interface CodiMetaDadaNomValid {
 
-	String message() default "Valor del camp codi no es pot constar de caràcters que no poden formar part del correcte identificador java i no es pot començar amb lletra majúscula";
+	String message() default "Valor del camp codi no es pot constar de caràcters que no poden formar part del correcte identificador java i les 2 primeres lletres no poden ser majúscules";
 
 	Class<?>[] groups() default {};
 

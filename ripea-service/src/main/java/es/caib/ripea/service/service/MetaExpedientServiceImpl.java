@@ -1396,19 +1396,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		paginacioParams.canviaCampOrdenacio("duracioFormat", "duracio");
 		
-		return paginacioHelper.toPaginaDto(
-				metaExpedientTascaRepository.findByEntitatAndMetaExpedientAndFiltre(
-						entitat,
-						metaExpedient,
-						paginacioParams.getFiltre() == null,
-						paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
-				MetaExpedientTascaDto.class);
+		Page<MetaExpedientTascaEntity> meE = metaExpedientTascaRepository.findByEntitatAndMetaExpedientAndFiltre(
+				entitat,
+				metaExpedient,
+				paginacioParams.getFiltre() == null,
+				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
+				paginacioHelper.toSpringDataPageable(paginacioParams));
+		
+		return paginacioHelper.toPaginaDto(meE, MetaExpedientTascaDto.class);
 	}
-	
-	
-	
-	
+
 	@Transactional
 	@Override
 	public boolean publicarComentariPerMetaExpedient(

@@ -31,7 +31,7 @@ public class RipeaAuditable<PK extends Serializable> extends RipeaPersistable<PK
 
 	@Override
 	public Optional<String> getCreatedBy() {
-		return Optional.of(this.createdBy);
+		return this.createdBy==null?null:Optional.of(this.createdBy);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class RipeaAuditable<PK extends Serializable> extends RipeaPersistable<PK
 
 	@Override
 	public Optional<String> getLastModifiedBy() {
-		return Optional.of(this.lastModifiedBy);
+		return this.lastModifiedBy==null?null:Optional.of(this.lastModifiedBy);
 	}
 
 	@Override
