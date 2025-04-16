@@ -3,11 +3,15 @@ import {Button, Grid, Icon, Typography, MenuItem, Divider, Select, FormControl} 
 import MenuButton from "../../components/MenuButton.tsx";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import usePerfil from "./detail/Perfil.tsx";
-import {useSessionEntitat, useSessionRol, useSessionUser} from "../../components/Session.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 
 const HeaderButton = (props:any) => {
-    const { children, badgeContent, onClick, ...other } = props;
+    const { children, badgeContent, onClick, hidden, ...other } = props;
+
+    if (hidden){
+        return <></>
+    }
 
     return <Button onClick={onClick} {...other} size={'small'}>
         <StyledBadge
@@ -21,13 +25,16 @@ const HeaderButton = (props:any) => {
     </Button>
 }
 const HeaderMenu = (props:any) => {
-    const { title, children, buttonProps, ...other } = props;
+    const { title, children, buttonProps, hidden, ...other } = props;
+
+    if (hidden){
+        return <></>
+    }
 
     return <MenuButton
         id={title}
         buttonLabel={title}
         buttonProps={{
-            endIcon:<Icon>arrow_drop_down</Icon>,
             size: 'small',
             style: {textTransform: 'none'},
             ...buttonProps
@@ -38,7 +45,7 @@ const HeaderMenu = (props:any) => {
     </MenuButton>
 }
 const HeaderSelect = (props:any) => {
-    const {icon, value, onChange, children} = props
+    const {icon, value, onChange, color = "white", children} = props
 
     return <FormControl sx={{ minWidth: 90 }} size="small">
         <Select
@@ -46,12 +53,12 @@ const HeaderSelect = (props:any) => {
             value={value}
             onChange={(event) => onChange(event.target.value)}
             sx={{
-                color: "white",
+                color: color,
                 '.MuiOutlinedInput-notchedOutline': {
                     border: 'none',
                 },
                 '.MuiSvgIcon-root ': {
-                    fill: "white !important",
+                    fill: `${color} !important`,
                 }
             }}
         >
@@ -60,66 +67,89 @@ const HeaderSelect = (props:any) => {
     </FormControl>
 }
 
-const UserHeadToolbar = () => {
-    const { user } = useSessionUser();
+const UserHeadToolbar = (props:any) => {
+    const {color = "white"} = props;
+
+    const { value: entitat } = useEntitatSession()
+    const textColor = entitat?.capsaleraColorLletra ?? color;
+
+    const { value: user, save: apiSave } = useUserSession();
     const navigate = useNavigate();
 
-    const { value: sessionEntitat, save: saveSessionEntitat } = useSessionEntitat();
-    const entitats:any[] = user && Object.values(user?.permisosEntitat);
-    const [entitat, setEntitat] = useState(sessionEntitat || entitats?.[0]);
+    const [entitatId, setEntitatId] = useState<number>(user?.entitatActualId);
+    const entitats :any[] = useMemo(()=>{
+        return user?.permisosEntitat ?Object.values(user?.permisosEntitat) :[]
+    }, [user])
+    const permisoEntitat :any = useMemo(()=>{
+        return entitats?.find((e: any) => e?.entitatId == entitatId)
+    }, [entitatId, entitats])
 
-    const { value: sessionRol, save: saveSessionRol } = useSessionRol();
-    const roles :any[] = [
-        // {
-        //     label: 'Super User',
-        //     value: 'superusuari',
-        //     hidden: !user?.superusuari
-        // },
-        {
-            label: 'Admin',
-            value: 'admin',
-            hidden: !entitat?.permisAdministrador
-        },
-        {
-            label: 'Admin Organ',
-            value: 'organ',
-            hidden: !entitat?.permisAdministradorOrgan || entitat?.organs
-        },
-        {
-            label: 'User',
-            value: 'usuari',
-            hidden: !entitat?.permisUsuari
-        }
-    ].filter((rol:any)=> !rol.hidden)
-    const [rol, setRol] = useState(sessionRol || roles?.[0]?.value);
+    const [organId, setOrganId] = useState<number>(user?.organActualId);
+    const organs :any[] = useMemo(()=>{
+        return permisoEntitat?.organs
+    }, [permisoEntitat])
+
+    const [rol, setRol] = useState<string>(user?.rolActual)
+    const rolsEntitat :any[] = useMemo(()=>{
+        return [
+            // {
+            //     label: 'Super User',
+            //     value: 'IPA_SUPER',
+            //     hidden: !user?.superusuari
+            // },
+            {
+                label: 'Admin',
+                value: 'IPA_ADMIN',
+                hidden: !permisoEntitat?.permisAdministrador
+            },
+            {
+                label: 'Admin Organ',
+                value: 'IPA_ORGAN_ADMIN',
+                hidden: !permisoEntitat?.permisAdministradorOrgan || !permisoEntitat?.organs
+            },
+            {
+                label: 'User',
+                value: 'tothom',
+                hidden: !permisoEntitat?.permisUsuari
+            }
+        ].filter((rol: any) => !rol.hidden)
+    },[permisoEntitat])
 
     const {handleOpen, dialog} = usePerfil();
 
     useEffect(() => {
-        if(entitat) {
-            saveSessionEntitat(entitat)
-
-            const found = roles?.find((r) => r?.value == rol)
-            if (!found){
-                setRol(roles?.[0]?.value)
-            }
+        if (user){
+            setEntitatId(user?.entitatActualId)
+            setOrganId(user?.organActualId)
+            setRol(user?.rolActual)
         }
-    }, [entitat]);
+    }, [user]);
+
     useEffect(() => {
-        if(rol) {
-            saveSessionRol(rol)
+        if (entitatId && entitatId!=user?.entitatActualId){
+            apiSave({canviEntitat: entitatId})
+        }
+    }, [entitatId]);
+
+    useEffect(() => {
+        if (organId && organId!=user?.organActualId){
+            apiSave({canviOrganGestor: organId})
+        }
+    }, [organId]);
+
+    useEffect(() => {
+        if (rol && rol!=user?.rolActual){
+            apiSave({canviRol: rol})
         }
     }, [rol]);
 
-    return <Grid container rowSpacing={1} columnSpacing={1} maxWidth={'100%'}>
+    return <Grid container rowSpacing={1} columnSpacing={1}>
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
-
             <HeaderSelect
-                value={entitat?.entitatId}
-                onChange={(entitatId:any) => {
-                    setEntitat(entitats?.find((e) => e?.entitatId == entitatId))
-                }}
+                value={entitatId}
+                onChange={setEntitatId}
                 icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
+                color={textColor}
             >
                 {
                     entitats?.map((entitat: any) =>
@@ -128,21 +158,40 @@ const UserHeadToolbar = () => {
                 }
             </HeaderSelect>
 
-            <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: 'white'}}/>
+            <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
+
+            {user?.rolActual == 'IPA_ORGAN_ADMIN' &&
+                <>
+                    <HeaderSelect
+                        value={organId}
+                        onChange={setOrganId}
+                        icon={<Icon fontSize={"inherit"}>badge</Icon>}
+                        color={textColor}
+                    >
+                        {
+                            organs?.map((rol:any) =>
+                                <MenuItem key={rol.codi} value={rol.id}>{rol.nom}</MenuItem>
+                            )
+                        }
+                    </HeaderSelect>
+                    <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
+                </>
+            }
 
             <HeaderSelect
                 value={rol}
                 onChange={setRol}
                 icon={<Icon fontSize={"inherit"}>badge</Icon>}
+                color={textColor}
             >
                 {
-                    roles.map((rol:any) =>
+                    rolsEntitat?.map((rol:any) =>
                         <MenuItem key={rol.value} value={rol.value}>{rol.label}</MenuItem>
                     )
                 }
             </HeaderSelect>
 
-            <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: 'white'}}/>
+            <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
 
             <HeaderMenu
                 title={
@@ -150,11 +199,13 @@ const UserHeadToolbar = () => {
                         <Icon fontSize={"inherit"}>person</Icon>{user?.nom}
                     </Typography>
                 }
-                buttonProps={{color: 'white'}}
+                buttonProps={{
+                    style: {color: textColor, textTransform: 'none'}
+                }}
             >
                 <MenuItem onClick={handleOpen}>Perfil</MenuItem>
 
-                {rol=='admin' && <MenuItem onClick={()=>{
+                {user?.rolActual=='IPA_ADMIN' && <MenuItem onClick={()=>{
 
                     /* TODO: revisar */
                     const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf';
@@ -171,26 +222,27 @@ const UserHeadToolbar = () => {
                 }}
                 ><Icon>download</Icon>Manual de administrador</MenuItem>}
 
-                <MenuItem onClick={()=>{
+                <MenuItem
+                    onClick={()=>{
+                        /* TODO: revisar */
+                        const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf';
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = '01_ripea_manual_usuari.pdf';
+                        document.body.appendChild(link);
+                        link.click();
 
-                    /* TODO: revisar */
-                    const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf';
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = '01_ripea_manual_usuari.pdf';
-                    document.body.appendChild(link);
-                    link.click();
-
-                    // Limpieza
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-
-                }}
-                ><Icon>download</Icon>Manual de usuario</MenuItem>
+                        // Limpieza
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }}
+                >
+                    <Icon>download</Icon>Manual de usuario
+                </MenuItem>
 
                 <MenuItem><Icon>logout</Icon>Desconectar</MenuItem>
             </HeaderMenu>
-
+            {dialog}
         </Grid>
 
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
@@ -222,7 +274,6 @@ const UserHeadToolbar = () => {
                 <MenuItem>Consultar accions massives</MenuItem>
             </HeaderMenu>
         </Grid>
-        {dialog}
     </Grid>
 }
 export default UserHeadToolbar;

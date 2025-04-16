@@ -39,7 +39,7 @@ type ResourceApiMethods = {
     artifactFieldOptionsFields: (args: ResourceApiArtifactFieldOptionsArgs) => Promise<any[]>;
     artifactFieldOptionsFind: (args: ResourceApiArtifactFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
     artifactAction: (id: any, args: ResourceApiActionArgs) => Promise<any>;
-    artifactReport: (id: any, args: ResourceApiReportArgs) => Promise<any[]>;
+    artifactReport: (id: any, args: ResourceApiReportArgs) => Promise<any[] | ResourceApiBlobResponse>;
     fieldOptionsFields: (args: ResourceApiFieldArgs) => Promise<any[]>;
     fieldOptionsFind: (args: ResourceApiFieldOptionsFindArgs) => Promise<ResourceApiFindResponse>;
     fieldDownload: (id: any, args: ResourceApiFieldArgs) => Promise<ResourceApiBlobResponse>;
@@ -154,7 +154,7 @@ export type ResourceApiActionArgs = ResourceApiRequestArgs & {
 
 export type ResourceApiReportArgs = ResourceApiRequestArgs & {
     code: string;
-    //outputFormat?: ReportOutputFormat;
+    fileType?: ExportFileType;
 };
 
 export type ResourceApiFieldArgs = ResourceApiRequestArgs & {
@@ -722,14 +722,23 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
             }
         });
     }, [request]);
-    const artifactReport = React.useCallback((id: any, args: ResourceApiReportArgs): Promise<any[]> => {
+    const artifactReport = React.useCallback((id: any, args: ResourceApiReportArgs): Promise<any[] | ResourceApiBlobResponse> => {
         return new Promise((resolve, reject) => {
             if (args?.code != null) {
                 const reportRel = 'generate_' + args.code;
-                request(reportRel, id, args).
+                const reportArgs = {
+                    ...args,
+                    fileType: undefined,
+                    urlData: { fileType: args.fileType }
+                };
+                request(reportRel, id, reportArgs).
                     then((state: State) => {
-                        const result = state.data;
-                        resolve(result);
+                        if (args.fileType != null) {
+                            resolve(stateToBlobResponse(state));
+                        } else {
+                            const result = state.data;
+                            resolve(result);
+                        }
                     }).
                     catch((error: ResourceApiError) => {
                         processAnswerRequiredError(

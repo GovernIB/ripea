@@ -4,9 +4,11 @@ import {MuiFormDialog, useBaseAppContext} from "reactlib";
 import {DataFormDialogApi} from "../../../../lib/components/mui/datacommon/DataFormDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {Grid} from "@mui/material";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const usePerfil = () => {
     // const { t } = useTranslation();
+    const { value: user } = useUserSession();
 
     const formApiRef = useRef<DataFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
@@ -39,6 +41,10 @@ const usePerfil = () => {
                     <GridFormField xs={12} name="nif" disabled readOnly/>
                     <GridFormField xs={12} name="email" disabled readOnly/>
                     <GridFormField xs={12} name="emailAlternatiu"/>
+
+                    <GridFormField xs={12} name="rols"
+                                   value={user?.rols}
+                                   disabled readOnly multiple/>
                     <GridFormField xs={12} name="idioma" disabled readOnly/>
                 </CardData>
 

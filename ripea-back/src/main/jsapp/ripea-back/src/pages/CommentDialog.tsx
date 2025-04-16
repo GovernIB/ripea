@@ -29,8 +29,7 @@ const Comments = (props:any) => {
             findAll({
                 filter: `${resourceReference}.id:${entity?.id}`,
                 includeLinksInRows: true,
-                page: 0,
-                size: 0,
+                unpaged: true,
                 sorts: ['createdDate', 'desc']
             })
                 .then((app) => {

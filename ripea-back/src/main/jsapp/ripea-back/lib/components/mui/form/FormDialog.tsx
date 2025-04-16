@@ -15,7 +15,7 @@ type FormDialogProps = DialogProps & {
     noForm?: boolean;
 };
 
-export type FormDialogSubmitFn = (data?: any) => Promise<React.ReactElement | undefined>;
+export type FormDialogSubmitFn = (id: any, data?: any) => Promise<React.ReactElement | undefined>;
 export type FormDialogShowArgs = {
     title?: string;
     additionalData?: any;
@@ -68,7 +68,7 @@ export const useFormDialog: UseFormDialogFn = (
     const buttonCallback = (value: any) => {
         if (value) {
             const isCustomSubmit = customSubmit != null;
-            const result = isCustomSubmit ? customSubmit(formApiRef.current.getData()) : formApiRef.current.save();
+            const result = isCustomSubmit ? customSubmit(formApiRef.current.id, formApiRef.current.getData()) : formApiRef.current.save();
             result.then((value: any) => {
                 if (isCustomSubmit) {
                     // S'ha fet click al botó executar/generar i s'ha executat/generat correctament

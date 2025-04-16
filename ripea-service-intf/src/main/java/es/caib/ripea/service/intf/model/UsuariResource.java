@@ -8,9 +8,11 @@ import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,6 +54,9 @@ public class UsuariResource extends BaseResource<String> {
 	private ResourceReference<EntitatResource, Long> entitatPerDefecte;
 
 	private boolean expedientExpandit = true;
+
+    @Transient
+    private List<String> rols;
 
     public String getCodiAndNom(){
         return  codi + " - " + nom;

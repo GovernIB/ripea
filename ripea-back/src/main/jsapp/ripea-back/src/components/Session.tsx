@@ -1,61 +1,95 @@
 import axios from "axios";
 import {useEffect} from "react";
+import {useSession} from "./SessionStorageContext.tsx";
+import {useResourceApiService} from "reactlib";
 
-const url :string = 'http://localhost:8080/ripeaback/api/usuari/actual/securityInfo';
-const userKey :string = 'usuario';
-const entitatKey :string = 'entitat';
-const rolKey :string = 'rol';
+const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
+const userkey :string = 'usuario';
+const entitatKey = 'entitat';
 
-const get = (key:string) => {
-    const datosGuardados = sessionStorage.getItem(key);
+export const useUserSession = () => {
+    const {value, save, remove} = useSession(userkey)
 
-    try {
-        if (datosGuardados) {
-            return JSON.parse(datosGuardados);
-        }
-    } catch {
-    }
-    return null
-}
-
-const save = (key:string, value:any) => {
-    sessionStorage.setItem(key, JSON.stringify(value));
-}
-
-const remove = (key:string) => {
-    sessionStorage.removeItem(key);
-}
-
-export const useSession = (key:string) => {
-    return {
-        value: get(key),
-        save: (value:any) => save(key, value),
-        remove: () => remove(key),
-    }
-}
-
-export const useSessionUser = () => {
     const refresh = () => {
-        axios.get(url)
+        axios.get(userUrl+'/actual/securityInfo')
             .then((response) => {
-                save(userKey, response.data);
+                save(response.data);
             })
             .catch((error) => {
+                save(undefined);
                 console.log(">>>> axios error", error)
             })
     }
 
+    const apiSave = (value:any) => {
+        axios.post(userUrl+'/actual/changeInfo', value)
+            .then((response) => {
+                save(response.data);
+            })
+            .catch((error) => {
+                save(undefined);
+                console.log(">>>> axios error", error)
+            })
+    }
+
+    const apiRemove = () => {
+        // axios.delete(url)
+        //     .then(() => {
+        //         changeValue({});
+        //     })
+        //     .catch((error) => {
+        //         console.log(">>>> axios error", error)
+        //     })
+        remove()
+    }
+
     useEffect(() => {
-        if (!get(userKey)) {
+        if (!value) {
+            save({});
             refresh()
         }
     }, []);
 
     return {
-        user: get(userKey),
+        value,
         refresh,
-        remove: () => remove(userKey),
+        save: apiSave,
+        remove: apiRemove,
     };
 }
-export const useSessionEntitat = () => useSession(entitatKey)
-export const useSessionRol = () => useSession(rolKey)
+
+export const useEntitatSession = () => {
+    const { value, save, remove } = useSession(entitatKey)
+    const { value: user } = useUserSession();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+    } = useResourceApiService('entitatResource');
+
+    const refresh = () => {
+        if (apiIsReady){
+            apiGetOne(user?.entitatActualId)
+                .then((app) => save(app))
+                .catch(() => remove())
+        }
+    }
+
+    useEffect(()=>{
+        if(user && user?.entitatActualId && user?.entitatActualId != value?.id){
+            refresh()
+        }
+    },[user])
+
+    useEffect(()=>{
+        if(user?.entitatActualId && !value){
+            refresh()
+        }
+    },[apiIsReady])
+
+    // useEffect(()=>{
+    //     console.log(">>>> entitat", value)
+    // },[value])
+
+    return { value }
+}

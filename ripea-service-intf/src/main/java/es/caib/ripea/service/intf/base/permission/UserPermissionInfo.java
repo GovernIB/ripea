@@ -16,6 +16,7 @@ public class UserPermissionInfo {
     private Long entitatActualId;
     private Long organActualId;
     private String rolActual;
+    private List<String> rols;
 
     @Data
     @Builder
