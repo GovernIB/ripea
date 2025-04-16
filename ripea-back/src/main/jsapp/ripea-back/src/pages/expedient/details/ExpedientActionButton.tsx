@@ -17,7 +17,6 @@ const ExpedientActionButton = (props:{entity:any}) => {
         buttonLabel={t('common.action')}
         buttonProps={{
             startIcon:<Icon>settings</Icon>,
-            endIcon:<Icon>keyboard_arrow_down</Icon>,
             sx: {borderRadius: 1},
             size: 'small',
             variant: "contained",

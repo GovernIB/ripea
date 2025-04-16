@@ -73,7 +73,7 @@ export const CommentDialog = (props:any) => {
             },
         })
             .then(() => {
-                setNumComm(numComm + 1);
+                setNumComm((numComm ?? entity?.numComentaris) + 1);
             })
     }
 

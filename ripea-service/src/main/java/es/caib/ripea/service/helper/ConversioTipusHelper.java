@@ -347,7 +347,16 @@ public class ConversioTipusHelper {
 						target.setEstatColorFinalitzarTasca(source.getEstatFinalitzarTasca() != null ? source.getEstatFinalitzarTasca().getColor() : null);
 						target.setId(source.getId());
 						target.setNom(source.getNom());
+						//El responsable de la tasca, no mostra el nom complet...
 						target.setResponsable(source.getResponsable());
+//						if (source.getResponsable()!=null) {
+//			      			UsuariEntity ue = usuariRepository.findByCodi(source.getResponsable());
+//			      			if (ue!=null) {
+//			      				target.setResponsable(ue.getNom());
+//			      			} else {
+//			      				target.setResponsable(source.getResponsable());
+//			      			}
+//						}
 						target.setDuracio(source.getDuracio());
 						target.setPrioritat(source.getPrioritat()!=null?source.getPrioritat():PrioritatEnumDto.B_NORMAL);
 						return target;

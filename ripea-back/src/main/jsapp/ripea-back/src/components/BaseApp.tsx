@@ -22,6 +22,7 @@ import Footer from './Footer';
 import uenegroma from '../assets/uenegroma.png';
 import feder7 from '../assets/feder7.png';
 import una_manera from '../assets/una_manera.png';
+import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -126,6 +127,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
+
     return <MuiBaseApp
         code={code}
         logo={logo}
@@ -146,12 +148,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
         menuEntries={baseAppMenuEntries}
-        /*additionalHeaderComponents={availableLanguages?.length ? [
-            <HeaderLanguageSelector
-                key="sel_lang"
-                languages={availableLanguages}
-                sx={{ mr: 2 }} />
-        ] : undefined}*/
+        additionalHeaderComponents={[<UserHeadToolbar/>]}
         additionalAuthComponents={availableLanguages?.length ? [
             <AuthLanguageSelector
                 key="sel_lang"

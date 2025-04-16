@@ -29,7 +29,7 @@ public interface AplicacioService {
 	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
 	@PermitAll
-	public void processarAutenticacioUsuari() throws NotFoundException;
+	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) throws NotFoundException;
 
 	/**
 	 * Obté l'usuari actual.

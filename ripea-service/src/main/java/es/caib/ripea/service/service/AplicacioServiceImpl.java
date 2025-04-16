@@ -84,10 +84,9 @@ public class AplicacioServiceImpl implements AplicacioService {
         return configHelper.getEntitatActualCodi();
     }
 	
-	
 	@Transactional
 	@Override
-	public void processarAutenticacioUsuari() {
+	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
 		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
@@ -99,14 +98,22 @@ public class AplicacioServiceImpl implements AplicacioService {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
-								dadesUsuari.getNom(),
+								dadesUsuari.getNomSencer(),
 								dadesUsuari.getNif(),
 								dadesUsuari.getEmail(),
 								getIdiomaPerDefecte()).build());
 			} else {
-				throw new NotFoundException(
-						auth.getName(),
-						DadesUsuari.class);
+				if (comprovaAmbUsuariPlugin) {
+					throw new NotFoundException(auth.getName(), DadesUsuari.class);
+				} else {
+					usuari = usuariRepository.save(
+							UsuariEntity.getBuilder(
+									auth.getName(),
+									auth.getName(),
+									null,
+									null,
+									getIdiomaPerDefecte()).build());
+				}
 			}
 		} else {
 			logger.debug("Consultant plugin de dades d'usuari (" +
@@ -114,13 +121,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
 				usuari.update(
-						dadesUsuari.getNom(),
+						dadesUsuari.getNomSencer(),
 						dadesUsuari.getNif(),
 						dadesUsuari.getEmail());
 			} else {
-				throw new NotFoundException(
-						auth.getName(),
-						DadesUsuari.class);
+				if (comprovaAmbUsuariPlugin) {
+					throw new NotFoundException(auth.getName(), DadesUsuari.class);
+				}
 			}
 		}
 	}
@@ -436,9 +443,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private String getIdiomaPerDefecte() {
 		return configHelper.getConfig(PropertyConfig.IDIOMA_DEFECTE);
 	}
-	
-	
-	
 	
 	@Override
 	public List<String> findUsuarisCodisAmbRol(String rol) {

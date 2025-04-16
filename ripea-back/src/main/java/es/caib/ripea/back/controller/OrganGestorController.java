@@ -106,27 +106,20 @@ public class OrganGestorController extends BaseUserOAdminController {
 					null);
 		}
 		try {
-
-			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(
-					entitat.getId());
+			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
 			if (prediccio.isNoCanvis()) {
 				return getModalControllerReturnValueSuccess(
 						request,
 						"redirect:../organgestor",
 						"unitat.controller.synchronize.no.changes");
 			}
-
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
-//			model.addAttribute("unitatsVigentsFirstSincro", unitatsVigentsFirstSincro);
-
 			model.addAttribute("splitMap", prediccio.getSplitMap());
 			model.addAttribute("mergeMap", prediccio.getMergeMap());
 			model.addAttribute("substMap", prediccio.getSubstMap());
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
-//			organGestorService.syncDir3OrgansGestors(entitat.getId());
-			
 		} catch (Exception e) {
  			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
 			return getModalControllerReturnValueErrorMessageText(
@@ -135,9 +128,6 @@ public class OrganGestorController extends BaseUserOAdminController {
 					e.getMessage(),
 					e);
 		}
-
-//        return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
-//                "organgestor.controller.update.nom.tots.ok");
 		return "synchronizationPrediction";
     }
 

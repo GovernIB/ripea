@@ -47,7 +47,7 @@ public class SessioHelper {
 			UsuariDto usuariActual = null;
 			EntitatDto entitatActual = null;
 			if (autenticacioProcessada == null) {
-				aplicacioService.processarAutenticacioUsuari();
+				aplicacioService.processarAutenticacioUsuari(true);
 				usuariActual = aplicacioService.getUsuariActual();
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, new Boolean(true));
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuariActual);

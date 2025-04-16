@@ -98,7 +98,7 @@ const RemesaGrid = (props:any) => {
             titleDisabled
             apiRef={apiRef}
             staticSortModel={[{field: 'id', sort: 'asc'}]}
-            onRowsChange={(rows) => onRowCountChange?.(rows.length)}
+            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
             disableColumnMenu
             disableColumnSorting
             toolbarHideCreate

@@ -40,7 +40,7 @@ public class DistribucioRestController {
 	public ResponseEntity<String> event(@RequestBody List<AnotacioRegistreId> event) {
 		try {
 			//Guardam el usuari a la taula de BBDD, aquest en concret ha de existir a Keycloak, i tendrem les dades de auditoria correctes.
-			aplicacioService.processarAutenticacioUsuari();
+			aplicacioService.processarAutenticacioUsuari(false);
 			expedientPeticioService.crearExpedientPeticion(event);
 			return new ResponseEntity<String>("OK", HttpStatus.OK);
 		} catch (Exception e) {

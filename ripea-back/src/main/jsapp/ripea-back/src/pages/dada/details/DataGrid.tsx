@@ -92,8 +92,8 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
                     node:{id: contingut?.id},
                     tipusValor: getDataFieldType(entity?.tipus),
                 }}
-                onRowsChange={(rows)=> {
-                    setNumDades(rows?.length)
+                onRowsChange={(rows, info) => {
+                    setNumDades?.(info?.totalElements)
                     refresh?.()
                 }}
                 autoHeight
