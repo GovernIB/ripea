@@ -53,9 +53,8 @@ export type FormFieldCustomProps = FormFieldCommonProps & {
 
 const useFormFieldComponent = (type?: string, field?: any, fieldTypeMap?: Map<string, string>) => {
     const { getFormFieldComponent } = useBaseAppContext();
-    const fieldType: string = type ?? field?.type;
-    const mappedFieldType = fieldTypeMap?.get(fieldType) ?? fieldType;
-    const processedType = processType(field, mappedFieldType);
+    const fieldType = field?.type ? (fieldTypeMap?.get(field?.type) ?? field?.type) : field?.type; 
+    const processedType = processType(field, type ?? fieldType);
     return {
         type: processedType,
         FormFieldComponent: getFormFieldComponent(processedType),

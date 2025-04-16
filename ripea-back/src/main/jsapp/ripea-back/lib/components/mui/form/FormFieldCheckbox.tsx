@@ -37,8 +37,7 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
         onChange={!readOnly ? (e) => onChange(e.target.checked) : undefined}
         disabled={disabled}
         sx={{ ml: 1 }}
-        {...componentProps}
-    /> : <Checkbox
+        {...componentProps} /> : <Checkbox
         checked={value ? true : false}
         color={fieldError != null ? 'error' : undefined}
         title={title}
@@ -47,7 +46,8 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
         disabled={disabled}
         sx={{ ml: 1 }}
         {...componentProps} />;
-    return <FormControl error={!!fieldError} sx={!inline ? { top: '7px', mb: 3.9 } : undefined}>
+    const formControlSx = !inline ? { top: typeSwitch ? '12px' : '4px', ml: typeSwitch ? 2 : 1.4 } : undefined;
+    return <FormControl error={!!fieldError} sx={formControlSx}>
         <FormControlLabel
             name={name}
             required={required}
