@@ -17,15 +17,20 @@
 </head>
 <body>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/excepcio/{{:index}}</script>
-	<table id="excepcions" data-toggle="datatable" data-url="<c:url value="/excepcio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%"
-	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
+	<table	id="excepcions" 
+			data-toggle="datatable" 
+			data-url="<c:url value="/excepcio/datatable"/>" 
+			data-search-enabled="false" 
+			class="table table-striped table-bordered" 
+			style="width:100%" 
+			data-rowhref-template="#rowhrefTemplate"
+			data-rowhref-toggle="modal">
 		<thead>
 			<tr>
-				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="excepcio.list.columna.data"/></th>
-				<th data-col-name="tipus" data-orderable="false"><spring:message code="excepcio.list.columna.tipus"/></th>
-				<th data-col-name="objectId" data-orderable="false"><spring:message code="excepcio.list.columna.objecte.id"/></th>
-				<th data-col-name="objectClass" data-orderable="false"><spring:message code="excepcio.list.columna.objecte.class"/></th>
-				<th data-col-name="message" data-orderable="false"><spring:message code="excepcio.list.columna.message"/></th>
+				<th data-col-name="data" data-orderable="false" data-converter="datetime" width="10%"><spring:message code="excepcio.list.columna.data"/></th>
+				<th data-col-name="tipus" data-orderable="false" width="20%"><spring:message code="excepcio.list.columna.tipus"/></th>
+				<th data-col-name="uri" data-orderable="false" width="25%"><spring:message code="excepcio.detall.camp.uri"/></th>
+				<th data-col-name="message" data-orderable="false" width="35%"><spring:message code="excepcio.list.columna.message"/></th>
 				<th data-col-name="index" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a href="excepcio/{{:index}}" class="btn btn-default" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>

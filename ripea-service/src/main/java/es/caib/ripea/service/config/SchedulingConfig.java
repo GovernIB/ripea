@@ -566,7 +566,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 		String errMsg = th.getClass() + ": " + th.getMessage() + " (" + new Date().getTime() + ")";
 		logger.error("Error no controlat a l'execució de la tasca en segon pla amb codi \"" + codiTasca + "\": " + errMsg, th);
 		monitorTasquesService.error(codiTasca, errMsg);
-		aplicacioService.excepcioSave(th);
+		aplicacioService.excepcioSave(codiTasca, th);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);

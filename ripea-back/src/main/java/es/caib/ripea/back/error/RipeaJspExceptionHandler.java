@@ -84,7 +84,7 @@ public class RipeaJspExceptionHandler {
 			EJBException ex,
 			HttpServletRequest request) {
 		Throwable cause = ex.getCause();
-		aplicacioService.excepcioSave(ex.getCause());
+		aplicacioService.excepcioSave(request.getRequestURI(), ex.getCause()==null?ex:ex.getCause());
 		if (cause instanceof NotFoundException) {
 			return handleNotFoundException((NotFoundException)cause);
 		} else if (cause instanceof SistemaExternException) {
@@ -118,7 +118,7 @@ public class RipeaJspExceptionHandler {
 			Throwable ex,
 			HttpServletRequest request) {
 		log.error("Error al processar la petició HTTP al recurs " + request.getRequestURI(), ex);
-		aplicacioService.excepcioSave(ex.getCause());
+		aplicacioService.excepcioSave(request.getRequestURI(), ex.getCause()==null?ex:ex.getCause());
 		ModelAndView model = new ModelAndView("util/error");
 		ErrorObject errorObject = new ErrorObject(
 				HttpStatus.INTERNAL_SERVER_ERROR.value(),

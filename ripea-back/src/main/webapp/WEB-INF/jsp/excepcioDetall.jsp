@@ -18,6 +18,8 @@
 			<dd><fmt:formatDate value="${excepcio.data}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 			<dt><spring:message code="excepcio.detall.camp.tipus"/></dt>
 			<dd>${excepcio.tipus}</dd>
+			<dt><spring:message code="excepcio.detall.camp.uri"/></dt>
+			<dd>${excepcio.uri}</dd>
 			<c:if test="${not empty excepcio.objectId}">
 				<dt><spring:message code="excepcio.detall.camp.objecte.id"/></dt>
 				<dd>${excepcio.objectId}</dd>

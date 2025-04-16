@@ -132,7 +132,6 @@ public class ConversioTipusHelper {
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ConfigHelper configHelper;
 
-	@SuppressWarnings("rawtypes")
 	public ConversioTipusHelper() {
 		
 		mapperFactory = new DefaultMapperFactory.Builder().build();
@@ -733,31 +732,30 @@ public class ConversioTipusHelper {
 					}
 				});	
 		
+		// SeguimentArxiuPendentsDto --> InteressatEntity
 		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<InteressatEntity, SeguimentArxiuPendentsDto>() {
+				new CustomConverter<InteressatPersonaJuridicaEntity, SeguimentArxiuPendentsDto>() {
 					@Override
-					public SeguimentArxiuPendentsDto convert(InteressatEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
-						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
-						target.setId(source.getId());
-						target.setExpedientId(source.getExpedient().getId());
-						if (source instanceof  InteressatAdministracioEntity) {
-							target.setElementNom(((InteressatAdministracioEntity)source).getOrganNom());
-						} else if (source instanceof  InteressatPersonaFisicaEntity) {
-							InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity)source;
-							target.setElementNom(fis.getNom() + " " + fis.getLlinatge1() + " " + fis.getLlinatge2());
-						} else if (source instanceof  InteressatPersonaJuridicaEntity) {
-							target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
-						} 
-						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
-						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacio() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
-						target.setCreatedDate(
-								Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-						target.setDataDarrerIntent(source.getArxiuIntentData());
-						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
-						return target;
+					public SeguimentArxiuPendentsDto convert(InteressatPersonaJuridicaEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
+						return getInteressatPendentArxiuFromInteressatDto(deproxyInteressatEntity(source));
 					}
 				});
-
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<InteressatAdministracioEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(InteressatAdministracioEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
+						return getInteressatPendentArxiuFromInteressatDto(deproxyInteressatEntity(source));
+					}
+				});
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<InteressatPersonaFisicaEntity, SeguimentArxiuPendentsDto>() {
+					@Override
+					public SeguimentArxiuPendentsDto convert(InteressatPersonaFisicaEntity source, Type<? extends SeguimentArxiuPendentsDto> destinationClass, MappingContext mappingContext) {
+						return getInteressatPendentArxiuFromInteressatDto(deproxyInteressatEntity(source));
+					}
+				});
+		// FI SeguimentArxiuPendentsDto --> InteressatEntity
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExecucioMassivaEntity, ExecucioMassivaDto>() {
 					@Override
@@ -954,9 +952,9 @@ public class ConversioTipusHelper {
 		      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
 		      			target.setCreatedBy(ue.getCodiAndNom());
 					}
-	            	target.setCreatedDate(
-				            Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-	            	target.setError(HtmlUtils.htmlEscape(source.getError()));
+	            	target.setCreatedDate(Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+	            	if (Utils.hasValue(source.getError())) 
+	            		target.setError(HtmlUtils.htmlEscape(source.getError()));
 	            	PinbalServeiEntity pse = pinbalServeiRepository.findByCodi(source.getServei());
 	            	if (pse!=null) {
 	            		target.setServei(pse.getCodi() + " - " + pse.getNom());
@@ -1122,6 +1120,29 @@ public class ConversioTipusHelper {
 		target.setRepresentantArxiuPropagat(representant != null ? representant.isArxiuPropagat() : true);
 	}
 
+	private SeguimentArxiuPendentsDto getInteressatPendentArxiuFromInteressatDto(InteressatEntity source) {
+		SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
+		target.setId(source.getId());
+		target.setExpedientId(source.getExpedient().getId());
+		if (source instanceof  InteressatAdministracioEntity) {
+			target.setElementNom(((InteressatAdministracioEntity)source).getOrganNom());
+		} else if (source instanceof  InteressatPersonaFisicaEntity) {
+			InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity)source;
+			String elemNom = fis.getNom() + " " + fis.getLlinatge1();
+			if (fis.getLlinatge2()!=null) {
+				elemNom = elemNom + " " + fis.getLlinatge2();
+			}
+			target.setElementNom(elemNom);
+		} else if (source instanceof  InteressatPersonaJuridicaEntity) {
+			target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
+		} 
+		target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
+		target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacio() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
+		target.setCreatedDate(Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+		target.setDataDarrerIntent(source.getArxiuIntentData());
+		target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+		return target;
+	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {
 		if (source == null)

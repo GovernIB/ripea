@@ -76,8 +76,8 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 	@Override
 	@RolesAllowed("**")
-	public void excepcioSave(Throwable exception) {
-		delegateService.excepcioSave(exception);
+	public void excepcioSave(String uri, Throwable exception) {
+		delegateService.excepcioSave(uri, exception);
 	}
 
 	@Override

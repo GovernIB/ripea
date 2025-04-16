@@ -475,22 +475,14 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			return "firmaSimpleWebForm";
 		}
 
-		FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
-				entitatActualId,
-				documentId);
+		FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(entitatActualId, documentId);
 		fitxerPerFirmar.setId(documentId);
 
 		String urlReturnToRipea = aplicacioService.propertyBaseUrl() + "/document/" + documentId + "/firmaSimpleWebEnd?tascaId=" + (tascaId == null ? "" : tascaId);
-
-		String urlRedirectToPortafib = documentService.firmaSimpleWebStart(
-				fitxerPerFirmar,
-				command.getMotiu(),
-				urlReturnToRipea);
+		String urlRedirectToPortafib = documentService.firmaSimpleWebStart(fitxerPerFirmar, command.getMotiu(), urlReturnToRipea);
 
 		return "redirect:" + urlRedirectToPortafib;
-
 	}
-
 
 	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd")
 	public String firmaSimpleWebEnd(
@@ -505,47 +497,42 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
 
-		if (firmaResultat.getStatus() == StatusEnumDto.OK && firmaResultat.getSignatures().get(0).getStatus() == StatusEnumDto.OK) {
+		if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
 
-			documentService.processarFirmaClient(
-					entitatActualId,
-					documentId,
-					firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
-					firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
-					RolHelper.getRolActual(request),
-					tascaId);
-
-			MissatgesHelper.success(
-					request,
-					getMessage(
-							request,
-							"document.controller.firma.passarela.final.ok"));
+			if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
+							
+				documentService.processarFirmaClient(
+						entitatActualId,
+						documentId,
+						firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
+						firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
+						RolHelper.getRolActual(request),
+						tascaId);
+	
+				MissatgesHelper.success(
+						request,
+						getMessage(
+								request,
+								"document.controller.firma.passarela.final.ok"));
+			} else {
+				MissatgesHelper.error(request, firmaResultat.getSignatures().get(0).getMsg());
+			}
 
 		} else if (firmaResultat.getStatus() == StatusEnumDto.WARNING) {
-			MissatgesHelper.warning(
-					request,
-					firmaResultat.getMsg());
+			MissatgesHelper.warning(request, firmaResultat.getMsg());
 
 		} else if (firmaResultat.getStatus() == StatusEnumDto.ERROR) {
-			MissatgesHelper.error(
-					request,
-					firmaResultat.getMsg());
+			MissatgesHelper.error(request, firmaResultat.getMsg());
 		}
 
-
-		boolean massiu = (boolean) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				"massiu");
+		boolean massiu = (boolean) RequestSessionHelper.obtenirObjecteSessio(request, "massiu");
 
 		if (massiu) {
 			return "redirect:/massiu/firmasimpleweb";
 		} else {
 			return "redirect:/contingut/" + contingutService.getExpedientId(documentId) + "?tascaId=" + (tascaId == null ? "" : tascaId);
 		}
-
 	}
-
-
 
 	@RequestMapping(value = "/{documentId}/viafirma/upload", method = RequestMethod.GET)
 	public String viaFirmaUploadGet(

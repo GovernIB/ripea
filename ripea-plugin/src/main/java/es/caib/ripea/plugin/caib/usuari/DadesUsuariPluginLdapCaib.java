@@ -122,6 +122,11 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 
 	@Override
 	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
-		return findRolsAmbCodi(usuariCodi);
+		try {
+			var info = getRolesByUsername(usuariCodi);
+			return info != null && info.getRoles() != null ? List.of(info.getRoles()) : new ArrayList<String>();
+		} catch (Exception e) {
+			return new ArrayList<String>();
+		}
 	}
 }
