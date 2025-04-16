@@ -10,6 +10,7 @@ import {
     useConfirmDialogButtons,
 } from '../AppButtons';
 import { useBaseAppContext } from '../BaseAppContext';
+import { ExportFileType } from '../ResourceApiContext';
 import { useResourceApiService } from '../ResourceApiProvider';
 
 export type ActionReportCustomButton = {
@@ -26,6 +27,7 @@ export type ActionReportButtonProps = {
     resourceName: string;
     action?: string;
     report?: string;
+    reportFileType?: ExportFileType;
     id?: any;
     icon?: any;
     title?: string;
@@ -85,6 +87,7 @@ export const useActionReportLogic = (
     resourceName: string,
     action?: string,
     report?: string,
+    reportFileType?: ExportFileType,
     confirm?: boolean,
     formAdditionalDataArg?: any,
     formDialogContent?: React.ReactElement,
@@ -92,7 +95,7 @@ export const useActionReportLogic = (
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void) => {
-    const { t, messageDialogShow } = useBaseAppContext();
+    const { t, messageDialogShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
     const reportDialogButtons = useReportDialogButtons();
     const confirmDialogButtons = useConfirmDialogButtons();
@@ -118,8 +121,9 @@ export const useActionReportLogic = (
     });
     const generateReport: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (report != null) {
-            const requestArgs = { code: report, data };
-            apiArtifactReport(id, requestArgs).then((result) => {
+            const requestArgs = { code: report, fileType: reportFileType, data };
+            apiArtifactReport(id, requestArgs).then((result: any) => {
+                saveAs?.(result.blob, result.fileName);
                 onSuccess?.(result);
                 resolve(formDialogResultProcessor?.(result));
             }).catch(error => {
@@ -130,6 +134,13 @@ export const useActionReportLogic = (
             console.error('Couldn\'t generate report without code');
         }
     });
+    const dialogDisabled = formDialogContent == null;
+    const [formDialogShow, formDialogComponent] = useFormDialog(
+        resourceName,
+        action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
+        action ? execAction : generateReport,
+        formDialogContent,
+        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
     const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
         if (hasForm) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
@@ -137,7 +148,7 @@ export const useActionReportLogic = (
                 title: dialogTitle ?? formDialogTitle,
                 additionalData: formAdditionalData ?? formAdditionalDataArg,
                 dialogComponentProps: formDialogComponentProps ?? formDialogComponentPropsArg ?? { fullWidth: true, maxWidth: 'md' }
-            });
+            }).catch(_error => {});
         } else if (action != null) {
             if (confirm) {
                 const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
@@ -148,22 +159,16 @@ export const useActionReportLogic = (
                     confirmDialogComponentProps).
                     then((value: any) => {
                         if (value) {
-                            execAction(id);
+                            execAction(id, formAdditionalDataArg);
                         }
                     });
             } else {
-                execAction(id);
+                execAction(id, formAdditionalDataArg);
             }
         } else if (report != null) {
-            generateReport();
+            generateReport(null, formAdditionalDataArg);
         }
     }
-    const [formDialogShow, formDialogComponent] = useFormDialog(
-        resourceName,
-        action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
-        action ? execAction : generateReport,
-        formDialogContent,
-        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
     const [artifact, setArtifact] = React.useState<any>();
     const [apiLink, setApiLink] = React.useState<any>();
     const initialized = artifact != null;
@@ -195,8 +200,7 @@ export const useActionReportLogic = (
         initialized,
         apiLink,
         formDialogComponent,
-        execAction,
-        generateReport: exec
+        exec
     }
 }
 
@@ -205,6 +209,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         resourceName,
         action,
         report,
+        reportFileType = 'PDF',
         id,
         icon,
         title,
@@ -225,11 +230,12 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         initialized,
         apiLink,
         formDialogComponent,
-        execAction: handleButtonClick,
+        exec: handleButtonClick,
     } = useActionReportLogic(
         resourceName,
         action,
         report,
+        reportFileType,
         confirm,
         formAdditionalData,
         formDialogContent,
