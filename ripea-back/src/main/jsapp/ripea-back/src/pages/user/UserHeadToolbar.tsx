@@ -3,8 +3,8 @@ import {Button, Grid, Icon, Typography, MenuItem, Divider, Select, FormControl} 
 import MenuButton from "../../components/MenuButton.tsx";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import usePerfil from "./detail/Perfil.tsx";
-import {useSessionUser} from "../../components/Session.tsx";
 import {useEffect, useMemo, useState} from "react";
+import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 
 const HeaderButton = (props:any) => {
     const { children, badgeContent, onClick, hidden, ...other } = props;
@@ -68,8 +68,12 @@ const HeaderSelect = (props:any) => {
 }
 
 const UserHeadToolbar = (props:any) => {
-    const {textColor = "white"} = props;
-    const { value: user, save: apiSave } = useSessionUser();
+    const {color = "white"} = props;
+
+    const { value: entitat } = useEntitatSession()
+    const textColor = entitat?.capsaleraColorLletra ?? color;
+
+    const { value: user, save: apiSave } = useUserSession();
     const navigate = useNavigate();
 
     const [entitatId, setEntitatId] = useState<number>(user?.entitatActualId);

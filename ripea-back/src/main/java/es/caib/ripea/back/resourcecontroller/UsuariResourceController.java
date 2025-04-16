@@ -59,7 +59,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     // INICI - Variables fake per DevelopmentMode
     @Getter @Setter private Long entitatActualId = 1L;
     @Getter @Setter private Long organActualId = null;
-    @Getter @Setter private String rolActualId = "IPA_ADMIN";
+    @Getter @Setter private String rolActualCodi = "IPA_ADMIN";
     @Getter @Setter private List<String> rols = List.of("IPA_SUPER", "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom");
     // FI - Variables fake per DevelopmentMode
 
@@ -81,7 +81,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                     .superusuari(true)
                     .entitatActualId(entitatActualId)
                     .organActualId(organActualId)
-                    .rolActual(rolActualId)
+                    .rolActual(rolActualCodi)
                     .rols(rols)
                     .permisosEntitat(Map.of(
                             1L,
@@ -128,23 +128,16 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
 
-        String entitatCodi = request.getParameter(EntitatHelper.getRequestParameterCanviEntitat());
-        String organCodi = request.getParameter(EntitatHelper.getRequestParameterCanviOrganGestor());
-        String rol = request.getParameter(RolHelper.getRequestParameterCanviRol());
-        boolean canviEntitat = entitatCodi != null && !entitatCodi.isEmpty();
-        boolean canviOrgan = organCodi != null && !organCodi.isEmpty();
-        boolean canvirol = rol != null && !rol.isEmpty();
-
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
             if (developmentMode) {
-                if (canviEntitat) {
-                    entitatActualId = "GOIB".equals(entitatCodi) ? 1L : 3721L;
+                if (response.containsKey("canviEntitat")) {
+                    entitatActualId = Long.valueOf(String.valueOf(response.get("canviEntitat")));
                 }
-                if (canviOrgan) {
-                    organActualId = "A04026973".equals(organCodi) ? 73L : 118L;
+                if (response.containsKey("canviOrganGestor")) {
+                    organActualId = Long.valueOf(String.valueOf(response.get("canviOrganGestor")));
                 }
-                if (canvirol) {
-                    rolActualId = rol;
+                if (response.containsKey("canviRol")) {
+                    rolActualCodi = String.valueOf(response.get("canviRol"));
                 }
             } else {
                 EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);

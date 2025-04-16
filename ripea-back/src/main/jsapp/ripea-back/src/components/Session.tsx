@@ -1,45 +1,14 @@
 import axios from "axios";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
+import {useSession} from "./SessionStorageContext.tsx";
+import {useResourceApiService} from "reactlib";
 
 const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
 const userkey :string = 'usuario';
+const entitatKey = 'entitat';
 
-const get = (key:string) => {
-    const datosGuardados = sessionStorage.getItem(key);
-
-    try {
-        if (datosGuardados) {
-            return JSON.parse(datosGuardados);
-        }
-    } catch {
-    }
-    return null
-}
-const save = (key:string, value:any) => {
-    sessionStorage.setItem(key, JSON.stringify(value));
-}
-const remove = (key:string) => {
-    sessionStorage.removeItem(key);
-}
-
-export const useSession = (key:string) => {
-    const [value, setValue] = useState<any>(get(key));
-
-    useEffect(() => {
-        if (value) {
-            save(key, value);
-        }
-    }, [value]);
-
-    return {
-        value,
-        save: setValue,
-        remove: () => remove(key),
-    }
-}
-
-export const useSessionUser = () => {
-    const {value, save} = useSession(userkey)
+export const useUserSession = () => {
+    const {value, save, remove} = useSession(userkey)
 
     const refresh = () => {
         axios.get(userUrl+'/actual/securityInfo')
@@ -71,6 +40,7 @@ export const useSessionUser = () => {
         //     .catch((error) => {
         //         console.log(">>>> axios error", error)
         //     })
+        remove()
     }
 
     useEffect(() => {
@@ -86,4 +56,40 @@ export const useSessionUser = () => {
         save: apiSave,
         remove: apiRemove,
     };
+}
+
+export const useEntitatSession = () => {
+    const { value, save, remove } = useSession(entitatKey)
+    const { value: user } = useUserSession();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+    } = useResourceApiService('entitatResource');
+
+    const refresh = () => {
+        if (apiIsReady){
+            apiGetOne(user?.entitatActualId)
+                .then((app) => save(app))
+                .catch(() => remove())
+        }
+    }
+
+    useEffect(()=>{
+        if(user && user?.entitatActualId && user?.entitatActualId != value?.id){
+            refresh()
+        }
+    },[user])
+
+    useEffect(()=>{
+        if(user?.entitatActualId && !value){
+            refresh()
+        }
+    },[apiIsReady])
+
+    // useEffect(()=>{
+    //     console.log(">>>> entitat", value)
+    // },[value])
+
+    return { value }
 }
