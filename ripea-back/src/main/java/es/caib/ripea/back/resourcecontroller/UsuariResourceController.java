@@ -1,7 +1,9 @@
 package es.caib.ripea.back.resourcecontroller;
 
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
+import es.caib.ripea.back.helper.ContingutEstaticHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.ExpedientHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.Ent;
@@ -11,21 +13,25 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Servei REST de gestió d'usuaris.
@@ -33,6 +39,7 @@ import java.util.Map;
  * @author Límit Tecnologies
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(BaseConfig.API_PATH + "/usuari")
 @Tag(name = "Usuaris", description = "Servei de gestió d'usuaris")
 public class UsuariResourceController extends BaseMutableResourceController<UsuariResource, String> {
@@ -40,14 +47,20 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @Value("${es.caib.ripea.develope.mode:false}")
     private boolean developmentMode;
 
+    private final EntitatService entitatService;
+    private final OrganGestorService organGestorService;
+    private final AplicacioService aplicacioService;
+
     @Hidden
     @GetMapping("/actual/securityInfo")
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
-    public ResponseEntity<UserPermissionInfo> getUsauriActualSecurityInfo(HttpServletRequest request) throws MethodArgumentNotValidException {
+    public ResponseEntity<UserPermissionInfo> getUsuariActualSecurityInfo(HttpServletRequest request) throws MethodArgumentNotValidException {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
         String rolActual = RolHelper.getRolActual(request);
+        List<String> roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
 
         if (developmentMode) {
             return ResponseEntity.ok(UserPermissionInfo.builder()
@@ -57,6 +70,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                     .entitatActualId(entitatActual != null ? entitatActual.getId() : null)
                     .organActualId(organActual != null ? organActual.getId() : null)
                     .rolActual(rolActual)
+                    .rols(roles)
                     .permisosEntitat(Map.of(
                             1L,
                             PermisosEntitat.builder()
@@ -93,7 +107,33 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setEntitatActualId(entitatActual != null ? entitatActual.getId() : null);
         userPermissionInfo.setOrganActualId(organActual != null ? organActual.getId() : null);
         userPermissionInfo.setRolActual(rolActual);
+        userPermissionInfo.setRols(roles);
         return ResponseEntity.ok(userPermissionInfo);
     }
 
+    @Hidden
+    @PostMapping("/actual/changeInfo")
+    @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
+    public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
+
+        if (!ContingutEstaticHelper.isContingutEstatic(request)) {
+            EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
+            EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+            EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
+            EntitatHelper.findEntitatsAccessibles(request, entitatService);
+
+            RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService);
+            RolHelper.setRolActualFromDb(request, aplicacioService);
+        }
+
+        EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+        if (entitatDto != null) {
+            entitatService.setConfigEntitat(entitatDto);
+        }
+
+//        llistaEntitatsInterceptor.preHandle(request, null, null);// canviEntitat, canviOrganGestor
+//        llistaRolsInterceptor.preHandle(request, null, null);// canviRol
+
+        return getUsuariActualSecurityInfo(request);
+    }
 }

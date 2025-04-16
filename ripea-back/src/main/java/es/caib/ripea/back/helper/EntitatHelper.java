@@ -47,7 +47,9 @@ public class EntitatHelper {
 	}
 
 	public static void processarCanviEntitats(HttpServletRequest request, EntitatService entitatService, AplicacioService aplicacioService) {
-		String canviEntitat = request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT);
+        processarCanviEntitats(request, request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT), entitatService, aplicacioService);
+    }
+	public static void processarCanviEntitats(HttpServletRequest request, String canviEntitat, EntitatService entitatService, AplicacioService aplicacioService) {
 		if (canviEntitat != null && canviEntitat.length() > 0) {
 			LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
 			try {
@@ -175,7 +177,9 @@ public class EntitatHelper {
 	}
 	
 	public static void processarCanviOrganGestor(HttpServletRequest request, AplicacioService aplicacioService) {
-		String canviOrganGestor = request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL);
+        processarCanviOrganGestor(request, request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL), aplicacioService);
+    }
+	public static void processarCanviOrganGestor(HttpServletRequest request, String canviOrganGestor, AplicacioService aplicacioService) {
 		if (canviOrganGestor != null && canviOrganGestor.length() > 0) {
 			LOGGER.debug("Processant canvi òrgan gestor (id=" + canviOrganGestor + ")");
 			try {

@@ -31,9 +31,9 @@ public class RolHelper {
 	public  static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
 	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService, OrganGestorService organGestorService) {
-		
-		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
-		
+        processarCanviRols(request, request.getParameter(REQUEST_PARAMETER_CANVI_ROL), aplicacioService, organGestorService);
+    }
+	public static void processarCanviRols(HttpServletRequest request, String canviRol, AplicacioService aplicacioService, OrganGestorService organGestorService) {
 		if (canviRol != null && canviRol.length() > 0) {
 			
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");

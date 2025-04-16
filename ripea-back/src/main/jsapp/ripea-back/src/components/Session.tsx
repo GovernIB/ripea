@@ -1,10 +1,8 @@
 import axios from "axios";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
-const url :string = 'http://localhost:8080/ripeaback/api/usuari/actual/securityInfo';
-const userKey :string = 'usuario';
-const entitatKey :string = 'entitat';
-const rolKey :string = 'rol';
+const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
+const userkey :string = 'usuario';
 
 const get = (key:string) => {
     const datosGuardados = sessionStorage.getItem(key);
@@ -17,45 +15,75 @@ const get = (key:string) => {
     }
     return null
 }
-
 const save = (key:string, value:any) => {
     sessionStorage.setItem(key, JSON.stringify(value));
 }
-
 const remove = (key:string) => {
     sessionStorage.removeItem(key);
 }
 
 export const useSession = (key:string) => {
+    const [value, setValue] = useState<any>(get(key));
+
+    useEffect(() => {
+        if (value) {
+            save(key, value);
+        }
+    }, [value]);
+
     return {
-        value: get(key),
-        save: (value:any) => save(key, value),
+        value,
+        save: setValue,
         remove: () => remove(key),
     }
 }
 
 export const useSessionUser = () => {
+    const {value, save} = useSession(userkey)
+
     const refresh = () => {
-        axios.get(url)
+        axios.get(userUrl+'/actual/securityInfo')
             .then((response) => {
-                save(userKey, response.data);
+                save(response.data);
             })
             .catch((error) => {
+                save(undefined);
                 console.log(">>>> axios error", error)
             })
     }
 
+    const apiSave = (value:any) => {
+        axios.post(userUrl+'/actual/changeInfo', value)
+            .then((response) => {
+                save(response.data);
+            })
+            .catch((error) => {
+                save(undefined);
+                console.log(">>>> axios error", error)
+            })
+    }
+
+    const apiRemove = () => {
+        // axios.delete(url)
+        //     .then(() => {
+        //         changeValue({});
+        //     })
+        //     .catch((error) => {
+        //         console.log(">>>> axios error", error)
+        //     })
+    }
+
     useEffect(() => {
-        if (!get(userKey)) {
+        if (!value) {
+            save({});
             refresh()
         }
     }, []);
 
     return {
-        user: get(userKey),
+        value,
         refresh,
-        remove: () => remove(userKey),
+        save: apiSave,
+        remove: apiRemove,
     };
 }
-export const useSessionEntitat = () => useSession(entitatKey)
-export const useSessionRol = () => useSession(rolKey)
