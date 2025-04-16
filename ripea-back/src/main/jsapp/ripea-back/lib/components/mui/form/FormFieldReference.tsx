@@ -245,7 +245,9 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     } = useFormFieldCommon(field, fieldError, inline, componentProps, startAdornmentIcons);
     const loadingElement = <CircularProgress color="inherit" size={20} />;
     const endAdornment = optionsLoading ? loadingElement : componentProps?.slotProps?.input?.endAdornment;
-    const valueMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? null);
+    const valueMultipleAdapted = React.useMemo(() => {
+        return multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? null);
+    }, [multiple, value]);
     return <>
         {advancedSearchButtonActive && <AdvancedSearchDialog
             title={t('form.field.reference.advanced.title')}
