@@ -3,7 +3,6 @@ package es.caib.ripea.back.resourcecontroller;
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
 import es.caib.ripea.back.helper.ContingutEstaticHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
-import es.caib.ripea.back.helper.ExpedientHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.Ent;
@@ -18,7 +17,9 @@ import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -51,6 +56,13 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
 
+    // INICI - Variables fake per DevelopmentMode
+    @Getter @Setter private Long entitatActualId = 1L;
+    @Getter @Setter private Long organActualId = null;
+    @Getter @Setter private String rolActualId = "IPA_ADMIN";
+    @Getter @Setter private List<String> rols = List.of("IPA_SUPER", "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom");
+    // FI - Variables fake per DevelopmentMode
+
     @Hidden
     @GetMapping("/actual/securityInfo")
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
@@ -67,10 +79,10 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                     .codi("rip_admin")
                     .nom("Administrador Ripea")
                     .superusuari(true)
-                    .entitatActualId(entitatActual != null ? entitatActual.getId() : null)
-                    .organActualId(organActual != null ? organActual.getId() : null)
-                    .rolActual(rolActual)
-                    .rols(roles)
+                    .entitatActualId(entitatActualId)
+                    .organActualId(organActualId)
+                    .rolActual(rolActualId)
+                    .rols(rols)
                     .permisosEntitat(Map.of(
                             1L,
                             PermisosEntitat.builder()
@@ -116,23 +128,39 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
 
+        String entitatCodi = request.getParameter(EntitatHelper.getRequestParameterCanviEntitat());
+        String organCodi = request.getParameter(EntitatHelper.getRequestParameterCanviOrganGestor());
+        String rol = request.getParameter(RolHelper.getRequestParameterCanviRol());
+        boolean canviEntitat = entitatCodi != null && !entitatCodi.isEmpty();
+        boolean canviOrgan = organCodi != null && !organCodi.isEmpty();
+        boolean canvirol = rol != null && !rol.isEmpty();
+
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-            EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
-            EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-            EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
-            EntitatHelper.findEntitatsAccessibles(request, entitatService);
+            if (developmentMode) {
+                if (canviEntitat) {
+                    entitatActualId = "GOIB".equals(entitatCodi) ? 1L : 3721L;
+                }
+                if (canviOrgan) {
+                    organActualId = "A04026973".equals(organCodi) ? 73L : 118L;
+                }
+                if (canvirol) {
+                    rolActualId = rol;
+                }
+            } else {
+                EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
+                EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+                EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
+                EntitatHelper.findEntitatsAccessibles(request, entitatService);
 
-            RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService);
-            RolHelper.setRolActualFromDb(request, aplicacioService);
+                RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService);
+                RolHelper.setRolActualFromDb(request, aplicacioService);
+
+                EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+                if (entitatDto != null) {
+                    entitatService.setConfigEntitat(entitatDto);
+                }
+            }
         }
-
-        EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
-        if (entitatDto != null) {
-            entitatService.setConfigEntitat(entitatDto);
-        }
-
-//        llistaEntitatsInterceptor.preHandle(request, null, null);// canviEntitat, canviOrganGestor
-//        llistaRolsInterceptor.preHandle(request, null, null);// canviRol
 
         return getUsuariActualSecurityInfo(request);
     }
