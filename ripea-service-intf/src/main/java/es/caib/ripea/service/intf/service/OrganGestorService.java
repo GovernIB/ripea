@@ -20,7 +20,7 @@ public interface OrganGestorService {
 	 * 
 	 * @return Llistat de tots els organs gestors
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_SUPER')")
 	public List<OrganGestorDto> findAll();
 	
 	/**

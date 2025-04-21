@@ -65,18 +65,21 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity ep left join ep.metaExpedient me " +
 			"where " +
 			"ep.registre.entitat = :entitat " +
-			"and ( (:rolActual = 'IPA_ADMIN') " +
-			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and (ep.registre.destiCodi in (:organsPermesos0) " +
-			"		or ep.registre.destiCodi in (:organsPermesos1) " +
-			"		or ep.registre.destiCodi in (:organsPermesos2) " +
-			"		or ep.registre.destiCodi in (:organsPermesos3))) " +
-			"	or (:rolActual = 'tothom' " +
+			"and (" +
+			" 		(:rolActual = 'IPA_ADMIN') " +
+			"	or	(:rolActual = 'IPA_ORGAN_ADMIN' and (ep.registre.destiCodi in (:organsPermesos0) " +
+			"			or ep.registre.destiCodi in (:organsPermesos1) " +
+			"			or ep.registre.destiCodi in (:organsPermesos2) " +
+			"			or ep.registre.destiCodi in (:organsPermesos3))) " +
+			"	or	(:rolActual = 'tothom' " +
 			"			and (ep.metaExpedient in (:metaExpedientsPermesos0) " +
 			"			  or ep.metaExpedient in (:metaExpedientsPermesos1) " +
 			"			  or ep.metaExpedient in (:metaExpedientsPermesos2) " +
 			"			  or ep.metaExpedient in (:metaExpedientsPermesos3)) " +
-			"			and me.gestioAmbGrupsActiva = false " +
-			"			or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +
+			"			and (me.gestioAmbGrupsActiva = false or (:esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos)) )" +
+			"		)" +
+			"	)" +
+//			"			or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +
 			"and (:esNullMetaExpedient = true or ep.metaExpedient = :metaExpedient) " +
 			"and (:senseMetaExpedientInformat = false or ep.metaExpedient is null) " +
 			"and (:esNullNumero = true or lower(ep.registre.identificador) like lower('%'||:numero||'%')) " +
