@@ -13,6 +13,7 @@ import {
     // KeycloakAuthProvider as AuthProvider,
     ResourceApiProvider
 } from 'reactlib';
+import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
 
 dayjs.extend(duration);
 
@@ -53,6 +54,7 @@ const getEnvApiUrl = () => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
+        <SessionStorageProvider>
             <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
@@ -60,7 +62,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <App />
                     </BrowserRouter>
                 </ThemeProvider>
-             </ResourceApiProvider> 
+             </ResourceApiProvider>
+        </SessionStorageProvider>
         {/*</AuthProvider>*/}
     </React.StrictMode>,
 );

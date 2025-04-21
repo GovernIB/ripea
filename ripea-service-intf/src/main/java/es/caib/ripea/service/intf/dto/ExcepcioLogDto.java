@@ -11,12 +11,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.io.Serializable;
 import java.util.Date;
 
-
-/**
- * Excepció llençada per un servei.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public class ExcepcioLogDto implements Serializable {
 
 	private Long index;
@@ -25,14 +19,13 @@ public class ExcepcioLogDto implements Serializable {
 	private Class<?> tipus;
 	private Object objectId;
 	private Class<?> objectClass;
+	private String uri;
 	private String param1;
 	private String param2;
 	private String message;
 	private String stacktrace;
 
-
-
-	public ExcepcioLogDto(Throwable exception) {
+	public ExcepcioLogDto(String uri, Throwable exception) {
 		if (exception instanceof NotFoundException) {
 			this.objectId = ((NotFoundException)exception).getObjectId();
 			this.objectClass = ((NotFoundException)exception).getObjectClass();
@@ -46,6 +39,7 @@ public class ExcepcioLogDto implements Serializable {
 			this.objectClass = ((ValidationException)exception).getObjectClass();
 			this.param1 = ((ValidationException)exception).getError();
 		}
+		this.setUri(uri);
 		this.setTipus(exception.getClass());
 		this.setMessage(exception.getMessage());
 		this.setStacktrace(ExceptionUtils.getStackTrace(exception));
@@ -111,7 +105,11 @@ public class ExcepcioLogDto implements Serializable {
 	public void setTipus(Class<?> tipus) {
 		this.tipus = tipus;
 	}
-
+	public String getUri() {
+		return uri;
+	}
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

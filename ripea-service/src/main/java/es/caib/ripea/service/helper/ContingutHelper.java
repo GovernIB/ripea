@@ -279,6 +279,18 @@ public class ContingutHelper {
 			}
 		}
 		
+		if (contingut.getLastModifiedBy()!=null && contingut.getLastModifiedBy().get()!=null) {
+			UsuariEntity ue = usuariRepository.findByCodi(contingut.getLastModifiedBy().get());
+			if (ue!=null) {
+				UsuariDto aux = new UsuariDto();
+				aux.setCodi(ue.getCodi());
+				aux.setNom(ue.getNom());
+				aux.setNif(ue.getNif());
+				aux.setEmail(ue.getEmail());
+				resposta.setLastModifiedBy(aux);
+			}
+		}
+		
 		return resposta;
 	}
 

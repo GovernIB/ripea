@@ -25,13 +25,13 @@ public class ExcepcioLogHelper {
 	}
 
 	@Synchronized
-	public void addExcepcio(Throwable exception) {
+	public void addExcepcio(String uri, Throwable exception) {
 		if (exception == null) return;
 
 		while (excepcions.size() >= DEFAULT_MAX_EXCEPCIONS) {
 			excepcions.removeLast();
 		}
-		excepcions.addFirst(new ExcepcioLogDto(exception));
+		excepcions.addFirst(new ExcepcioLogDto(uri, exception));
 	}
 
 }

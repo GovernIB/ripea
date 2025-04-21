@@ -376,6 +376,12 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(ExpedientSeguidorResourceService.class);
 	}
 	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean entitatResourceServiceEjb() {
+		return getLocalEjbFactoyBean(EntitatResourceService.class);
+	}
+	
 	/*
 	@Bean
 	@ConditionalOnWarDeployment
