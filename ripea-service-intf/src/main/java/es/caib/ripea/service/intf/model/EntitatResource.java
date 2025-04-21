@@ -19,16 +19,9 @@ import org.springframework.data.annotation.Transient;
 @NoArgsConstructor
 @ResourceConfig(
         quickFilterFields = { "codi", "nom" },
-        descriptionField = "nom",
-        artifacts = {
-                @ResourceConfigArtifact(
-                        type = ResourceArtifactType.PERSPECTIVE,
-                        code = EntitatResource.PERSPECTIVE_IMAGE),
-        }
+        descriptionField = "nom"
 )
 public class EntitatResource extends BaseAuditableResource<Long> {
-
-    public static final String PERSPECTIVE_IMAGE = "IMAGE";
 
 	@NotNull
 	@Size(max = 64)
