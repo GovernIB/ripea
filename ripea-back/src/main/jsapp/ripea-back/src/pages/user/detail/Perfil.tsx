@@ -14,7 +14,7 @@ const usePerfil = () => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleOpen = () => {
-        formApiRef.current?.show('rip_user')
+        formApiRef.current?.show(user?.codi)
             .then(() => {
                 // refresh?.()
                 temporalMessageShow(null, '', 'success');
@@ -34,7 +34,7 @@ const usePerfil = () => {
             <Grid container columnSpacing={1} rowSpacing={1}>
                 <CardData
                     title={'Datos de usuario'}
-                    cardProps={{border: '1px solid #004B99',}}
+                    cardProps={{border: '1px solid #004B99'}}
                     headerProps={{color: 'white', backgroundColor: '#004B99'}}
                 >
                     <GridFormField xs={12} name="nom" disabled readOnly/>

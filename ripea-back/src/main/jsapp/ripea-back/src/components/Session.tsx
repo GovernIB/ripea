@@ -6,6 +6,7 @@ import {useResourceApiService} from "reactlib";
 const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
+const organKey = 'organ';
 
 export const useUserSession = () => {
     const {value, save, remove} = useSession(userkey)
@@ -76,8 +77,12 @@ export const useEntitatSession = () => {
     }
 
     useEffect(()=>{
-        if(user && user?.entitatActualId && user?.entitatActualId != value?.id){
-            refresh()
+        if (user && user?.entitatActualId) {
+            if(user?.entitatActualId != value?.id){
+                refresh()
+            }
+        } else {
+            remove()
         }
     },[user])
 
@@ -91,5 +96,44 @@ export const useEntitatSession = () => {
     //     console.log(">>>> entitat", value)
     // },[value])
 
-    return { value }
+    return { value, remove }
+}
+export const useOrganSession = () => {
+    const { value, save, remove } = useSession(organKey)
+    const { value: user } = useUserSession();
+
+    const {
+        isReady: apiIsReady,
+        getOne: apiGetOne,
+    } = useResourceApiService('organGestorResource');
+
+    const refresh = () => {
+        if (apiIsReady){
+            apiGetOne(user?.organActualId)
+                .then((app) => save(app))
+                .catch(() => remove())
+        }
+    }
+
+    useEffect(()=>{
+        if (user && user?.organActualId) {
+            if(user?.organActualId != value?.id){
+                refresh()
+            }
+        } else {
+            remove()
+        }
+    },[user])
+
+    useEffect(()=>{
+        if(user?.organActualId && !value){
+            refresh()
+        }
+    },[apiIsReady])
+
+    // useEffect(()=>{
+    //     console.log(">>>> organ", value)
+    // },[value])
+
+    return { value, remove }
 }

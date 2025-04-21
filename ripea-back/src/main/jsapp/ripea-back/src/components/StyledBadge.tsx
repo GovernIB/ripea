@@ -8,7 +8,7 @@ interface StyledBadgeProps {
     textcolor?: ThemeColorKey | string;
 }
 
-export const StyledBadge = styled(Badge)<StyledBadgeProps>(({ theme, badgecolor = 'default', textcolor = 'white' }) => {
+export const StyledBadge = styled(Badge)<StyledBadgeProps>(({ theme, badgecolor = 'primary', textcolor = 'white' }) => {
     const resolveColor = (value: string | undefined) =>
         theme.palette[value as ThemeColorKey]?.main || value;
 

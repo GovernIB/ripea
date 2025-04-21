@@ -74,7 +74,6 @@ const UserHeadToolbar = (props:any) => {
     const textColor = entitat?.capsaleraColorLletra ?? color;
 
     const { value: user, save: apiSave } = useUserSession();
-    const navigate = useNavigate();
 
     const [entitatId, setEntitatId] = useState<number>(user?.entitatActualId);
     const entitats :any[] = useMemo(()=>{
@@ -92,11 +91,11 @@ const UserHeadToolbar = (props:any) => {
     const [rol, setRol] = useState<string>(user?.rolActual)
     const rolsEntitat :any[] = useMemo(()=>{
         return [
-            // {
-            //     label: 'Super User',
-            //     value: 'IPA_SUPER',
-            //     hidden: !user?.superusuari
-            // },
+            {
+                label: 'Super User',
+                value: 'IPA_SUPER',
+                hidden: !user?.superusuari
+            },
             {
                 label: 'Admin',
                 value: 'IPA_ADMIN',
@@ -114,8 +113,6 @@ const UserHeadToolbar = (props:any) => {
             }
         ].filter((rol: any) => !rol.hidden)
     },[permisoEntitat])
-
-    const {handleOpen, dialog} = usePerfil();
 
     useEffect(() => {
         if (user){
@@ -143,24 +140,38 @@ const UserHeadToolbar = (props:any) => {
         }
     }, [rol]);
 
+    const {handleOpen, dialog} = usePerfil();
+
+    const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
+    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
+    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
+    const isRolActualDissenyOrgan = user?.rolActual == 'IPA_DISSENY';
+    const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
+    const isRolActualUser = user?.rolActual == 'tothom';
+
     return <Grid container rowSpacing={1} columnSpacing={1}>
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
-            <HeaderSelect
-                value={entitatId}
-                onChange={setEntitatId}
-                icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
-                color={textColor}
-            >
-                {
-                    entitats?.map((entitat: any) =>
-                        <MenuItem key={entitat?.entitatCodi} value={entitat?.entitatId}>{entitat?.entitatNom}</MenuItem>
-                    )
-                }
-            </HeaderSelect>
+            { !isRolActualSupAdmin &&
+                <>
+                    <HeaderSelect
+                        value={entitatId}
+                        onChange={setEntitatId}
+                        icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
+                        color={textColor}
+                        hidden={isRolActualSupAdmin}
+                    >
+                        {
+                            entitats?.map((entitat: any) =>
+                                <MenuItem key={entitat?.entitatCodi} value={entitat?.entitatId}>{entitat?.entitatNom}</MenuItem>
+                            )
+                        }
+                    </HeaderSelect>
 
-            <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
+                    <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
+                </>
+            }
 
-            {user?.rolActual == 'IPA_ORGAN_ADMIN' &&
+            { (isRolActualOrganAdmin || isRolActualDissenyOrgan) &&
                 <>
                     <HeaderSelect
                         value={organId}
@@ -204,22 +215,23 @@ const UserHeadToolbar = (props:any) => {
                 }}
             >
                 <MenuItem onClick={handleOpen}>Perfil</MenuItem>
+                {dialog}
 
-                {user?.rolActual=='IPA_ADMIN' && <MenuItem onClick={()=>{
+                {(isRolActualSupAdmin || isRolActualAdmin || isRolActualOrganAdmin) &&
+                    <MenuItem onClick={()=>{
+                        /* TODO: revisar */
+                        const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf';
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = '02_ripea_manual_administradors.pdf';
+                        document.body.appendChild(link);
+                        link.click();
 
-                    /* TODO: revisar */
-                    const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf';
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = '02_ripea_manual_administradors.pdf';
-                    document.body.appendChild(link);
-                    link.click();
+                        // Limpieza
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
 
-                    // Limpieza
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-
-                }}
+                    }}
                 ><Icon>download</Icon>Manual de administrador</MenuItem>}
 
                 <MenuItem
@@ -242,38 +254,214 @@ const UserHeadToolbar = (props:any) => {
 
                 <MenuItem><Icon>logout</Icon>Desconectar</MenuItem>
             </HeaderMenu>
-            {dialog}
         </Grid>
 
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
-            <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
-                <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
-            </HeaderButton>
-            <HeaderButton badgeContent={3} variant={"contained"}>
-                <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
-            </HeaderButton>
-            <HeaderButton badgeContent={1} variant={"contained"}>
-                <Typography display={'inline'} variant={'subtitle2'}>Tareas</Typography>
-            </HeaderButton>
+            { isRolActualSupAdmin && <MenuSupAdmin/> }
+            { isRolActualAdmin && <MenuAdmin/> }
+            { isRolActualOrganAdmin && <MenuAdminOrgan/> }
+            { isRolActualDissenyOrgan && <MenuDissenyOrgan/> }
+            { isRolActualUser && <MenuUsuari/> }
 
-            <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
-                <MenuItem>Datos estadisticos</MenuItem>
-                <MenuItem>Documentos enviados a Porafib</MenuItem>
-                <MenuItem>Remesas enviadas a Notib</MenuItem>
-            </HeaderMenu>
-            <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
-                <MenuItem>Enviar documents al portafirmes</MenuItem>
-                <MenuItem>Firmar documents des del navegador</MenuItem>
-                <MenuItem>Canvi d'estat d'expedients</MenuItem>
-                <MenuItem>Tancament d'expedients</MenuItem>
-                <MenuItem>Custodiar elements pendents</MenuItem>
-                <MenuItem>Copiar enllaç CSV</MenuItem>
-                <MenuItem>Adjuntar annexos pendents d'anotacions acceptades</MenuItem>
-                <MenuItem>Canviar prioritat d'expedients</MenuItem>
-                <Divider/>
-                <MenuItem>Consultar accions massives</MenuItem>
-            </HeaderMenu>
+            {
+                (
+                    isRolActualAdmin
+                    || isRolActualOrganAdmin
+                    || isRolActualUser
+                ) && <AccionesMassivas isRolActualAdmin={isRolActualAdmin}/>
+            }
+
+            { isRolActualRevisor && <MenuRevisor/> }
         </Grid>
     </Grid>
+}
+
+const MenuSupAdmin = () => {
+    const navigate = useNavigate();
+
+    return <>
+        <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+        </HeaderButton>
+
+        <HeaderMenu title={"Monitorizar"} buttonProps={{variant: "contained"}}>
+            <MenuItem>Integraciones</MenuItem>
+            <MenuItem>Excepciones</MenuItem>
+            <MenuItem>Monitor de sistema</MenuItem>
+        </HeaderMenu>
+
+        <HeaderMenu title={"Configuración"} buttonProps={{variant: "contained"}}>
+            <MenuItem>Propiedades configurables</MenuItem>
+            <MenuItem>Servicios PINBAL</MenuItem>
+            <MenuItem>Reiniciar tareas en segundo plano</MenuItem>
+            <MenuItem>Reiniciar plugins</MenuItem>
+        </HeaderMenu>
+
+        <HeaderButton variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Avisos</Typography>
+        </HeaderButton>
+    </>
+}
+const MenuAdmin = () => {
+    const navigate = useNavigate();
+    const countAnotacionsPendents = 0;// es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+
+    return <>
+        <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+        </HeaderButton>
+        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
+        </HeaderButton>
+
+        <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
+            <MenuItem>
+                {/* MetaExpedientHelper.getOrgansNoSincronitzats(request)*/}
+                <StyledBadge /*badgeContent={organsNoSincronitzats}*/ title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                    Procedimientos
+                </StyledBadge>
+            </MenuItem>
+            {/*sessionScope['SessionHelper.isDocumentsGeneralsEnabled']!=null && sessionScope['SessionHelper.isDocumentsGeneralsEnabled']*/
+                <MenuItem>Tipos de documentos</MenuItem>
+            }
+
+            <Divider/>
+
+            {/*sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null && sessionScope['SessionHelper.isTipusDocumentsEnabled']*/
+                <MenuItem>Tipos documentales NTI</MenuItem>
+            }
+            {/*sessionScope['SessionHelper.isDominisEnabled']!=null && sessionScope['SessionHelper.isDominisEnabled']*/
+                <MenuItem>Dominios</MenuItem>
+            }
+            <MenuItem>Grupos</MenuItem>
+            <MenuItem>Órganos gestores</MenuItem>
+            {/* ExpedientHelper.isUrlsInstruccioActiu(request) */
+                <MenuItem>URLs instrucción</MenuItem>
+            }
+
+            <Divider/>
+
+            <MenuItem>Permisos de la entidad</MenuItem>
+        </HeaderMenu>
+        <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
+            <MenuItem>Contenidos</MenuItem>
+            <MenuItem>Datos estadisticos</MenuItem>
+            {/*isRevisioActiva*/
+                <MenuItem>Revisión de procedimientos</MenuItem>
+            }
+            <MenuItem>Documentos enviados a Porafib</MenuItem>
+            <MenuItem>Remesas enviadas a Notib</MenuItem>
+            <MenuItem>Consultas enviadas a PINBAL</MenuItem>
+            <MenuItem>Asignación de tareas</MenuItem>
+            <MenuItem>Expedientes pendientes de distribución</MenuItem>
+            <MenuItem>Anotaciones comunicadas</MenuItem>
+        </HeaderMenu>
+    </>
+}
+const MenuAdminOrgan = () => {
+    const navigate = useNavigate();
+    const countAnotacionsPendents = 0;// es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+    const organsNoSincronitzats = 0;// es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
+
+    return <>
+        <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+        </HeaderButton>
+        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
+        </HeaderButton>
+
+        <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
+            <MenuItem>
+                <StyledBadge badgeContent={organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                    Procedimientos
+                </StyledBadge>
+            </MenuItem>
+            <MenuItem>Grupos</MenuItem>
+        </HeaderMenu>
+    </>
+}
+const MenuDissenyOrgan = () => {
+    return <>
+        <HeaderButton variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Procedimientos</Typography>
+        </HeaderButton>
+        <HeaderButton variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Grupos</Typography>
+        </HeaderButton>
+    </>
+}
+const MenuUsuari = () => {
+    const navigate = useNavigate();
+    const countAnotacionsPendents = 0; // es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+    const countTasquesPendent = 0; // es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
+    const isCreacioFluxUsuariActiu = false; // es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
+    const teAccesEstadistiques = false; // es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
+    const isMostrarSeguimentEnviamentsUsuariActiu = false; // es.caib.ripea.war.helper.SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
+
+    return <>
+        <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+        </HeaderButton>
+        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
+        </HeaderButton>
+        <HeaderButton badgeContent={countTasquesPendent} variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Tareas</Typography>
+        </HeaderButton>
+        { isCreacioFluxUsuariActiu &&
+            <HeaderButton variant={"contained"}>
+                <Typography display={'inline'} variant={'subtitle2'}>Flujos de firma</Typography>
+            </HeaderButton>
+        }
+        { (teAccesEstadistiques || isMostrarSeguimentEnviamentsUsuariActiu) &&
+            <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
+                { teAccesEstadistiques &&
+                    <MenuItem>Datos estadisticos</MenuItem>
+                }
+                { isMostrarSeguimentEnviamentsUsuariActiu &&
+                    <>
+                        <MenuItem>Documentos enviados a Portafib</MenuItem>
+                        <MenuItem>Remesas enviadas a Notib</MenuItem>
+                    </>
+                }
+            </HeaderMenu>
+        }
+    </>
+}
+
+const AccionesMassivas = (props:any) => {
+    const {isRolActualAdmin} = props;
+    const isConvertirDefinitiuActiu = false;// es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
+    const isUrlValidacioDefinida = false;// es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+
+    return <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
+        <MenuItem>Enviar documentos al portafirmas</MenuItem>
+        <MenuItem>Firmar documentos desde el navegador</MenuItem>
+        { isConvertirDefinitiuActiu &&
+            <MenuItem>Marcar como definitivos</MenuItem>
+        }
+        <MenuItem>Cambio de estado de expedientes</MenuItem>
+        <MenuItem>Cierre de expedientes</MenuItem>
+        <MenuItem>Custodiar elementos pendientes</MenuItem>
+        { isUrlValidacioDefinida &&
+            <MenuItem>Copiar enlace CSV</MenuItem>
+        }
+        <MenuItem>Adjuntar anexos pendientes de anotaciones aceptadas</MenuItem>
+        { isRolActualAdmin &&
+            <MenuItem>Actualizar estado de las anotaciones en Distribución</MenuItem>
+        }
+        <MenuItem>Cambiar prioridad de expedientes</MenuItem>
+        <Divider/>
+        <MenuItem>Consultar acciones masivas</MenuItem>
+    </HeaderMenu>
+}
+const MenuRevisor = () => {
+
+    return <>
+        <HeaderButton variant={"contained"}>
+            <Typography display={'inline'} variant={'subtitle2'}>Revisión de procedimientos</Typography>
+        </HeaderButton>
+    </>
 }
 export default UserHeadToolbar;
