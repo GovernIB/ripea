@@ -84,7 +84,7 @@ public class PermissionHelper {
 	private boolean isResourcePermissionAllowed(String targetType, Permissions userPermissions) {
 		if (targetType!=null) {
 			//Exclusius super admin
-			if (targetType.endsWith(".EntitatResource")) { return userPermissions.isSuperAdmin(); }
+//			if (targetType.endsWith(".EntitatResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".PinbalServeiResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
