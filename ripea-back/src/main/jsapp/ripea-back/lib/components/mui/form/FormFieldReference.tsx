@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridColDef } from '@mui/x-data-grid-pro';
+import { GridColDef, GridSortModel } from '@mui/x-data-grid-pro';
 import Autocomplete, { AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -23,7 +23,7 @@ type FormFieldReferenceRendererArgs = {
 
 type FormFieldRefProps = FormFieldCustomProps & {
     filter?: string;
-    sorts?: string[];
+    sortModel?: GridSortModel;
     namedQueries?: string[];
     perspectives?: string[];
     advancedSearchColumns?: GridColDef[];
@@ -32,6 +32,8 @@ type FormFieldRefProps = FormFieldCustomProps & {
     optionsRequest?: (q: string) => AdvancedSearchOptionsRequestType,
     optionRenderer?: (args: FormFieldReferenceRendererArgs) => React.ReactElement;
     multiple?: boolean;
+    dialogHeight?: number;
+    dialogComponentProps?: any;
 };
 
 type AdvancedSearchDialogApi = {
@@ -42,7 +44,12 @@ type AdvancedSearchDialogProps = React.PropsWithChildren & {
     title: string;
     fieldName: string;
     columns: GridColDef[];
+    filter?: string;
+    sortModel?: GridSortModel;
+    namedQueries?: string[];
+    perspectives?: string[];
     apiRef: React.MutableRefObject<AdvancedSearchDialogApi | undefined>;
+    dialogHeight?: number;
     dialogComponentProps?: any;
 };
 
@@ -61,7 +68,12 @@ const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
         title,
         fieldName,
         columns,
+        filter,
+        sortModel,
+        namedQueries,
+        perspectives,
         apiRef,
+        dialogHeight,
         dialogComponentProps
     } = props;
     const {
@@ -74,11 +86,15 @@ const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
         columns,
         resourceType,
         resourceTypeCode,
-        fieldName);
+        fieldName,
+        filter,
+        sortModel,
+        namedQueries,
+        perspectives);
     const show = () => {
         return gridDialogShow(
             title,
-            undefined,
+            dialogHeight,
             { fullWidth: true, maxWidth: 'md', ...dialogComponentProps });
     }
     apiRef.current = { show };
@@ -133,7 +149,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         onChange,
         componentProps,
         filter,
-        sorts,
+        sortModel,
         namedQueries,
         perspectives,
         advancedSearchColumns,
@@ -142,6 +158,8 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         optionsRequest: optionsRequestProp,
         optionRenderer,
         multiple: multipleProp,
+        dialogHeight,
+        dialogComponentProps,
     } = props;
     const { t } = useBaseAppContext();
     const { requestHref } = useResourceApiContext();
@@ -169,6 +187,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 const valueField = dataSource.valueField;
                 const labelField = dataSource.labelField;
                 const pageArgs = optionsUnpaged ? { page: 'UNPAGED' } : { page: 0, size: optionsPageSize };
+                const sorts = sortModel && sortModel.length ? sortModel.map(sm => sm.field + ',' + sm.sort) : undefined;
                 const templateData = {
                     quickFilter: q,
                     filter,
@@ -190,7 +209,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 }).catch(reject);
             });
         }
-    }, [optionsRequestProp, filter, sorts, namedQueries, perspectives]);
+    }, [optionsRequestProp, filter, sortModel, namedQueries, perspectives]);
     const {
         loading: optionsLoading,
         options,
@@ -253,7 +272,13 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             title={t('form.field.reference.advanced.title')}
             fieldName={field.name}
             columns={advancedSearchColumns}
-            apiRef={advancedSearchApiRef} />}
+            filter={filter}
+            sortModel={sortModel}
+            namedQueries={namedQueries}
+            perspectives={perspectives}
+            apiRef={advancedSearchApiRef}
+            dialogHeight={dialogHeight}
+            dialogComponentProps={dialogComponentProps} />}
         <Autocomplete
             name={name}
             value={valueMultipleAdapted}

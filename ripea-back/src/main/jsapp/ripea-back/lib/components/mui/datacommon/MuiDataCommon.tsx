@@ -41,6 +41,7 @@ export const useApiDataCommon = (
     findDisabled?: boolean,
     findArgs?: DataCommonFindArgs,
     quickFilterInitialValue?: string,
+    quickFilterSetFocus?: true,
     quickFilterProps?: any,
     getArtifacts?: boolean) => {
     const { saveAs } = useBaseAppContext();
@@ -63,7 +64,7 @@ export const useApiDataCommon = (
     const {
         value: quickFilterValue,
         component: quickFilterComponent
-    } = useDataQuickFilter(quickFilterInitialValue, quickFilterProps);
+    } = useDataQuickFilter(quickFilterInitialValue, quickFilterSetFocus, quickFilterProps);
     const refresh = () => {
         if (apiIsReady && !findDisabled) {
             const processedFindArgs = {

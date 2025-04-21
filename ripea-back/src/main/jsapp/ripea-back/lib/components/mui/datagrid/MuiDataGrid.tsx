@@ -70,6 +70,7 @@ export type MuiDataGridProps = {
     sortModel?: GridSortModel;
     staticSortModel?: GridSortModel;
     quickFilterInitialValue?: string;
+    quickFilterSetFocus?: true;
     quickFilterFullWidth?: true;
     filter?: string;
     staticFilter?: string;

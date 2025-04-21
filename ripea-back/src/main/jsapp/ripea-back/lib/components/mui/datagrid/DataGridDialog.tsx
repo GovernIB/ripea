@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridColDef, GridRowParams } from '@mui/x-data-grid-pro';
+import { GridColDef, GridRowParams, GridSortModel } from '@mui/x-data-grid-pro';
 import { ResourceType } from '../../ResourceApiContext';
 import Dialog, { DialogProps } from '../Dialog';
 import MuiDataGrid from './MuiDataGrid';
@@ -10,6 +10,10 @@ type DataGridDialogProps = DialogProps & {
     resourceType?: ResourceType;
     resourceTypeCode?: string;
     resourceFieldName?: string;
+    staticFilter?: string;
+    staticSortModel?: GridSortModel;
+    namedQueries?: string[];
+    perspectives?: string[];
     onRowClick?: (params: GridRowParams) => void;
     height?: number | null;
 };
@@ -21,14 +25,22 @@ export type UseDataGridDialogFn = (
     columns: GridColDef[],
     resourceType?: ResourceType,
     resourceTypeCode?: string,
-    resourceFieldName?: string) => [DataGridDialogShowFn, React.ReactElement];
+    resourceFieldName?: string,
+    staticFilter?: string,
+    staticSortModel?: GridSortModel,
+    namedQueries?: string[],
+    perspectives?: string[]) => [DataGridDialogShowFn, React.ReactElement];
 
 export const useDataGridDialog: UseDataGridDialogFn = (
     resourceName: string,
     columns: GridColDef[],
     resourceType?: ResourceType,
     resourceTypeCode?: string,
-    resourceFieldName?: string) => {
+    resourceFieldName?: string,
+    staticFilter?: string,
+    staticSortModel?: GridSortModel,
+    namedQueries?: string[],
+    perspectives?: string[]) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
     const [height, setHeight] = React.useState<number | undefined | null>();
@@ -60,6 +72,10 @@ export const useDataGridDialog: UseDataGridDialogFn = (
         resourceType={resourceType}
         resourceTypeCode={resourceTypeCode}
         resourceFieldName={resourceFieldName}
+        staticFilter={staticFilter}
+        staticSortModel={staticSortModel}
+        namedQueries={namedQueries}
+        perspectives={perspectives}
         onRowClick={handleRowClick}
         height={height}
         open={open}
@@ -76,6 +92,10 @@ export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
         resourceType,
         resourceTypeCode,
         resourceFieldName,
+        staticFilter,
+        staticSortModel,
+        namedQueries,
+        perspectives,
         onRowClick,
         height,
         children,
@@ -90,10 +110,14 @@ export const DataGridDialog: React.FC<DataGridDialogProps> = (props) => {
             resourceFieldName={resourceFieldName}
             paginationActive
             titleDisabled
+            quickFilterSetFocus
             quickFilterFullWidth
-            toolbarHideExport
             toolbarHideRefresh
             readOnly
+            staticFilter={staticFilter}
+            staticSortModel={staticSortModel}
+            namedQueries={namedQueries}
+            perspectives={perspectives}
             onRowClick={onRowClick}
             height={height ?? 370} />
     </Dialog>;

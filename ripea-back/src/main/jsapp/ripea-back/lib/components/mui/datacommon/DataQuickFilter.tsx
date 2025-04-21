@@ -6,13 +6,18 @@ import IconButton from '@mui/material/IconButton';
 
 type DataQuickFilterProps = {
     value: string;
+    setFocus?: true;
     onChange: (value: string) => void
 } & any;
 
-export const useDataQuickFilter = (initialValue?: string, otherProps?: any): { value: string, component: React.ReactElement } => {
+export const useDataQuickFilter = (
+    initialValue?: string,
+    setFocus?: true,
+    otherProps?: any): { value: string, component: React.ReactElement } => {
     const [value, setValue] = React.useState(initialValue ?? '');
     const component = <DataQuickFilter
         value={value}
+        setFocus={setFocus}
         onChange={setValue}
         {...otherProps} />;
     return { value, component }
@@ -21,12 +26,14 @@ export const useDataQuickFilter = (initialValue?: string, otherProps?: any): { v
 const DataQuickFilter: React.FC<DataQuickFilterProps> = (props) => {
     const {
         value,
+        setFocus,
         onChange,
         ...otherProps
     } = props;
     return <TextField
         size="small"
         value={value}
+        inputRef={setFocus ? input => input && input.focus() : undefined}
         onChange={(event) => onChange(event.target.value)}
         slotProps={{
             input: {
