@@ -289,6 +289,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         sortModel,
         staticSortModel,
         quickFilterInitialValue,
+        quickFilterSetFocus,
         quickFilterFullWidth,
         filter: filterProp,
         staticFilter,
@@ -376,7 +377,9 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         staticSortModel,
         internalSortModel,
         internalFilter,
-        staticFilter
+        staticFilter,
+        namedQueries,
+        perspectives
     ]);
     const {
         loading,
@@ -395,6 +398,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         findDisabled,
         findArgs,
         quickFilterInitialValue,
+        quickFilterSetFocus,
         { fullWidth: quickFilterFullWidth, sx: { ml: quickFilterFullWidth ? 0 : 1 } },
         anyArtifactRowAction);
     const isUpperToolbarType = toolbarType === 'upper';
