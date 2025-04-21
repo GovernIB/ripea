@@ -9,9 +9,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
 import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.model.*;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.hibernate.Hibernate;
@@ -27,11 +31,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.model.ExpedientEstatResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
-import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +50,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
+    private final ConfigHelper configHelper;
 
     @PostConstruct
     public void init() {
@@ -61,6 +62,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
+    }
+
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+        Filter filter = FilterBuilder.and(
+                FilterBuilder.equal(ContingutResource.Fields.entitat + ".codi", configHelper.getEntitatActualCodi()),
+                FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", configHelper.getOrganActualCodi())
+        );
+
+        return filter.generate();
     }
 
     @Override

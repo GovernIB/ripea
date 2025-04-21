@@ -12,10 +12,12 @@ import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(quickFilterFields = { "nom" }, descriptionField = "nom")
 public class ContingutResource extends BaseAuditableResource<Long> {
 
