@@ -146,7 +146,7 @@ export const useActionReportLogic = (
     const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
         if (hasForm && !dialogDisabled) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
-            formDialogShow(null, {
+            formDialogShow(id, {
                 title: dialogTitle ?? formDialogTitle,
                 additionalData: formAdditionalData ?? formAdditionalDataArg,
                 dialogComponentProps: formDialogComponentProps ?? formDialogComponentPropsArg ?? { fullWidth: true, maxWidth: 'md' }

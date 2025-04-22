@@ -200,6 +200,7 @@ export const Form: React.FC<FormProps> = (props) => {
         {},
         onChangeActionMiddleware,
         (error: any) => temporalMessageShow(t('form.onChange.error'), error.message, 'error'));
+    const getId = () => calculatedId(id);
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
     const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
@@ -412,6 +413,7 @@ export const Form: React.FC<FormProps> = (props) => {
         onDataChange?.(data);
     }, [data]);
     apiRef.current = {
+        getId,
         getData,
         refresh,
         reset: externalReset,
@@ -423,6 +425,7 @@ export const Form: React.FC<FormProps> = (props) => {
     };
     if (apiRefProp) {
         if (apiRefProp.current) {
+            apiRefProp.current.getId = getId,
             apiRefProp.current.getData = getData;
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.reset = externalReset;

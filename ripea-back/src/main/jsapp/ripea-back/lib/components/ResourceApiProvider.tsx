@@ -645,7 +645,6 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 catch(reject);
         });
     }, [request]);
-    
     const artifactFieldOptionsFields = React.useCallback((args: ResourceApiArtifactFieldOptionsArgs): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             request('artifacts', null, args).

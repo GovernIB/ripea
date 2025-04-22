@@ -2,6 +2,7 @@ import React from 'react';
 import { ResourceType } from '../ResourceApiContext';
 
 export type FormApi = {
+    getId: () => any;
     getData: () => any;
     refresh: () => void;
     reset: (data?: any, id?: any) => void;
