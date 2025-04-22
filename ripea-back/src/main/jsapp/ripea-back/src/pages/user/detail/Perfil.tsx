@@ -1,16 +1,15 @@
 import {useRef} from "react";
-import {CardData} from "../../../components/CardData.tsx";
-import {MuiFormDialog, useBaseAppContext} from "reactlib";
-import {DataFormDialogApi} from "../../../../lib/components/mui/datacommon/DataFormDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
 import {Grid} from "@mui/material";
+import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi} from "reactlib";
+import {CardData} from "../../../components/CardData.tsx";
+import GridFormField from "../../../components/GridFormField.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 
 const usePerfil = () => {
     // const { t } = useTranslation();
     const { value: user } = useUserSession();
 
-    const formApiRef = useRef<DataFormDialogApi>();
+    const formApiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleOpen = () => {
@@ -43,7 +42,7 @@ const usePerfil = () => {
                     <GridFormField xs={12} name="emailAlternatiu"/>
 
                     <GridFormField xs={12} name="rols"
-                                   value={user?.rols}
+                                   value={user?.auth}
                                    disabled readOnly multiple/>
                     <GridFormField xs={12} name="idioma" disabled readOnly/>
                 </CardData>

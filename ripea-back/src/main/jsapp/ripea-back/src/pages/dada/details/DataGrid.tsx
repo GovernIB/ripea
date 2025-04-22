@@ -1,9 +1,8 @@
 import {useState} from "react";
+import {Grid} from "@mui/material";
+import {MuiGrid, useFormContext, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
-import {MuiGrid, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 
 const DadaForm = () => {
@@ -57,7 +56,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
     };
 
     const content =
-        <Dialog
+        <MuiDialog
             open={open}
             closeCallback={handleClose}
             componentProps={{ fullWidth: true, maxWidth: 'md' }}
@@ -99,7 +98,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
                 autoHeight
                 toolbarHideCreate={ numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
             />
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

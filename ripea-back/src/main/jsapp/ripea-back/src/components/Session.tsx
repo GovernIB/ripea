@@ -9,7 +9,7 @@ const entitatKey = 'entitat';
 const organKey = 'organ';
 
 export const useUserSession = () => {
-    const {value, save, remove} = useSession(userkey)
+    const {value, isInitialized, save, remove} = useSession(userkey)
 
     const refresh = () => {
         axios.get(userUrl+'/actual/securityInfo')
@@ -45,9 +45,9 @@ export const useUserSession = () => {
     }
 
     useEffect(() => {
-        if (!value) {
-            save({});
-            refresh()
+        if (!isInitialized()) {
+            save({})
+            refresh();
         }
     }, []);
 
@@ -60,7 +60,7 @@ export const useUserSession = () => {
 }
 
 export const useEntitatSession = () => {
-    const { value, save, remove } = useSession(entitatKey)
+    const { value, isInitialized, save, remove } = useSession(entitatKey)
     const { value: user } = useUserSession();
 
     const {
@@ -87,7 +87,8 @@ export const useEntitatSession = () => {
     },[user])
 
     useEffect(()=>{
-        if(user?.entitatActualId && !value){
+        if(user?.entitatActualId && isInitialized()){
+            save({});
             refresh()
         }
     },[apiIsReady])
@@ -99,7 +100,7 @@ export const useEntitatSession = () => {
     return { value, remove }
 }
 export const useOrganSession = () => {
-    const { value, save, remove } = useSession(organKey)
+    const { value, isInitialized, save, remove } = useSession(organKey)
     const { value: user } = useUserSession();
 
     const {
@@ -126,7 +127,8 @@ export const useOrganSession = () => {
     },[user])
 
     useEffect(()=>{
-        if(user?.organActualId && !value){
+        if(user?.organActualId && !isInitialized()){
+            save({});
             refresh()
         }
     },[apiIsReady])

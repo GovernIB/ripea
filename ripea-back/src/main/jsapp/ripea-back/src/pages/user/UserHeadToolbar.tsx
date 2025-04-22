@@ -5,6 +5,7 @@ import {StyledBadge} from "../../components/StyledBadge.tsx";
 import usePerfil from "./detail/Perfil.tsx";
 import {useEffect, useMemo, useState} from "react";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
+import {useTranslation} from "react-i18next";
 
 const HeaderButton = (props:any) => {
     const { children, badgeContent, onClick, hidden, ...other } = props;
@@ -45,7 +46,7 @@ const HeaderMenu = (props:any) => {
     </MenuButton>
 }
 const HeaderSelect = (props:any) => {
-    const {icon, value, onChange, color = "white", children} = props
+    const {icon, value, onChange, color = "white", children, ...other} = props
 
     return <FormControl sx={{ minWidth: 90 }} size="small">
         <Select
@@ -61,6 +62,7 @@ const HeaderSelect = (props:any) => {
                     fill: `${color} !important`,
                 }
             }}
+            {...other}
         >
             {children}
         </Select>
@@ -69,11 +71,13 @@ const HeaderSelect = (props:any) => {
 
 const UserHeadToolbar = (props:any) => {
     const {color = "white"} = props;
+    const { t } = useTranslation();
 
     const { value: entitat } = useEntitatSession()
+    const navigate = useNavigate();
     const textColor = entitat?.capsaleraColorLletra ?? color;
 
-    const { value: user, save: apiSave } = useUserSession();
+    const { value: user, save: apiSave, remove: logOut } = useUserSession();
 
     const [entitatId, setEntitatId] = useState<number>(user?.entitatActualId);
     const entitats :any[] = useMemo(()=>{
@@ -89,30 +93,6 @@ const UserHeadToolbar = (props:any) => {
     }, [permisoEntitat])
 
     const [rol, setRol] = useState<string>(user?.rolActual)
-    const rolsEntitat :any[] = useMemo(()=>{
-        return [
-            {
-                label: 'Super User',
-                value: 'IPA_SUPER',
-                hidden: !user?.superusuari
-            },
-            {
-                label: 'Admin',
-                value: 'IPA_ADMIN',
-                hidden: !permisoEntitat?.permisAdministrador
-            },
-            {
-                label: 'Admin Organ',
-                value: 'IPA_ORGAN_ADMIN',
-                hidden: !permisoEntitat?.permisAdministradorOrgan || !permisoEntitat?.organs
-            },
-            {
-                label: 'User',
-                value: 'tothom',
-                hidden: !permisoEntitat?.permisUsuari
-            }
-        ].filter((rol: any) => !rol.hidden)
-    },[permisoEntitat])
 
     useEffect(() => {
         if (user){
@@ -137,6 +117,7 @@ const UserHeadToolbar = (props:any) => {
     useEffect(() => {
         if (rol && rol!=user?.rolActual){
             apiSave({canviRol: rol})
+            navigate('/expedient')
         }
     }, [rol]);
 
@@ -196,8 +177,8 @@ const UserHeadToolbar = (props:any) => {
                 color={textColor}
             >
                 {
-                    rolsEntitat?.map((rol:any) =>
-                        <MenuItem key={rol.value} value={rol.value}>{rol.label}</MenuItem>
+                    user?.rols?.map((rol:any) =>
+                        <MenuItem key={rol} value={rol}>{t(`enum.rol.${rol}`)}</MenuItem>
                     )
                 }
             </HeaderSelect>
@@ -252,7 +233,7 @@ const UserHeadToolbar = (props:any) => {
                     <Icon>download</Icon>Manual de usuario
                 </MenuItem>
 
-                <MenuItem><Icon>logout</Icon>Desconectar</MenuItem>
+                <MenuItem onClick={logOut}><Icon>logout</Icon>Desconectar</MenuItem>
             </HeaderMenu>
         </Grid>
 

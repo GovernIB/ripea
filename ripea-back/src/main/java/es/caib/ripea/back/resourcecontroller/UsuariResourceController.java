@@ -71,7 +71,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
         String rolActual = RolHelper.getRolActual(request);
-        List<String> roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+        List<String> roles = RolHelper.getRolsUsuariActual(request);
+        List<String> auth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
 
         if (developmentMode) {
@@ -83,6 +84,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                     .organActualId(organActualId)
                     .rolActual(rolActualCodi)
                     .rols(rols)
+                    .auth(auth)
                     .permisosEntitat(Map.of(
                             1L,
                             PermisosEntitat.builder()
@@ -120,6 +122,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setOrganActualId(organActual != null ? organActual.getId() : null);
         userPermissionInfo.setRolActual(rolActual);
         userPermissionInfo.setRols(roles);
+        userPermissionInfo.setAuth(auth);
         return ResponseEntity.ok(userPermissionInfo);
     }
 
@@ -132,12 +135,14 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
             if (developmentMode) {
                 if (response.containsKey("canviEntitat")) {
                     entitatActualId = Long.valueOf(String.valueOf(response.get("canviEntitat")));
+                    organActualId = null;
                 }
                 if (response.containsKey("canviOrganGestor")) {
                     organActualId = Long.valueOf(String.valueOf(response.get("canviOrganGestor")));
                 }
                 if (response.containsKey("canviRol")) {
                     rolActualCodi = String.valueOf(response.get("canviRol"));
+                    organActualId = null;
                 }
             } else {
                 EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);

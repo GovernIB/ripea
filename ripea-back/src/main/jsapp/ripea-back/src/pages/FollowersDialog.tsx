@@ -1,7 +1,6 @@
-import {useResourceApiService} from "reactlib";
 import {useEffect, useState} from "react";
 import {Badge, Icon, IconButton, Typography} from "@mui/material";
-import Dialog from "../../lib/components/mui/Dialog.tsx";
+import {useResourceApiService, MuiDialog} from "reactlib";
 import {useTranslation} from 'react-i18next';
 
 const followerStyle = {
@@ -52,7 +51,7 @@ export const FollowersDialog = (props:any) => {
 	        </Badge>
 	    </IconButton>	
 	
-		<Dialog
+		<MuiDialog
 		    open={open}
 			closeCallback={handleClose}
 			title={t('page.expedient.modal.seguidors') +': '+ entity?.nom}
@@ -71,6 +70,6 @@ export const FollowersDialog = (props:any) => {
 		        }
 		    }}>
             {followes?.map((a:any)=><Typography key={a?.seguidor?.id} sx={followerStyle}>{a?.seguidor?.description}</Typography>)}
-        </Dialog>
+        </MuiDialog>
     </>
 }

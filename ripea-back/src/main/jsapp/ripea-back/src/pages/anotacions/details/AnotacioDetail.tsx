@@ -1,11 +1,10 @@
-import {Grid} from "@mui/material";
-import {useTranslation} from "react-i18next";
-import TabComponent from "../../../components/TabComponent.tsx";
 import {useState} from "react";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
-import {BasePage, MuiGrid, useResourceApiService} from "reactlib";
-import {formatDate} from "../../../util/dateUtils.ts";
+import {Grid} from "@mui/material";
+import {BasePage, MuiGrid, MuiDialog, useResourceApiService} from "reactlib";
+import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import TabComponent from "../../../components/TabComponent.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -277,7 +276,7 @@ const useAnotacioDetail = () => {
     ]
 
     const dialog =
-        <Dialog
+        <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.anotacio.detall.title')}
@@ -301,7 +300,7 @@ const useAnotacioDetail = () => {
                 tabs={tabs}
                 variant="scrollable"
             />
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

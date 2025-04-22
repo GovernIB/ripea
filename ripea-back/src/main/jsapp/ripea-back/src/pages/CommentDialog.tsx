@@ -1,8 +1,7 @@
-import {MuiFormDialog, useResourceApiService} from "reactlib";
 import {useEffect, useRef, useState} from "react";
 import {Badge, Grid, Icon, IconButton, Typography} from "@mui/material";
+import {MuiFormDialog, useResourceApiService, MuiFormDialogApi} from "reactlib";
 import GridFormField from "../components/GridFormField.tsx";
-import {DataFormDialogApi} from "../../lib/components/mui/datacommon/DataFormDialog.tsx";
 import {formatDate} from "../util/dateUtils.ts";
 
 const CommentForm = () => {
@@ -63,7 +62,7 @@ const Comments = (props:any) => {
 export const CommentDialog = (props:any) => {
     const { entity, title, resourceName, resourceReference } = props;
     const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
-    const formApiRef = useRef<DataFormDialogApi>()
+    const formApiRef = useRef<MuiFormDialogApi>()
 
     const handleOpen = () => {
         formApiRef.current?.show(undefined, {

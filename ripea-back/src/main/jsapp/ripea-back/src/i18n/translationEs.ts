@@ -11,6 +11,14 @@ const translationEs = {
         detail: "Detalle",
     },
     enum: {
+        rol: {
+            IPA_SUPER: "Superusuario",
+            IPA_ADMIN: "Administrador",
+            IPA_DISSENY: "Disseñador",
+            IPA_ORGAN_ADMIN: "Administrador de organos",
+            IPA_REVISIO: "Revisor",
+            tothom: "Usuario",
+        },
         siNO: {
             true: "Si",
             false: "No",
