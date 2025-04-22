@@ -137,12 +137,14 @@ export const useActionReportLogic = (
     const dialogDisabled = formDialogContent == null;
     const [formDialogShow, formDialogComponent] = useFormDialog(
         resourceName,
+        action ? 'ACTION' : (report ? 'REPORT' : undefined),
+        action ? action : (report ? report : undefined),
         action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
         action ? execAction : generateReport,
         formDialogContent,
         { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
     const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
-        if (hasForm) {
+        if (hasForm && !dialogDisabled) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
             formDialogShow(null, {
                 title: dialogTitle ?? formDialogTitle,

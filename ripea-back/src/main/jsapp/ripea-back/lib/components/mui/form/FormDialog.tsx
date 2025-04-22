@@ -1,5 +1,6 @@
 import React from 'react';
 import { DialogButton } from '../../BaseAppContext';
+import { ResourceType } from '../../ResourceApiContext';
 import { useFormDialogButtons } from '../../AppButtons';
 import { FormApi } from '../../form/FormContext';
 import Dialog, { DialogProps } from '../Dialog';
@@ -7,6 +8,8 @@ import MuiForm from './MuiForm';
 
 type FormDialogProps = DialogProps & {
     resourceName: string;
+    resourceType?: ResourceType;
+    resourceTypeCode?: string;
     id?: any;
     additionalData?: any;
     apiRef?: React.RefObject<FormApi>;
@@ -26,6 +29,8 @@ export type FormDialogShowArgs = {
 export type FormDialogShowFn = (id: any, args?: FormDialogShowArgs) => Promise<any>;
 export type UseFormDialogFn = (
     resourceName: string,
+    resourceType?: ResourceType,
+    resourceTypeCode?: string,
     dialogButtons?: DialogButton[],
     customSubmit?: FormDialogSubmitFn,
     defaultFormContent?: React.ReactNode,
@@ -34,6 +39,8 @@ export type UseFormDialogFn = (
 
 export const useFormDialog: UseFormDialogFn = (
     resourceName: string,
+    resourceType?: ResourceType,
+    resourceTypeCode?: string,
     dialogButtons?: DialogButton[],
     customSubmit?: FormDialogSubmitFn,
     defaultFormContent?: React.ReactNode,
@@ -101,6 +108,8 @@ export const useFormDialog: UseFormDialogFn = (
     }
     const dialogComponent = <FormDialog
         resourceName={resourceName}
+        resourceType={resourceType}
+        resourceTypeCode={resourceTypeCode}
         id={id}
         additionalData={additionalData}
         apiRef={formApiRef}
@@ -120,6 +129,8 @@ export const useFormDialog: UseFormDialogFn = (
 export const FormDialog: React.FC<FormDialogProps> = (props) => {
     const {
         resourceName,
+        resourceType,
+        resourceTypeCode,
         id,
         additionalData,
         apiRef,
@@ -133,6 +144,8 @@ export const FormDialog: React.FC<FormDialogProps> = (props) => {
         {noForm ? children : <MuiForm
             {...formComponentProps}
             resourceName={resourceName}
+            resourceType={resourceType}
+            resourceTypeCode={resourceTypeCode}
             id={id}
             additionalData={additionalData}
             apiRef={apiRef}

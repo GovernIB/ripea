@@ -32,6 +32,8 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
     const { t } = useBaseAppContext();
     const [formDialogShow, formDialogComponent] = useFormDialog(
         resourceName,
+        undefined,
+        undefined,
         dialogButtons,
         formSubmit,
         children,

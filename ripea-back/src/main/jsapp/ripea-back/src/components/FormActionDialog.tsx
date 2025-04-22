@@ -60,6 +60,8 @@ const FormActionDialog = (props:FormActionDialogProp) => {
 
     const [formDialogShow, formDialogComponent] = useFormDialog(
         resourceName,
+        'ACTION',
+        action,
         actionDialogButtons,
         execAction,
         children,

@@ -156,7 +156,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const [apiActions, setApiActions] = React.useState<any>(undefined);
     const apiRef = React.useRef<FormApi>();
     const idFromExternalResetRef = React.useRef<any>();
-    const isSaveActionPresent = apiActions?.[id != null ? 'update' : 'create'] != null;
+    const isSaveActionPresent = resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
     const calculatedId = (id?: any) => idFromExternalResetRef.current ?? id;
     const sendOnChangeRequest = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
