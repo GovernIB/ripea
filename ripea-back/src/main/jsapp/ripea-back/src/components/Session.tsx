@@ -69,7 +69,7 @@ export const useEntitatSession = () => {
     } = useResourceApiService('entitatResource');
 
     const refresh = () => {
-        if (apiIsReady){
+        if (user?.entitatActualId && user?.entitatActualId != value?.id && apiIsReady){
             apiGetOne(user?.entitatActualId)
                 .then((app) => save(app))
                 .catch(() => remove())
@@ -78,16 +78,14 @@ export const useEntitatSession = () => {
 
     useEffect(()=>{
         if (user && user?.entitatActualId) {
-            if(user?.entitatActualId != value?.id){
-                refresh()
-            }
+            refresh()
         } else {
-            remove()
+            // remove()
         }
     },[user])
 
     useEffect(()=>{
-        if(user?.entitatActualId && isInitialized()){
+        if(!isInitialized()){
             save({});
             refresh()
         }
@@ -109,7 +107,7 @@ export const useOrganSession = () => {
     } = useResourceApiService('organGestorResource');
 
     const refresh = () => {
-        if (apiIsReady){
+        if (user?.organActualId && user?.organActualId != value?.id && apiIsReady){
             apiGetOne(user?.organActualId)
                 .then((app) => save(app))
                 .catch(() => remove())
@@ -118,16 +116,14 @@ export const useOrganSession = () => {
 
     useEffect(()=>{
         if (user && user?.organActualId) {
-            if(user?.organActualId != value?.id){
-                refresh()
-            }
+            refresh()
         } else {
             remove()
         }
     },[user])
 
     useEffect(()=>{
-        if(user?.organActualId && !isInitialized()){
+        if(!isInitialized()){
             save({});
             refresh()
         }

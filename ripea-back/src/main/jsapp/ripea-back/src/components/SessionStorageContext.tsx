@@ -68,9 +68,9 @@ export const useSession = (key:string) => {
     const {data, setValue, removeValue} = useSessionStorage();
     return {
         value: data[key],
-        isInitialized: () => initialized.get(key),
+        isInitialized: () => !!initialized.get(key) || !!data[key],
         save: (val:any) => {
-            initialized.set(key, !!val);
+            initialized.set(key, val != undefined);
             setValue(key, val)
         },
         remove: () => {

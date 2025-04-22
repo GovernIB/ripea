@@ -12,6 +12,9 @@ export const App: React.FC = () => {
     const entitatLogo = useMemo(()=>{
         return entitat?.logoImgBytes ?`data:image/png;base64,${entitat?.logoImgBytes}` :null;
     }, [entitat]);
+    const backgroundColor = useMemo(()=>{
+        return entitat?.capsaleraColorFons
+    }, [entitat]);
 
     return <BaseApp
         code="cmd"
@@ -30,7 +33,7 @@ export const App: React.FC = () => {
         title={<img src={logo} title={'RIPEA v' + version} alt={'RIPEA v' + version} />}
         version={version}
         availableLanguages={['ca', 'es']}
-        appbarBackgroundColor={entitat?.capsaleraColorFons ?? "#ff9523"}>
+        appbarBackgroundColor={backgroundColor ?? "#ff9523"}>
         <AppRoutes />
     </BaseApp>;
 }
