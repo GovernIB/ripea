@@ -16,8 +16,8 @@ export const FollowersDialog = (props:any) => {
 
     const {
         isReady: appApiIsReady,
-        find: findAll,
-    } = useResourceApiService('expedientSeguidorResource');
+        getOne: apiGetOne
+    } = useResourceApiService('expedientResource');
 
     const [numFollowes, setNumFollowes] = useState<number>(entity?.numSeguidors);
     const [followes, setFollowes] = useState<any[]>([]);
@@ -25,13 +25,10 @@ export const FollowersDialog = (props:any) => {
 
     useEffect(() => {
         if (open && appApiIsReady){
-            findAll({
-                filter: `expedient.id:${entity?.id}`,
-                sorts: ['seguidor.nom', 'desc']
-            })
+            apiGetOne(entity?.id, {perspectives: ['FOLLOWERS']})
                 .then((app) => {
-                    setFollowes(app.rows);
-                    setNumFollowes?.(app.rows.length)
+                    setFollowes(app?.seguidors);
+                    setNumFollowes?.(app?.seguidors?.length)
                 })
         }
     }, [open]);
@@ -69,7 +66,7 @@ export const FollowersDialog = (props:any) => {
 		            handleClose();
 		        }
 		    }}>
-            {followes?.map((a:any)=><Typography key={a?.seguidor?.id} sx={followerStyle}>{a?.seguidor?.description}</Typography>)}
+            {followes?.map((a:any)=><Typography key={a?.id} sx={followerStyle}>{a?.description}</Typography>)}
         </MuiDialog>
     </>
 }

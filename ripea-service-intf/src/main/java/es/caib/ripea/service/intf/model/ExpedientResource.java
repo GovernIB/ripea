@@ -47,13 +47,27 @@ import java.util.List;
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_ARXIU_EXPEDIENT),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_FOLLOWERS),
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.FILTER,
 						code = ExpedientResource.FILTER_CODE,
-						formClass = ExpedientResource.ExpedientFilterForm.class)
+						formClass = ExpedientResource.ExpedientFilterForm.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_FOLLOW_CODE,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_UNFOLLOW_CODE,
+                        requiresId = true),
 		})
 public class ExpedientResource extends NodeResource {
 
 	private static final long serialVersionUID = 7440910672703796468L;
+	public static final String ACTION_FOLLOW_CODE = "FOLLOW";
+	public static final String ACTION_UNFOLLOW_CODE = "UNFOLLOW";
+	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
@@ -137,7 +151,8 @@ public class ExpedientResource extends NodeResource {
     private ExpedientEstatResource estatAdditionalInfo;
 
     @Transient private List<InteressatResource> interessats;
-    @Transient private List<UsuariResource> seguidors;
+    @Transient private List<ResourceReference<UsuariResource, String>> seguidors;
+    @Transient private boolean seguidor = false;
     @Transient private int numComentaris;
     @Transient private int numSeguidors;
     @Transient private int numContingut;

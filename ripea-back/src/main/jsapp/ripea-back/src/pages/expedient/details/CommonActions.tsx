@@ -14,8 +14,29 @@ const useActions = (refresh?: () => void) =>{
 
     const {
         patch: apiPatch,
+        artifactAction: apiAction
     } = useResourceApiService('expedientResource');
 
+    const follow = (id: any): void => {
+        apiAction(id, {code : 'FOLLOW'})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+    const unfollow = (id: any): void => {
+        apiAction(id, {code : 'UNFOLLOW'})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
     const agafar = (id: any): void => {
         apiPatch(id, {
             data: {
@@ -48,13 +69,13 @@ const useActions = (refresh?: () => void) =>{
             });
     }
 
-    return {agafar, lliberar}
+    return {follow, unfollow, agafar, lliberar}
 }
 
 export const useCommonActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const {agafar, lliberar} = useActions(refresh);
+    const {follow, unfollow, agafar, lliberar} = useActions(refresh);
 
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
@@ -73,13 +94,15 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.follow'),
             icon: "person_add",
             showInMenu: true,
-            // hidden: // si el usuario actual es seguidor
+            onClick: follow,
+            hidden: (row:any) => row?.seguidor,// si el usuario actual es seguidor
         },
         {
             title: t('page.expedient.acciones.unfollow'),
             icon: "person_remove",
             showInMenu: true,
-            hidden: true,// si el usuario actual no es seguidor
+            onClick: unfollow,
+            hidden: (row:any) => !row?.seguidor,// si el usuario actual no es seguidor
         },
         {
             title: t('page.expedient.acciones.assignar'),
