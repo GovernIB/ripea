@@ -15,9 +15,7 @@ import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,13 +61,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
 
-    // INICI - Variables fake per DevelopmentMode
-    @Getter @Setter private Long entitatActualId = 1L;
-    @Getter @Setter private Long organActualId = null;
-    @Getter @Setter private String rolActualCodi = "IPA_ADMIN";
-    @Getter @Setter private List<String> rols = List.of("IPA_SUPER", "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom");
-    // FI - Variables fake per DevelopmentMode
-
     @Hidden
     @GetMapping("/actual/securityInfo")
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
@@ -102,6 +93,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+        entitatService.setConfigEntitat(entitatActual);
         OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
         String rolActual = RolHelper.getRolActual(request);
         List<String> roles = RolHelper.getRolsUsuariActual(request);
@@ -124,32 +116,13 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
 
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-            if (developmentMode) {
-                if (response.containsKey("canviEntitat")) {
-                    entitatActualId = Long.valueOf(String.valueOf(response.get("canviEntitat")));
-                    organActualId = null;
-                }
-                if (response.containsKey("canviOrganGestor")) {
-                    organActualId = Long.valueOf(String.valueOf(response.get("canviOrganGestor")));
-                }
-                if (response.containsKey("canviRol")) {
-                    rolActualCodi = String.valueOf(response.get("canviRol"));
-                    organActualId = null;
-                }
-            } else {
-                EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
-                EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-                EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
-                EntitatHelper.findEntitatsAccessibles(request, entitatService);
+            EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
+            EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+            EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
+            EntitatHelper.findEntitatsAccessibles(request, entitatService);
 
-                RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService);
-                RolHelper.setRolActualFromDb(request, aplicacioService);
-
-                EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
-                if (entitatDto != null) {
-                    entitatService.setConfigEntitat(entitatDto);
-                }
-            }
+            RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService);
+            RolHelper.setRolActualFromDb(request, aplicacioService);
         }
 
         return getUsuariActualSecurityInfo(request);
