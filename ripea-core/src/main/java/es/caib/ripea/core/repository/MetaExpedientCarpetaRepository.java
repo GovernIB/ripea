@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.repository;
 
 import java.util.List;
@@ -13,12 +10,6 @@ import org.springframework.data.repository.query.Param;
 import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 
-/**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades que representa les carpetes d'un procediment
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public interface MetaExpedientCarpetaRepository extends JpaRepository<MetaExpedientCarpetaEntity, Long> {
 
 	List<MetaExpedientCarpetaEntity> findByMetaExpedientAndPare(MetaExpedientEntity metaExpedient, MetaExpedientCarpetaEntity pare);
@@ -31,12 +22,4 @@ public interface MetaExpedientCarpetaRepository extends JpaRepository<MetaExpedi
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
 	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	
-	@Modifying
- 	@Query(value = "UPDATE IPA_METAEXPEDIENT_METADOCUMENT " +
- 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
- 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
- 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
- 			nativeQuery = true)
-	public int updateUsuariAuditoriaMetaDoc(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

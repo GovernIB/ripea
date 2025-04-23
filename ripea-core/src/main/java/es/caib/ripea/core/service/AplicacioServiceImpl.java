@@ -129,7 +129,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private EmailPendentEnviarRepository emailPendentEnviarRepository;
     @Autowired private ExecucioMassivaRepository execucioMassivaRepository;
     @Autowired private ExpedientComentariRepository expedientComentariRepository;
-    @Autowired private ExpedientEstatRepository expedientEstatRepository; //IPA_EXPEDIENT_ESTAT i IPA_EXPEDIENT_FILTRE
+    @Autowired private ExpedientEstatRepository expedientEstatRepository; //IPA_EXPEDIENT_ESTAT
     @Autowired private ExpedientOrganPareRepository expedientOrganPareRepository;
     @Autowired private ExpedientPeticioRepository expedientPeticioRepository;
     @Autowired private ExpedientTascaRepository expedientTascaRepository; 
@@ -139,7 +139,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
     @Autowired private MetaDadaRepository metaDadaRepository;
     @Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository; //IPA_METAEXP_COMMENT i IPA_METAEXP_DOMINI
-    @Autowired private MetaExpedientCarpetaRepository metaExpedientCarpetaRepository; //IPA_METAEXPEDIENT_CARPETA i IPA_METAEXPEDIENT_METADOCUMENT
+    @Autowired private MetaExpedientCarpetaRepository metaExpedientCarpetaRepository; //IPA_METAEXPEDIENT_CARPETA
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
     @Autowired private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
     @Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
@@ -743,7 +743,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += execucioMassivaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXECUCIO_MASSIVA **
 		 registresModificats += expedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_COMMENT **
 		 registresModificats += expedientEstatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ESTAT **
-		 registresModificats += expedientEstatRepository.updateUsuariAuditoriaFiltre(codiAntic, codiNou);//IPA_EXPEDIENT_FILTRE **
 		 registresModificats += expedientOrganPareRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ORGANPARE **
 		 registresModificats += expedientPeticioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_PETICIO **
 		 registresModificats += expedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_TASCA **
@@ -756,7 +755,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += metaDadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METADADA **
 		 registresModificats += metaExpedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_COMMENT **
 		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXPEDIENT_CARPETA **
-		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoriaMetaDoc(codiAntic, codiNou);//IPA_METAEXPEDIENT_METADOCUMENT **
 		 registresModificats += metaExpedientOrganGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_ORGAN **
 		 registresModificats += metaExpedientSequenciaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_SEQ **
 		 registresModificats += metaExpedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA **
