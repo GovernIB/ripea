@@ -290,7 +290,10 @@ const MenuSupAdmin = () => {
 }
 const MenuAdmin = () => {
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0;// es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+    const countAnotacionsPendents = 0;// AnotacionsPendentsHelper.countAnotacionsPendents(request)
+    const organsNoSincronitzats = 0;// MetaExpedientHelper.getOrgansNoSincronitzats(request)
+    const urlsInstruccioActiu = false;// ExpedientHelper.isUrlsInstruccioActiu(request)
+    const revisioActiva = false;// MetaExpedientHelper.getRevisioActiva(request)
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
@@ -302,8 +305,7 @@ const MenuAdmin = () => {
 
         <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                {/* MetaExpedientHelper.getOrgansNoSincronitzats(request)*/}
-                <StyledBadge /*badgeContent={organsNoSincronitzats}*/ title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                <StyledBadge badgeContent={organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
                     Procedimientos
                 </StyledBadge>
             </MenuItem>
@@ -321,7 +323,7 @@ const MenuAdmin = () => {
             }
             <MenuItem>Grupos</MenuItem>
             <MenuItem>Órganos gestores</MenuItem>
-            {/* ExpedientHelper.isUrlsInstruccioActiu(request) */
+            { urlsInstruccioActiu &&
                 <MenuItem>URLs instrucción</MenuItem>
             }
 
@@ -332,7 +334,7 @@ const MenuAdmin = () => {
         <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
             <MenuItem>Contenidos</MenuItem>
             <MenuItem>Datos estadisticos</MenuItem>
-            {/*isRevisioActiva*/
+            { revisioActiva &&
                 <MenuItem>Revisión de procedimientos</MenuItem>
             }
             <MenuItem>Documentos enviados a Porafib</MenuItem>
@@ -346,8 +348,8 @@ const MenuAdmin = () => {
 }
 const MenuAdminOrgan = () => {
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0;// es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
-    const organsNoSincronitzats = 0;// es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
+    const countAnotacionsPendents = 0;// AnotacionsPendentsHelper.countAnotacionsPendents(request)
+    const organsNoSincronitzats = 0;// MetaExpedientHelper.getOrgansNoSincronitzats(request)
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
@@ -379,11 +381,11 @@ const MenuDissenyOrgan = () => {
 }
 const MenuUsuari = () => {
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0; // es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
-    const countTasquesPendent = 0; // es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
-    const isCreacioFluxUsuariActiu = false; // es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
-    const teAccesEstadistiques = false; // es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
-    const isMostrarSeguimentEnviamentsUsuariActiu = false; // es.caib.ripea.war.helper.SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
+    const countAnotacionsPendents = 0; // AnotacionsPendentsHelper.countAnotacionsPendents(request)
+    const countTasquesPendent = 0; // TasquesPendentsHelper.countTasquesPendents(request)
+    const isCreacioFluxUsuariActiu = false; // FluxFirmaHelper.isCreacioFluxUsuariActiu(request)
+    const teAccesEstadistiques = false; // ExpedientHelper.teAccesEstadistiques(request)
+    const isMostrarSeguimentEnviamentsUsuariActiu = false; // SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request)
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
@@ -418,8 +420,8 @@ const MenuUsuari = () => {
 
 const AccionesMassivas = (props:any) => {
     const {isRolActualAdmin} = props;
-    const isConvertirDefinitiuActiu = false;// es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
-    const isUrlValidacioDefinida = false;// es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+    const isConvertirDefinitiuActiu = false;// ExpedientHelper.isConversioDefinitiuActiva(request)
+    const isUrlValidacioDefinida = false;// ExpedientHelper.isUrlValidacioDefinida(request)
 
     return <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
         <MenuItem>Enviar documentos al portafirmas</MenuItem>
@@ -443,7 +445,6 @@ const AccionesMassivas = (props:any) => {
     </HeaderMenu>
 }
 const MenuRevisor = () => {
-
     return <>
         <HeaderButton variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Revisión de procedimientos</Typography>
