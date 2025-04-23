@@ -9,6 +9,8 @@ const entitatKey = 'entitat';
 const organKey = 'organ';
 
 export const useUserSession = () => {
+    axios.defaults.withCredentials = true;
+
     const {value, isInitialized, save, remove} = useSession(userkey)
 
     const refresh = () => {

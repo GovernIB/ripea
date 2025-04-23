@@ -1,40 +1,41 @@
 package es.caib.ripea.service.resourceservice;
 
-import java.time.chrono.ChronoLocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.model.*;
-import es.caib.ripea.service.intf.service.ContingutService;
-import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
-
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.ExpedientEstatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.time.chrono.ChronoLocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -71,7 +72,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", configHelper.getOrganActualCodi())
         );
 
-        return filter.generate();
+        return filter != null ? filter.generate() : null;
     }
 
     @Override

@@ -5,8 +5,6 @@ import es.caib.ripea.back.helper.ContingutEstaticHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.Ent;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEntitat;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
@@ -24,7 +22,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +54,10 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
 
     @Value("${es.caib.ripea.develope.mode:false}")
     private boolean developmentMode;
+    @Value("${es.caib.ripea.develope.user:rip_admin}")
+    private String developmentUser;
+    @Value("${es.caib.ripea.develope.roles:IPA_SUPER,IPA_ADMIN,IPA_ORGAN_ADMIN,tothom}")
+    private String developmentRoles;
 
     private final EntitatService entitatService;
     private final OrganGestorService organGestorService;
@@ -68,61 +75,46 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> getUsuariActualSecurityInfo(HttpServletRequest request) throws MethodArgumentNotValidException {
 
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-        String rolActual = RolHelper.getRolActual(request);
-        List<String> roles = RolHelper.getRolsUsuariActual(request);
-        List<String> auth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (developmentMode) {
-            return ResponseEntity.ok(UserPermissionInfo.builder()
-                    .codi("rip_admin")
-                    .nom("Administrador Ripea")
-                    .superusuari(true)
-                    .entitatActualId(entitatActualId)
-                    .organActualId(organActualId)
-                    .rolActual(rolActualCodi)
-                    .rols(rols)
-                    .auth(auth)
-                    .permisosEntitat(Map.of(
-                            1L,
-                            PermisosEntitat.builder()
-                                    .entitatId(1L)
-                                    .entitatCodi("GOIB")
-                                    .entitatNom("Govern de les Illes Balears")
-                                    .permisUsuari(true)
-                                    .permisAdministrador(true)
-                                    .permisAdministradorOrgan(true)
-                                    .organs(List.of(
-                                            Ent.builder().id(73L).codi("A04026973").nom("Direcció General d' Innovació i Transformació Digital").build(),
-                                            Ent.builder().id(118L).codi("A04013554").nom("Direcció General de Medi Natural i Gestió Forestal").build()
-                                    ))
-                                    .build(),
+        if (developmentMode && (auth == null || "anonymousUser".equals(auth.getName()))) {
 
-                            3721L,
-                            PermisosEntitat.builder()
-                                    .entitatId(3721L)
-                                    .entitatCodi("GONA")
-                                    .entitatNom("Gobierno de Navarra")
-                                    .permisUsuari(true)
-                                    .permisAdministrador(false)
-                                    .permisAdministradorOrgan(false)
-                                    .build()
-                    ))
-                    .build());
+            // 1. Crear un Authentication personalitzat
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    developmentUser,
+                    null,
+                    Arrays.stream(developmentRoles.split(","))
+                            .map(String::trim)
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList())
+            );
+
+            // 2. Assignar el Authentication al SecurityContext
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
+
+            // 3. Sincronitzar el SecurityContext amb la sessió HTTP
+            request.getSession(true).setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
         }
 
         if (SecurityContextHolder.getContext().getAuthentication() == null || SecurityContextHolder.getContext().getAuthentication().getName() == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
+        OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+        String rolActual = RolHelper.getRolActual(request);
+        List<String> roles = RolHelper.getRolsUsuariActual(request);
+        List<String> rolesAuth = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+
         UserPermissionInfo userPermissionInfo = ((UsuariResourceService) readonlyResourceService).getCurrentUserPermissionInfo();
         userPermissionInfo.setEntitatActualId(entitatActual != null ? entitatActual.getId() : null);
         userPermissionInfo.setOrganActualId(organActual != null ? organActual.getId() : null);
         userPermissionInfo.setRolActual(rolActual);
         userPermissionInfo.setRols(roles);
-        userPermissionInfo.setAuth(auth);
+        userPermissionInfo.setAuth(rolesAuth);
+        
         return ResponseEntity.ok(userPermissionInfo);
     }
 
