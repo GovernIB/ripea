@@ -18,6 +18,7 @@ public class UserPermissionInfo {
     private String rolActual;
     private List<String> rols;
     private List<String> auth;
+    private Map<String, Object> sessionScope;
 
     @Data
     @Builder

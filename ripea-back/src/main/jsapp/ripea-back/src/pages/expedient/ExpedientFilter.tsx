@@ -49,6 +49,26 @@ const springFilterBuilder = (data: any) :string => {
     return filterStr;
 }
 
+const ExpedientFilterForm = () => {
+    return <>
+        <GridFormField xs={2} name="numero"/>
+        <GridFormField xs={4} name="nom"/>
+        <GridFormField xs={3} name="estat"/>
+        <GridFormField xs={3} name="interessat"/>
+        <GridFormField xs={3} name="organGestor"/>
+        <GridFormField xs={3} name="metaExpedient"/>
+        <GridFormField xs={3} name="dataCreacioInici"/>
+        <GridFormField xs={3} name="dataCreacioFinal"/>
+
+        <GridFormField xs={2} name="numeroRegistre"/>
+        <GridFormField xs={3} name="grup"/>
+        <GridFormField xs={3} name="agafatPer"/>
+
+        <GridFormField xs={2} name="agafat"/>
+        <GridFormField xs={2} name="pendentFirmar"/>
+    </>
+}
+
 const ExpedientFilter = (props:any) => {
     const {onSpringFilterChange} = props;
     const filterRef = useFilterApiRef();
@@ -71,21 +91,7 @@ const ExpedientFilter = (props:any) => {
         buttonControlled
     >
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <GridFormField xs={2} name="numero"/>
-            <GridFormField xs={4} name="nom"/>
-            <GridFormField xs={3} name="estat"/>
-            <GridFormField xs={3} name="interessat"/>
-            <GridFormField xs={3} name="organGestor"/>
-            <GridFormField xs={3} name="metaExpedient"/>
-            <GridFormField xs={3} name="dataCreacioInici"/>
-            <GridFormField xs={3} name="dataCreacioFinal"/>
-
-            <GridFormField xs={2} name="numeroRegistre"/>
-            <GridFormField xs={3} name="grup"/>
-            <GridFormField xs={3} name="agafatPer"/>
-
-            <GridFormField xs={2} name="agafat"/>
-            <GridFormField xs={2} name="pendentFirmar"/>
+            <ExpedientFilterForm/>
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
                 <Button onClick={netejar}>Netejar</Button>

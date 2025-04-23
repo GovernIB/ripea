@@ -244,17 +244,17 @@ const UserHeadToolbar = (props:any) => {
 
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
             { isRolActualSupAdmin && <MenuSupAdmin/> }
-            { isRolActualAdmin && <MenuAdmin/> }
-            { isRolActualOrganAdmin && <MenuAdminOrgan/> }
+            { isRolActualAdmin && <MenuAdmin sessionScope={user?.sessionScope}/> }
+            { isRolActualOrganAdmin && <MenuAdminOrgan sessionScope={user?.sessionScope}/> }
             { isRolActualDissenyOrgan && <MenuDissenyOrgan/> }
-            { isRolActualUser && <MenuUsuari/> }
+            { isRolActualUser && <MenuUsuari sessionScope={user?.sessionScope}/> }
 
             {
                 (
                     isRolActualAdmin
                     || isRolActualOrganAdmin
                     || isRolActualUser
-                ) && <AccionesMassivas isRolActualAdmin={isRolActualAdmin}/>
+                ) && <AccionesMassivas isRolActualAdmin={isRolActualAdmin} sessionScope={user?.sessionScope}/>
             }
 
             { isRolActualRevisor && <MenuRevisor/> }
@@ -288,42 +288,39 @@ const MenuSupAdmin = () => {
         </HeaderButton>
     </>
 }
-const MenuAdmin = () => {
+const MenuAdmin = (props:any) => {
+    const {sessionScope} = props;
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0;// AnotacionsPendentsHelper.countAnotacionsPendents(request)
-    const organsNoSincronitzats = 0;// MetaExpedientHelper.getOrgansNoSincronitzats(request)
-    const urlsInstruccioActiu = false;// ExpedientHelper.isUrlsInstruccioActiu(request)
-    const revisioActiva = false;// MetaExpedientHelper.getRevisioActiva(request)
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
         </HeaderButton>
 
         <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                <StyledBadge badgeContent={organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
                     Procedimientos
                 </StyledBadge>
             </MenuItem>
-            {/*sessionScope['SessionHelper.isDocumentsGeneralsEnabled']!=null && sessionScope['SessionHelper.isDocumentsGeneralsEnabled']*/
+            { sessionScope?.isDocumentsGeneralsEnabled &&
                 <MenuItem>Tipos de documentos</MenuItem>
             }
 
             <Divider/>
 
-            {/*sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null && sessionScope['SessionHelper.isTipusDocumentsEnabled']*/
+            { sessionScope?.isTipusDocumentsEnabled &&
                 <MenuItem>Tipos documentales NTI</MenuItem>
             }
-            {/*sessionScope['SessionHelper.isDominisEnabled']!=null && sessionScope['SessionHelper.isDominisEnabled']*/
+            { sessionScope?.isDominisEnabled &&
                 <MenuItem>Dominios</MenuItem>
             }
             <MenuItem>Grupos</MenuItem>
             <MenuItem>Órganos gestores</MenuItem>
-            { urlsInstruccioActiu &&
+            { sessionScope?.urlsInstruccioActiu &&
                 <MenuItem>URLs instrucción</MenuItem>
             }
 
@@ -334,7 +331,7 @@ const MenuAdmin = () => {
         <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
             <MenuItem>Contenidos</MenuItem>
             <MenuItem>Datos estadisticos</MenuItem>
-            { revisioActiva &&
+            { sessionScope?.revisioActiva &&
                 <MenuItem>Revisión de procedimientos</MenuItem>
             }
             <MenuItem>Documentos enviados a Porafib</MenuItem>
@@ -346,22 +343,21 @@ const MenuAdmin = () => {
         </HeaderMenu>
     </>
 }
-const MenuAdminOrgan = () => {
+const MenuAdminOrgan = (props:any) => {
+    const {sessionScope} = props;
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0;// AnotacionsPendentsHelper.countAnotacionsPendents(request)
-    const organsNoSincronitzats = 0;// MetaExpedientHelper.getOrgansNoSincronitzats(request)
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
         </HeaderButton>
 
         <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                <StyledBadge badgeContent={organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
                     Procedimientos
                 </StyledBadge>
             </MenuItem>
@@ -379,35 +375,31 @@ const MenuDissenyOrgan = () => {
         </HeaderButton>
     </>
 }
-const MenuUsuari = () => {
+const MenuUsuari = (props:any) => {
+    const {sessionScope} = props;
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0; // AnotacionsPendentsHelper.countAnotacionsPendents(request)
-    const countTasquesPendent = 0; // TasquesPendentsHelper.countTasquesPendents(request)
-    const isCreacioFluxUsuariActiu = false; // FluxFirmaHelper.isCreacioFluxUsuariActiu(request)
-    const teAccesEstadistiques = false; // ExpedientHelper.teAccesEstadistiques(request)
-    const isMostrarSeguimentEnviamentsUsuariActiu = false; // SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request)
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countTasquesPendent} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countTasquesPendent} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Tareas</Typography>
         </HeaderButton>
-        { isCreacioFluxUsuariActiu &&
+        { sessionScope?.isCreacioFluxUsuariActiu &&
             <HeaderButton variant={"contained"}>
                 <Typography display={'inline'} variant={'subtitle2'}>Flujos de firma</Typography>
             </HeaderButton>
         }
-        { (teAccesEstadistiques || isMostrarSeguimentEnviamentsUsuariActiu) &&
+        { (sessionScope?.teAccesEstadistiques || sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu) &&
             <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
-                { teAccesEstadistiques &&
+                { sessionScope?.teAccesEstadistiques &&
                     <MenuItem>Datos estadisticos</MenuItem>
                 }
-                { isMostrarSeguimentEnviamentsUsuariActiu &&
+                { sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu &&
                     <>
                         <MenuItem>Documentos enviados a Portafib</MenuItem>
                         <MenuItem>Remesas enviadas a Notib</MenuItem>
@@ -419,20 +411,18 @@ const MenuUsuari = () => {
 }
 
 const AccionesMassivas = (props:any) => {
-    const {isRolActualAdmin} = props;
-    const isConvertirDefinitiuActiu = false;// ExpedientHelper.isConversioDefinitiuActiva(request)
-    const isUrlValidacioDefinida = false;// ExpedientHelper.isUrlValidacioDefinida(request)
+    const {isRolActualAdmin, sessionScope} = props;
 
     return <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
         <MenuItem>Enviar documentos al portafirmas</MenuItem>
         <MenuItem>Firmar documentos desde el navegador</MenuItem>
-        { isConvertirDefinitiuActiu &&
+        { sessionScope?.isConvertirDefinitiuActiu &&
             <MenuItem>Marcar como definitivos</MenuItem>
         }
         <MenuItem>Cambio de estado de expedientes</MenuItem>
         <MenuItem>Cierre de expedientes</MenuItem>
         <MenuItem>Custodiar elementos pendientes</MenuItem>
-        { isUrlValidacioDefinida &&
+        { sessionScope?.isUrlValidacioDefinida &&
             <MenuItem>Copiar enlace CSV</MenuItem>
         }
         <MenuItem>Adjuntar anexos pendientes de anotaciones aceptadas</MenuItem>

@@ -1,9 +1,7 @@
 package es.caib.ripea.back.resourcecontroller;
 
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
-import es.caib.ripea.back.helper.ContingutEstaticHelper;
-import es.caib.ripea.back.helper.EntitatHelper;
-import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.*;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -35,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -106,6 +105,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setRolActual(rolActual);
         userPermissionInfo.setRols(roles);
         userPermissionInfo.setAuth(rolesAuth);
+        userPermissionInfo.setSessionScope(getUsuariActualAdditionalInfo(request));
         
         return ResponseEntity.ok(userPermissionInfo);
     }
@@ -126,5 +126,27 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         return getUsuariActualSecurityInfo(request);
+    }
+
+    @Hidden
+    private Map<String, Object> getUsuariActualAdditionalInfo(HttpServletRequest request) throws MethodArgumentNotValidException {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
+        response.put("urlsInstruccioActiu", ExpedientHelper.isUrlsInstruccioActiu(request));
+        response.put("organsNoSincronitzats", MetaExpedientHelper.getOrgansNoSincronitzats(request));
+        response.put("revisioActiva", MetaExpedientHelper.getRevisioActiva(request));
+        response.put("countTasquesPendent", TasquesPendentsHelper.countTasquesPendents(request));
+        response.put("isCreacioFluxUsuariActiu", FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
+        response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
+        response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
+        response.put("isConvertirDefinitiuActiu", ExpedientHelper.isConversioDefinitiuActiva(request));
+        response.put("isUrlValidacioDefinida", ExpedientHelper.isUrlValidacioDefinida(request));
+
+        response.put("isDocumentsGeneralsEnabled", request.getSession().getAttribute("SessionHelper.isDocumentsGeneralsEnabled"));
+        response.put("isTipusDocumentsEnabled", request.getSession().getAttribute("SessionHelper.isTipusDocumentsEnabled"));
+        response.put("isDominisEnabled", request.getSession().getAttribute("SessionHelper.isDominisEnabled"));
+
+        return response;
     }
 }
