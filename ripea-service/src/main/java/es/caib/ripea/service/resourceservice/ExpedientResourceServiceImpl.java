@@ -67,12 +67,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+        // En cas de no disposar d'entitat actual, filtrarem per un string "................................................................................"
+        // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
         Filter filter = FilterBuilder.and(
-                FilterBuilder.equal(ContingutResource.Fields.entitat + ".codi", configHelper.getEntitatActualCodi()),
+                FilterBuilder.equal(ContingutResource.Fields.entitat + ".codi", configHelper.getEntitatActualCodi() != null ? configHelper.getEntitatActualCodi() : "................................................................................"),
                 FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", configHelper.getOrganActualCodi())
         );
 
-        return filter != null ? filter.generate() : null;
+        return filter.generate();
     }
 
     @Override
