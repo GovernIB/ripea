@@ -119,7 +119,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private AlertaRepository alertaRepository;
     @Autowired private AvisRepository avisRepository;
     @Autowired private ConsultaPinbalRepository consultaPinbalRepository;
-    @Autowired private ContingutRepository contingutRepository; //IPA_CONTINGUT i IPA_CONT_COMMENT
+    @Autowired private ContingutRepository contingutRepository; //IPA_CONTINGUT
     @Autowired private ContingutLogRepository contingutLogRepository;
     @Autowired private ContingutMovimentRepository contingutMovimentRepository;
     @Autowired private DadaRepository dadaRepository;
@@ -730,7 +730,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += avisRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_AVIS **
 		 registresModificats += configRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONFIG **
 		 registresModificats += consultaPinbalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONSULTA_PINBAL **
-		 registresModificats += contingutRepository.updateUsuariAuditoriaComment(codiAntic, codiNou);//IPA_CONT_COMMENT **
 		 registresModificats += contingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONTINGUT **
 		 registresModificats += contingutLogRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_LOG **
 		 registresModificats += contingutMovimentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_MOV **
@@ -758,7 +757,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += metaExpedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_COMMENT **
 		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXPEDIENT_CARPETA **
 		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoriaMetaDoc(codiAntic, codiNou);//IPA_METAEXPEDIENT_METADOCUMENT **
-		 registresModificats += registresModificats += metaExpedientOrganGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_ORGAN **
+		 registresModificats += metaExpedientOrganGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_ORGAN **
 		 registresModificats += metaExpedientSequenciaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_SEQ **
 		 registresModificats += metaExpedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA **
 		 registresModificats += metaExpedientTascaValidacioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA_VALIDACIO **
