@@ -70,7 +70,7 @@ export const useSession = (key:string) => {
         value: data[key],
         isInitialized: () => !!initialized.get(key) || !!data[key],
         save: (val:any) => {
-            initialized.set(key, val != undefined);
+            initialized.set(key, !!val);
             setValue(key, val)
         },
         remove: () => {

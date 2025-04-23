@@ -17,7 +17,7 @@ export const useUserSession = () => {
                 save(response.data);
             })
             .catch((error) => {
-                save(undefined);
+                save(null);
                 console.log(">>>> axios error", error)
             })
     }
@@ -28,7 +28,7 @@ export const useUserSession = () => {
                 save(response.data);
             })
             .catch((error) => {
-                save(undefined);
+                save(null);
                 console.log(">>>> axios error", error)
             })
     }
@@ -80,7 +80,7 @@ export const useEntitatSession = () => {
         if (user && user?.entitatActualId) {
             refresh()
         } else {
-            // remove()
+            remove()
         }
     },[user])
 
