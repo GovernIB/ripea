@@ -22,9 +22,6 @@ export const App: React.FC = () => {
         style={{ height: '110px' }}
         logoStyle={{
             '& img': { height: '80px' },
-            // component: "img",
-            // src: {entitatLogo},
-            // alt: "Imagen cargada",
             pl: 2,
             pr: 4,
             mr: 4,

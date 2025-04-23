@@ -24,7 +24,7 @@ export const FollowersDialog = (props:any) => {
 	const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        if (appApiIsReady && !followes?.length){
+        if (open && appApiIsReady){
             findAll({
                 filter: `expedient.id:${entity?.id}`,
                 sorts: ['seguidor.nom', 'desc']
@@ -34,7 +34,7 @@ export const FollowersDialog = (props:any) => {
                     setNumFollowes?.(app.rows.length)
                 })
         }
-    }, [appApiIsReady]);
+    }, [open]);
 	
     const handleOpen = () => {
 		setOpen(true);
