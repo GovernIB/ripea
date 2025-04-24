@@ -157,7 +157,7 @@ const useRelacionar= (refresh?: () => void) => {
                 )}
 
                 selectionActive
-                // TODO: check
+                // TODO: check seleccionados al inicio
                 rowSelectionModel={entity?.relacionatsAmb?.map((a:any)=>a.id)}
                 toolbarElementsWithPositions={[
                     {

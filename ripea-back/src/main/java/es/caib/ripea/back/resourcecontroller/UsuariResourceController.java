@@ -4,6 +4,7 @@ import es.caib.ripea.back.base.controller.BaseMutableResourceController;
 import es.caib.ripea.back.helper.*;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -129,7 +130,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     }
 
     @Hidden
-    private Map<String, Object> getUsuariActualAdditionalInfo(HttpServletRequest request) throws MethodArgumentNotValidException {
+    private Map<String, Object> getUsuariActualAdditionalInfo(HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
         response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
@@ -146,6 +147,9 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isDocumentsGeneralsEnabled", request.getSession().getAttribute("SessionHelper.isDocumentsGeneralsEnabled"));
         response.put("isTipusDocumentsEnabled", request.getSession().getAttribute("SessionHelper.isTipusDocumentsEnabled"));
         response.put("isDominisEnabled", request.getSession().getAttribute("SessionHelper.isDominisEnabled"));
+
+        response.put("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
+        response.put("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
 
         return response;
     }

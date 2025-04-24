@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
@@ -37,6 +38,9 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 	@Size(max = 80)
 	protected String numeroRegistre;
 	protected boolean arxiuPropagat;
+
+    @Transient
+    private boolean conteDocumentsDefinitius;
 	
 //	@NotNull
 	protected ResourceReference<EntitatResource, Long> entitat;

@@ -163,7 +163,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             open={open}
             closeCallback={handleClose}
             title={t('page.arxiu.detall.title')}
-            componentProps={{ fullWidth: true, maxWidth: 'lg'}}
+            componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={[
                 {
                     value: 'close',

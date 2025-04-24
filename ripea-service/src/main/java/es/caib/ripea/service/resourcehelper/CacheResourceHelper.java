@@ -3,6 +3,9 @@ package es.caib.ripea.service.resourcehelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.caib.ripea.service.intf.model.MetaDadaResource;
+import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.ValidacioErrorResource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -29,10 +32,7 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ErrorsValidacioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDadaDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
-import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 
@@ -54,9 +54,9 @@ public class CacheResourceHelper {
 	public void evictErrorsValidacioPerNode(NodeEntity node) {}
 	
 	@Cacheable(value = "errorsValidacioNodeResource", key = "#node.id")
-	public List<ValidacioErrorDto> findErrorsValidacioPerNode(NodeResourceEntity node) {
+	public List<ValidacioErrorResource> findErrorsValidacioPerNode(NodeResourceEntity node) {
 		
-		List<ValidacioErrorDto> errors = new ArrayList<ValidacioErrorDto>();
+		List<ValidacioErrorResource> errors = new ArrayList<ValidacioErrorResource>();
 		List<DadaResourceEntity> dades = dadaResourceRepository.findByNodeId(node.getId());
 		// Valida dades específiques del meta-node
 		List<MetaDadaResourceEntity> metaDades = metaDadaResourceRepository.findByMetaNodeAndActivaTrueAndMultiplicitatIn(
@@ -151,21 +151,21 @@ public class CacheResourceHelper {
 	public void evictEnviamentsPortafirmesPendentsPerExpedient(ExpedientResourceEntity expedient) {
 	}
 	
-	private ValidacioErrorDto crearValidacioError(
+	private ValidacioErrorResource crearValidacioError(
 			MetaDocumentResourceEntity metaDocument,
 			MultiplicitatEnumDto multiplicitat,
 			ErrorsValidacioTipusEnumDto tipus) {
-		return new ValidacioErrorDto(
-				multiplicitat != null ? objectMappingHelper.newInstanceMap(metaDocument, MetaDocumentDto.class) : null,
+		return new ValidacioErrorResource(
+				multiplicitat != null ? objectMappingHelper.newInstanceMap(metaDocument, MetaDocumentResource.class) : null,
 				multiplicitat != null ? MultiplicitatEnumDto.valueOf(multiplicitat.toString()) : null,
 				tipus);
 	}
 	
-	private ValidacioErrorDto crearValidacioError(
+	private ValidacioErrorResource crearValidacioError(
 			MetaDadaResourceEntity metaDada,
 			MultiplicitatEnumDto multiplicitat) {
-		return new ValidacioErrorDto(
-				objectMappingHelper.newInstanceMap(metaDada,MetaDadaDto.class),
+		return new ValidacioErrorResource(
+				objectMappingHelper.newInstanceMap(metaDada, MetaDadaResource.class),
 				MultiplicitatEnumDto.valueOf(multiplicitat.toString()));
 	}
 	

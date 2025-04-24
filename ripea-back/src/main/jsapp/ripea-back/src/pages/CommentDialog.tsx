@@ -3,6 +3,7 @@ import {Badge, Grid, Icon, IconButton, Typography} from "@mui/material";
 import {MuiFormDialog, useResourceApiService, MuiFormDialogApi} from "reactlib";
 import GridFormField from "../components/GridFormField.tsx";
 import {formatDate} from "../util/dateUtils.ts";
+import {useUserSession} from "../components/Session.tsx";
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -16,6 +17,8 @@ const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
 const Comments = (props:any) => {
     const { entity, resourceName, resourceReference } = props;
+
+    const { value: user } = useUserSession();
     const [comentarios, setComentarios] = useState<any[]>([]);
 
     const {
@@ -49,8 +52,7 @@ const Comments = (props:any) => {
         }}
     >
         {comentarios?.map((a:any)=>
-            // TODO: check my comment
-            <Grid item key={a?.id} sx={a?.createdBy=="rip_admin" ?myComment :otherComment}>
+            <Grid item key={a?.id} sx={a?.createdBy==user?.codi ?myComment :otherComment}>
                 <Typography variant={"subtitle2"} color={"textDisabled"}>{a?.createdBy}</Typography>
                 <Typography variant={"body2"}>{a?.text}</Typography>
                 <Typography variant={"caption"} color={"textDisabled"}>{formatDate(a?.createdDate)}</Typography>

@@ -4,10 +4,7 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.persistence.entity.resourceentity.*;
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.*;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.PluginHelper;
@@ -21,6 +18,7 @@ import es.caib.ripea.service.intf.model.*;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
+import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -53,11 +51,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
+    private final ExpedientResourceHelper expedientResourceHelper;
 
     @PostConstruct
     public void init() {
         register(ExpedientResource.ACTION_FOLLOW_CODE, new FollowActionExecutor());
         register(ExpedientResource.ACTION_UNFOLLOW_CODE, new UnFollowActionExecutor());
+        register(ExpedientResource.ACTION_AGAFAR_CODE, new AgafarActionExecutor());
+        register(ExpedientResource.ACTION_RETORNAR_CODE, new RetornarActionExecutor());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
@@ -94,6 +95,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         resource.setNumSeguidors(entity.getSeguidors().size());
         usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
+
+        /*/////////////////////////////////////////////////*/
+        expedientResourceHelper.setPotTancar(entity, resource);
+        /*/////////////////////////////////////////////////*/
     }
 
     @Override
@@ -252,6 +257,46 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             if (optionalUsuariResource.isPresent() && entity.getSeguidors().contains(optionalUsuariResource.get())) {
                 entity.getSeguidors().remove(optionalUsuariResource.get());
                 expedientResourceRepository.save(entity);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+    private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
+                entity.setAgafatPer(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(
+                    entity.getCreatedBy());
+
+            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
+                entity.setAgafatPer(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+//                emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
             }
 
             return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);

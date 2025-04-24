@@ -61,12 +61,22 @@ import java.util.List;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_UNFOLLOW_CODE,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_AGAFAR_CODE,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_RETORNAR_CODE,
+                        requiresId = true),
 		})
 public class ExpedientResource extends NodeResource {
 
 	private static final long serialVersionUID = 7440910672703796468L;
 	public static final String ACTION_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_UNFOLLOW_CODE = "UNFOLLOW";
+	public static final String ACTION_AGAFAR_CODE = "AGAFAR";
+	public static final String ACTION_RETORNAR_CODE = "RETORNAR";
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
@@ -173,6 +183,14 @@ public class ExpedientResource extends NodeResource {
 
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
+
+    @Transient private boolean conteDocuments;
+    @Transient private boolean conteDocumentsFirmats;
+    @Transient private boolean conteDocumentsEnProcessDeFirma;
+    @Transient private boolean conteDocumentsDePortafirmesNoCustodiats;
+    @Transient private boolean conteDocumentsDeAnotacionesNoMogutsASerieFinal;
+    @Transient private boolean conteDocumentsPendentsReintentsArxiu;
+    @Transient private boolean potTancar;
 
     @Getter
 	@Setter

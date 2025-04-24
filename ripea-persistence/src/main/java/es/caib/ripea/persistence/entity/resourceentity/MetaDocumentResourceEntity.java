@@ -90,7 +90,7 @@ public class MetaDocumentResourceEntity extends MetaNodeResourceEntity<MetaDocum
 	@JoinColumn(
 			name = "meta_expedient_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "METADOC_METAEXP_FK"))
-	private MetaExpedientEntity metaExpedient;
+	private MetaExpedientResourceEntity metaExpedient;
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(
