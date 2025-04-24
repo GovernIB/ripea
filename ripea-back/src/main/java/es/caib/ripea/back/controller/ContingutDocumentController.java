@@ -1261,7 +1261,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				}
 
 				
-				return "redirect:../../document/" + document.getId() + "/notificar";
+				return "redirect:../../modal/document/" + document.getId() + "/notificar";
 				
 			}
 		} catch (Exception e) {
