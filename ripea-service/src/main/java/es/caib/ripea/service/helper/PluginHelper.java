@@ -1970,11 +1970,14 @@ public class PluginHelper {
 			String versio,
 			boolean ambContingut,
 			boolean ambVersioImprimible) {
-
         return arxiuDocumentConsultar(
-                document.getId(), document.getNom(), document.getArxiuUuid(), document.getEntitat().getCodi(),
+        		document!=null?document.getId():null,
+        		document!=null?document.getNom():null,
+        		document!=null?document.getArxiuUuid():null,
+        		document!=null?document.getEntitat().getCodi():null,
                 arxiuUuid, versio, ambContingut, ambVersioImprimible);
 	}
+	
 	public Document arxiuDocumentConsultar(
 			Long documentId, String documentNom, String documentArxiuUuid, String documentEntitatCodi,
 			String arxiuUuid,
