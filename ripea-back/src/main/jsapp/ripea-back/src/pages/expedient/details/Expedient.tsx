@@ -24,6 +24,8 @@ const Contenido = (props :any) => {
     const { title, children } = props;
     return <ContenidoData
         title={title}
+        titleXs={12}
+        textXs={12}
         componentTitleProps={{ color: 'text.secondary', fontSize: 14, fontStyle: "italic" }}
         componentTextProps={{ color: 'text.primary', wordWrap: "break-word" }}
         sx={{ display: 'flex', flexDirection:'column' }}

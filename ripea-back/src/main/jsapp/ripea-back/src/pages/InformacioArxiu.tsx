@@ -1,10 +1,9 @@
-import {Grid} from "@mui/material";
-import {BasePage, useResourceApiService} from "reactlib";
 import {useState} from "react";
-import TabComponent from "../components/TabComponent.tsx";
-import {formatDate} from "../util/dateUtils.ts";
+import {Grid} from "@mui/material";
+import {BasePage, useResourceApiService, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
-import Dialog from "../../lib/components/mui/Dialog.tsx";
+import {formatDate} from "../util/dateUtils.ts";
+import TabComponent from "../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../components/CardData.tsx";
 import Load from "./Load.tsx";
 
@@ -160,11 +159,11 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
     ]
 
     const dialog =
-        <Dialog
+        <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.arxiu.detall.title')}
-            componentProps={{ fullWidth: true, maxWidth: 'lg'}}
+            componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={[
                 {
                     value: 'close',
@@ -185,7 +184,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
                 tabs={tabs}
                 variant="scrollable"
             />
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

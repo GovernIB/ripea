@@ -5,6 +5,8 @@ import {StyledBadge} from "../../components/StyledBadge.tsx";
 import usePerfil from "./detail/Perfil.tsx";
 import {useEffect, useMemo, useState} from "react";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
+import {useTranslation} from "react-i18next";
+import Load from "../Load.tsx";
 
 const HeaderButton = (props:any) => {
     const { children, badgeContent, onClick, hidden, ...other } = props;
@@ -45,7 +47,7 @@ const HeaderMenu = (props:any) => {
     </MenuButton>
 }
 const HeaderSelect = (props:any) => {
-    const {icon, value, onChange, color = "white", children} = props
+    const {icon, value, onChange, color = "white", children, ...other} = props
 
     return <FormControl sx={{ minWidth: 90 }} size="small">
         <Select
@@ -61,6 +63,7 @@ const HeaderSelect = (props:any) => {
                     fill: `${color} !important`,
                 }
             }}
+            {...other}
         >
             {children}
         </Select>
@@ -69,11 +72,13 @@ const HeaderSelect = (props:any) => {
 
 const UserHeadToolbar = (props:any) => {
     const {color = "white"} = props;
+    const { t } = useTranslation();
 
     const { value: entitat } = useEntitatSession()
+    const navigate = useNavigate();
     const textColor = entitat?.capsaleraColorLletra ?? color;
 
-    const { value: user, save: apiSave } = useUserSession();
+    const { value: user, save: apiSave, remove: logOut } = useUserSession();
 
     const [entitatId, setEntitatId] = useState<number>(user?.entitatActualId);
     const entitats :any[] = useMemo(()=>{
@@ -89,30 +94,6 @@ const UserHeadToolbar = (props:any) => {
     }, [permisoEntitat])
 
     const [rol, setRol] = useState<string>(user?.rolActual)
-    const rolsEntitat :any[] = useMemo(()=>{
-        return [
-            {
-                label: 'Super User',
-                value: 'IPA_SUPER',
-                hidden: !user?.superusuari
-            },
-            {
-                label: 'Admin',
-                value: 'IPA_ADMIN',
-                hidden: !permisoEntitat?.permisAdministrador
-            },
-            {
-                label: 'Admin Organ',
-                value: 'IPA_ORGAN_ADMIN',
-                hidden: !permisoEntitat?.permisAdministradorOrgan || !permisoEntitat?.organs
-            },
-            {
-                label: 'User',
-                value: 'tothom',
-                hidden: !permisoEntitat?.permisUsuari
-            }
-        ].filter((rol: any) => !rol.hidden)
-    },[permisoEntitat])
 
     useEffect(() => {
         if (user){
@@ -137,6 +118,7 @@ const UserHeadToolbar = (props:any) => {
     useEffect(() => {
         if (rol && rol!=user?.rolActual){
             apiSave({canviRol: rol})
+            navigate('/expedient')
         }
     }, [rol]);
 
@@ -149,7 +131,11 @@ const UserHeadToolbar = (props:any) => {
     const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
     const isRolActualUser = user?.rolActual == 'tothom';
 
-    return <Grid container rowSpacing={1} columnSpacing={1}>
+    if (!entitatId && !organId && !rol){
+        return <Load/>
+    }
+
+    return <Grid container rowSpacing={1} columnSpacing={1} xs={8}>
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
             { !isRolActualSupAdmin &&
                 <>
@@ -196,8 +182,8 @@ const UserHeadToolbar = (props:any) => {
                 color={textColor}
             >
                 {
-                    rolsEntitat?.map((rol:any) =>
-                        <MenuItem key={rol.value} value={rol.value}>{rol.label}</MenuItem>
+                    user?.rols?.map((rol:any) =>
+                        <MenuItem key={rol} value={rol}>{t(`enum.rol.${rol}`)}</MenuItem>
                     )
                 }
             </HeaderSelect>
@@ -252,23 +238,23 @@ const UserHeadToolbar = (props:any) => {
                     <Icon>download</Icon>Manual de usuario
                 </MenuItem>
 
-                <MenuItem><Icon>logout</Icon>Desconectar</MenuItem>
+                <MenuItem onClick={logOut}><Icon>logout</Icon>Desconectar</MenuItem>
             </HeaderMenu>
         </Grid>
 
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
             { isRolActualSupAdmin && <MenuSupAdmin/> }
-            { isRolActualAdmin && <MenuAdmin/> }
-            { isRolActualOrganAdmin && <MenuAdminOrgan/> }
+            { isRolActualAdmin && <MenuAdmin sessionScope={user?.sessionScope}/> }
+            { isRolActualOrganAdmin && <MenuAdminOrgan sessionScope={user?.sessionScope}/> }
             { isRolActualDissenyOrgan && <MenuDissenyOrgan/> }
-            { isRolActualUser && <MenuUsuari/> }
+            { isRolActualUser && <MenuUsuari sessionScope={user?.sessionScope}/> }
 
             {
                 (
                     isRolActualAdmin
                     || isRolActualOrganAdmin
                     || isRolActualUser
-                ) && <AccionesMassivas isRolActualAdmin={isRolActualAdmin}/>
+                ) && <AccionesMassivas isRolActualAdmin={isRolActualAdmin} sessionScope={user?.sessionScope}/>
             }
 
             { isRolActualRevisor && <MenuRevisor/> }
@@ -302,40 +288,39 @@ const MenuSupAdmin = () => {
         </HeaderButton>
     </>
 }
-const MenuAdmin = () => {
+const MenuAdmin = (props:any) => {
+    const {sessionScope} = props;
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0;// es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
         </HeaderButton>
 
         <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                {/* MetaExpedientHelper.getOrgansNoSincronitzats(request)*/}
-                <StyledBadge /*badgeContent={organsNoSincronitzats}*/ title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
                     Procedimientos
                 </StyledBadge>
             </MenuItem>
-            {/*sessionScope['SessionHelper.isDocumentsGeneralsEnabled']!=null && sessionScope['SessionHelper.isDocumentsGeneralsEnabled']*/
+            { sessionScope?.isDocumentsGeneralsEnabled &&
                 <MenuItem>Tipos de documentos</MenuItem>
             }
 
             <Divider/>
 
-            {/*sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null && sessionScope['SessionHelper.isTipusDocumentsEnabled']*/
+            { sessionScope?.isTipusDocumentsEnabled &&
                 <MenuItem>Tipos documentales NTI</MenuItem>
             }
-            {/*sessionScope['SessionHelper.isDominisEnabled']!=null && sessionScope['SessionHelper.isDominisEnabled']*/
+            { sessionScope?.isDominisEnabled &&
                 <MenuItem>Dominios</MenuItem>
             }
             <MenuItem>Grupos</MenuItem>
             <MenuItem>Órganos gestores</MenuItem>
-            {/* ExpedientHelper.isUrlsInstruccioActiu(request) */
+            { sessionScope?.urlsInstruccioActiu &&
                 <MenuItem>URLs instrucción</MenuItem>
             }
 
@@ -346,7 +331,7 @@ const MenuAdmin = () => {
         <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
             <MenuItem>Contenidos</MenuItem>
             <MenuItem>Datos estadisticos</MenuItem>
-            {/*isRevisioActiva*/
+            { sessionScope?.revisioActiva &&
                 <MenuItem>Revisión de procedimientos</MenuItem>
             }
             <MenuItem>Documentos enviados a Porafib</MenuItem>
@@ -358,22 +343,21 @@ const MenuAdmin = () => {
         </HeaderMenu>
     </>
 }
-const MenuAdminOrgan = () => {
+const MenuAdminOrgan = (props:any) => {
+    const {sessionScope} = props;
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0;// es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
-    const organsNoSincronitzats = 0;// es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
         </HeaderButton>
 
         <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                <StyledBadge badgeContent={organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
+                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
                     Procedimientos
                 </StyledBadge>
             </MenuItem>
@@ -391,35 +375,31 @@ const MenuDissenyOrgan = () => {
         </HeaderButton>
     </>
 }
-const MenuUsuari = () => {
+const MenuUsuari = (props:any) => {
+    const {sessionScope} = props;
     const navigate = useNavigate();
-    const countAnotacionsPendents = 0; // es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
-    const countTasquesPendent = 0; // es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
-    const isCreacioFluxUsuariActiu = false; // es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
-    const teAccesEstadistiques = false; // es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
-    const isMostrarSeguimentEnviamentsUsuariActiu = false; // es.caib.ripea.war.helper.SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={countTasquesPendent} variant={"contained"}>
+        <HeaderButton badgeContent={sessionScope?.countTasquesPendent} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Tareas</Typography>
         </HeaderButton>
-        { isCreacioFluxUsuariActiu &&
+        { sessionScope?.isCreacioFluxUsuariActiu &&
             <HeaderButton variant={"contained"}>
                 <Typography display={'inline'} variant={'subtitle2'}>Flujos de firma</Typography>
             </HeaderButton>
         }
-        { (teAccesEstadistiques || isMostrarSeguimentEnviamentsUsuariActiu) &&
+        { (sessionScope?.teAccesEstadistiques || sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu) &&
             <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
-                { teAccesEstadistiques &&
+                { sessionScope?.teAccesEstadistiques &&
                     <MenuItem>Datos estadisticos</MenuItem>
                 }
-                { isMostrarSeguimentEnviamentsUsuariActiu &&
+                { sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu &&
                     <>
                         <MenuItem>Documentos enviados a Portafib</MenuItem>
                         <MenuItem>Remesas enviadas a Notib</MenuItem>
@@ -431,20 +411,18 @@ const MenuUsuari = () => {
 }
 
 const AccionesMassivas = (props:any) => {
-    const {isRolActualAdmin} = props;
-    const isConvertirDefinitiuActiu = false;// es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
-    const isUrlValidacioDefinida = false;// es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+    const {isRolActualAdmin, sessionScope} = props;
 
     return <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
         <MenuItem>Enviar documentos al portafirmas</MenuItem>
         <MenuItem>Firmar documentos desde el navegador</MenuItem>
-        { isConvertirDefinitiuActiu &&
+        { sessionScope?.isConvertirDefinitiuActiu &&
             <MenuItem>Marcar como definitivos</MenuItem>
         }
         <MenuItem>Cambio de estado de expedientes</MenuItem>
         <MenuItem>Cierre de expedientes</MenuItem>
         <MenuItem>Custodiar elementos pendientes</MenuItem>
-        { isUrlValidacioDefinida &&
+        { sessionScope?.isUrlValidacioDefinida &&
             <MenuItem>Copiar enlace CSV</MenuItem>
         }
         <MenuItem>Adjuntar anexos pendientes de anotaciones aceptadas</MenuItem>
@@ -457,7 +435,6 @@ const AccionesMassivas = (props:any) => {
     </HeaderMenu>
 }
 const MenuRevisor = () => {
-
     return <>
         <HeaderButton variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>Revisión de procedimientos</Typography>

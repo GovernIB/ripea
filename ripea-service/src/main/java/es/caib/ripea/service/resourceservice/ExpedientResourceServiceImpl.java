@@ -1,40 +1,38 @@
 package es.caib.ripea.service.resourceservice;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.ripea.persistence.entity.resourceentity.*;
+import es.caib.ripea.persistence.entity.resourcerepository.*;
+import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.model.*;
+import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
+import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
+import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
-import com.turkraft.springfilter.FilterBuilder;
-import com.turkraft.springfilter.parser.Filter;
-import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.model.*;
-import es.caib.ripea.service.intf.service.ContingutService;
-import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
-
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
-import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
-import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
-import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -46,14 +44,22 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
 
+    private final ExpedientResourceRepository expedientResourceRepository;
+    private final UsuariResourceRepository usuariResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
+    private final ExpedientResourceHelper expedientResourceHelper;
 
     @PostConstruct
     public void init() {
+        register(ExpedientResource.ACTION_FOLLOW_CODE, new FollowActionExecutor());
+        register(ExpedientResource.ACTION_UNFOLLOW_CODE, new UnFollowActionExecutor());
+        register(ExpedientResource.ACTION_AGAFAR_CODE, new AgafarActionExecutor());
+        register(ExpedientResource.ACTION_RETORNAR_CODE, new RetornarActionExecutor());
+        register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_ESTAT_CODE, new EstatPerspectiveApplicator());
@@ -66,8 +72,17 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+        // En cas de no disposar d'entitat actual, filtrarem per un string "................................................................................"
+        // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+
         Filter filter = FilterBuilder.and(
-                FilterBuilder.equal(ContingutResource.Fields.entitat + ".codi", configHelper.getEntitatActualCodi()),
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())
+                        ?Filter.parse(currentSpringFilter)
+                        :null,
+                FilterBuilder.equal(ContingutResource.Fields.entitat + ".codi", entitatActualCodi != null
+                        ?entitatActualCodi
+                        :"................................................................................"),
                 FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", configHelper.getOrganActualCodi())
         );
 
@@ -78,6 +93,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setNumSeguidors(entity.getSeguidors().size());
+        usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
+
+        /*/////////////////////////////////////////////////*/
+        expedientResourceHelper.setPotTancar(entity, resource);
+        /*/////////////////////////////////////////////////*/
     }
 
     @Override
@@ -192,6 +213,98 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuExpedientDetall(arxiuExpedient);
 //            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDetall(entity.getEntitat().getId(), entity.getId());
             resource.setArxiu(arxiu);
+        }
+    }
+    private class FollowersPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            List<ResourceReference<UsuariResource, String>> seguidors = entity.getSeguidors().stream()
+                    .map(usuariResourceEntity -> {
+                        UsuariResource usuariResource = objectMappingHelper.newInstanceMap(usuariResourceEntity, UsuariResource.class);
+                        return ResourceReference.<UsuariResource, String>toResourceReference(usuariResource.getId(), usuariResource.getCodiAndNom());
+                    })
+                    .collect(Collectors.toList());
+            resource.setSeguidors(seguidors);
+        }
+    }
+
+    // ActionExecutor
+    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            if (optionalUsuariResource.isPresent() && !entity.getSeguidors().contains(optionalUsuariResource.get())) {
+                entity.getSeguidors().add(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            if (optionalUsuariResource.isPresent() && entity.getSeguidors().contains(optionalUsuariResource.get())) {
+                entity.getSeguidors().remove(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+    private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
+                entity.setAgafatPer(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(
+                    entity.getCreatedBy());
+
+            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
+                entity.setAgafatPer(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+//                emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
         }
     }
 

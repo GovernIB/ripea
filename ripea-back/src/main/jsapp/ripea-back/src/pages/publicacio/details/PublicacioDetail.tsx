@@ -1,8 +1,7 @@
 import {useState} from "react";
-import {useTranslation} from "react-i18next";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
 import {Grid} from "@mui/material";
-import {BasePage} from "reactlib";
+import {BasePage, MuiDialog} from "reactlib";
+import {useTranslation} from "react-i18next";
 import {ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 
@@ -22,7 +21,7 @@ const usePublicacioDetail = () => {
     };
 
     const dialog =
-        <Dialog
+        <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.publicacio.detall.title')}
@@ -50,7 +49,7 @@ const usePublicacioDetail = () => {
                     <ContenidoData title={t('page.publicacio.detall.observacions')} hiddenIfEmpty>{entity?.observacions}</ContenidoData>
                 </Grid>
             </BasePage>
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

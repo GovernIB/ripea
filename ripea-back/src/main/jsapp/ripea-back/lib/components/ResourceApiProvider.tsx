@@ -988,17 +988,23 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     const refreshKettingClient = (userSession: any, currentLanguage: string | undefined) => {
         const kettingClient = new Client(apiUrl);
         kettingClient.use((request, next) => {
+            // Crear una nova instància de Request amb les propietats modificades
+            const newRequest = new Request(request, {
+                credentials: 'include', // Afegir el suport per a cookies
+            });
+
+            // Actualitzar les capçaleres
             const token = getToken?.();
             if (isAuthenticated && token) {
-                request.headers.set('Authorization', 'Bearer ' + token);
+                newRequest.headers.set('Authorization', 'Bearer ' + token);
             }
             if (userSession && Object.keys(userSession).length > 0) {
-                request.headers.set('Bb-Session', JSON.stringify(userSession));
+                newRequest.headers.set('Bb-Session', JSON.stringify(userSession));
             }
             if (currentLanguage && currentLanguage.length) {
-                request.headers.set('Accept-Language', currentLanguage);
+                newRequest.headers.set('Accept-Language', currentLanguage);
             }
-            return next(request);
+            return next(newRequest);
         });
         kettingClientRef.current = kettingClient;
     }

@@ -1,8 +1,7 @@
-import {MuiGrid} from "reactlib";
-import {formatDate} from "../../../util/dateUtils.ts";
-import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
+import {MuiGrid, MuiDialog} from "reactlib";
+import {useTranslation} from "react-i18next";
+import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import useNotificacioInteressatActions from "./NotificacioInteressatActions.tsx";
 
@@ -44,7 +43,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
     };
 
     const dialog =
-        <Dialog
+        <MuiDialog
             open={open}
             title={t('page.notificacio.acciones.notificacioInteressat')}
             closeCallback={handleClose}
@@ -79,7 +78,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
                 rowAdditionalActions={actions}
             />
             {components}
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

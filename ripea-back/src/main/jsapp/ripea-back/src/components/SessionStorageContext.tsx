@@ -63,11 +63,19 @@ const useSessionStorage = () => {
     return ctx;
 };
 
+let initialized :Map<string, boolean> = new Map();
 export const useSession = (key:string) => {
     const {data, setValue, removeValue} = useSessionStorage();
     return {
         value: data[key],
-        save: (val:any) => setValue(key, val),
-        remove: () => removeValue(key),
+        isInitialized: () => !!initialized.get(key) || !!data[key],
+        save: (val:any) => {
+            initialized.set(key, !!val);
+            setValue(key, val)
+        },
+        remove: () => {
+            initialized.set(key, false);
+            removeValue(key)
+        },
     };
 };

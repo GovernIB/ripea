@@ -1,19 +1,18 @@
 import {useState} from "react";
-import {useTranslation} from "react-i18next";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
+import {Button, Grid, Icon, IconButton, Typography} from "@mui/material";
+import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {
     MuiFilter,
     MuiGrid,
     useBaseAppContext,
     useFilterApiRef,
-    useResourceApiService
+    useResourceApiService,
+    MuiDialog
 } from "reactlib";
+import {useTranslation} from "react-i18next";
+import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
-import {Button, Grid, Icon, Typography} from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
-import {useGridApiRef} from "@mui/x-data-grid-pro";
-import IconButton from "@mui/material/IconButton";
 
 const columns = [
     {
@@ -127,7 +126,7 @@ const useRelacionar= (refresh?: () => void) => {
     }
 
     const content =
-        <Dialog
+        <MuiDialog
             title={'Relacionar expediente'}
             open={open}
             closeCallback={handleClose}
@@ -158,7 +157,7 @@ const useRelacionar= (refresh?: () => void) => {
                 )}
 
                 selectionActive
-                // TODO: check
+                // TODO: check seleccionados al inicio
                 rowSelectionModel={entity?.relacionatsAmb?.map((a:any)=>a.id)}
                 toolbarElementsWithPositions={[
                     {
@@ -175,7 +174,7 @@ const useRelacionar= (refresh?: () => void) => {
                 paginationActive
                 readOnly
             />
-    </Dialog>
+    </MuiDialog>
 
     return {
         handleShow,

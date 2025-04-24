@@ -1,8 +1,8 @@
-import {Grid} from "@mui/material";
 import {useState} from "react";
-import {formatDate} from "../../../util/dateUtils.ts";
+import {Grid} from "@mui/material";
+import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
 import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {ContenidoData} from "../../../components/CardData.tsx";
 
@@ -22,7 +22,7 @@ const useTascaDetail = () => {
     };
 
     const dialog =
-        <Dialog
+        <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.tasca.detall.title')}
@@ -56,7 +56,7 @@ const useTascaDetail = () => {
                 <ContenidoData title={t('page.tasca.detall.estat')}>{entity?.estat}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.prioritat')}><StyledPrioritat entity={entity}/></ContenidoData>
             </Grid>
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

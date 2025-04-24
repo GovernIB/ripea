@@ -1,9 +1,8 @@
-import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
-import {BasePage} from "reactlib";
 import {useState} from "react";
-import TabComponent from "../../../components/TabComponent.tsx";
+import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
+import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
-import Dialog from "../../../../lib/components/mui/Dialog.tsx";
+import TabComponent from "../../../components/TabComponent.tsx";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
@@ -90,7 +89,7 @@ const useHistoric = () => {
     ]
 
     const dialog =
-        <Dialog
+        <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={"Histórico de acciones del elemento"}
@@ -115,7 +114,7 @@ const useHistoric = () => {
                 tabs={tabs}
                 variant="scrollable"
             />
-        </Dialog>
+        </MuiDialog>
 
     return {
         handleOpen,

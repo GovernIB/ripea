@@ -17,6 +17,8 @@ public class UserPermissionInfo {
     private Long organActualId;
     private String rolActual;
     private List<String> rols;
+    private List<String> auth;
+    private Map<String, Object> sessionScope;
 
     @Data
     @Builder

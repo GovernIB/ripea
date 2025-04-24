@@ -30,6 +30,8 @@ import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Configuració de Spring MVC.
@@ -97,34 +99,45 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		WebMvcConfigurer.super.addArgumentResolvers(resolvers);
 	}
 
+	private static final List<String> COMMON_EXCLUDED_PATHS = List.of(
+			"/js/**",
+			"/css/**",
+			"/fonts/**",
+			"/img/**",
+			"/images/**",
+			"/extensions/**",
+			"/webjars/**",
+			"/**/datatable/**",
+			"/**/selection/**",
+			"/**/rest/notib**",
+			"/**/rest/notib/**",
+			"/**/rest/portafib**",
+			"/**/rest/portafib/**",
+			"/api/historic**",
+			"/api/historic/**",
+			"/api-docs/**",
+			"/**/api-docs/",
+			"/public/**",
+			"/api",
+			"/error"
+	);
+
+	private static final List<String> ADDITIONAL_EXCLUDED_PATHS = List.of(
+			"/api/**"
+	);
+
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		String[] excludedPathPatterns = new String [] {
-				"/js/**",
-				"/css/**",
-				"/fonts/**",
-				"/img/**",
-				"/images/**",
-				"/extensions/**",
-				"/webjars/**",
-				"/**/datatable/**",
-				"/**/selection/**",
-				"/**/rest/notib**",
-				"/**/rest/notib/**",
-				"/**/rest/portafib**",
-				"/**/rest/portafib/**",
-				"/api/historic**",
-				"/api/historic/**",
-				"/api-docs/**",
-				"/**/api-docs/",
-				"/public/**",
-				"/api",
-				"/api/**",
-				"/error"
-		};
+		List<String> excludedSessionPathPatterns = COMMON_EXCLUDED_PATHS;
+		List<String> excludedPathPatterns = Stream.concat(
+				COMMON_EXCLUDED_PATHS.stream(),
+				ADDITIONAL_EXCLUDED_PATHS.stream()
+		).collect(Collectors.toList());
+
 		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);
-		registry.addInterceptor(sessioInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(sessioInterceptor).excludePathPatterns(excludedSessionPathPatterns);
 		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(llistaRolsInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(modalInterceptor).excludePathPatterns(excludedPathPatterns);

@@ -1,19 +1,18 @@
+import {useState} from "react";
+import {Typography, Icon, Grid, CardContent, Card} from "@mui/material";
 import {
     GridPage,
     MuiGrid,
     useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
-import {Typography, Icon, Grid} from "@mui/material";
-import { formatDate } from '../../util/dateUtils';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from '../../util/dateUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 import { useCommonActions } from "./details/CommonActions.tsx";
-import { useTranslation } from "react-i18next";
 import {CommentDialog} from "../CommentDialog.tsx";
 import {FollowersDialog} from "../FollowersDialog.tsx";
-import {CardData} from "../../components/CardData.tsx";
-import {useState} from "react";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
@@ -198,16 +197,17 @@ const ExpedientGrid = () => {
     ];
 
     return <GridPage>
-        <CardData
-            title={t('page.expedient.filter.title')}
-            display={'flex'}
-            flexDirection={'row'}
-        >
-            <Grid item xs={12}>
-                <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
-            </Grid>
+        <Card sx={{border: '1px solid #e3e3e3', borderRadius: '10px', height: '100%', display: 'flex', flexDirection: 'column'}}>
+            <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
+                <Typography variant="h5">{t('page.expedient.filter.title')}</Typography>
+            </CardContent>
 
-            <Grid item xs={12}>
+            <CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}} >
+
+                <Grid item xs={12}>
+                    <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
+                </Grid>
+
                 <MuiGrid
                     titleDisabled
                     resourceName="expedientResource"
@@ -224,13 +224,11 @@ const ExpedientGrid = () => {
                     paginationActive
                     rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
                     disableColumnMenu
-                    // height={'calc(162px + calc(52px * 4))'}
-                    height={162 + 52 * 4}
                 />
-            </Grid>
 
-            {components}
-        </CardData>
+                {components}
+            </CardContent>
+        </Card>
     </GridPage>
 }
 
