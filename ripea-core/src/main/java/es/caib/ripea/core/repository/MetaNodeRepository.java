@@ -30,12 +30,4 @@ public interface MetaNodeRepository extends JpaRepository<MetaNodeEntity, Long> 
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
 	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	
-	@Modifying
- 	@Query(value = "UPDATE IPA_METANODE_METADADA " +
- 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
- 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
- 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
- 			nativeQuery = true)
-	public int updateUsuariAuditoriaMetaDada(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

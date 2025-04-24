@@ -144,7 +144,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
     @Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
     @Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
-    @Autowired private MetaNodeRepository metaNodeRepository; //IPA_METANODE i IPA_METANODE_METADADA
+    @Autowired private MetaNodeRepository metaNodeRepository; //IPA_METANODE
     @Autowired private OrganGestorRepository organGestorRepository;
     @Autowired private PinbalServeiRepository pinbalServeiRepository;
     @Autowired private PortafirmesBlockRepository portafirmesBlockRepository;
@@ -760,7 +760,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += metaExpedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA **
 		 registresModificats += metaExpedientTascaValidacioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA_VALIDACIO **
 		 registresModificats += metaNodeRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METANODE **
-		 registresModificats += metaNodeRepository.updateUsuariAuditoriaMetaDada(codiAntic, codiNou);//IPA_METANODE_METADADA **
 		 registresModificats += organGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ORGAN_GESTOR **
 		 registresModificats += pinbalServeiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PINBAL_SERVEI
 		 registresModificats += portafirmesBlockRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK **
