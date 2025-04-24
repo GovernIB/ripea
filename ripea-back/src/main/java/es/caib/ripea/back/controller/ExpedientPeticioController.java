@@ -1134,13 +1134,17 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		try {
 
 			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, true);
-			String fileNameTractat = URLEncoder.encode(fitxer.getNom(), "UTF-8").replace("+", " ");
+
+//			String fileNameTractat = URLEncoder.encode(fitxer.getNom(), "UTF-8").replace("+", " ");
+//			response.setHeader("Content-Disposition", "inline; filename=\""+fileNameTractat+"\"");
+//			response.getOutputStream().write(fitxer.getContingut());
+//			response.setHeader("X-Frame-Options", "ALLOW"); //Permet carregar la resposta en un Iframe
+//			response.setContentLength(fitxer.getContingut().length);
+//			response.setContentType("application/pdf");
 			
-			response.setHeader("Content-Disposition", "inline; filename=\""+fileNameTractat+"\"");
-			response.getOutputStream().write(fitxer.getContingut());
-			response.setHeader("X-Frame-Options", "ALLOW"); //Permet carregar la resposta en un Iframe
-			response.setContentLength(fitxer.getContingut().length);
 			response.setContentType("application/pdf");
+			response.setHeader("Content-Disposition", "inline; filename=\""+fitxer.getNom()+"\"");
+			response.getOutputStream().write(fitxer.getContingut());
 			
 		} catch (Exception e) {
 			logger.error("Errol al descarregarBase64", e);

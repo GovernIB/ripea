@@ -344,13 +344,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi) {
-
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(entitatCodi);
-
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuTrueOrderByNomAsc(entitat);
-
-		return conversioTipusHelper.convertirList(metaExpedients,
-				MetaExpedientSelectDto.class);
+		return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientSelectDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -360,15 +356,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.getOne(annexId);
 		FitxerDto fitxer = new FitxerDto();
-
-		Document document = null;
-		document = pluginHelper.arxiuDocumentConsultar(
-				null,
-				annex.getUuid(),
-				null,
-				true,
-				versioImprimible);
-
+		Document document = pluginHelper.arxiuDocumentConsultar(null, annex.getUuid(), null, true, versioImprimible);
 		RegistreAnnexEntity registreAnnex = registreAnnexRepository.getOne(annexId);
 		
 		if (document != null) {
