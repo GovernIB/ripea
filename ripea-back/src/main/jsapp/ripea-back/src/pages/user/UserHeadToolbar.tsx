@@ -78,20 +78,14 @@ const UserHeadToolbar = (props:any) => {
     const navigate = useNavigate();
     const textColor = entitat?.capsaleraColorLletra ?? color;
 
-    const { value: user, save: apiSave, remove: logOut } = useUserSession();
+    const { value: user, permisos, save: apiSave, remove: logOut } = useUserSession();
 
     const [entitatId, setEntitatId] = useState<number>(user?.entitatActualId);
     const entitats :any[] = useMemo(()=>{
         return user?.permisosEntitat ?Object.values(user?.permisosEntitat) :[]
     }, [user])
-    const permisoEntitat :any = useMemo(()=>{
-        return entitats?.find((e: any) => e?.entitatId == entitatId)
-    }, [entitatId, entitats])
 
     const [organId, setOrganId] = useState<number>(user?.organActualId);
-    const organs :any[] = useMemo(()=>{
-        return permisoEntitat?.organs
-    }, [permisoEntitat])
 
     const [rol, setRol] = useState<string>(user?.rolActual)
 
@@ -166,7 +160,7 @@ const UserHeadToolbar = (props:any) => {
                         color={textColor}
                     >
                         {
-                            organs?.map((rol:any) =>
+                            permisos?.organs?.map((rol:any) =>
                                 <MenuItem key={rol.codi} value={rol.id}>{rol.nom}</MenuItem>
                             )
                         }

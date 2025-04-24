@@ -27,7 +27,7 @@ public class AuditingConfig {
 	@Bean
 	public AuditorAware<String> auditorProvider() {
 		return () -> {
-			if (SecurityContextHolder.getContext()!=null && SecurityContextHolder.getContext().getAuthentication()!=null) {
+//			if (SecurityContextHolder.getContext()!=null && SecurityContextHolder.getContext().getAuthentication()!=null) {
 				//Si el usuari no existeix a la BBDD, perque es per exemple un usuari de integracio de portafib que esta modificant un document del qual
 				//hem rebut la firma. Pot falla la FK cap a la taula de usuaris si es que existeix (en cas de IPA_CONT_LOG existeix)
 //				UsuariEntity  ue = usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -36,11 +36,11 @@ public class AuditingConfig {
 //				} else {
 //					return Optional.empty();
 //				}
-				return Optional.of(SecurityContextHolder.getContext().getAuthentication().getName());
-			} else {
+//				return Optional.of(SecurityContextHolder.getContext().getAuthentication().getName());
+//			} else {
 				//TODO: Nomes per REACT, pendent de afegir autenticació a REACT
 				return Optional.of("rip_admin");
-			}
+//			}
 
 		};
 	}

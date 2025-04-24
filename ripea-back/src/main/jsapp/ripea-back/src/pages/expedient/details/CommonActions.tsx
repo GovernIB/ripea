@@ -77,7 +77,7 @@ const useActions = (refresh?: () => void) =>{
 
 export const useCommonActions = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const { value: user } = useUserSession();
+    const { value: user, permisos } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
 
@@ -88,6 +88,22 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
+
+    const isTancat = (row:any) :boolean => {
+        return row?.estat != "OBERT"
+    }
+    const isAgafatUsuariActual = (row:any) :boolean => {
+        return row?.agafatPer?.id == user?.codi
+    }
+    const isUsuariActualWrite = (row:any) :boolean => {
+        return row?.usuariActualWrite
+    }
+    const isAdminOAdminOrgan = (row:any) :boolean => {
+        return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
+    }
+    const potModificar = (row:any) :boolean => {
+        return (isUsuariActualWrite(row) && isAgafatUsuariActual(row)) || (isAdminOAdminOrgan(row) && !isTancat(row));
+    }
 
     const actions = [
         {
@@ -101,14 +117,14 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "person_add",
             showInMenu: true,
             onClick: follow,
-            hidden: (row:any) => row?.seguidor,// si el usuario actual es seguidor
+            hidden: (row:any) => row?.seguidor || !isUsuariActualWrite(row),// si el usuario actual es seguidor
         },
         {
             title: t('page.expedient.acciones.unfollow'),
             icon: "person_remove",
             showInMenu: true,
             onClick: unfollow,
-            hidden: (row:any) => !row?.seguidor,// si el usuario actual no es seguidor
+            hidden: (row:any) => !row?.seguidor || !isUsuariActualWrite(row),// si el usuario actual no es seguidor
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
@@ -119,26 +135,26 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "person",
             showInMenu: true,
             onClick: hanldeAssignar,
-            hidden: !( isRolActualAdmin || isRolActualOrganAdmin ),// si el usuario actual no admin o organo
+            hidden: (row:any) => !isAdminOAdminOrgan(row),// si el usuario actual no admin o organo
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
-            hidden: !( isRolActualAdmin || isRolActualOrganAdmin ),
+            hidden: (row:any) => !isAdminOAdminOrgan(row),
         },
         {
             title: t('page.expedient.acciones.agafar'),
             icon: "lock",
             showInMenu: true,
             onClick: agafar,
-            hidden: (row:any) => row?.agafatPer?.id == user?.codi
+            hidden: isAgafatUsuariActual
         },
         {
             title: t('page.expedient.acciones.retornar'),
             icon: "undo",
             showInMenu: true,
             onClick: retornar,
-            hidden: (row:any) => row?.agafatPer?.id == row?.createdBy
+            hidden: (row:any) => row?.agafatPer?.id == row?.createdBy,
         },
         {
             title: t('page.expedient.acciones.lliberar'),
@@ -151,27 +167,29 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.upPrioritat'),
             icon: "logout",
             showInMenu: true,
-            onClick: hanldeCambiarPrioridad
+            onClick: hanldeCambiarPrioridad,
+            hidden: (row:any) => !potModificar(row),
         },
         {
             title: t('page.expedient.acciones.upEstat'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarEstado,
-            hidden: (row:any) => row?.estat != "OBERT",
+            hidden: (row:any) => isTancat(row) || !potModificar(row),
         },
         {
             title: t('page.expedient.acciones.relacio'),
             icon: "link",
             showInMenu: true,
             onClick: hanldeRelacionar,
+            disabled: (row:any) => !potModificar(row),
         },
         {
             title: t('page.expedient.acciones.close'),
             icon: "check",
             showInMenu: true,
             disabled: (row:any) => !row?.potTancar,
-            hidden: (row:any) => row?.estat != "OBERT",
+            hidden: (row:any) => !potModificar(row) || isTancat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,

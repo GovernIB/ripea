@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useResourceApiService} from "reactlib";
 
@@ -46,6 +46,13 @@ export const useUserSession = () => {
         remove()
     }
 
+    const permisos :any = useMemo(()=>{
+        if (value && value?.permisosEntitat) {
+            return Object.values(value?.permisosEntitat)?.find((e: any) => e?.entitatId == value?.entitatActualId)
+        }
+        return {}
+    }, [value])
+
     useEffect(() => {
         if (!isInitialized()) {
             save({})
@@ -55,6 +62,8 @@ export const useUserSession = () => {
 
     return {
         value,
+        permisos,
+
         refresh,
         save: apiSave,
         remove: apiRemove,

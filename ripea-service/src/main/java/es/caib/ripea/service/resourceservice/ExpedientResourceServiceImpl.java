@@ -7,6 +7,7 @@ import es.caib.ripea.persistence.entity.resourceentity.*;
 import es.caib.ripea.persistence.entity.resourcerepository.*;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -17,6 +18,7 @@ import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.model.*;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
 import lombok.RequiredArgsConstructor;
@@ -48,10 +50,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final UsuariResourceRepository usuariResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
     private final ExpedientResourceHelper expedientResourceHelper;
+    private final EntityComprovarHelper entityComprovarHelper;
 
     @PostConstruct
     public void init() {
@@ -97,6 +101,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
 
         /*/////////////////////////////////////////////////*/
+        resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
         expedientResourceHelper.setPotTancar(entity, resource);
         /*/////////////////////////////////////////////////*/
     }

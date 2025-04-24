@@ -191,6 +191,7 @@ public class ExpedientResource extends NodeResource {
     @Transient private boolean conteDocumentsDeAnotacionesNoMogutsASerieFinal;
     @Transient private boolean conteDocumentsPendentsReintentsArxiu;
     @Transient private boolean potTancar;
+    @Transient private boolean usuariActualWrite;
 
     @Getter
 	@Setter
