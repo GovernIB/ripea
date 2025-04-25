@@ -85,7 +85,7 @@ const ExpedientFilter = (props:any) => {
         code="EXPEDIENT_FILTER"
         springFilterBuilder={springFilterBuilder}
         commonFieldComponentProps={{ size: 'small' }}
-        componentProps={{ sx: filterStyle }}
+        componentProps={{ sx: { ...filterStyle, minHeight: '206px' } }}
         apiRef={filterRef}
         onSpringFilterChange={onSpringFilterChange}
         buttonControlled
