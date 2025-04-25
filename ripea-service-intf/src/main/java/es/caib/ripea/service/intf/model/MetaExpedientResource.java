@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -19,6 +20,7 @@ import javax.validation.constraints.Size;
  */
 @Getter
 @Setter
+@FieldNameConstants
 @NoArgsConstructor
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
@@ -52,6 +54,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	private boolean notificacioActiva;
 	private boolean permetMetadocsGenerals;
 	private boolean gestioAmbGrupsActiva;
+	private boolean permisDirecte = false;
 	@Size(max = 8)
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	@Size(max = 1024)

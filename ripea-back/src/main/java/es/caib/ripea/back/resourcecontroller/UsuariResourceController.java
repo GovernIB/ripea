@@ -108,6 +108,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setAuth(rolesAuth);
         userPermissionInfo.setSessionScope(getUsuariActualAdditionalInfo(request));
         
+        aplicacioService.actualitzarRolThreadLocal(rolActual);
+        
         return ResponseEntity.ok(userPermissionInfo);
     }
 

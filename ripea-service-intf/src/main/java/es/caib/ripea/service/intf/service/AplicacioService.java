@@ -20,7 +20,8 @@ import javax.annotation.security.PermitAll;
 
 public interface AplicacioService {
 
-	void actualitzarEntiatThreadLocal(EntitatDto entitat);
+	void actualitzarEntitatThreadLocal(EntitatDto entitat);
+	void actualitzarRolThreadLocal(String rol);
 
 	/**
 	 * Processa l'autenticació d'un usuari.

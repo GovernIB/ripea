@@ -36,6 +36,7 @@ public class ConfigHelper {
 
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
     private static ThreadLocal<String> organCodi = new ThreadLocal<>();
+    private static ThreadLocal<String> rolActual = new ThreadLocal<>();
 
     public static ThreadLocal<EntitatDto> getEntitat() {
 		return entitat;
@@ -43,7 +44,9 @@ public class ConfigHelper {
 	public static void setEntitat(EntitatDto entitat) {
 		ConfigHelper.entitat.set(entitat);
 	}
-	
+	public static void setRol(String rol) {
+		ConfigHelper.rolActual.set(rol);
+	}
     public static ThreadLocal<String> getOrganCodi() {
 		return organCodi;
 	}
@@ -376,6 +379,11 @@ public class ConfigHelper {
     @Transactional(readOnly = true)
     public String getOrganActualCodi() {
         return organCodi != null ? organCodi.get() : null;
+    }
+    
+    @Transactional(readOnly = true)
+    public String getRolActual() {
+        return rolActual != null ? rolActual.get() : null;
     }
 
     @Transactional(readOnly = true)

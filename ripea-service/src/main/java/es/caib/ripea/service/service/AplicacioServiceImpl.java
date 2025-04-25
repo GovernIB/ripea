@@ -69,8 +69,13 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private EntitatRepository entitatRepository;
 
 	@Override
-	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
 		ConfigHelper.setEntitat(entitat);
+	}
+	
+	@Override
+	public void actualitzarRolThreadLocal(String rol) {
+		ConfigHelper.setRol(rol);
 	}
 	
 	@Override
