@@ -41,22 +41,22 @@ const TabComponent = (props :any) => {
     };
 
     return <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-        <Tabs
-            value={value}
-            onChange={handleChange}
-            {...other}
-            sx={{px: 1}}
-        >
-            {tabs.filter((tab:TabProps)=>!tab.hidden).map((tab:TabProps) => {
-                const {value, label , content, badge, badgeColor= 'primary'} = tab;
+        <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+            <Tabs
+                value={value}
+                onChange={handleChange}
+                {...other}
+                sx={{px: 1}}
+            >
+                {tabs.filter((tab:TabProps)=>!tab.hidden).map((tab:TabProps) => {
+                    const {value, label , content, badge, badgeColor= 'primary'} = tab;
 
-                return <Tab value={value} content={content} key={"tab-" + value} label={
-                    <StyledBadge badgeContent={badge} badgecolor={badgeColor}>{label}</StyledBadge>}/>
-            })}
-
+                    return <Tab value={value} content={content} key={"tab-" + value} label={
+                        <StyledBadge badgeContent={badge} badgecolor={badgeColor}>{label}</StyledBadge>}/>
+                })}
+            </Tabs>
             {headerAdditionalData}
-        </Tabs>
-
+        </Box>
         {tabs.map((tab:TabProps) =>
             <TabPanel value={value} index={tab.value} key={"tab-panel-"+tab.value}>
                 {tab.content}

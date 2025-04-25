@@ -212,7 +212,9 @@ const ExpedientGrid = () => {
     // Custom row styling with colored bar
     const getRowClassName = (params: any) => {
         const color = params.row?.estatAdditionalInfo?.color;
-        return color ? `row-with-color-${params.row.id}` : '';
+        const className = (color ? `row-with-color-${params.row.id} ` : '') + (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd');
+        console.log('Row className:', className);
+        return className;
     };
 
     // Apply custom CSS for rows with color
@@ -263,6 +265,7 @@ const ExpedientGrid = () => {
                         // align-items: start !important;
                         text-overflow: ellipsis !important;
                     }
+                    
                     .MuiDataGrid-checkboxInput {
                         transform: scale(0.8);
                     }
@@ -324,6 +327,7 @@ const ExpedientGrid = () => {
                     }}
                     getRowClassName={getRowClassName}
                     onRowsChange={(rows) => { setGridRows([...rows]); }}
+                    // getRowHeight={(params) => "auto"}
                 />
 
                 {components}

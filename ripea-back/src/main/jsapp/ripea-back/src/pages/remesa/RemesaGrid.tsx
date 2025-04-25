@@ -104,6 +104,7 @@ const RemesaGrid = (props:any) => {
             toolbarHideCreate
             rowHideUpdateButton={(row:any) => row.tipus != 'MANUAL'}
             rowHideDeleteButton={(row:any) => row.tipus != 'MANUAL'}
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
         {components}
     </GridPage>

@@ -130,6 +130,7 @@ const DocumentsGrid = (props:any) => {
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
             onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {

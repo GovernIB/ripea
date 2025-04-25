@@ -117,6 +117,18 @@ const theme = createTheme({
                 }
             }
         },
+        MuiDataGrid: {
+            styleOverrides: {
+                row: {
+                    '&.even': {
+                        backgroundColor: '#f9f9f9 !important',
+                        '&:hover': {
+                            backgroundColor: '#f5f5f5 !important',
+                        }
+                    }
+                }
+            }
+        }
     }
 });
 

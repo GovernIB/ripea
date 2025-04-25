@@ -115,6 +115,7 @@ const TasquesGrid = (props: any) => {
             disableColumnMenu
             rowHideUpdateButton
             rowHideDeleteButton
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
         {components}
     </GridPage>

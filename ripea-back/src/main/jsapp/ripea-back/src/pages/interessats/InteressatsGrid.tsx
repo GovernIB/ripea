@@ -80,6 +80,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             rowAdditionalActions={actions}
             onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
             rowHideDeleteButton
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
 
         {components}

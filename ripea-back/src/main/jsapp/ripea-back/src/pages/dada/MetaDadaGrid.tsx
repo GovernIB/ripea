@@ -47,7 +47,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             disableColumnMenu
             disableColumnSorting
             readOnly
-
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
             onRowsChange={(rows)=> {
                 const array:any[] = []
                 rows.forEach(row => array.push(...row.dades))
