@@ -22,8 +22,14 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 	@Override
 	@RolesAllowed("**")
-	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		delegateService.actualitzarEntiatThreadLocal(entitat);
+	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
+		delegateService.actualitzarEntitatThreadLocal(entitat);
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public void actualitzarRolThreadLocal(String rol) {
+		delegateService.actualitzarRolThreadLocal(rol);
 	}
 
 	@Override

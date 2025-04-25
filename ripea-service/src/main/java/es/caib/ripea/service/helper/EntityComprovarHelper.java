@@ -90,8 +90,10 @@ public class EntityComprovarHelper {
 			String entitatCodi,
 			boolean comprovarPermisUsuari,
 			boolean comprovarPermisAdmin,
-			boolean comprovarPermisUsuariOrAdmin) throws NotFoundException {
-		EntitatEntity entitat = entitatRepository.findByUnitatArrel(entitatCodi);
+			boolean comprovarPermisUsuariOrAdmin,
+			boolean comprovarPermisUsuariOrAdminOrOrgan, 
+			boolean comprovarPermisAdminOrOrgan) throws NotFoundException {
+		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
 		if (entitat == null) {
 			throw new NotFoundException(entitatCodi, EntitatEntity.class);
 		}
@@ -99,7 +101,9 @@ public class EntityComprovarHelper {
 				entitat.getId(),
 				comprovarPermisUsuari,
 				comprovarPermisAdmin,
-				comprovarPermisUsuariOrAdmin, false, false);
+				comprovarPermisUsuariOrAdmin,
+				comprovarPermisUsuariOrAdminOrOrgan,
+				comprovarPermisAdminOrOrgan);
 	}
 
 	public EntitatEntity comprovarEntitatPerMetaExpedients(Long entitatId) {

@@ -3,6 +3,7 @@ package es.caib.ripea.persistence.entity.resourceentity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,6 +21,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Where;
+
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -27,7 +30,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "expedient")
@@ -157,10 +159,8 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "expedient_seguidor",
-			joinColumns = {
-					@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
-			inverseJoinColumns = {
-					@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")},
+			joinColumns = {@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
+			inverseJoinColumns = {@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")},
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_expseguidor_fk"))
 	protected List<UsuariResourceEntity> seguidors = new ArrayList<>();
 
@@ -181,13 +181,13 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 //			cascade = CascadeType.ALL,
 //			orphanRemoval = true)
 //	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
-//
-//	@ManyToMany(fetch = FetchType.LAZY)
-//	@JoinTable(
-//			name = BaseConfig.DB_PREFIX + "expedient_organpare",
-//			joinColumns = @JoinColumn(name = "expedient_id"),
-//			inverseJoinColumns = @JoinColumn(name = "meta_expedient_organ_id"))
-//	Set<MetaExpedientOrganGestorEntity> metaexpedientOrganGestorPares;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = BaseConfig.DB_PREFIX + "expedient_organpare",
+			joinColumns = {@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
+			inverseJoinColumns = {@JoinColumn(name = "meta_expedient_organ_id", referencedColumnName = "id")})
+	Set<MetaExpedientOrganGestorResourceEntity> metaexpedientOrganGestorPares;
 
 	@Column(name = "prioritat")
 	@Enumerated(EnumType.STRING)

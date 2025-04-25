@@ -111,6 +111,7 @@ public class ExpedientResource extends NodeResource {
 	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
 	private ResourceReference<GrupResource, Long> grup;
+	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
 
 	// Tancat
 	private Date tancatData;
