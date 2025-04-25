@@ -13,6 +13,7 @@ import {
     GridRowModesModel,
     GridApiPro,
     GridEventListener,
+    GridCallbackDetails,
     useGridApiRef as useMuiDatagridApiRef,
 } from '@mui/x-data-grid-pro';
 import Box from '@mui/material/Box';
@@ -109,6 +110,7 @@ export type MuiDataGridProps = {
     popupEditFormDialogComponentProps?: any;
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     onRowOrderChange?: GridEventListener<"rowOrderChange">;
+    onRowSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails) => void;
     apiRef?: MuiDataGridApiRef;
     datagridApiRef?: React.MutableRefObject<GridApiPro>;
     height?: number;
@@ -329,6 +331,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         onRowClick,
         onRowsChange,
         onRowOrderChange,
+        onRowSelectionModelChange,
         apiRef: apiRefProp,
         datagridApiRef: datagridApiRefProp,
         height,
@@ -516,7 +519,10 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const selectionProps: any = selectionActive ? {
         checkboxSelection: true,
         disableRowSelectionOnClick: true,
-        onRowSelectionModelChange: setRowSelectionModel,
+        onRowSelectionModelChange: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails) => {
+            setRowSelectionModel(rowSelectionModel);
+            onRowSelectionModelChange?.(rowSelectionModel, details);
+        },
         rowSelectionModel,
         keepNonExistentRowsSelected: true,
     } : {
