@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {Typography, Icon, Grid, CardContent, Card} from "@mui/material";
+import {useState, useRef, useEffect, useMemo} from "react";
+import {Typography, Icon, Grid, CardContent, Card, Box} from "@mui/material";
 import {
     GridPage,
     MuiGrid,
@@ -14,10 +14,13 @@ import { useCommonActions } from "./details/CommonActions.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
+import ExpedientGridToolbar from "./ExpedientGridToolbar.tsx";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
-const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
-const obertStyle = { border: '1px dashed #AAA' }
-const tancatStyle = { backgroundColor: 'grey', color: 'white' }
+const labelStyle = { padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
+const commonStyle = { p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content' }
+const obertStyle = { border: '1px dashed #AAA', ...labelStyle }
+const tancatStyle = { backgroundColor: 'grey', color: 'white', ...labelStyle }
 
 const ExpedientGridForm = () => {
     const { data }  = useFormContext();
@@ -37,7 +40,7 @@ export const StyledEstat = (props:any) => {
     const { entity: expedient, icon } = props;
     const { t } = useTranslation();
 
-    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color }
+    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color, padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
 
     const style = expedient?.estatAdditionalInfo
         ? additionalStyle
@@ -45,8 +48,10 @@ export const StyledEstat = (props:any) => {
             ? tancatStyle
             :obertStyle;
 
+    const icona = expedient?.estat == 'TANCAT' ? 'folder' : 'folder_open'
+
     return <Typography variant="caption" sx={{...commonStyle, ...style }}>
-        { icon && <Icon fontSize={"inherit"}>{icon}</Icon>}
+        { icon && <Icon fontSize={"inherit"}>{icona}</Icon>}
         {expedient?.estatAdditionalInfo?.nom ?? t(`enum.estat.${expedient?.estat}`)}
     </Typography>
 }
@@ -54,21 +59,22 @@ export const StyledEstat = (props:any) => {
 export const StyledPrioritat = (props:any) => {
     const { entity: expedient } = props;
     const { t } = useTranslation();
+    const labelStyle = { padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
 
     let style;
 
     switch (expedient?.prioritat){
         case "D_MOLT_ALTA":
-            style = {backgroundColor: '#d99b9d', color: 'white'}
+            style = {backgroundColor: '#d99b9d', color: 'white', ...labelStyle}
             break;
         case "C_ALTA":
-            style = {backgroundColor: '#ffebae'}
+            style = {backgroundColor: '#ffebae', ...labelStyle}
             break;
         case "B_NORMAL":
-            style = {border: '1px dashed #AAA'}
+            style = {border: '1px dashed #AAA', ...labelStyle}
             break;
         case "A_BAIXA":
-            style = {backgroundColor: '#c3e8d1'}
+            style = {backgroundColor: '#c3e8d1', ...labelStyle}
             break;
     }
 
@@ -159,12 +165,19 @@ const columns = [
     // },
 ];
 
+
+// sortModel i perspectives per prevenir re-renders
+const sortModel = [{ field: 'createdDate', sort: 'desc' }];
+const perspectives = ["INTERESSATS_RESUM", "ESTAT"];
+
 const ExpedientGrid = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
-
-    const apiRef = useMuiDataGridApiRef()
+    const [selectedRows, setSelectedRows] = useState<any[]>([]);
+    const [gridRows, setGridRows] = useState<any[]>([]);
+    const apiRef = useMuiDataGridApiRef();
+    const datagridApiRef = useMuiDatagridApiRef();
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
@@ -196,8 +209,38 @@ const ExpedientGrid = () => {
 		},
     ];
 
+    // Custom row styling with colored bar
+    const getRowClassName = (params: any) => {
+        const color = params.row?.estatAdditionalInfo?.color;
+        return color ? `row-with-color-${params.row.id}` : '';
+    };
+
+    // Apply custom CSS for rows with color
+    const getRowStyle = () => {
+        const styles: any = {};
+        if (gridRows.length > 0) {
+            gridRows.forEach((row: any) => {
+                const color = row?.estatAdditionalInfo?.color;
+                if (color) {
+                    styles[`.row-with-color-${row.id}`] = {
+                        'box-shadow': `${color} -6px 0px 0px`,
+                        'border-left': `6px solid ${color}`
+                    };
+                }
+            });
+        }
+        return styles;
+    };
+
+    // Applica word wrap a totes les columnes
+    const columnsWithWordWrap = columnsAddition.map(col => ({
+        ...col,
+        flex: col.flex || 1,
+        cellClassName: 'cell-with-wrap',
+    }));
+
     return <GridPage>
-        <Card sx={{border: '1px solid #e3e3e3', borderRadius: '10px', height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <Card sx={{border: '1px solid #e3e3e3', borderRadius: '4px', height: '100%', display: 'flex', flexDirection: 'column'}}>
             <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
                 <Typography variant="h5">{t('page.expedient.filter.title')}</Typography>
             </CardContent>
@@ -208,15 +251,61 @@ const ExpedientGrid = () => {
                     <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
                 </Grid>
 
+                <style>
+                    {`
+                    .cell-with-wrap {
+                        // white-space: normal !important;
+                        // line-height: 1.2em;
+                        // word-break: break-word;
+                        // padding: 5px 10px !important;
+                        // overflow: auto;
+                        // display: flex;
+                        // align-items: start !important;
+                        text-overflow: ellipsis !important;
+                    }
+                    .MuiDataGrid-checkboxInput {
+                        transform: scale(0.8);
+                    }
+                    .MuiDataGrid-cell--withRenderer {
+                        align-items: flex-start !important;
+                    }
+                    .MuiDataGrid-columnHeaderCheckbox, 
+                    .MuiDataGrid-cellCheckbox {
+                        align-items: flex-start !important;
+                        padding-top: 4px !important;
+                    }
+                    [class^="row-with-color-"] .MuiDataGrid-cellCheckbox {
+                        width: 48px !important;
+                        max-width: 48px !important;
+                        min-width: 48px !important;
+                        margin-left: -4px !important;
+                    }
+                    ${Object.entries(getRowStyle()).map(([className, style]) => 
+                        `${className} { ${Object.entries(style as any).map(([prop, value]) => 
+                            `${prop}: ${value};`).join(' ')} }`
+                    ).join('\n')}
+                    `}
+                </style>
+
+                <ExpedientGridToolbar
+                    selectedRows={selectedRows}
+                    setSelectedRows={setSelectedRows}
+                    gridRows={gridRows}
+                    apiRef={apiRef}
+                    datagridApiRef={datagridApiRef}
+                />
+
+
                 <MuiGrid
                     titleDisabled
                     resourceName="expedientResource"
                     popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                    columns={columnsAddition}
+                    columns={columnsWithWordWrap}
                     filter={springFilter}
-                    sortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                    perspectives={["INTERESSATS_RESUM", "ESTAT"]}
+                    sortModel={sortModel}
+                    perspectives={perspectives}
                     apiRef={apiRef}
+                    datagridApiRef={datagridApiRef}
                     popupEditCreateActive
                     popupEditFormContent={<ExpedientGridForm />}
                     onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
@@ -224,6 +313,17 @@ const ExpedientGrid = () => {
                     paginationActive
                     rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
                     disableColumnMenu
+                    toolbarHide
+                    selectionActive
+                    checkboxSelection
+                    keepNonExistentRowsSelected
+                    rowSelectionModel={selectedRows}
+                    onRowSelectionModelChange={(newSelection) => {
+                        // console.log('Selection changed:', newSelection);
+                        setSelectedRows([...newSelection]);
+                    }}
+                    getRowClassName={getRowClassName}
+                    onRowsChange={(rows) => { setGridRows([...rows]); }}
                 />
 
                 {components}

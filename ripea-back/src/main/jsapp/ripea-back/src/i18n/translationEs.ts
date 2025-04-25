@@ -9,6 +9,7 @@ const translationEs = {
         contract: "Contraer",
         download: "Descargar",
         detail: "Detalle",
+        refresh: "Refrescar",
     },
     enum: {
         rol: {
@@ -168,6 +169,7 @@ const translationEs = {
         },
         expedient: {
             title: "Expediente",
+            nou: "New expedient",
             filter: {
                 title: "Buscador de expedientes"
             },

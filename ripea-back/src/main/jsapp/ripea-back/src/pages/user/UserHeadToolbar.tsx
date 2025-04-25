@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {Button, Grid, Icon, Typography, MenuItem, Divider, Select, FormControl} from "@mui/material";
+import {Button, Grid, Icon, Typography, MenuItem, Divider, Select, FormControl, ButtonGroup} from "@mui/material";
 import MenuButton from "../../components/MenuButton.tsx";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import usePerfil from "./detail/Perfil.tsx";
@@ -237,6 +237,7 @@ const UserHeadToolbar = (props:any) => {
         </Grid>
 
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
+            <ButtonGroup>
             { isRolActualSupAdmin && <MenuSupAdmin/> }
             { isRolActualAdmin && <MenuAdmin sessionScope={user?.sessionScope}/> }
             { isRolActualOrganAdmin && <MenuAdminOrgan sessionScope={user?.sessionScope}/> }
@@ -252,6 +253,7 @@ const UserHeadToolbar = (props:any) => {
             }
 
             { isRolActualRevisor && <MenuRevisor/> }
+            </ButtonGroup>
         </Grid>
     </Grid>
 }

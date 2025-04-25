@@ -7,7 +7,7 @@ import {formatIso} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 
-const filterStyle = {mb: 2, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '10px'}
+const filterStyle = {mb: 2, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '4px'}
 
 const springFilterBuilder = (data: any) :string => {
     let filterStr :string = '';
@@ -94,8 +94,8 @@ const ExpedientFilter = (props:any) => {
             <ExpedientFilterForm/>
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-                <Button onClick={netejar}>Netejar</Button>
-                <Button onClick={cercar} variant="contained" sx={{borderRadius: 1}}><Icon>filter_alt</Icon>Cercar</Button>
+                <Button variant="outlined" sx={{borderRadius: 1}} onClick={netejar}>Netejar</Button>
+                <Button onClick={cercar} variant="contained" sx={{borderRadius: 1}}><Icon>filter_alt</Icon>Filtrar</Button>
             </Grid>
         </Grid>
     </MuiFilter>
