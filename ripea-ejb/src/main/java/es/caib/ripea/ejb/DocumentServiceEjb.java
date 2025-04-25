@@ -365,7 +365,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	}
 
 	@Override
-	@RolesAllowed("**")
+	@PermitAll
 	public void notificacioActualitzarEstat(String identificador,
 			String referencia) {
 		delegateService.notificacioActualitzarEstat(identificador, referencia);
