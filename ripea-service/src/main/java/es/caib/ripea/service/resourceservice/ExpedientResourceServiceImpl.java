@@ -527,6 +527,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                         target.setDataCreacioFinal(null);
                     }
                     break;
+                case ExpedientFilterForm.Fields.agafatPer:
+                    if (previous.getAgafat()!=null && fieldValue!=null){
+                        target.setAgafat(null);
+                    }
+                    break;
+                case ExpedientFilterForm.Fields.agafat:
+                    if(previous.getAgafatPer()!=null && (Boolean) fieldValue){
+                        target.setAgafatPer(null);
+                    }
+                    break;
             }
         }
     }

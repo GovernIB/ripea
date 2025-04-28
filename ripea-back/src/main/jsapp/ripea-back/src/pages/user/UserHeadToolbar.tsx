@@ -126,7 +126,7 @@ const UserHeadToolbar = (props:any) => {
     const isRolActualUser = user?.rolActual == 'tothom';
 
     return <Load value={entitatId || organId || rol} noEffect>
-        <Grid container rowSpacing={1} columnSpacing={1} xs={8}>
+        <Grid container rowSpacing={1} columnSpacing={1} item xs={8}>
         <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
             { !isRolActualSupAdmin &&
                 <>

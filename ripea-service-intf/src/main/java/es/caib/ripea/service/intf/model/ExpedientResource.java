@@ -213,9 +213,12 @@ public class ExpedientResource extends NodeResource {
 
         private String numeroRegistre;
         private ResourceReference<GrupResource, Long> grup;
+        @ResourceField(onChangeActive = true)
         private ResourceReference<UsuariResource, String> agafatPer;
 
+        @ResourceField(onChangeActive = true)
         private Boolean agafat;
         private Boolean pendentFirmar;
+        private Boolean seguit;
 	}
 }

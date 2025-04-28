@@ -213,7 +213,7 @@ const ExpedientGrid = () => {
     const getRowClassName = (params: any) => {
         const color = params.row?.estatAdditionalInfo?.color;
         const className = (color ? `row-with-color-${params.row.id} ` : '') + (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd');
-        console.log('Row className:', className);
+        // console.log('Row className:', className);
         return className;
     };
 
