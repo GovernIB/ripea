@@ -86,7 +86,7 @@ const Expedient = () => {
         isReady: apiIsReady,
         getOne: appGetOne,
     } = useResourceApiService('expedientResource');
-    const [expedient, setExpedient] = useState<any>({id: id});
+    const [expedient, setExpedient] = useState<any>();
 
     useEffect(()=>{
         if (apiIsReady) {

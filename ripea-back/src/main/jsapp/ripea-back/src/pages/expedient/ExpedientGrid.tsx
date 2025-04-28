@@ -1,5 +1,5 @@
-import {useState, useRef, useEffect, useMemo} from "react";
-import {Typography, Icon, Grid, CardContent, Card, Box} from "@mui/material";
+import {useState} from "react";
+import {Typography, Icon, Grid, CardContent, Card} from "@mui/material";
 import {
     GridPage,
     MuiGrid,
@@ -182,7 +182,7 @@ const ExpedientGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const {actions, components} = useCommonActions(refresh);
+    const {actions, hiddenUpdate, hiddenDelete, components} = useCommonActions(refresh);
 
     const columnsAddition = [
         ...columns,
@@ -298,7 +298,6 @@ const ExpedientGrid = () => {
                     datagridApiRef={datagridApiRef}
                 />
 
-
                 <MuiGrid
                     titleDisabled
                     resourceName="expedientResource"
@@ -314,7 +313,8 @@ const ExpedientGrid = () => {
                     onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
                     rowAdditionalActions={actions}
                     paginationActive
-                    rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
+                    rowHideUpdateButton={hiddenUpdate}
+                    rowHideDeleteButton={hiddenDelete}
                     disableColumnMenu
                     toolbarHide
                     selectionActive

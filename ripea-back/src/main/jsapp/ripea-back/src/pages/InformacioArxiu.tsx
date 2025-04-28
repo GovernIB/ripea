@@ -5,46 +5,44 @@ import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";
 import TabComponent from "../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../components/CardData.tsx";
-import Load from "./Load.tsx";
+import Load from "../components/Load.tsx";
 
 const InformacionArxiu = (props:any) => {
     const { arxiu } = props;
     const { t } = useTranslation();
 
-    if (!arxiu){
-        return <Load/>
-    }
-
     return <BasePage>
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</ContenidoData>
-            <ContenidoData title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</ContenidoData>
-            <ContenidoData title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</ContenidoData>
-            <ContenidoData title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</ContenidoData>
+        <Load value={arxiu}>
+            <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+                <ContenidoData title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</ContenidoData>
+                <ContenidoData title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</ContenidoData>
+                <ContenidoData title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</ContenidoData>
+                <ContenidoData title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</ContenidoData>
 
-            <CardData title={t('page.arxiu.detall.document')} hidden={!arxiu?.contingutTipusMime && !arxiu?.contingutArxiuNom}>
-                <ContenidoData title={t('page.arxiu.detall.fitxerContentType')} hiddenIfEmpty>{arxiu?.contingutTipusMime}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.fitxerNom')} hiddenIfEmpty>{arxiu?.contingutArxiuNom}</ContenidoData>
-            </CardData>
+                <CardData title={t('page.arxiu.detall.document')} hidden={!arxiu?.contingutTipusMime && !arxiu?.contingutArxiuNom}>
+                    <ContenidoData title={t('page.arxiu.detall.fitxerContentType')} hiddenIfEmpty>{arxiu?.contingutTipusMime}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.fitxerNom')} hiddenIfEmpty>{arxiu?.contingutArxiuNom}</ContenidoData>
+                </CardData>
 
-            <CardData title={t('page.arxiu.detall.metadata')} hidden={!arxiu?.eniIdentificador}>
-                <ContenidoData title={t('page.arxiu.detall.versions')} hiddenIfEmpty>{arxiu?.eniVersio}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.identificador')} hiddenIfEmpty>{arxiu?.eniIdentificador}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.organ')} hiddenIfEmpty>{arxiu?.eniOrgans?.join(', ')}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.dataApertura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataObertura)}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.clasificacion')} hiddenIfEmpty>{arxiu?.eniClassificacio}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.estat')} hiddenIfEmpty>{arxiu?.eniEstat}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.dataCaptura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataCaptura)}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.origen')} hidden={!arxiu?.eniOrigen}>{t(`enum.origen.${arxiu?.eniOrigen}`)}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.estadoElaboracion')} hidden={!arxiu?.eniEstatElaboracio}>{t(`enum.estatElaboracio.${arxiu?.eniEstatElaboracio}`)}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.tipoDocumental')} hiddenIfEmpty>{arxiu?.eniTipusDocumental}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.tipoDocumental')} hiddenIfEmpty>{arxiu?.eniTipusDocumentalAddicional}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.format')} hiddenIfEmpty>{arxiu?.eniFormat}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.firmes')} hiddenIfEmpty>{arxiu?.firmes?.map((firma:any)=>firma?.tipus)?.join(', ')}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.interessats')} hiddenIfEmpty>{arxiu?.eniInteressats?.join(', ')}</ContenidoData>
-                <ContenidoData title={t('page.arxiu.detall.documentOrigen')} hiddenIfEmpty>{arxiu?.eniDocumentOrigenId}</ContenidoData>
-            </CardData>
-        </Grid>
+                <CardData title={t('page.arxiu.detall.metadata')} hidden={!arxiu?.eniIdentificador}>
+                    <ContenidoData title={t('page.arxiu.detall.versions')} hiddenIfEmpty>{arxiu?.eniVersio}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.identificador')} hiddenIfEmpty>{arxiu?.eniIdentificador}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.organ')} hiddenIfEmpty>{arxiu?.eniOrgans?.join(', ')}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.dataApertura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataObertura)}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.clasificacion')} hiddenIfEmpty>{arxiu?.eniClassificacio}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.estat')} hiddenIfEmpty>{arxiu?.eniEstat}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.dataCaptura')} hiddenIfEmpty>{formatDate(arxiu?.eniDataCaptura)}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.origen')} hidden={!arxiu?.eniOrigen}>{t(`enum.origen.${arxiu?.eniOrigen}`)}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.estadoElaboracion')} hidden={!arxiu?.eniEstatElaboracio}>{t(`enum.estatElaboracio.${arxiu?.eniEstatElaboracio}`)}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.tipoDocumental')} hiddenIfEmpty>{arxiu?.eniTipusDocumental}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.tipoDocumental')} hiddenIfEmpty>{arxiu?.eniTipusDocumentalAddicional}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.format')} hiddenIfEmpty>{arxiu?.eniFormat}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.firmes')} hiddenIfEmpty>{arxiu?.firmes?.map((firma:any)=>firma?.tipus)?.join(', ')}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.interessats')} hiddenIfEmpty>{arxiu?.eniInteressats?.join(', ')}</ContenidoData>
+                    <ContenidoData title={t('page.arxiu.detall.documentOrigen')} hiddenIfEmpty>{arxiu?.eniDocumentOrigenId}</ContenidoData>
+                </CardData>
+            </Grid>
+        </Load>
     </BasePage>
 }
 

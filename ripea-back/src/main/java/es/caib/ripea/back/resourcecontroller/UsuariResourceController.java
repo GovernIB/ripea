@@ -136,10 +136,10 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         Map<String, Object> response = new HashMap<>();
 
         response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
-        response.put("urlsInstruccioActiu", ExpedientHelper.isUrlsInstruccioActiu(request));
-        response.put("organsNoSincronitzats", MetaExpedientHelper.getOrgansNoSincronitzats(request));
-        response.put("revisioActiva", MetaExpedientHelper.getRevisioActiva(request));
         response.put("countTasquesPendent", TasquesPendentsHelper.countTasquesPendents(request));
+        response.put("organsNoSincronitzats", MetaExpedientHelper.getOrgansNoSincronitzats(request));
+        response.put("urlsInstruccioActiu", ExpedientHelper.isUrlsInstruccioActiu(request));
+        response.put("revisioActiva", MetaExpedientHelper.getRevisioActiva(request));
         response.put("isCreacioFluxUsuariActiu", FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
         response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
@@ -152,6 +152,12 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
 
         response.put("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
         response.put("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
+        response.put("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
+        response.put("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PUBLICAR_DOCUMENTS_ACTIVA)));
+        response.put("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
+        response.put("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
+        response.put("isReobrirPermes", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT, true));
+        response.put("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC)));
 
         return response;
     }

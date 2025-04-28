@@ -3,6 +3,7 @@ import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
 
 const ContenidoData = (props:any) => {
     const {title, children} = props;
@@ -39,7 +40,7 @@ const Auditoria = (props:any) => {
                 <CardContenido title={"Creació"}>
                     <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
                         <ContenidoData title={"Usuario"} >{entity?.createdBy}</ContenidoData>
-                        <ContenidoData title={"Fecha"} >{entity?.createdDate}</ContenidoData>
+                        <ContenidoData title={"Fecha"} >{formatDate(entity?.createdDate)}</ContenidoData>
                     </Grid>
                 </CardContenido>
             </Grid>
@@ -47,7 +48,7 @@ const Auditoria = (props:any) => {
                 <CardContenido title={"Modificació"}>
                     <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
                         <ContenidoData title={"Usuario"} >{entity?.lastModifiedBy}</ContenidoData>
-                        <ContenidoData title={"Fecha"} >{entity?.lastModifiedDate}</ContenidoData>
+                        <ContenidoData title={"Fecha"} >{formatDate(entity?.lastModifiedDate)}</ContenidoData>
                     </Grid>
                 </CardContenido>
             </Grid>

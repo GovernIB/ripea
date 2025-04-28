@@ -213,6 +213,16 @@ public class DocumentResource extends NodeResource {
         }
     }
 
+    public String getFitxerExtension() {
+        if (fitxerNom != null) {
+            return fitxerNom.substring(
+                    fitxerNom.lastIndexOf('.') + 1,
+                    fitxerNom.length());
+        } else {
+            return "";
+        }
+    }
+
     @Getter
     @Setter
     public static class EnviarViaEmailFormAction implements Serializable {
