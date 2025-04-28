@@ -85,7 +85,7 @@ const ExpedientFilter = (props:any) => {
                 )
             )
         )
-        console.log('>>> springFilterBuilder:', filterStr)
+        // console.log('>>> springFilterBuilder:', filterStr)
         return filterStr;
     }
 

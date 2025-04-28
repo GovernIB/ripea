@@ -2,7 +2,6 @@ import {useState} from "react";
 import {Typography, Icon, Grid, CardContent, Card} from "@mui/material";
 import {
     GridPage,
-    MuiGrid,
     useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
@@ -14,8 +13,8 @@ import { useCommonActions } from "./details/CommonActions.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
-import ExpedientGridToolbar from "./ExpedientGridToolbar.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import useMassiveActions from "./details/ExpedientMassiveActions.tsx";
 
 const labelStyle = { padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
 const commonStyle = { p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content' }
@@ -174,15 +173,14 @@ const ExpedientGrid = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
-    const [gridRows, setGridRows] = useState<any[]>([]);
     const apiRef = useMuiDataGridApiRef();
-    const datagridApiRef = useMuiDatagridApiRef();
+
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
 
     const {actions, hiddenUpdate, hiddenDelete, components} = useCommonActions(refresh);
+    const {actions: massiveActions, components: massiveComponents} = useMassiveActions(refresh);
 
     const columnsAddition = [
         ...columns,
@@ -209,38 +207,6 @@ const ExpedientGrid = () => {
 		},
     ];
 
-    // Custom row styling with colored bar
-    const getRowClassName = (params: any) => {
-        const color = params.row?.estatAdditionalInfo?.color;
-        const className = (color ? `row-with-color-${params.row.id} ` : '') + (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd');
-        // console.log('Row className:', className);
-        return className;
-    };
-
-    // Apply custom CSS for rows with color
-    const getRowStyle = () => {
-        const styles: any = {};
-        if (gridRows.length > 0) {
-            gridRows.forEach((row: any) => {
-                const color = row?.estatAdditionalInfo?.color;
-                if (color) {
-                    styles[`.row-with-color-${row.id}`] = {
-                        'box-shadow': `${color} -6px 0px 0px`,
-                        'border-left': `6px solid ${color}`
-                    };
-                }
-            });
-        }
-        return styles;
-    };
-
-    // Applica word wrap a totes les columnes
-    const columnsWithWordWrap = columnsAddition.map(col => ({
-        ...col,
-        flex: col.flex || 1,
-        cellClassName: 'cell-with-wrap',
-    }));
-
     return <GridPage>
         <Card sx={{border: '1px solid #e3e3e3', borderRadius: '4px', height: '100%', display: 'flex', flexDirection: 'column'}}>
             <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
@@ -253,61 +219,15 @@ const ExpedientGrid = () => {
                     <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
                 </Grid>
 
-                <style>
-                    {`
-                    .cell-with-wrap {
-                        // white-space: normal !important;
-                        // line-height: 1.2em;
-                        // word-break: break-word;
-                        // padding: 5px 10px !important;
-                        // overflow: auto;
-                        // display: flex;
-                        // align-items: start !important;
-                        text-overflow: ellipsis !important;
-                    }
-                    
-                    .MuiDataGrid-checkboxInput {
-                        transform: scale(0.8);
-                    }
-                    .MuiDataGrid-cell--withRenderer {
-                        align-items: flex-start !important;
-                    }
-                    .MuiDataGrid-columnHeaderCheckbox, 
-                    .MuiDataGrid-cellCheckbox {
-                        align-items: flex-start !important;
-                        padding-top: 4px !important;
-                    }
-                    [class^="row-with-color-"] .MuiDataGrid-cellCheckbox {
-                        width: 48px !important;
-                        max-width: 48px !important;
-                        min-width: 48px !important;
-                        margin-left: -4px !important;
-                    }
-                    ${Object.entries(getRowStyle()).map(([className, style]) => 
-                        `${className} { ${Object.entries(style as any).map(([prop, value]) => 
-                            `${prop}: ${value};`).join(' ')} }`
-                    ).join('\n')}
-                    `}
-                </style>
-
-                <ExpedientGridToolbar
-                    selectedRows={selectedRows}
-                    setSelectedRows={setSelectedRows}
-                    gridRows={gridRows}
-                    apiRef={apiRef}
-                    datagridApiRef={datagridApiRef}
-                />
-
-                <MuiGrid
+                <StyledMuiGrid
                     titleDisabled
                     resourceName="expedientResource"
                     popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                    columns={columnsWithWordWrap}
+                    columns={columnsAddition}
                     filter={springFilter}
                     sortModel={sortModel}
                     perspectives={perspectives}
                     apiRef={apiRef}
-                    datagridApiRef={datagridApiRef}
                     popupEditCreateActive
                     popupEditFormContent={<ExpedientGridForm />}
                     onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
@@ -316,21 +236,16 @@ const ExpedientGrid = () => {
                     rowHideUpdateButton={hiddenUpdate}
                     rowHideDeleteButton={hiddenDelete}
                     disableColumnMenu
-                    toolbarHide
+                    // toolbarHide
                     selectionActive
                     checkboxSelection
                     keepNonExistentRowsSelected
-                    rowSelectionModel={selectedRows}
-                    onRowSelectionModelChange={(newSelection) => {
-                        // console.log('Selection changed:', newSelection);
-                        setSelectedRows([...newSelection]);
-                    }}
-                    getRowClassName={getRowClassName}
-                    onRowsChange={(rows) => { setGridRows([...rows]); }}
-                    // getRowHeight={(params) => "auto"}
+                    toolbarCreateTitle={t('page.expedient.nou')}
+                    toolbarMassiveActions={massiveActions}
                 />
 
                 {components}
+                {massiveComponents}
             </CardContent>
         </Card>
     </GridPage>
