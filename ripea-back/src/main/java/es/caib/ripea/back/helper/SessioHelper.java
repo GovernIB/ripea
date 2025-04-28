@@ -88,6 +88,9 @@ public class SessioHelper {
 			request.getSession().setAttribute("SessionHelper.isDominisEnabled", habilitarDominis);
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			aplicacioService.actualitzarEntitatThreadLocal(entitatActual);
+			Object rolActualSessio = request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
+			if (rolActualSessio!=null)
+				aplicacioService.actualitzarRolThreadLocal(rolActualSessio.toString());
 			localeResolver.setLocale(request, response, StringUtils.parseLocaleString(idioma_usuari));
 		}
 		

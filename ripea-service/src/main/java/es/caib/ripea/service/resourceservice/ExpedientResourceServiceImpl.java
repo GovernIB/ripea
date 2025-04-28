@@ -105,7 +105,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
-        String rolActual		 = "IPA_ADMIN"; //configHelper.getRolActual();
+        String rolActual		 = configHelper.getRolActual();
 
         //throw new PermissionDeniedException
         EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
@@ -116,7 +116,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				rolActual,
 				ogEntity!=null?ogEntity.getId():null);
         
-		FilterBuilder filterBuilder = new FilterBuilder();
 		Filter filtreResultat = null;
 
         Filter filtreEntitatSessio = FilterBuilder.and(
