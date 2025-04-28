@@ -768,7 +768,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += registreAnnexRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_ANNEX **
 		 registresModificats += registreInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_INTERESSAT **
 		 registresModificats += tipusDocumentalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_TIPUS_DOCUMENTAL **
-		 registresModificats += uRLInstruccioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_URL_INSTRUCCIO
 		 return registresModificats;
 	 }
 	 
