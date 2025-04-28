@@ -29,7 +29,7 @@ const StyledMuiGrid = (props:any) => {
     const dataApiRef = useMuiDatagridApiRef();
     const { t } = useTranslation();
 
-    const {resourceName, springFilter,columns, apiRef = gridApiRef, datagridApiRef = dataApiRef, toolbarElementsWithPositions, toolbarCreateTitle, toolbarHideRefresh, toolbarHideCreate, toolbarMassiveActions, ...others} = props
+    const {resourceName, filter, columns, apiRef = gridApiRef, datagridApiRef = dataApiRef, toolbarElementsWithPositions, toolbarCreateTitle, toolbarHideRefresh, toolbarHideCreate, toolbarMassiveActions, ...others} = props
     const [gridRows, setGridRows] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
@@ -51,7 +51,7 @@ const StyledMuiGrid = (props:any) => {
                 resourceName={resourceName}
                 selectedRows={selectedRows}
                 setSelectedRows={setGridSelectedRows}
-                springFilter={springFilter}
+                filter={filter}
                 actions={toolbarMassiveActions}
             />,
             hidden: !toolbarMassiveActions,
@@ -147,7 +147,7 @@ const StyledMuiGrid = (props:any) => {
 
         <MuiGrid
             resourceName={resourceName}
-            springFilter={springFilter}
+            filter={filter}
 
             {...others}
             apiRef={apiRef}

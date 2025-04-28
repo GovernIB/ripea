@@ -10,11 +10,11 @@ interface MassiveActionSelectorProps {
     selectedRows: any[];
     setSelectedRows: (value:any[]) => void
     actions: any[]
-    springFilter?: string
+    filter?: string
 }
 
 const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) => {
-    const {resourceName, springFilter, selectedRows, setSelectedRows, actions } = props;
+    const {resourceName, filter, selectedRows, setSelectedRows, actions } = props;
     const { t } = useTranslation();
 
     const {
@@ -25,7 +25,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) 
     // Handle selection actions
     const handleSelectAll = () => {
         if (apiIsReady) {
-            apiFindAll({unpaged: true, filter: springFilter})
+            apiFindAll({unpaged: true, filter: filter})
                 .then((app) => {
                     const allIds = app?.rows?.map(row=>row?.id)
                     setSelectedRows(allIds);
