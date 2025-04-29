@@ -13,12 +13,29 @@ import {Divider} from "@mui/material";
 
 const useActions = (refresh?: () => void) =>{
     const {temporalMessageShow} = useBaseAppContext();
-
+debugger;
     const {
         patch: apiPatch,
-        artifactAction: apiAction
+        artifactAction: apiAction,
+		fieldDownload: apiDownload,
     } = useResourceApiService('expedientResource');
+	debugger;
+	const downloadAdjunt = (id:any,fieldName:string) :void => {
+	    apiDownload(id,{fieldName})
+	        .then((result)=>{
+	            const url = URL.createObjectURL(result.blob);
+	            const link = document.createElement('a');
+	            link.href = url;
+	            link.download = result.fileName; // Usa el nombre recibido
+	            document.body.appendChild(link);
+	            link.click();
 
+	            // Limpieza
+	            document.body.removeChild(link);
+	            URL.revokeObjectURL(url);
+	            refresh?.();
+	        })
+	}	
     const follow = (id: any): void => {
         apiAction(id, {code : 'FOLLOW'})
             .then(() => {
@@ -72,17 +89,16 @@ const useActions = (refresh?: () => void) =>{
             });
     }
 
-    return {follow, unfollow, agafar, retornar, lliberar}
+    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: downloadAdjunt}
 }
 
 export const useCommonActions = (refresh?: () => void) => {
+	
     const { t } = useTranslation();
     const { value: user, permisos } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-
-    const {follow, unfollow, agafar, retornar, lliberar} = useActions(refresh);
-
+    const {follow, unfollow, agafar, retornar, lliberar, apiDownload} = useActions(refresh);
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
@@ -215,31 +231,37 @@ export const useCommonActions = (refresh?: () => void) => {
         {
             title: t('page.expedient.acciones.exportPDF'),
             icon: "format_list_numbered",
+			onClick: (id:any) => apiDownload(id, 'exportPdf'),
             showInMenu: true,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportEXCEL'),
             icon: "lists",
+			onClick: (id:any) => apiDownload(id, 'exportExcel'),
             showInMenu: true,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioExcelActiva),
         },
         {
-            title: t('page.expedient.acciones.exportPDF_EIN'),
+            title: t('page.expedient.acciones.exportPDF_ENI'),
             icon: "format_list_numbered",
+			onClick: (id:any) => apiDownload(id, 'exportPdfEni'),
             showInMenu: true,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.acciones.exportEIN'),
+            title: t('page.expedient.acciones.exportENI'),
             icon: "folder_code",
+			onClick: (id:any) => apiDownload(id, 'exportEni'),
             showInMenu: true,
-            hidden: (row:any) => !(row?.conteDocuments && row?.conteDocumentsDefinitius),
+			disabled: (row:any) => !row?.conteDocumentsDefinitius,
+			hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportINSIDE'),
             icon: "folder_zip",
+			onClick: (id:any) => apiDownload(id, 'exportInside'),
             showInMenu: true,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),

@@ -45,9 +45,7 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
     const { value: entitat } = useEntitatSession()
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-
     const {apiDownload} = useActions(refresh)
-
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');

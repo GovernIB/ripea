@@ -1,9 +1,12 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +23,7 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
@@ -33,14 +37,17 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -80,6 +87,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExpedientHelper expedientHelper;
     private final ExpedientResourceHelper expedientResourceHelper;
     private final EntityComprovarHelper entityComprovarHelper;
+    private final ExcepcioLogHelper excepcioLogHelper;
 
     @PostConstruct
     public void init() {
@@ -96,8 +104,166 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
+        register(ExpedientResource.Fields.exportPdf, new ExportPdf());
+        register(ExpedientResource.Fields.exportExcel, new ExportExcel());
+        register(ExpedientResource.Fields.exportPdfEni, new ExportPdfEni());
+        register(ExpedientResource.Fields.exportEni, new ExportEni());
+        register(ExpedientResource.Fields.exportInside, new ExportInside());
     }
 
+    private class ExportPdf implements FieldDownloader<ExpedientResourceEntity> {
+        @Override
+        public DownloadableFile download(
+        		ExpedientResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+			try {
+	        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
+	        			entity.getId(),
+	        			false,
+	        			true,
+	        			false,
+	        			false,
+	        			false,
+	        			configHelper.getRolActual());
+	        	FitxerDto fitxerDto = expedientHelper.exportarExpedient(
+						expedientEntity.getEntitat(),
+						Arrays.asList(expedientEntity), 
+						false,
+						"PDF");
+				
+	            return new DownloadableFile(
+	            		fitxerDto.getNom(),
+	            		fitxerDto.getContentType(),
+	            		fitxerDto.getContingut()
+	            );
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/generarIndex/PDF", e);
+				return null;
+			}
+        }
+    }
+    
+    private class ExportExcel implements FieldDownloader<ExpedientResourceEntity> {
+        @Override
+        public DownloadableFile download(
+        		ExpedientResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+			try {
+	        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
+	        			entity.getId(),
+	        			false,
+	        			true,
+	        			false,
+	        			false,
+	        			false,
+	        			configHelper.getRolActual());
+	        	FitxerDto fitxerDto = expedientHelper.exportarExpedient(
+						expedientEntity.getEntitat(),
+						Arrays.asList(expedientEntity), 
+						false,
+						"XLSX");
+	            return new DownloadableFile(
+	            		fitxerDto.getNom(),
+	            		fitxerDto.getContentType(),
+	            		fitxerDto.getContingut()
+	            );				
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/generarIndex/XLSX", e);
+				return null;
+			}
+        }
+    }
+    
+    private class ExportPdfEni implements FieldDownloader<ExpedientResourceEntity> {
+        @Override
+        public DownloadableFile download(
+        		ExpedientResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+			try {
+	        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
+	        			entity.getId(),
+	        			false,
+	        			true,
+	        			false,
+	        			false,
+	        			false,
+	        			configHelper.getRolActual());
+				FitxerDto fitxerDto = expedientHelper.exportarExpedient(
+						expedientEntity.getEntitat(),
+						Arrays.asList(expedientEntity), 
+						true,
+						"PDF");
+	            return new DownloadableFile(
+	            		fitxerDto.getNom(),
+	            		fitxerDto.getContentType(),
+	            		fitxerDto.getContingut()
+	            );				
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/generarExportarIndex", e);
+				return null;
+			}
+        }
+    }
+    
+    private class ExportEni implements FieldDownloader<ExpedientResourceEntity> {
+        @Override
+        public DownloadableFile download(
+        		ExpedientResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+			try {
+	        	entityComprovarHelper.comprovarExpedient(
+	        			entity.getId(),
+	        			false,
+	        			true,
+	        			false,
+	        			false,
+	        			false,
+	        			configHelper.getRolActual());
+				FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(Arrays.asList(entity.getId())), false);
+	            return new DownloadableFile(
+	            		fitxerDto.getNom(),
+	            		fitxerDto.getContentType(),
+	            		fitxerDto.getContingut()
+	            );
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/exportarEni", e);
+				return null;
+			}
+        }
+    }
+    
+    private class ExportInside implements FieldDownloader<ExpedientResourceEntity> {
+        @Override
+        public DownloadableFile download(
+        		ExpedientResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+			try {
+	        	entityComprovarHelper.comprovarExpedient(
+	        			entity.getId(),
+	        			false,
+	        			true,
+	        			false,
+	        			false,
+	        			false,
+	        			configHelper.getRolActual());
+				FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(Arrays.asList(entity.getId())), true);
+	            return new DownloadableFile(
+	            		fitxerDto.getNom(),
+	            		fitxerDto.getContentType(),
+	            		fitxerDto.getContingut()
+	            );
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/exportarInside", e);
+				return null;
+			}
+        }
+    }
+    
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	

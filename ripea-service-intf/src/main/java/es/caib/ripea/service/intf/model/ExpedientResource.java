@@ -3,6 +3,7 @@ package es.caib.ripea.service.intf.model;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -113,6 +114,26 @@ public class ExpedientResource extends NodeResource {
 	private ResourceReference<GrupResource, Long> grup;
 	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
 
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference exportPdf;
+    
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference exportExcel;
+    
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference exportPdfEni;
+    
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference exportEni;
+    
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference exportInside;
+	
 	// Tancat
 	private Date tancatData;
 	@Size(max = 1024)

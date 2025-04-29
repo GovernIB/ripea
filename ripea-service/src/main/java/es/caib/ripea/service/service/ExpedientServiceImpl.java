@@ -1518,35 +1518,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, 
 				true, 
 				false);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ZipOutputStream zos = new ZipOutputStream(baos);
-		FitxerDto resultat = new FitxerDto();
-		boolean isMassiu = expedientIds.size() > 1;
-//		comprovar accés expedients
-		for (Long expedientId : expedientIds) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-					expedientId,
-					false,
-					true,
-					false,
-					false,
-					false,
-					null);
-			resultat = expedientHelper.exportarEniExpedientPerInside(
-					isMassiu, 
-					expedient, 
-					zos, 
-					ambDocuments);
-		}
-		
-		if (isMassiu || ambDocuments) {
-			zos.close();
-			
-			resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.eni") + ".zip");
-			resultat.setContentType("application/zip");
-			resultat.setContingut(baos.toByteArray());
-		}
-		return resultat;
+		return expedientHelper.exportarExpedient(expedientIds, ambDocuments);
 	}
 	
 	@Override
