@@ -28,6 +28,7 @@ export type FormProps = React.PropsWithChildren & {
     resourceTypeCode?: string;
     id?: any;
     apiRef?: FormApiRef;
+    initialData?: any;
     additionalData?: any;
     perspectives?: string[];
     initOnChangeRequest?: boolean;
@@ -105,6 +106,7 @@ export const Form: React.FC<FormProps> = (props) => {
         resourceTypeCode,
         id,
         apiRef: apiRefProp,
+        initialData,
         additionalData,
         perspectives,
         initOnChangeRequest,
@@ -232,7 +234,9 @@ export const Form: React.FC<FormProps> = (props) => {
         }
     }
     const refresh = () => {
-        if (fields) {
+        if (initialData != null) {
+            reset(initialData);
+        } else if (fields) {
             getInitialData(id, fields, additionalData, initOnChangeRequest).
                 then((initialData: any) => {
                     debug && logConsole.debug('Initial data loaded', initialData);
@@ -256,7 +260,8 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
-        const mergedData = data ?? { ...getInitialDataFromFields(fields), ...additionalData };
+        const initialDataForMerge = initialData ?? getInitialDataFromFields(fields);
+        const mergedData = data ?? { ...initialDataForMerge, ...additionalData };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {

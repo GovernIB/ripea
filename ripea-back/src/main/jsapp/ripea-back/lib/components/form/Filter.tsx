@@ -15,6 +15,7 @@ export type FilterProps = React.PropsWithChildren & {
     apiRef?: FilterApiRef;
     formApiRef?: FormApiRef;
     springFilterBuilder: (data: any) => string | undefined;
+    initialData?: any;
     additionalData?: any;
     initOnChangeRequest?: boolean;
     commonFieldComponentProps?: any;
@@ -39,6 +40,8 @@ export const Filter: React.FC<FilterProps> = (props) => {
         code,
         buttonControlled,
         springFilterBuilder,
+        initialData,
+        additionalData,
         onDataChange,
         onSpringFilterChange,
         apiRef: apiRefProp,
@@ -99,6 +102,8 @@ export const Filter: React.FC<FilterProps> = (props) => {
             resourceName={resourceName}
             resourceType='FILTER'
             resourceTypeCode={code}
+            initialData={initialData}
+            additionalData={additionalData}
             onDataChange={handleDataChange}
             fieldTypeMap={fieldTypeMap}
             apiRef={formApiRef}
