@@ -11,6 +11,8 @@ const translationEn = {
         download: "Download",
         detail: "Detail",
         refresh: "Refresh",
+        clear: "Clear",
+        search: "Search",
     },
     enum: {
         rol: {

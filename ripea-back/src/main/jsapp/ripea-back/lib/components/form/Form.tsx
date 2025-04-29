@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useBaseAppContext } from '../BaseAppContext';
 import {
     ResourceApiError,
@@ -28,6 +29,7 @@ export type FormProps = React.PropsWithChildren & {
     resourceTypeCode?: string;
     id?: any;
     apiRef?: FormApiRef;
+    initialData?: any;
     additionalData?: any;
     perspectives?: string[];
     initOnChangeRequest?: boolean;
@@ -105,7 +107,8 @@ export const Form: React.FC<FormProps> = (props) => {
         resourceTypeCode,
         id,
         apiRef: apiRefProp,
-        additionalData,
+        initialData: initialDataProp,
+        additionalData: additionalDataProp,
         perspectives,
         initOnChangeRequest,
         commonFieldComponentProps,
@@ -158,6 +161,8 @@ export const Form: React.FC<FormProps> = (props) => {
     const idFromExternalResetRef = React.useRef<any>();
     const isSaveActionPresent = resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
+    const location = useLocation();
+    const additionalData = additionalDataProp ?? location.state?.additionalData;
     const calculatedId = (id?: any) => idFromExternalResetRef.current ?? id;
     const sendOnChangeRequest = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
         if (resourceType == null) {
@@ -203,7 +208,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const getId = () => calculatedId(id);
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
-    const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
+    const getFieldsInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
         // Obté les dades inicials.
         // Si és un formulari d'artefacte obté les dades dels camps
         // Si no és un formulari d'artefacte:
@@ -233,12 +238,12 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const refresh = () => {
         if (fields) {
-            getInitialData(id, fields, additionalData, initOnChangeRequest).
+            getFieldsInitialData(id, fields, additionalData, initOnChangeRequest).
                 then((initialData: any) => {
                     debug && logConsole.debug('Initial data loaded', initialData);
                     const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
                     id != null && setApiActions(initialDataActions);
-                    reset(initialDataWithoutLinks);
+                    reset({...initialDataWithoutLinks, ...initialDataProp});
                 });
         }
     }
@@ -256,7 +261,7 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
-        const mergedData = data ?? { ...getInitialDataFromFields(fields), ...additionalData };
+        const mergedData = { ...getInitialDataFromFields(fields), ...additionalData, ...data };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {
@@ -426,7 +431,7 @@ export const Form: React.FC<FormProps> = (props) => {
     if (apiRefProp) {
         if (apiRefProp.current) {
             apiRefProp.current.getId = getId,
-            apiRefProp.current.getData = getData;
+                apiRefProp.current.getData = getData;
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.reset = externalReset;
             apiRefProp.current.revert = revert;

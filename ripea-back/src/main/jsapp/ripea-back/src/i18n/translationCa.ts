@@ -11,6 +11,8 @@ const translationCa = {
         download: "Descarregar",
         detail: "Detall",
         refresh: "Refrescar",
+        clear: "Netejar",
+        search: "Cercar",
     },
     enum: {
         rol: {
