@@ -137,7 +137,7 @@ export const FormFieldDuration: React.FC<FormFieldDurationProps> = (props) => {
                 required: required ?? field.required,
                 error: fieldError != null,
                 placeholder: componentProps?.placeholder ?? (inline ? label : undefined),
-                title,
+                title: componentProps?.title ?? title,
                 helperText,
                 fullWidth: true,
                 onBlur: handleOnBlur,

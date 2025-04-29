@@ -109,7 +109,7 @@ export const FormFieldDate: React.FC<FormFieldCustomProps> = (props) => {
                 required: required ?? field.required,
                 error: fieldError != null || dateError != null,
                 placeholder: componentProps?.placeholder ?? (inline ? label : undefined),
-                title,
+                title: componentProps?.title ?? title,
                 helperText,
                 fullWidth: true,
                 onBlur: handleOnBlur,

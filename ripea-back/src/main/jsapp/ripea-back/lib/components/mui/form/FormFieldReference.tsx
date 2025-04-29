@@ -342,7 +342,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 disabled={disabled}
                 required={required ?? field.required}
                 error={fieldError != null}
-                title={title}
+                title={componentProps?.title ?? title}
                 helperText={helperText}
                 autoFocus={autoFocus}
                 sx={{
