@@ -1,19 +1,17 @@
 import {useState} from "react";
-import {Button, Grid, Icon} from "@mui/material";
 import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {
-    MuiFilter,
     useBaseAppContext,
-    useFilterApiRef,
     useResourceApiService,
     MuiDialog
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
 
 const sortModel = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
@@ -57,39 +55,17 @@ const springFilterBuilder = (data: any) :string => {
 const ActionFilter = (props:any) => {
     const {onSpringFilterChange} = props;
 
-    const filterRef = useFilterApiRef();
-
-    const cercar = ()=> {
-        filterRef.current.filter()
-    }
-    const netejar = ()=> {
-        filterRef.current.clear()
-    }
-
-    return <MuiFilter
+    return <StyledMuiFilter
         resourceName="expedientResource"
         code="EXPEDIENT_FILTER"
         springFilterBuilder={springFilterBuilder}
-        commonFieldComponentProps={{size: 'small'}}
-        componentProps={{
-            sx: {mb: 3, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '10px'}
-        }}
-        apiRef={filterRef}
         onSpringFilterChange={onSpringFilterChange}
-        buttonControlled
     >
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <GridFormField xs={3} name="metaExpedient"/>
-            <GridFormField xs={3} name="numero"/>
-            <GridFormField xs={3} name="nom"/>
-            <GridFormField xs={3} name="estat"/>
-
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-                <Button onClick={netejar}>Netejar</Button>
-                <Button onClick={cercar} variant="contained" sx={{borderRadius: 1}}><Icon>filter_alt</Icon>Cercar</Button>
-            </Grid>
-        </Grid>
-    </MuiFilter>
+        <GridFormField xs={3} name="metaExpedient"/>
+        <GridFormField xs={3} name="numero"/>
+        <GridFormField xs={3} name="nom"/>
+        <GridFormField xs={3} name="estat"/>
+    </StyledMuiFilter>
 }
 
 const useRelacionar= (refresh?: () => void) => {
