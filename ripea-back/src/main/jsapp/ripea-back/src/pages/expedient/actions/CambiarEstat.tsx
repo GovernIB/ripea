@@ -1,13 +1,16 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 
 const CambiarEstatForm = () => {
+    const { data } = useFormContext();
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
         <GridFormField xs={12} name="estat" required/>
+        <GridFormField xs={12} name="estatAdditional" required hidden={data?.estat == "TANCAT"}/>
     </Grid>
 }
 

@@ -179,7 +179,7 @@ const ExpedientGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const {actions, hiddenUpdate, hiddenDelete, components} = useCommonActions(refresh);
+    const {actions, hiddenDelete, components} = useCommonActions(refresh);
     const {actions: massiveActions, components: massiveComponents} = useMassiveActions(refresh);
 
     const columnsAddition = [
@@ -233,7 +233,7 @@ const ExpedientGrid = () => {
                     onRowDoubleClick={(row:any) => navigate(`/contingut/${row?.id}`)}
                     rowAdditionalActions={actions}
                     paginationActive
-                    rowHideUpdateButton={hiddenUpdate}
+                    rowHideUpdateButton
                     rowHideDeleteButton={hiddenDelete}
                     disableColumnMenu
                     // toolbarHide

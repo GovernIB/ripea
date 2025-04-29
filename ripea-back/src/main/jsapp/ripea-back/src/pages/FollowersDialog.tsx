@@ -19,7 +19,6 @@ export const FollowersDialog = (props:any) => {
         getOne: apiGetOne
     } = useResourceApiService('expedientResource');
 
-    const [numFollowes, setNumFollowes] = useState<number>(entity?.numSeguidors);
     const [followes, setFollowes] = useState<any[]>([]);
 	const [open, setOpen] = useState(false);
 
@@ -28,7 +27,6 @@ export const FollowersDialog = (props:any) => {
             apiGetOne(entity?.id, {perspectives: ['FOLLOWERS']})
                 .then((app) => {
                     setFollowes(app?.seguidors);
-                    setNumFollowes?.(app?.seguidors?.length)
                 })
         }
     }, [open]);
@@ -43,7 +41,7 @@ export const FollowersDialog = (props:any) => {
 	
     return <>
 		<IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
-	        <Badge badgeContent={numFollowes} color="primary">
+	        <Badge badgeContent={entity?.numSeguidors} color="primary">
 	            <Icon>people</Icon>
 	        </Badge>
 	    </IconButton>	
