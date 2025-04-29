@@ -2,7 +2,6 @@ package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +82,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @PostConstruct
     public void init() {
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_DOC_CODE, new ExportDocumentMassiveActionExecutor());
         register(ExpedientResource.ACTION_FOLLOW_CODE, new FollowActionExecutor());
         register(ExpedientResource.ACTION_UNFOLLOW_CODE, new UnFollowActionExecutor());
         register(ExpedientResource.ACTION_AGAFAR_CODE, new AgafarActionExecutor());
@@ -432,6 +432,34 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         @Override
         public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+
+    // MassiveActionExecutor
+    private class ExportDocumentMassiveActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params) throws ActionExecutionException {
+            // Individual
+            if (entity!=null) {
+                exec(entity, params);
+            }
+
+            // Massive
+            if (params.getIds()!=null && !params.getIds().isEmpty()) {
+                expedientResourceRepository.findAllById(params.getIds())
+                        .forEach(expedientResourceEntity -> exec(expedientResourceEntity, params));
+            }
+            return null;
+        }
+
+        private void exec(ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params){
+
+        }
+
+        @Override
+        public void onChange(ExpedientResource.ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.ExportarDocumentMassiu target) {
 
         }
     }

@@ -29,7 +29,21 @@ const StyledMuiGrid = (props:any) => {
     const dataApiRef = useMuiDatagridApiRef();
     const { t } = useTranslation();
 
-    const {resourceName, filter, columns, apiRef = gridApiRef, datagridApiRef = dataApiRef, toolbarElementsWithPositions, toolbarCreateTitle, toolbarHideRefresh, toolbarHideCreate, toolbarMassiveActions, readOnly, ...others} = props
+    const {
+        resourceName,
+        filter,
+        columns,
+        apiRef = gridApiRef,
+        datagridApiRef = dataApiRef,
+        toolbarElementsWithPositions,
+        toolbarCreateTitle,
+        toolbarHideRefresh,
+        toolbarHideCreate,
+        toolbarMassiveActions,
+        selectionActive,
+        readOnly,
+        ...others
+    } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
@@ -160,6 +174,13 @@ const StyledMuiGrid = (props:any) => {
                 // console.log('Selection changed:', newSelection);
                 setSelectedRows([...newSelection]);
             }}
+
+            titleDisabled
+            disableColumnMenu
+
+            selectionActive={selectionActive}
+            checkboxSelection={selectionActive}
+            keepNonExistentRowsSelected={selectionActive}
 
             toolbarHideRefresh
             toolbarHideCreate

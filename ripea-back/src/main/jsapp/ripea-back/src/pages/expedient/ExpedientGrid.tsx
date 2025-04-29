@@ -220,7 +220,6 @@ const ExpedientGrid = () => {
                 </Grid>
 
                 <StyledMuiGrid
-                    titleDisabled
                     resourceName="expedientResource"
                     popupEditFormDialogResourceTitle={t('page.expedient.title')}
                     columns={columnsAddition}
@@ -235,11 +234,7 @@ const ExpedientGrid = () => {
                     paginationActive
                     rowHideUpdateButton
                     rowHideDeleteButton={hiddenDelete}
-                    disableColumnMenu
-                    // toolbarHide
                     selectionActive
-                    checkboxSelection
-                    keepNonExistentRowsSelected
                     toolbarCreateTitle={t('page.expedient.nou')}
                     toolbarMassiveActions={massiveActions}
                 />
