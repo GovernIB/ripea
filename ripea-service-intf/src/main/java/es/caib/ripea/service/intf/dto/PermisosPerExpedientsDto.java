@@ -6,6 +6,7 @@ import org.apache.commons.collections4.ListUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter
 public class PermisosPerExpedientsDto  {
@@ -95,6 +96,43 @@ public class PermisosPerExpedientsDto  {
 		return getList(this.idsProcedimentsComunsSplit, index);
 	}
 
+    public List<String> getIdsProcedimentsGruposMil() {
+    	return getIdsProcedimentsGruposMil(this.idsMetaExpedientsPermesos);
+    }
+    
+    public List<String> getIdsGrupsGruposMil() {
+    	return getIdsProcedimentsGruposMil(this.idsGrupsPermesos);
+    }
+    
+    public List<String> getIdsMetaExpedientOrganPairsGruposMil() {
+    	return getIdsProcedimentsGruposMil(this.idsMetaExpedientOrganPairsPermesos);
+    }
+    
+    public List<String> getIdsOrgansAmbProcedimentsComunsGruposMil() {
+    	return getIdsProcedimentsGruposMil(this.idsOrgansAmbProcedimentsComunsPermesos);
+    }
+    
+    public List<String> getIdsOrgansGruposMil() {
+    	return getIdsProcedimentsGruposMil(this.idsOrgansPermesos);
+    }
+    
+    public List<String> getIdsProcedimentsComunsGruposMil() {
+    	return getIdsProcedimentsGruposMil(this.idsProcedimentsComuns);
+    }
+    
+    private List<String> getIdsProcedimentsGruposMil(List<Long> ids) {
+    	int maxSize = 1000;
+    	if (ids!=null && ids.size()>0) {
+    		List<String> result = new ArrayList<>();
+    		for (int i = 0; i < ids.size(); i += maxSize) {
+                List<Long> subList = ids.subList(i, Math.min(i + maxSize, ids.size()));
+                String concatenated = subList.stream().map(String::valueOf).collect(Collectors.joining(","));
+                result.add(concatenated);
+            }
+    		return result;
+    	}
+    	return null;
+    }
 
 	private static <T> List<List<T>> listSplit(List<T> list) {
 

@@ -58,7 +58,12 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {id, onRowCountChange} = props
     const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef()
-    const {actions, components} = useInteressatActions(apiRef?.current?.refresh)
+
+    const refresh = ()=> {
+        apiRef?.current?.refresh()
+    }
+
+    const {actions, components} = useInteressatActions(refresh)
 
     return <GridPage>
         <MuiGrid
@@ -80,6 +85,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             rowAdditionalActions={actions}
             onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
             rowHideDeleteButton
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
 
         {components}

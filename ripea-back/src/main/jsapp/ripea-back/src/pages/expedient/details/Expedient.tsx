@@ -60,7 +60,7 @@ const ExpedientInfo = (props:any) => {
     const {entity: expedient, xs} = props;
     const { t } = useTranslation();
 
-    return <CardData title={"Informació de l'expedient"} direction={'column'} xs={xs}>
+    return <CardData title={"Informació de l'expedient"} direction={'column'} xs={xs} cardProps={{backgroundColor: '#f5f5f5 !important'}}>
         <Contenido title={t('page.contingut.detalle.numero')} direction={'column'}>{expedient?.numero}</Contenido>
         <Contenido title={t('page.contingut.detalle.titol')} direction={'column'}>{expedient?.nom}</Contenido>
         <Contenido title={t('page.contingut.detalle.metaExpedient')} direction={'column'}>{expedient?.metaExpedient?.description}</Contenido>
@@ -86,7 +86,7 @@ const Expedient = () => {
         isReady: apiIsReady,
         getOne: appGetOne,
     } = useResourceApiService('expedientResource');
-    const [expedient, setExpedient] = useState<any>({id: id});
+    const [expedient, setExpedient] = useState<any>();
 
     useEffect(()=>{
         if (apiIsReady) {

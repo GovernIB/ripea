@@ -154,7 +154,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "undo",
             showInMenu: true,
             onClick: retornar,
-            hidden: (row:any) => row?.agafatPer?.id == row?.createdBy,
+            hidden: (row:any) => !isAgafatUsuariActual(row) || row?.agafatPer?.id == row?.createdBy,
         },
         {
             title: t('page.expedient.acciones.lliberar'),
@@ -182,7 +182,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "link",
             showInMenu: true,
             onClick: hanldeRelacionar,
-            disabled: (row:any) => !potModificar(row),
+            hidden: (row:any) => !potModificar(row),
         },
         {
             title: t('page.expedient.acciones.close'),
@@ -190,6 +190,12 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
             disabled: (row:any) => !row?.potTancar,
             hidden: (row:any) => !potModificar(row) || isTancat(row),
+        },
+        {
+            title: "Reabrir",
+            icon: "undo",
+            showInMenu: true,
+            hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
@@ -251,6 +257,10 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
     ]
+        .map(({ hidden, ...rest }) => ({
+            ...rest,
+            hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus != 'EXPEDIENT'
+        }));
 
     const components = <>
         {cambiarPrioridadContent}
@@ -262,6 +272,8 @@ export const useCommonActions = (refresh?: () => void) => {
 
     return {
         actions,
+        hiddenUpdate: (row:any) => isTancat(row),
+        hiddenDelete: (row:any) => isTancat(row),
         components
     }
 }

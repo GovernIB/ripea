@@ -1,6 +1,7 @@
 const translationEs = {
     common: {
         close: "Cerrar",
+        copy: "Copiar",
         create: "Crear",
         update: "Modificar",
         delete: "Borrar",
@@ -9,6 +10,7 @@ const translationEs = {
         contract: "Contraer",
         download: "Descargar",
         detail: "Detalle",
+        refresh: "Refrescar",
     },
     enum: {
         rol: {
@@ -168,6 +170,7 @@ const translationEs = {
         },
         expedient: {
             title: "Expediente",
+            nou: "New expedient",
             filter: {
                 title: "Buscador de expedientes"
             },
@@ -274,14 +277,22 @@ const translationEs = {
             acciones: {
                 detall: "Detalles",
                 move: "Mover...",
+                vincular: "Vincular",
+                imprimible: "Versión imprimible",
+                original: "Descargar original",
+                firma: "Descargar firma",
                 view: "Visualizar",
+                csv: "Copiar enlace CSV",
                 portafirmes: "Enviar a portafirmas...",
                 firmar: "Firma desde el navegador...",
+                viaFirma: "Enviar viaFirma...",
                 mail: "Enviar via email...",
+                seguiment: "Seguimiento portafirmas",
                 history: "Histórico de acciones",
                 infoArxiu: "Información archivo",
                 export: "Exportación EIN...",
                 notificar: "Notificar o comunicar...",
+                comunicar: "Comunicar...",
                 publicar: "Publicar...",
                 descarregarImprimible: "Descarregar versión imprimible",
             },

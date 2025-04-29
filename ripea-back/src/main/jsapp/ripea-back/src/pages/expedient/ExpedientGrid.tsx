@@ -2,7 +2,6 @@ import {useState} from "react";
 import {Typography, Icon, Grid, CardContent, Card} from "@mui/material";
 import {
     GridPage,
-    MuiGrid,
     useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
@@ -14,10 +13,13 @@ import { useCommonActions } from "./details/CommonActions.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import useMassiveActions from "./details/ExpedientMassiveActions.tsx";
 
-const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
-const obertStyle = { border: '1px dashed #AAA' }
-const tancatStyle = { backgroundColor: 'grey', color: 'white' }
+const labelStyle = { padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
+const commonStyle = { p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content' }
+const obertStyle = { border: '1px dashed #AAA', ...labelStyle }
+const tancatStyle = { backgroundColor: 'grey', color: 'white', ...labelStyle }
 
 const ExpedientGridForm = () => {
     const { data }  = useFormContext();
@@ -37,7 +39,7 @@ export const StyledEstat = (props:any) => {
     const { entity: expedient, icon } = props;
     const { t } = useTranslation();
 
-    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color }
+    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color, padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
 
     const style = expedient?.estatAdditionalInfo
         ? additionalStyle
@@ -45,8 +47,10 @@ export const StyledEstat = (props:any) => {
             ? tancatStyle
             :obertStyle;
 
+    const icona = expedient?.estat == 'TANCAT' ? 'folder' : 'folder_open'
+
     return <Typography variant="caption" sx={{...commonStyle, ...style }}>
-        { icon && <Icon fontSize={"inherit"}>{icon}</Icon>}
+        { icon && <Icon fontSize={"inherit"}>{icona}</Icon>}
         {expedient?.estatAdditionalInfo?.nom ?? t(`enum.estat.${expedient?.estat}`)}
     </Typography>
 }
@@ -54,21 +58,22 @@ export const StyledEstat = (props:any) => {
 export const StyledPrioritat = (props:any) => {
     const { entity: expedient } = props;
     const { t } = useTranslation();
+    const labelStyle = { padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
 
     let style;
 
     switch (expedient?.prioritat){
         case "D_MOLT_ALTA":
-            style = {backgroundColor: '#d99b9d', color: 'white'}
+            style = {backgroundColor: '#d99b9d', color: 'white', ...labelStyle}
             break;
         case "C_ALTA":
-            style = {backgroundColor: '#ffebae'}
+            style = {backgroundColor: '#ffebae', ...labelStyle}
             break;
         case "B_NORMAL":
-            style = {border: '1px dashed #AAA'}
+            style = {border: '1px dashed #AAA', ...labelStyle}
             break;
         case "A_BAIXA":
-            style = {backgroundColor: '#c3e8d1'}
+            style = {backgroundColor: '#c3e8d1', ...labelStyle}
             break;
     }
 
@@ -159,17 +164,23 @@ const columns = [
     // },
 ];
 
+
+// sortModel i perspectives per prevenir re-renders
+const sortModel = [{ field: 'createdDate', sort: 'desc' }];
+const perspectives = ["INTERESSATS_RESUM", "ESTAT"];
+
 const ExpedientGrid = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
+    const apiRef = useMuiDataGridApiRef();
 
-    const apiRef = useMuiDataGridApiRef()
     const refresh = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const {actions, components} = useCommonActions(refresh);
+    const {actions, hiddenUpdate, hiddenDelete, components} = useCommonActions(refresh);
+    const {actions: massiveActions, components: massiveComponents} = useMassiveActions(refresh);
 
     const columnsAddition = [
         ...columns,
@@ -197,7 +208,7 @@ const ExpedientGrid = () => {
     ];
 
     return <GridPage>
-        <Card sx={{border: '1px solid #e3e3e3', borderRadius: '10px', height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <Card sx={{border: '1px solid #e3e3e3', borderRadius: '4px', height: '100%', display: 'flex', flexDirection: 'column'}}>
             <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
                 <Typography variant="h5">{t('page.expedient.filter.title')}</Typography>
             </CardContent>
@@ -208,25 +219,33 @@ const ExpedientGrid = () => {
                     <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
                 </Grid>
 
-                <MuiGrid
+                <StyledMuiGrid
                     titleDisabled
                     resourceName="expedientResource"
                     popupEditFormDialogResourceTitle={t('page.expedient.title')}
                     columns={columnsAddition}
                     filter={springFilter}
-                    sortModel={[{ field: 'createdDate', sort: 'desc' }]}
-                    perspectives={["INTERESSATS_RESUM", "ESTAT"]}
+                    sortModel={sortModel}
+                    perspectives={perspectives}
                     apiRef={apiRef}
                     popupEditCreateActive
                     popupEditFormContent={<ExpedientGridForm />}
-                    onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
+                    onRowDoubleClick={(row:any) => navigate(`/contingut/${row?.id}`)}
                     rowAdditionalActions={actions}
                     paginationActive
-                    rowHideDeleteButton={(row:any) => row?.estat == "TANCAT"}
+                    rowHideUpdateButton={hiddenUpdate}
+                    rowHideDeleteButton={hiddenDelete}
                     disableColumnMenu
+                    // toolbarHide
+                    selectionActive
+                    checkboxSelection
+                    keepNonExistentRowsSelected
+                    toolbarCreateTitle={t('page.expedient.nou')}
+                    toolbarMassiveActions={massiveActions}
                 />
 
                 {components}
+                {massiveComponents}
             </CardContent>
         </Card>
     </GridPage>

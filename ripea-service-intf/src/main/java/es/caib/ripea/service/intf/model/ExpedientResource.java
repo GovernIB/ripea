@@ -111,6 +111,7 @@ public class ExpedientResource extends NodeResource {
 	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
 	private ResourceReference<GrupResource, Long> grup;
+	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
 
 	// Tancat
 	private Date tancatData;
@@ -212,9 +213,12 @@ public class ExpedientResource extends NodeResource {
 
         private String numeroRegistre;
         private ResourceReference<GrupResource, Long> grup;
+        @ResourceField(onChangeActive = true)
         private ResourceReference<UsuariResource, String> agafatPer;
 
+        @ResourceField(onChangeActive = true)
         private Boolean agafat;
         private Boolean pendentFirmar;
+        private Boolean seguit;
 	}
 }

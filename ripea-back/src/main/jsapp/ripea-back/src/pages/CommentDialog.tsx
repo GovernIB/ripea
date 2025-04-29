@@ -4,6 +4,7 @@ import {MuiFormDialog, useResourceApiService, MuiFormDialogApi} from "reactlib";
 import GridFormField from "../components/GridFormField.tsx";
 import {formatDate} from "../util/dateUtils.ts";
 import {useUserSession} from "../components/Session.tsx";
+import Load from "../components/Load.tsx";
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -83,18 +84,19 @@ export const CommentDialog = (props:any) => {
                 <Icon>forum</Icon>
             </Badge>
         </IconButton>
-
-        <MuiFormDialog
-            resourceName={resourceName}
-            title={title}
-            apiRef={formApiRef}
-        >
-            <Comments
-                entity={entity}
+        <Load value={entity} noEffect>
+            <MuiFormDialog
                 resourceName={resourceName}
-                resourceReference={resourceReference}
-            />
-            <CommentForm/>
-        </MuiFormDialog>
+                title={title}
+                apiRef={formApiRef}
+            >
+                <Comments
+                    entity={entity}
+                    resourceName={resourceName}
+                    resourceReference={resourceReference}
+                />
+                <CommentForm/>
+            </MuiFormDialog>
+        </Load>
     </>
 }

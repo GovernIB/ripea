@@ -11,6 +11,7 @@ import {useContingutActions} from "./details/ContingutActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
 import {useTranslation} from "react-i18next";
+import Load from "../../components/Load.tsx";
 
 const DocumentsGridForm = () => {
     const { data } = useFormContext();
@@ -105,9 +106,10 @@ const DocumentsGrid = (props:any) => {
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {actions, components} = useContingutActions(refresh);
+    const {actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, refresh);
 
     return <GridPage>
+        <Load value={entity}>
         <MuiGrid
             resourceName="documentResource"
             popupEditFormDialogResourceTitle={t('page.document.title')}
@@ -125,11 +127,12 @@ const DocumentsGrid = (props:any) => {
             }}
             disableColumnSorting
             disableColumnMenu
-            rowHideUpdateButton={(row:any) => row?.tipus!="DOCUMENT"}
-            rowHideDeleteButton={(row:any) => row?.tipus!="DOCUMENT"}
+            rowHideUpdateButton={hiddenUpdate}
+            rowHideDeleteButton={hiddenDelete}
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
             onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
             // checkboxSelection
             treeData={treeView}
             treeDataAdditionalRows={(_rows) => {
@@ -174,6 +177,7 @@ const DocumentsGrid = (props:any) => {
             ]}
         />
         {components}
+        </Load>
     </GridPage>
 }
 

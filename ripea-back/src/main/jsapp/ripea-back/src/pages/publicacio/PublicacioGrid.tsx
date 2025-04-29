@@ -93,6 +93,7 @@ const PublicacioGrid = (props:any) => {
             disableColumnMenu
             disableColumnSorting
             toolbarHideCreate
+            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
         {components}
     </GridPage>

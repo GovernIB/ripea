@@ -1,6 +1,7 @@
 const translationEn = {
     common: {
         close: "Close",
+        copy: "Copy",
         create: "Create",
         update: "Update",
         delete: "Delete",
@@ -9,6 +10,7 @@ const translationEn = {
         contract: "Contract",
         download: "Download",
         detail: "Detail",
+        refresh: "Refresh",
     },
     enum: {
         rol: {
@@ -168,6 +170,7 @@ const translationEn = {
         },
         expedient: {
             title: "Expedient",
+            nou: "Nuevo expediente",
             filter: {
                 title: "Expedient Search"
             },
@@ -274,14 +277,22 @@ const translationEn = {
             acciones: {
                 detall: "Details",
                 move: "Move...",
+                vincular: "Link",
+                imprimible: "Printable version",
+                original: "Download original",
+                firma: "Download signature",
                 view: "View",
+                csv: "Copy CSV link",
                 portafirmes: "Send to Signature Portal...",
                 firmar: "Sign from Browser...",
+                viaFirma: "Send viaFirma...",
                 mail: "Send via Email...",
+                seguiment: "Signature tracking",
                 history: "Action History",
                 infoArxiu: "Archive Information",
                 export: "EIN Export...",
                 notificar: "Notify or Communicate...",
+                comunicar: "Communicate...",
                 publicar: "Publish...",
                 descarregarImprimible: "Download printable version",
             },

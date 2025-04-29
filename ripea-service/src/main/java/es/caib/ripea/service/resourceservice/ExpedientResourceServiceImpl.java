@@ -1,13 +1,39 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
+import java.time.chrono.ChronoLocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.hibernate.Hibernate;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.ripea.persistence.entity.resourceentity.*;
-import es.caib.ripea.persistence.entity.resourcerepository.*;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -15,26 +41,22 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.model.*;
+import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.ExpedientEstatResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.time.chrono.ChronoLocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -50,10 +72,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final UsuariResourceRepository usuariResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+    private final OrganGestorRepository organGestorRepository;
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
+    private final ExpedientHelper expedientHelper;
     private final ExpedientResourceHelper expedientResourceHelper;
     private final EntityComprovarHelper entityComprovarHelper;
 
@@ -76,23 +100,122 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
         // En cas de no disposar d'entitat actual, filtrarem per un string "................................................................................"
         // amb una mida superior a la mida màxima del camp codi de manera que asseguram que no es retornin resultats un cop aplicat el filtre
         String entitatActualCodi = configHelper.getEntitatActualCodi();
+        String organActualCodi	 = configHelper.getOrganActualCodi();
+        String rolActual		 = configHelper.getRolActual();
 
-        Filter filter = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())
-                        ?Filter.parse(currentSpringFilter)
-                        :null,
-                FilterBuilder.equal(ContingutResource.Fields.entitat + ".codi", entitatActualCodi != null
-                        ?entitatActualCodi
-                        :"................................................................................"),
-                FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", configHelper.getOrganActualCodi())
+        //throw new PermissionDeniedException
+        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+        OrganGestorEntity ogEntity	= organGestorRepository.findByCodi(organActualCodi);
+        
+		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+				entitatEntity.getId(),
+				rolActual,
+				ogEntity!=null?ogEntity.getId():null);
+        
+		Filter filtreResultat = null;
+
+        Filter filtreEntitatSessio = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+//                ,FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", organActualCodi)
         );
 
-        return filter.generate();
-    }
+        /**
+         * Procediment (meta-expedients) amb permisos
+         */
+        String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+        Filter filtreProcedimentsPermesos = null; 
+        List<String> grupsClausulesIn = permisosPerExpedients.getIdsProcedimentsGruposMil();
+        if (grupsClausulesIn!=null) {
+	        for (String aux: grupsClausulesIn) {
+		        if (aux != null && !aux.isEmpty()) {
+		        	filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+		        }
+	        }
+        }
 
+        /**
+         * Meta expedient - Organs gestors amb permisos (permis ACL a OrganGestorEntity)
+         */
+        String ogId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.metaExpedient + ".id";
+        Filter filtreOrgansPermesos = null;
+        List<String> grupsOrgansPermesosClausulesIn = permisosPerExpedients.getIdsOrgansGruposMil();
+        if (grupsOrgansPermesosClausulesIn!=null) {
+	        for (String aux: grupsOrgansPermesosClausulesIn) {
+		        if (aux != null && !aux.isEmpty()) {
+	        		filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(ogId + " IN (" + aux + ")"));
+		        }
+	        }
+        }
+        
+        /**
+         * Meta expedient - Organs gestors amb permisos (permis ACL a MetaexpedientOrganGestorEntity)
+         */
+        String meogId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+        Filter filtreProcedimentOrgansPermesos = null;
+        List<String> grupsMetaExpedientOrganPairsPermesosClausulesIn = permisosPerExpedients.getIdsMetaExpedientOrganPairsGruposMil();
+        if (grupsMetaExpedientOrganPairsPermesosClausulesIn!=null) {
+	        for (String aux: grupsMetaExpedientOrganPairsPermesosClausulesIn) {
+		        if (aux != null && !aux.isEmpty()) {
+		        	filtreProcedimentOrgansPermesos = FilterBuilder.or(filtreProcedimentOrgansPermesos, Filter.parse(meogId + " IN (" + aux + ")"));
+		        }
+	        }
+        }
+        
+        /**
+         * Meta expedient - Procediments comuns
+         */
+        String orgComuId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+        Filter filtreOrgansComunsPermesos = null;
+        List<String> grupsOrgansAmbProcedimentsComunsClausulesIn = permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsGruposMil();
+        if (grupsOrgansAmbProcedimentsComunsClausulesIn!=null) {
+	        for (String aux: grupsOrgansAmbProcedimentsComunsClausulesIn) {
+		        if (aux != null && !aux.isEmpty()) {
+		        	filtreOrgansComunsPermesos = FilterBuilder.or(filtreOrgansComunsPermesos, Filter.parse(orgComuId + " IN (" + aux + ")"));
+		        }
+	        }
+        }
+        
+        String procedimentComuId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+        Filter filtreProcedimentComunsPermesos = null;
+        List<String> grupsProcedimentsComunsClausulesIn = permisosPerExpedients.getIdsProcedimentsComunsGruposMil();
+        if (grupsProcedimentsComunsClausulesIn!=null) {
+	        for (String aux: grupsProcedimentsComunsClausulesIn) {
+		        if (aux != null && !aux.isEmpty()) {
+		        	filtreProcedimentComunsPermesos = FilterBuilder.or(filtreProcedimentComunsPermesos, Filter.parse(procedimentComuId + " IN (" + aux + ")"));
+		        }
+	        }
+        }
+
+        //Combinam els 2 filtres de comuns anteriors
+        Filter combinedComunsAnd = FilterBuilder.and(filtreOrgansComunsPermesos, filtreProcedimentComunsPermesos);
+        
+        //Combinam els 4 filtres anteriors
+        Filter combinedFilterProcedimentsOr = FilterBuilder.or(
+        		filtreProcedimentsPermesos,
+        		filtreOrgansPermesos,
+        		filtreProcedimentOrgansPermesos,
+        		combinedComunsAnd);
+        
+        filtreResultat = FilterBuilder.and(filtreEntitatSessio, combinedFilterProcedimentsOr);
+        
+        //No aplica filtre permis directe procediment
+        if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER")) {
+            Filter filtreProcedimentPermisDirecte = FilterBuilder.or(
+            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
+            		filtreProcedimentsPermesos
+            );
+            filtreResultat = FilterBuilder.and(combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
+        }
+
+        return filtreResultat.generate();
+    }
+    
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
@@ -402,6 +525,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     if (fieldValue != null && previous.getDataCreacioInici() != null
                             && previous.getDataCreacioInici().isAfter((ChronoLocalDateTime<?>) fieldValue)) {
                         target.setDataCreacioFinal(null);
+                    }
+                    break;
+                case ExpedientFilterForm.Fields.agafatPer:
+                    if (previous.getAgafat()!=null && fieldValue!=null){
+                        target.setAgafat(null);
+                    }
+                    break;
+                case ExpedientFilterForm.Fields.agafat:
+                    if(previous.getAgafatPer()!=null && (Boolean) fieldValue){
+                        target.setAgafatPer(null);
                     }
                     break;
             }

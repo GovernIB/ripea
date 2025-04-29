@@ -12,11 +12,14 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
 import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "codi", "nom" },
         descriptionField = "nom"

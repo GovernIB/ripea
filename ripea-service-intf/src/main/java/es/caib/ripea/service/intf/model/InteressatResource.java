@@ -85,7 +85,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     private ResourceReference<InteressatResource, Long> representat;
     @Transient
 	private boolean hasRepresentats;
-
+    @Transient
 	public String getNomComplet() {
 		switch (this.tipus) {
 		case InteressatPersonaFisicaEntity:
