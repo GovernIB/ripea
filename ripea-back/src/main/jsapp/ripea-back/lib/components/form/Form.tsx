@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useBaseAppContext } from '../BaseAppContext';
 import {
     ResourceApiError,
@@ -106,8 +107,8 @@ export const Form: React.FC<FormProps> = (props) => {
         resourceTypeCode,
         id,
         apiRef: apiRefProp,
-        initialData,
-        additionalData,
+        initialData: initialDataProp,
+        additionalData: additionalDataProp,
         perspectives,
         initOnChangeRequest,
         commonFieldComponentProps,
@@ -160,6 +161,8 @@ export const Form: React.FC<FormProps> = (props) => {
     const idFromExternalResetRef = React.useRef<any>();
     const isSaveActionPresent = resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
+    const location = useLocation();
+    const additionalData = additionalDataProp ?? location.state?.additionalData;
     const calculatedId = (id?: any) => idFromExternalResetRef.current ?? id;
     const sendOnChangeRequest = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
         if (resourceType == null) {
@@ -234,8 +237,8 @@ export const Form: React.FC<FormProps> = (props) => {
         }
     }
     const refresh = () => {
-        if (initialData != null) {
-            reset(initialData);
+        if (initialDataProp != null) {
+            reset(initialDataProp);
         } else if (fields) {
             getInitialData(id, fields, additionalData, initOnChangeRequest).
                 then((initialData: any) => {
@@ -260,8 +263,8 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
-        const initialDataForMerge = initialData ?? getInitialDataFromFields(fields);
-        const mergedData = data ?? { ...initialDataForMerge, ...additionalData };
+        const initialData = initialDataProp ?? getInitialDataFromFields(fields);
+        const mergedData = data ?? { ...initialData, ...additionalData };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {
