@@ -6,7 +6,7 @@ import {useTranslation} from "react-i18next";
 
 const CambiarEstatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="nom" readOnly/>
+        <GridFormField xs={12} name="nom" disabled readOnly/>
         <GridFormField xs={12} name="estat" required/>
     </Grid>
 }

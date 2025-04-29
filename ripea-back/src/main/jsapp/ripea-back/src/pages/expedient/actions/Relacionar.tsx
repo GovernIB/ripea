@@ -1,9 +1,8 @@
 import {useState} from "react";
-import {Button, Grid, Icon, IconButton, Typography} from "@mui/material";
+import {Button, Grid, Icon} from "@mui/material";
 import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {
     MuiFilter,
-    MuiGrid,
     useBaseAppContext,
     useFilterApiRef,
     useResourceApiService,
@@ -13,6 +12,11 @@ import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {formatDate} from "../../../util/dateUtils.ts";
+
+const sortModel = [{ field: 'createdDate', sort: 'desc' }];
+const perspectives = ["ESTAT"];
 
 const columns = [
     {
@@ -31,6 +35,11 @@ const columns = [
         field: 'estat',
         flex: 0.5,
         renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}/>
+    },
+    {
+        field: 'createdDate',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value),
     },
 ]
 
@@ -114,7 +123,7 @@ const useRelacionar= (refresh?: () => void) => {
 
     const relacionar = (ids:any[]) => {
         if (apiIsReady) {
-            apiPatch(entity?.id, {data: {relacionatsAmb: ids}})
+            apiPatch(entity?.id, {data: {relacionatsAmb: ids.map(id=>{ return {id:id}} )}})
                 .then(() => {
                     refresh?.()
                     temporalMessageShow(null, '', 'success');
@@ -138,15 +147,30 @@ const useRelacionar= (refresh?: () => void) => {
                     text: t('common.close'),
                     icon: 'close'
                 },
+                {
+                    value: 'relacio',
+                    text: t('page.expedient.acciones.relacio'),
+                    icon: 'link',
+                    componentProps: {
+                        variant: "contained",
+                        style: {
+                            borderRadius: '4px',
+                        },
+                    }
+                },
             ]}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();
                 }
+                if (value=='relacio') {
+                    relacionarAll();
+                    handleClose();
+                }
             }}
         >
             <ActionFilter onSpringFilterChange={setSpringFilter}/>
-            <MuiGrid
+            <StyledMuiGrid
                 resourceName={'expedientResource'}
                 titleDisabled
                 datagridApiRef={gridApiRef}
@@ -155,19 +179,12 @@ const useRelacionar= (refresh?: () => void) => {
                     builder.neq('id', entity?.id),
                     springFilter
                 )}
+                sortModel={sortModel}
+                perspectives={perspectives}
 
                 selectionActive
                 // TODO: check seleccionados al inicio
                 rowSelectionModel={entity?.relacionatsAmb?.map((a:any)=>a.id)}
-                toolbarElementsWithPositions={[
-                    {
-                        position: 3,
-                        element: <IconButton onClick={relacionarAll}>
-                            <Icon>link</Icon>
-                            <Typography>{t('page.expedient.acciones.relacio')}</Typography>
-                        </IconButton>,
-                    },
-                ]}
 
                 // height={'calc(162px + calc(52px * 4))'}
                 height={162 + 52 * 4}

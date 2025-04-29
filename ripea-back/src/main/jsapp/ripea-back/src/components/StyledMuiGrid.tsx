@@ -29,7 +29,7 @@ const StyledMuiGrid = (props:any) => {
     const dataApiRef = useMuiDatagridApiRef();
     const { t } = useTranslation();
 
-    const {resourceName, filter, columns, apiRef = gridApiRef, datagridApiRef = dataApiRef, toolbarElementsWithPositions, toolbarCreateTitle, toolbarHideRefresh, toolbarHideCreate, toolbarMassiveActions, ...others} = props
+    const {resourceName, filter, columns, apiRef = gridApiRef, datagridApiRef = dataApiRef, toolbarElementsWithPositions, toolbarCreateTitle, toolbarHideRefresh, toolbarHideCreate, toolbarMassiveActions, readOnly, ...others} = props
     const [gridRows, setGridRows] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
@@ -54,7 +54,7 @@ const StyledMuiGrid = (props:any) => {
                 filter={filter}
                 actions={toolbarMassiveActions}
             />,
-            hidden: !toolbarMassiveActions,
+            hidden: !toolbarMassiveActions || readOnly,
         },
         {
             position: 3,
@@ -64,7 +64,7 @@ const StyledMuiGrid = (props:any) => {
         {
             position: 4,
             element: <ToolBarButton title={t('common.create')} icon={'add'} onClick={create}>{toolbarCreateTitle}</ToolBarButton>,
-            hidden: toolbarHideCreate,
+            hidden: toolbarHideCreate || readOnly,
         }
     ]
         .filter(e => !e.hidden)
@@ -166,6 +166,7 @@ const StyledMuiGrid = (props:any) => {
             toolbarHideExport
             toolbarHideQuickFilter
             toolbarElementsWithPositions={toolbarElements}
+            readOnly={readOnly}
         />
     </>
 }

@@ -230,7 +230,7 @@ const ExpedientGrid = () => {
                     apiRef={apiRef}
                     popupEditCreateActive
                     popupEditFormContent={<ExpedientGridForm />}
-                    onRowDoubleClick={(row) => navigate(`/contingut/${row?.id}`)}
+                    onRowDoubleClick={(row:any) => navigate(`/contingut/${row?.id}`)}
                     rowAdditionalActions={actions}
                     paginationActive
                     rowHideUpdateButton={hiddenUpdate}
