@@ -129,6 +129,13 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
         {
+            title: t('common.update'),
+            icon: 'edit',
+            showInMenu: true,
+            hidden: isTancat,
+            clickShowUpdateDialog: true,
+        },
+        {
             title: t('page.expedient.acciones.follow'),
             icon: "person_add",
             showInMenu: true,
@@ -294,7 +301,6 @@ export const useCommonActions = (refresh?: () => void) => {
 
     return {
         actions,
-        hiddenUpdate: (row:any) => isTancat(row),
         hiddenDelete: (row:any) => isTancat(row),
         components
     }

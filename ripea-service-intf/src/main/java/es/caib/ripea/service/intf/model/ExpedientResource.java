@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -70,10 +71,16 @@ import java.util.List;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_RETORNAR_CODE,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_MASSIVE_EXPORT_DOC_CODE,
+                        formClass = ExpedientResource.ExportarDocumentMassiu.class),
 		})
 public class ExpedientResource extends NodeResource {
 
 	private static final long serialVersionUID = 7440910672703796468L;
+	public static final String ACTION_MASSIVE_EXPORT_DOC_CODE = "EXPORT_DOC";
+
 	public static final String ACTION_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_UNFOLLOW_CODE = "UNFOLLOW";
 	public static final String ACTION_AGAFAR_CODE = "AGAFAR";
@@ -242,4 +249,16 @@ public class ExpedientResource extends NodeResource {
         private Boolean pendentFirmar;
         private Boolean seguit;
 	}
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class ExportarDocumentMassiu implements Serializable {
+        private boolean carpetes = true;
+        private boolean versioImprimible = false;
+        private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
+
+        private List<Long> ids;
+    }
 }

@@ -92,7 +92,7 @@ const StyledMuiFilter = (props:any) => {
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
                 {
                     buttons?.map((button:FilterButtonProps)=>
-                        <Button onClick={() => buttonCallback?.(button.value)} {...button?.componentProps}>
+                        <Button key={button.value} onClick={() => buttonCallback?.(button.value)} {...button?.componentProps}>
                             {button?.icon && <Icon>{button?.icon}</Icon>}
                             {button.text}
                         </Button>)

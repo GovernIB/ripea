@@ -148,7 +148,6 @@ const useRelacionar= (refresh?: () => void) => {
             <ActionFilter onSpringFilterChange={setSpringFilter}/>
             <StyledMuiGrid
                 resourceName={'expedientResource'}
-                titleDisabled
                 datagridApiRef={gridApiRef}
                 columns={columns}
                 filter={builder.and(

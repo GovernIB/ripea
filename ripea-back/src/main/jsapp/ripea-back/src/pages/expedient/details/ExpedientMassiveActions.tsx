@@ -1,3 +1,5 @@
+import useExportarDocuments from "../actions/ExportarDocuments.tsx";
+
 const useMassiveActions = (refresh?: () => void)=> {
     // const {artifactAction} = useResourceApiService('expedientResource')
     return {}
@@ -6,6 +8,8 @@ const useMassiveActions = (refresh?: () => void)=> {
 const useExpedientMassiveActions = (refresh?: () => void)=> {
 
     const {} = useMassiveActions(refresh);
+
+    const {handleMassiveShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
 
     const actions = [
         {
@@ -62,10 +66,12 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
             title: "Exportar els documents dels expedients seleccionats",
             icon: "description",
             showInMenu: true,
+            onClick: handleExportDoc,
         },
     ]
 
     const components = <>
+        {contentExportDoc}
     </>
 
     return {
