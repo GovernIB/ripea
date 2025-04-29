@@ -208,7 +208,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const getId = () => calculatedId(id);
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
-    const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
+    const getFieldsInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
         // Obté les dades inicials.
         // Si és un formulari d'artefacte obté les dades dels camps
         // Si no és un formulari d'artefacte:
@@ -237,15 +237,13 @@ export const Form: React.FC<FormProps> = (props) => {
         }
     }
     const refresh = () => {
-        if (initialDataProp != null) {
-            reset(initialDataProp);
-        } else if (fields) {
-            getInitialData(id, fields, additionalData, initOnChangeRequest).
+        if (fields) {
+            getFieldsInitialData(id, fields, additionalData, initOnChangeRequest).
                 then((initialData: any) => {
                     debug && logConsole.debug('Initial data loaded', initialData);
                     const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
                     id != null && setApiActions(initialDataActions);
-                    reset(initialDataWithoutLinks);
+                    reset({...initialDataWithoutLinks, ...initialDataProp});
                 });
         }
     }
@@ -263,7 +261,7 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
-        const mergedData = { ...data, ...additionalData };
+        const mergedData = { ...getInitialDataFromFields(fields), ...additionalData, ...data };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {
@@ -271,7 +269,6 @@ export const Form: React.FC<FormProps> = (props) => {
                     idFromExternalResetRef.current = id;
                 });
         } else {
-            console.log('>>> externalReset', mergedData)
             reset(mergedData);
             idFromExternalResetRef.current = id;
         }
