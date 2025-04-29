@@ -70,6 +70,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE, new ArxiuDocumentPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
+        register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
+        register(DocumentResource.Fields.imprimible, new ImprimibleFieldDownloader());
+        register(DocumentResource.Fields.original, new OriginalFieldDownloader());
         register(DocumentResource.Fields.metaDocument, new MetaDocumentOnchangeLogicProcessor());
         register(DocumentResource.Fields.adjunt, new AdjuntOnchangeLogicProcessor());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaAdjuntOnchangeLogicProcessor());
@@ -213,10 +216,88 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 DocumentResourceEntity entity,
                 String fieldName,
                 OutputStream out) {
+        	
+        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+        			entity.getEntitat().getId(),
+        			entity.getId(),
+					true,
+					false);
+
+        	FitxerDto fitxerDto = documentHelper.getFitxerAssociat(document, null);
+        	
             return new DownloadableFile(
-                    entity.getFitxerNom(),
-                    entity.getFitxerContentType(),
-                    entity.getFitxerContingut()
+            		fitxerDto.getNom(),
+            		fitxerDto.getContentType(),
+            		fitxerDto.getContingut()
+            );
+        }
+    }
+    
+    private class FirmaFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
+        @Override
+        public DownloadableFile download(
+                DocumentResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+        	
+        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+        			entity.getEntitat().getId(),
+        			entity.getId(),
+					true,
+					false);
+
+        	FitxerDto fitxerDto = documentHelper.getFitxerFirmaSeparada(document);
+        	
+            return new DownloadableFile(
+            		fitxerDto.getNom(),
+            		fitxerDto.getContentType(),
+            		fitxerDto.getContingut()
+            );
+        }
+    }
+    
+    private class ImprimibleFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
+        @Override
+        public DownloadableFile download(
+                DocumentResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+        	
+        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+        			entity.getEntitat().getId(),
+        			entity.getId(),
+					true,
+					false);
+
+        	FitxerDto fitxerDto = pluginHelper.arxiuDocumentVersioImprimible(document);
+        	
+            return new DownloadableFile(
+            		fitxerDto.getNom(),
+            		fitxerDto.getContentType(),
+            		fitxerDto.getContingut()
+            );
+        }
+    }
+    
+    private class OriginalFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
+        @Override
+        public DownloadableFile download(
+                DocumentResourceEntity entity,
+                String fieldName,
+                OutputStream out) {
+        	
+        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+        			entity.getEntitat().getId(),
+        			entity.getId(),
+					true,
+					false);
+
+        	FitxerDto fitxerDto = documentHelper.getContingutOriginal(document);
+        	
+            return new DownloadableFile(
+            		fitxerDto.getNom(),
+            		fitxerDto.getContentType(),
+            		fitxerDto.getContingut()
             );
         }
     }

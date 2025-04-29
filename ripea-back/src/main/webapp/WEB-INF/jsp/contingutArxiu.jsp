@@ -248,29 +248,25 @@
 					<div role="tabpanel" class="tab-pane" id="metadades">
 						<table class="table table-striped table-bordered">
 							<c:set var="contMetadades" value="0" />
-							<c:forEach var="metadada" items="${arxiuDetall.metadadesAddicionals}" varStatus="status">
+							<c:forEach var="entry" items="${arxiuDetall.metadadesAddicionals}" varStatus="status">
 								<tr>
+									<c:set var="contMetadades" value="${contMetadades + 1}" />
 									<c:choose>
 										<c:when test="${contingut.document}">
-											<spring:message code="contingut.arxiu.camp.metadades.docu.enum.${metadada.key}" var="message" text=""/>
+											<spring:message code="contingut.arxiu.camp.metadades.docu.enum.${entry.key}" var="message" text="${entry.key}"/>
 											<c:if test="${not empty message}">
-												<c:set var="contMetadades" value="${contMetadades + 1}" />
-												<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.docu.enum.${metadada.key}"/></strong></td>
-												<td>${metadada.value}</td>
-											</c:if>			
+												<td width="20%"><strong>${message}</strong></td>
+												<td>${entry.value}</td>
+											</c:if>
 										</c:when>
 										<c:when test="${contingut.expedient}">
-											<spring:message code="contingut.arxiu.camp.metadades.exp.enum.${metadada.key}" var="message" text=""/>
-											<c:if test="${not empty message}">
-												<c:set var="contMetadades" value="${contMetadades + 1}" />
-												<td width="20%"><strong><spring:message code="contingut.arxiu.camp.metadades.exp.enum.${metadada.key}"/></strong></td>
-												<td>${metadada.value}</td>
-											</c:if>			
+											<spring:message code="contingut.arxiu.camp.metadades.exp.enum.${entry.key}" var="message" text="${entry.key}"/>
+											<td width="20%"><strong>${message}</strong></td>
+											<td>${entry.value}</td>
 										</c:when>
 										<c:otherwise>
-											<c:set var="contMetadades" value="${contMetadades + 1}" />
-											<td width="20%"><strong>${metadada.key}</strong></td>
-											<td>${metadada.value}</td>
+											<td width="20%"><strong>${entry.key}</strong></td>
+											<td>${entry.value}</td>
 										</c:otherwise>	
 									</c:choose>
 								</tr>

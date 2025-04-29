@@ -1018,6 +1018,34 @@ public class DocumentHelper {
         return getFitxerAssociat(document, versio);
     }
 
+    public FitxerDto getFitxerFirmaSeparada(DocumentEntity documentEntity) {
+		FitxerDto arxiu = new FitxerDto();
+		Document documentArxiu = pluginHelper.arxiuDocumentConsultar(documentEntity, null, null, true);
+
+		if (documentArxiu != null) {
+			List<Firma> firmes = documentArxiu.getFirmes();
+			if (firmes != null && firmes.size() > 0) {
+				Iterator<Firma> it = firmes.iterator();
+				while (it.hasNext()) {
+					Firma firma = it.next();
+					if (!FirmaTipus.CADES_DET.equals(firma.getTipus())) {
+						it.remove();
+					}
+				}
+
+				Firma firma = firmes.get(0);
+
+				if (firma != null) {
+					arxiu.setNom(documentArxiu.getNom()+"_signature.csig");
+					arxiu.setContentType("application/octet-stream");
+					arxiu.setContingut(firma.getContingut());
+					arxiu.setTamany(firma.getContingut() != null ? Long.valueOf(firma.getContingut().length) : null);
+				}
+			}
+		}
+		return arxiu;
+    }
+    
 	public FitxerDto getFitxerAssociat(DocumentEntity document, String versio) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));

@@ -100,6 +100,7 @@ public class DocumentResource extends NodeResource {
 	private String fitxerContentType;
 	private Long fitxerTamany;
 	private byte[] fitxerContingut;
+	
     @NotNull
     @Transient
     @ResourceField(onChangeActive = true)
@@ -107,6 +108,12 @@ public class DocumentResource extends NodeResource {
     @Transient
     @ResourceField(onChangeActive = true)
     private FileReference firmaAdjunt;
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference original;
+    @Transient
+    @ResourceField(onChangeActive = true)
+    private FileReference imprimible;    
 
 	@Size(max = 32)
 	private String versioDarrera;

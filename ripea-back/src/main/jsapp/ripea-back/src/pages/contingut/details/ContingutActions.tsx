@@ -17,8 +17,8 @@ const useActions = (refresh?: () => void) => {
         fieldDownload: apiDownload,
     } = useResourceApiService('documentResource');
 
-    const downloadAdjunt = (id:any) :void => {
-        apiDownload(id,{fieldName: 'adjunt'})
+    const downloadAdjunt = (id:any,fieldName:string) :void => {
+        apiDownload(id,{fieldName})
             .then((result)=>{
                 const url = URL.createObjectURL(result.blob);
                 const link = document.createElement('a');
@@ -114,24 +114,28 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
         {
             title: t('page.document.acciones.imprimible'),
             icon: "download",
+			onClick: (id:any) => apiDownload(id, 'imprimible'),
             showInMenu: true,
             hidden: (row:any) => !isDigitalOrImportat(row) || isInOptions(row?.estat, 'DEFINITIU', 'FIRMA_PARCIAL') || isInOptions(row?.fitxerExtension, 'xsig') || user?.sessionScope?.imprimibleNoFirmats,
         },
         {
             title: t('common.download'),
             icon: "download",
+			onClick: (id:any) => apiDownload(id, 'adjunt'),
             showInMenu: true,
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
             title: t('page.document.acciones.original'),
             icon: "download",
+			onClick: (id:any) => apiDownload(id, 'original'),
             showInMenu: true,
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
             title: t('page.document.acciones.firma'),
             icon: "download",
+			onClick: (id:any) => apiDownload(id, 'firmaAdjunt'),
             showInMenu: true,
             hidden: (row:any) => !isDigitalOrImportat(row) || row?.ntiTipoFirma != "TF04"
         },
