@@ -95,7 +95,7 @@ const ExpedientFilter = (props:any) => {
     }
     const netejar = ()=> {
         filterRef.current.clear()
-        saveFilterData(formApiRef.current.getData())
+        saveFilterData(null)
     }
 
     useEffect(() => {
@@ -113,7 +113,6 @@ const ExpedientFilter = (props:any) => {
         formApiRef={formApiRef}
         commonFieldComponentProps={{ size: 'small' }}
         componentProps={{ sx: { ...filterStyle, minHeight: '206px' } }}
-        additionalData={filterData}
         onDataChange={(data) => {
             if (data && Object.keys(data).length > 0 && !filterData) {
                 cercar()
