@@ -9,8 +9,8 @@ const CambiarEstatForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
-        <GridFormField xs={12} name="estat" required/>
-        <GridFormField xs={12} name="estatAdditional" required hidden={data?.estat == "TANCAT"}/>
+        <GridFormField xs={12} name="estat" disabled readOnly/>
+        <GridFormField xs={12} name="estatAdditional" hidden={data?.estat == "TANCAT"}/>
     </Grid>
 }
 
