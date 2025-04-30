@@ -1,10 +1,10 @@
-import {GridPage, MuiGrid, useMuiDataGridApiRef} from "reactlib";
+import {Grid, Icon} from "@mui/material";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
-import Icon from "@mui/material/Icon";
-import usePublicacioActions from "./details/PublicacioActions.tsx";
-import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import usePublicacioActions from "./details/PublicacioActions.tsx";
 
 const StyledEstat = (props:any) => {
     const { entity: publicacio } = props;
@@ -34,6 +34,7 @@ const PublicacioGridForm = () => {
     </Grid>
 }
 
+const sortModel = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
@@ -75,7 +76,7 @@ const PublicacioGrid = (props:any) => {
     const {actions, components} = usePublicacioActions(refresh);
 
     return <GridPage>
-        <MuiGrid
+        <StyledMuiGrid
             resourceName="documentPublicacioResource"
             // perspectives={['']}
             popupEditActive
@@ -86,14 +87,11 @@ const PublicacioGrid = (props:any) => {
             filter={builder.and(
                 builder.eq('expedient.id', id)
             )}
-            titleDisabled
             apiRef={apiRef}
-            staticSortModel={[{field: 'id', sort: 'asc'}]}
-            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
-            disableColumnMenu
+            staticSortModel={sortModel}
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
             disableColumnSorting
             toolbarHideCreate
-            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
         {components}
     </GridPage>

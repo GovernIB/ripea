@@ -1,10 +1,14 @@
-import {GridPage, MuiGrid, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import * as builder from '../../util/springFilterUtils';
 import {useDadaActions} from "./details/DadaActions.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const dadesFilter = (entity:any, dades:any[]) :any[] => {
     return dades.filter((dada)=>dada?.node?.id == entity?.id)
 }
+
+const sortModel = [{ field: 'ordre', sort: 'asc' }]
+const perspectives = ['DADES']
 
 const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) => void) }) => {
     const apiRef = useMuiDataGridApiRef()
@@ -30,8 +34,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
     const {actions, components} = useDadaActions(entity,refresh);
 
     return <GridPage>
-        <MuiGrid
-            titleDisabled
+        <StyledMuiGrid
             resourceName="metaDadaResource"
             columns={columns}
             filter={
@@ -39,18 +42,16 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
                     builder.eq('metaNode.id', entity?.metaNode?.id)
                 )
             }
-            sortModel={[{ field: 'ordre', sort: 'asc' }]}
-            perspectives={['DADES']}
+            staticSortModel={sortModel}
+            perspectives={perspectives}
             apiRef={apiRef}
             rowAdditionalActions={actions}
             paginationActive
-            disableColumnMenu
             disableColumnSorting
             readOnly
-            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
-            onRowsChange={(rows)=> {
+            onRowsChange={(rows:any)=> {
                 const array:any[] = []
-                rows.forEach(row => array.push(...row.dades))
+                rows.forEach((row:any) => array.push(...row.dades))
                 onRowCountChange?.(dadesFilter(entity, array).length)
             }}
         />

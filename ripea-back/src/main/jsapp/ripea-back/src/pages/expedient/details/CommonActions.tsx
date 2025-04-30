@@ -13,13 +13,13 @@ import {Divider} from "@mui/material";
 
 const useActions = (refresh?: () => void) =>{
     const {temporalMessageShow} = useBaseAppContext();
-debugger;
+
     const {
         patch: apiPatch,
         artifactAction: apiAction,
 		fieldDownload: apiDownload,
     } = useResourceApiService('expedientResource');
-	debugger;
+
 	const downloadAdjunt = (id:any,fieldName:string) :void => {
 	    apiDownload(id,{fieldName})
 	        .then((result)=>{

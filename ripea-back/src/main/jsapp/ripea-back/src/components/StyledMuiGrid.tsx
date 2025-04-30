@@ -6,7 +6,7 @@ import {useTranslation} from "react-i18next";
 import MassiveActionSelector from "./MassiveActionSelector.tsx";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
-const ToolBarButton = (props:any) => {
+export const ToolbarButton = (props:any) => {
     const { title, icon, children, color = "info", ...other } = props;
 
     return <Tooltip title={title}>
@@ -72,12 +72,12 @@ const StyledMuiGrid = (props:any) => {
         },
         {
             position: 3,
-            element: <ToolBarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh}/>,
+            element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh}/>,
             hidden: toolbarHideRefresh,
         },
         {
             position: 4,
-            element: <ToolBarButton title={t('common.create')} icon={'add'} onClick={create}>{toolbarCreateTitle}</ToolBarButton>,
+            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create}>{toolbarCreateTitle}</ToolbarButton>,
             hidden: toolbarHideCreate || readOnly,
         }
     ]
@@ -178,9 +178,9 @@ const StyledMuiGrid = (props:any) => {
             titleDisabled
             disableColumnMenu
 
-            selectionActive={selectionActive}
-            checkboxSelection={selectionActive}
-            keepNonExistentRowsSelected={selectionActive}
+            selectionActive={selectionActive || !!toolbarMassiveActions}
+            checkboxSelection={selectionActive || !!toolbarMassiveActions}
+            keepNonExistentRowsSelected={selectionActive || !!toolbarMassiveActions}
 
             toolbarHideRefresh
             toolbarHideCreate

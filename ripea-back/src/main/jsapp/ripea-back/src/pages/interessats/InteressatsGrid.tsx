@@ -1,6 +1,5 @@
 import {
     GridPage,
-    MuiGrid,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import {Grid} from "@mui/material";
@@ -8,6 +7,8 @@ import React from "react";
 import GridFormField from "../../components/GridFormField.tsx";
 import useInteressatActions from "./details/InteressatActions.tsx";
 import {useTranslation} from "react-i18next";
+import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
+import * as builder from "../../util/springFilterUtils.ts";
 
 export const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -28,6 +29,8 @@ export const InteressatsGridForm = () => {
         <GridFormField xs={12} name="preferenciaIdioma" required/>
     </Grid>
 }
+
+const sortModel = [{field: 'id', sort: 'asc'}]
 
 const columns = [
     {
@@ -66,26 +69,37 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {actions, components} = useInteressatActions(refresh)
 
     return <GridPage>
-        <MuiGrid
+        <StyledMuiGrid
             resourceName="interessatResource"
             popupEditFormDialogResourceTitle={t('page.interessat.title')}
             columns={columns}
             paginationActive
             apiRef={apiRef}
-            filter={`expedient.id:${id} AND esRepresentant:false`}
-            staticSortModel={[{field: 'id', sort: 'asc'}]}
+            filter={builder.and(
+                builder.eq('expedient.id', id),
+                builder.eq('esRepresentant', false)
+            )}
+            staticSortModel={sortModel}
             disableColumnSorting
-            disableColumnMenu
-            titleDisabled
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
             formAdditionalData={{
                 expedient: {id: id},
             }}
             rowAdditionalActions={actions}
-            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
             rowHideDeleteButton
-            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
+
+            toolbarElementsWithPositions={[
+                {
+                    position: 0,
+                    element: <ToolbarButton icon={'upload'} color={'none'}>Exportar...</ToolbarButton>
+                },
+                {
+                    position: 0,
+                    element: <ToolbarButton icon={'download'} color={'none'}>Importar...</ToolbarButton>
+                },
+            ]}
         />
 
         {components}

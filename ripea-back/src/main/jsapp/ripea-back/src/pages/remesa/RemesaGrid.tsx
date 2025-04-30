@@ -1,10 +1,10 @@
-import {GridPage, MuiGrid, useMuiDataGridApiRef} from "reactlib";
-import {formatDate} from "../../util/dateUtils.ts";
-import {Grid, Typography} from "@mui/material";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {Grid, Typography, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
-import Icon from "@mui/material/Icon";
-import * as builder from "../../util/springFilterUtils.ts";
 import GridFormField from "../../components/GridFormField.tsx";
+import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import {formatDate} from "../../util/dateUtils.ts";
+import * as builder from "../../util/springFilterUtils.ts";
 
 const StyledEstat = (props:any) => {
     const { entity } = props;
@@ -38,6 +38,7 @@ const RemesaGridForm = () => {
     </Grid>
 }
 
+const sortModel = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
@@ -84,27 +85,22 @@ const RemesaGrid = (props:any) => {
     const {actions, components} = useRemesaActions(refresh);
 
     return <GridPage>
-        <MuiGrid
+        <StyledMuiGrid
             resourceName="documentNotificacioResource"
             popupEditActive
             popupEditFormContent={<RemesaGridForm/>}
+            filter={builder.and(builder.eq('expedient.id', id))}
+            staticSortModel={sortModel}
             // perspectives={['']}
             columns={columns}
             rowAdditionalActions={actions}
             paginationActive
-            filter={builder.and(
-                builder.eq('expedient.id', id)
-            )}
-            titleDisabled
             apiRef={apiRef}
-            staticSortModel={[{field: 'id', sort: 'asc'}]}
-            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
-            disableColumnMenu
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
             disableColumnSorting
             toolbarHideCreate
             rowHideUpdateButton={(row:any) => row.tipus != 'MANUAL'}
             rowHideDeleteButton={(row:any) => row.tipus != 'MANUAL'}
-            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
         {components}
     </GridPage>
