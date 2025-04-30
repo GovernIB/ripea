@@ -1,9 +1,10 @@
 import {useState} from "react";
 import {Grid} from "@mui/material";
-import {MuiGrid, useFormContext, MuiDialog} from "reactlib";
+import {useFormContext, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 
 const DadaForm = () => {
     const { data }  = useFormContext();
@@ -39,6 +40,8 @@ const columns = [
     }
 ]
 
+const sortModel = [{ field: 'ordre', sort: 'asc' }]
+
 const useDataGrid = (contingut:any, refresh?:() => void) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
@@ -73,8 +76,8 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
                 }
             }}
         >
-            <MuiGrid
-                titleDisabled
+            <StyledMuiGrid
+                // titleDisabled
                 resourceName={"dadaResource"}
                 filter={
                     builder.and(
@@ -82,7 +85,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
                         builder.eq('node.id', contingut?.id),
                     )
                 }
-                staticSortModel={[{ field: 'ordre', sort: 'asc' }]}
+                staticSortModel={sortModel}
                 columns={columns}
                 popupEditCreateActive
                 popupEditFormContent={<DadaForm/>}
@@ -91,11 +94,12 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
                     node:{id: contingut?.id},
                     tipusValor: getDataFieldType(entity?.tipus),
                 }}
-                onRowsChange={(rows, info) => {
+                onRowsChange={(rows:any, info:any) => {
                     setNumDades?.(info?.totalElements)
                     refresh?.()
                 }}
                 autoHeight
+                // height={162 + 52 * 4}
                 toolbarHideCreate={ numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
             />
         </MuiDialog>

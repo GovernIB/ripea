@@ -1,10 +1,15 @@
 import {
     GridPage,
-    MuiGrid, useMuiDataGridApiRef,
+    useMuiDataGridApiRef,
 } from 'reactlib';
+import {useTranslation} from "react-i18next";
 import useAnotacioActions from "./details/AnotacioActions.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
-import {useTranslation} from "react-i18next";
+import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
+import * as builder from "../../util/springFilterUtils.ts";
+
+const sortModel = [{field: 'registreInfo.data', sort: 'desc'}];
+const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
 
 const AnotacionsGrid = (props:any) => {
     const { id } = props;
@@ -33,7 +38,7 @@ const AnotacionsGrid = (props:any) => {
         },
         {
             field: 'registreInfo.destiDescripcio',
-            headerName: t('page.anotacio.grid.destiDescripcio'),
+            headerName: t('page.registre.grid.destiDescripcio'),
             flex: 0.5,
         },
     ];
@@ -41,17 +46,15 @@ const AnotacionsGrid = (props:any) => {
     const {actions, components} = useAnotacioActions(refresh);
 
     return <GridPage>
-        <MuiGrid
+        <StyledMuiGrid
             resourceName="expedientPeticioResource"
-            perspectives={['REGISTRE', 'ESTAT_VIEW']}
+            filter={builder.and(builder.eq('expedient.id', id))}
+            staticSortModel={sortModel}
+            perspectives={perspectives}
             columns={columns}
             rowAdditionalActions={actions}
             paginationActive
-            filter={`expedient.id:${id}`}
-            titleDisabled
             apiRef={apiRef}
-            staticSortModel={[{field: 'registreInfo.data', sort: 'desc'}]}
-            disableColumnMenu
             disableColumnSorting
             readOnly
         />

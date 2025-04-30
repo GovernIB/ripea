@@ -1,17 +1,18 @@
+import { useState } from "react";
+import { FormControl, Grid, InputLabel, Select, MenuItem, Icon } from "@mui/material";
 import {
     GridPage,
-    MuiGrid,
     useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
-import { useState } from "react";
+import {useTranslation} from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
-import { FormControl, Grid, FormControlLabel, InputLabel, Select, MenuItem, Checkbox, Icon } from "@mui/material";
 import {useContingutActions} from "./details/ContingutActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
-import * as builder from '../../util/springFilterUtils.ts';
-import {useTranslation} from "react-i18next";
+import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
+import * as builder from '../../util/springFilterUtils.ts';
+import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
 
 const DocumentsGridForm = () => {
     const { data } = useFormContext();
@@ -43,22 +44,24 @@ const ExpandButton = (props:{value:any, onChange:(value:any) => void, hidden: bo
         return <></>
     }
 
-    return <FormControlLabel control={<Checkbox
-        checked={value}
-        onChange={(event) => onChange(event.target.checked)}
-        icon={<Icon>arrow_right</Icon>}
-        checkedIcon={<Icon>arrow_drop_down</Icon>}
-    />} label={value ? t("common.contract") : t("common.expand")}/>
+    return <ToolbarButton
+        startIcon={<Icon>{value ?'arrow_right' :'arrow_drop_down'}</Icon>}
+        onClick={()=>onChange(!value)}
+        color={'none'}
+    >
+        {value ? t("common.contract") : t("common.expand")}
+    </ToolbarButton>
 }
 
 const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) => {
     const {value, onChange} = props;
     const { t } = useTranslation();
 
-    return <Grid item xs={3}>
+    return <Grid item xs={3} sx={{ ml: 1 }}>
         <FormControl fullWidth size="small">
             <InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>
             <Select
+                sx={{ maxHeight: '32px' }}
                 labelId="demo-simple-select-label"
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
@@ -71,6 +74,8 @@ const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) =
     </Grid>
 }
 
+const sortModel = [{field: 'id', sort: 'desc'}]
+const perspectives = ["PATH"]
 const columns = [
     {
         field: 'nom',
@@ -107,18 +112,19 @@ const DocumentsGrid = (props:any) => {
         dataGridApiRef?.current?.refresh?.();
     }
     const {actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, refresh);
+    const {actions: massiveActions, components: massiveComponents} = useContingutMassiveActions(refresh);
 
     return <GridPage>
         <Load value={entity}>
-        <MuiGrid
+        <StyledMuiGrid
             resourceName="documentResource"
             popupEditFormDialogResourceTitle={t('page.document.title')}
             columns={columns}
             paginationActive
-            filter={`expedient.id:${entity?.id}`}
-            perspectives={["PATH"]}
-            staticSortModel={[{field: 'id', sort: 'desc'}]}
-            titleDisabled
+            filter={builder.and(builder.eq('expedient.id', entity?.id))}
+            perspectives={perspectives}
+            staticSortModel={sortModel}
+            // titleDisabled
             popupEditCreateActive
             popupEditFormContent={<DocumentsGridForm/>}
             formAdditionalData={{
@@ -126,16 +132,13 @@ const DocumentsGrid = (props:any) => {
                 metaExpedient: {id: entity?.metaExpedient?.id},
             }}
             disableColumnSorting
-            disableColumnMenu
             rowHideUpdateButton={hiddenUpdate}
             rowHideDeleteButton={hiddenDelete}
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
-            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
-            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
-            // checkboxSelection
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
             treeData={treeView}
-            treeDataAdditionalRows={(_rows) => {
+            treeDataAdditionalRows={(_rows:any) => {
                 const additionalRows :any[] = [];
 
                 if(_rows!=null && vista == "carpeta") {
@@ -153,7 +156,7 @@ const DocumentsGrid = (props:any) => {
                 // console.log('>>> additionalRows', additionalRows)
                 return additionalRows;
             }}
-            getTreeDataPath={(row) :string[] => {
+            getTreeDataPath={(row:any) :string[] => {
                 switch (vista) {
                     case "estat": return [`${row.estat}`, `${row.nom}`];
                     case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
@@ -175,8 +178,14 @@ const DocumentsGrid = (props:any) => {
                     }} />,
                 }
             ]}
+
+            toolbarMassiveActions={massiveActions}
+            // isRowSelectable={(data:any)=> typeof data?.id == 'number'}
+            isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
+            // toolbarHideCreate
         />
         {components}
+        {massiveComponents}
         </Load>
     </GridPage>
 }

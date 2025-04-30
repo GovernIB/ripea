@@ -1,16 +1,17 @@
+import { Grid } from "@mui/material";
 import {
     GridPage,
-    MuiGrid, useFormContext,
+    useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
-import { formatDate } from "../../util/dateUtils.ts";
-import { Grid } from "@mui/material";
+import {useTranslation} from "react-i18next";
 import GridFormField from "../../components/GridFormField.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
+import { formatDate } from "../../util/dateUtils.ts";
 import useTascaActions from "./details/TascaActions.tsx";
-import {useTranslation} from "react-i18next";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
+import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -33,51 +34,56 @@ const TasquesGridForm = () => {
     </Grid>
 }
 
+const perspectives = ["RESPONSABLES_RESUM"]
+const columns = [
+    {
+        field: 'metaExpedientTasca',
+        flex: 0.5,
+    },
+    {
+        field: 'dataInici',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value)
+    },
+    {
+        field: 'dataLimit',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
+    },
+    {
+        field: 'titol',
+        flex: 0.5,
+    },
+    {
+        field: 'observacions',
+        flex: 0.5,
+    },
+    {
+        field: 'responsablesStr',
+        flex: 0.5,
+    },
+    {
+        field: 'responsableActual',
+        flex: 0.5,
+    },
+    {
+        field: 'estat',
+        flex: 0.5,
+    },
+    {
+        field: 'prioritat',
+        flex: 0.5,
+        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
+    },
+];
+
 const TasquesGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
 
-    const columns = [
-        {
-            field: 'metaExpedientTasca',
-            flex: 0.5,
-        },
-        {
-            field: 'dataInici',
-            flex: 0.5,
-            valueFormatter: (value: any) => formatDate(value)
-        },
-        {
-            field: 'dataLimit',
-            flex: 0.5,
-            valueFormatter: (value: any) => formatDate(value, "DD/MM/Y")
-        },
-        {
-            field: 'titol',
-            flex: 0.5,
-        },
-        {
-            field: 'observacions',
-            flex: 0.5,
-        },
-        {
-            field: 'responsablesStr',
-            flex: 0.5,
-        },
-        {
-            field: 'responsableActual',
-            flex: 0.5,
-        },
-        {
-            field: 'estat',
-            flex: 0.5,
-        },
-        {
-            field: 'prioritat',
-            flex: 0.5,
-            renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
-        },
+    const additionalColumns = [
+        ...columns,
         {
             field: 'numComentaris',
             headerName: '',
@@ -91,20 +97,19 @@ const TasquesGrid = (props: any) => {
                 resourceReference={'expedientTasca'}
             />
         },
-    ];
+    ]
     const { actions, components } = useTascaActions(apiRef?.current?.refresh);
 
     return <GridPage>
-        <MuiGrid
+        <StyledMuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
-            columns={columns}
+            columns={additionalColumns}
             paginationActive
-            filter={`expedient.id:${entity?.id}`}
-            titleDisabled
-            perspectives={["RESPONSABLES_RESUM"]}
-            onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
+            filter={builder.and(builder.eq('expedient.id', entity?.id))}
+            perspectives={perspectives}
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
             popupEditCreateActive
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
@@ -112,10 +117,8 @@ const TasquesGrid = (props: any) => {
                 metaExpedient: {id: entity?.metaExpedient?.id},
             }}
             rowAdditionalActions={actions}
-            disableColumnMenu
             rowHideUpdateButton
             rowHideDeleteButton
-            getRowClassName={(params) => params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
         />
         {components}
     </GridPage>

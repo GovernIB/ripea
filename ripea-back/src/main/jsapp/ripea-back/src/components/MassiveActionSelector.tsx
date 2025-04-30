@@ -52,7 +52,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) 
                     onClick={handleSelectAll}
                     sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
                 >
-                    <Icon color="action">check_box</Icon>
+                    <Icon color="action" sx={{m: 0}}>check_box</Icon>
                 </Button>
             </Tooltip>
             <Tooltip title={t('Netejar selecció')}>
@@ -60,7 +60,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) 
                     onClick={handleClearSelection}
                     sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
                 >
-                    <Icon color="action">check_box_outline_blank</Icon>
+                    <Icon color="action" sx={{m: 0}}>check_box_outline_blank</Icon>
                 </Button>
             </Tooltip>
 
@@ -73,7 +73,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) 
                 }}
             >
                 {actions.map((action:any) =>
-                    action?.showInMenu && !(action?.hidden==true || action?.hidden?.(selectedRows)) && <MenuItem onClick={()=>action?.onClick?.(selectedRows)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(selectedRows)}>
+                    !(action?.hidden==true || action?.hidden?.(selectedRows)) && <MenuItem onClick={()=>action?.onClick?.(selectedRows)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(selectedRows)}>
                         {action.icon && <Icon>{action.icon}</Icon>}{action.title}
                     </MenuItem>
                 )}
