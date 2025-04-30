@@ -1,13 +1,51 @@
+import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 
 const useMassiveActions = (refresh?: () => void)=> {
-    // const {artifactAction} = useResourceApiService('expedientResource')
-    return {}
+    const {temporalMessageShow} = useBaseAppContext();
+    const {artifactAction: apiAction} = useResourceApiService('expedientResource')
+
+    const agafar = (ids: any[]): void => {
+        apiAction(undefined, {code: 'AGAFAR', data:{ ids: ids }})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+    const follow = (ids: any[]): void => {
+        apiAction(undefined, {code : 'FOLLOW', data:{ ids: ids }})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+    const unfollow = (ids: any[]): void => {
+        apiAction(undefined, {code : 'UNFOLLOW', data:{ ids: ids }})
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                error && temporalMessageShow('Error', error.message, 'error');
+            });
+    }
+
+    return {
+        agafar,
+        follow,
+        unfollow,
+    }
 }
 
 const useExpedientMassiveActions = (refresh?: () => void)=> {
 
-    const {} = useMassiveActions(refresh);
+    const {agafar, follow, unfollow} = useMassiveActions(refresh);
 
     const {handleMassiveShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
 
@@ -15,6 +53,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
         {
             title: "Agafar",
             icon: "lock",
+            onClick: agafar,
         },
         {
             title: "Alliberar",
@@ -23,10 +62,12 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
         {
             title: "Seguir",
             icon: "person_add_alt1",
+            onClick: follow,
         },
         {
             title: "Deixar de seguir",
             icon: "person_remove",
+            onClick: unfollow,
         },
         {
             title: "Esborrar",

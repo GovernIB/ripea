@@ -4,12 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -524,60 +519,132 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     // ActionExecutor
-    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
-        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
             Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+            List<ExpedientResourceEntity> expedients = new ArrayList<>();
 
-            if (optionalUsuariResource.isPresent() && !entity.getSeguidors().contains(optionalUsuariResource.get())) {
-                entity.getSeguidors().add(optionalUsuariResource.get());
-                expedientResourceRepository.save(entity);
+            if (optionalUsuariResource.isPresent()) {
+
+                // Individual
+                if (entity != null) {
+                    expedients.add(entity);
+                }
+
+                // Massive
+                if (params.getIds() != null && !params.getIds().isEmpty()) {
+                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
+                }
+
+                expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
             }
 
-            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+            return null;
+        }
+
+        public List<ExpedientResourceEntity> exec(List<ExpedientResourceEntity> entitys, UsuariResourceEntity user) throws ActionExecutionException {
+            List<ExpedientResourceEntity> expedients = new ArrayList<>();
+
+            entitys.forEach(expedientResourceEntity -> {
+                if (!expedientResourceEntity.getSeguidors().contains(user)) {
+                    expedientResourceEntity.getSeguidors().add(user);
+                    expedients.add(expedientResourceEntity);
+                }
+            });
+
+            return expedients;
         }
 
         @Override
-        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {
 
         }
     }
-    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
-        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
             Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+            List<ExpedientResourceEntity> expedients = new ArrayList<>();
 
-            if (optionalUsuariResource.isPresent() && entity.getSeguidors().contains(optionalUsuariResource.get())) {
-                entity.getSeguidors().remove(optionalUsuariResource.get());
-                expedientResourceRepository.save(entity);
+            if (optionalUsuariResource.isPresent()) {
+
+                // Individual
+                if (entity != null) {
+                    expedients.add(entity);
+                }
+
+                // Massive
+                if (params.getIds() != null && !params.getIds().isEmpty()) {
+                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
+                }
+
+                expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
             }
 
-            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+            return null;
+        }
+
+        public List<ExpedientResourceEntity> exec(List<ExpedientResourceEntity> entitys, UsuariResourceEntity user) throws ActionExecutionException {
+            List<ExpedientResourceEntity> expedients = new ArrayList<>();
+
+            entitys.forEach(expedientResourceEntity -> {
+                if (expedientResourceEntity.getSeguidors().contains(user)) {
+                    expedientResourceEntity.getSeguidors().remove(user);
+                    expedients.add(expedientResourceEntity);
+                }
+            });
+
+            return expedients;
         }
 
         @Override
-        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {
 
         }
     }
-    private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+    private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
-        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
             Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
+            List<ExpedientResourceEntity> expedients = new ArrayList<>();
 
-            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
-                entity.setAgafatPer(optionalUsuariResource.get());
-                expedientResourceRepository.save(entity);
+            if (optionalUsuariResource.isPresent()) {
+
+                // Individual
+                if (entity != null) {
+                    expedients.add(entity);
+                }
+
+                // Massive
+                if (params.getIds() != null && !params.getIds().isEmpty()) {
+                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
+                }
+
+                expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
             }
 
-            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+            return null;
+        }
+
+        public List<ExpedientResourceEntity> exec(List<ExpedientResourceEntity> entitys, UsuariResourceEntity user) throws ActionExecutionException {
+            List<ExpedientResourceEntity> expedients = new ArrayList<>();
+
+            entitys.forEach(entity -> {
+                if (entity.getAgafatPer() != user) {
+                    entity.setAgafatPer(user);
+                    expedients.add(entity);
+                }
+            });
+
+            return expedients;
         }
 
         @Override
-        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {
 
         }
     }

@@ -93,11 +93,11 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             toolbarElementsWithPositions={[
                 {
                     position: 0,
-                    element: <ToolbarButton icon={'upload'} color={'none'}>Exportar...</ToolbarButton>
+                    element: <ToolbarButton icon={'upload'}>Exportar...</ToolbarButton>
                 },
                 {
                     position: 0,
-                    element: <ToolbarButton icon={'download'} color={'none'}>Importar...</ToolbarButton>
+                    element: <ToolbarButton icon={'download'}>Importar...</ToolbarButton>
                 },
             ]}
         />

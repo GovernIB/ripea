@@ -7,13 +7,12 @@ import MassiveActionSelector from "./MassiveActionSelector.tsx";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
 
 export const ToolbarButton = (props:any) => {
-    const { title, icon, children, color = "info", ...other } = props;
+    const { title, icon, children, ...other } = props;
 
     return <Tooltip title={title}>
         <Button
             variant="outlined"
             size="small"
-            color={color}
             startIcon={<Icon sx={{m: 0}}>{icon}</Icon>}
             {...other}
             sx={{ borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }}
@@ -72,12 +71,12 @@ const StyledMuiGrid = (props:any) => {
         },
         {
             position: 3,
-            element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh}/>,
+            element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'info'}/>,
             hidden: toolbarHideRefresh,
         },
         {
             position: 4,
-            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create}>{toolbarCreateTitle}</ToolbarButton>,
+            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create} color={'info'}>{toolbarCreateTitle}</ToolbarButton>,
             hidden: toolbarHideCreate || readOnly,
         }
     ]

@@ -58,11 +58,11 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_FOLLOW_CODE,
-                        requiresId = true),
+                        formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_UNFOLLOW_CODE,
-                        requiresId = true),
+                        formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_AGAFAR_CODE,
@@ -254,11 +254,15 @@ public class ExpedientResource extends NodeResource {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class ExportarDocumentMassiu implements Serializable {
+    public static class ExportarDocumentMassiu extends MassiveAction {
         private boolean carpetes = true;
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
+    }
 
+    @Getter
+    @Setter
+    public static class MassiveAction implements Serializable {
         private List<Long> ids;
     }
 }
