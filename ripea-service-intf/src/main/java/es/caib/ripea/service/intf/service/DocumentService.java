@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.security.PermitAll;
+
 
 /**
  * Declaració dels mètodes per a gestionar documents.
@@ -412,7 +414,7 @@ public interface DocumentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("isAuthenticated()")
+	@PermitAll
 	public Exception portafirmesCallback(
 			long documentId,
 			PortafirmesCallbackEstatEnumDto estat,
@@ -571,9 +573,8 @@ public interface DocumentService {
 
 	FitxerDto descarregarImprimible(Long entitatId, Long id, String versio);
 	
-
-	void notificacioActualitzarEstat(String identificador,
-			String referencia);
+	@PermitAll
+	void notificacioActualitzarEstat(String identificador, String referencia);
 
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId);
 

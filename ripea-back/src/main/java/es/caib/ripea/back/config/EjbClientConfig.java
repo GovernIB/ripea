@@ -3,16 +3,72 @@
  */
 package es.caib.ripea.back.config;
 
-import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
-import es.caib.ripea.service.intf.base.service.ResourceApiService;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.resourceservice.*;
-import es.caib.ripea.service.intf.service.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
+
+import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
+import es.caib.ripea.service.intf.base.service.ResourceApiService;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentEnviamentInteressatResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentPublicacioResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientComentariResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientTascaComentariResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
+import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
+import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaDadaResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
+import es.caib.ripea.service.intf.resourceservice.MetaExpedientTascaResourceService;
+import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
+import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
+import es.caib.ripea.service.intf.resourceservice.RegistreInteressatResourceService;
+import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
+import es.caib.ripea.service.intf.service.AlertaService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.AvisService;
+import es.caib.ripea.service.intf.service.CarpetaService;
+import es.caib.ripea.service.intf.service.ConfigService;
+import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.service.DadesExternesService;
+import es.caib.ripea.service.intf.service.DigitalitzacioService;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.DominiService;
+import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.ExecucioMassivaService;
+import es.caib.ripea.service.intf.service.ExpedientEstatService;
+import es.caib.ripea.service.intf.service.ExpedientInteressatService;
+import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
+import es.caib.ripea.service.intf.service.ExpedientService;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
+import es.caib.ripea.service.intf.service.GrupService;
+import es.caib.ripea.service.intf.service.HistoricService;
+import es.caib.ripea.service.intf.service.ImportacioService;
+import es.caib.ripea.service.intf.service.MetaDadaService;
+import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.service.MetaExpedientService;
+import es.caib.ripea.service.intf.service.MonitorTasquesService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.service.PinbalServeiService;
+import es.caib.ripea.service.intf.service.PortafirmesFluxService;
+import es.caib.ripea.service.intf.service.SegonPlaService;
+import es.caib.ripea.service.intf.service.SeguimentService;
+import es.caib.ripea.service.intf.service.TipusDocumentalService;
+import es.caib.ripea.service.intf.service.URLInstruccioService;
+import es.caib.ripea.service.intf.service.UnitatOrganitzativaService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configuració d'accés als services de Spring mitjançant EJBs.
@@ -374,6 +430,12 @@ public class EjbClientConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean entitatResourceServiceEjb() {
 		return getLocalEjbFactoyBean(EntitatResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean expedientEstatResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ExpedientEstatResourceService.class);
 	}
 	
 	/*

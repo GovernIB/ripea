@@ -366,8 +366,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 
 	@Override
 	@PermitAll
-	public void notificacioActualitzarEstat(String identificador,
-			String referencia) {
+	public void notificacioActualitzarEstat(String identificador, String referencia) {
 		delegateService.notificacioActualitzarEstat(identificador, referencia);
 	}
 
