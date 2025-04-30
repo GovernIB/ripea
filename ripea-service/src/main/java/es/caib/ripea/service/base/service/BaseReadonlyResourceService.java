@@ -63,7 +63,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	private Class<R> resourceClass;
 	private Class<E> entityClass;
-	private final Map<String, ReportDataGenerator<E, ?, ? extends Serializable>> reportDataGeneratorMap = new HashMap<>();
+	private final Map<String, ReportGenerator<E, ?, ? extends Serializable>> reportGeneratorMap = new HashMap<>();
 	private final Map<String, FilterProcessor<?>> filterProcessorMap = new HashMap<>(); // TODO
 	private final Map<String, PerspectiveApplicator<E, R>> perspectiveApplicatorMap = new HashMap<>();
 	private final Map<String, FieldDownloader<E>> fieldDownloaderMap = new HashMap<>();
@@ -229,7 +229,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		}
 		if (type == null || type == ResourceArtifactType.REPORT) {
 			artifacts.addAll(
-					reportDataGeneratorMap.keySet().stream().
+					reportGeneratorMap.keySet().stream().
 							map(code -> new ResourceArtifact(
 									ResourceArtifactType.REPORT,
 									code,
@@ -264,8 +264,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 						null);
 			}
 		} else if (type == ResourceArtifactType.REPORT) {
-			ReportDataGenerator<E, ?, ?> reportDataGenerator = reportDataGeneratorMap.get(code);
-			if (reportDataGenerator != null) {
+			ReportGenerator<E, ?, ?> reportGenerator = reportGeneratorMap.get(code);
+			if (reportGenerator != null) {
 				return new ResourceArtifact(
 						ResourceArtifactType.REPORT,
 						code,
@@ -334,7 +334,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String code,
 			P params) throws ArtifactNotFoundException, ReportGenerationException {
 		log.debug("Generating report data (id={}, code={}, params={})", id, code, params);
-		ReportDataGenerator<E, P, ?> generator = (ReportDataGenerator<E, P, ?>)reportDataGeneratorMap.get(code);
+		ReportGenerator<E, P, ?> generator = (ReportGenerator<E, P, ?>) reportGeneratorMap.get(code);
 		if (generator != null) {
 			E entity = null;
 			if (id != null) {
@@ -354,7 +354,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			ReportFileType fileType,
 			OutputStream out) throws ArtifactNotFoundException, ReportGenerationException {
 		log.debug("Generating report file (code={}, data={}, fileType={})", code, data, fileType);
-		ReportDataGenerator<E, ?, ?> generator = reportDataGeneratorMap.get(code);
+		ReportGenerator<E, ?, ?> generator = reportGeneratorMap.get(code);
 		if (generator != null) {
 			DownloadableFile downloadableFile = generator.generateFile(code, data, fileType, out);
 			if (downloadableFile != null) {
@@ -780,9 +780,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String[] previousFieldsChanged,
 			P target) {
 		if (type == ResourceArtifactType.REPORT) {
-			ReportDataGenerator<E, P, ?> reportDataGenerator = (ReportDataGenerator<E, P, ?>)reportDataGeneratorMap.get(code);
-			if (reportDataGenerator != null) {
-				reportDataGenerator.onChange(
+			ReportGenerator<E, P, ?> reportGenerator = (ReportGenerator<E, P, ?>) reportGeneratorMap.get(code);
+			if (reportGenerator != null) {
+				reportGenerator.onChange(
 						previous,
 						fieldName,
 						fieldValue,
@@ -806,9 +806,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	protected void register(
 			String reportCode,
-			ReportDataGenerator<E, ?, ?> reportGenerator) {
+			ReportGenerator<E, ?, ?> reportGenerator) {
 		if (artifactIsPresentInResourceConfig(ResourceArtifactType.REPORT, reportCode)) {
-			reportDataGeneratorMap.put(reportCode, reportGenerator);
+			reportGeneratorMap.put(reportCode, reportGenerator);
 		} else {
 			log.error("Artifact not registered because it doesn't exist in ResourceConfig annotation (" +
 					"resourceClass=" + getResourceClass() + ", " +
@@ -1219,7 +1219,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
 	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportDataGenerator<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
+	public interface ReportGenerator<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
 		/**
 		 * Genera les dades per l'informe.
 		 *
