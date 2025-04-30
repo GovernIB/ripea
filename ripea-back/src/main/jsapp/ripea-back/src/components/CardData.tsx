@@ -40,7 +40,7 @@ export const CardData = (props:any) => {
             <CardContent hidden={!children}>
                 <Grid container columnSpacing={1} rowSpacing={1} item xs={12} {...other}>
                     {children}
-                    {buttons?.map((button:any) => <CardButton {...button}/>)}
+                    {buttons?.map((button:any) => <CardButton key={button?.text} {...button}/>)}
                 </Grid>
             </CardContent>
         </Card>

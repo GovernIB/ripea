@@ -10,6 +10,8 @@ import useRelacionar from "../actions/Relacionar.tsx";
 import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
+import useExportarDocuments from "../actions/ExportarDocuments.tsx";
+import {DataCommonAdditionalAction} from "../../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
 
 const useActions = (refresh?: () => void) =>{
     const {temporalMessageShow} = useBaseAppContext();
@@ -104,6 +106,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
+    const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
 
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
@@ -274,6 +277,14 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),
         },
         {
+            title: "Exportar los documentos...",
+            icon: "description",
+			onClick: handleExportDoc,
+            showInMenu: true,
+            disabled: (row:any) => !row?.conteDocumentsDefinitius,
+            hidden: (row:any) => !row?.conteDocuments,
+        },
+        {
             title: t('page.expedient.acciones.infoArxiu'),
             icon: "info",
             showInMenu: true,
@@ -297,6 +308,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {arxiuDialog}
         {assignarContent}
         {cambiarRelacionar}
+        {contentExportDoc}
     </>;
 
     return {

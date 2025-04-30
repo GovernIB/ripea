@@ -94,7 +94,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
             icon: "download",
         },
         {
-            title: "Exportar els documents dels expedients seleccionats",
+            title: "Exportar els documents dels expedients seleccionats...",
             icon: "description",
             onClick: handleExportDoc,
         },

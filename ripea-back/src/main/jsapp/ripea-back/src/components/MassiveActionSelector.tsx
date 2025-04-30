@@ -5,15 +5,22 @@ import { useTranslation } from 'react-i18next';
 import { GridApiCommunity } from '@mui/x-data-grid';
 import MenuButton from "./MenuButton.tsx";
 
-interface MassiveActionSelectorProps {
+export type MassiveActionProps = {
+    title?: string;
+    icon?: string;
+    disabled?: boolean | ((ids: any[]) => void);
+    hidden?: boolean | ((ids: any[]) => void);
+    onClick?: (ids: any[]) => void;
+}
+type MassiveActionSelectorProps = {
     resourceName: string,
     selectedRows: any[];
     setSelectedRows: (value:any[]) => void
-    actions: any[]
+    actions: MassiveActionProps[]
     filter?: string
 }
 
-const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) => {
+const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:MassiveActionSelectorProps) => {
     const {resourceName, filter, selectedRows, setSelectedRows, actions } = props;
     const { t } = useTranslation();
 
@@ -37,7 +44,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:any) 
         setSelectedRows([]);
     };
 
-    return <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+    return <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>
         {/* Selection buttons */}
         <ButtonGroup
             variant="outlined"

@@ -12,7 +12,7 @@ import {useEntitatSession, useUserSession} from "../../../components/Session.tsx
 import {Divider} from "@mui/material";
 import {useCommonActions} from "../../expedient/details/CommonActions.tsx";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
     const {
         fieldDownload: apiDownload,
     } = useResourceApiService('documentResource');

@@ -19,6 +19,7 @@ import {CommentDialog} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import Load from "../../../components/Load.tsx";
 
 const Contenido = (props :any) => {
     const { title, children } = props;
@@ -61,20 +62,22 @@ const ExpedientInfo = (props:any) => {
     const { t } = useTranslation();
 
     return <CardData title={"Informació de l'expedient"} direction={'column'} xs={xs} cardProps={{backgroundColor: '#f5f5f5 !important'}}>
-        <Contenido title={t('page.contingut.detalle.numero')} direction={'column'}>{expedient?.numero}</Contenido>
-        <Contenido title={t('page.contingut.detalle.titol')} direction={'column'}>{expedient?.nom}</Contenido>
-        <Contenido title={t('page.contingut.detalle.metaExpedient')} direction={'column'}>{expedient?.metaExpedient?.description}</Contenido>
-        <Contenido title={t('page.contingut.detalle.organGestor')} direction={'column'}>{expedient?.organGestor?.description}</Contenido>
-        <Contenido title={t('page.contingut.detalle.fechaApertura')} direction={'column'}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
-        <Contenido title={t('page.contingut.detalle.estat')} direction={'column'}><StyledEstat entity={expedient}/></Contenido>
-        <Contenido title={t('page.contingut.detalle.prioritat')} direction={'column'}><StyledPrioritat entity={expedient}/></Contenido>
-        <Contenido title={t('page.contingut.detalle.clasificacio')} direction={'column'}>{expedient?.ntiClasificacionSia}</Contenido>
+        <Load value={expedient} noEffect>
+            <Contenido title={t('page.contingut.detalle.numero')} direction={'column'}>{expedient?.numero}</Contenido>
+            <Contenido title={t('page.contingut.detalle.titol')} direction={'column'}>{expedient?.nom}</Contenido>
+            <Contenido title={t('page.contingut.detalle.metaExpedient')} direction={'column'}>{expedient?.metaExpedient?.description}</Contenido>
+            <Contenido title={t('page.contingut.detalle.organGestor')} direction={'column'}>{expedient?.organGestor?.description}</Contenido>
+            <Contenido title={t('page.contingut.detalle.fechaApertura')} direction={'column'}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
+            <Contenido title={t('page.contingut.detalle.estat')} direction={'column'}><StyledEstat entity={expedient}/></Contenido>
+            <Contenido title={t('page.contingut.detalle.prioritat')} direction={'column'}><StyledPrioritat entity={expedient}/></Contenido>
+            <Contenido title={t('page.contingut.detalle.clasificacio')} direction={'column'}>{expedient?.ntiClasificacionSia}</Contenido>
 
-        <ExpedientsRelacionats entity={expedient}/>
+            <ExpedientsRelacionats entity={expedient}/>
 
-        <Grid item xs={12} display={'flex'} justifyContent={'end'}>
-            <ExpedientActionButton entity={expedient}/>
-        </Grid>
+            <Grid item xs={12} display={'flex'} justifyContent={'end'}>
+                <ExpedientActionButton entity={expedient}/>
+            </Grid>
+        </Load>
     </CardData>
 }
 

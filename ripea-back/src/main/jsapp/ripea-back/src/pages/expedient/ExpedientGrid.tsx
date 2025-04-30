@@ -166,7 +166,7 @@ const columns = [
 
 
 // sortModel i perspectives per prevenir re-renders
-const sortModel = [{ field: 'createdDate', sort: 'desc' }];
+const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["INTERESSATS_RESUM", "ESTAT"];
 
 const ExpedientGrid = () => {

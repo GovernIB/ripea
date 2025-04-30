@@ -1,11 +1,12 @@
 import {useState} from "react";
 import {Grid} from "@mui/material";
-import {BasePage, MuiDialog, MuiGrid} from "reactlib";
+import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 
 const columns = [
     {
@@ -45,20 +46,20 @@ const columns = [
     },
 ]
 
+const sortModel:any = [{field: 'id', sort: 'asc'}]
+
 const EnviamentInteressatGrid = (props:any) => {
     const {entity} = props;
 
-    return <MuiGrid
+    return <StyledMuiGrid
         resourceName={'documentEnviamentInteressatResource'}
         // perspectives={['']}
         columns={columns}
         filter={builder.and(
             builder.eq('notificacio.id', entity?.id)
         )}
-        titleDisabled
-        staticSortModel={[{field: 'id', sort: 'asc'}]}
+        staticSortModel={sortModel}
         toolbarHide
-        disableColumnMenu
         disableColumnSorting
         readOnly
         autoHeight

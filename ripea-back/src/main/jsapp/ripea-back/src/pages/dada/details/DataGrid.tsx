@@ -77,7 +77,6 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
             }}
         >
             <StyledMuiGrid
-                // titleDisabled
                 resourceName={"dadaResource"}
                 filter={
                     builder.and(

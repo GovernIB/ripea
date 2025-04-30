@@ -1,10 +1,13 @@
 import {useState} from "react";
 import {Grid} from "@mui/material";
-import {BasePage, MuiGrid, MuiDialog, useResourceApiService} from "reactlib";
+import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -128,21 +131,20 @@ const interessatsColumns = [
     },
 ];
 
+const interessatsSortModel:any = [{field: 'id', sort: 'asc'}];
 const Interessats = (props:any) => {
     const { entity, onRowCountChange } = props;
 
-    return <MuiGrid
+    return <StyledMuiGrid
         resourceName="registreInteressatResource"
         columns={interessatsColumns}
         filter={`registre.id:${entity?.id}`}
-        staticSortModel={[{field: 'id', sort: 'asc'}]}
+        staticSortModel={interessatsSortModel}
         toolbarHide
         disableColumnSorting
-        disableColumnMenu
-        titleDisabled
         readOnly
         autoHeight
-        onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
+        onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
     />
 }
 
@@ -178,52 +180,35 @@ const annexosColumns = [
     },
 ];
 
+const annexosSortModel:any = [{field: 'id', sort: 'asc'}];
 const Annexos = (props:any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
 
-    const {
-        fieldDownload: apiDownload,
-    } = useResourceApiService('documentResource');
-    const downloadAdjunt = (id:any, row:any) :void => {
-        apiDownload(row?.document?.id,{fieldName: 'adjunt'})
-            .then((result) => {
-                const url = URL.createObjectURL(result.blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = result.fileName; // Usa el nombre recibido
-                document.body.appendChild(link);
-                link.click();
-                // Limpieza
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            })
-    }
+    const {apiDownload} = useDocumentActions()
 
     const actions = [
         {
             title: t('common.download'),
             icon: "download",
             showInMenu: true,
-            onClick: downloadAdjunt,
+            onClick: (id:any, row:any) => apiDownload(row?.document?.id,'adjunt'),
             hidden: (row:any) => !row?.document?.id,
         },
     ]
 
-    return <MuiGrid
+    return <StyledMuiGrid
         resourceName="registreAnnexResource"
         columns={annexosColumns}
-        filter={`registre.id:${entity?.id}`}
-        staticSortModel={[{field: 'id', sort: 'asc'}]}
+        filter={builder.and(builder.eq('registre.id',entity?.id))}
+        staticSortModel={annexosSortModel}
         toolbarHide
         disableColumnSorting
-        disableColumnMenu
-        titleDisabled
         rowAdditionalActions={actions}
         readOnly
         autoHeight
 
-        onRowsChange={(rows, info) => onRowCountChange?.(info?.totalElements)}
+        onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
     />
 }
 
