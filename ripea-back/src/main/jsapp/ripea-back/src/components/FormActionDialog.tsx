@@ -1,10 +1,9 @@
 import React, {MutableRefObject} from "react";
 import {useMuiActionReportLogic} from "reactlib";
 
-type FormActionDialogProp = {
+type CommonProps = {
     title?: string | ((data:any) => string),
     resourceName: string,
-    action: string,
     formDialogComponentProps?: any,
     children: React.ReactElement,
     apiRef?: MutableRefObject<any>,
@@ -12,18 +11,13 @@ type FormActionDialogProp = {
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void
 }
+type FormActionDialogProp = CommonProps & {
+    action: string,
+}
 
-type FormReportDialogProp = {
-    title?: string | ((data:any) => string),
-    resourceName: string,
+type FormReportDialogProp = CommonProps & {
     report: string,
     reportFileType: any,
-    formDialogComponentProps?: any,
-    children: React.ReactElement,
-    apiRef?: MutableRefObject<any>,
-    formDialogResultProcessor?: (result?: any) => React.ReactElement,
-    onSuccess?: (result?: any) => void,
-    onError?: (error?: any) => void
 }
 
 const FormActionDialog = (props:FormActionDialogProp) => {
@@ -72,7 +66,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         title,
         resourceName,
         report,
-        reportFileType,
+        reportFileType = 'PDF',
         formDialogComponentProps,
         children,
         apiRef,
