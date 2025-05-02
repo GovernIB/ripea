@@ -5,6 +5,7 @@ package es.caib.ripea.ejb;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
@@ -58,6 +59,8 @@ public class ExecucioMassivaServiceEjb extends AbstractServiceEjb<ExecucioMassiv
 		return delegateService.findContingutPerExecucioMassiva(exm_id);
 	}
 
+	@Override
+	@PermitAll
 	public void executeNextMassiveScheduledTask() {
 		delegateService.executeNextMassiveScheduledTask();
 	}

@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
+
 /**
  * Declaració dels mètodes per a gestionar documents.
  * 
@@ -40,6 +42,7 @@ public interface ExecucioMassivaService {
 	
 	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException;
 
+	@PermitAll
 	public void executeNextMassiveScheduledTask();
 
 	@PreAuthorize("isAuthenticated()")
