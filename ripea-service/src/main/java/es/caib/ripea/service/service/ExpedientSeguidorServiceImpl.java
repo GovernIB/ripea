@@ -5,6 +5,7 @@ import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ExpedientHelper expedientHelper;
 	
 	@Override
 	@Transactional
@@ -43,12 +45,8 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false,
 				false,
 				null);
-		
-		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-		if (!expedient.getSeguidors().contains(usuariActual)) 
-//			throw new ValidationException("L'usuari actual " + usuariActual.getCodi() + " ja és seguidor de l'expedient seleccionat");
-			expedient.addSeguidor(usuariActual);
-		
+
+		expedientHelper.follow(expedient, auth.getName());
 	}
 	
 	@Override
@@ -68,11 +66,8 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false,
 				false,
 				null);
-		
-		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-		if (expedient.getSeguidors().contains(usuariActual))
-//			throw new ValidationException("L'usuari actual " + usuariActual.getCodi() + " no és seguidor de l'expedient seleccionat");
-			expedient.getSeguidors().remove(usuariActual);
+
+		expedientHelper.unfollow(expedient, auth.getName());
 	}
 	
 	@Override

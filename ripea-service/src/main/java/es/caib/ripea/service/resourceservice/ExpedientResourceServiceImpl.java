@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.hibernate.Hibernate;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -31,14 +32,14 @@ import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
@@ -67,6 +68,7 @@ import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
+import es.caib.ripea.service.intf.model.ExpedientResource.MassiveAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -88,16 +90,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
 
-    private final ExpedientResourceRepository expedientResourceRepository;
     private final UsuariResourceRepository usuariResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
     private final OrganGestorRepository organGestorRepository;
+    private final EntitatRepository entitatRepository; //Nomes per recuperar entitat sense comprovar permisos
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
     private final ExpedientHelper expedientHelper;
+    private final ContingutHelper contingutHelper;
     private final ExpedientResourceHelper expedientResourceHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -105,11 +108,17 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @PostConstruct
     public void init() {
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_DOC_CODE, new ExportDocumentMassiveDataGenerator());
+        register(ExpedientResource.ACTION_EXPORT_PDF_CODE, new ExportZipGenerator());
+        register(ExpedientResource.ACTION_EXPORT_ODS_CODE, new ExportOdsGenerator());
+        register(ExpedientResource.ACTION_EXPORT_CSV_CODE, new ExportCsvGenerator());
+
+        register(ExpedientResource.ACTION_AGAFAR_CODE, new AgafarActionExecutor());
+        register(ExpedientResource.ACTION_ALLIBERAR_CODE, new AlliberarActionExecutor());
+        register(ExpedientResource.ACTION_RETORNAR_CODE, new RetornarActionExecutor());
         register(ExpedientResource.ACTION_FOLLOW_CODE, new FollowActionExecutor());
         register(ExpedientResource.ACTION_UNFOLLOW_CODE, new UnFollowActionExecutor());
-        register(ExpedientResource.ACTION_AGAFAR_CODE, new AgafarActionExecutor());
-        register(ExpedientResource.ACTION_RETORNAR_CODE, new RetornarActionExecutor());
+        register(ExpedientResource.ACTION_DELETE_CODE, new DeleteActionExecutor());
+        
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
@@ -537,169 +546,203 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
-    // ActionExecutor
-    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
-
-        @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
-            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
-
-            if (optionalUsuariResource.isPresent()) {
-
-                // Individual
-                if (entity != null) {
-                    expedients.add(entity);
-                }
-
-                // Massive
-                if (params.getIds() != null && !params.getIds().isEmpty()) {
-                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
-                }
-
-                expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
-            }
-
-            return null;
-        }
-
-        public List<ExpedientResourceEntity> exec(List<ExpedientResourceEntity> entitys, UsuariResourceEntity user) throws ActionExecutionException {
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
-
-            entitys.forEach(expedientResourceEntity -> {
-                if (!expedientResourceEntity.getSeguidors().contains(user)) {
-                    expedientResourceEntity.getSeguidors().add(user);
-                    expedients.add(expedientResourceEntity);
-                }
-            });
-
-            return expedients;
-        }
-
-        @Override
-        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {
-
-        }
-    }
-    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
-
-        @Override
-        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
-            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
-
-            if (optionalUsuariResource.isPresent()) {
-
-                // Individual
-                if (entity != null) {
-                    expedients.add(entity);
-                }
-
-                // Massive
-                if (params.getIds() != null && !params.getIds().isEmpty()) {
-                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
-                }
-
-                expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
-            }
-
-            return null;
-        }
-
-        public List<ExpedientResourceEntity> exec(List<ExpedientResourceEntity> entitys, UsuariResourceEntity user) throws ActionExecutionException {
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
-
-            entitys.forEach(expedientResourceEntity -> {
-                if (expedientResourceEntity.getSeguidors().contains(user)) {
-                    expedientResourceEntity.getSeguidors().remove(user);
-                    expedients.add(expedientResourceEntity);
-                }
-            });
-
-            return expedients;
-        }
-
-        @Override
-        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {
-
-        }
-    }
     private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
-            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
-
-            if (optionalUsuariResource.isPresent()) {
-
-                // Individual
-                if (entity != null) {
-                    expedients.add(entity);
-                }
-
-                // Massive
-                if (params.getIds() != null && !params.getIds().isEmpty()) {
-                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
-                }
-
-                expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth!=null) {
+            	if (params.isMasivo()) {
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
+	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+            	} else {
+            		expedientHelper.agafar(entity.getId(), auth.getName());
+            	}
             }
-
             return null;
         }
 
-        public List<ExpedientResourceEntity> exec(List<ExpedientResourceEntity> entitys, UsuariResourceEntity user) throws ActionExecutionException {
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
-
-            entitys.forEach(entity -> {
-                if (entity.getAgafatPer() != user) {
-                    entity.setAgafatPer(user);
-                    expedients.add(entity);
-                }
-            });
-
-            return expedients;
-        }
-
         @Override
-        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {
-
-        }
-    }
-    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
-
-        @Override
-        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
-            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(
-                    entity.getCreatedBy());
-
-            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
-                entity.setAgafatPer(optionalUsuariResource.get());
-                expedientResourceRepository.save(entity);
-//                emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
-            }
-
-            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
-        }
-
-        @Override
-        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
-
-        }
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
     
-    // MassiveActionExecutor
-    private class ExportDocumentMassiveDataGenerator implements 
-//    	ActionExecutor<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable>,
-    	ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+    private class AlliberarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth!=null) {
+            	if (params.isMasivo()) {
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.ALLIBERAR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
+	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+            	} else {
+            		expedientHelper.alliberar(entity.getId());
+            	}
+            }
+            return null;
+        }
+
+        @Override
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+    }
+    
+    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth!=null) {
+            	if (params.isMasivo()) {
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.RETORNAR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
+	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+            	} else {
+            		expedientHelper.retornar(entity.getId());
+            	}
+            }
+            return null;
+		}
+
+		@Override
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+    }
+
+    private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth!=null) {
+            	if (params.isMasivo()) {
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.SEGUIR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
+	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+            	} else {
+            		expedientHelper.follow(entity.getId(), auth.getName());
+            	}
+            }
+            return null;
+        }
+
+        @Override
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+    }
+    
+    private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth!=null) {
+            	if (params.isMasivo()) {
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.UNFOLLOW_EXPEDIENT, new Date(), null, configHelper.getRolActual());
+	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+            	} else {
+            		expedientHelper.unfollow(entity.getId(), auth.getName());
+            	}
+            }
+            return null;
+        }
+
+        @Override
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+    }
+    
+    private class DeleteActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+        @Override
+        public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth!=null) {
+            	String rolActual = configHelper.getRolActual();
+            	String entitatActual = configHelper.getEntitatActualCodi();
+            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+            	if (params.isMasivo()) {
+	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
+	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.ESBORRAR_EXPEDIENT, new Date(), null, rolActual);
+	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
+            	} else {
+           			try {
+						contingutHelper.deleteReversible(entitatEntity.getId(), entity.getId(), null, code);
+					} catch (IOException e) {
+						excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/delete", e);
+						throw new ActionExecutionException(ExpedientResource.class, entity.getId(), code, e.getMessage());
+					}
+            	}
+            }
+            return null;
+        }
+
+        @Override
+        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+    }
+    
+    private class ExportOdsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
-		public DownloadableFile generateFile(
-				String code,
-				List<?> data,
-				ReportFileType fileType,
-				OutputStream out) {
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+    		try {
+    			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+				FitxerDto exportacio = expedientHelper.exportacio(entitatEntity.getId(), params.getIds(), "ODS");
+				return new DownloadableFile(exportacio.getNom(), exportacio.getContentType(), exportacio.getContingut());)
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/export/ODS", e);
+				throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al exportar a excel els expedients seleccionats.");
+			}
+    	}    	
+    	
+		@Override
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(params);
+			return parametres;
+		}
+
+		@Override
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+    }
+    
+    private class ExportCsvGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+    	@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+    		try {
+    			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+				FitxerDto exportacio = expedientHelper.exportacio(entitatEntity.getId(), params.getIds(), "CSV");
+				return new DownloadableFile(exportacio.getNom(), exportacio.getContentType(), exportacio.getContingut());
+			} catch (IOException e) {
+				excepcioLogHelper.addExcepcio("/expedient/export/CSV", e);
+				throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al exportar a CSV els expedients seleccionats.");
+			}
+    	}
+    	
+		@Override
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(params);
+			return parametres;
+		}
+
+		@Override
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+    }
+    
+    private class ExportZipGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+
+    	@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		
     		DownloadableFile resultat = null;
     		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
@@ -717,29 +760,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
-					throw new ReportGenerationException(
-							getResourceClass(),
-							null,
-							code,
-							"Se ha llamado a la funcion de generar ZIP masivamente sin seleccionar ningún expediente.");
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP: no hi ha cap expedient seleccionat.");
 	            }
 	            
             } else {
             	
-	        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
-	        			expedientId,
-	        			false,
-	        			true,
-	        			false,
-	        			false,
-	        			false,
-	        			configHelper.getRolActual());
-	        	
-	        	double actualMbFitxer = 0;
-            	List<DocumentDto> docsZip = execucioMassivaHelper.getDocumentsForExportacioZip(
-            			expedientEntity, params.getNomFitxer(), params.isVersioImprimible(), params.isCarpetes(), actualMbFitxer);
+            	try {
             	
-				try {
+		        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
+		        			expedientId,
+		        			false,
+		        			true,
+		        			false,
+		        			false,
+		        			false,
+		        			configHelper.getRolActual());
+		        	
+		        	double actualMbFitxer = 0;
+	            	List<DocumentDto> docsZip = execucioMassivaHelper.getDocumentsForExportacioZip(
+	            			expedientEntity, params.getNomFitxer(), params.isVersioImprimible(), params.isCarpetes(), actualMbFitxer);
+				
 					ByteArrayOutputStream baos = execucioMassivaHelper.getZipFromDocuments(docsZip);
 	            	resultat = new DownloadableFile(
 		            		"documentsExpedients_" + Calendar.getInstance().getTimeInMillis() + ".zip",
@@ -747,6 +787,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		            		baos.toByteArray());
 				} catch (IOException e) {
 					excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP per els expedients seleccionats.");
 				}
             }
             
@@ -763,9 +804,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
 
 		@Override
-		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue,
-				Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {
-		}
+		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
     }
     
     // OnChangeLogicProcessor

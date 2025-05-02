@@ -98,6 +98,7 @@ import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
@@ -1334,12 +1335,34 @@ public class ContingutHelper {
 		return (NodeEntity)contingut;
 	}
 
-
-
 	public void deleteReversible(
 			Long entitatId,
-			ContingutEntity contingut,
+			Long contingutId,
+			Long tascaId,
 			String rolActual) throws IOException {
+		
+		ContingutEntity contingut = null;
+		
+		if (tascaId == null) {
+			contingut = comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutId,
+				false,
+				false,
+				false,
+				true, 
+				false, 
+					true, 
+					rolActual);
+		} else {
+		  contingut = comprovarContingutPertanyTascaAccesible(
+					tascaId,
+					contingutId);
+		}
+		
+		if (contingut instanceof ExpedientEntity) {
+			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
+		}
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 

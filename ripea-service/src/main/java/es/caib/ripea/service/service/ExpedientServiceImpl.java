@@ -140,7 +140,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private ExpedientComentariRepository expedientComentariRepository;
 	@Autowired private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
-	@Autowired private DadaRepository dadaRepository;
 	@Autowired private AlertaRepository alertaRepository;
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
@@ -149,7 +148,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private PluginHelper pluginHelper;
-	@Autowired private CsvHelper csvHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
@@ -1356,154 +1354,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto exportacio(
-			Long entitatId,
-			Collection<Long> expedientIds,
-			String format) throws IOException {
-		logger.debug(
-				"Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		// Passam la Collection a List
-		List<Long> ids = new ArrayList<>(expedientIds != null ? expedientIds : new ArrayList<Long>());
-		List<ExpedientEntity> expedients = expedientRepositoryCommnand.findByEntitatAndIdInOrderByIdAsc(
-				entitat,
-				ids);
-		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
-				expedientIds);
-		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
-		int numColumnes = 10 + metaDades.size();
-		String[] columnes = new String[numColumnes];
-		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
-		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
-		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
-		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
-		columnes[4] = messageHelper.getMessage("expedient.service.exportacio.idnti");
-		columnes[5] = messageHelper.getMessage("expedient.service.exportacio.codi.sia");
-		columnes[6] = messageHelper.getMessage("expedient.service.exportacio.procediment");
-		columnes[7] = messageHelper.getMessage("expedient.service.exportacio.interessats");
-		columnes[8] = messageHelper.getMessage("expedient.service.exportacio.organ.codi");
-		columnes[9] = messageHelper.getMessage("expedient.service.exportacio.organ.nom");
-		for (int i = 0; i < metaDades.size(); i++) {
-			MetaDadaEntity metaDada = metaDades.get(i);
-			columnes[10 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
-		}
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		List<String[]> files = new ArrayList<String[]>();
-		int dadesIndex = 0;
-		for (ExpedientEntity expedient : expedients) {
-			
-			entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					expedient.getMetaExpedient().getId(),
-					true,
-					false,
-					false,
-					false, false, null, null);
-			
-			String[] fila = new String[numColumnes];
-			fila[0] = expedient.getNumero();
-			fila[1] = expedient.getNom();
-			if (expedient.getEstatAdditional() != null && expedient.getEstat() != ExpedientEstatEnumDto.TANCAT) {
-				fila[2] = expedient.getEstatAdditional().getNom();
-			} else {
-				fila[2] = expedient.getEstat().name();
-			}
-			fila[3] = sdf.format(
-					Date.from(expedient.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-			fila[4] = expedient.getNtiIdentificador();
-			fila[5] = expedient.getMetaExpedient().getClassificacio();
-			fila[6] = expedient.getMetaExpedient().getNom();
-			
-			String intressatsString = "";
-			for (InteressatEntity interessat : expedient.getInteressatsORepresentants()) {
-				intressatsString += interessat.getIdentificador() + " (" + interessat.getDocumentNum() + ") | ";
-			}
-			intressatsString = intressatsString.replaceAll(",","");
-			
-			int index = intressatsString.lastIndexOf(" | ");
-			if (index != -1) {
-				intressatsString = intressatsString.substring(0, index);
-			}
-			fila[7] = intressatsString;
-			
-			fila[8] = expedient.getOrganGestor().getCodi();
-			fila[9] = expedient.getOrganGestor().getNom();
-			
-			if (!dades.isEmpty() && dadesIndex < dades.size()) {
-				DadaEntity dadaActual = dades.get(dadesIndex);
-				if (dadaActual.getNode().getId().equals(expedient.getId())) {
-					for (int i = 0; i < metaDades.size(); i++) {
-						MetaDadaEntity metaDada = metaDades.get(i); 
-						int dadesIndexIncrement = 0;
-						while (dadaActual.getNode().getId().equals(expedient.getId())) {
-							
-							if (dadaActual.getMetaDada().getId().equals(metaDada.getId())) {
- 								break;
-							}
-							
-							dadesIndexIncrement++;
-							if (dadesIndex + dadesIndexIncrement == dades.size()) {
-								break;
-							}
-							dadaActual = dades.get(dadesIndex + dadesIndexIncrement);
-						}
-						if (dadaActual.getMetaDada().getId().equals(metaDada.getId()) && dadaActual.getNode().getId().equals(expedient.getId())) {
-							fila[10 + i] = dadaActual.getValorComString();
-						} else {
-							dadaActual = dades.get(dadesIndex);
-						}
-					}
-				}
-				// search for first dada index of next expedient
-				DadaEntity dada = dades.get(dadesIndex); 
-				while (dada.getNode().getId().equals(expedient.getId())) {
-					dadesIndex++;
-					if (dadesIndex == dades.size()) {
-						break;
-					}
-					dada = dades.get(dadesIndex);
-				}
-			}
-			files.add(fila);
-			
-			
-		}
-		FitxerDto fitxer = new FitxerDto();
-		if ("ODS".equalsIgnoreCase(format)) {
-			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
-			TableModel tableModel = new DefaultTableModel(filesArray, columnes);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//			SpreadSheet.createEmpty(model).getPackage().save(baos);
-			
-			Workbook workbook = new XSSFWorkbook();
-			Sheet sheet = workbook.createSheet("Expedient");
-
-			for (int i = 0; i < tableModel.getRowCount(); i++) {
-			    Row row = sheet.createRow(i);
-			    for (int j = 0; j < tableModel.getColumnCount(); j++) {
-			        Cell cell = row.createCell(j);
-			        cell.setCellValue(tableModel.getValueAt(i, j).toString());
-			    }
-			}
-
-			workbook.write(baos);
-			workbook.close();
-			fitxer.setNom("exportacio.ods");
-			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
-			fitxer.setContingut(baos.toByteArray());
-		} else if ("CSV".equalsIgnoreCase(format)) {
-			fitxer.setNom("exportacio.csv");
-			fitxer.setContentType("text/csv");
-			StringBuilder sb = new StringBuilder();
-			csvHelper.afegirLinia(sb, columnes, ';');
-			for (String[] fila : files) {
-				csvHelper.afegirLinia(sb, fila, ';');
-			}
-			fitxer.setContingut(sb.toString().getBytes("UTF-8"));
-		} else {
-			throw new ValidationException("Format de fitxer no suportat: " + format);
-		}
-		return fitxer;
+	public FitxerDto exportacio(Long entitatId, Collection<Long> expedientIds, String format) throws IOException {
+		logger.debug("Exportant informació dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ", " + "format=" + format + ")");
+		return expedientHelper.exportacio(entitatId, expedientIds, format);
 	}
 
 	@Transactional(readOnly = true)

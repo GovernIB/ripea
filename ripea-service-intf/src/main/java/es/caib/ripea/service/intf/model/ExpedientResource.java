@@ -35,7 +35,7 @@ import java.util.List;
 		artifacts = {
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_DOC_CODE,
+						code = ExpedientResource.ACTION_EXPORT_PDF_CODE,
 						formClass = ExpedientResource.ExportarDocumentMassiu.class),		
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -70,30 +70,50 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_AGAFAR_CODE,
-                        requiresId = true),
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_ALLIBERAR_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_RETORNAR_CODE,
-                        requiresId = true),
-//                @ResourceConfigArtifact(
-//                        type = ResourceArtifactType.ACTION,
-//                        code = ExpedientResource.ACTION_MASSIVE_EXPORT_DOC_CODE,
-//                        formClass = ExpedientResource.ExportarDocumentMassiu.class),
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_DELETE_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_ODS_CODE,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_CSV_CODE,
+						formClass = ExpedientResource.MassiveAction.class),
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 
 	private static final long serialVersionUID = 7440910672703796468L;
-	public static final String ACTION_MASSIVE_EXPORT_DOC_CODE = "EXPORT_DOC";
+	
+	public static final String ACTION_EXPORT_PDF_CODE = "EXPORT_DOC";
+	public static final String ACTION_EXPORT_ODS_CODE = "EXPORT_EXCEL";
+	public static final String ACTION_EXPORT_CSV_CODE = "EXPORT_CSV";
+	
 	public static final String ACTION_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_UNFOLLOW_CODE = "UNFOLLOW";
 	public static final String ACTION_AGAFAR_CODE = "AGAFAR";
+	public static final String ACTION_ALLIBERAR_CODE = "ALLIBERAR";
 	public static final String ACTION_RETORNAR_CODE = "RETORNAR";
+	public static final String ACTION_DELETE_CODE = "ESBORRAR";	
+	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
 	public static final String PERSPECTIVE_RELACIONAT_CODE = "RELACIONAT";
+	
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
 	@NotNull
