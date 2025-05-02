@@ -1,15 +1,16 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.ContingutRepository;
-import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
-import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,30 +22,267 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.FileNameOption;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
-public class ExecucioMassivaHelper{
+public class ExecucioMassivaHelper {
 
+	@Autowired private ExecucioMassivaRepository execucioMassivaRepository;
 	@Autowired private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private ContingutRepository contingutRepository;
+	
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
-	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired private DocumentHelper documentHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	
+	public ByteArrayOutputStream getZipFromDocuments(List<DocumentDto> docsExp) throws IOException {
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream out = new ZipOutputStream(baos);
+		List<String> nomsArxius = new ArrayList<String>();
+		ZipEntry ze;
+		
+		if (docsExp != null && docsExp.size() > 0) {
+			for (DocumentDto documentDto : docsExp) {
+				String recursNom = getZipRecursNom(documentDto.getFitxerNom(), nomsArxius);
+				ze = new ZipEntry(recursNom);
+				out.putNextEntry(ze);
+				if (documentDto.getFitxerContingut()!=null) {
+					out.write(documentDto.getFitxerContingut());
+				}
+				out.closeEntry();
+			}
+		}
+
+		out.close();
+		return baos;
+	}
+	
+	private String getZipRecursNom(String nomEntrada, List<String> nomsArxius) {
+		int contador = 0;
+		for (String nom : nomsArxius) {
+			if (nom!=null && nom.equals(nomEntrada)) {
+				contador++;
+			}
+		}
+		//Guardam al llistat de noms de documents abans de modificar-lo amb un contador.
+		nomsArxius.add(nomEntrada+""); //Ens asseguram que es guarda un nou string, no un apuntador.
+		if (contador > 0) {
+			nomEntrada = nomEntrada.substring(0, nomEntrada.lastIndexOf(".")) +
+					" (" + contador + ")" +
+					nomEntrada.substring(nomEntrada.lastIndexOf("."));
+		}
+		return nomEntrada;
+	}
+	
+	public List<DocumentDto> getDocumentsForExportacioZip(
+			ExpedientEntity expedient,
+			FileNameOption nomFitxer,
+			boolean isVersioImprimible,
+			boolean carpetes,
+			double actualMbFitxer) {
+		
+		List<ContingutEntity> contingutsExp = new ArrayList<>();
+		List<DocumentDto> docsExp = new ArrayList<DocumentDto>();
+		contingutHelper.findDescendants(expedient, contingutsExp, true, false);
+
+		if (contingutsExp != null && contingutsExp.size()>0) {
+
+			for (ContingutEntity contingutExpedient : contingutsExp) {
+				if (ContingutTipusEnumDto.DOCUMENT.equals(contingutExpedient.getTipus())) {
+					DocumentEntity documentEntity = (DocumentEntity)contingutExpedient;
+
+					DocumentDto doc = new DocumentDto();
+					doc.setId(documentEntity.getId());
+
+					FitxerDto fitxerDto = null;
+					
+					//Configuració de l'execució massiva: Versió imprimible o original del fitxer
+					if (isVersioImprimible) {
+						try {
+							//La versió imprimible pot no estar disponible si el document no esta definitiu (signat)
+							fitxerDto = pluginHelper.arxiuDocumentVersioImprimible(documentEntity);
+						} catch (Exception notImpr) {
+							//Si no té uuid l'intentará obtenir el gestorDocumental amb el identificador "getGesDocAdjuntId"
+							fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
+						}
+					} else {
+						//Si no té uuid l'intentará obtenir el gestorDocumental amb el identificador "getGesDocAdjuntId"
+						fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
+					}
+
+					actualMbFitxer = actualMbFitxer + (fitxerDto.getContingut().length / (1024.0 * 1024.0));
+
+					doc.setFitxerContingut(fitxerDto.getContingut());
+
+					String nomDoc = null;
+					//Configuració de l'execució massiva: Nom del fitxer dins el ZIP
+					if (nomFitxer!=null) {
+						switch (nomFitxer) {
+						case TITLE:
+							nomDoc = documentEntity.getNom().replaceAll("/", "_");
+							nomDoc = nomDoc + documentEntity.getExtensio();
+							break;
+						case TYPE_TITLE:
+							nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
+							nomDoc = nomDoc + " - " + documentEntity.getNom().replaceAll("/", "_");
+							nomDoc = nomDoc + documentEntity.getExtensio();
+							break;
+						case TYPE_ORIGINAL:
+							nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
+							nomDoc = nomDoc + " - " + documentEntity.getFitxerNom().replaceAll("/", "_");
+							break;								
+						default:
+							nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
+							break;
+						}
+					}
+					//Valor per defecte del nom del fitxer
+					if (nomDoc==null) {
+						nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
+					}
+
+					//Configuració de l'execució massiva: Estructura de carpetes = al expedient
+					if (carpetes) {
+						if (documentEntity.getPare()!=null) {
+							ContingutEntity pare = documentEntity.getPare();
+							while (pare!=null) {
+								//Ens aturam abans de arribar a nivell de expedient
+								if (pare.getPare()!=null) {
+									nomDoc = pare.getNom().replaceAll("/", "_") + "/" + nomDoc;
+								}
+								pare = pare.getPare(); //Pujam fins a l'arrel
+							}
+						}
+					}
+					
+					nomDoc = ("[" + expedient.getNumero() + "] " + expedient.getNom()).replaceAll("/", "_") + "/" + nomDoc;
+					
+					doc.setFitxerNom(nomDoc);
+					docsExp.add(doc);
+				}
+			}
+		} else {
+			//Expedient sense documents, cream la carpeta buida al zip
+			DocumentDto doc = new DocumentDto();
+			doc.setFitxerNom(("[" + expedient.getNumero() + "] " + expedient.getNom()).replaceAll("/", "_") + "/");
+			docsExp.add(doc);
+		}
+		
+		return docsExp;
+	}
+	
+	public void saveExecucioMassiva(
+			EntitatEntity entitat,
+			ExecucioMassivaDto execMassDto,
+			List<ExecucioMassivaContingutDto> execElements,
+			ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException {
+		
+		ExecucioMassivaEntity execucioMassiva = ExecucioMassivaEntity.getBuilder(
+				execMassDto.getTipus(),
+				execMassDto.getDataInici(),
+				execMassDto.getDataFi(),
+				entitat,
+				execMassDto.getRolActual()).build();
+	
+		execucioMassiva.setCarpetes(execMassDto.getCarpetes());
+		execucioMassiva.setVersioImprimible(execMassDto.getVersioImprimible());
+		execucioMassiva.setNomFitxer(execMassDto.getNomFitxer());
+		
+		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
+		
+		int ordre = 0;
+		for (ExecucioMassivaContingutDto execElement: execElements) {
+			
+			String elementName = null;
+			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
+				elementName = contingutRepository.getOne(execElement.getElementId()).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
+				elementName = interessatRepository.getOne(execElement.getElementId()).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.ANOTACIO) {
+				elementName = expedientPeticioRepository.getOne(execElement.getElementId()).getIdentificador();
+			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
+				elementName = registreAnnexRepository.getOne(execElement.getElementId()).getNom();
+			}
+
+			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
+					execucioMassiva, 
+					execElement.getElementId(), 
+					elementName,
+					elementTipus, 
+					ordre++).build();
+			
+			emc.updateEstatDataFi(
+					execElement.getEstat(),
+					execElement.getDataFi());
+			
+			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(execElement.getThrowable());
+			if (excepcioRetorn != null) {
+				String error = ExecucioMassivaHelper.getExceptionString(
+						emc,
+						excepcioRetorn);
+				
+				emc.updateError(
+						new Date(), 
+						error);
+			}
+			execucioMassivaContingutRepository.save(emc);
+		}
+	}
+	
+	public List<ExecucioMassivaContingutDto> getMassivaContingutFromIds(List<Long> seleccio) {
+		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<ExecucioMassivaContingutDto>();
+		if (seleccio!=null && seleccio.size()>0) {
+			for (Long expedientId : seleccio) {
+				ExecucioMassivaContingutDto execMass = new ExecucioMassivaContingutDto(
+						new Date(),
+						null,
+						expedientId,
+						ExecucioMassivaEstatDto.ESTAT_PENDENT);
+				execucioMassivaElements.add(execMass);
+			}
+		}
+		return execucioMassivaElements;
+	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public String executarExecucioMassivaContingutNewTransaction(Long execucioMassivaContingutId) {
+ 	public String executarExecucioMassivaContingutNewTransaction(Long execucioMassivaContingutId) {
 		
 		Throwable exc = null;
 		String resultat = null;
