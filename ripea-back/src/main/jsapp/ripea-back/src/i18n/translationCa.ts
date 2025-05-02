@@ -85,7 +85,23 @@ const translationCa = {
                 anotacions: "Anotacions",
                 versions: "Versions",
                 tasques: "Tasques",
-            }
+
+                actions: "Accions",
+                move: "Moviments",
+                auditoria: "Auditoria",
+            },
+            log: {
+                causa: "Acció causa",
+                param: "Paràmetres",
+                param1: "Paràmetre 1",
+                param2: "Paràmetre 2",
+                objecte: "Objecte",
+            },
+            moviment: {
+                causa: "Causa del moviment",
+                origen: "Origen",
+                desti: "Destí",
+            },
         },
         anotacio: {
             tabs: {

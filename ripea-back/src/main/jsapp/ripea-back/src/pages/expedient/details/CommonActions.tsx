@@ -11,7 +11,7 @@ import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
-import {DataCommonAdditionalAction} from "../../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
+import useHistoric from "../../Historic.tsx";
 
 const useActions = (refresh?: () => void) =>{
     const {temporalMessageShow} = useBaseAppContext();
@@ -95,12 +95,13 @@ const useActions = (refresh?: () => void) =>{
 }
 
 export const useCommonActions = (refresh?: () => void) => {
-	
     const { t } = useTranslation();
     const { value: user, permisos } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
+
     const {follow, unfollow, agafar, retornar, lliberar, apiDownload} = useActions(refresh);
+    const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
@@ -231,6 +232,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.history'),
             icon: "list",
             showInMenu: true,
+            onClick: handelHistoricOpen,
         },
         {
             title: t('page.expedient.acciones.download'),
@@ -297,12 +299,13 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
     ]
-        .map(({ hidden, ...rest }) => ({
-            ...rest,
-            hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus != 'EXPEDIENT'
-        }));
+        // .map(({ hidden, ...rest }) => ({
+        //     ...rest,
+        //     hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus != 'EXPEDIENT'
+        // }));
 
     const components = <>
+        {dialogHistoric}
         {cambiarPrioridadContent}
         {cambiarEstadoContent}
         {arxiuDialog}

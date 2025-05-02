@@ -85,7 +85,23 @@ const translationEn = {
                 anotacions: "Annotations",
                 versions: "Versions",
                 tasques: "Tasks",
-            }
+
+                actions: "Actions",
+                move: "Movements",
+                auditoria: "Audit",
+            },
+            log: {
+                causa: "Action cause",
+                param: "Parameters",
+                param1: "Parameter 1",
+                param2: "Parameter 2",
+                objecte: "Object",
+            },
+            moviment: {
+                causa: "Movement cause",
+                origen: "Origin",
+                desti: "Destination",
+            },
         },
         anotacio: {
             tabs: {
