@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -266,6 +267,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Getter
     @Setter
     public static class MassiveAction implements Serializable {
+        @NotNull
+        @NotEmpty
         private List<Long> ids;
         private boolean masivo = false;
     }

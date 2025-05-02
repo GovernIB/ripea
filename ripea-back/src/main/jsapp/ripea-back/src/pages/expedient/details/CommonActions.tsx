@@ -22,7 +22,11 @@ const useActions = (refresh?: () => void) =>{
 		fieldDownload: apiDownload,
     } = useResourceApiService('expedientResource');
 
-	const downloadAdjunt = (id:any,fieldName:string) :void => {
+    const action = (id:any, code:string) => {
+        return apiAction(undefined, {code :code, data:{ ids: [id], massivo: false }})
+    }
+
+	const download = (id:any,fieldName:string) :void => {
 	    apiDownload(id,{fieldName})
 	        .then((result)=>{
 	            const url = URL.createObjectURL(result.blob);
@@ -39,43 +43,43 @@ const useActions = (refresh?: () => void) =>{
 	        })
 	}	
     const follow = (id: any): void => {
-        apiAction(id, {code : 'FOLLOW'})
+        action(id, 'FOLLOW')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
     const unfollow = (id: any): void => {
-        apiAction(id, {code : 'UNFOLLOW'})
+        action(id, 'UNFOLLOW')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
     const agafar = (id: any): void => {
-        apiAction(id, {code : 'AGAFAR'})
+        action(id, 'AGAFAR')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
     const retornar = (id: any) :void => {
-        apiAction(id, {code : 'RETORNAR'})
+        action(id, 'RETORNAR')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
     const lliberar = (id: any): void => {
@@ -87,11 +91,11 @@ const useActions = (refresh?: () => void) =>{
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
 
-    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: downloadAdjunt}
+    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: download}
 }
 
 export const useCommonActions = (refresh?: () => void) => {

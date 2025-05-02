@@ -5,34 +5,38 @@ const useMassiveActions = (refresh?: () => void)=> {
     const {temporalMessageShow} = useBaseAppContext();
     const {artifactAction: apiAction} = useResourceApiService('expedientResource')
 
+    const massiveAction = (ids:any[], code:string) => {
+        return apiAction(undefined, {code :code, data:{ ids: ids, massivo: true }})
+    }
+
     const agafar = (ids: any[]): void => {
-        apiAction(undefined, {code: 'AGAFAR', data:{ ids: ids }})
+        massiveAction(ids, 'AGAFAR')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
     const follow = (ids: any[]): void => {
-        apiAction(undefined, {code : 'FOLLOW', data:{ ids: ids }})
+        massiveAction(ids, 'FOLLOW')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
     const unfollow = (ids: any[]): void => {
-        apiAction(undefined, {code : 'UNFOLLOW', data:{ ids: ids }})
+        massiveAction(ids, 'UNFOLLOW')
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
 

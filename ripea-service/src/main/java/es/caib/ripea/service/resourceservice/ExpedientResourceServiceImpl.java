@@ -538,6 +538,28 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     // ActionExecutor
+    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
+
+        @Override
+        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
+            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(
+                    entity.getCreatedBy());
+
+            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
+                entity.setAgafatPer(optionalUsuariResource.get());
+                expedientResourceRepository.save(entity);
+            }
+
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+        }
+
+        @Override
+        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+
+        }
+    }
+    
+    // MassiveActionExecutor
     private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -546,16 +568,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             List<ExpedientResourceEntity> expedients = new ArrayList<>();
 
             if (optionalUsuariResource.isPresent()) {
+                expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
 
-                // Individual
-                if (entity != null) {
-                    expedients.add(entity);
-                }
-
-                // Massive
-                if (params.getIds() != null && !params.getIds().isEmpty()) {
-                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
-                }
+//                if (params.isMasivo()) {
+//                    // Massive
+//                }else {
+//                    // Individual
+//                }
 
                 expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
             }
@@ -586,20 +605,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
             Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
 
             if (optionalUsuariResource.isPresent()) {
-
-                // Individual
-                if (entity != null) {
-                    expedients.add(entity);
-                }
-
-                // Massive
-                if (params.getIds() != null && !params.getIds().isEmpty()) {
-                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
-                }
-
+                List<ExpedientResourceEntity> expedients = new ArrayList<>(expedientResourceRepository.findAllById(params.getIds()));
                 expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
             }
 
@@ -629,20 +637,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
             Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName());
-            List<ExpedientResourceEntity> expedients = new ArrayList<>();
 
             if (optionalUsuariResource.isPresent()) {
-
-                // Individual
-                if (entity != null) {
-                    expedients.add(entity);
-                }
-
-                // Massive
-                if (params.getIds() != null && !params.getIds().isEmpty()) {
-                    expedients.addAll(expedientResourceRepository.findAllById(params.getIds()));
-                }
-
+                List<ExpedientResourceEntity> expedients = new ArrayList<>(expedientResourceRepository.findAllById(params.getIds()));
                 expedientResourceRepository.saveAll(exec(expedients, optionalUsuariResource.get()));
             }
 
@@ -667,30 +664,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         }
     }
-    private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, Serializable, ExpedientResource> {
 
-        @Override
-        public ExpedientResource exec(String code, ExpedientResourceEntity entity, Serializable params) throws ActionExecutionException {
-            Optional<UsuariResourceEntity> optionalUsuariResource = usuariResourceRepository.findById(
-                    entity.getCreatedBy());
-
-            if (optionalUsuariResource.isPresent() && entity.getAgafatPer() != optionalUsuariResource.get()) {
-                entity.setAgafatPer(optionalUsuariResource.get());
-                expedientResourceRepository.save(entity);
-//                emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
-            }
-
-            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
-        }
-
-        @Override
-        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
-
-        }
-    }
-    
-    // MassiveActionExecutor
-    private class ExportDocumentMassiveDataGenerator implements 
+    // ReportGenerator
+    private class ExportDocumentMassiveDataGenerator implements
 //    	ActionExecutor<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable>,
     	ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
 
