@@ -80,7 +80,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                 }}
             >
                 {actions.map((action:any) =>
-                    !(action?.hidden==true || action?.hidden?.(selectedRows)) && <MenuItem onClick={()=>action?.onClick?.(selectedRows)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(selectedRows)}>
+                    !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden) && <MenuItem onClick={()=>action?.onClick?.(selectedRows)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(selectedRows)}>
                         {action.icon && <Icon>{action.icon}</Icon>}{action.title}
                     </MenuItem>
                 )}

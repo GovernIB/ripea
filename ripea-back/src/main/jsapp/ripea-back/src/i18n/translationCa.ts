@@ -85,7 +85,23 @@ const translationCa = {
                 anotacions: "Anotacions",
                 versions: "Versions",
                 tasques: "Tasques",
-            }
+
+                actions: "Accions",
+                move: "Moviments",
+                auditoria: "Auditoria",
+            },
+            log: {
+                causa: "Acció causa",
+                param: "Paràmetres",
+                param1: "Paràmetre 1",
+                param2: "Paràmetre 2",
+                objecte: "Objecte",
+            },
+            moviment: {
+                causa: "Causa del moviment",
+                origen: "Origen",
+                desti: "Destí",
+            },
         },
         anotacio: {
             tabs: {
@@ -123,7 +139,6 @@ const translationCa = {
                 prioritat: "Prioritat",
             },
             acciones: {
-                detall: "Detall",
                 tramitar: "Tramitar",
                 iniciar: "Iniciar",
                 rebutjar: "Rebutjar",
@@ -208,7 +223,11 @@ const translationCa = {
             },
             modal: {
                 seguidors: "Seguidors del expedient",
-            }
+            },
+			results: {
+				actionOk: 'L&#39;acció s&#39;ha executat correctament.',
+				actionBackgroundOk: 'L&#39;acción s&#39;ha preparat per la seva execució en segon plà. Pot consultar l&#39;estat del procés des del llistat de execucions massives.',
+			}
         },
         arxiu: {
             detall: {
@@ -316,9 +335,6 @@ const translationCa = {
         },
         metaDada: {
             title: "Tipus de dada",
-            acciones: {
-                detail: "Detall",
-            },
         },
         registre: {
             grid: {

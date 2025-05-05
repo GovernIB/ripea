@@ -164,7 +164,6 @@ const columns = [
     // },
 ];
 
-
 // sortModel i perspectives per prevenir re-renders
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["INTERESSATS_RESUM", "ESTAT"];
@@ -237,6 +236,16 @@ const ExpedientGrid = () => {
                     selectionActive
                     toolbarCreateTitle={t('page.expedient.nou')}
                     toolbarMassiveActions={massiveActions}
+
+                    rowProps={(row:any) => {
+                        const color = row?.estatAdditionalInfo?.color;
+                        return color
+                            ?{
+                                'box-shadow': `${color} -6px 0px 0px`,
+                                'border-left': `6px solid ${color}`
+                            }
+                            :{}
+                    }}
                 />
 
                 {components}

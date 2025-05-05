@@ -11,74 +11,70 @@ import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
-import {DataCommonAdditionalAction} from "../../../../lib/components/mui/datacommon/MuiDataCommon.tsx";
+import useHistoric from "../../Historic.tsx";
 
-const useActions = (refresh?: () => void) =>{
+const useActions = (refresh?: () => void) => {
+	
     const {temporalMessageShow} = useBaseAppContext();
-
+	const { t } = useTranslation();
     const {
         patch: apiPatch,
         artifactAction: apiAction,
 		fieldDownload: apiDownload,
+		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
 
-	const downloadAdjunt = (id:any,fieldName:string) :void => {
+	const iniciaDescargaBlob = (result: any[]) => {
+		const url = URL.createObjectURL(result.blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = result.fileName;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link); // Limpieza
+		URL.revokeObjectURL(url);
+	}
+	
+    const action = (id:any, code:string, msg:string) => {
+        return apiAction(undefined, {code :code, data:{ ids: [id], massivo: false }})
+			.then(() => {
+			    refresh?.()
+			    temporalMessageShow(null, t(msg), 'success');
+			})
+			.catch((error) => {
+			    temporalMessageShow('Error', error?.message, 'error');
+			});		
+    }
+	
+	const massiveReport = (id:any, code:string, msg:string, fileType:string) => {
+	    return apiReport(undefined, {code :code, data:{ ids: [id], masivo: false }, fileType})
+			.then((result) => {
+				iniciaDescargaBlob(result);
+			})
+			.catch((error) => {
+			    temporalMessageShow('Error', error?.message, 'error');
+			});		
+	}
+
+	const download = (id:any,fieldName:string) :void => {
 	    apiDownload(id,{fieldName})
 	        .then((result)=>{
-	            const url = URL.createObjectURL(result.blob);
-	            const link = document.createElement('a');
-	            link.href = url;
-	            link.download = result.fileName; // Usa el nombre recibido
-	            document.body.appendChild(link);
-	            link.click();
-
-	            // Limpieza
-	            document.body.removeChild(link);
-	            URL.revokeObjectURL(url);
-	            refresh?.();
+	            iniciaDescargaBlob(result);
 	        })
-	}	
-    const follow = (id: any): void => {
-        apiAction(id, {code : 'FOLLOW'})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const unfollow = (id: any): void => {
-        apiAction(id, {code : 'UNFOLLOW'})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const agafar = (id: any): void => {
-        apiAction(id, {code : 'AGAFAR'})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const retornar = (id: any) :void => {
-        apiAction(id, {code : 'RETORNAR'})
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const lliberar = (id: any): void => {
+	}
+	
+    const follow	= (id: any): void => { action(id, 'FOLLOW', 'page.expedient.results.actionOk'); }
+    const unfollow	= (id: any): void => { action(id, 'UNFOLLOW', 'page.expedient.results.actionOk'); }
+    const agafar	= (id: any): void => { action(id, 'AGAFAR', 'page.expedient.results.actionOk'); }
+    const retornar	= (id: any) :void => { action(id, 'RETORNAR', 'page.expedient.results.actionOk'); }
+	
+	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', 'page.expedient.results.actionBackgroundOk', 'PDF');}	
+	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', 'page.expedient.results.actionBackgroundOk', 'XLSX');}
+	const exportPdfEni	= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ZIP', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
+	const exportEni		= (id: any): void => { massiveReport(id, 'EXPORT_ENI', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
+	const exportInside  = (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
+	
+    const lliberar	= (id: any): void => {
         apiPatch(id, {
             data: {agafatPer: null,}
         })
@@ -87,20 +83,21 @@ const useActions = (refresh?: () => void) =>{
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow('Error', error?.message, 'error');
             });
     }
 
-    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: downloadAdjunt}
+    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: download, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
 }
 
 export const useCommonActions = (refresh?: () => void) => {
-	
     const { t } = useTranslation();
     const { value: user, permisos } = useUserSession();
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-    const {follow, unfollow, agafar, retornar, lliberar, apiDownload} = useActions(refresh);
+
+    const {follow, unfollow, agafar, retornar, lliberar, apiDownload, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
+    const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
@@ -231,6 +228,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.history'),
             icon: "list",
             showInMenu: true,
+            onClick: handelHistoricOpen,
         },
         {
             title: t('page.expedient.acciones.download'),
@@ -241,21 +239,21 @@ export const useCommonActions = (refresh?: () => void) => {
         {
             title: t('page.expedient.acciones.exportPDF'),
             icon: "format_list_numbered",
-			onClick: (id:any) => apiDownload(id, 'exportPdf'),
+			onClick: exportIndexPdf,
             showInMenu: true,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportEXCEL'),
             icon: "lists",
-			onClick: (id:any) => apiDownload(id, 'exportExcel'),
+			onClick: exportIndexXls,
             showInMenu: true,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioExcelActiva),
         },
         {
             title: t('page.expedient.acciones.exportPDF_ENI'),
             icon: "format_list_numbered",
-			onClick: (id:any) => apiDownload(id, 'exportPdfEni'),
+			onClick: exportPdfEni,
             showInMenu: true,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !row?.conteDocuments,
@@ -263,7 +261,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {
             title: t('page.expedient.acciones.exportENI'),
             icon: "folder_code",
-			onClick: (id:any) => apiDownload(id, 'exportEni'),
+			onClick: exportEni,
             showInMenu: true,
 			disabled: (row:any) => !row?.conteDocumentsDefinitius,
 			hidden: (row:any) => !row?.conteDocuments,
@@ -271,7 +269,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {
             title: t('page.expedient.acciones.exportINSIDE'),
             icon: "folder_zip",
-			onClick: (id:any) => apiDownload(id, 'exportInside'),
+			onClick: exportInside,
             showInMenu: true,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),
@@ -297,12 +295,13 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
     ]
-        .map(({ hidden, ...rest }) => ({
-            ...rest,
-            hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus != 'EXPEDIENT'
-        }));
+        // .map(({ hidden, ...rest }) => ({
+        //     ...rest,
+        //     hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus != 'EXPEDIENT'
+        // }));
 
     const components = <>
+        {dialogHistoric}
         {cambiarPrioridadContent}
         {cambiarEstadoContent}
         {arxiuDialog}

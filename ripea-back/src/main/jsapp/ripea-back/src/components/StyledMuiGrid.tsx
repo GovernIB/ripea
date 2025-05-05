@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
 import {MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -26,6 +26,7 @@ export const ToolbarButton = (props:any) => {
 // type StyledMuiGridProps = MuiDataGridProps & {
 //     toolbarCreateTitle?: string,
 //     toolbarMassiveActions?: MassiveActionProps[]
+//     rowProps?: any
 // }
 
 const StyledMuiGrid = (props:any) => {
@@ -48,6 +49,7 @@ const StyledMuiGrid = (props:any) => {
         selectionActive,
         readOnly,
         onRowsChange,
+        rowProps,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
@@ -78,12 +80,12 @@ const StyledMuiGrid = (props:any) => {
         },
         {
             position: 3,
-            element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'info'}/>,
+            element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'primary'}/>,
             hidden: toolbarHideRefresh,
         },
         {
             position: 4,
-            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create} color={'info'}>{toolbarCreateTitle}</ToolbarButton>,
+            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create} color={'primary'}>{toolbarCreateTitle}</ToolbarButton>,
             hidden: toolbarHideCreate || readOnly,
         }
     ]
@@ -96,36 +98,27 @@ const StyledMuiGrid = (props:any) => {
     }, [user]);
 
     // Custom row styling with colored bar
-    const getRowClassName = (params: any) :string => {
-        const color = params.row?.estatAdditionalInfo?.color;
-        const className = (color ? `row-with-color-${params.row.id} ` : '') + (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd');
-        // console.log('Row className:', className);
-        return className;
-    };
+    const getRowClassName = (params: any) :string =>
+        `row-with-color-${params.row.id} ${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}`;
 
     // Apply custom CSS for rows with color
-    const getRowStyle = () => {
-        const styles: any = {};
-        if (gridRows.length > 0) {
-            gridRows.forEach((row: any) => {
-                const color = row?.estatAdditionalInfo?.color;
-                if (color) {
-                    styles[`.row-with-color-${row.id}`] = {
-                        'box-shadow': `${color} -6px 0px 0px`,
-                        'border-left': `6px solid ${color}`
-                    };
-                }
-            });
-        }
-        return styles;
-    };
+    const rowStyles = useMemo(() => (
+        gridRows.map((row: any) => {
+            const style = rowProps?.(row);
+            return style
+                ? `.row-with-color-${row.id} { ${Object.entries(style).map(([k, v]) => `${k}: ${v};`).join(' ')} }`
+                : '';
+        }).join('\n')
+    ), [gridRows]);
 
     // Applica word wrap a totes les columnes
-    const columnsWithWordWrap = columns.map((col:any) => ({
-        ...col,
-        flex: col.flex || 1,
-        cellClassName: 'cell-with-wrap',
-    }));
+    const columnsWithWordWrap = useMemo(()=>{
+        return columns.map((col:any) => ({
+            ...col,
+            flex: col.flex ?? 1,
+            cellClassName: 'cell-with-wrap',
+        }));
+    }, [columns])
 
     return <>
         <style>
@@ -158,11 +151,8 @@ const StyledMuiGrid = (props:any) => {
                         min-width: 48px !important;
                         margin-left: -4px !important;
                     }
-                    ${Object.entries(getRowStyle()).map(([className, style]) =>
-                `${className} { ${Object.entries(style as any).map(([prop, value]) =>
-                    `${prop}: ${value};`).join(' ')} }`
-            ).join('\n')}
-                    `}
+            `}
+            {rowStyles}
         </style>
 
         <MuiGrid

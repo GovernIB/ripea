@@ -85,7 +85,23 @@ const translationEs = {
                 anotacions: "Anotaciones",
                 versions: "Versiones",
                 tasques: "Tareas",
-            }
+
+                actions: "Acciones",
+                move: "Movimientos",
+                auditoria: "Auditoria",
+            },
+            log: {
+                causa: "Accion causa",
+                param: "Parametros",
+                param1: "Parametro 1",
+                param2: "Parametro 2",
+                objecte: "Objeto",
+            },
+            moviment: {
+                causa: "Movimiento causa",
+                origen: "Origen",
+                desti: "Destino",
+            },
         },
         anotacio: {
             tabs: {
@@ -123,7 +139,6 @@ const translationEs = {
                 prioritat: "Prioridad",
             },
             acciones: {
-                detall: "Detalle",
                 tramitar: "Tramitar",
                 iniciar: "Iniciar",
                 rebutjar: "Rechazar",
@@ -208,7 +223,11 @@ const translationEs = {
             },
 			modal: {
 				seguidors: "Seguidores del expediente",
-			}
+			},
+			results: {
+				actionOk: 'La acción se ha ejecutado correctamente.',
+				actionBackgroundOk: 'La acción se ha preparadot para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.',
+			}		
         },
         arxiu: {
             detall: {
@@ -232,21 +251,21 @@ const translationEs = {
                 clasificacion: "Clasificació",
                 estat: "Estado",
                 interessats: "Interesados",
-                firmes: 'Tipo de firma',
+                firmes: "Tipo de firma",
                 documentOrigen: "Documento origen id",
             },
             firma: {
-                title: 'Firma',
-                perfil: 'Perfil de firma',
-                fitxerNom: 'Nombre del fichero',
-                tipusMime: 'Tipo MIME',
-                contingut: 'CSV',
-                csvRegulacio: 'Regulación CSV',
+                title: "Firma",
+                perfil: "Perfil de firma",
+                fitxerNom: "Nombre del fichero",
+                tipusMime: "Tipo MIME",
+                contingut: "CSV",
+                csvRegulacio: "Regulación CSV",
             },
             tabs: {
                 resum: "Información",
                 fills: "Hijos",
-                firmes: 'Firmas',
+                firmes: "Firmas",
                 data: "Metadatos",
             },
         },
@@ -316,9 +335,6 @@ const translationEs = {
         },
         metaDada: {
             title: "Tipo de dato",
-            acciones: {
-                detail: "Detalle",
-            },
         },
         registre: {
             grid: {

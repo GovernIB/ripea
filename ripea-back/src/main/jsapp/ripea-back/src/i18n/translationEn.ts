@@ -85,7 +85,23 @@ const translationEn = {
                 anotacions: "Annotations",
                 versions: "Versions",
                 tasques: "Tasks",
-            }
+
+                actions: "Actions",
+                move: "Movements",
+                auditoria: "Audit",
+            },
+            log: {
+                causa: "Action cause",
+                param: "Parameters",
+                param1: "Parameter 1",
+                param2: "Parameter 2",
+                objecte: "Object",
+            },
+            moviment: {
+                causa: "Movement cause",
+                origen: "Origin",
+                desti: "Destination",
+            },
         },
         anotacio: {
             tabs: {
@@ -123,7 +139,6 @@ const translationEn = {
                 prioritat: "Priority",
             },
             acciones: {
-                detall: "Detail",
                 tramitar: "Process",
                 iniciar: "Start",
                 rebutjar: "Reject",
@@ -208,7 +223,11 @@ const translationEn = {
             },
             modal: {
                 seguidors: "Expedient followers",
-            }
+            },
+			results: {
+				actionOk: 'Action executed.',
+				actionBackgroundOk: 'Action is executing on background.',
+			}
         },
         arxiu: {
             detall: {
@@ -316,9 +335,6 @@ const translationEn = {
         },
         metaDada: {
             title: "Data Type",
-            acciones: {
-                detail: "Detail",
-            },
         },
         registre: {
             grid: {

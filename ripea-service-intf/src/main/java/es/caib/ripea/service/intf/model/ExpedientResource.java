@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -33,6 +34,10 @@ import java.util.List;
 		quickFilterFields = { "numero", "nom" },
         descriptionField = "nom",
 		artifacts = {
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,
+						formClass = ExpedientResource.ExportarDocumentMassiu.class),		
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
@@ -57,40 +62,84 @@ import java.util.List;
 						formClass = ExpedientResource.ExpedientFilterForm.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientResource.ACTION_FOLLOW_CODE,
+                        code = ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientResource.ACTION_UNFOLLOW_CODE,
+                        code = ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientResource.ACTION_AGAFAR_CODE,
-                        requiresId = true),
+                        code = ExpedientResource.ACTION_MASSIVE_AGAFAR_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientResource.ACTION_RETORNAR_CODE,
-                        requiresId = true),
+                        code = ExpedientResource.ACTION_MASSIVE_ALLIBERAR_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientResource.ACTION_MASSIVE_EXPORT_DOC_CODE,
-                        formClass = ExpedientResource.ExportarDocumentMassiu.class),
+                        code = ExpedientResource.ACTION_MASSIVE_RETORNAR_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_MASSIVE_DELETE_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_CSV_CODE,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ZIP,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_PDF,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_XLS,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ENI,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE,
+						formClass = ExpedientResource.MassiveAction.class),				
 		})
-public class ExpedientResource extends NodeResource {
+public class ExpedientResource extends NodeResource implements Serializable {
 
 	private static final long serialVersionUID = 7440910672703796468L;
-	public static final String ACTION_MASSIVE_EXPORT_DOC_CODE = "EXPORT_DOC";
-
-	public static final String ACTION_FOLLOW_CODE = "FOLLOW";
-	public static final String ACTION_UNFOLLOW_CODE = "UNFOLLOW";
-	public static final String ACTION_AGAFAR_CODE = "AGAFAR";
-	public static final String ACTION_RETORNAR_CODE = "RETORNAR";
+	
+	public static final String ACTION_MASSIVE_EXPORT_PDF_CODE 	= "EXPORT_DOC";
+	public static final String ACTION_MASSIVE_EXPORT_ODS_CODE 	= "EXPORT_EXCEL";
+	public static final String ACTION_MASSIVE_EXPORT_CSV_CODE 	= "EXPORT_CSV";
+	public static final String ACTION_MASSIVE_EXPORT_INDEX_ZIP 	= "EXPORT_INDEX_ZIP";
+	public static final String ACTION_MASSIVE_EXPORT_INDEX_PDF 	= "EXPORT_INDEX_PDF";
+	public static final String ACTION_MASSIVE_EXPORT_INDEX_XLS 	= "EXPORT_INDEX_XLS";
+	public static final String ACTION_MASSIVE_EXPORT_ENI 		= "EXPORT_ENI";
+	public static final String ACTION_MASSIVE_EXPORT_INSIDE 	= "EXPORT_INSIDE";
+	
+	public static final String ACTION_MASSIVE_FOLLOW_CODE = "FOLLOW";
+	public static final String ACTION_MASSIVE_UNFOLLOW_CODE = "UNFOLLOW";
+	public static final String ACTION_MASSIVE_AGAFAR_CODE = "AGAFAR";
+	public static final String ACTION_MASSIVE_ALLIBERAR_CODE = "ALLIBERAR";
+	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
+	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";	
+	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
 	public static final String PERSPECTIVE_RELACIONAT_CODE = "RELACIONAT";
+	
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
 	@NotNull
@@ -254,8 +303,8 @@ public class ExpedientResource extends NodeResource {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class ExportarDocumentMassiu extends MassiveAction {
-        private boolean carpetes = true;
+    public static class ExportarDocumentMassiu extends MassiveAction implements Serializable {
+		private boolean carpetes = true;
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
     }
@@ -263,6 +312,9 @@ public class ExpedientResource extends NodeResource {
     @Getter
     @Setter
     public static class MassiveAction implements Serializable {
+        @NotNull
+        @NotEmpty
         private List<Long> ids;
+        private boolean masivo = false;
     }
 }

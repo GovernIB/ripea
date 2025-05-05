@@ -7,6 +7,7 @@ import {useEffect, useMemo, useState} from "react";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import Load from "../../components/Load.tsx";
+import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 
 const HeaderButton = (props:any) => {
     const { children, badgeContent, onClick, hidden, ...other } = props;
@@ -407,6 +408,8 @@ const MenuUsuari = (props:any) => {
 const AccionesMassivas = (props:any) => {
     const {isRolActualAdmin, sessionScope} = props;
 
+    const {handleOpen, dialog} = useExecucioMassiva();
+
     return <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
         <MenuItem>Enviar documentos al portafirmas</MenuItem>
         <MenuItem>Firmar documentos desde el navegador</MenuItem>
@@ -425,7 +428,8 @@ const AccionesMassivas = (props:any) => {
         }
         <MenuItem>Cambiar prioridad de expedientes</MenuItem>
         <Divider/>
-        <MenuItem>Consultar acciones masivas</MenuItem>
+        <MenuItem onClick={handleOpen}>Consultar acciones masivas</MenuItem>
+        {dialog}
     </HeaderMenu>
 }
 const MenuRevisor = () => {

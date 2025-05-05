@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassivaEntity, Long> {
 	
-	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(UsuariEntity createdBy, Long entitatId, Pageable pageable);
+	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(String createdBy, Long entitatId, Pageable pageable);
 	
 	List<ExecucioMassivaEntity> findByEntitatIdOrderByCreatedDateDesc(Long entitatId, Pageable pageable);
 	

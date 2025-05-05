@@ -328,25 +328,6 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 				interessatsAccionsMap);
 		
 	}
-
-	@Override
-	@RolesAllowed("**")
-	public FitxerDto exportIndexExpedients(Long entitatId, Set<Long> expedientIds, String format) throws IOException {
-		return delegateService.exportIndexExpedients(
-				entitatId, 
-				expedientIds,
-				format);
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public FitxerDto exportIndexExpedient(Long entitatId, Set<Long> expedientId, boolean exportar, String format) throws IOException {
-		return delegateService.exportIndexExpedient(
-				entitatId,
-				expedientId,
-				exportar,
-				format);
-	}
 	
 	@Override
 	@RolesAllowed("**")

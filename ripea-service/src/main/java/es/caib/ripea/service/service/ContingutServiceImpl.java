@@ -206,10 +206,6 @@ public class ContingutServiceImpl implements ContingutService {
 		cacheHelper.evictErrorsValidacioPerNode(node);
 	}
 
-	
-
-	
-	
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
@@ -221,33 +217,10 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		
-		ContingutEntity contingut = null;
-		if (tascaId == null) {
-			contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutId,
-				false,
-				false,
-				false,
-				true, 
-				false, 
-					true, 
-					rolActual);
-		} else {
-		  contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-					tascaId,
-					contingutId);
-		}
-
-		
-		if (contingut instanceof ExpedientEntity) {
-			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
-		}
-
 		contingutHelper.deleteReversible(
 				entitatId,
-				contingut, 
+				contingutId,
+				tascaId,
 				rolActual);
 	}
 

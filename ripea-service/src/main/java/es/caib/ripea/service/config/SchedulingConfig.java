@@ -23,7 +23,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -134,6 +139,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
         }
     }
 
+    private void createAuthenticationContext() {
+    	if(SecurityContextHolder.getContext().getAuthentication()==null) {
+			// Crear un usuario autenticado simulado
+	        User user = new User("SYSTEM_RIPEA", "", Collections.singletonList(new SimpleGrantedAuthority("IPA_ADMIN")));
+	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+    	}
+    }
+    
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 
@@ -148,10 +162,13 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
                         monitorTasquesService.inici(codiEnviarDocumentsAlPortafirmes);
                         try {
+                        	createAuthenticationContext();
                             execucioMassivaService.executeNextMassiveScheduledTask();
                             monitorTasquesService.fi(codiEnviarDocumentsAlPortafirmes);
                         } catch (Throwable th) {
                             tractarErrorTascaSegonPla(th, codiEnviarDocumentsAlPortafirmes);
+                        } finally {
+                        	SecurityContextHolder.clearContext();
                         }
                     }
                 },
@@ -166,11 +183,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiConsultarIGuardarAnotacionsPendents);
 						try {
+							createAuthenticationContext();
 							segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
 							monitorTasquesService.fi(codiConsultarIGuardarAnotacionsPendents);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiConsultarIGuardarAnotacionsPendents);
-						}                     	
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }                 	
                     }
                 },
                 getTrigger(codiConsultarIGuardarAnotacionsPendents)
@@ -184,11 +204,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
 					public void run() {
 						monitorTasquesService.inici(codiCanviarEstatEnDistribucio);
 						try {
+							createAuthenticationContext();
 							segonPlaService.reintentarCanviEstatDistribucio();
 							monitorTasquesService.fi(codiCanviarEstatEnDistribucio);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiCanviarEstatEnDistribucio);
-						}  						
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }					
 					}
 		        },
                 getTrigger(codiCanviarEstatEnDistribucio)
@@ -199,7 +222,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @SneakyThrows
                     @Override
                     public void run() {
+                    	createAuthenticationContext();
                         segonPlaService.buidarCacheDominis();
+                       	SecurityContextHolder.clearContext();
                     }
                 },
                 getTrigger(codiBuidarCachesDominis)
@@ -213,11 +238,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiEnviarEmailsInformantDeNouComentariPerProcediment);
 						try {
+							createAuthenticationContext();
 	                        segonPlaService.enviarEmailPerComentariMetaExpedient();
 							monitorTasquesService.fi(codiEnviarEmailsInformantDeNouComentariPerProcediment);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiEnviarEmailsInformantDeNouComentariPerProcediment);
-						}                         
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }                      
                     }
                 },
                 getTrigger(codiEnviarEmailsInformantDeNouComentariPerProcediment)
@@ -230,11 +258,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @Override
                     public void run() {
                     	monitorTasquesService.inici(codiEnviarEmailsAgrupats);
-                        try{ 
+                        try {
+                        	createAuthenticationContext();
                         	segonPlaService.enviarEmailsPendentsAgrupats();
                         	monitorTasquesService.fi(codiEnviarEmailsAgrupats);
                         } catch(Throwable th) {                        	
                         	tractarErrorTascaSegonPla(th, codiEnviarEmailsAgrupats);
+                        } finally {
+                        	SecurityContextHolder.clearContext();
                         }
                     }
                 },
@@ -249,11 +280,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiGuardarEnArxiuContingutsPendents);
 						try {
+							createAuthenticationContext();
 	                        segonPlaService.guardarExpedientsDocumentsArxiu();
 							monitorTasquesService.fi(codiGuardarEnArxiuContingutsPendents);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuContingutsPendents);
-						}                         
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
                     }
                 },
                 getTrigger(codiGuardarEnArxiuContingutsPendents)
@@ -267,11 +301,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiGuardarEnArxiuInteressats);
 						try {
+							createAuthenticationContext();
 	                        segonPlaService.guardarInteressatsArxiu();
 							monitorTasquesService.fi(codiGuardarEnArxiuInteressats);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuInteressats);
-						}                         
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
                     }
                 },
                 getTrigger(codiGuardarEnArxiuInteressats)
@@ -285,11 +322,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiActualitzacioDeProcediments);
 						try {
+							createAuthenticationContext();
 	                        segonPlaService.actualitzarProcediments();
 							monitorTasquesService.fi(codiActualitzacioDeProcediments);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiActualitzacioDeProcediments);
-						}                           
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
                     }
                 },
                 getTrigger(codiActualitzacioDeProcediments)
@@ -303,11 +343,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiConsultaDeCanvisAlOrganigrama);
 						try {
+							createAuthenticationContext();
 	                        segonPlaService.consultaCanvisOrganigrama();
 							monitorTasquesService.fi(codiConsultaDeCanvisAlOrganigrama);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiConsultaDeCanvisAlOrganigrama);
-						}                         
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
                     }
                 },
                 getTrigger(codiConsultaDeCanvisAlOrganigrama)
@@ -321,11 +364,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public void run() {
 						monitorTasquesService.inici(codiTancarExpedientsEnArxiu);
 						try {
+							createAuthenticationContext();
 	                        segonPlaService.tancarExpedientsArxiu();
 							monitorTasquesService.fi(codiTancarExpedientsEnArxiu);
 						} catch (Throwable th) {
 							tractarErrorTascaSegonPla(th, codiTancarExpedientsEnArxiu);
-						}                            
+						} finally {
+                        	SecurityContextHolder.clearContext();
+                        }
                     }
                 },
                 getTrigger(codiTancarExpedientsEnArxiu)
