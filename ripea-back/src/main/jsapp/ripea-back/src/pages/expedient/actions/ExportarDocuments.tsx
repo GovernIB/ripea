@@ -1,6 +1,6 @@
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
-import {useRef} from "react";
+import {useRef, useState} from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 
@@ -28,20 +28,21 @@ const ExportarDocuments = (props:any) => {
 const useExportarDocuments = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
+    const [message, setMessage] = useState<any>('');
 
     const handleShow = (id:any, row:any) :void => {
         console.log("id", id, row);
-        apiRef.current?.show?.(id)
+        setMessage('individual')
+        apiRef.current?.show?.(undefined, {ids: [id], massivo: false})
     }
-    const handleMassiveShow = (ids:any) :void => {
+    const handleMassiveShow = (ids:any[]) :void => {
         console.log("ids", ids);
-        apiRef.current?.show?.(undefined, {
-            ids: ids,
-        })
+        setMessage('maassiu')
+        apiRef.current?.show?.(undefined, {ids: ids, massivo: true})
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, message, 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow('Error', error.message, 'error');

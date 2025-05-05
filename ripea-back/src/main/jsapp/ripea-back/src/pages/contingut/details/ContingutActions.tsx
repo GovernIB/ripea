@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import {useResourceApiService} from "reactlib";
 import useMoure from "../actions/Moure.tsx";
-import useHistoric from "./Historic.tsx";
+import useHistoric from "../../Historic.tsx";
 import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
 import useEviarPortafirmes from "../actions/EviarPortafirmes.tsx";

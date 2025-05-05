@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -112,26 +111,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     public void init() {
         
     	//Exportar docs a ZIP amb formulari previ. Massiu o individual.
-    	register(ExpedientResource.ACTION_EXPORT_PDF_CODE,	new ExportZipGenerator());
+    	register(ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,	new ExportZipGenerator());
     	//Exportar info expedients a EXCEL sense formulari previ. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_EXPORT_ODS_CODE,	new ExportOdsGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,	new ExportOdsGenerator());
         //Exportar info expedients a CSV sense formulari previ. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_EXPORT_CSV_CODE,	new ExportCsvGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_CSV_CODE,	new ExportCsvGenerator());
         //Genera els indexos dels expedients seleccionats i els comprimeix. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_EXPORT_INDEX_ZIP, new ExportIndexZipGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ZIP, new ExportIndexZipGenerator());
         //Genera els indexos dels expedients seleccionats en PDF. Massiu o individual.
-        register(ExpedientResource.ACTION_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
         //Genera els indexos dels expedients seleccionats en EXCEL. Massiu o individual.
-        register(ExpedientResource.ACTION_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
-        register(ExpedientResource.ACTION_EXPORT_ENI, 		new ExportIdexEniGenerator());
-        register(ExpedientResource.ACTION_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ENI, 		new ExportIdexEniGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
 
-        register(ExpedientResource.ACTION_AGAFAR_CODE, new AgafarActionExecutor());
-        register(ExpedientResource.ACTION_ALLIBERAR_CODE, new AlliberarActionExecutor());
-        register(ExpedientResource.ACTION_RETORNAR_CODE, new RetornarActionExecutor());
-        register(ExpedientResource.ACTION_FOLLOW_CODE, new FollowActionExecutor());
-        register(ExpedientResource.ACTION_UNFOLLOW_CODE, new UnFollowActionExecutor());
-        register(ExpedientResource.ACTION_DELETE_CODE, new DeleteActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_AGAFAR_CODE, new AgafarActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_ALLIBERAR_CODE, new AlliberarActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_RETORNAR_CODE, new RetornarActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE, new FollowActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE, new UnFollowActionExecutor());
+        register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -682,7 +681,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		try {
-    			ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 				DownloadableFile resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
             	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
     			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_EXCEL, new Date(), null, configHelper.getRolActual());
@@ -698,7 +697,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
@@ -712,13 +711,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		try {
-    			ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
             	DownloadableFile resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
             	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
     			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_CSV, new Date(), null, configHelper.getRolActual());
-    			execMassDto.setCarpetes(params.isCarpetes());
-    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-    			execMassDto.setNomFitxer(params.getNomFitxer());
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
     			return resultat;
@@ -731,7 +727,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
@@ -745,13 +741,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		try {
-				ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+				ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
             	DownloadableFile resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
             	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
     			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP, new Date(), null, configHelper.getRolActual());
-    			execMassDto.setCarpetes(params.isCarpetes());
-    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-    			execMassDto.setNomFitxer(params.getNomFitxer());
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
     			return resultat;
@@ -764,7 +757,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
@@ -832,7 +825,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
@@ -841,7 +834,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
     }
     
-    private class ExportIdexPdfGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+    private class ExportIdexPdfGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -849,9 +842,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		DownloadableFile resultat = null;
     		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
     		
-    		try {	    		
+    		try {		
 	    		
-	    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMasivo()) {
@@ -860,9 +853,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
 		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF, new Date(), null, configHelper.getRolActual());
-		    			execMassDto.setCarpetes(params.isCarpetes());
-		    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-		    			execMassDto.setNomFitxer(params.getNomFitxer());
 		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 		            } else {
 						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats: no hi ha cap expedient seleccionat.");
@@ -889,19 +879,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
 
 		@Override
-		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class ExportIdexXlsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+    private class ExportIdexXlsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -911,7 +901,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMasivo()) {
@@ -920,9 +910,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
 		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL, new Date(), null, configHelper.getRolActual());
-		    			execMassDto.setCarpetes(params.isCarpetes());
-		    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-		    			execMassDto.setNomFitxer(params.getNomFitxer());
 		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 		            } else {
 						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format XLSX per els expedients seleccionats: no hi ha cap expedient seleccionat.");
@@ -949,19 +936,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
 
 		@Override
-		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class ExportIdexEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+    private class ExportIdexEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -971,7 +958,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMasivo()) {
@@ -980,9 +967,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
 		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_ENI, new Date(), null, configHelper.getRolActual());
-		    			execMassDto.setCarpetes(params.isCarpetes());
-		    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-		    			execMassDto.setNomFitxer(params.getNomFitxer());
 		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 		            } else {
 						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a ENI els expedients seleccionats: no hi ha cap expedient seleccionat.");
@@ -1005,19 +989,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
 
 		@Override
-		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
+    private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -1027,7 +1011,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		
     		try {	    		
 	    		
-	    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
 	            if (params.isMasivo()) {
@@ -1036,9 +1020,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
 		            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 		    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.EXPORTAR_INSIDE, new Date(), null, configHelper.getRolActual());
-		    			execMassDto.setCarpetes(params.isCarpetes());
-		    			execMassDto.setVersioImprimible(params.isVersioImprimible());
-		    			execMassDto.setNomFitxer(params.getNomFitxer());
 		    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 		            } else {
 						throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a format INSIDE els expedients seleccionats: no hi ha cap expedient seleccionat.");
@@ -1061,16 +1042,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		}
     	
 		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():null);
+			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
 
 		@Override
-		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
     // OnChangeLogicProcessor

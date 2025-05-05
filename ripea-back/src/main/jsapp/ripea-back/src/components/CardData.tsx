@@ -1,4 +1,4 @@
-import {Card, CardContent, Grid, Typography} from "@mui/material";
+import {Card, CardContent, CardHeader, Grid, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
 
@@ -32,10 +32,8 @@ export const CardData = (props:any) => {
 
     return <Grid item xs={xs ?? 12}>
         <Card sx={{...cardBorder, ...cardProps}}>
-            <CardContent sx={headerProps} hidden={!title && !header}>
-                <Typography variant={"h5"} hidden={!title}>{title}</Typography>
-                {header}
-            </CardContent>
+            <CardHeader title={title} sx={headerProps} hidden={!title}/>
+            <CardContent sx={headerProps} hidden={!header}>{header}</CardContent>
 
             <CardContent hidden={!children}>
                 <Grid container columnSpacing={1} rowSpacing={1} item xs={12} {...other}>

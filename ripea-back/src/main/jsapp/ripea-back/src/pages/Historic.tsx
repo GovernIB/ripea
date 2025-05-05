@@ -1,0 +1,256 @@
+import {useState} from "react";
+import {Grid} from "@mui/material";
+import {BasePage, MuiDialog} from "reactlib";
+import {useTranslation} from "react-i18next";
+import TabComponent from "../components/TabComponent.tsx";
+import {formatDate} from "../util/dateUtils.ts";
+import StyledMuiGrid from "../components/StyledMuiGrid.tsx";
+import * as builder from "../util/springFilterUtils.ts";
+import {CardData, ContenidoData} from "../components/CardData.tsx";
+
+const columnsAccions = [
+    {
+        field: 'createdDate',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value),
+    },
+    {
+        field: 'createdBy',
+        flex: 0.5,
+    },
+    {
+        field: 'tipus',
+        flex: 0.5,
+        valueFormatter: (value: any, row:any)=> {
+            if(row?.secundari){
+                return row?.objecte
+            }
+            return value
+        }
+    },
+]
+
+const sortModel:any = [{ field: 'createdDate', sort: 'asc' }];
+const Accions = (props:any) => {
+    const { id, onRowCountChange } = props;
+    const { t } = useTranslation();
+
+    const {handleOpen, dialog} = useAccioDialog()
+
+    const actions = [
+        {
+            title: t('common.detail'),
+            icon: 'info',
+            showInMenu: true,
+            onClick: handleOpen,
+        }
+    ]
+
+    return <BasePage>
+        <StyledMuiGrid
+            resourceName={'contingutLogResource'}
+            filter={builder.eq('contingut.id', id)}
+            staticSortModel={sortModel}
+            columns={columnsAccions}
+            rowAdditionalActions={actions}
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            paginationActive
+            height={162 + 52 * 4}
+            toolbarHide
+            readOnly
+        />
+        {dialog}
+    </BasePage>;
+}
+const useAccioDialog = () => {
+    const { t } = useTranslation();
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+
+    const handleOpen = (id:any, row:any) => {
+        console.log(id, row);
+        setEntity(row);
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const dialog =
+    <MuiDialog
+        open={open}
+        closeCallback={handleClose}
+        componentProps={{ fullWidth: true, maxWidth: 'md'}}
+        buttons={[
+            {
+                value: 'close',
+                text: t('common.close'),
+                icon: 'close'
+            },
+        ]}
+        buttonCallback={(value :any) :void=>{
+            if (value=='close') {
+                handleClose();
+            }
+        }}
+    >
+        <Grid container columnSpacing={1} rowSpacing={1}>
+            <CardData title={t('page.contingut.log.param')}>
+                <ContenidoData title={t('page.contingut.log.param1')} xs={6}>{entity?.param1}</ContenidoData>
+                <ContenidoData title={t('page.contingut.log.param2')} xs={6}>{entity?.param2}</ContenidoData>
+            </CardData>
+
+            <CardData title={t('page.contingut.log.causa')} hidden={!entity?.pare}>
+                <ContenidoData title={t('common.action')}>
+                    {formatDate(entity?.pare?.createdDate)} | {entity?.pare?.createdBy} | {(entity?.pare?.objecteLogTipus ?? entity?.pare?.tipus)}
+                </ContenidoData>
+                <ContenidoData title={t('page.contingut.log.objecte')}>{entity?.objecte} {!!entity?.objecteNom ?' - '+entity?.objecteNom :''}</ContenidoData>
+                <ContenidoData title={t('page.contingut.log.param1')} xs={6}>{entity?.pare?.param1}</ContenidoData>
+                <ContenidoData title={t('page.contingut.log.param2')} xs={6}>{entity?.pare?.param2}</ContenidoData>
+            </CardData>
+
+            <CardData title={t('page.contingut.moviment.causa')} hidden={!entity?.moviment}>
+                <ContenidoData title={t('page.contingut.moviment.origen')} xs={6}>#{entity?.moviment?.origen?.id}</ContenidoData>
+                <ContenidoData title={t('page.contingut.moviment.desti')} xs={6}>#{entity?.moviment?.desti?.id}</ContenidoData>
+            </CardData>
+        </Grid>
+    </MuiDialog>
+
+    return {
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}
+
+const columnsMoviment = [
+    {
+        field: 'createdDate',
+        flex: 0.5,
+        valueFormatter: (value: any) => formatDate(value),
+    },
+    {
+        field: 'remitent',
+        flex: 0.5,
+    },
+    {
+        field: 'origen',
+        flex: 0.5,
+        valueFormatter: (value: any) => '#'+value?.id,
+    },
+    {
+        field: 'desti',
+        flex: 0.5,
+        valueFormatter: (value: any) => '#'+value?.id,
+    },
+    {
+        field: 'comentari',
+        flex: 0.5,
+    },
+]
+const Moviment = (props:any) => {
+    const { id, onRowCountChange } = props;
+    return <BasePage>
+        <StyledMuiGrid
+            resourceName={'contingutMovimentResource'}
+            filter={builder.eq('contingut.id', id)}
+            staticSortModel={sortModel}
+            columns={columnsMoviment}
+            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            paginationActive
+            height={162 + 52 * 4}
+            toolbarHide
+            readOnly
+        />
+    </BasePage>;
+}
+const Auditoria = (props:any) => {
+    const { entity } = props;
+    return <BasePage>
+        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+            <CardData title={"Creación"} xs={6}>
+                <ContenidoData title={"Usuario"}>{entity?.createdBy}</ContenidoData>
+                <ContenidoData title={"Fecha"} >{formatDate(entity?.createdDate)}</ContenidoData>
+            </CardData>
+            <CardData title={"Modificación"} xs={6}>
+                <ContenidoData title={"Usuario"} >{entity?.lastModifiedBy}</ContenidoData>
+                <ContenidoData title={"Fecha"} >{formatDate(entity?.lastModifiedDate)}</ContenidoData>
+            </CardData>
+        </Grid>
+    </BasePage>;
+}
+
+const useHistoric = () => {
+    const { t } = useTranslation();
+    const [open, setOpen] = useState(false);
+    const [entity, setEntity] = useState<any>();
+
+    const [numAccions, setNumAccions] = useState<number>(0);
+    const [numMoviment, setMoviment] = useState<number>(0);
+
+    const handleOpen = (id:any, row:any) => {
+        console.log(id, row);
+        setEntity(row);
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const tabs = [
+        {
+            value: 'actions',
+            label: t('page.contingut.tabs.actions'),
+            content: <Accions id={entity?.id} onRowCountChange={setNumAccions}/>,
+            badge: numAccions,
+        },
+        {
+            value: "move",
+            label: t('page.contingut.tabs.move'),
+            content: <Moviment id={entity?.id} onRowCountChange={setMoviment}/>,
+            badge: numMoviment,
+        },
+        {
+            value: "auditoria",
+            label: t('page.contingut.tabs.auditoria'),
+            content: <Auditoria entity={entity}/>,
+        },
+    ]
+
+    const dialog =
+        <MuiDialog
+            open={open}
+            closeCallback={handleClose}
+            title={"Histórico de acciones del elemento"}
+            componentProps={{ fullWidth: true, maxWidth: 'xl'}}
+            buttons={[
+                {
+                    value: 'close',
+                    text: t('common.close'),
+                    icon: 'close'
+                },
+            ]}
+            buttonCallback={(value :any) :void=>{
+                if (value=='close') {
+                    handleClose();
+                }
+            }}
+        >
+            <TabComponent
+                indicatorColor={"primary"}
+                textColor={"primary"}
+                aria-label="scrollable force tabs"
+                tabs={tabs}
+                variant="scrollable"
+            />
+        </MuiDialog>
+
+    return {
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}
+export default useHistoric;
