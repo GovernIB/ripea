@@ -1,6 +1,7 @@
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import { useTranslation } from "react-i18next";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const useMassiveActions = (refresh?: () => void)=> {
 	
@@ -19,7 +20,7 @@ const useMassiveActions = (refresh?: () => void)=> {
             })
     }
 	
-	const massiveReport = (ids:any[], code:string, msg:string, fileType:string) => {
+	const massiveReport = (ids:any[], code:string, msg:string, fileType:any) => {
 	    return apiReport(undefined, {code :code, data:{ ids: ids, masivo: true }, fileType})
 			.then(() => {
 			    refresh?.()
@@ -63,6 +64,8 @@ const useMassiveActions = (refresh?: () => void)=> {
 }
 
 const useExpedientMassiveActions = (refresh?: () => void)=> {
+
+    const { value: user } = useUserSession();
 
     const {	agafar,
 			alliberar,
@@ -134,7 +137,8 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 		{
 		    title: "Exportar índex Excel",
 		    icon: "download",
-			onClick: exportIndexXls
+			onClick: exportIndexXls,
+            hidden: !(user?.sessionScope?.isExportacioExcelActiva),
 		},
         {
             title: "Exportació ENI",
