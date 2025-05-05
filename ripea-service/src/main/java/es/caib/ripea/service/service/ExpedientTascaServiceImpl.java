@@ -594,7 +594,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			ExpedientTascaDto.class);
 	}
 
-
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
@@ -602,17 +601,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		Long entitatId,
 		Long tascaId,
 		Long contingutId) throws IOException {
-		logger.debug("Esborrant el contingut ("
-			+ "entitatId=" + entitatId + ", "
-			+ "contingutId=" + contingutId + ")");
-
-		ContingutEntity contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-			tascaId,
-			contingutId);
-
-		contingutHelper.deleteReversible(
-			entitatId,
-			contingut, null);
+		logger.debug("Esborrant el contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
+		contingutHelper.comprovarContingutPertanyTascaAccesible(tascaId, contingutId);
+		contingutHelper.deleteReversible(entitatId, contingutId, tascaId, null);
 	}
 
 	@Transactional

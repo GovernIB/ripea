@@ -70,6 +70,7 @@ public class ExecucioMassivaHelper {
 	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired private DocumentHelper documentHelper;
 	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	
 	public ByteArrayOutputStream getZipFromDocuments(List<DocumentDto> docsExp) throws IOException {
 		
@@ -331,8 +332,25 @@ public class ExecucioMassivaHelper {
 					exc = enviarPortafirmes(emc);
 				} else if (ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS.equals(tipus)){
 					exc = custodiarElementsPendents(emc);
+				} else if (ExecucioMassivaTipusDto.CANVI_ESTAT.equals(tipus)){
+					//TODO: Es necessita saber l'estat al qual es vol canviar l'expedient.
+				} else if (ExecucioMassivaTipusDto.TANCAMENT.equals(tipus)){
+					//TODO: Es necessita saber el motiu y els esborranys que es volen firmar.
+				} else if (ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS.equals(tipus)){
+					//TODO: Veurer com es la logica a MassiuAnnexProcesarController
+				} else if (ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS.equals(tipus)){
+					exc = reintentarCanviEstatDistribucio(emc);
+				} else if (ExecucioMassivaTipusDto.FIRMASIMPLEWEB.equals(tipus)){
+					//TODO: Veurer com es fa a DocumentMassiuFirmaWebController. Es necessita info addicional.
+				} else if (ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT.equals(tipus) ||
+						ExecucioMassivaTipusDto.ALLIBERAR_EXPEDIENT.equals(tipus) ||
+						ExecucioMassivaTipusDto.RETORNAR_EXPEDIENT.equals(tipus) ||
+						ExecucioMassivaTipusDto.SEGUIR_EXPEDIENT.equals(tipus) ||
+						ExecucioMassivaTipusDto.UNFOLLOW_EXPEDIENT.equals(tipus) ||
+						ExecucioMassivaTipusDto.ESBORRAR_EXPEDIENT.equals(tipus)){
+					exc = executarAccioSimpleExpedient(emc, tipus);
 				}
-				
+
 				SecurityContextHolder.getContext().setAuthentication(orgAuthentication);
 				
 				if (exc == null) {
@@ -362,6 +380,45 @@ public class ExecucioMassivaHelper {
 		return resultat;
 	}
 
+	private Throwable executarAccioSimpleExpedient(ExecucioMassivaContingutEntity emc, ExecucioMassivaTipusDto accio) {
+		
+		Throwable exc = null;
+		try {
+			if (ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT.equals(accio)){
+				expedientHelper.agafar(emc.getElementId(), emc.getCreatedBy().get());
+			} else if (ExecucioMassivaTipusDto.ALLIBERAR_EXPEDIENT.equals(accio)){
+				expedientHelper.alliberar(emc.getElementId());
+			} else if (ExecucioMassivaTipusDto.RETORNAR_EXPEDIENT.equals(accio)){
+				expedientHelper.retornar(emc.getElementId());
+			} else if (ExecucioMassivaTipusDto.SEGUIR_EXPEDIENT.equals(accio)){
+				expedientHelper.follow(emc.getElementId(), emc.getCreatedBy().get());
+			} else if (ExecucioMassivaTipusDto.UNFOLLOW_EXPEDIENT.equals(accio)){
+				expedientHelper.unfollow(emc.getElementId(), emc.getCreatedBy().get());
+			} else if (ExecucioMassivaTipusDto.ESBORRAR_EXPEDIENT.equals(accio)){
+				contingutHelper.deleteReversible(
+						emc.getExecucioMassiva().getEntitat().getId(),
+						emc.getElementId(),
+						null, //tascaID
+						null);//rolActual
+			}
+		} catch (Exception ex) {
+			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut realitzar l'accio "+accio.toString()+" sobre l'element "+emc.getElementId(), ex);
+			exc = ex;
+		}
+		return exc;		
+	}
+	
+	private Throwable reintentarCanviEstatDistribucio(ExecucioMassivaContingutEntity emc) {
+		Throwable exc = null;
+		try {
+			expedientPeticioHelper.reintentarCanviEstatDistribucio(emc.getElementId());
+		} catch (Exception ex) {
+			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut actualitzat l'estat a distribució de l'element", ex);
+			exc = ex;
+		}
+		return exc;
+	}
+	
 	private Throwable custodiarElementsPendents(ExecucioMassivaContingutEntity emc) throws Exception {
 		
 		Throwable exc = null;

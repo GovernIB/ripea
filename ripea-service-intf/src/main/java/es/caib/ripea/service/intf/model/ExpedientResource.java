@@ -91,14 +91,39 @@ import java.util.List;
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_EXPORT_CSV_CODE,
 						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_INDEX_ZIP,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_INDEX_PDF,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_INDEX_XLS,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_ENI,
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORT_INSIDE,
+						formClass = ExpedientResource.MassiveAction.class),				
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 
 	private static final long serialVersionUID = 7440910672703796468L;
 	
-	public static final String ACTION_EXPORT_PDF_CODE = "EXPORT_DOC";
-	public static final String ACTION_EXPORT_ODS_CODE = "EXPORT_EXCEL";
-	public static final String ACTION_EXPORT_CSV_CODE = "EXPORT_CSV";
+	public static final String ACTION_EXPORT_PDF_CODE 	= "EXPORT_DOC";
+	public static final String ACTION_EXPORT_ODS_CODE 	= "EXPORT_EXCEL";
+	public static final String ACTION_EXPORT_CSV_CODE 	= "EXPORT_CSV";
+	public static final String ACTION_EXPORT_INDEX_ZIP 	= "EXPORT_INDEX_ZIP";
+	public static final String ACTION_EXPORT_INDEX_PDF 	= "EXPORT_INDEX_PDF";
+	public static final String ACTION_EXPORT_INDEX_XLS 	= "EXPORT_INDEX_XLS";
+	public static final String ACTION_EXPORT_ENI 		= "EXPORT_ENI";
+	public static final String ACTION_EXPORT_INSIDE 	= "EXPORT_INSIDE";
 	
 	public static final String ACTION_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_UNFOLLOW_CODE = "UNFOLLOW";

@@ -1572,22 +1572,63 @@ public class ExpedientHelper {
 		return resultat;
     }    		
     
-	public FitxerDto exportarExpedient(
-			EntitatEntity entitatActual, 
-			List<ExpedientEntity> expedients,
+	public FitxerDto generarIndexExpedients(
+			Long entitatId, 
+			Set<Long> expedientIds,
 			boolean exportar,
 			String format) throws IOException {
+		FitxerDto resposta = new FitxerDto();
+		if ("ZIP".equals(format)) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ZipOutputStream zos = new ZipOutputStream(baos);
+			for (Long expedientId : expedientIds) {
+				Set<Long> expedientIdSet = new HashSet<>(Arrays.asList(expedientId));
+				FitxerDto resultat = _generarIndexExpedients(entitatId, expedientIdSet, false, "PDF");
+				contingutHelper.crearNovaEntrada(
+						resultat.getNom(), 
+						resultat, 
+						zos);
+			}
+			zos.close();
+			resposta.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
+			resposta.setContentType("application/zip");
+			resposta.setContingut(baos.toByteArray());
+		} else {
+			resposta = _generarIndexExpedients(entitatId, expedientIds, exportar, format);
+		}
+		return resposta;
+	}
+    
+	private FitxerDto _generarIndexExpedients(
+			Long entitatActualId, 
+			Set<Long> expedientIds,
+			boolean exportar,
+			String format) throws IOException {
+		
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatActualId, false, false, false, true, false);
+
+		//Comprovar permis de lectura per els expedients
+		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
+		for (Long expedientId : expedientIds) {
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
+					expedientId,
+					false,
+					true,
+					false,
+					false,
+					false,
+					null);
+			expedients.add(expedient);
+		}
+		
 		FitxerDto resultat = new FitxerDto();
-		if (exportar) {
-//			crear estructura documents + exportació ENI + índex
+		
+		if (exportar) { //Crear estructura documents + exportació ENI + índex
+			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			BigDecimal sum = new BigDecimal(1);
 			ExpedientEntity expedient = expedients.get(0);
-//			List<ContingutEntity> continguts = contingutRepository.findByPareAndEsborrat(
-//					expedient,
-//					0,
-//					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 			List<ContingutEntity> continguts = new ArrayList<ContingutEntity>();
 			if (contingutHelper.isOrdenacioPermesa()) {
 				continguts = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(expedient, 0);
@@ -1596,9 +1637,9 @@ public class ExpedientHelper {
 			}
 			BigDecimal num = new BigDecimal(0);
 			for (ContingutEntity contingut : continguts) {
-				if (num.scale() > 0)
+				if (num.scale() > 0) {
 					num = num.setScale(0, BigDecimal.ROUND_HALF_UP);
-				
+				}
 				if (contingut instanceof DocumentEntity) {
 					DocumentEntity document = (DocumentEntity)contingut;
 					if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
@@ -1668,8 +1709,6 @@ public class ExpedientHelper {
 		}
 		return resultat;
 	}
-	
-	
 	
 	public PermisosPerExpedientsDto findPermisosPerExpedients(
 			Long entitatId,

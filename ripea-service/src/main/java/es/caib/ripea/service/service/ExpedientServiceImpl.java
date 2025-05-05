@@ -1359,8 +1359,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientHelper.exportacio(entitatId, expedientIds, format);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds, boolean ambDocuments) throws IOException {
 		logger.debug(
 				"Exportant ENI dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ")");
@@ -1373,79 +1373,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false);
 		return expedientHelper.exportarExpedient(expedientIds, ambDocuments);
 	}
-	
+
 	@Override
-	public FitxerDto exportIndexExpedient(
+	public FitxerDto generarIndexExpedients(
 			Long entitatId, 
 			Set<Long> expedientIds,
 			boolean exportar,
 			String format) throws IOException {
-		if (expedientIds.size() == 1)
-			logger.debug("Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientIds.iterator().next() + ")");
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
-//		comprovar accés expedients
-		for (Long expedientId : expedientIds) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
-					expedientId,
-					false,
-					true,
-					false,
-					false,
-					false,
-					null);
-			expedients.add(expedient);
-		}
-		
-		FitxerDto resultat = new FitxerDto();
-		
-		try {
-			resultat = expedientHelper.exportarExpedient(
-					entitatActual, 
-					expedients, 
-					exportar,
-					format);	
-		} catch (Exception ex) {
-			throw new RuntimeException("Hi ha hagut un problema generant l'índex de l'expedient", ex);
-		}
-		return resultat;
-	}
-
-	@Override
-	public FitxerDto exportIndexExpedients(
-			Long entitatId, 
-			Set<Long> expedientIds,
-			String format) throws IOException {
 		logger.debug("Exportant índex dels expedients seleccionats (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ")");
-		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		FitxerDto resposta = new FitxerDto();
-		
-		if ("PDF".equals(format)) {
-			FitxerDto resultat = exportIndexExpedient(
-					entitatId, 
-					expedientIds, 
-					false,
-					format);
-			resposta.setNom(resultat.getNom());
-			resposta.setContentType("application/pdf");
-			resposta.setContingut(resultat.getContingut());
-		} else if ("ZIP".equals(format)) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ZipOutputStream zos = new ZipOutputStream(baos);
-			for (Long expedientId : expedientIds) {
-				Set<Long> expedientIdSet = new HashSet<>(Arrays.asList(expedientId));
-				FitxerDto resultat = exportIndexExpedient(entitatId, expedientIdSet, false, "PDF");
-				contingutHelper.crearNovaEntrada(
-						resultat.getNom(), 
-						resultat, 
-						zos);
-			}
-			zos.close();
-			resposta.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".zip");
-			resposta.setContentType("application/zip");
-			resposta.setContingut(baos.toByteArray());
-		}
-		return resposta;
+		return expedientHelper.generarIndexExpedients(entitatId, expedientIds, exportar, format);
 	}
 	
 	@Override

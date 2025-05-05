@@ -311,7 +311,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (! isExportacioExcelActiva() && format != null && format.equals("XLSX"))
 			throw new SecurityException("És necessari activar la propietat '"+PropertyConfig.EXPORTACIO_EXCEL +"' per realitzar la exportació a excel");
 		
-		FitxerDto fitxer = expedientService.exportIndexExpedient(
+		FitxerDto fitxer = expedientService.generarIndexExpedients(
 				entitatActual.getId(),
 				new HashSet<>(Arrays.asList(expedientId)),
 				false,
@@ -331,7 +331,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		FitxerDto fitxer = expedientService.exportIndexExpedient(
+		FitxerDto fitxer = expedientService.generarIndexExpedients(
 				entitatActual.getId(),
 				new HashSet<>(Arrays.asList(expedientId)),
 				true,
@@ -493,9 +493,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "redirect:../../expedient";
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			FitxerDto fitxer = expedientService.exportIndexExpedients(
+			FitxerDto fitxer = expedientService.generarIndexExpedients(
 					entitatActual.getId(),
 					seleccio,
+					false,
 					format);
 				
 			response.setHeader("Set-cookie", "contentLoaded=true; path=/");

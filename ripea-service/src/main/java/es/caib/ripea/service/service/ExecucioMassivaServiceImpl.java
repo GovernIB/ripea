@@ -9,7 +9,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -40,6 +42,7 @@ import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExceptionHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -67,6 +70,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired private ExecucioMassivaHelper execucioMassivaHelper;
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
+	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ConfigHelper configHelper;
     @Autowired private ExpedientRepository expedientRepository;
@@ -209,19 +213,22 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			if (massives != null && massives.size()>0) {
 				
 				ExecucioMassivaEntity execucioMassiva = massives.get(0);
-				
-//				for (ExecucioMassivaEntity execucioMassiva : massives) {
-
 				EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
 				ConfigHelper.setEntitat(entitat);
 				
 				if (execucioMassiva.getContinguts() != null) {
 
 					if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
-						
 						//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
 						generaZipDocumentsExpedients(execucioMassiva);
-						
+					} else if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP.equals(execucioMassiva.getTipus()) ||
+							ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF.equals(execucioMassiva.getTipus())||
+							ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL.equals(execucioMassiva.getTipus()) ||
+							ExecucioMassivaTipusDto.EXPORTAR_ENI.equals(execucioMassiva.getTipus()) || 
+							ExecucioMassivaTipusDto.EXPORTAR_INSIDE.equals(execucioMassiva.getTipus()) ||
+							ExecucioMassivaTipusDto.EXPORTAR_EXCEL.equals(execucioMassiva.getTipus()) || 
+							ExecucioMassivaTipusDto.EXPORTAR_CSV.equals(execucioMassiva.getTipus())) {
+						exportarExpedients(execucioMassiva);
 					} else {
 						
 						for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
@@ -252,13 +259,61 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					}
 				}
 			}
-//			}
-
 		} catch (Exception e) {
 			logger.error("Error al fer execucio massiva", e);
 		}
 	}
 
+	private Set<Long> contingutsToLongList(List<ExecucioMassivaContingutEntity> continguts) {
+		Set<Long> resultat = new HashSet<Long>();
+		if (continguts!=null) {
+			for (ExecucioMassivaContingutEntity execucioMassivaContingutEntity : continguts) {
+				resultat.add(execucioMassivaContingutEntity.getElementId());
+			}
+		}
+		return resultat;
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	private void exportarExpedients(ExecucioMassivaEntity execucioMassiva) {
+		
+		try {
+			
+			Set<Long> ids = contingutsToLongList(execucioMassiva.getContinguts());
+			FitxerDto resultat = new FitxerDto();
+			if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.generarIndexExpedients(execucioMassiva.getEntitat().getId(), ids, false, "ZIP");
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.generarIndexExpedients(execucioMassiva.getEntitat().getId(), ids, false, "PDF");
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.generarIndexExpedients(execucioMassiva.getEntitat().getId(), ids, false, "XLSX");
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_ENI.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.exportarExpedient(ids, false);
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_INSIDE.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.exportarExpedient(ids, true);
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_EXCEL.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.exportacio(execucioMassiva.getEntitat().getId(), ids, "ODS");
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_CSV.equals(execucioMassiva.getTipus())) {
+				resultat = expedientHelper.exportacio(execucioMassiva.getEntitat().getId(), ids, "CSV");
+			}
+			
+			String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR);
+			String documentNom = "/exportZip/documentsExpedients_" + Calendar.getInstance().getTimeInMillis() + ".zip";
+			File fContent = new File(directoriDesti + documentNom);
+			fContent.getParentFile().mkdirs();
+			FileOutputStream outContent = new FileOutputStream(fContent);
+			outContent.write(resultat.getContingut());
+			outContent.close();
+			execucioMassiva.setDocumentNom(documentNom);
+			
+		} catch (Exception exc) {
+			//En aquets cas, no es pot saber quin expedient ha fallat, els marcam a tots com a error
+			for (ExecucioMassivaContingutEntity execucioMassivaContingutEntity : execucioMassiva.getContinguts()) {
+				execucioMassivaContingutEntity.updateError(new Date(), "Error en la generació del index dels expedients."+execucioMassiva.getTipus().toString());
+			}
+		}
+	}	
+	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	private void generaZipDocumentsExpedients(ExecucioMassivaEntity execucioMassiva) {
 

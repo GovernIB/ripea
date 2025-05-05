@@ -399,27 +399,11 @@ public interface ExpedientService {
 	 * @throws IOException 
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public FitxerDto exportIndexExpedients(
+	public FitxerDto generarIndexExpedients(
 			Long entitatId, 
 			Set<Long> expedientIds,
+			boolean exportar,
 			String format) throws IOException;
-	
-	/**
-	 * Genera un índex amb el continut de l'expedient.
-	 * 
-	 * @param entitatId 
-	 *            Atribut id de l'entitat.
-	 * @param expedientIds
-	 *            Els expedients dels que vol generar l'índex
-	 * @param format Format pel fitxer d'exportació ("PDF" o "EXCEL").
-	 * @return Un document amb l'índex.
-	 * @throws IOException 
-	 */
-	@PreAuthorize("isAuthenticated()")
-	public FitxerDto exportIndexExpedient(
-			Long entitatId, 
-			Set<Long> expedientIds,
-			boolean exportar, String format) throws IOException;
 
 	/**
 	 * Exportació ENI de l'expedient.

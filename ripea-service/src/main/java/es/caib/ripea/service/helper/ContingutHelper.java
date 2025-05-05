@@ -1352,12 +1352,10 @@ public class ContingutHelper {
 				false,
 				true, 
 				false, 
-					true, 
-					rolActual);
+				true, 
+				rolActual);
 		} else {
-		  contingut = comprovarContingutPertanyTascaAccesible(
-					tascaId,
-					contingutId);
+		  contingut = comprovarContingutPertanyTascaAccesible(tascaId, contingutId);
 		}
 		
 		if (contingut instanceof ExpedientEntity) {
