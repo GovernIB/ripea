@@ -57,7 +57,7 @@ const useTascaActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('page.tasca.acciones.detall'),
+            title: t('common.detall'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,

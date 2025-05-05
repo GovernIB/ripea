@@ -8,7 +8,7 @@ export const useDadaActions = (contingut:any, refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('page.metaDada.acciones.detail'),
+            title: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,

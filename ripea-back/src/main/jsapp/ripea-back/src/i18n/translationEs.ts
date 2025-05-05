@@ -139,7 +139,6 @@ const translationEs = {
                 prioritat: "Prioridad",
             },
             acciones: {
-                detall: "Detalle",
                 tramitar: "Tramitar",
                 iniciar: "Iniciar",
                 rebutjar: "Rechazar",
@@ -336,9 +335,6 @@ const translationEs = {
         },
         metaDada: {
             title: "Tipo de dato",
-            acciones: {
-                detail: "Detalle",
-            },
         },
         registre: {
             grid: {
