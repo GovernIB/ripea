@@ -448,6 +448,76 @@ const translationCa = {
                 }
             },
         },
+        user: {
+            options: {
+                perfil: "Perfil",
+                manual: "Manual d'usuari",
+                manualAdmin: "Manual d'administrador",
+                logout: "Desconnectar"
+            },
+            menu: {
+                expedient: "Expedients",
+                monitoritzar: "Monitoritzar",
+                integracions: "Integracions",
+                excepcions: "Excepcions",
+                monitor: "Monitor del sistema",
+
+                config: "Configuració",
+                props: "Propietats configurables",
+                pinbal: "Serveis PINBAL",
+                segonPla: "Reiniciar tasques en segon pla",
+                plugins: "Reiniciar connectors",
+                avisos: "Avisos",
+
+                anotacions: "Anotacions",
+                procediments: "Procediments",
+                procedimentsTitle: "L'entitat té procediments amb òrgans gestors no actualitzats",
+                grups: "Grups",
+                revisar: "Revisió de procediments",
+                tasca: "Tasques",
+                flux: "Fluxos de signatura",
+
+                consultar: "Consultar",
+                continguts: "Continguts",
+                dadesEstadistiques: "Dades estadístiques",
+                portafib: "Documents enviats a Portafib",
+                notib: "Remeses enviades a Notib",
+                pinbalEnviades: "Consultes enviades a PINBAL",
+                assignacio: "Assignació de tasques",
+                pendents: "Expedients pendents de distribució",
+                comunicades: "Anotacions comunicades",
+
+                documents: "Tipus de documents",
+                nti: "Tipus documentals NTI",
+                dominis: "Dominis",
+                organs: "Òrgans gestors",
+                url: "URLs d'instrucció",
+                permisos: "Permisos de l'entitat"
+            },
+            massive: {
+                title: "Acció massiva",
+                portafirmes: "Enviar documents al portafirmes",
+                firmar: "Signar documents des del navegador",
+                marcar: "Marcar com a definitius",
+                estat: "Canvi d'estat dels expedients",
+                tancar: "Tancament d'expedients",
+                custodiar: "Custodiar elements pendents",
+                csv: "Copiar enllaç CSV",
+                anexos: "Adjuntar annexos pendents d'anotacions acceptades",
+                anotacio: "Actualitzar estat de les anotacions a Distribució",
+                prioritat: "Canviar prioritat dels expedients",
+                masives: "Consultar accions massives"
+            },
+            perfil: {
+                title: "El meu perfil",
+                dades: "Dades d'usuari",
+                correu: "Enviament de correus",
+                generic: "Configuració genèrica",
+                column: "Configuració de columnes del llistat d'expedients",
+                vista: "Configuració vista de documents dels expedients",
+                moure: "Configuració vista destí al moure documents"
+            }
+        },
         notFound: "No trobat",
     }
 };

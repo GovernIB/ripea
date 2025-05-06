@@ -448,6 +448,76 @@ const translationEn = {
                 }
             },
         },
+        user: {
+            options: {
+                perfil: "Profile",
+                manual: "User manual",
+                manualAdmin: "Administrator manual",
+                logout: "Log out"
+            },
+            menu: {
+                expedient: "Cases",
+                monitoritzar: "Monitor",
+                integracions: "Integrations",
+                excepcions: "Exceptions",
+                monitor: "System monitor",
+
+                config: "Configuration",
+                props: "Configurable properties",
+                pinbal: "PINBAL services",
+                segonPla: "Restart background tasks",
+                plugins: "Restart plugins",
+                avisos: "Notifications",
+
+                anotacions: "Annotations",
+                procediments: "Procedures",
+                procedimentsTitle: "The entity has procedures with outdated managing bodies",
+                grups: "Groups",
+                revisar: "Procedure review",
+                tasca: "Tasks",
+                flux: "Signature workflows",
+
+                consultar: "Consult",
+                continguts: "Contents",
+                dadesEstadistiques: "Statistical data",
+                portafib: "Documents sent to Portafib",
+                notib: "Batches sent to Notib",
+                pinbalEnviades: "Queries sent to PINBAL",
+                assignacio: "Task assignment",
+                pendents: "Cases pending distribution",
+                comunicades: "Communicated annotations",
+
+                documents: "Document types",
+                nti: "NTI document types",
+                dominis: "Domains",
+                organs: "Managing bodies",
+                url: "Instruction URLs",
+                permisos: "Entity permissions"
+            },
+            massive: {
+                title: "Massive action",
+                portafirmes: "Send documents to portafirmes",
+                firmar: "Sign documents from browser",
+                marcar: "Mark as final",
+                estat: "Change case status",
+                tancar: "Close cases",
+                custodiar: "Safeguard pending items",
+                csv: "Copy CSV link",
+                anexos: "Attach pending annexes from accepted annotations",
+                anotacio: "Update annotation status in Distribution",
+                prioritat: "Change case priority",
+                masives: "View massive actions"
+            },
+            perfil: {
+                title: "My profile",
+                dades: "User data",
+                correu: "Email sending",
+                generic: "General settings",
+                column: "Column configuration of case list",
+                vista: "Document view settings in cases",
+                moure: "Destination view settings when moving documents"
+            }
+        },
         notFound: "Not Found",
     }
 };
