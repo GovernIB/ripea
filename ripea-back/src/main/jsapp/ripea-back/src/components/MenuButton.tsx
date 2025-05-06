@@ -70,8 +70,8 @@ const MenuButton = (props:MenuButtonProps) => {
 }
 
 type MenuActionButtonProps = MenuButtonProps & {
-    entity: any;
     actions: any[];
+    entity?: any;
 }
 export const MenuActionButton = (props:MenuActionButtonProps) => {
     const {
