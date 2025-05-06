@@ -13,81 +13,70 @@ import {Divider} from "@mui/material";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
 
+const iniciaDescargaBlob = (result: any) => {
+    const url = URL.createObjectURL(result.blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = result.fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Limpieza
+    URL.revokeObjectURL(url);
+}
+
 const useActions = (refresh?: () => void) => {
 	
     const {temporalMessageShow} = useBaseAppContext();
 	const { t } = useTranslation();
     const {
-        patch: apiPatch,
         artifactAction: apiAction,
 		fieldDownload: apiDownload,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
-
-	const iniciaDescargaBlob = (result: any[]) => {
-		const url = URL.createObjectURL(result.blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = result.fileName;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link); // Limpieza
-		URL.revokeObjectURL(url);
-	}
 	
     const action = (id:any, code:string, msg:string) => {
         return apiAction(undefined, {code :code, data:{ ids: [id], massivo: false }})
 			.then(() => {
 			    refresh?.()
-			    temporalMessageShow(null, t(msg), 'success');
+			    temporalMessageShow(null, msg, 'success');
 			})
 			.catch((error) => {
 			    temporalMessageShow('Error', error?.message, 'error');
 			});		
     }
 	
-	const massiveReport = (id:any, code:string, msg:string, fileType:string) => {
+	const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
 	    return apiReport(undefined, {code :code, data:{ ids: [id], masivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
+                temporalMessageShow(null, msg, 'info');
 			})
 			.catch((error) => {
 			    temporalMessageShow('Error', error?.message, 'error');
 			});		
 	}
 
-	const download = (id:any,fieldName:string) :void => {
-	    apiDownload(id,{fieldName})
-	        .then((result)=>{
-	            iniciaDescargaBlob(result);
-	        })
-	}
-	
-    const follow	= (id: any): void => { action(id, 'FOLLOW', 'page.expedient.results.actionOk'); }
-    const unfollow	= (id: any): void => { action(id, 'UNFOLLOW', 'page.expedient.results.actionOk'); }
-    const agafar	= (id: any): void => { action(id, 'AGAFAR', 'page.expedient.results.actionOk'); }
-    const retornar	= (id: any) :void => { action(id, 'RETORNAR', 'page.expedient.results.actionOk'); }
-	
-	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', 'page.expedient.results.actionBackgroundOk', 'PDF');}	
-	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', 'page.expedient.results.actionBackgroundOk', 'XLSX');}
-	const exportPdfEni	= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ZIP', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
-	const exportEni		= (id: any): void => { massiveReport(id, 'EXPORT_ENI', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
-	const exportInside  = (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
-	
-    const lliberar	= (id: any): void => {
-        apiPatch(id, {
-            data: {agafatPer: null,}
-        })
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow('Error', error?.message, 'error');
-            });
-    }
+	// const download = (id:any,fieldName:string) :void => {
+	//     apiDownload(id,{fieldName})
+	//         .then((result)=>{
+	//             iniciaDescargaBlob(result);
+    //             temporalMessageShow(null, '', 'info');
+	//         })
+	// }
 
-    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: download, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
+    const agafar	= (id: any): void => { action(id, 'AGAFAR', t('page.expedient.results.actionOk'));}
+    const lliberar	= (id: any): void => { action(id, 'ALLIBERAR', t('page.expedient.results.actionOk'));}
+    const follow	= (id: any): void => { action(id, 'FOLLOW', t('page.expedient.results.actionOk'));}
+    const unfollow	= (id: any): void => { action(id, 'UNFOLLOW', t('page.expedient.results.actionOk'));}
+    const retornar	= (id: any) :void => { action(id, 'RETORNAR', t('page.expedient.results.actionOk'));}
+	
+	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
+	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
+	const exportPdfEni	= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ZIP', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportEni		= (id: any): void => { massiveReport(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportInside  = (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+
+    return {follow, unfollow, agafar, retornar, lliberar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
 }
 
 export const useCommonActions = (refresh?: () => void) => {
@@ -96,7 +85,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
 
-    const {follow, unfollow, agafar, retornar, lliberar, apiDownload, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
+    const {follow, unfollow, agafar, retornar, lliberar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
     const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);

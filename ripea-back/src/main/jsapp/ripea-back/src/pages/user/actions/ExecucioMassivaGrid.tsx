@@ -9,11 +9,12 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 
 const StyledLinearProgress = (props:any) => {
-    const {sx, children, ...other} = props
+    const {sx, textColor = "white", children, ...other} = props
 
     return <Box position="relative" width="100%" sx={{ml: 1}}>
         <LinearProgress variant="determinate" {...other} sx={{width: '100%', borderRadius: '4px', ...sx}} />
         <Box
+            color={textColor}
             position="absolute"
             top={0}
             left={0}
