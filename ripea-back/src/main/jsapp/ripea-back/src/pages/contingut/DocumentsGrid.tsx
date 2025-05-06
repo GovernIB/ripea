@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FormControl, Grid, InputLabel, Select, MenuItem, Icon } from "@mui/material";
+import {FormControl, Grid, InputLabel, Select, MenuItem, Icon} from "@mui/material";
 import {
     GridPage,
     useFormContext,
@@ -8,11 +8,12 @@ import {
 import {useTranslation} from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
 import {useContingutActions} from "./details/ContingutActions.tsx";
+import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
+import {MenuActionButton} from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
-import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
 
 const DocumentsGridForm = () => {
     const { data } = useFormContext();
@@ -170,18 +171,47 @@ const DocumentsGrid = (props:any) => {
                     element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView}/>,
                 },
                 {
-                    position: 3,
+                    position: 1,
                     element: <TreeViewSelector value={vista} onChange={(value:any) => {
                         setVista(value);
                         refresh();
                     }} />,
+                },
+                {
+                    position: 3,
+                    element: <MenuActionButton
+                        id={'createDocument'}
+                        buttonLabel={"Crear contenido"}
+                        buttonProps={{
+                            startIcon: <Icon>add</Icon>,
+                            variant: "outlined",
+                            sx: {borderRadius: '4px',  minWidth: '20px', minHeight: '32px', py: 0}
+                        }}
+                        actions={[
+                            {
+                                title: t('common.create')+"...",
+                                icon: "description",
+                                onClick: () => dataGridApiRef?.current?.showCreateDialog?.()
+                            },
+                            {
+                                title: "Consulta PINBAL...",
+                                icon: "description",
+                                disabled: true,
+                            },
+                            {
+                                title: "Importar documentos...",
+                                icon: "upload_file",
+                                disabled: true,
+                            },
+                        ]}
+                    />,
                 }
             ]}
 
             toolbarMassiveActions={massiveActions}
             // isRowSelectable={(data:any)=> typeof data?.id == 'number'}
             isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
-            // toolbarHideCreate
+            toolbarHideCreate
         />
         {components}
         {massiveComponents}

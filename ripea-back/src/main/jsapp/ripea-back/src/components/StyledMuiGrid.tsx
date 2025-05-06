@@ -66,9 +66,8 @@ const StyledMuiGrid = (props:any) => {
     }
 
     const toolbarElements = [
-        ...(toolbarElementsWithPositions ?? []),
         {
-            position: 2,
+            position: 1,
             element: <MassiveActionSelector
                 resourceName={resourceName}
                 selectedRows={selectedRows}
@@ -79,15 +78,16 @@ const StyledMuiGrid = (props:any) => {
             hidden: !toolbarMassiveActions || readOnly,
         },
         {
-            position: 3,
+            position: 2,
             element: <ToolbarButton title={t('common.refresh')} icon={'refresh'} onClick={refresh} color={'primary'}/>,
             hidden: toolbarHideRefresh,
         },
         {
-            position: 4,
+            position: 3,
             element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={create} color={'primary'}>{toolbarCreateTitle}</ToolbarButton>,
             hidden: toolbarHideCreate || readOnly,
-        }
+        },
+        ...(toolbarElementsWithPositions ?? []),
     ]
         .filter((e:any) => !e?.hidden)
 
