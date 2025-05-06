@@ -1,17 +1,20 @@
 package es.caib.ripea.service.helper;
 
-import com.sun.jersey.core.util.Base64;
-import es.caib.plugins.arxiu.api.*;
-import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
-import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.zip.ZipOutputStream;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +25,52 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.zip.ZipOutputStream;
+import com.sun.jersey.core.util.Base64;
+
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentPublicacioEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.NodeEntity;
+import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
+import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class DocumentHelper {
@@ -42,6 +85,8 @@ public class DocumentHelper {
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private DocumentFirmaAppletHelper firmaAppletHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
@@ -1272,6 +1317,58 @@ public class DocumentHelper {
 		return (DocumentEntity)node;
 	}
 
+	public DocumentPublicacioDto publicarDocument(Long entitatId,
+			Long documentId,
+			DocumentPublicacioDto publicacio) {
+		DocumentEntity document = comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				true);
+		ExpedientEntity expedient = document.getExpedient();
+		if (expedient == null) {
+			throw new ValidationException(
+					documentId,
+					DocumentEntity.class,
+					"El document no te cap expedient associat (documentId=" + documentId + ")");
+		}
+		DocumentPublicacioEntity publicacioEntity = DocumentPublicacioEntity.getBuilder(
+				DocumentEnviamentEstatEnumDto.ENVIAT,
+				publicacio.getAssumpte(),
+				publicacio.getTipus(),
+				expedient,
+				document).
+				observacions(publicacio.getObservacions()).
+				enviatData(publicacio.getEnviatData()).
+				processatData(publicacio.getProcessatData()).
+				build();
+		DocumentPublicacioDto dto = conversioTipusHelper.convertir(
+				documentPublicacioRepository.save(publicacioEntity),
+				DocumentPublicacioDto.class);
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				publicacioEntity,
+				LogObjecteTipusEnumDto.PUBLICACIO,
+				LogTipusEnumDto.CREACIO,
+				document.getNom(),
+				publicacio.getTipus().name(),
+				false,
+				false);
+		
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.MODIFICACIO,
+				publicacioEntity,
+				LogObjecteTipusEnumDto.PUBLICACIO,
+				LogTipusEnumDto.CREACIO,
+				publicacio.getAssumpte(),
+				publicacio.getTipus().name(),
+				false,
+				false);
+		return dto;
+	}
+	
 	public DocumentEntity comprovarDocumentDinsExpedientAccessible(
 			Long entitatId,
 			Long id,

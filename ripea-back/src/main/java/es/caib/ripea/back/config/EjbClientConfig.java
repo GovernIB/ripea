@@ -11,12 +11,17 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
+import es.caib.ripea.service.intf.resourceservice.ContingutLogResourceService;
+import es.caib.ripea.service.intf.resourceservice.ContingutMovimentResourceService;
 import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentEnviamentInteressatResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentPublicacioResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaContingutResourceService;
+import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientComentariResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
@@ -436,6 +441,36 @@ public class EjbClientConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean expedientEstatResourceServiceEjb() {
 		return getLocalEjbFactoyBean(ExpedientEstatResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean carpetaResourceServiceEjb() {
+		return getLocalEjbFactoyBean(CarpetaResourceService.class);
+	}
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean contingutMovimentResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ContingutMovimentResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean contingutLogResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ContingutLogResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean execucioMassivaResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ExecucioMassivaResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean execucioMassivaContingutResourceServiceEjb() {
+		return getLocalEjbFactoyBean(ExecucioMassivaContingutResourceService.class);
 	}
 	
 	/*

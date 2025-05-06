@@ -37,9 +37,11 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceR
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
@@ -65,6 +67,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
+    private final ExcepcioLogHelper excepcioLogHelper;
     private final ExpedientResourceRepository expedientResourceRepository;
     private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -448,40 +451,47 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         .ifPresent(entity::setExpedient);
             }
 
-            if (params.getCarpeta()!=null){
-                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getCarpeta().getId()).orElse(null);
-                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
-                    entity.setPare(contingut);
-                    documentResourceRepository.save(entity);
-                }
-            } else {
-                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getExpedient().getId()).orElse(null);
-                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
-                    entity.setPare(contingut);
-                    documentResourceRepository.save(entity);
-                }
-            }
+//            if (params.getCarpeta()!=null){
+//                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getCarpeta().getId()).orElse(null);
+//                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
+//                    entity.setPare(contingut);
+//                    documentResourceRepository.save(entity);
+//                }
+//            } else {
+//                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getExpedient().getId()).orElse(null);
+//                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
+//                    entity.setPare(contingut);
+//                    documentResourceRepository.save(entity);
+//                }
+//            }
 
             return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
         }
 
         @Override
-        public void onChange(DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {
-
-        }
+        public void onChange(DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
+    
     private class PublicarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.PublicarFormAction, DocumentResource> {
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.PublicarFormAction params) throws ActionExecutionException {
-            return null;
+        	try {
+        		documentHelper.publicarDocument(
+        				entity.getEntitat().getId(),
+        				entity.getId(),
+        				objectMappingHelper.newInstanceMap(params, DocumentPublicacioDto.class));
+        		return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/publicar", e);
+				return null;
+			}
         }
 
         @Override
-        public void onChange(DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {
-
-        }
+        public void onChange(DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
     }
+    
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
 
         @Override

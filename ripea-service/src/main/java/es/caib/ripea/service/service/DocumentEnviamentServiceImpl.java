@@ -201,53 +201,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"publicacio=" + publicacio + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-				entitatId,
-				documentId,
-				false,
-				true);
-		ExpedientEntity expedient = document.getExpedient();
-		if (expedient == null) {
-			throw new ValidationException(
-					documentId,
-					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + documentId + ")");
-		}
-		DocumentPublicacioEntity publicacioEntity = DocumentPublicacioEntity.getBuilder(
-				DocumentEnviamentEstatEnumDto.ENVIAT,
-				publicacio.getAssumpte(),
-				publicacio.getTipus(),
-				expedient,
-				document).
-				observacions(publicacio.getObservacions()).
-				enviatData(publicacio.getEnviatData()).
-				processatData(publicacio.getProcessatData()).
-				build();
-		DocumentPublicacioDto dto = conversioTipusHelper.convertir(
-				documentPublicacioRepository.save(publicacioEntity),
-				DocumentPublicacioDto.class);
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				publicacioEntity,
-				LogObjecteTipusEnumDto.PUBLICACIO,
-				LogTipusEnumDto.CREACIO,
-				document.getNom(),
-				publicacio.getTipus().name(),
-				false,
-				false);
-		
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.MODIFICACIO,
-				publicacioEntity,
-				LogObjecteTipusEnumDto.PUBLICACIO,
-				LogTipusEnumDto.CREACIO,
-				publicacio.getAssumpte(),
-				publicacio.getTipus().name(),
-				false,
-				false);
-		return dto;
+		return documentHelper.publicarDocument(entitatId, documentId, publicacio);
 	}
 
 	@Transactional

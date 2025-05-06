@@ -253,19 +253,13 @@ public class DocumentResource extends NodeResource {
         @NotNull
         private DocumentPublicacioTipusEnumDto tipus = DocumentPublicacioTipusEnumDto.BOIB;
         @NotNull
-        private EstatEnum estat = EstatEnum.PENDENT;
+        private DocumentEnviamentEstatEnumDto estat = DocumentEnviamentEstatEnumDto.PENDENT;
         @NotNull
         private String assumpte;
         private Date dataPublicacio;
         @NotNull
-        private Date dataEnviament;
-//        @Field(type = Field.TYPE_TEXTAREA)
-        private String descripcio;
-
-        private enum EstatEnum {
-            PENDENT,
-            REBUTJADA,
-        }
+        private Date enviatData;
+        private String observacions;
     }
 
     @Getter
