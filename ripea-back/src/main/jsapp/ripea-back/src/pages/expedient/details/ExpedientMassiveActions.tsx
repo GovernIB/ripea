@@ -13,7 +13,7 @@ const useMassiveActions = (refresh?: () => void)=> {
         return apiAction(undefined, {code :code, data:{ ids: ids, masivo: true }})
 			.then(() => {
                 refresh?.()
-                temporalMessageShow(null, t(msg), 'info');
+                temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
                 temporalMessageShow('Error', error?.message, 'error');
@@ -24,27 +24,27 @@ const useMassiveActions = (refresh?: () => void)=> {
 	    return apiReport(undefined, {code :code, data:{ ids: ids, masivo: true }, fileType})
 			.then(() => {
 			    refresh?.()
-			    temporalMessageShow(null, t(msg), 'info');
+			    temporalMessageShow(null, msg, 'info');
 			})
 			.catch((error) => {
 			    temporalMessageShow('Error', error?.message, 'error');
 			});		
 	}
 
-    const agafar 	= (ids: any[]): void => { massiveAction(ids, 'AGAFAR', 'page.expedient.results.actionBackgroundOk');}
-	const alliberar = (ids: any[]): void => { massiveAction(ids, 'ALLIBERAR', 'page.expedient.results.actionBackgroundOk'); }
-	const retornar 	= (ids: any[]): void => { massiveAction(ids, 'RETORNAR', 'page.expedient.results.actionBackgroundOk'); }
-    const follow	= (ids: any[]): void => { massiveAction(ids, 'FOLLOW', 'page.expedient.results.actionBackgroundOk');}
-    const unfollow 	= (ids: any[]): void => { massiveAction(ids, 'UNFOLLOW', 'page.expedient.results.actionBackgroundOk');}
-	const esborrar 	= (ids: any[]): void => { massiveAction(ids, 'ESBORRAR', 'page.expedient.results.actionBackgroundOk');}
+    const agafar 	= (ids: any[]): void => { massiveAction(ids, 'AGAFAR', t('page.expedient.results.actionBackgroundOk'));}
+	const alliberar = (ids: any[]): void => { massiveAction(ids, 'ALLIBERAR', t('page.expedient.results.actionBackgroundOk'));}
+	const retornar 	= (ids: any[]): void => { massiveAction(ids, 'RETORNAR', t('page.expedient.results.actionBackgroundOk'));}
+    const follow	= (ids: any[]): void => { massiveAction(ids, 'FOLLOW', t('page.expedient.results.actionBackgroundOk'));}
+    const unfollow 	= (ids: any[]): void => { massiveAction(ids, 'UNFOLLOW', t('page.expedient.results.actionBackgroundOk'));}
+	const esborrar 	= (ids: any[]): void => { massiveAction(ids, 'ESBORRAR', t('page.expedient.results.actionBackgroundOk'));}
 	
-	const exportExcel 	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_EXCEL', 'page.expedient.results.actionBackgroundOk', 'XLSX');}	
-	const exportCsv		= (ids: any[]): void => { massiveReport(ids, 'EXPORT_CSV', 'page.expedient.results.actionBackgroundOk', 'CSV');}
-	const exportIndexZip= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_ZIP', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
-	const exportIndexPdf= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_PDF', 'page.expedient.results.actionBackgroundOk', 'PDF');}
-	const exportIndexXls= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_XLS', 'page.expedient.results.actionBackgroundOk', 'XLSX');}
-	const exportEni		= (ids: any[]): void => { massiveReport(ids, 'EXPORT_ENI', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
-	const exportInside	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INSIDE', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
+	const exportExcel 	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_EXCEL', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
+	const exportCsv		= (ids: any[]): void => { massiveReport(ids, 'EXPORT_CSV', t('page.expedient.results.actionBackgroundOk'), 'CSV');}
+	const exportIndexZip= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_ZIP', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportIndexPdf= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
+	const exportIndexXls= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
+	const exportEni		= (ids: any[]): void => { massiveReport(ids, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportInside	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
     return {
         agafar,

@@ -1,9 +1,9 @@
 import React from 'react';
-import {Box, Button, ButtonGroup, Chip, Icon, MenuItem, Tooltip} from '@mui/material';
+import {Box, Button, ButtonGroup, Chip, Icon, Tooltip} from '@mui/material';
 import {useResourceApiService} from 'reactlib';
 import { useTranslation } from 'react-i18next';
 import { GridApiCommunity } from '@mui/x-data-grid';
-import MenuButton from "./MenuButton.tsx";
+import {MenuActionButton} from "./MenuButton.tsx";
 
 export type MassiveActionProps = {
     title?: string;
@@ -71,20 +71,16 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                 </Button>
             </Tooltip>
 
-            <MenuButton
+            <MenuActionButton
                 id={'massiveOpcions'}
+                entity={selectedRows}
                 buttonLabel={'Opcions'}
                 buttonProps={{
                     startIcon: <Chip label={selectedRows?.length} size="small" />,
                     disabled: selectedRows?.length === 0
                 }}
-            >
-                {actions.map((action:any) =>
-                    !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden) && <MenuItem onClick={()=>action?.onClick?.(selectedRows)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(selectedRows)}>
-                        {action.icon && <Icon>{action.icon}</Icon>}{action.title}
-                    </MenuItem>
-                )}
-            </MenuButton>
+                actions={actions}
+            />
         </ButtonGroup>
     </Box>;
 };

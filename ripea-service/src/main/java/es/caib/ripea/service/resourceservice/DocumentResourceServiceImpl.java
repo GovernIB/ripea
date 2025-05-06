@@ -18,6 +18,9 @@ import javax.annotation.PostConstruct;
 
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.ExpedientResource;
@@ -62,6 +65,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
+    private final ExpedientResourceRepository expedientResourceRepository;
+    private final ContingutResourceRepository contingutResourceRepository;
+    private final DocumentResourceRepository documentResourceRepository;
 
     @PostConstruct
     public void init() {
@@ -438,7 +444,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
 
             if (!Objects.equals(params.getExpedient(), entity.getExpedient())){
-                // TODO: Moure
+                expedientResourceRepository.findById(params.getExpedient().getId())
+                        .ifPresent(entity::setExpedient);
+            }
+
+            if (params.getCarpeta()!=null){
+                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getCarpeta().getId()).orElse(null);
+                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
+                    entity.setPare(contingut);
+                    documentResourceRepository.save(entity);
+                }
+            } else {
+                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getExpedient().getId()).orElse(null);
+                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
+                    entity.setPare(contingut);
+                    documentResourceRepository.save(entity);
+                }
             }
 
             return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

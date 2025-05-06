@@ -121,10 +121,9 @@ const DocumentsGrid = (props:any) => {
             popupEditFormDialogResourceTitle={t('page.document.title')}
             columns={columns}
             paginationActive
-            filter={builder.and(builder.eq('expedient.id', entity?.id))}
+            filter={builder.eq('expedient.id', entity?.id)}
             perspectives={perspectives}
             staticSortModel={sortModel}
-            // titleDisabled
             popupEditCreateActive
             popupEditFormContent={<DocumentsGridForm/>}
             formAdditionalData={{

@@ -1,5 +1,5 @@
-import { Icon, MenuItem } from "@mui/material";
-import MenuButton from "../../../components/MenuButton.tsx";
+import { Icon } from "@mui/material";
+import {MenuActionButton} from "../../../components/MenuButton.tsx";
 import {useCommonActions} from "./CommonActions.tsx";
 import {useTranslation} from "react-i18next";
 
@@ -7,13 +7,11 @@ const ExpedientActionButton = (props:{entity:any}) => {
     const {entity} = props;
     const { t } = useTranslation();
 
-    const {
-        actions: commonActionsActions,
-        components: commonActionsComponents
-    } = useCommonActions();
+    const {actions, components} = useCommonActions();
 
-    return <MenuButton
-        id={entity?.id}
+    return <MenuActionButton
+        id={'accionsExpedient'}
+        entity={entity}
         buttonLabel={t('common.action')}
         buttonProps={{
             startIcon:<Icon>settings</Icon>,
@@ -22,17 +20,9 @@ const ExpedientActionButton = (props:{entity:any}) => {
             variant: "contained",
             disableElevation: true,
         }}
+        actions={actions}
     >
-        {commonActionsActions.map((action:any) =>
-            action?.showInMenu
-            && !(action?.hidden==true || action?.hidden?.(entity)) 
-            && (action?.linkTo == null && action?.clickShowUpdateDialog == null)
-            && <MenuItem onClick={()=>action?.onClick?.(entity.id, entity)} key={action.title} disabled={action?.disabled==true || action?.disabled?.(entity)}>
-                {action.icon && <Icon>{action.icon}</Icon>}{action.title}
-            </MenuItem>
-        )}
-
-        {commonActionsComponents}
-    </MenuButton>
+        {components}
+    </MenuActionButton>
 }
 export default ExpedientActionButton;

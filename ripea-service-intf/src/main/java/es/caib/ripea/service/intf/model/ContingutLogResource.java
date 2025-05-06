@@ -33,7 +33,7 @@ public class ContingutLogResource extends BaseAuditableResource<Long> {
     private String objecteNom;
     @Transient
     public String getObjecte(){
-        return objecteId!=null ? objecteLogTipus + " [" + objecteTipus + "#" + objecteId + "]" :null;
+        return objecteId!=null ?(objecteLogTipus!=null ?objecteLogTipus :"") + " [" + objecteTipus + "#" + objecteId + "]" :null;
     }
 
     public boolean isSecundari() {

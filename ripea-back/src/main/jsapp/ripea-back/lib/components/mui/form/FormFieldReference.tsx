@@ -240,7 +240,13 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 description: row[labelField],
             };
             const valueReferenceWithData = valueReference ? { ...valueReference, data: row } : null;
-            changeValue(valueReferenceWithData);
+            if (multiple) {
+                const currentValues = Array.isArray(value) ? value : [value];
+                const currentValueFound = currentValues.find(v => v.id === valueReferenceWithData?.id);
+                changeValue(currentValueFound ? currentValues : [...currentValues, valueReferenceWithData]);
+            } else {
+                changeValue(valueReferenceWithData);
+            }
         }).catch(() => { });
     }
     const autoFocus = componentProps?.autoFocus;

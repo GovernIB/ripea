@@ -1,9 +1,9 @@
 import React from "react";
-import {Button, Icon, Menu} from "@mui/material";
+import {Button, Icon, Menu, MenuItem} from "@mui/material";
 
 type MenuButtonProps = {
     id: string;
-    children: any;
+    children?: any;
     buttonLabel?: string;
     buttonProps?: any;
     menuProps?: any;
@@ -67,5 +67,34 @@ const MenuButton = (props:MenuButtonProps) => {
             {children}
         </Menu>
     </>)
+}
+
+type MenuActionButtonProps = MenuButtonProps & {
+    entity: any;
+    actions: any[];
+}
+export const MenuActionButton = (props:MenuActionButtonProps) => {
+    const {
+        entity,
+        actions,
+        children,
+        ...other
+    } = props;
+
+    return <MenuButton {...other}>
+        {actions.map((action:any) =>
+                // action?.showInMenu
+                !(typeof action.hidden === 'function' ? action.hidden(entity) : action.hidden)
+                && (action?.linkTo == null && action?.clickShowUpdateDialog == null)
+                && <MenuItem onClick={()=>
+                    entity?.id
+                        ? action?.onClick?.(entity?.id, entity)
+                        : action?.onClick?.(entity)
+                } key={action.title} disabled={action?.disabled==true || action?.disabled?.(entity)}>
+                    {action.icon && <Icon>{action.icon}</Icon>}{action.title}
+                </MenuItem>
+        )}
+        {children}
+    </MenuButton>
 }
 export default MenuButton;

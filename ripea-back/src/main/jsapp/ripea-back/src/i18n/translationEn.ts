@@ -139,7 +139,6 @@ const translationEn = {
                 prioritat: "Priority",
             },
             acciones: {
-                detall: "Detail",
                 tramitar: "Process",
                 iniciar: "Start",
                 rebutjar: "Reject",
@@ -337,9 +336,6 @@ const translationEn = {
         },
         metaDada: {
             title: "Data Type",
-            acciones: {
-                detail: "Detail",
-            },
         },
         registre: {
             grid: {
