@@ -67,27 +67,16 @@ const useActions = (refresh?: () => void) => {
     const unfollow	= (id: any): void => { action(id, 'UNFOLLOW', 'page.expedient.results.actionOk'); }
     const agafar	= (id: any): void => { action(id, 'AGAFAR', 'page.expedient.results.actionOk'); }
     const retornar	= (id: any) :void => { action(id, 'RETORNAR', 'page.expedient.results.actionOk'); }
+	const alliberar	= (id: any) :void => { action(id, 'ALLIBERAR', 'page.expedient.results.actionOk'); }
+	const eliminar	= (id: any) :void => { action(id, 'ESBORRAR', 'page.expedient.results.actionOk'); }
 	
-	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', 'page.expedient.results.actionBackgroundOk', 'PDF');}	
+	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', 'page.expedient.results.actionBackgroundOk', 'PDF');}
 	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', 'page.expedient.results.actionBackgroundOk', 'XLSX');}
-	const exportPdfEni	= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ZIP', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
+	const exportPdfEni	= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ENI', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
 	const exportEni		= (id: any): void => { massiveReport(id, 'EXPORT_ENI', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
 	const exportInside  = (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', 'page.expedient.results.actionBackgroundOk', 'ZIP');}
-	
-    const lliberar	= (id: any): void => {
-        apiPatch(id, {
-            data: {agafatPer: null,}
-        })
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow('Error', error?.message, 'error');
-            });
-    }
 
-    return {follow, unfollow, agafar, retornar, lliberar, apiDownload: download, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
+    return {follow, unfollow, agafar, retornar, alliberar, eliminar, apiDownload: download, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
 }
 
 export const useCommonActions = (refresh?: () => void) => {
@@ -96,7 +85,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
 
-    const {follow, unfollow, agafar, retornar, lliberar, apiDownload, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
+    const {follow, unfollow, agafar, retornar, alliberar, eliminar, apiDownload, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
     const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
@@ -183,7 +172,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.lliberar'),
             icon: "lock_open",
             showInMenu: true,
-            onClick: lliberar,
+            onClick: alliberar,
             hidden: (row:any) => !row?.agafatPer,
         },
         {
@@ -294,11 +283,14 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "autorenew",
             showInMenu: true,
         },
+		{
+		    title: t('page.expedient.acciones.eliminar'),
+		    icon: "delete",
+		    showInMenu: true,
+		    onClick: eliminar,
+		    hidden: (row:any) => isTancat(row),
+		},	
     ]
-        // .map(({ hidden, ...rest }) => ({
-        //     ...rest,
-        //     hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus != 'EXPEDIENT'
-        // }));
 
     const components = <>
         {dialogHistoric}
@@ -312,7 +304,6 @@ export const useCommonActions = (refresh?: () => void) => {
 
     return {
         actions,
-        hiddenDelete: (row:any) => isTancat(row),
         components
     }
 }

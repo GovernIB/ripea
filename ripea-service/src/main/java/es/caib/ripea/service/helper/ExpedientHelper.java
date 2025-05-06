@@ -1695,8 +1695,8 @@ public class ExpedientHelper {
 			FitxerDto indexDoc = contingutHelper.generarIndexPdf(entitatActual, expedients, exportar);
 			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
 			zos.close();
-			
-			resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedient.getNom() + ".zip");
+			String prefix = messageHelper.getMessage("expedient.service.exportacio.index");
+			resultat.setNom(prefix + " " + expedient.getNom() + ".zip");
 			resultat.setContentType("application/zip");
 			resultat.setContingut(baos.toByteArray());
 		} else {

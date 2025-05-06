@@ -178,7 +178,7 @@ const ExpedientGrid = () => {
         apiRef?.current?.refresh?.();
     }
 
-    const {actions, hiddenDelete, components} = useCommonActions(refresh);
+    const {actions, components} = useCommonActions(refresh);
     const {actions: massiveActions, components: massiveComponents} = useMassiveActions(refresh);
 
     const columnsAddition = [
@@ -232,7 +232,7 @@ const ExpedientGrid = () => {
                     rowAdditionalActions={actions}
                     paginationActive
                     rowHideUpdateButton
-                    rowHideDeleteButton={hiddenDelete}
+					rowHideDeleteButton
                     selectionActive
                     toolbarCreateTitle={t('page.expedient.nou')}
                     toolbarMassiveActions={massiveActions}

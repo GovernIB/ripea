@@ -203,6 +203,7 @@ const translationEn = {
                 agafar: "Take",
                 retornar: "Return",
                 lliberar: "Release",
+				eliminar: "Delete",
                 upPrioritat: "Change Priority...",
                 upEstat: "Change Status...",
                 relacio: "Relate...",

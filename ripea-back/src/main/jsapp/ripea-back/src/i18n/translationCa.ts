@@ -203,6 +203,7 @@ const translationCa = {
                 agafar: "Agafar",
                 retornar: "Retornar",
                 lliberar: "Alliberar",
+				eliminar: "Eliminar",
                 upPrioritat: "Canviar prioritat...",
                 upEstat: "Canviar estat...",
                 relacio: "Relacionar...",

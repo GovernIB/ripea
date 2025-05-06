@@ -106,6 +106,10 @@ import java.util.List;
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ENI,
+						formClass = ExpedientResource.MassiveAction.class),				
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ENI,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
@@ -123,6 +127,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_EXPORT_INDEX_ZIP 	= "EXPORT_INDEX_ZIP";
 	public static final String ACTION_MASSIVE_EXPORT_INDEX_PDF 	= "EXPORT_INDEX_PDF";
 	public static final String ACTION_MASSIVE_EXPORT_INDEX_XLS 	= "EXPORT_INDEX_XLS";
+	public static final String ACTION_MASSIVE_EXPORT_INDEX_ENI 	= "EXPORT_INDEX_ENI";
 	public static final String ACTION_MASSIVE_EXPORT_ENI 		= "EXPORT_ENI";
 	public static final String ACTION_MASSIVE_EXPORT_INSIDE 	= "EXPORT_INSIDE";
 	

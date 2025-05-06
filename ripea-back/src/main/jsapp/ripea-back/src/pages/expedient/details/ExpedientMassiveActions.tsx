@@ -148,7 +148,8 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 		{
 		    title: "Exportació INSIDE",
 		    icon: "download",
-			onClick: exportInside
+			onClick: exportInside,
+			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
             title: "Exportar els documents dels expedients seleccionats...",

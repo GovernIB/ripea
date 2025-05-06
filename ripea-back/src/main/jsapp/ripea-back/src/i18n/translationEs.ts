@@ -203,6 +203,7 @@ const translationEs = {
                 agafar: "Coger",
                 retornar: "Devolver",
                 lliberar: "Liberar",
+				eliminar: "Eliminar",
                 upPrioritat: "Cambiar prioridad...",
                 upEstat: "Cambiar estado...",
                 relacio: "Relacionar...",

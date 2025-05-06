@@ -122,7 +122,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
         //Genera els indexos dels expedients seleccionats en EXCEL. Massiu o individual.
         register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ENI, 		new ExportIdexEniGenerator());
+        //Genera els indexos dels expedients seleccionats en PDF i els comprimeix en ZIP. Nomes individual.
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ENI, new ExportIndexEniGenerator());
+        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
         register(ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
 
         register(ExpedientResource.ACTION_MASSIVE_AGAFAR_CODE, new AgafarActionExecutor());
@@ -296,8 +298,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				entitatEntity.getId(),
 				rolActual,
 				ogEntity!=null?ogEntity.getId():null);
-        
-		Filter filtreResultat = null;
 
         Filter filtreEntitatSessio = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
@@ -383,16 +383,18 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         		filtreProcedimentOrgansPermesos,
         		combinedComunsAnd);
         
-        filtreResultat = FilterBuilder.and(filtreEntitatSessio, combinedFilterProcedimentsOr);
-        
         //No aplica filtre permis directe procediment
         if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER")) {
             Filter filtreProcedimentPermisDirecte = FilterBuilder.or(
             		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
             		filtreProcedimentsPermesos
             );
-            filtreResultat = FilterBuilder.and(combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
+            combinedFilterProcedimentsOr = FilterBuilder.and(combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
         }
+        
+        Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
+        
+        Filter filtreResultat = FilterBuilder.and(filtreNoEliminats, filtreEntitatSessio, combinedFilterProcedimentsOr);
 
         return filtreResultat.generate();
     }
@@ -549,7 +551,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             	} else {
-            		expedientHelper.agafar(entity.getId(), auth.getName());
+            		entityComprovarHelper.comprovarExpedient(
+            				params.getIds().get(0),
+            				false,
+            				false,
+            				true,
+            				false,
+            				false,
+            				null);
+            		expedientHelper.agafar(params.getIds().get(0), auth.getName());
             	}
             }
             return null;
@@ -571,7 +581,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             	} else {
-            		expedientHelper.alliberar(entity.getId());
+            		entityComprovarHelper.comprovarExpedient(
+            				params.getIds().get(0),
+            				false, //Agafat per usuari actual
+            				false, //Permis read
+            				true,  //Permis write
+            				false, //Permis create
+            				false, //Permis delete
+            				null);
+            		expedientHelper.alliberar(params.getIds().get(0));
             	}
             }
             return null;
@@ -593,7 +611,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             	} else {
-            		expedientHelper.retornar(entity.getId());
+            		//Comprovam que l'expedient esta agafat per el usuari actual.
+		        	entityComprovarHelper.comprovarExpedient(
+		        			params.getIds().get(0),
+		        			true,
+		        			false,
+		        			false,
+		        			false,
+		        			false,
+		        			configHelper.getRolActual());
+            		expedientHelper.retornar(params.getIds().get(0));
             	}
             }
             return null;
@@ -615,7 +642,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             	} else {
-            		expedientHelper.follow(entity.getId(), auth.getName());
+            		expedientHelper.follow(params.getIds().get(0), auth.getName());
             	}
             }
             return null;
@@ -637,7 +664,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             	} else {
-            		expedientHelper.unfollow(entity.getId(), auth.getName());
+            		expedientHelper.unfollow(params.getIds().get(0), auth.getName());
             	}
             }
             return null;
@@ -662,7 +689,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
             	} else {
            			try {
-						contingutHelper.deleteReversible(entitatEntity.getId(), entity.getId(), null, code);
+						contingutHelper.deleteReversible(entitatEntity.getId(), params.getIds().get(0), null, code);
 					} catch (IOException e) {
 						excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/delete", e);
 						throw new ActionExecutionException(ExpedientResource.class, entity.getId(), code, e.getMessage());
@@ -948,7 +975,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
     
-    private class ExportIdexEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+    private class ExportEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
@@ -974,6 +1001,54 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		            
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(params.getIds()), false);
+	            	resultat = new DownloadableFile(
+	            			fitxerDto.getNom(),
+	            			fitxerDto.getContentType(),
+		            		fitxerDto.getContingut());
+	            }
+
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarEni", e);
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al exportar a ENI per els expedients seleccionats.");
+			}
+            
+            return resultat;
+		}
+    	
+		@Override
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params)
+				throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getId():0l);
+			parametres.add(params);
+			return parametres;
+		}
+
+		@Override
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+    }
+    
+    private class ExportIndexEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+    	@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+    		
+    		DownloadableFile resultat = null;
+    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
+    		
+    		try {	    		
+	    		
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	    		
+	            if (params.isMasivo()) {
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "La funcio de Índex PDF i exportació ENI no esta implementada massivament.");
+	            } else {
+	        		FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
+	        				entitatEntity.getId(),
+	        				new HashSet<>(params.getIds()),
+	        				true,
+	        				"PDF");
 	            	resultat = new DownloadableFile(
 	            			fitxerDto.getNom(),
 	            			fitxerDto.getContentType(),
