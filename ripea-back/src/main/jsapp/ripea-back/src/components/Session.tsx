@@ -80,15 +80,13 @@ export const useEntitatSession = () => {
     } = useResourceApiService('entitatResource');
 
     const refresh = () => {
-        if (user?.entitatActualId && user?.entitatActualId != value?.id && apiIsReady){
-            apiGetOne(user?.entitatActualId)
-                .then((app) => save(app))
-                .catch(() => remove())
-        }
+        apiGetOne(user?.entitatActualId)
+            .then((app) => save(app))
+            .catch(() => remove())
     }
 
     useEffect(()=>{
-        if (user && user?.entitatActualId) {
+        if (user?.entitatActualId && user?.entitatActualId != value?.id) {
             refresh()
         } else {
             remove()
@@ -96,7 +94,7 @@ export const useEntitatSession = () => {
     },[user])
 
     useEffect(()=>{
-        if(!isInitialized()){
+        if(!isInitialized() && user?.entitatActualId && apiIsReady){
             save({});
             refresh()
         }

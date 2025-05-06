@@ -30,7 +30,7 @@ const useActions = (refresh?: () => void) => {
 	const { t } = useTranslation();
     const {
         artifactAction: apiAction,
-		fieldDownload: apiDownload,
+		// fieldDownload: apiDownload,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
 	
