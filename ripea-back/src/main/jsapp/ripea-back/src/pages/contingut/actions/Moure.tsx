@@ -12,7 +12,7 @@ const MoureForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="contingut" readOnly disabled/>
         <GridFormField xs={12} name="expedient" required/>
-        <GridFormField xs={12} name="carpeta" filter={builder.eq('expedientRelacionat.id', data?.expedient?.id)} />
+        <GridFormField xs={12} name="carpeta" filter={builder.eq('expedient.id', data?.expedient?.id)} />
         <GridFormField xs={12} name="motiu"/>
     </Grid>
 }
