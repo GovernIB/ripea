@@ -183,16 +183,13 @@ const UserHeadToolbar = (props:any) => {
             <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
 
             <HeaderMenu
-                title={
-                    <Typography variant={"subtitle1"} display={'flex'} alignItems={'center'}>
-                        <Icon fontSize={"inherit"}>person</Icon>{user?.nom}
-                    </Typography>
+                title={<><Icon fontSize={"inherit"}>person</Icon>{user?.nom}</>
                 }
                 buttonProps={{
                     style: {color: textColor, textTransform: 'none'}
                 }}
             >
-                <MenuItem onClick={handleOpen}>Perfil</MenuItem>
+                <MenuItem onClick={handleOpen}>{t('page.user.options.perfil')}</MenuItem>
                 {dialog}
 
                 {(isRolActualSupAdmin || isRolActualAdmin || isRolActualOrganAdmin) &&
@@ -208,9 +205,8 @@ const UserHeadToolbar = (props:any) => {
                         // Limpieza
                         document.body.removeChild(link);
                         URL.revokeObjectURL(url);
-
                     }}
-                ><Icon>download</Icon>Manual de administrador</MenuItem>}
+                ><Icon>download</Icon>{t('page.user.options.manualAdmin')}</MenuItem>}
 
                 <MenuItem
                     onClick={()=>{
@@ -226,11 +222,9 @@ const UserHeadToolbar = (props:any) => {
                         document.body.removeChild(link);
                         URL.revokeObjectURL(url);
                     }}
-                >
-                    <Icon>download</Icon>Manual de usuario
-                </MenuItem>
+                ><Icon>download</Icon>{t('page.user.options.manual')}</MenuItem>
 
-                <MenuItem onClick={logOut}><Icon>logout</Icon>Desconectar</MenuItem>
+                <MenuItem onClick={logOut}><Icon>logout</Icon>{t('page.user.options.logout')}</MenuItem>
             </HeaderMenu>
         </Grid>
 
@@ -258,146 +252,152 @@ const UserHeadToolbar = (props:any) => {
 }
 
 const MenuSupAdmin = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
 
-        <HeaderMenu title={"Monitorizar"} buttonProps={{variant: "contained"}}>
-            <MenuItem>Integraciones</MenuItem>
-            <MenuItem>Excepciones</MenuItem>
-            <MenuItem>Monitor de sistema</MenuItem>
+        <HeaderMenu title={t('page.user.menu.monitoritzar')} buttonProps={{variant: "contained"}}>
+            <MenuItem>{t('page.user.menu.integracions')}</MenuItem>
+            <MenuItem>{t('page.user.menu.excepcions')}</MenuItem>
+            <MenuItem>{t('page.user.menu.monitor')}</MenuItem>
         </HeaderMenu>
 
-        <HeaderMenu title={"Configuración"} buttonProps={{variant: "contained"}}>
-            <MenuItem>Propiedades configurables</MenuItem>
-            <MenuItem>Servicios PINBAL</MenuItem>
-            <MenuItem>Reiniciar tareas en segundo plano</MenuItem>
-            <MenuItem>Reiniciar plugins</MenuItem>
+        <HeaderMenu title={t('page.user.menu.config')} buttonProps={{variant: "contained"}}>
+            <MenuItem>{t('page.user.menu.props')}</MenuItem>
+            <MenuItem>{t('page.user.menu.pinbal')}</MenuItem>
+            <MenuItem>{t('page.user.menu.segonPla')}</MenuItem>
+            <MenuItem>{t('page.user.menu.plugins')}</MenuItem>
         </HeaderMenu>
 
         <HeaderButton variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Avisos</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.avisos')}</Typography>
         </HeaderButton>
     </>
 }
 const MenuAdmin = (props:any) => {
     const {sessionScope} = props;
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
         <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
 
-        <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
+        <HeaderMenu title={t('page.user.menu.config')} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
-                    Procedimientos
+                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
+                    {t('page.user.menu.procediments')}
                 </StyledBadge>
             </MenuItem>
             { sessionScope?.isDocumentsGeneralsEnabled &&
-                <MenuItem>Tipos de documentos</MenuItem>
+                <MenuItem>{t('page.user.menu.documents')}</MenuItem>
             }
 
             <Divider/>
 
             { sessionScope?.isTipusDocumentsEnabled &&
-                <MenuItem>Tipos documentales NTI</MenuItem>
+                <MenuItem>{t('page.user.menu.nti')}</MenuItem>
             }
             { sessionScope?.isDominisEnabled &&
-                <MenuItem>Dominios</MenuItem>
+                <MenuItem>{t('page.user.menu.nti')}</MenuItem>
             }
-            <MenuItem>Grupos</MenuItem>
-            <MenuItem>Órganos gestores</MenuItem>
+            <MenuItem>{t('page.user.menu.dominis')}</MenuItem>
+            <MenuItem>{t('page.user.menu.organs')}</MenuItem>
             { sessionScope?.urlsInstruccioActiu &&
-                <MenuItem>URLs instrucción</MenuItem>
+                <MenuItem>{t('page.user.menu.url')}</MenuItem>
             }
 
             <Divider/>
 
-            <MenuItem>Permisos de la entidad</MenuItem>
+            <MenuItem>{t('page.user.menu.permisos')}</MenuItem>
         </HeaderMenu>
-        <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
-            <MenuItem>Contenidos</MenuItem>
-            <MenuItem>Datos estadisticos</MenuItem>
+        <HeaderMenu title={t('page.user.menu.consultar')} buttonProps={{variant: "contained"}}>
+            <MenuItem>{t('page.user.menu.continguts')}</MenuItem>
+            <MenuItem>{t('page.user.menu.dadesEstadistiques')}</MenuItem>
             { sessionScope?.revisioActiva &&
-                <MenuItem>Revisión de procedimientos</MenuItem>
+                <MenuItem>{t('page.user.menu.revisar')}</MenuItem>
             }
-            <MenuItem>Documentos enviados a Porafib</MenuItem>
-            <MenuItem>Remesas enviadas a Notib</MenuItem>
-            <MenuItem>Consultas enviadas a PINBAL</MenuItem>
-            <MenuItem>Asignación de tareas</MenuItem>
-            <MenuItem>Expedientes pendientes de distribución</MenuItem>
-            <MenuItem>Anotaciones comunicadas</MenuItem>
+            <MenuItem>{t('page.user.menu.portafib')}</MenuItem>
+            <MenuItem>{t('page.user.menu.notib')}</MenuItem>
+            <MenuItem>{t('page.user.menu.pinbalEnviades')}</MenuItem>
+            <MenuItem>{t('page.user.menu.assignacio')}</MenuItem>
+            <MenuItem>{t('page.user.menu.pendents')}</MenuItem>
+            <MenuItem>{t('page.user.menu.comunicades')}</MenuItem>
         </HeaderMenu>
     </>
 }
 const MenuAdminOrgan = (props:any) => {
     const {sessionScope} = props;
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
         <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
 
-        <HeaderMenu title={"Configurar"} buttonProps={{variant: "contained"}}>
+        <HeaderMenu title={t('page.user.menu.config')} buttonProps={{variant: "contained"}}>
             <MenuItem>
-                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={"La entidad tiene procedimientos con órganos gestores no actualizados"} sx={{pl: 0}}>
-                    Procedimientos
+                <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
+                    {t('page.user.menu.procediments')}
                 </StyledBadge>
             </MenuItem>
-            <MenuItem>Grupos</MenuItem>
+            <MenuItem>{t('page.user.menu.grups')}</MenuItem>
         </HeaderMenu>
     </>
 }
 const MenuDissenyOrgan = () => {
+    const { t } = useTranslation();
+
     return <>
         <HeaderButton variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Procedimientos</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.procediments')}</Typography>
         </HeaderButton>
         <HeaderButton variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Grupos</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.grups')}</Typography>
         </HeaderButton>
     </>
 }
 const MenuUsuari = (props:any) => {
     const {sessionScope} = props;
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return <>
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Expedientes</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
         <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Anotaciones</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
         <HeaderButton badgeContent={sessionScope?.countTasquesPendent} variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Tareas</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.tasca')}</Typography>
         </HeaderButton>
         { sessionScope?.isCreacioFluxUsuariActiu &&
             <HeaderButton variant={"contained"}>
-                <Typography display={'inline'} variant={'subtitle2'}>Flujos de firma</Typography>
+                <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.flux')}</Typography>
             </HeaderButton>
         }
         { (sessionScope?.teAccesEstadistiques || sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu) &&
-            <HeaderMenu title={"Consultar"} buttonProps={{variant: "contained"}}>
+            <HeaderMenu title={t('page.user.menu.consultar')} buttonProps={{variant: "contained"}}>
                 { sessionScope?.teAccesEstadistiques &&
-                    <MenuItem>Datos estadisticos</MenuItem>
+                    <MenuItem>{t('page.user.menu.dadesEstadistiques')}</MenuItem>
                 }
                 { sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu &&
                     <>
-                        <MenuItem>Documentos enviados a Portafib</MenuItem>
-                        <MenuItem>Remesas enviadas a Notib</MenuItem>
+                        <MenuItem>{t('page.user.menu.portafib')}</MenuItem>
+                        <MenuItem>{t('page.user.menu.notib')}</MenuItem>
                     </>
                 }
             </HeaderMenu>
@@ -407,35 +407,41 @@ const MenuUsuari = (props:any) => {
 
 const AccionesMassivas = (props:any) => {
     const {isRolActualAdmin, sessionScope} = props;
+    const { t } = useTranslation();
 
     const {handleOpen, dialog} = useExecucioMassiva();
 
-    return <HeaderMenu title={"Acción masiva"} buttonProps={{variant: "contained"}}>
-        <MenuItem>Enviar documentos al portafirmas</MenuItem>
-        <MenuItem>Firmar documentos desde el navegador</MenuItem>
+    return <HeaderMenu
+        title={<Typography display={'inline'} variant={'subtitle2'}>{t('page.user.massive.title')}</Typography>}
+        buttonProps={{variant: "contained"}}
+    >
+        <MenuItem>{t('page.user.massive.portafirmes')}</MenuItem>
+        <MenuItem>{t('page.user.massive.firmar')}</MenuItem>
         { sessionScope?.isConvertirDefinitiuActiu &&
-            <MenuItem>Marcar como definitivos</MenuItem>
+            <MenuItem>{t('page.user.massive.marcar')}</MenuItem>
         }
-        <MenuItem>Cambio de estado de expedientes</MenuItem>
-        <MenuItem>Cierre de expedientes</MenuItem>
-        <MenuItem>Custodiar elementos pendientes</MenuItem>
+        <MenuItem>{t('page.user.massive.estat')}</MenuItem>
+        <MenuItem>{t('page.user.massive.tancar')}</MenuItem>
+        <MenuItem>{t('page.user.massive.custodiar')}</MenuItem>
         { sessionScope?.isUrlValidacioDefinida &&
-            <MenuItem>Copiar enlace CSV</MenuItem>
+            <MenuItem>{t('page.user.massive.csv')}</MenuItem>
         }
-        <MenuItem>Adjuntar anexos pendientes de anotaciones aceptadas</MenuItem>
+        <MenuItem>{t('page.user.massive.anexos')}</MenuItem>
         { isRolActualAdmin &&
-            <MenuItem>Actualizar estado de las anotaciones en Distribución</MenuItem>
+            <MenuItem>{t('page.user.massive.anotacio')}</MenuItem>
         }
-        <MenuItem>Cambiar prioridad de expedientes</MenuItem>
+        <MenuItem>{t('page.user.massive.prioritat')}</MenuItem>
         <Divider/>
-        <MenuItem onClick={handleOpen}>Consultar acciones masivas</MenuItem>
+        <MenuItem onClick={handleOpen}>{t('page.user.massive.masives')}</MenuItem>
         {dialog}
     </HeaderMenu>
 }
 const MenuRevisor = () => {
+    const { t } = useTranslation();
+
     return <>
         <HeaderButton variant={"contained"}>
-            <Typography display={'inline'} variant={'subtitle2'}>Revisión de procedimientos</Typography>
+            <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.revisar')}</Typography>
         </HeaderButton>
     </>
 }
