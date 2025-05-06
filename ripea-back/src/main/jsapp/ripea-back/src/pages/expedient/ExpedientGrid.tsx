@@ -84,16 +84,23 @@ export const StyledPrioritat = (props:any) => {
 
 const columns = [
     {
+		headerName: 'Número',
         field: 'numero',
         flex: 0.75,
     },
     {
+		headerName: 'Títol',
         field: 'nom',
         flex: 1,
     },
+	{
+		headerName: 'Procediment',
+	    field: 'tipusStr',
+	    flex: 1,
+	},	
     {
+		headerName: 'Avisos',
         field: 'avisos',
-        headerName: 'Avisos',
         sortable: false,
         disableColumnMenu: true,
         flex: 0.5,
@@ -108,29 +115,31 @@ const columns = [
         </>),
     },
     {
-        field: 'tipusStr',
-        flex: 1,
-    },
-    {
+		headerName: 'Creat el',
         field: 'createdDate',
         flex: 1,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
+		headerName: 'Estat',
         field: 'estat',
         flex: 0.75,
         renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}/>
     },
     {
+		headerName: 'Prioritat',
         field: 'prioritat',
         flex: 0.5,
         renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
     },
     {
+		headerName: 'Agafat per',
         field: 'agafatPer',
         flex: 0.75,
+		valueFormatter: (value: any) => { return value?.description; }
     },
     {
+		headerName: 'Interessats',
         field: 'interessats',
         flex: 1,
         valueFormatter: (value: any) => {
