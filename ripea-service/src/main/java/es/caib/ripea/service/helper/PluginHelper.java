@@ -6964,7 +6964,7 @@ public class PluginHelper {
 							IntegracioHelper.INTCODI_NOTIFICACIO,
 							entitatCodi,
 							organCodi);
-					propsPluingNotib.setProperty(PropertyConfig.ENTORN, configHelper.getConfig(PropertyConfig.USUARIS_PLUGIN_CLASS));
+					propsPluingNotib.setProperty(PropertyConfig.ENTORN, configHelper.getConfig(PropertyConfig.ENTORN));
 					plugin = (NotificacioPlugin) clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(ConfigDto.prefix + ".", propsPluingNotib);
@@ -6991,7 +6991,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			Properties propsPluingNotib = configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_NOTIFICACIO, entitatCodi);
-			propsPluingNotib.setProperty(PropertyConfig.ENTORN, configHelper.getConfig(PropertyConfig.USUARIS_PLUGIN_CLASS));
+			propsPluingNotib.setProperty(PropertyConfig.ENTORN, configHelper.getConfig(PropertyConfig.ENTORN));
 			plugin = (NotificacioPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance(ConfigDto.prefix + ".", propsPluingNotib);
