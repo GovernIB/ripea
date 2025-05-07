@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid, Alert} from "@mui/material";
+import {Grid, Alert, Icon} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
@@ -15,21 +15,26 @@ const ErrorValidacio = (props:any) => {
     const expedientAmbInteressatObligatori = errors?.some((error:any)=>error?.expedientWithoutInteressats);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <CardData title={t('page.alert.errors.metaDada')} hiddenIfEmpty>
             {
                 errors.map((error:any)=>
-                    error?.metaDada && <ContenidoData title={error?.metaDada?.nom} hiddenIfEmpty>{error?.metaDada?.tipus}</ContenidoData>
+                    error?.metaDada && <Grid item xs={12}>
+					<Alert 
+					iconMapping={{
+					    warning: <Icon>create</Icon>,
+					  }}
+					 severity="warning">{t('page.alert.errors.metaDada')} {error?.metaDada?.nom} ({error?.metaDada?.tipus})</Alert></Grid>
                 )
-            }
-        </CardData>
-        <CardData title={t('page.alert.errors.metaDocument')} hiddenIfEmpty>
-            {
+			}
+			{
                 errors.map((error:any)=>
-                    error?.metaDocument && <ContenidoData title={error?.metaDocument?.nom} xs={6} titleXs={12} textXs={0}/>
+                    error?.metaDocument && <Grid item xs={12}>
+					<Alert 
+					iconMapping={{
+					    warning: <Icon>insert_drive_file</Icon>,
+					  }}
+					severity="warning" >{t('page.alert.errors.metaDocument')} {error?.metaDocument?.nom}</Alert></Grid> 
                 )
             }
-        </CardData>
-
         <Grid item xs={12} hidden={!hiHaDocumentsSenseMetaNode}><Alert severity="warning">{t('page.alert.errors.metaNode')}</Alert></Grid>
         <Grid item xs={12} hidden={!hiHaNotificacionsNoFinalitzades}><Alert severity="warning">{t('page.alert.errors.noFinalitzades')}</Alert></Grid>
         <Grid item xs={12} hidden={!expedientAmbInteressatObligatori}><Alert severity="warning">{t('page.alert.errors.interessatObligatori')}</Alert></Grid>
