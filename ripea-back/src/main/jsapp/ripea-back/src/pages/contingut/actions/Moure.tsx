@@ -10,7 +10,7 @@ const MoureForm = () => {
     const { data } = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="contingut" readOnly disabled/>
+        <GridFormField xs={12} name="contingut" readOnly disabled hidden={data?.massivo}/>
         <GridFormField xs={12} name="expedient" required/>
         <GridFormField xs={12} name="carpeta" filter={builder.eq('expedient.id', data?.expedient?.id)} />
         <GridFormField xs={12} name="motiu"/>
@@ -36,10 +36,22 @@ const useMoure = (refresh?: () => void) => {
 
     const handleShow = (id:any, row:any) :void => {
         const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
-        apiRef.current?.show?.(id, {
+        apiRef.current?.show?.(undefined, {
+            ids: [id],
+            massivo: false,
             contingut: row?.nom,
             expedient: row?.expedient,
             carpeta: carpeta,
+        })
+    }
+    const handleMassiveShow = (ids:any[], entity:any) :void => {
+        apiRef.current?.show?.(undefined, {
+            ids: ids,
+            massivo: true,
+            expedient: {
+                id: entity?.id,
+                description: entity?.nom,
+            },
         })
     }
     const onSuccess = () :void => {
@@ -52,6 +64,7 @@ const useMoure = (refresh?: () => void) => {
 
     return {
         handleShow,
+        handleMassiveShow,
         content: <Moure apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }

@@ -207,6 +207,7 @@ const translationEs = {
                 upEstat: "Cambiar estado...",
                 relacio: "Relacionar...",
                 close: "Cerrar...",
+                open: "Reabrir",
                 history: "Histórico de acciones",
                 download: "Descargar documentos...",
                 exportPDF: "Exportar indice PDF",

@@ -1,7 +1,10 @@
 import {useTranslation} from "react-i18next";
+import useMoure from "../actions/Moure.tsx";
 
-const useContingutMassiveActions = (refresh?: () => void) => {
+const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
+
+    const {handleMassiveShow: handleMoure, content: contentMoure} = useMoure(refresh)
 
     const actions = [
         {
@@ -15,6 +18,7 @@ const useContingutMassiveActions = (refresh?: () => void) => {
         {
             title: t('page.document.acciones.move'),
             icon: "open_with",
+            onClick: (ids:any[])=>handleMoure(ids, entity),
         },
         {
             title: "Cambiar tipo",
@@ -23,6 +27,7 @@ const useContingutMassiveActions = (refresh?: () => void) => {
     ]
 
     const components = <>
+        {contentMoure}
     </>
 
     return {
