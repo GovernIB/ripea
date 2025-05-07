@@ -45,8 +45,9 @@ export { toolbarBackgroundStyle } from './util/toolbar';
 export * as springFilterBuilder from './util/springFilterBuilder';
 
 export type { MenuEntry } from './components/mui/Menu';
-export type { MuiDataGridColDef } from './components/mui/datagrid/MuiDataGrid';
+export type { MuiDataGridProps, MuiDataGridColDef } from './components/mui/datagrid/MuiDataGrid';
 export type { MuiDataGridApi, MuiDataGridApiRef } from './components/mui/datagrid/DataGridContext';
+export type { MuiFormProps } from './components/mui/form/MuiForm';
 export type { FormApi, FormApiRef } from './components/form/FormContext';
 export type { FormFieldProps, FormFieldCustomProps } from './components/form/FormField';
 export type { DataFormDialogApi as MuiFormDialogApi } from './components/mui/datacommon/DataFormDialog';
