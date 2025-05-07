@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -16,41 +17,56 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.service.ContingutService;
-import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,16 +77,20 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
     private final DocumentResourceHelper documentResourceHelper;
-    private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
-
+    private final ConfigHelper configHelper;
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
+    private final DocumentNotificacioHelper documentNotificacioHelper;
+    private final EntityComprovarHelper entityComprovarHelper;
+    
     private final ExpedientResourceRepository expedientResourceRepository;
     private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
+    private final MetaDocumentResourceRepository metaDocumentResourceRepository;
+    private final InteressatResourceRepository interessatResourceRepository;
 
     @PostConstruct
     public void init() {
@@ -494,48 +514,93 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
 
-        @Override
-        public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.NotificarFormAction params) throws ActionExecutionException {
-            return null;
-        }
-
-        @Override
-        public void onChange(DocumentResource.NotificarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.NotificarFormAction target) {
-
+		@Override
+		public void onChange(NotificarFormAction previous, String fieldName, Object fieldValue,
+				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
             switch (fieldName){
-                case DocumentResource.NotificarFormAction.Fields.duracio:
-                    if (fieldValue != null) {
-                        Date dataLimit= DateUtils.addDays(new Date(), (Integer) fieldValue);
-                        if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
-                            target.setDataCaducitat(dataLimit);
-                        }
-                    } else {
-                        if (previous.getDataCaducitat()!=null) {
-                            target.setDataCaducitat(null);
-                        }
-                    }
-                    break;
+	            case DocumentResource.NotificarFormAction.Fields.duracio:
+	                if (fieldValue != null) {
+	                    Date dataLimit= DateUtils.addDays(new Date(), (Integer) fieldValue);
+	                    if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
+	                        target.setDataCaducitat(dataLimit);
+	                    }
+	                } else {
+	                    if (previous.getDataCaducitat()!=null) {
+	                        target.setDataCaducitat(null);
+	                    }
+	                }
+	                break;
+	
+	            case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
+	                if (fieldValue != null) {
+	                    LocalDate start = LocalDate.now();
+	                    LocalDate end = ((Date)fieldValue).toInstant()
+	                            .atZone(ZoneId.systemDefault())
+	                            .toLocalDate();
+	                    int dias = (int) start.until(end, ChronoUnit.DAYS);
+	
+	                    if (!Objects.equals(previous.getDuracio(), dias)) {
+	                        target.setDuracio(dias);
+	                    }
+	                } else {
+	                    if (previous.getDuracio()!=null) {
+	                        target.setDuracio(null);
+	                    }
+	                }
+	                break;
+	        }			
+		}
 
-                case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
-                    if (fieldValue != null) {
-                        LocalDate start = LocalDate.now();
-                        LocalDate end = ((Date)fieldValue).toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate();
-                        int dias = (int) start.until(end, ChronoUnit.DAYS);
+		@Override
+		public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarFormAction params) throws ActionExecutionException {
+        	try {
+            	
+	        	List<Long> interessatsIds = new ArrayList<Long>();
+	        	boolean anyInteressatIsAdministracio = false;
+	        	if (params.getInteressats()!=null) {
+	        		for (ResourceReference<InteressatResource, Long> interessat: params.getInteressats()) {
+	        			interessatsIds.add(interessat.getId());
+	        			InteressatResourceEntity ie = interessatResourceRepository.findById(interessat.getId()).get();
+	        			if (InteressatTipusEnum.InteressatAdministracioEntity.equals(ie.getTipus())) {
+	        				anyInteressatIsAdministracio = true;
+	        			}
+	        			if (params.getEntregaPostal()!=null && params.getEntregaPostal().booleanValue() && !ie.adressaCompleta()) {
+	        				throw new ActionExecutionException(ie.getClass(), ie.getId(), code, "notificacio.controller.reject.postal");
+	        			}
+	        		}
+	        	}
+	        	
+	        	if (DocumentNotificacioTipusEnumDto.COMUNICACIO.equals(params.getTipus()) && 
+	        		"application/zip".equals(entity.getFitxerContentType()) &&
+	        		anyInteressatIsAdministracio) {
+	        			throw new ActionExecutionException(entity.getClass(), entity.getId(), code, "notificacio.controller.reject.comunicacio.zip.administracio");
+	        	}
+	        	
+	            String entitatActualCodi = configHelper.getEntitatActualCodi();
+	            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+	        	
+	        	DocumentNotificacioDto notificacioDto = new DocumentNotificacioDto();
+	        	notificacioDto.setTipus(params.getTipus());
+	        	notificacioDto.setInteressatsIds(interessatsIds); //El helper notifica al representant si és necessari
+	        	notificacioDto.setServeiTipusEnum(params.getServeiTipus());
+	        	notificacioDto.setEntregaPostal(params.getEntregaPostal()!=null?params.getEntregaPostal().booleanValue():false);
+	        	notificacioDto.setObservacions(params.getDescripcio());
+	        	notificacioDto.setAssumpte(params.getConcepte());
+				notificacioDto.setDataProgramada(params.getDataProgramada()); 
+				notificacioDto.setRetard(params.getRetard());
+				notificacioDto.setDataCaducitat(params.getDataCaducitat());
+	        	
+	        	documentNotificacioHelper.notificacioCreate(entitatEntity.getId(), entity.getId(), notificacioDto);
 
-                        if (!Objects.equals(previous.getDuracio(), dias)) {
-                            target.setDuracio(dias);
-                        }
-                    } else {
-                        if (previous.getDuracio()!=null) {
-                            target.setDuracio(null);
-                        }
-                    }
-                    break;
-            }
-        }
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/notificar", e);
+				throw new ActionExecutionException(DocumentResource.class, entity.getId(), code, e.getMessage());
+			}
+        	
+        	return null;
+		}
     }
+    
     private class EnviarPortafirmesActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarPortafirmesFormAction, DocumentResource> {
 
         @Override

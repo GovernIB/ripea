@@ -13,6 +13,8 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -267,7 +269,7 @@ public class DocumentResource extends NodeResource {
     @FieldNameConstants
     public static class NotificarFormAction implements Serializable {
 
-        private TipusEnum tipus;
+        private DocumentNotificacioTipusEnumDto tipus;
         @NotNull
         private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
         @NotEmpty
@@ -278,19 +280,15 @@ public class DocumentResource extends NodeResource {
         private ServeiTipusEnumDto serveiTipus = ServeiTipusEnumDto.NORMAL;
 //        @Field(type = Field.TYPE_TEXTAREA)
         private String descripcio;
-
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
         private Date dataProgramada;
         @NotNull
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
         private Date dataCaducitat;
         @NotNull
         private Integer duracio;
         private Integer retard;
         private Boolean entregaPostal;
-
-        private enum TipusEnum {
-            COMUNICACIO,
-            NOTIFICACIO,
-        }
     }
 
     @Getter

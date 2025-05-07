@@ -14,6 +14,7 @@ import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

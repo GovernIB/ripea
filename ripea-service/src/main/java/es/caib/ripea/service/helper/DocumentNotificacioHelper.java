@@ -2,7 +2,9 @@ package es.caib.ripea.service.helper;
 
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.DadesExternesService;
@@ -26,10 +28,34 @@ public class DocumentNotificacioHelper {
 	@Autowired private DadesExternesService dadesExternesService;
 	@Autowired private DocumentHelper documentHelper;
 	@Autowired private DocumentNotificacioInteressatHelper documentNotificacioInteressatHelper;
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 
-	public Map<String, String> crear(
-			DocumentNotificacioDto notificacioDto, 
-			DocumentEntity documentEntity) {
+	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds) {
+		boolean isAnyAdministracio = false;
+		if (interessatsIds != null) {
+			for (Long id : interessatsIds) {
+				InteressatEntity inter = interessatRepository.getOne(id);
+				if (inter instanceof InteressatAdministracioEntity) {
+					isAnyAdministracio = true;
+					break;
+				}
+			}
+		}
+		return isAnyAdministracio;
+	}
+	
+	public Map<String, String> notificacioCreate(
+			Long entitatId,
+			Long documentId,
+			DocumentNotificacioDto notificacioDto) {
+		
+		DocumentEntity documentEntity = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				true);
+
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity,
 				  notificacioDto.getTipus());
 		
@@ -45,7 +71,12 @@ public class DocumentNotificacioHelper {
 					expedientEntity, 
 					documentEntity, 
 					interessatId);
+		}		
+		
+		if (documentEntity.getFitxerContentType().equals("application/zip")) {
+			documentFirmaServidorFirma.removeFirmesInvalidesAndFirmaServidor(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents", null);
 		}
+
 		return notificacionsWithError;
 	}
 	

@@ -91,8 +91,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		try {
 			NotificacioV2 notificacioNotib = new NotificacioV2();
 
-			boolean provaLocal = false;
-			if (provaLocal) {
+			if ("LOCAL".equals(getEntorn())) {
 				notificacioNotib.setProcedimentCodi("894623");
 				notificacioNotib.setOrganGestor("A04027005");
 				notificacioNotib.setUsuariCodi("e18225486X");
@@ -497,7 +496,9 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 		return clientV2;
 	}
-
+	private String getEntorn() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ENTORN));
+	}
 	private String getUrl() {
 		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.NOTIB_PLUGIN_URL));
 	}

@@ -11,6 +11,7 @@ import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -102,4 +103,13 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 
     @OneToMany(mappedBy = "representant", cascade = {CascadeType.DETACH}, fetch = FetchType.LAZY)
     protected List<InteressatResourceEntity> representats;
+    
+    public boolean adressaCompleta() {
+		if (Utils.isEmpty(this.getPais()) || Utils.isEmpty(this.getProvincia()) ||
+			Utils.isEmpty(this.getMunicipi()) || Utils.isEmpty(this.getCodiPostal()) ||
+			Utils.isEmpty(this.getAdresa())) {
+				return true;
+		}
+		return false;
+    }
 }

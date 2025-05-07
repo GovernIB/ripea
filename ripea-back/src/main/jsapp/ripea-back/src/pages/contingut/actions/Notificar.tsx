@@ -15,7 +15,7 @@ const NotificarForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus"/>
-        <GridFormField xs={12} name="estat"/>
+        <GridFormField xs={12} name="estat" disabled/>
         <GridFormField xs={12} name="interessats" multiple filter={interessatsFilter}/>
         <GridFormField xs={12} name="concepte"/>
         <GridFormField xs={12} name="serveiTipus"/>

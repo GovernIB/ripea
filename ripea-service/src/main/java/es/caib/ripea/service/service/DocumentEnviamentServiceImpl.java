@@ -14,13 +14,9 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPublicacioEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
-import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.InteressatRepository;
-import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -30,7 +26,6 @@ import es.caib.ripea.service.helper.HibernateHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentDto;
-import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
@@ -50,8 +45,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
-	@Autowired private DocumentFirmaServidorFirma documentFirmaServidorFirma;
-	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private PluginHelper pluginHelper;
 
@@ -66,34 +59,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"documentId=" + documentId + ", " +
 				"notificacio=" + notificacioDto + ")");
-		DocumentEntity documentEntity = documentHelper.comprovarDocumentDinsExpedientAccessible(
-				entitatId,
-				documentId,
-				false,
-				true);
-		Map<String, String> errorsNotificant = documentNotificacioHelper.crear(notificacioDto, documentEntity);
-		
-		if (documentEntity.getFitxerContentType().equals("application/zip")) {
-			documentFirmaServidorFirma.removeFirmesInvalidesAndFirmaServidor(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents", null);
-		}
-
-		return errorsNotificant;
+		return documentNotificacioHelper.notificacioCreate(entitatId, documentId, notificacioDto);
 	}
 	
 	@Transactional
 	@Override
 	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds) {
-		boolean isAnyAdministracio = false;
-		if (interessatsIds != null) {
-			for (Long id : interessatsIds) {
-				InteressatEntity inter = interessatRepository.getOne(id);
-				if (inter instanceof InteressatAdministracioEntity) {
-					isAnyAdministracio = true;
-					break;
-				}
-			}
-		}
-		return isAnyAdministracio;
+		return documentNotificacioHelper.checkIfAnyInteressatIsAdministracio(interessatsIds);
 	}
 	
 	@Transactional

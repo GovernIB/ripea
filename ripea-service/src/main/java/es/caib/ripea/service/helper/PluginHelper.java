@@ -6959,19 +6959,16 @@ public class PluginHelper {
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				
 				try {
-					Class<?> clazz = Class.forName(
-							pluginClassOrgan);
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					Properties propsPluingNotib = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
+							IntegracioHelper.INTCODI_NOTIFICACIO,
+							entitatCodi,
+							organCodi);
+					propsPluingNotib.setProperty(PropertyConfig.ENTORN, configHelper.getConfig(PropertyConfig.USUARIS_PLUGIN_CLASS));
 					plugin = (NotificacioPlugin) clazz.getDeclaredConstructor(
 							String.class,
-							Properties.class).newInstance(
-									ConfigDto.prefix + ".",
-									configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
-											IntegracioHelper.INTCODI_NOTIFICACIO,
-											entitatCodi,
-											organCodi));
-					notificacioPlugins.put(
-							entitatCodi + "." + organCodi,
-							plugin);
+							Properties.class).newInstance(ConfigDto.prefix + ".", propsPluingNotib);
+					notificacioPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
 					throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,
@@ -6980,28 +6977,24 @@ public class PluginHelper {
 			}
 		}
 
-		// ENTITAT/GENERAL PLUGIN
-		plugin = notificacioPlugins.get(
-				entitatCodi);
-		// loadPluginProperties("NOTIB");
+		plugin = notificacioPlugins.get(entitatCodi);
 		if (plugin != null) {
 			return plugin;
 		}
+		
 		String pluginClass = getPropertyPluginNotificacio();
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,
 					"No està configurada la classe per al plugin de notificació");
 		}
+		
 		try {
-			Class<?> clazz = Class.forName(
-					pluginClass);
+			Class<?> clazz = Class.forName(pluginClass);
+			Properties propsPluingNotib = configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_NOTIFICACIO, entitatCodi);
+			propsPluingNotib.setProperty(PropertyConfig.ENTORN, configHelper.getConfig(PropertyConfig.USUARIS_PLUGIN_CLASS));
 			plugin = (NotificacioPlugin) clazz.getDeclaredConstructor(
 					String.class,
-					Properties.class).newInstance(
-							ConfigDto.prefix + ".",
-							configHelper.getGroupPropertiesEntitatOrGeneral(
-									IntegracioHelper.INTCODI_NOTIFICACIO,
-									entitatCodi));
+					Properties.class).newInstance(ConfigDto.prefix + ".", propsPluingNotib);
 			notificacioPlugins.put(
 					entitatCodi,
 					plugin);
