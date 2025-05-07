@@ -316,6 +316,8 @@ public class DocumentResource extends NodeResource {
         private boolean mostrarAvisFirmaParcial;
         @Transient
         private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+        @Transient
+        private ResourceReference<MetaDocumentResource, Long> metaDocument;
 
         // SIMPLE
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();

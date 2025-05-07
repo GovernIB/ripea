@@ -155,8 +155,8 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
             icon: "mail",
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
-            disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden : (row:any) => !potModificar() || !row?.metaNode?.firmaPortafirmesActiva || !isFirmaActiva(row),
+            // disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
+            // hidden : (row:any) => !potModificar() || !row?.metaNode?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.firmar'),

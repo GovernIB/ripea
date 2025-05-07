@@ -287,6 +287,10 @@ export const useCommonActions = (refresh?: () => void) => {
 		    hidden: (row:any) => isTancat(row),
 		},	
     ]
+        .map(({ hidden, ...rest }) => ({
+            ...rest,
+            hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus!='EXPEDIENT'
+        }));
 
     const components = <>
         {dialogHistoric}
