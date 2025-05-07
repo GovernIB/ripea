@@ -239,7 +239,7 @@ public class DocumentResource extends NodeResource {
 
     @Getter
     @Setter
-    public static class MoureFormAction implements Serializable {
+    public static class MoureFormAction extends ExpedientResource.MassiveAction {
         private String contingut;
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;

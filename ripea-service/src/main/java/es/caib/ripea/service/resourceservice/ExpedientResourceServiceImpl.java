@@ -143,142 +143,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
-        register(ExpedientResource.Fields.exportPdf, new ExportPdf());
-        register(ExpedientResource.Fields.exportExcel, new ExportExcel());
-        register(ExpedientResource.Fields.exportPdfEni, new ExportPdfEni());
-        register(ExpedientResource.Fields.exportEni, new ExportEni());
-        register(ExpedientResource.Fields.exportInside, new ExportInside());
-    }
-
-    private class ExportPdf implements FieldDownloader<ExpedientResourceEntity> {
-        @Override
-        public DownloadableFile download(
-        		ExpedientResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
-			try {
-				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-	        	FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
-	        			entitatEntity.getId(),
-	        			Collections.singleton(entity.getId()), 
-						false,
-						"PDF");
-	            return new DownloadableFile(
-	            		fitxerDto.getNom(),
-	            		fitxerDto.getContentType(),
-	            		fitxerDto.getContingut()
-	            );
-			} catch (IOException e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/generarIndex/PDF", e);
-				return null;
-			}
-        }
-    }
-    
-    private class ExportExcel implements FieldDownloader<ExpedientResourceEntity> {
-        @Override
-        public DownloadableFile download(
-        		ExpedientResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
-			try {
-				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-	        	FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
-	        			entitatEntity.getId(),
-	        			Collections.singleton(entity.getId()), 
-						false,
-						"XLSX");
-	            return new DownloadableFile(
-	            		fitxerDto.getNom(),
-	            		fitxerDto.getContentType(),
-	            		fitxerDto.getContingut()
-	            );				
-			} catch (IOException e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/generarIndex/XLSX", e);
-				return null;
-			}
-        }
-    }
-    
-    private class ExportPdfEni implements FieldDownloader<ExpedientResourceEntity> {
-        @Override
-        public DownloadableFile download(
-        		ExpedientResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
-			try {
-				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-				FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
-	        			entitatEntity.getId(),
-	        			Collections.singleton(entity.getId()), 
-						true,
-						"PDF");
-	            return new DownloadableFile(
-	            		fitxerDto.getNom(),
-	            		fitxerDto.getContentType(),
-	            		fitxerDto.getContingut()
-	            );				
-			} catch (IOException e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/generarExportarIndex", e);
-				return null;
-			}
-        }
-    }
-    
-    private class ExportEni implements FieldDownloader<ExpedientResourceEntity> {
-        @Override
-        public DownloadableFile download(
-        		ExpedientResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
-			try {
-	        	entityComprovarHelper.comprovarExpedient(
-	        			entity.getId(),
-	        			false,
-	        			true,
-	        			false,
-	        			false,
-	        			false,
-	        			configHelper.getRolActual());
-				FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(Arrays.asList(entity.getId())), false);
-	            return new DownloadableFile(
-	            		fitxerDto.getNom(),
-	            		fitxerDto.getContentType(),
-	            		fitxerDto.getContingut()
-	            );
-			} catch (IOException e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/exportarEni", e);
-				return null;
-			}
-        }
-    }
-    
-    private class ExportInside implements FieldDownloader<ExpedientResourceEntity> {
-        @Override
-        public DownloadableFile download(
-        		ExpedientResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
-			try {
-	        	entityComprovarHelper.comprovarExpedient(
-	        			entity.getId(),
-	        			false,
-	        			true,
-	        			false,
-	        			false,
-	        			false,
-	        			configHelper.getRolActual());
-				FitxerDto fitxerDto = expedientHelper.exportarExpedient(new HashSet<>(Arrays.asList(entity.getId())), true);
-	            return new DownloadableFile(
-	            		fitxerDto.getNom(),
-	            		fitxerDto.getContentType(),
-	            		fitxerDto.getContingut()
-	            );
-			} catch (IOException e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/exportarInside", e);
-				return null;
-			}
-        }
     }
     
     @Override
@@ -474,7 +338,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
         }
     }
-
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -484,7 +347,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setInteressats(interessats);
         }
     }
-
     private class EstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -493,7 +355,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
-
     private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -539,6 +400,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
+    // ActionExecutor
     private class AgafarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -568,7 +430,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
-    
     private class AlliberarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -598,7 +459,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
-    
     private class RetornarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
 		@Override
@@ -629,7 +489,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-
     private class FollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -651,7 +510,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
-    
     private class UnFollowActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -673,7 +531,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
-    
     private class DeleteActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -702,7 +559,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
-    
+
+    // ReportGenerator
     private class ExportOdsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -732,7 +590,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportCsvGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -762,7 +619,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportIndexZipGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -792,7 +648,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportZipGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.ExportarDocumentMassiu, Serializable> {
 
     	@Override
@@ -860,7 +715,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(ExportarDocumentMassiu previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExportarDocumentMassiu target) {}
     }
-    
     private class ExportIdexPdfGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -917,7 +771,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportIdexXlsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -974,7 +827,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -1027,7 +879,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportIndexEniGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -1075,7 +926,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		@Override
 		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
     private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
     	@Override
@@ -1169,7 +1019,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
-
     private class AnyOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientResource> {
         @Override
         public void onChange(
@@ -1202,7 +1051,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
-
     private static class FilterOnchangeLogicProcessor implements FilterProcessor<ExpedientFilterForm> {
 
         @Override
