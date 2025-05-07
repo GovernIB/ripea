@@ -36,6 +36,7 @@ export type ActionReportButtonProps = {
     selectedCount?: number;
     buttonComponent?: React.FC<ActionReportCustomButton>;
     formAdditionalData?: any;
+    formInitOnChangeRequest?: boolean;
     formDialogContent?: React.ReactElement;
     formDialogComponentProps?: any;
     formDialogResultProcessor?: (result?: any) => React.ReactElement;
@@ -90,6 +91,7 @@ export const useActionReportLogic = (
     reportFileType?: ExportFileType,
     confirm?: boolean,
     formAdditionalDataArg?: any,
+    formInitOnChangeRequest?: boolean,
     formDialogContent?: React.ReactElement,
     formDialogComponentPropsArg?: any,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
@@ -149,6 +151,7 @@ export const useActionReportLogic = (
             formDialogShow(id, {
                 title: dialogTitle ?? formDialogTitle,
                 additionalData: formAdditionalData ?? formAdditionalDataArg,
+                initOnChangeRequest: formInitOnChangeRequest,
                 dialogComponentProps: formDialogComponentProps ?? formDialogComponentPropsArg ?? { fullWidth: true, maxWidth: 'md' }
             }).catch(_error => {});
         } else if (action != null) {
@@ -220,6 +223,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         selectedCount,
         buttonComponent: buttonComponentProp,
         formAdditionalData,
+        formInitOnChangeRequest,
         formDialogContent,
         formDialogComponentProps,
         formDialogResultProcessor,
@@ -240,6 +244,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         reportFileType,
         confirm,
         formAdditionalData,
+        formInitOnChangeRequest,
         formDialogContent,
         formDialogComponentProps,
         formDialogResultProcessor,
