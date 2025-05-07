@@ -5,6 +5,7 @@ type CommonProps = {
     title?: string | ((data:any) => string),
     resourceName: string,
     formDialogComponentProps?: any,
+    initialOnChange: boolean,
     children: React.ReactElement,
     apiRef?: MutableRefObject<any>,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
@@ -26,6 +27,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         resourceName,
         action,
         formDialogComponentProps,
+        initialOnChange,
         children,
         apiRef,
         formDialogResultProcessor,
@@ -43,6 +45,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         undefined,
         false,
         undefined,
+        initialOnChange,
         children,
         formDialogComponentProps,
         formDialogResultProcessor,
@@ -68,6 +71,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         report,
         reportFileType = 'PDF',
         formDialogComponentProps,
+        initialOnChange,
         children,
         apiRef,
         formDialogResultProcessor,
@@ -77,7 +81,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
 
     const {
         formDialogComponent,
-        exec: actionExecutor
+        exec: reportExecutor
     } = useMuiActionReportLogic(
         resourceName,
         undefined,
@@ -85,6 +89,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         reportFileType,
         false,
         undefined,
+        initialOnChange,
         children,
         formDialogComponentProps,
         formDialogResultProcessor,
@@ -94,7 +99,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
 
     const exec = (id: any, formAdditionalData?: any) :void => {
         const customTitle = (typeof title === 'function') ?title?.(formAdditionalData) :title;
-        actionExecutor(id, customTitle, formAdditionalData)
+        reportExecutor(id, customTitle, formAdditionalData)
     }
 
     if (apiRef != null) {

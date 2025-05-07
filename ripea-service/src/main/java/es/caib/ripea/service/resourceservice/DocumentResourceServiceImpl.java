@@ -22,8 +22,10 @@ import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepo
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.apache.commons.lang3.time.DateUtils;
@@ -60,14 +62,16 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     private final DocumentResourceHelper documentResourceHelper;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
-    private final ContingutResourceHelper contingutResourceHelper;
-    private final PluginHelper pluginHelper;
-
-    private final EmailHelper emailHelper;
-    private final DocumentHelper documentHelper;
     private final ExpedientResourceRepository expedientResourceRepository;
     private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
+
+    private final ContingutResourceHelper contingutResourceHelper;
+    private final PluginHelper pluginHelper;
+    private final EmailHelper emailHelper;
+    private final DocumentHelper documentHelper;
+
+    private final AplicacioService aplicacioService;
 
     @PostConstruct
     public void init() {
@@ -547,7 +551,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					false, 
 					false, 
 					rolActual);
-        	
+
 			/*firmaPortafirmesHelper.portafirmesEnviar(
 					entitatId,
 					document,
@@ -568,7 +572,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
+            if (fieldName==null){
+                metaDocumentResourceRepository.findById(previous.getMetaDocument().getId())
+                        .ifPresent(document -> {
+                            target.setPortafirmesFluxTipus(document.getPortafirmesFluxTipus());
+                        });
 
+                target.setMostrarFirmaParcial(aplicacioService.propertyBooleanFindByKey(PropertyConfig.FIRMA_PARCIAL));
+                target.setMostrarAvisFirmaParcial(aplicacioService.propertyBooleanFindByKey(PropertyConfig.AVIS_FIRMA_PARCIAL));
+            }
         }
     }
 }
