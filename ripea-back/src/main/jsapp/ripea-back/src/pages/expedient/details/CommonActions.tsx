@@ -24,7 +24,7 @@ const iniciaDescargaBlob = (result: any) => {
     URL.revokeObjectURL(url);
 }
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
 	
     const {temporalMessageShow} = useBaseAppContext();
 	const { t } = useTranslation();

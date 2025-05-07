@@ -192,6 +192,7 @@ const translationCa = {
                 title: "Cercador d'expedients"
             },
             detall: {
+                title: "Informació de l'expedient",
                 agafatPer: "Agafat per",
             },
             acciones: {
@@ -517,6 +518,19 @@ const translationCa = {
                 vista: "Configuració vista de documents dels expedients",
                 moure: "Configuració vista destí al moure documents"
             }
+        },
+        alert: {
+            title: "Alertes d'expedient",
+            acciones: {
+                read: "Marcar com a llegida",
+            },
+            errors: {
+                metaDada: "Falten les dades següents:",
+                metaDocument: "Falten els documents següents:",
+                metaNode: "Hi ha documents sense un tipus de document assignat",
+                noFinalitzades: "Hi ha notificacions amb un estat que no és final",
+                interessatObligatori: "Falta informar un interessat",
+            },
         },
         notFound: "No trobat",
     }

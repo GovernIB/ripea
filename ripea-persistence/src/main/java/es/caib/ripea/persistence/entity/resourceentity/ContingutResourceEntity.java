@@ -1,6 +1,8 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -81,5 +83,10 @@ public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> 
 			orphanRemoval = true)
 	protected Set<ContingutResourceEntity> fills;
 
-
+    @OneToMany(
+            mappedBy = "contingut",
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.REMOVE}
+    )
+    protected List<AlertaResourceEntity> alertes = new ArrayList<>();
 }

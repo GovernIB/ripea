@@ -7,7 +7,11 @@ const ExpedientActionButton = (props:{entity:any}) => {
     const {entity} = props;
     const { t } = useTranslation();
 
-    const {actions, components} = useCommonActions();
+    const refresh = () => {
+        window.location.reload();
+    }
+
+    const {actions, components} = useCommonActions(refresh);
 
     return <MenuActionButton
         id={'accionsExpedient'}

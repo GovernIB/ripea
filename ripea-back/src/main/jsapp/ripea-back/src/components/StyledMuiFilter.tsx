@@ -13,6 +13,11 @@ export type FilterButtonProps = {
     componentProps?: any;
 };
 
+// type StyledMuiFormProps = MuiFilterProps & {
+//     buttons?: FilterButtonProps[],
+//     buttonCallback?: (code:any) => void
+// }
+
 const StyledMuiFilter = (props:any) => {
     const { t } = useTranslation();
     const filterRef = useFilterApiRef();
@@ -38,15 +43,6 @@ const StyledMuiFilter = (props:any) => {
         }
     ];
 
-    const cercar = ()=> {
-        apiRef.current.filter()
-        saveFilterData(formApiRef.current.getData())
-    }
-    const netejar = ()=> {
-        saveFilterData(null)
-        apiRef.current.clear()
-    }
-
     const callback = (value:string) :void => {
         if (value=='clear') {
             netejar()
@@ -56,13 +52,34 @@ const StyledMuiFilter = (props:any) => {
         }
     }
 
-    const { buttons = defaultButtons, buttonCallback = callback, apiRef = filterRef, formApiRef = formRef, springFilterBuilder, onSpringFilterChange, commonFieldComponentProps, componentProps, children, code, ...other } = props
+    const {
+        buttons = defaultButtons,
+        buttonCallback = callback,
+        apiRef = filterRef,
+        formApiRef = formRef,
+        springFilterBuilder,
+        onSpringFilterChange,
+        commonFieldComponentProps,
+        componentProps,
+        children,
+        code,
+        ...other
+    } = props
+
+    const cercar = ()=> {
+        apiRef?.current?.filter?.()
+        saveFilterData(formApiRef?.current?.getData?.())
+    }
+    const netejar = ()=> {
+        saveFilterData(null)
+        apiRef?.current?.clear?.()
+    }
 
     const { value: filterData, save: saveFilterData } = useSession(code);
 
     useEffect(() => {
         if (!!filterData) {
-            onSpringFilterChange(
+            onSpringFilterChange?.(
                 springFilterBuilder(filterData)
             )
         }

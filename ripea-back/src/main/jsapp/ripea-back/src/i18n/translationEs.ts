@@ -192,6 +192,7 @@ const translationEs = {
                 title: "Buscador de expedientes"
             },
             detall: {
+                title: "Información del expediente",
                 agafatPer: "Cogido por",
             },
             acciones: {
@@ -518,6 +519,19 @@ const translationEs = {
                 vista: "Configuración vista de documentos de expedientes",
                 moure: "Configuración vista destino al mover documentos",
             }
+        },
+        alert: {
+            title: "Alertas de expediente",
+            acciones: {
+                read: "Marcar como leido",
+            },
+            errors: {
+                metaDada: "Faltan los siguientes datos:",
+                metaDocument: "Faltan los siguientes documentos:",
+                metaNode: "Existen documentos sin un tipo de documento asigando",
+                noFinalitzades: "Existen notificaciones con un estado que no es final",
+                interessatObligatori: "Falta informar un interesado",
+            },
         },
         notFound: "No encontrado",
     }

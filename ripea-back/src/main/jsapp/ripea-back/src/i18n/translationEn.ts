@@ -192,6 +192,7 @@ const translationEn = {
                 title: "Expedient Search"
             },
             detall: {
+                title: "Case Information",
                 agafatPer: "Taken by",
             },
             acciones: {
@@ -517,6 +518,19 @@ const translationEn = {
                 vista: "Document view settings in cases",
                 moure: "Destination view settings when moving documents"
             }
+        },
+        alert: {
+            title: "Case Alerts",
+            acciones: {
+                read: "Mark as read",
+            },
+            errors: {
+                metaDada: "The following data is missing:",
+                metaDocument: "The following documents are missing:",
+                metaNode: "There are documents without an assigned document type",
+                noFinalitzades: "There are notifications with a non-final status",
+                interessatObligatori: "An interested party is missing",
+            },
         },
         notFound: "Not Found",
     }

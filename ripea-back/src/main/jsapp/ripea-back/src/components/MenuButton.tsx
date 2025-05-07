@@ -3,6 +3,7 @@ import {Button, Icon, Menu, MenuItem} from "@mui/material";
 
 type MenuButtonProps = {
     id: string;
+    hidden?: boolean;
     children?: any;
     buttonLabel?: string;
     buttonProps?: any;
@@ -14,6 +15,7 @@ type MenuButtonProps = {
 const MenuButton = (props:MenuButtonProps) => {
     const {
         id,
+        hidden,
         children,
         buttonLabel,
         buttonProps,
@@ -29,6 +31,10 @@ const MenuButton = (props:MenuButtonProps) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    if (hidden){
+        return <></>
+    }
 
     return(<>
         <Button
