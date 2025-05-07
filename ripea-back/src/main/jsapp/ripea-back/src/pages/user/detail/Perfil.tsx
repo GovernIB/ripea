@@ -1,12 +1,13 @@
 import {useRef} from "react";
 import {Grid} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi} from "reactlib";
+import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 
 const usePerfil = () => {
-    // const { t } = useTranslation();
+    const { t } = useTranslation();
     const { value: user } = useUserSession();
 
     const formApiRef = useRef<MuiFormDialogApi>();
@@ -26,13 +27,13 @@ const usePerfil = () => {
     const dialog =
         <MuiFormDialog
             resourceName={'usuariResource'}
-            title={'Datos de usuario'}
+            title={t('page.user.perfil.title')}
             apiRef={formApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg'}}
         >
             <Grid container columnSpacing={1} rowSpacing={1}>
                 <CardData
-                    title={'Datos de usuario'}
+                    title={t('page.user.perfil.dades')}
                     cardProps={{border: '1px solid #004B99'}}
                     headerProps={{color: 'white', backgroundColor: '#004B99'}}
                 >
@@ -47,18 +48,18 @@ const usePerfil = () => {
                     <GridFormField xs={12} name="idioma" disabled readOnly/>
                 </CardData>
 
-                <CardData title={'Envio de correos'}>
+                <CardData title={t('page.user.perfil.correu')}>
                     <GridFormField xs={12} name="rebreEmailsAgrupats"/>
                     <GridFormField xs={12} name="rebreAvisosNovesAnotacions"/>
                 </CardData>
 
-                <CardData title={'Configuración genérica'}>
+                <CardData title={t('page.user.perfil.generic')}>
                     <GridFormField xs={12} name="numElementsPagina"/>
                     <GridFormField xs={12} name="entitatPerDefecte"/>
                     <GridFormField xs={12} name="procediment"/>
                 </CardData>
 
-                <CardData title={'Configuración de columnas del listado de expedientes'}>
+                <CardData title={t('page.user.perfil.column')}>
                     <GridFormField xs={12} name="expedientListDataDarrerEnviament"/>
                     <GridFormField xs={12} name="expedientListAgafatPer"/>
                     <GridFormField xs={12} name="expedientListInteressats"/>
@@ -66,12 +67,12 @@ const usePerfil = () => {
                     <GridFormField xs={12} name="expedientListGrup"/>
                 </CardData>
 
-                <CardData title={'Configuración vista de documentos de expedientes'}>
+                <CardData title={t('page.user.perfil.vista')}>
                     <GridFormField xs={12} name="vistaActual" required/>
                     <GridFormField xs={12} name="expedientExpandit"/>
                 </CardData>
 
-                <CardData title={'Configuración vista destino al mover documentos'}>
+                <CardData title={t('page.user.perfil.moure')}>
                     <GridFormField xs={12} name="vistaMoureActual" required/>
                 </CardData>
             </Grid>

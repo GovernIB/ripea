@@ -186,7 +186,7 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
             icon: "publish",
             showInMenu: true,
             onClick: handlePublicarShow,
-//            hidden: (row:any) => !potModificar() || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
+            hidden: (row:any) => !potModificar() || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
         },
         {
             title: t('page.document.acciones.mail'),

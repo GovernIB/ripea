@@ -16,7 +16,7 @@ const CardButton = (props:any) => {
     return <Grid item xs={flex ?? 12} display={'flex'} justifyContent={'end'}>
         <IconButton sx={{...iconButton, ...buttonProps}} title={text} onClick={onClick}>
             <Typography sx={{display: 'flex', alignItems: 'center'}} variant={'caption'} color={'textPrimary'}>
-                <Icon fontSize={'inherit'} hidden={!icon}>{icon}</Icon>
+                {icon && <Icon fontSize={'inherit'}>{icon}</Icon>}
                 {text}
             </Typography>
         </IconButton>
@@ -32,8 +32,8 @@ export const CardData = (props:any) => {
 
     return <Grid item xs={xs ?? 12}>
         <Card sx={{...cardBorder, ...cardProps}}>
-            <CardHeader title={title} sx={headerProps} hidden={!title}/>
-            <CardContent sx={headerProps} hidden={!header}>{header}</CardContent>
+            {title && <CardHeader title={title} sx={headerProps}/>}
+            {header && <CardContent sx={headerProps}>{header}</CardContent>}
 
             <CardContent hidden={!children}>
                 <Grid container columnSpacing={1} rowSpacing={1} item xs={12} {...other}>

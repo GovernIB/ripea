@@ -32,6 +32,7 @@ const EviarPortafirmes = (props:any) => {
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}
         title={t('page.document.action.enviarPortafirmes')}
+        initialOnChange
         {...props}
     >
         <EviarPortafirmesForm/>
@@ -45,6 +46,7 @@ const useEviarPortafirmes = (refresh?: () => void) => {
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id, {
             motiu: `Tramitació de l'expedient [${row?.expedient?.description}]`,
+            metaDocument: row?.metaDocument,
         })
     }
     const onSuccess = () :void => {

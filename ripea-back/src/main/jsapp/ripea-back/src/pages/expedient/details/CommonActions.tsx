@@ -30,7 +30,6 @@ const useActions = (refresh?: () => void) => {
 	const { t } = useTranslation();
     const {
         artifactAction: apiAction,
-		// fieldDownload: apiDownload,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
 	
@@ -56,13 +55,6 @@ const useActions = (refresh?: () => void) => {
 			});		
 	}
 
-	const download = (id:any,fieldName:string) :void => {
-	    apiDownload(id,{fieldName})
-	        .then((result)=>{
-	            iniciaDescargaBlob(result);
-	        })
-	}
-	
     const follow	= (id: any): void => { action(id, 'FOLLOW', 	t('page.expedient.results.actionOk')); }
     const unfollow	= (id: any): void => { action(id, 'UNFOLLOW',	t('page.expedient.results.actionOk')); }
     const agafar	= (id: any): void => { action(id, 'AGAFAR',		t('page.expedient.results.actionOk')); }
@@ -76,7 +68,7 @@ const useActions = (refresh?: () => void) => {
 	const exportEni		= (id: any): void => { massiveReport(id, 'EXPORT_ENI', 		 t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 	const exportInside  = (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', 	 t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
-    return {follow, unfollow, agafar, retornar, alliberar, eliminar, apiDownload: download, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
+    return {follow, unfollow, agafar, retornar, alliberar, eliminar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
 }
 
 export const useCommonActions = (refresh?: () => void) => {
@@ -85,7 +77,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
 
-    const {follow, unfollow, agafar, retornar, alliberar, eliminar, apiDownload, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
+    const {follow, unfollow, agafar, retornar, alliberar, eliminar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
     const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
@@ -200,13 +192,15 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.close'),
             icon: "check",
             showInMenu: true,
+            // onClick: ,
             disabled: (row:any) => !row?.potTancar,
             hidden: (row:any) => !potModificar(row) || isTancat(row),
         },
         {
-            title: "Reabrir",
+            title: t('page.expedient.acciones.open'),
             icon: "undo",
             showInMenu: true,
+            // onClick: ,
             hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData),
         },
         {
@@ -223,51 +217,52 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.download'),
             icon: "download",
             showInMenu: true,
+            // onClick: ,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportPDF'),
             icon: "format_list_numbered",
-			onClick: exportIndexPdf,
             showInMenu: true,
+			onClick: exportIndexPdf,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportEXCEL'),
             icon: "lists",
-			onClick: exportIndexXls,
             showInMenu: true,
+			onClick: exportIndexXls,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioExcelActiva),
         },
         {
             title: t('page.expedient.acciones.exportPDF_ENI'),
             icon: "format_list_numbered",
-			onClick: exportPdfEni,
             showInMenu: true,
+			onClick: exportPdfEni,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportENI'),
             icon: "folder_code",
-			onClick: exportEni,
             showInMenu: true,
+			onClick: exportEni,
 			disabled: (row:any) => !row?.conteDocumentsDefinitius,
 			hidden: (row:any) => !row?.conteDocuments,
         },
         {
             title: t('page.expedient.acciones.exportINSIDE'),
             icon: "folder_zip",
-			onClick: exportInside,
             showInMenu: true,
+			onClick: exportInside,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),
         },
         {
             title: "Exportar los documentos...",
             icon: "description",
-			onClick: handleExportDoc,
             showInMenu: true,
+			onClick: handleExportDoc,
             disabled: (row:any) => !row?.conteDocumentsDefinitius,
             hidden: (row:any) => !row?.conteDocuments,
         },
@@ -282,6 +277,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.sincronitzar'),
             icon: "autorenew",
             showInMenu: true,
+            // onClick: ,
         },
 		{
 		    title: t('page.expedient.acciones.eliminar'),
@@ -291,6 +287,10 @@ export const useCommonActions = (refresh?: () => void) => {
 		    hidden: (row:any) => isTancat(row),
 		},	
     ]
+        .map(({ hidden, ...rest }) => ({
+            ...rest,
+            hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus!='EXPEDIENT'
+        }));
 
     const components = <>
         {dialogHistoric}

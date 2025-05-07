@@ -7,12 +7,12 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const PublicarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus"/>
-        <GridFormField xs={12} name="estat"/>
+        <GridFormField xs={12} name="tipus" required/>
+        <GridFormField xs={12} name="estat" required/>
         <GridFormField xs={12} name="assumpte"/>
-        <GridFormField xs={12} name="dataPublicacio"/>
-        <GridFormField xs={12} name="dataEnviament"/>
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
+        <GridFormField xs={12} name="dataPublicacio" type={"date"}/>
+        <GridFormField xs={12} name="enviatData" type={"date"}/>
+        <GridFormField xs={12} name="observacions" type={"textarea"}/>
     </Grid>
 }
 

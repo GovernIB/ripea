@@ -63,14 +63,14 @@ const ExpedientInfo = (props:any) => {
 
     return <CardData title={"Informació de l'expedient"} direction={'column'} xs={xs} cardProps={{backgroundColor: '#f5f5f5 !important'}}>
         <Load value={expedient} noEffect>
-            <Contenido title={t('page.contingut.detalle.numero')} direction={'column'}>{expedient?.numero}</Contenido>
-            <Contenido title={t('page.contingut.detalle.titol')} direction={'column'}>{expedient?.nom}</Contenido>
-            <Contenido title={t('page.contingut.detalle.metaExpedient')} direction={'column'}>{expedient?.metaExpedient?.description}</Contenido>
-            <Contenido title={t('page.contingut.detalle.organGestor')} direction={'column'}>{expedient?.organGestor?.description}</Contenido>
-            <Contenido title={t('page.contingut.detalle.fechaApertura')} direction={'column'}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
-            <Contenido title={t('page.contingut.detalle.estat')} direction={'column'}><StyledEstat entity={expedient}/></Contenido>
-            <Contenido title={t('page.contingut.detalle.prioritat')} direction={'column'}><StyledPrioritat entity={expedient}/></Contenido>
-            <Contenido title={t('page.contingut.detalle.clasificacio')} direction={'column'}>{expedient?.ntiClasificacionSia}</Contenido>
+            <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
+            <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
+            <Contenido title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</Contenido>
+            <Contenido title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</Contenido>
+            <Contenido title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
+            <Contenido title={t('page.contingut.detalle.estat')}><StyledEstat entity={expedient}/></Contenido>
+            <Contenido title={t('page.contingut.detalle.prioritat')}><StyledPrioritat entity={expedient}/></Contenido>
+            <Contenido title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</Contenido>
 
             <ExpedientsRelacionats entity={expedient}/>
 

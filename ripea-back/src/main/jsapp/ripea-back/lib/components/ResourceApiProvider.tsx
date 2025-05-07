@@ -862,7 +862,7 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
         indexState != null && resourceName != null && getPromiseFromStateLink(indexState, resourceName, args, true).
             then((state: State) => {
                 setCurrentState(state);
-                const processedFields = processApiFields(state.action().fields);
+                const processedFields = processApiFields(state.action('default').fields);
                 setCurrentFields(processedFields);
                 setIsCurrentLoading(false);
                 !isCurrentLoaded && setIsCurrentLoaded(true);

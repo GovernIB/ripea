@@ -239,7 +239,7 @@ public class DocumentResource extends NodeResource {
 
     @Getter
     @Setter
-    public static class MoureFormAction implements Serializable {
+    public static class MoureFormAction extends ExpedientResource.MassiveAction {
         private String contingut;
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
@@ -310,6 +310,8 @@ public class DocumentResource extends NodeResource {
         private boolean mostrarAvisFirmaParcial;
         @Transient
         private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+        @Transient
+        private ResourceReference<MetaDocumentResource, Long> metaDocument;
 
         // SIMPLE
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();

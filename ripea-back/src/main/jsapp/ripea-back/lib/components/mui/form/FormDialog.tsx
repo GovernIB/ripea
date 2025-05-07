@@ -12,6 +12,7 @@ type FormDialogProps = DialogProps & {
     resourceTypeCode?: string;
     id?: any;
     additionalData?: any;
+    initOnChangeRequest?: boolean;
     apiRef?: React.RefObject<FormApi>;
     dialogComponentProps?: any;
     formComponentProps?: any;
@@ -22,6 +23,7 @@ export type FormDialogSubmitFn = (id: any, data?: any) => Promise<React.ReactEle
 export type FormDialogShowArgs = {
     title?: string;
     additionalData?: any;
+    initOnChangeRequest?: boolean;
     formContent?: React.ReactNode;
     dialogComponentProps?: any;
     formComponentProps?: any;
@@ -52,6 +54,7 @@ export const useFormDialog: UseFormDialogFn = (
     const [title, setTitle] = React.useState<string | null>();
     const [id, setId] = React.useState<any>();
     const [additionalData, setAdditionalData] = React.useState<any>();
+    const [initOnChangeRequest, setInitOnChangeRequest] = React.useState<boolean>();
     const [dialogComponentProps, setDialogComponentProps] = React.useState<any>(defaultDialogComponentProps);
     const [formComponentProps, setFormComponentProps] = React.useState<any>(defaultFormComponentProps);
     const [resolveFn, setResolveFn] = React.useState<(value?: any) => void>();
@@ -63,6 +66,7 @@ export const useFormDialog: UseFormDialogFn = (
         setTitle(args?.title);
         args?.formContent != null && setFormContent(args.formContent);
         args?.additionalData != null && setAdditionalData(args.additionalData);
+        args?.initOnChangeRequest != null && setInitOnChangeRequest(args.initOnChangeRequest);
         args?.dialogComponentProps != null && setDialogComponentProps(args.dialogComponentProps);
         args?.formComponentProps != null && setFormComponentProps(args.formComponentProps);
         setOpen(true);
@@ -112,6 +116,7 @@ export const useFormDialog: UseFormDialogFn = (
         resourceTypeCode={resourceTypeCode}
         id={id}
         additionalData={additionalData}
+        initOnChangeRequest={initOnChangeRequest}
         apiRef={formApiRef}
         open={open}
         buttonCallback={buttonCallback}
@@ -133,6 +138,7 @@ export const FormDialog: React.FC<FormDialogProps> = (props) => {
         resourceTypeCode,
         id,
         additionalData,
+        initOnChangeRequest,
         apiRef,
         dialogComponentProps,
         formComponentProps,
@@ -148,6 +154,7 @@ export const FormDialog: React.FC<FormDialogProps> = (props) => {
             resourceTypeCode={resourceTypeCode}
             id={id}
             additionalData={additionalData}
+            initOnChangeRequest={initOnChangeRequest}
             apiRef={apiRef}
             hiddenToolbar>
             {children}

@@ -207,6 +207,7 @@ const translationEs = {
                 upEstat: "Cambiar estado...",
                 relacio: "Relacionar...",
                 close: "Cerrar...",
+                open: "Reabrir",
                 history: "Histórico de acciones",
                 download: "Descargar documentos...",
                 exportPDF: "Exportar indice PDF",
@@ -227,7 +228,7 @@ const translationEs = {
 			},
 			results: {
 				actionOk: 'La acción se ha ejecutado correctamente.',
-				actionBackgroundOk: 'La acción se ha preparadot para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.',
+				actionBackgroundOk: 'La acción se ha preparado para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.',
 			}		
         },
         arxiu: {
@@ -447,6 +448,76 @@ const translationEs = {
                     message: "Una vez borrada la publicación no se podra recuperar",
                 }
             },
+        },
+        user: {
+            options: {
+                perfil: "Perfil",
+                manual: "Manual de usuario",
+                manualAdmin: "Manual de administrador",
+                logout: "Desconectar"
+            },
+            menu: {
+                expedient: "Expedientes",
+                monitoritzar: "Monitorizar",
+                integracions: "Integraciones",
+                excepcions: "Excepciones",
+                monitor: "Monitor de sistema",
+
+                config: "Configuración",
+                props: "Propiedades configurables",
+                pinbal: "Servicios PINBAL",
+                segonPla: "Reiniciar tareas en segundo plano",
+                plugins: "Reiniciar plugins",
+                avisos: "Avisos",
+
+                anotacions: "Anotaciones",
+                procediments: "Procedimientos",
+                procedimentsTitle: "La entidad tiene procedimientos con órganos gestores no actualizados",
+                grups: "Grupos",
+                revisar: "Revisión de procedimientos",
+                tasca: "Tareas",
+                flux: "Flujos de firma",
+
+                consultar: "Consultar",
+                continguts: "Contenidos",
+                dadesEstadistiques: "Datos estadisticos",
+                portafib: "Documentos enviados a Portafib",
+                notib: "Remesas enviadas a Notib",
+                pinbalEnviades: "Consultas enviadas a PINBAL",
+                assignacio: "Asignación de tareas",
+                pendents: "Expedientes pendientes de distribución",
+                comunicades: "Anotaciones comunicadas",
+
+                documents: "Tipos de documentos",
+                nti: "Tipos documentales NTI",
+                dominis: "Dominios",
+                organs: "Órganos gestores",
+                url: "URLs instrucción",
+                permisos: "Permisos de la entidad",
+            },
+            massive: {
+                title: "Acción masiva",
+                portafirmes: "Enviar documentos al portafirmas",
+                firmar: "Firmar documentos desde el navegador",
+                marcar: "Marcar como definitivos",
+                estat: "Cambio de estado de expedientes",
+                tancar: "Cierre de expedientes",
+                custodiar: "Custodiar elementos pendientes",
+                csv: "Copiar enlace CSV",
+                anexos: "Adjuntar anexos pendientes de anotaciones aceptadas",
+                anotacio: "Actualizar estado de las anotaciones en Distribución",
+                prioritat: "Cambiar prioridad de expedientes",
+                masives: "Consultar acciones masivas",
+            },
+            perfil: {
+                title: "Mi perfil",
+                dades: "Datos de usuario",
+                correu: "Envio de correos",
+                generic: "Configuración genérica",
+                column: "Configuración de columnas del listado de expedientes",
+                vista: "Configuración vista de documentos de expedientes",
+                moure: "Configuración vista destino al mover documentos",
+            }
         },
         notFound: "No encontrado",
     }
