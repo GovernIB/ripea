@@ -336,6 +336,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumPublicacions(entity.getPublicacions().size());
             resource.setNumRemeses(entity.getNotificacions().size());
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+            resource.setNumAlert(entity.getAlertes().size());
         }
     }
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {

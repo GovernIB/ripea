@@ -5,7 +5,7 @@ import {
     useResourceApiService,
 } from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid, Icon, IconButton, Link} from '@mui/material';
+import {Typography, Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
@@ -20,6 +20,10 @@ import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
+import {useActions} from "./CommonActions.tsx";
+import useAlerta from "./Alerta.tsx";
+import useErrorValidacio from "./ErrorValidacio.tsx";
 
 const Contenido = (props :any) => {
     const { title, children } = props;
@@ -61,7 +65,7 @@ const ExpedientInfo = (props:any) => {
     const {entity: expedient, xs} = props;
     const { t } = useTranslation();
 
-    return <CardData title={"Informació de l'expedient"} direction={'column'} xs={xs} cardProps={{backgroundColor: '#f5f5f5 !important'}}>
+    return <CardData title={t('page.expedient.detall.title')} direction={'column'} xs={xs} cardProps={{backgroundColor: '#f5f5f5 !important'}}>
         <Load value={expedient} noEffect>
             <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
             <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
@@ -81,9 +85,64 @@ const ExpedientInfo = (props:any) => {
     </CardData>
 }
 
+const ExpedientAlert = (props:any) => {
+    const {entity: expedient} = props;
+    const { t } = useTranslation();
+
+    const refresh = () => {
+        window.location.reload();
+    }
+
+    const {value: user} = useUserSession();
+    const {agafar} = useActions(refresh);
+
+    const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
+    const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
+
+    return <Load value={expedient} noEffect>
+        {expedient?.agafatPer?.id != user?.codi &&
+            <Alert severity="info"
+                   action={
+                       <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id)} color={"inherit"}>
+                           <Icon>lock</Icon>
+                           <Typography variant={"subtitle2"}>{t('page.expedient.acciones.agafar')}</Typography>
+                       </IconButton>
+                   }
+            >Es necesario reservar el expediente para poder modificarlo</Alert>
+        }
+        { expedient?.numAlert!=0 && count!=0 &&
+            <Alert severity="error" color="warning"
+                   action={
+                       <Button sx={{py: 0}} color={"inherit"} onClick={() => handelAlert(expedient?.id, expedient)}>
+                           <Typography variant={"subtitle2"}>Consultar</Typography>
+                       </Button>
+                   }
+            >Este expediente tiene alertas pendientes de leer</Alert>
+        }
+        { !expedient?.valid &&
+            <Alert severity="warning"
+                   action={
+                       <Button sx={{py: 0}} color={"inherit"} onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                           <Typography variant={"subtitle2"}>Consultar</Typography>
+                       </Button>
+                   }
+            >Este expediente tiene errores de validación</Alert>
+        }
+        {dialogAlert}
+        {dialogErrorValidacio}
+    </Load>
+}
+
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();
+
+    const refresh = () => {
+        window.location.reload();
+    }
+
+    const {value: user} = useUserSession();
+    const {alliberar} = useActions(refresh);
 
     const {
         isReady: apiIsReady,
@@ -170,13 +229,19 @@ const Expedient = () => {
                     <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
                         {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
 
-                        <IconButton aria-label="lock_open" color={"inherit"}>
-                            <Icon>lock_open</Icon>
-                        </IconButton>
+                        {expedient?.agafatPer?.id == user?.codi &&
+                            <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id)} title={t('page.expedient.acciones.lliberar')}>
+                                <Icon>lock_open</Icon>
+                            </IconButton>
+                        }
                     </Typography>
                 </Grid>
             </Grid>
         }>
+            <Grid item xs={12}>
+                <ExpedientAlert entity={expedient}></ExpedientAlert>
+            </Grid>
+
             <ExpedientInfo entity={expedient} xs={3}/>
 
             <Grid item xs={9}>

@@ -19,7 +19,8 @@ public class ExpedientResourceHelper {
 
     public void setPotTancar(ExpedientResourceEntity entity, ExpedientResource resource){
         this.setExpedientEstatDocuments(entity, resource);
-        resource.setValid(cacheResourceHelper.findErrorsValidacioPerNode(entity).isEmpty());
+        resource.setErrors(cacheResourceHelper.findErrorsValidacioPerNode(entity));
+        resource.setValid(resource.getErrors().isEmpty());
 
         resource.setPotTancar(
                 resource.isValid()

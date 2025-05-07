@@ -14,6 +14,7 @@ import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
+import {useUserSession} from "../../components/Session.tsx";
 
 const DocumentsGridForm = () => {
     const { data } = useFormContext();
@@ -104,6 +105,8 @@ const columns = [
 const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
+    const {value: user} = useUserSession();
+
     const dataGridApiRef = useMuiDataGridApiRef()
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(true);
@@ -181,6 +184,7 @@ const DocumentsGrid = (props:any) => {
                     position: 3,
                     element: <MenuActionButton
                         id={'createDocument'}
+                        hidden={entity?.agafatPer?.id != user?.codi}
                         buttonLabel={"Crear contenido"}
                         buttonProps={{
                             startIcon: <Icon>add</Icon>,
@@ -191,7 +195,7 @@ const DocumentsGrid = (props:any) => {
                             {
                                 title: t('common.create')+"...",
                                 icon: "description",
-                                onClick: () => dataGridApiRef?.current?.showCreateDialog?.()
+                                onClick: () => dataGridApiRef?.current?.showCreateDialog?.(),
                             },
                             {
                                 title: "Consulta PINBAL...",

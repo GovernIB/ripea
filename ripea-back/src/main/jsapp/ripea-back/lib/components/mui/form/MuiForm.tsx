@@ -7,7 +7,7 @@ import { ReactElementWithPosition } from '../../../util/reactNodePosition';
 import { toToolbarIcon } from '../ToolbarIcon';
 import { Toolbar } from '../Toolbar';
 
-type MuiFormProps = FormProps & {
+export type MuiFormProps = FormProps & {
     toolbarElementsWithPositions?: ReactElementWithPosition[];
     hiddenToolbar?: boolean;
     hiddenBackButton?: boolean;

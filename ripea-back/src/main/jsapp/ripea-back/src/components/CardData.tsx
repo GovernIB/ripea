@@ -26,7 +26,7 @@ const CardButton = (props:any) => {
 export const CardData = (props:any) => {
     const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = cardHeader, ...other} = props;
 
-    if (hidden || (hiddenIfEmpty && children == null)){
+    if (hidden || (hiddenIfEmpty && (!children || children?.length === 0 || children?.every?.((item:any) => !item)))){
         return <></>
     }
 
@@ -48,7 +48,7 @@ export const CardData = (props:any) => {
 export const ContenidoData = (props:any) => {
     const {title, titleXs, children, textXs, xs, componentTitleProps, componentTextProps, hidden, hiddenIfEmpty, ...other} = props;
 
-    if (hidden || (hiddenIfEmpty && children == null)){
+    if (hidden || (hiddenIfEmpty && (!children || children?.length === 0 || children?.every?.((item:any) => !item)))){
         return <></>
     }
 

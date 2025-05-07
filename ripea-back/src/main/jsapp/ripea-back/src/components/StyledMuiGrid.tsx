@@ -1,11 +1,10 @@
 import {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
-import {MuiGrid, useMuiDataGridApiRef} from "reactlib";
+import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
-import MassiveActionSelector from "./MassiveActionSelector.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro/hooks/utils/useGridApiRef";
-// import {MuiDataGridProps} from "../../lib/components/mui/datagrid/MuiDataGrid.tsx";
+import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, children, ...other } = props;
@@ -23,13 +22,14 @@ export const ToolbarButton = (props:any) => {
     </Tooltip>
 }
 
-// type StyledMuiGridProps = MuiDataGridProps & {
-//     toolbarCreateTitle?: string,
-//     toolbarMassiveActions?: MassiveActionProps[]
-//     rowProps?: any
-// }
+type StyledMuiGridProps = MuiDataGridProps & {
+    toolbarCreateTitle?: string,
+    toolbarMassiveActions?: MassiveActionProps[],
+    onRowCountChange?: (count:number) => void,
+    rowProps?: any
+}
 
-const StyledMuiGrid = (props:any) => {
+const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const { value: user } = useUserSession();
     const gridApiRef = useMuiDataGridApiRef();
     const dataApiRef = useMuiDatagridApiRef();
@@ -49,6 +49,7 @@ const StyledMuiGrid = (props:any) => {
         selectionActive,
         readOnly,
         onRowsChange,
+        onRowCountChange,
         rowProps,
         ...others
     } = props
@@ -164,7 +165,11 @@ const StyledMuiGrid = (props:any) => {
             datagridApiRef={datagridApiRef}
             columns={columnsWithWordWrap}
             getRowClassName={getRowClassName}
-            onRowsChange={(rows, info) => { setGridRows([...rows]); onRowsChange?.(rows, info) }}
+            onRowsChange={(rows, info) => {
+                setGridRows([...rows]);
+                onRowsChange?.(rows, info);
+                onRowCountChange?.(info?.totalElements);
+            }}
             rowSelectionModel={selectedRows}
             onRowSelectionModelChange={(newSelection) => {
                 // console.log('Selection changed:', newSelection);
