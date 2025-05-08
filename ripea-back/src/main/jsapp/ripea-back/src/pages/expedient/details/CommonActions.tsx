@@ -284,7 +284,7 @@ export const useCommonActions = (refresh?: () => void) => {
 		    icon: "delete",
 		    showInMenu: true,
 		    onClick: eliminar,
-		    hidden: (row:any) => isTancat(row),
+		    hidden: (row:any) => !potModificar(row),
 		},	
     ]
         .map(({ hidden, ...rest }) => ({

@@ -75,6 +75,11 @@ const translationCa = {
                 estat: "Estat",
                 prioritat: "Prioritat",
                 clasificacio: "Classificació",
+
+                dataProgramada: "Data en què es farà efectiu l’enviament de la notificació a Notific@",
+                duracio: "Dies naturals\nLa notificació estarà disponible fins a les 23:59:59 del dia introduït, i caducarà a les 00:00 del dia següent. Només s’aplica a les Notificacions Electròniques. Es pot indicar tant un nombre de dies naturals com una data concreta.",
+                dataCaducitat: "Dies naturals\nLa notificació estarà disponible fins a les 23:59:59 del dia introduït, i caducarà a les 00:00 del dia següent. Només s’aplica a les Notificacions Electròniques. Es pot indicar tant un nombre de dies naturals com una data concreta.",
+                retard: "Dies que la notificació romandrà a la seu abans de ser enviada via DEH o CIE",
             },
             tabs: {
                 contingut: "Contingut",
@@ -165,11 +170,15 @@ const translationCa = {
             title: "Interessat",
             rep: "Representant",
             detall: {
-                nif: "NIF",
+                nif: "NIF/CIF/NIE",
                 nom: "Nom",
-                llinatges: "Cognoms",
+                raoSocial: "Raó social",
+                llinatges: "Llinatges",
                 telefon: "Telèfon",
-                email: "Email",
+                email: "Correu electrònic",
+                incapacitat: "Incapacitat",
+                direccio: "Adreça",
+                direccioPostal: "Adreça postal",
                 entregaDehObligat: "DEH obligat?",
             },
             actions: {
@@ -374,6 +383,7 @@ const translationCa = {
             },
         },
         notificacio: {
+            title: "Notificació",
             tabs: {
                 dades: "Dades",
                 errors: "Errors",
