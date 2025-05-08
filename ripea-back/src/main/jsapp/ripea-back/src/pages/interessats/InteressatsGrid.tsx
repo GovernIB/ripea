@@ -1,13 +1,14 @@
+import React from "react";
+import {Grid} from "@mui/material";
 import {
     GridPage,
     useMuiDataGridApiRef,
 } from 'reactlib';
-import {Grid} from "@mui/material";
-import React from "react";
-import GridFormField from "../../components/GridFormField.tsx";
-import useInteressatActions from "./details/InteressatActions.tsx";
 import {useTranslation} from "react-i18next";
+import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
+import {useUserSession} from "../../components/Session.tsx";
+import useInteressatActions from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 
 export const InteressatsGridForm = () => {
@@ -53,20 +54,23 @@ const columns = [
 ];
 
 interface DetailGridProps {
-    id: any,
+    entity: any,
     onRowCountChange?: (number: number) => void,
 }
 
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
-    const {id, onRowCountChange} = props
+    const {entity, onRowCountChange} = props
     const { t } = useTranslation();
+    const {value: user} = useUserSession();
+
     const apiRef = useMuiDataGridApiRef()
 
     const refresh = ()=> {
         apiRef?.current?.refresh()
     }
 
-    const {actions, components} = useInteressatActions(refresh)
+    const readOnly = entity?.agafatPer?.id != user?.codi
+    const {actions, components} = useInteressatActions(readOnly,refresh)
 
     return <GridPage>
         <StyledMuiGrid
@@ -76,7 +80,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             paginationActive
             apiRef={apiRef}
             filter={builder.and(
-                builder.eq('expedient.id', id),
+                builder.eq('expedient.id', entity?.id),
                 builder.eq('esRepresentant', false)
             )}
             staticSortModel={sortModel}
@@ -84,10 +88,12 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
             formAdditionalData={{
-                expedient: {id: id},
+                expedient: {id: entity?.id},
             }}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
+            toolbarCreateTitle={"Nuevo interesado"}
+            readOnly={readOnly}
             rowHideDeleteButton
 
             toolbarElementsWithPositions={[
@@ -97,7 +103,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 },
                 {
                     position: 0,
-                    element: <ToolbarButton icon={'download'}>Importar...</ToolbarButton>
+                    element: <ToolbarButton icon={'download'} hidden={readOnly}>Importar...</ToolbarButton>
                 },
             ]}
         />

@@ -170,11 +170,15 @@ const translationEn = {
             title: "Interested Party",
             rep: "Representative",
             detall: {
-                nif: "NIF",
+                nif: "NIF/CIF/NIE",
                 nom: "Name",
+                raoSocial: "Company name",
                 llinatges: "Surnames",
                 telefon: "Phone",
                 email: "Email",
+                incapacitat: "Disability",
+                direccio: "Address",
+                direccioPostal: "Postal address",
                 entregaDehObligat: "DEH required?",
             },
             actions: {

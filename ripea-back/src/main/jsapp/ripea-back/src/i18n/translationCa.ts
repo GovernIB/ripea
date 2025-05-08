@@ -170,11 +170,15 @@ const translationCa = {
             title: "Interessat",
             rep: "Representant",
             detall: {
-                nif: "NIF",
+                nif: "NIF/CIF/NIE",
                 nom: "Nom",
-                llinatges: "Cognoms",
+                raoSocial: "Raó social",
+                llinatges: "Llinatges",
                 telefon: "Telèfon",
-                email: "Email",
+                email: "Correu electrònic",
+                incapacitat: "Incapacitat",
+                direccio: "Adreça",
+                direccioPostal: "Adreça postal",
                 entregaDehObligat: "DEH obligat?",
             },
             actions: {

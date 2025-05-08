@@ -139,7 +139,7 @@ const DocumentsGrid = (props:any) => {
             rowHideDeleteButton={hiddenDelete}
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             treeData={treeView}
             treeDataAdditionalRows={(_rows:any) => {
                 const additionalRows :any[] = [];
@@ -215,7 +215,7 @@ const DocumentsGrid = (props:any) => {
             toolbarMassiveActions={massiveActions}
             // isRowSelectable={(data:any)=> typeof data?.id == 'number'}
             isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
-            toolbarHideCreate
+            toolbarHideCreate={entity?.agafatPer?.id != user?.codi}
         />
         {components}
         {massiveComponents}

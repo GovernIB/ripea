@@ -57,7 +57,7 @@ const useTascaActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('common.detall'),
+            title: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,

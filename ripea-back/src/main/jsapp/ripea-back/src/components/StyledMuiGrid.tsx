@@ -7,7 +7,11 @@ import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
 export const ToolbarButton = (props:any) => {
-    const { title, icon, children, ...other } = props;
+    const { title, icon, hidden, children, ...other } = props;
+
+    if (hidden){
+        return <></>
+    }
 
     return <Tooltip title={title}>
         <Button

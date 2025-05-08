@@ -10,6 +10,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 
 const Notificacio = (props:any) => {
     const {entity, entregaPostal} = props;
+    const { t } = useTranslation();
     const representant = entity?.representantInfo
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -18,33 +19,29 @@ const Notificacio = (props:any) => {
             <Alert severity="warning">En caso de titular con incapacidad es obligatorio indicar un destinatario.</Alert>
         }
 
-        <CardData title={"Interesado"}>
-            <ContenidoData title={"NIF/CIF/NIE"}>{entity?.documentNum}</ContenidoData>
-            <ContenidoData title={"Nombre / Razón social"}>{entity?.nomComplet} {entity?.raoSocial}</ContenidoData>
-            <ContenidoData title={"Apellidos"}>{entity?.llinatge1} {entity?.llinatge2}</ContenidoData>
-            <ContenidoData title={"Correo electrónico"}>{entity?.email}</ContenidoData>
-            <ContenidoData title={"Teléfono"}>{entity?.telefon}</ContenidoData>
-            <ContenidoData title={"Incapacidad"}>{entity?.incapacitat}</ContenidoData>
+        <CardData title={t('page.interessat.title')}>
+            <ContenidoData title={t('page.interessat.detall.nif')}>{entity?.documentNum}</ContenidoData>
+            <ContenidoData title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{entity?.nomComplet} {entity?.raoSocial}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.llinatges')}>{entity?.llinatge1} {entity?.llinatge2}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.email')}>{entity?.email}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.telefon')}>{entity?.telefon}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</ContenidoData>
 
-            <CardData title={"Dirección postal"} hidden={representant || !entregaPostal}>
-                <ContenidoData title={"Pais"}>{entity?.pais}</ContenidoData>
-                <ContenidoData title={"Provincia"}>{entity?.provincia}</ContenidoData>
-                <ContenidoData title={"Municipio"}>{entity?.municipi}</ContenidoData>
-                <ContenidoData title={"Código postal"}>{entity?.codiPostal}</ContenidoData>
-                <ContenidoData title={"Dirección"}>{entity?.adresa}</ContenidoData>
+            <CardData title={t('page.interessat.detall.direccioPostal')} hidden={representant || !entregaPostal}>
+                <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.pais} {entity?.provincia} {entity?.municipi} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
             </CardData>
 
-            <CardData title={"Representante"} hidden={!representant}>
-                <ContenidoData title={"NIF/CIF/NIE"}>{representant?.documentNum}</ContenidoData>
-                <ContenidoData title={"Nombre / Razón social"}>{representant?.nom} {representant?.raoSocial}</ContenidoData>
-                <ContenidoData title={"Apellidos"}>{representant?.llinatge1} {representant?.llinatge2}</ContenidoData>
-                <ContenidoData title={"Correo electrónico"}>{representant?.email}</ContenidoData>
-                <ContenidoData title={"Teléfono"}>{representant?.telefon}</ContenidoData>
-                <ContenidoData title={"Incapacidad"}>{representant?.incapacitat}</ContenidoData>
+            <CardData title={t('page.interessat.rep')} hidden={!representant}>
+                <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
+                <ContenidoData title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{representant?.nom} {representant?.raoSocial}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.llinatges')}>{representant?.llinatge1} {representant?.llinatge2}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.email')}>{representant?.email}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.telefon')}>{representant?.telefon}</ContenidoData>
+                <ContenidoData title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</ContenidoData>
             </CardData>
 
-            <CardData title={"Dirección postal"} hidden={!representant || !entregaPostal}>
-                <ContenidoData title={"Dirección"}>{representant?.pais} {representant?.provincia} {representant?.municipi} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
+            <CardData title={t('page.interessat.detall.direccioPostal')} hidden={!representant || !entregaPostal}>
+                <ContenidoData title={t('page.interessat.detall.direccio')}>{representant?.pais} {representant?.provincia} {representant?.municipi} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
             </CardData>
         </CardData>
     </Grid>
