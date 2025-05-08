@@ -75,6 +75,11 @@ const translationEn = {
                 estat: "Status",
                 prioritat: "Priority",
                 clasificacio: "Classification",
+
+                dataProgramada: "Date on which the notification will be effectively sent to Notific@",
+                duracio: "Calendar days\nThe notification will be available until 23:59:59 of the entered day, expiring at 00:00 of the following day. Only applies to Electronic Notifications. You can indicate either a number of calendar days or a specific date.",
+                dataCaducitat: "Calendar days\nThe notification will be available until 23:59:59 of the entered day, expiring at 00:00 of the following day. Only applies to Electronic Notifications. You can indicate either a number of calendar days or a specific date.",
+                retard: "Days the notification will remain at the headquarters before being sent via DEH or CIE",
             },
             tabs: {
                 contingut: "Content",
@@ -374,6 +379,7 @@ const translationEn = {
             },
         },
         notificacio: {
+            title: "Notification",
             tabs: {
                 dades: "Data",
                 errors: "Errors",

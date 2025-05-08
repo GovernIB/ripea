@@ -1,14 +1,20 @@
 package es.caib.ripea.service.resourceservice;
 
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -30,7 +36,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
     @PostConstruct
     public void init() {
-        register("documentNum", new NumDocOnchangeLogicProcessor());
+        register(InteressatResource.Fields.documentNum, new NumDocOnchangeLogicProcessor());
+        register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
     }
 
     @Override
@@ -63,6 +70,16 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
+    // PerspectiveApplicator
+    private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
+        @Override
+        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
+            if (entity.getRepresentant() != null) {
+                resource.setRepresentantInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRepresentant()), InteressatResource.class));
+            }
+        }
+    }
+    // OnChangeLogicProcessor
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 
         public static final String NOT_REPRESENT_HIMSELF = "NOT_REPRESENT_HIMSELF";

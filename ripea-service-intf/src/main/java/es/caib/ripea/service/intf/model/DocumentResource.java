@@ -283,12 +283,17 @@ public class DocumentResource extends NodeResource {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
         private Date dataProgramada;
         @NotNull
+        @ResourceField(onChangeActive = true)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
         private Date dataCaducitat;
         @NotNull
+        @ResourceField(onChangeActive = true)
         private Integer duracio;
         private Integer retard;
         private Boolean entregaPostal;
+
+        @Transient
+        private boolean permetreEnviamentPostal;
     }
 
     @Getter

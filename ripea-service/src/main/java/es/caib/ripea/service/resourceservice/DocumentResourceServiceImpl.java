@@ -517,38 +517,45 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public void onChange(NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
-            switch (fieldName){
-	            case DocumentResource.NotificarFormAction.Fields.duracio:
-	                if (fieldValue != null) {
-	                    Date dataLimit= DateUtils.addDays(new Date(), (Integer) fieldValue);
-	                    if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
-	                        target.setDataCaducitat(dataLimit);
-	                    }
-	                } else {
-	                    if (previous.getDataCaducitat()!=null) {
-	                        target.setDataCaducitat(null);
-	                    }
-	                }
-	                break;
-	
-	            case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
-	                if (fieldValue != null) {
-	                    LocalDate start = LocalDate.now();
-	                    LocalDate end = ((Date)fieldValue).toInstant()
-	                            .atZone(ZoneId.systemDefault())
-	                            .toLocalDate();
-	                    int dias = (int) start.until(end, ChronoUnit.DAYS);
-	
-	                    if (!Objects.equals(previous.getDuracio(), dias)) {
-	                        target.setDuracio(dias);
-	                    }
-	                } else {
-	                    if (previous.getDuracio()!=null) {
-	                        target.setDuracio(null);
-	                    }
-	                }
-	                break;
-	        }			
+            // TODO: isPermetreEnviamentPostal
+//            if (fieldName==null){
+//                target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
+//            }
+
+            if (fieldName!=null) {
+                switch (fieldName) {
+                    case DocumentResource.NotificarFormAction.Fields.duracio:
+                        if (fieldValue != null) {
+                            Date dataLimit = DateUtils.addDays(new Date(), (Integer) fieldValue);
+                            if (previous.getDataCaducitat() == null || !DateUtils.isSameDay(previous.getDataCaducitat(), dataLimit)) {
+                                target.setDataCaducitat(dataLimit);
+                            }
+                        } else {
+                            if (previous.getDataCaducitat() != null) {
+                                target.setDataCaducitat(null);
+                            }
+                        }
+                        break;
+
+                    case DocumentResource.NotificarFormAction.Fields.dataCaducitat:
+                        if (fieldValue != null) {
+                            LocalDate start = LocalDate.now();
+                            LocalDate end = ((Date) fieldValue).toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate();
+                            int dias = (int) start.until(end, ChronoUnit.DAYS);
+
+                            if (!Objects.equals(previous.getDuracio(), dias)) {
+                                target.setDuracio(dias);
+                            }
+                        } else {
+                            if (previous.getDuracio() != null) {
+                                target.setDuracio(null);
+                            }
+                        }
+                        break;
+                }
+            }
 		}
 
 		@Override

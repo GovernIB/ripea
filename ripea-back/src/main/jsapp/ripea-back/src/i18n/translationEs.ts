@@ -75,6 +75,11 @@ const translationEs = {
                 estat: "Estado",
                 prioritat: "Prioridad",
                 clasificacio: "Clasificación",
+
+                dataProgramada: "Fecha en que se hará efectivo el envio de la notificación a Notific@",
+                duracio: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
+                dataCaducitat: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
+                retard: "Dias que la notificación permanecerá en la sede antes de ser enviada via DEH o CIE",
             },
             tabs: {
                 contingut: "Contenido",
@@ -375,6 +380,7 @@ const translationEs = {
             },
         },
         notificacio: {
+            title: "Notificación",
             tabs: {
                 dades: "Datos",
                 errors: "Errores",

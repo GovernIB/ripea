@@ -87,7 +87,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 expedient: {id: id},
             }}
             rowAdditionalActions={actions}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             rowHideDeleteButton
 
             toolbarElementsWithPositions={[
