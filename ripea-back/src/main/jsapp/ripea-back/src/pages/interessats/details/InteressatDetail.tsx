@@ -7,6 +7,7 @@ import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 const InteressatDetail = (props: any) => {
     const {entity} = props;
     const {t} = useTranslation();
+    const representant = entity?.representantInfo
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <CardData title={t('page.interessat.title')}>
@@ -17,7 +18,15 @@ const InteressatDetail = (props: any) => {
             <ContenidoData title={t('page.interessat.detall.telefon')}>{entity?.telefon}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.incapacitat')}>{entity?.incapacitat}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.pais} {entity?.provincia} {entity?.municipi} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
-            <ContenidoData title={t('page.interessat.rep')} hiddenIfEmpty>{entity?.representant?.description}</ContenidoData>
+        </CardData>
+        <CardData title={t('page.interessat.rep')} hidden={!representant}>
+            <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
+            <ContenidoData title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{representant?.nom} {representant?.raoSocial}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.llinatges')}>{representant?.llinatge1} {representant?.llinatge2}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.email')}>{representant?.email}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.telefon')}>{representant?.telefon}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.incapacitat')}>{representant?.incapacitat}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.direccio')}>{representant?.pais} {representant?.provincia} {representant?.municipi} {representant?.codiPostal} {representant?.adresa}</ContenidoData>
         </CardData>
     </Grid>
 }

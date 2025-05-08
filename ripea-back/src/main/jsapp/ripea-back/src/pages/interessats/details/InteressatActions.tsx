@@ -144,7 +144,7 @@ const useInteressatActions = (readOnly:boolean,refresh?: () => void) => {
             icon: "info",
             showInMenu: true,
             onClick: handleDetail,
-            // hidden: !readOnly,
+            hidden: !readOnly,
         },
         {
             title: t('page.interessat.actions.delete'),
