@@ -36,10 +36,11 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         undefined,
         dialogButtons,
         formSubmit,
+        t('datacommon.error'),
         children,
         formComponentProps);
     const show = (id?: any, additionalData?: any) => formDialogShow(id, {
-        title: titleProp ?? ((id != null ? t('form.dialog.update') : t('form.dialog.create')) + ' ' + (resourceTitle ?? resourceName)),
+        title: titleProp ?? ((id != null ? t('datacommon.update.title') : t('datacommon.create.title')) + ' ' + (resourceTitle ?? resourceName)),
         additionalData,
         dialogComponentProps: dialogComponentProps ?? { fullWidth: true, maxWidth: 'md' }
     });

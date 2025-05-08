@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResourceType } from '../ResourceApiContext';
+import { ResourceApiError } from '../ResourceApiProvider';
 
 export type FormApi = {
     getId: () => any;
@@ -11,6 +12,7 @@ export type FormApi = {
     save: () => Promise<any>;
     delete: () => void;
     setFieldValue: (name: string, value: any) => void;
+    handleSubmissionErrors: (error: ResourceApiError, temporalMessageTitle?: string) => void;
 };
 
 export type FormApiRef = React.MutableRefObject<FormApi | undefined>;

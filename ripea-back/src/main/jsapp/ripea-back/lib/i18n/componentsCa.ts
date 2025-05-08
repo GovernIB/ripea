@@ -27,7 +27,7 @@ const componentsCa = {
         delete: {
             title: 'Esborrar',
             single: {
-                title: 'Esborrar',
+                title: 'Confirmació',
                 confirm: 'Estau segur que voleu esborrar aquest element (aquesta acció no es pot desfer)?',
                 success: 'Element esborrat',
                 error: 'Error esborrant element',
@@ -44,6 +44,7 @@ const componentsCa = {
         },
         findDisabled: 'Sense consultar',
         noRows: 'Sense dades',
+        error: 'Error',
     },
     grid: {
         selection: {
@@ -101,6 +102,21 @@ const componentsCa = {
         validate: {
             error: 'Error de validació',
         },
+        submission: {
+            defaulterror: 'Error'
+        },
+    },
+    actionreport: {
+        action: {
+            confirm: {
+                title: 'Confirmació',
+                message: 'Estau segur que voleu executar l\'acció {{action}}?'
+            },
+            error: 'Error executant l\'acció'
+        },
+        report: {
+            error: 'Error generant l\'informe'
+        }
     },
     buttons: {
         answerRequired: {

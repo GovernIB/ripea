@@ -143,6 +143,7 @@ export const useActionReportLogic = (
         action ? action : (report ? report : undefined),
         action ? actionDialogButtons : (report ? reportDialogButtons : undefined),
         action ? execAction : generateReport,
+        action ? t('actionreport.action.error') : t('actionreport.report.error'),
         formDialogContent,
         { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
     const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
@@ -158,8 +159,8 @@ export const useActionReportLogic = (
             if (confirm) {
                 const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
                 messageDialogShow(
-                    t('actionReport.confirm.title'),
-                    t('actionReport.confirm.message', { action: apiLink?.title ?? action }),
+                    t('actionreport.action.confirm.title'),
+                    t('actionreport.action.confirm.message', { action: apiLink?.title ?? action }),
                     confirmDialogButtons,
                     confirmDialogComponentProps).
                     then((value: any) => {

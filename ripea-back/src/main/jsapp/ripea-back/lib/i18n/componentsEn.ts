@@ -27,7 +27,7 @@ const componentsEn = {
         delete: {
             title: 'Delete',
             single: {
-                title: 'Delete',
+                title: 'Confirmation',
                 confirm: 'Are you sure you want to delete this item (this action can\'t be undone)?',
                 success: 'Deleted items',
                 error: 'Error deleting items',
@@ -44,6 +44,14 @@ const componentsEn = {
         },
         findDisabled: 'Without searching',
         noRows: 'No data',
+        error: 'Error',
+    },
+    grid: {
+        selection: {
+            one: '1 selected row ',
+            multiple: '{{count}} selected rows',
+        },
+        pageInfo: '{{from}} to {{to}} of {{count}}',
     },
     form: {
         goBack: {
@@ -94,13 +102,21 @@ const componentsEn = {
         validate: {
             error: 'Validation error',
         },
-    },
-    grid: {
-        selection: {
-            one: '1 selected row ',
-            multiple: '{{count}} selected rows',
+        submission: {
+            defaulterror: 'Error'
         },
-        pageInfo: '{{from}} to {{to}} of {{count}}',
+    },
+    actionreport: {
+        action: {
+            confirm: {
+                title: 'Confirmation',
+                message: 'Are you sure you want to execute the action {{action}}?'
+            },
+            error: 'Error executing action'
+        },
+        report: {
+            error: 'Error generating report'
+        }
     },
     buttons: {
         answerRequired: {

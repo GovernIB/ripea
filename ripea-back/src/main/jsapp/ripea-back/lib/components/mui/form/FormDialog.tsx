@@ -35,6 +35,7 @@ export type UseFormDialogFn = (
     resourceTypeCode?: string,
     dialogButtons?: DialogButton[],
     customSubmit?: FormDialogSubmitFn,
+    customSubmitErrorMessage?: string,
     defaultFormContent?: React.ReactNode,
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any) => [FormDialogShowFn, React.ReactElement];
@@ -45,6 +46,7 @@ export const useFormDialog: UseFormDialogFn = (
     resourceTypeCode?: string,
     dialogButtons?: DialogButton[],
     customSubmit?: FormDialogSubmitFn,
+    customSubmitErrorMessage?: string,
     defaultFormContent?: React.ReactNode,
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any) => {
@@ -96,8 +98,11 @@ export const useFormDialog: UseFormDialogFn = (
                     setOpen(false);
                     resolveFn?.(value);
                 }
-            }).catch(() => {
+            }).catch((error: any) => {
                 // S'ha fet click al botó desar i s'han produit errors
+                if (isCustomSubmit) {
+                    formApiRef.current.handleSubmissionErrors(error, customSubmitErrorMessage);
+                }
             });
         } else {
             // S'ha fet clic al botó de cancel·lar

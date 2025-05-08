@@ -1,10 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.dto.ErrorsValidacioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDadaDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -16,6 +15,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class ValidacioErrorResource implements Serializable {
 
 	private ErrorsValidacioTipusEnumDto tipusValidacio;

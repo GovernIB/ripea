@@ -63,27 +63,6 @@ const formDataReducer = (state: any, action: FormFieldDataAction): any => {
     }
 }
 
-const processValidationErrors = (
-    error: ResourceApiError,
-    setFieldErrors: (fieldErrors?: FormFieldError[]) => void): ResourceApiError | undefined => {
-    // Es processen únicament els errors de validació (HTTP status 422)
-    if (error.status === 422) {
-        const errors = error.body.errors ?? error.body.validationErrors;
-        // TODO mostrar globalErrors
-        //const globalErrors = errors?.find((e: any) => e.field == null);
-        const fieldErrors = errors?.
-            filter((e: any) => e.field != null).
-            map((e: any) => ({
-                code: e.code,
-                field: e.field,
-                message: e.message,
-            }));
-        setFieldErrors(fieldErrors);
-    } else {
-        return error;
-    }
-}
-
 const getInitialDataFromFields = (fields: any[] | undefined) => {
     const initialDataFromFields: any = {};
     fields?.forEach(f => f.value && (initialDataFromFields[f.name] = f.value));
@@ -219,9 +198,9 @@ export const Form: React.FC<FormProps> = (props) => {
         const mergedData = { ...initialData, ...additionalData };
         return initOnChangeRequest ? await sendOnChangeRequest(id, { previous: mergedData }) : mergedData;
     }, [apiGetOne, sendOnChangeRequest]);
-    const processSubmitError = (
+    const handleSubmissionErrors = (
         error: ResourceApiError,
-        temporalMessageTitle: string,
+        temporalMessageTitle?: string,
         reject?: (reason: any) => void) => {
         // S'ignoren els errors de tipus cancel·lació
         if (!error.body?.modificationCanceledError) {
@@ -229,10 +208,24 @@ export const Form: React.FC<FormProps> = (props) => {
             // Si els errors els tracta el mateix component Form aleshores la
             // cridada a reject es fa amb un valor buit.
             // Si l'error s'ha de mostrar a l'usuari es fa un reject amb l'error.
-            const errorToShow = processValidationErrors(error, setFieldErrors);
-            if (errorToShow != null) {
-                temporalMessageShow(temporalMessageTitle, error.message, 'error');
-                reject?.(errorToShow);
+            if (error.status === 422) {
+                const errors = error.body.errors ?? error.body.validationErrors;
+                // TODO mostrar globalErrors
+                //const globalErrors = errors?.find((e: any) => e.field == null);
+                const fieldErrors = errors?.
+                    filter((e: any) => e.field != null).
+                    map((e: any) => ({
+                        code: e.code,
+                        field: e.field,
+                        message: e.message,
+                    }));
+                setFieldErrors(fieldErrors);
+            } else {
+                temporalMessageShow(
+                    temporalMessageTitle ?? '',
+                    error.message,
+                    t('form.submission.defaulterror'));
+                reject?.(error);
             }
         }
     }
@@ -301,7 +294,7 @@ export const Form: React.FC<FormProps> = (props) => {
                 apiArtifactFormValidate({ type: resourceType, code: resourceTypeCode, data }).
                     then(resolve).
                     catch((error: ResourceApiError) => {
-                        processSubmitError(error, t('form.validate.error'), reject)
+                        handleSubmissionErrors(error, t('form.validate.error'), reject)
                     });
             } else {
                 reject('Couldn\'t send artifact validate request: empty resource type code');
@@ -349,7 +342,7 @@ export const Form: React.FC<FormProps> = (props) => {
                 }).
                 catch((error: ResourceApiError) => {
                     const title = calcId != null ? t('form.update.error') : t('form.create.error');
-                    processSubmitError(error, title, reject)
+                    handleSubmissionErrors(error, title, reject)
                 });
         } else {
             reject(t('form.update.wrong_resource_type', { resourceType }));
@@ -427,11 +420,12 @@ export const Form: React.FC<FormProps> = (props) => {
         save,
         delete: delette,
         setFieldValue,
+        handleSubmissionErrors,
     };
     if (apiRefProp) {
         if (apiRefProp.current) {
-            apiRefProp.current.getId = getId,
-                apiRefProp.current.getData = getData;
+            apiRefProp.current.getId = getId;
+            apiRefProp.current.getData = getData;
             apiRefProp.current.refresh = refresh;
             apiRefProp.current.reset = externalReset;
             apiRefProp.current.revert = revert;
@@ -439,6 +433,7 @@ export const Form: React.FC<FormProps> = (props) => {
             apiRefProp.current.save = save;
             apiRefProp.current.delete = delette;
             apiRefProp.current.setFieldValue = setFieldValue;
+            apiRefProp.current.handleSubmissionErrors = handleSubmissionErrors;
         } else {
             logConsole.warn('apiRef prop must be initialized with an empty object');
         }

@@ -16,34 +16,42 @@ const componentsEs = {
     },
     datacommon: {
         details: {
-            title: 'Details',
+            title: 'Detalles',
         },
         create: {
-            title: 'Create',
+            title: 'Crear',
         },
         update: {
-            title: 'Update',
+            title: 'Modificar',
         },
         delete: {
-            title: 'Delete',
+            title: 'Borrar',
             single: {
-                title: 'Delete',
-                confirm: 'Are you sure you want to delete this item (this action can\'t be undone)?',
-                success: 'Deleted items',
-                error: 'Error deleting items',
+                title: 'Confirmación',
+                confirm: '¿Está seguro de que desea borrar este elemento (esta acción no se puede deshacer)?',
+                success: 'Elemento borrado',
+                error: 'Error borrando elemento',
             },
         },
         export: {
-            title: 'Export',
+            title: 'Exportar',
         },
         refresh: {
-            title: 'Refresh',
+            title: 'Refrescar',
         },
         toolbar: {
-            error: 'An error has occurred',
+            error: 'Se ha producido un error',
         },
         findDisabled: 'Sin consultar',
-        noRows: 'No data',
+        noRows: 'Sin datos',
+        error: 'Error',
+    },
+    grid: {
+        selection: {
+            one: '1 selected row ',
+            multiple: '{{count}} selected rows',
+        },
+        pageInfo: '{{from}} a {{to}} de {{count}}',
     },
     form: {
         goBack: {
@@ -51,7 +59,7 @@ const componentsEs = {
         },
         revert: {
             title: 'Deshacer cambios',
-            confirm: '¿Está seguro de que quiere deshacer los cambios hechos al formulario?',
+            confirm: '¿Está seguro de que desea deshacer los cambios hechos al formulario?',
         },
         create: {
             title: 'Crear',
@@ -66,7 +74,7 @@ const componentsEs = {
         },
         delete: {
             title: 'Borrar',
-            confirm: '¿Está seguro de que quiere borrar este elemento (esta acción no se puede deshacer)?',
+            confirm: '¿Está seguro de que desea borrar este elemento (esta acción no se puede deshacer)?',
             success: 'Elemento borrado',
             error: 'Error borrando elemento',
         },
@@ -94,13 +102,21 @@ const componentsEs = {
         validate: {
             error: 'Error de validación',
         },
-    },
-    grid: {
-        selection: {
-            one: '1 selected row ',
-            multiple: '{{count}} selected rows',
+        submission: {
+            defaulterror: 'Error'
         },
-        pageInfo: '{{from}} a {{to}} de {{count}}',
+    },
+    actionreport: {
+        action: {
+            confirm: {
+                title: 'Confirmación',
+                message: '¿Está seguro de que desea ejecutar la acción {{action}}?'
+            },
+            error: 'Error ejecutando la acción'
+        },
+        report: {
+            error: 'Error generando el informe'
+        }
     },
     buttons: {
         answerRequired: {
