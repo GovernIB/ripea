@@ -104,7 +104,12 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 
     @Transient
 	public String getCodiNom() {
-        return documentNum +" - "+ getNomComplet();
+        switch (this.tipus) {
+            case InteressatPersonaFisicaEntity:
+                return documentNum + " - " + getNomComplet();
+            default:
+                return getNomComplet();
+        }
     }
     @Transient
 	public String getNomComplet() {
