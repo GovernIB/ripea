@@ -6,18 +6,50 @@ import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import * as builder from "../../util/springFilterUtils.ts";
 
+const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
+const EstatMessage = (props:any) => {
+    const {icon, color, children} = props;
+
+    return <Typography variant="caption" sx={{ ...commonStyle, backgroundColor: color }}>
+        <Icon fontSize={"inherit"}>{icon}</Icon>
+        {children}
+    </Typography>
+}
 const StyledEstat = (props:any) => {
     const { entity } = props;
 
-    const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
-    const style = entity?.error
-        ? { backgroundColor: '#d99b9d' }
-        : { backgroundColor: '#c3e8d1' }
+    const error = '#ef5350';
+    const success = '#4caf50';
+    const warning = '#ff9800';
+    const info = '#03a9f4';
 
-    return <Typography variant="caption" sx={{ ...commonStyle, ...style }}>
-        <Icon fontSize={"inherit"}>{entity?.error ?'close' :'check'}</Icon>
-        {entity?.notificacioEstat}
-    </Typography>
+    switch (entity?.notificacioEstat) {
+        case 'PENDENT':
+            return <>
+                <EstatMessage icon={"schedule"} color={warning}>{entity?.notificacioEstat}</EstatMessage>
+                { entity?.error &&
+                    <EstatMessage icon={"warning"} color={error}>Error procesando la notificación dentro Notib</EstatMessage>
+                }
+            </>
+        case 'REGISTRADA':
+        case 'FINALITZADA':
+        case 'PROCESSADA':
+        case 'ENVIADA_AMB_ERRORS':
+            if (entity?.error) {
+                return <EstatMessage icon={"warning"} color={error}>{entity?.notificacioEstat}</EstatMessage>
+            } else {
+                return <EstatMessage icon={"check"} color={success}>{entity?.notificacioEstat}</EstatMessage>
+            }
+        case 'ENVIADA':
+        case 'FINALITZADA_AMB_ERRORS':
+            if (entity?.error) {
+                return <EstatMessage icon={"warning"} color={error}>{entity?.notificacioEstat}</EstatMessage>
+            } else {
+                return <EstatMessage icon={"mail"} color={info}>{entity?.notificacioEstat}</EstatMessage>
+            }
+    }
+
+    return <></>
 }
 
 const RemesaGridForm = () => {

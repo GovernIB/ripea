@@ -31,6 +31,7 @@ export const InteressatsGridForm = () => {
     </Grid>
 }
 
+const perspectives = ['REPRESENTANT']
 const sortModel = [{field: 'id', sort: 'asc'}]
 
 const columns = [
@@ -84,6 +85,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                 builder.eq('esRepresentant', false)
             )}
             staticSortModel={sortModel}
+            perspectives={perspectives}
             disableColumnSorting
             popupEditCreateActive
             popupEditFormContent={<InteressatsGridForm/>}
