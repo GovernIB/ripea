@@ -643,7 +643,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
-
+        	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte 
+        	if (fieldName==null) {
+        	} else { //És un camp concret el que s'ha canviat
+        	}
         }
     }
 }

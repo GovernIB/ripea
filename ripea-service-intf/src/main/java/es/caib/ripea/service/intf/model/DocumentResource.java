@@ -201,7 +201,9 @@ public class DocumentResource extends NodeResource {
     private List<DocumentVersioDto> versions;
     @Transient
     private int NumMetaDades;
-
+    @Transient
+    private boolean documentDeAnotacio;
+    
     @Getter
     @Setter
     public static class ParentPath {
@@ -298,25 +300,30 @@ public class DocumentResource extends NodeResource {
         private String motiu;
         @NotNull
         private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
-
+    	private Date dataInici;
+    	private boolean enviarCorreu;
+        private List<ResourceReference<DocumentResource, Long>> annexos;
+        
+        //Firma parcial
         private boolean firmaParcial;
         private boolean avisFirmaParcial;
-
         @Transient
         private boolean mostrarFirmaParcial;
         @Transient
         private boolean mostrarAvisFirmaParcial;
-        @Transient
-        private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
-        @Transient
-        private ResourceReference<MetaDocumentResource, Long> metaDocument;
 
         // SIMPLE
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
         private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 
-        // PORTAFIB
-//        private List<ResourceReference<>> annexos;
-//        private ResourceReference<> fluxFirma;
+        //FLUX
+        @Transient
+    	private String portafirmesEnviarFluxId;
+        @Transient
+    	private String portafirmesFluxNom;
+        @Transient
+    	private String portafirmesFluxDescripcio;
+        @Transient
+    	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
     }
 }

@@ -6,9 +6,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -36,9 +34,13 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaRes
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.base.service.BaseMutableResourceService.ActionExecutor;
+import es.caib.ripea.service.base.service.BaseReadonlyResourceService.FilterProcessor;
+import es.caib.ripea.service.base.service.BaseReadonlyResourceService.OnChangeLogicProcessor;
+import es.caib.ripea.service.base.service.BaseReadonlyResourceService.PerspectiveApplicator;
+import es.caib.ripea.service.base.service.BaseReadonlyResourceService.ReportGenerator;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -48,9 +50,9 @@ import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -64,16 +66,18 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
-import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
-import es.caib.ripea.service.intf.model.ExpedientResource.MassiveAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
+import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
+import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
+import es.caib.ripea.service.intf.model.ExpedientResource.MassiveAction;
+import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -95,7 +99,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
     private final OrganGestorRepository organGestorRepository;
-    private final EntitatRepository entitatRepository; //Nomes per recuperar entitat sense comprovar permisos
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
@@ -134,12 +137,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE, new UnFollowActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
         
+        register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
+        
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_ESTAT_CODE, new EstatPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_RELACIONAT_CODE, new RelacionatPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_ARXIU_EXPEDIENT, new ArxiuExpedientPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_NOTIFICACIONS_CADUCADES, new NotificacionsCaducadesPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_DOCUMENTS_NO_MOGUTS, new DocumentsNoMogutsPerspectiveApplicator());
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
@@ -339,6 +346,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumAlert(entity.getAlertes().size());
         }
     }
+    
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -348,6 +356,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setInteressats(interessats);
         }
     }
+    
     private class EstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -356,6 +365,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
+    
     private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -378,6 +388,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setRelacionatsPer(relacionatsPer);
         }
     }
+    
     private class ArxiuExpedientPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -388,6 +399,21 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setArxiu(arxiu);
         }
     }
+    
+    private class NotificacionsCaducadesPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            resource.setConteNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(entity.getId()));
+        }
+    }
+    
+    private class DocumentsNoMogutsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            resource.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(expedientHelper.expedientTeDocumentsDeAnotacionesNoMogutsASerieFinal(entity.getId()));
+        }
+    }
+    
     private class FollowersPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -532,6 +558,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
+    
     private class DeleteActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 
         @Override
@@ -561,6 +588,29 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
 
+    private class TancarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.TancarExpedientFormAction, Serializable> {
+
+		@Override
+		public void onChange(TancarExpedientFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, TancarExpedientFormAction target) {
+		}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, TancarExpedientFormAction params) throws ActionExecutionException {
+			expedientHelper.tancar(entity.getEntitat().getId(), entity.getId(), params.getMotiu(), getIdsDocumentsFirmar(params.getDocumentsPerFirmar()), false);
+			return null;
+		}
+    }
+    
+    private Long[] getIdsDocumentsFirmar(List<ResourceReference<DocumentResource, Long>> documentsPerFirmar) {
+    	List<Long> resultat = new ArrayList<Long>();
+    	if (documentsPerFirmar!=null) {
+    		for (ResourceReference<DocumentResource, Long> doc: documentsPerFirmar) {
+    			resultat.add(doc.getId());
+    		}
+    	}
+    	return resultat.toArray(new Long[0]);
+    }
+    
     // ReportGenerator
     private class ExportOdsGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
 

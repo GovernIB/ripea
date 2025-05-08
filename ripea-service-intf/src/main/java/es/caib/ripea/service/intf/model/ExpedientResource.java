@@ -1,5 +1,18 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -14,17 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -84,6 +86,10 @@ import java.util.List;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_DELETE_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_TANCAR_CODE,
+                        formClass = ExpedientResource.TancarExpedientFormAction.class),                
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,
@@ -136,7 +142,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_AGAFAR_CODE = "AGAFAR";
 	public static final String ACTION_MASSIVE_ALLIBERAR_CODE = "ALLIBERAR";
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
-	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";	
+	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
+	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
@@ -144,6 +151,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
 	public static final String PERSPECTIVE_RELACIONAT_CODE = "RELACIONAT";
+	public static final String PERSPECTIVE_NOTIFICACIONS_CADUCADES = "NOTIFICACIONS_CADUCADES";
+	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
 	
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
@@ -274,6 +283,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean conteDocumentsDePortafirmesNoCustodiats;
     @Transient private boolean conteDocumentsDeAnotacionesNoMogutsASerieFinal;
     @Transient private boolean conteDocumentsPendentsReintentsArxiu;
+    @Transient private boolean conteNotificacionsCaducades;
     @Transient private boolean potTancar;
     @Transient private boolean usuariActualWrite;
 
@@ -322,5 +332,13 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotEmpty
         private List<Long> ids;
         private boolean masivo = false;
+    }
+    
+    @Getter
+    @Setter
+    public static class TancarExpedientFormAction implements Serializable {
+        @NotNull
+        private String motiu;
+        private List<ResourceReference<DocumentResource, Long>> documentsPerFirmar;
     }
 }

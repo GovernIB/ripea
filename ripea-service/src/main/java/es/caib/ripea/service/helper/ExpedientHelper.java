@@ -22,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -57,6 +58,7 @@ import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
@@ -79,6 +81,7 @@ import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
@@ -167,11 +170,37 @@ public class ExpedientHelper {
 	@Autowired private ExpedientHelper2 expedientHelper2;
 	@Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private CsvHelper csvHelper;
 	@Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
+	public boolean expedientTeDocumentsDeAnotacionesNoMogutsASerieFinal(Long expedientId) {
+		return expedientTeDocumentsDeAnotacionesNoMogutsASerieFinal(expedientRepository.findById(expedientId).get());
+	}
+	
+	public boolean expedientTeDocumentsDeAnotacionesNoMogutsASerieFinal(ExpedientEntity expedient) {
+		return CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient));
+	}
+	
+	public boolean expedientTeNotificacionsCaducades(Long expedientId) {
+		return expedientTeNotificacionsCaducades(expedientRepository.findById(expedientId).get());
+	}
+	
+	public boolean expedientTeNotificacionsCaducades(ExpedientEntity expedient) {
+        List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+        for (DocumentEntity document : documents) {
+	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
+	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
+	        	if (notificacionsPendents.get(0).isCaducada() && !notificacionsPendents.get(0).isNotificacioFinalitzada()) {
+	            	return true;
+	            }
+	        }
+        }
+        return false;
+	}
+	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long create(
 			Long entitatId,
