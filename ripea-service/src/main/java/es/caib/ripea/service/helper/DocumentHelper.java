@@ -12,7 +12,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -1711,6 +1713,28 @@ public class DocumentHelper {
 				zos);
 	}
 	
+	public FitxerDto getZipFromDocumentsIds(Long entitatId, List<Long> docsIdx) throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		FitxerDto resultat = new FitxerDto();
+		if (docsIdx != null) {
+			for (Long docId: docsIdx) {
+				FitxerDto fitxer = getFitxerAssociat(docId, null);
+				ZipEntry entry = new ZipEntry(revisarContingutNom(fitxer.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));
+				entry.setSize(fitxer.getContingut().length);
+				zos.putNextEntry(entry);
+				zos.write(fitxer.getContingut());
+				zos.closeEntry();
+			}
+			zos.close();
+
+			resultat.setContingut(baos.toByteArray());
+			resultat.setNom("Fitxers_"+System.currentTimeMillis()+".zip");
+			resultat.setContentType("application/zip");
+		}
+		return resultat;
+	}
+	
 	private static String revisarContingutNom(String nom) {
 		if (nom == null) {
 			return null;
@@ -1745,5 +1769,4 @@ public class DocumentHelper {
     }
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
-
 }

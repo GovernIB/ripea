@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,9 +19,12 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,7 +41,7 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,
-						formClass = ExpedientResource.ExportarDocumentMassiu.class),		
+						formClass = ExpedientResource.ExportarDocumentMassiu.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
@@ -121,7 +123,11 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE,
-						formClass = ExpedientResource.MassiveAction.class),				
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_DESCARREGAR_MASSIU,
+						formClass = DocumentResource.MassiveAction.class),				
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 
@@ -143,6 +149,10 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_ALLIBERAR_CODE = "ALLIBERAR";
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
+	
+	//Accions massives desde la pipella de contingut
+	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
+	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
@@ -153,6 +163,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_RELACIONAT_CODE = "RELACIONAT";
 	public static final String PERSPECTIVE_NOTIFICACIONS_CADUCADES = "NOTIFICACIONS_CADUCADES";
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
+	public static final String PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR = "DOCUMENTS_OBLIGATORIS_TANCAR";
 	
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
@@ -276,6 +287,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
+    @Transient private List<ResourceReference<DocumentResource, Long>>  documentObligatorisAlTancar = new ArrayList<>();
 
     @Transient private boolean conteDocuments;
     @Transient private boolean conteDocumentsFirmats;
@@ -303,12 +315,10 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private LocalDateTime dataCreacioInici = LocalDateTime.now().withMonth(LocalDateTime.now().getMonth().getValue()-3);
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
-
         private String numeroRegistre;
         private ResourceReference<GrupResource, Long> grup;
         @ResourceField(onChangeActive = true)
         private ResourceReference<UsuariResource, String> agafatPer;
-
         @ResourceField(onChangeActive = true)
         private Boolean agafat;
         private Boolean pendentFirmar;
@@ -323,15 +333,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
 		private boolean carpetes = true;
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
-    }
-
-    @Getter
-    @Setter
-    public static class MassiveAction implements Serializable {
-        @NotNull
-        @NotEmpty
-        private List<Long> ids;
-        private boolean masivo = false;
     }
     
     @Getter

@@ -1,6 +1,5 @@
 package es.caib.ripea.service.resourceservice;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -27,11 +26,13 @@ import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaNodeResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaNodeResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -44,6 +45,7 @@ import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
@@ -60,9 +62,10 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
+import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
@@ -89,6 +92,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ExpedientResourceRepository expedientResourceRepository;
     private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
+    private final MetaNodeResourceRepository metaNodeResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
 
@@ -111,6 +115,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_PUBLICAR_CODE, new PublicarActionExecutor());
         register(DocumentResource.ACTION_NOTIFICAR_CODE, new NotificarActionExecutor());
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
+        register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
+        register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
+        
     }
 
     @Override
@@ -132,8 +139,39 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         beforeSave(entity, resource, answers);
     }
 
+    /**
+     * Accions comunes executades abans de Crear o Modificar
+     */
     private void beforeSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
-        entity.setPare(entity.getExpedient());
+        
+//		pare = contingutHelper.comprovarContingutDinsExpedientModificable(
+//				entitatId,
+//				pareId,
+//				false,
+//				false,
+//				false,
+//				false, 
+//				false, 
+//				true, 
+//				rolActual);
+    	
+//    	checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)
+    	
+//    	entityComprovarHelper.comprovarMetaDocument(
+//				pare.getEntitat(),
+//				expedient.getMetaExpedient(),
+//				document.getMetaDocument().getId(),
+//				true,
+//				comprovarMetaExpedient);
+    	
+//		DocumentDto documentDto = documentHelper.crearDocument(
+//				document,
+//				pare,
+//				expedient,
+//				metaDocument,
+//				true);
+    	
+    	entity.setPare(entity.getExpedient());
 
         Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
         optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> {
@@ -167,8 +205,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         ));
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
-
-    // PerspectiveApplicator
+    
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -438,7 +475,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
     }
 
-    // ActionExecutor
     private class EnviarViaEmailActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarViaEmailFormAction, DocumentResource> {
 
         @Override
@@ -461,6 +497,67 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         }
     }
+    
+    private class CanviTipusDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.UpdateTipusDocumentFormAction, DocumentResource> {
+
+		@Override
+		public void onChange(UpdateTipusDocumentFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UpdateTipusDocumentFormAction target) {}
+
+		@Override
+		public DocumentResource exec(String code, DocumentResourceEntity entity, UpdateTipusDocumentFormAction params) throws ActionExecutionException {
+    		try {	    		
+	    		
+    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    			
+                if (params!=null) {
+                	for (Long id: params.getIds()) {
+                		DocumentEntity  document = documentHelper.comprovarDocument(entitatEntity.getId(), id, false, true, false, false, false, configHelper.getRolActual());
+            			documentHelper.updateTipusDocumentDocument(
+            					entitatEntity.getId(),
+            					document,
+            					params.getMetaDocument().getId(),
+            					false);
+                	}
+                }
+    			return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/CanviTipusDocumentsActionExecutor", e);
+				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al canviar el tipus dels documents seleccionats.");
+			}
+		}
+    }
+    
+    private class NotificarDocumentsZipActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarDocumentsZipFormAction, DocumentResource> {
+
+		@Override
+		public void onChange(NotificarDocumentsZipFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsZipFormAction target) {}
+
+		@Override
+		public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarDocumentsZipFormAction params) throws ActionExecutionException {
+    		try {	    		
+	    		
+	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+        		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
+        		//Guardam el fitxer a l'expedient
+        		DocumentResourceEntity newZipFile = new DocumentResourceEntity();
+        		MetaNodeResourceEntity metaNodeResourceEntity = metaNodeResourceRepository.findById(params.getMetaDocument().getId()).get();
+        		newZipFile.setMetaNode(metaNodeResourceEntity);
+        		newZipFile.setNtiOrigen(params.getNtiOrigen());
+        		newZipFile.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
+        		newZipFile.setFitxerNom(newZipFile.getNom());
+        		newZipFile.setFitxerContentType(newZipFile.getFitxerContentType());
+        		newZipFile.setFitxerContingut(newZipFile.getFitxerContingut());
+//        		newZipFile.setFitxerTamany((Long)newZipFile.getFitxerContingut().length);
+        		newZipFile = documentResourceRepository.saveAndFlush(newZipFile);
+        		//TODO: Fer les accions posteriors a guardar a BBDD (Arxiu, validacio firmes, etc)
+        		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsZipActionExecutor", e);
+				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al guardar el ZIP per notificar per els documents seleccionats.");
+			}
+		}
+    }
+    
     private class MoureActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.MoureFormAction, DocumentResource> {
 
         @Override
