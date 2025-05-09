@@ -86,8 +86,10 @@ export const useEntitatSession = () => {
     }
 
     useEffect(()=>{
-        if (user?.entitatActualId && user?.entitatActualId != value?.id) {
-            refresh()
+        if (user && user?.entitatActualId) {
+            if (user?.entitatActualId != value?.id) {
+                refresh()
+            }
         } else {
             remove()
         }
@@ -116,23 +118,23 @@ export const useOrganSession = () => {
     } = useResourceApiService('organGestorResource');
 
     const refresh = () => {
-        if (user?.organActualId && user?.organActualId != value?.id && apiIsReady){
-            apiGetOne(user?.organActualId)
-                .then((app) => save(app))
-                .catch(() => remove())
-        }
+        apiGetOne(user?.organActualId)
+            .then((app) => save(app))
+            .catch(() => remove())
     }
 
     useEffect(()=>{
         if (user && user?.organActualId) {
-            refresh()
+            if (user?.organActualId != value?.id) {
+                refresh()
+            }
         } else {
             remove()
         }
     },[user])
 
     useEffect(()=>{
-        if(!isInitialized()){
+        if(!isInitialized() && user?.organActualId && apiIsReady){
             save({});
             refresh()
         }

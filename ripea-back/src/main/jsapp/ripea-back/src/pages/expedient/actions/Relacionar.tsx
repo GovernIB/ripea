@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {
     useBaseAppContext,
@@ -12,6 +12,7 @@ import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
+import Load from "../../../components/Load.tsx";
 
 const sortModel = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
@@ -68,10 +69,40 @@ const ActionFilter = (props:any) => {
     </StyledMuiFilter>
 }
 
+const Relacionar= (props:any) => {
+    const {entity, gridApiRef} = props;
+    const [springFilter, setSpringFilter] = useState<string>();
+
+    const selectionModel = useMemo(()=>{
+        return entity?.relacionatsAmb?.map((a:any)=>a.id)
+    }, [entity])
+
+    return <Load value={entity && selectionModel} noEffect>
+        <ActionFilter onSpringFilterChange={setSpringFilter}/>
+        <StyledMuiGrid
+            resourceName={'expedientResource'}
+            datagridApiRef={gridApiRef}
+            columns={columns}
+            filter={builder.and(
+                builder.neq('id', entity?.id),
+                springFilter
+            )}
+            sortModel={sortModel}
+            perspectives={perspectives}
+
+            selectionActive
+            // TODO: check seleccionados al inicio
+            rowSelectionModel={selectionModel}
+
+            height={162 + 52 * 4}
+            paginationActive
+            readOnly
+        />
+    </Load>
+}
 const useRelacionar= (refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const [springFilter, setSpringFilter] = useState<string>();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
@@ -145,27 +176,7 @@ const useRelacionar= (refresh?: () => void) => {
                 }
             }}
         >
-            <ActionFilter onSpringFilterChange={setSpringFilter}/>
-            <StyledMuiGrid
-                resourceName={'expedientResource'}
-                datagridApiRef={gridApiRef}
-                columns={columns}
-                filter={builder.and(
-                    builder.neq('id', entity?.id),
-                    springFilter
-                )}
-                sortModel={sortModel}
-                perspectives={perspectives}
-
-                selectionActive
-                // TODO: check seleccionados al inicio
-                rowSelectionModel={entity?.relacionatsAmb?.map((a:any)=>a.id)}
-
-                // height={'calc(162px + calc(52px * 4))'}
-                height={162 + 52 * 4}
-                paginationActive
-                readOnly
-            />
+            <Relacionar entity={entity} gridApiRef={gridApiRef}/>
     </MuiDialog>
 
     return {

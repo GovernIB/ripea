@@ -44,6 +44,15 @@ import lombok.experimental.FieldNameConstants;
 						formClass = ExpedientResource.ExportarDocumentMassiu.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_NOTIFICACIONS_CADUCADES),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_DOCUMENTS_NO_MOGUTS),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -91,7 +100,8 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_TANCAR_CODE,
-                        formClass = ExpedientResource.TancarExpedientFormAction.class),                
+                        formClass = ExpedientResource.TancarExpedientFormAction.class,
+                        requiresId = true),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,
@@ -340,6 +350,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
     public static class TancarExpedientFormAction implements Serializable {
         @NotNull
         private String motiu;
-        private List<ResourceReference<DocumentResource, Long>> documentsPerFirmar;
+        private List<Long> documentsPerFirmar;
     }
 }

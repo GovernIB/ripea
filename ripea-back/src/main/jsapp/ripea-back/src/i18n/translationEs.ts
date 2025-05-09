@@ -229,6 +229,7 @@ const translationEs = {
                 sincronitzar: "Sincronizar estado con archivo",
             },
             action: {
+                close: "Cerrar expediente",
                 changePrioritat: "Modificar prioridad del expediente",
                 changeEstat: "Modificar estado del expediente",
                 assignar: "Assignar expediente a usuario",

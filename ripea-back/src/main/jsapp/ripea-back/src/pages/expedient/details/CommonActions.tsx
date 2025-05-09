@@ -12,6 +12,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
+import useTancar from "../actions/Tancar.tsx";
 
 const iniciaDescargaBlob = (result: any) => {
     const url = URL.createObjectURL(result.blob);
@@ -85,6 +86,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
     const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
+    const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
 
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
@@ -192,9 +194,9 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.close'),
             icon: "check",
             showInMenu: true,
-            // onClick: ,
-            disabled: (row:any) => !row?.potTancar,
-            hidden: (row:any) => !potModificar(row) || isTancat(row),
+            onClick: handleTancar,
+            // disabled: (row:any) => !row?.potTancar,
+            // hidden: (row:any) => !potModificar(row) || isTancat(row),
         },
         {
             title: t('page.expedient.acciones.open'),
@@ -300,6 +302,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {assignarContent}
         {cambiarRelacionar}
         {contentExportDoc}
+        {contentTancar}
     </>;
 
     return {
