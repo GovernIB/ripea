@@ -195,8 +195,8 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "check",
             showInMenu: true,
             onClick: handleTancar,
-            // disabled: (row:any) => !row?.potTancar,
-            // hidden: (row:any) => !potModificar(row) || isTancat(row),
+            disabled: (row:any) => !row?.potTancar,
+            hidden: (row:any) => !potModificar(row) || isTancat(row),
         },
         {
             title: t('page.expedient.acciones.open'),
