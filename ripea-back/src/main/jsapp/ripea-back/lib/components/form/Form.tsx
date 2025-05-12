@@ -229,19 +229,7 @@ export const Form: React.FC<FormProps> = (props) => {
             }
         }
     }
-    const refresh = () => {
-        if (fields) {
-            getFieldsInitialData(id, fields, additionalData, initOnChangeRequest).
-                then((initialData: any) => {
-                    debug && logConsole.debug('Initial data loaded', initialData);
-                    const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
-                    id != null && setApiActions(initialDataActions);
-                    reset({...initialDataWithoutLinks, ...initialDataProp});
-                });
-        }
-    }
     const reset = (data: any) => {
-        // Accions per a reiniciar l'estat del formulari
         dataDispatchAction({
             type: FormFieldDataActionType.RESET,
             payload: data,
@@ -251,6 +239,17 @@ export const Form: React.FC<FormProps> = (props) => {
         setRevertData(data);
         setFieldErrors(undefined);
         idFromExternalResetRef.current = null;
+    }
+    const refresh = () => {
+        if (fields) {
+            getFieldsInitialData(id, fields, additionalData, initOnChangeRequest).
+                then((initialData: any) => {
+                    debug && logConsole.debug('Initial data loaded', initialData);
+                    const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
+                    id != null && setApiActions(initialDataActions);
+                    reset({ ...initialDataWithoutLinks, ...initialDataProp });
+                });
+        }
     }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
