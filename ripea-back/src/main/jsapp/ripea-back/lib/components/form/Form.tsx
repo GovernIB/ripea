@@ -196,7 +196,17 @@ export const Form: React.FC<FormProps> = (props) => {
         const getInitialDataFromApiGetOne = resourceType == null && id != null;
         const initialData = getInitialDataFromApiGetOne ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
         const mergedData = { ...initialData, ...additionalData };
-        return initOnChangeRequest ? await sendOnChangeRequest(id, { previous: mergedData }) : mergedData;
+        if (initOnChangeRequest) {
+            return new Promise<any>((resolve, reject) => {
+                sendOnChangeRequest(id, { previous: mergedData }).
+                then(onChangeData => {
+                    resolve({ ...mergedData, ...onChangeData });
+                }).
+                catch(reject);
+            })
+        } else {
+            return mergedData;
+        }
     }, [apiGetOne, sendOnChangeRequest]);
     const handleSubmissionErrors = (
         error: ResourceApiError,
@@ -247,7 +257,7 @@ export const Form: React.FC<FormProps> = (props) => {
                     debug && logConsole.debug('Initial data loaded', initialData);
                     const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
                     id != null && setApiActions(initialDataActions);
-                    reset({ ...initialDataWithoutLinks, ...initialDataProp });
+                    reset(initialDataWithoutLinks);
                 });
         }
     }
