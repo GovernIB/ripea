@@ -258,7 +258,7 @@ export const Form: React.FC<FormProps> = (props) => {
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {
-                    reset(changedData);
+                    reset({ ...additionalData, ...changedData });
                     idFromExternalResetRef.current = id;
                 });
         } else {

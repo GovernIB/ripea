@@ -135,7 +135,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             const field = fields.find(f => f.name === name);
             setField(field ?? null);
         }
-    }, [fields]);
+    }, [fields, name]);
     React.useEffect(() => {
         if (fieldErrors) {
             const fieldError = fieldErrors.find(e => e.field === name);
@@ -143,7 +143,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         } else {
             setFieldError(undefined);
         }
-    }, [fieldErrors]);
+    }, [fieldErrors, name]);
     const isReady = isFormReady && field !== undefined;
     const value = dataGetFieldValue(name);
     const handleFieldValueChange = React.useCallback((value: any) => {
