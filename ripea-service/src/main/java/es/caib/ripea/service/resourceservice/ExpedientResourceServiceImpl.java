@@ -458,7 +458,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
-            	if (params.isMasivo()) {
+            	if (params.isMassivo()) {
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -487,7 +487,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
-            	if (params.isMasivo()) {
+            	if (params.isMassivo()) {
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.ALLIBERAR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -516,7 +516,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
-            	if (params.isMasivo()) {
+            	if (params.isMassivo()) {
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.RETORNAR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -546,7 +546,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
-            	if (params.isMasivo()) {
+            	if (params.isMassivo()) {
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.SEGUIR_EXPEDIENT, new Date(), null, configHelper.getRolActual());
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -567,7 +567,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.MassiveAction params) throws ActionExecutionException {
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth!=null) {
-            	if (params.isMasivo()) {
+            	if (params.isMassivo()) {
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.UNFOLLOW_EXPEDIENT, new Date(), null, configHelper.getRolActual());
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -592,7 +592,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             	String rolActual = configHelper.getRolActual();
             	String entitatActual = configHelper.getEntitatActualCodi();
             	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-            	if (params.isMasivo()) {
+            	if (params.isMassivo()) {
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(ExecucioMassivaTipusDto.ESBORRAR_EXPEDIENT, new Date(), null, rolActual);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
@@ -743,7 +743,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
     		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
 
-            if (params.isMasivo()) {
+            if (params.isMassivo()) {
             	
 	            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 	            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
@@ -814,7 +814,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
-	            if (params.isMasivo()) {
+	            if (params.isMassivo()) {
 	            	
 		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
@@ -870,7 +870,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
-	            if (params.isMasivo()) {
+	            if (params.isMassivo()) {
 	            	
 		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
@@ -926,7 +926,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
-	            if (params.isMasivo()) {
+	            if (params.isMassivo()) {
 	            	
 		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
@@ -979,7 +979,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
-	            if (params.isMasivo()) {
+	            if (params.isMassivo()) {
 					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "La funcio de Índex PDF i exportació ENI no esta implementada massivament.");
 	            } else {
 	        		FitxerDto fitxerDto = expedientHelper.generarIndexExpedients(
@@ -1066,7 +1066,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    		
-	            if (params.isMasivo()) {
+	            if (params.isMassivo()) {
 	            	
 		            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 		            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);

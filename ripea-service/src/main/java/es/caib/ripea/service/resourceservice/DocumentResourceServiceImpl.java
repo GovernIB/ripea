@@ -562,10 +562,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		newZipFile.setMetaNode(metaNodeResourceEntity);
         		newZipFile.setNtiOrigen(params.getNtiOrigen());
         		newZipFile.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
-        		newZipFile.setFitxerNom(newZipFile.getNom());
-        		newZipFile.setFitxerContentType(newZipFile.getFitxerContentType());
-        		newZipFile.setFitxerContingut(newZipFile.getFitxerContingut());
-//        		newZipFile.setFitxerTamany((Long)newZipFile.getFitxerContingut().length);
+        		newZipFile.setFitxerNom(fitxerDto.getNom());
+        		newZipFile.setFitxerContentType(fitxerDto.getContentType());
+        		newZipFile.setFitxerContingut(fitxerDto.getContingut());
+        		newZipFile.setFitxerTamany(fitxerDto.getTamany());
         		newZipFile = documentResourceRepository.saveAndFlush(newZipFile);
         		//TODO: Fer les accions posteriors a guardar a BBDD (Arxiu, validacio firmes, etc)
         		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);

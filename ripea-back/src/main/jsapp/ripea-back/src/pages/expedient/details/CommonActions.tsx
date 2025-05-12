@@ -46,7 +46,7 @@ export const useActions = (refresh?: () => void) => {
     }
 	
 	const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code :code, data:{ ids: [id], masivo: false }, fileType})
+	    return apiReport(undefined, {code :code, data:{ ids: [id], massivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
