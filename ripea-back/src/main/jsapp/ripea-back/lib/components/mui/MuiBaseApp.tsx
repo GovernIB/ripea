@@ -39,6 +39,7 @@ export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
     appbarStyle?: any;
     appbarBackgroundColor?: string;
     appbarBackgroundImg?: string;
+    objectesSyncSessio?: any;
 };
 
 const baseFormFieldComponents = [{
@@ -161,6 +162,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         additionalHeaderComponents,
         additionalAuthComponents,
         children,
+        objectesSyncSessio,
         ...otherProps
     } = props;
     const mergedFormFieldComponents = [...baseFormFieldComponents, ...(formFieldComponents ?? [])];
@@ -177,6 +179,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         version={version}
         logo={logo}
         logoStyle={logoStyle}
+        objectesSyncSessio={objectesSyncSessio}
         menuButton={!menuShrinkDisabled && menuEntries != null ? menuButton : undefined}
         additionalToolbarComponents={additionalHeaderComponents}
         additionalAuthComponents={additionalAuthComponents}

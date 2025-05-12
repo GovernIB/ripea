@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
@@ -33,6 +35,8 @@ import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepo
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaNodeResourceRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -46,20 +50,21 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
@@ -95,6 +100,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final MetaNodeResourceRepository metaNodeResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
+    private final ContingutRepository contingutRepository;
+    private final DocumentRepository documentRepository;
 
     @PostConstruct
     public void init() {
@@ -117,75 +124,84 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
-        
     }
-
+    
     @Override
-    protected void beforeCreateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        beforeSave(entity, resource, answers);
-
-        entity.setEstat(entity.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT);
-        entity.setTipus(ContingutTipusEnumDto.DOCUMENT);
-        entity.setData(new Date());
-        // TODO: revisar
-        entity.setEntitat(entity.getMetaNode().getEntitat());
-        entity.setNtiIdentificador(Long.toString(System.currentTimeMillis()));
-        entity.setNtiOrgano(entity.getExpedient().getNtiOrgano());
-        entity.setExpedientEstatAdditional(entity.getExpedient().getEstatAdditional());
+    public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	try {
+    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    		//TODO: el padre no siempre es el expediente, puede ser una carpeta
+    		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();
+    		DocumentDto documentCreat = documentHelper.crearDocument(
+    				entitatEntity.getId(),
+    				toDocumentDto(resource),
+    				pare,
+    				true,
+    				false);
+    		resource.setId(documentCreat.getId());
+    		return resource;
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
+    	}
+    	return null;
     }
-
+    
     @Override
-    protected void beforeUpdateSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
-        beforeSave(entity, resource, answers);
+	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	try {
+    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
+    		DocumentDto documentCreat = documentHelper.updateDocument(
+    				entitatEntity.getId(),
+    				documentActual,
+    				toDocumentDto(resource),
+    				true);
+    		resource.setId(documentCreat.getId());
+    		return resource;
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
+    	}
+    	return null;
     }
 
-    /**
-     * Accions comunes executades abans de Crear o Modificar
-     */
-    private void beforeSave(DocumentResourceEntity entity, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
-        
-//		pare = contingutHelper.comprovarContingutDinsExpedientModificable(
-//				entitatId,
-//				pareId,
-//				false,
-//				false,
-//				false,
-//				false, 
-//				false, 
-//				true, 
-//				rolActual);
+    private DocumentDto toDocumentDto(DocumentResource resource) {
     	
-//    	checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)
+    	DocumentDto resultat = new DocumentDto();
     	
-//    	entityComprovarHelper.comprovarMetaDocument(
-//				pare.getEntitat(),
-//				expedient.getMetaExpedient(),
-//				document.getMetaDocument().getId(),
-//				true,
-//				comprovarMetaExpedient);
+    	MetaNodeDto metaNode = new MetaNodeDto();
+    	metaNode.setId(resource.getMetaDocument().getId());
+    	resultat.setMetaNode(metaNode);
     	
-//		DocumentDto documentDto = documentHelper.crearDocument(
-//				document,
-//				pare,
-//				expedient,
-//				metaDocument,
-//				true);
+    	resultat.setPareId(resource.getPare()!=null?resource.getPare().getId():resource.getExpedient().getId());
     	
-    	entity.setPare(entity.getExpedient());
-
-        Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resource.getMetaDocument().getId());
-        optionalDocumentResource.ifPresent((metaDocumentResourceEntity -> {
-            entity.setMetaNode(metaDocumentResourceEntity);
-            entity.setNtiTipoDocumental(metaDocumentResourceEntity.getNtiTipoDocumental());
-        }));
-
-        if (resource.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA){
-            /* TODO: (PluginHelper.gestioDocumentalCreate) */
-        }
-
-        entity.setFitxerNom(documentResourceHelper.getUniqueNameInPare(entity));
+    	resultat.setDocumentTipus(resource.getDocumentTipus());
+    	resultat.setNom(resource.getNom());
+    	resultat.setDescripcio(resource.getDescripcio());
+    	resultat.setData(Calendar.getInstance().getTime());
+    	
+    	resultat.setNtiOrigen(resource.getNtiOrigen());
+    	resultat.setNtiEstadoElaboracion(resource.getNtiEstadoElaboracion());
+    	resultat.setNtiIdDocumentoOrigen(resource.getNtiIdDocumentoOrigen());
+    	
+    	resultat.setFitxerContingut(resource.getFitxerContingut());
+    	resultat.setFitxerContentType(resource.getFitxerContentType());
+    	resultat.setAmbFirma(resource.isAmbFirma());
+    	switch (resource.getDocumentFirmaTipus()) {
+		case FIRMA_ADJUNTA:
+			resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+			break;
+		case FIRMA_SEPARADA:
+			resultat.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+			break;
+		default:
+			break;
+		}
+    	resultat.setFirmaContingut(resource.getFirmaContingut());
+    	resultat.setFirmaContentType(resource.getFirmaContentType());
+    	
+    	return resultat;
     }
-
+    
     @Override
     protected void afterConversion(DocumentResourceEntity entity, DocumentResource resource) {
         if(entity.getMetaNode()!=null) {

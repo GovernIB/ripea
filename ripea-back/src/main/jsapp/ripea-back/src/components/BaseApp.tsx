@@ -23,6 +23,7 @@ import uenegroma from '../assets/uenegroma.png';
 import feder7 from '../assets/feder7.png';
 import una_manera from '../assets/una_manera.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
+import {useAlertesSessio} from "../components/Session.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -127,6 +128,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
+    const { value } = useAlertesSessio();
 
     return <MuiBaseApp
         code={code}
@@ -136,6 +138,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         title={title}
         footer={<Footer title="RIPEA" version={version} logos={[uenegroma,feder7,una_manera]}/>}
         version={version}
+        objectesSyncSessio={value}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}

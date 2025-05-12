@@ -132,6 +132,11 @@ public class DocumentResource extends NodeResource {
 	private Long fitxerTamany;
 	private byte[] fitxerContingut;
 	
+	private boolean ambFirma;
+	private String firmaNom;
+	private String firmaContentType;
+	private byte[] firmaContingut;
+	
     @NotNull
     @Transient
     @ResourceField(onChangeActive = true)

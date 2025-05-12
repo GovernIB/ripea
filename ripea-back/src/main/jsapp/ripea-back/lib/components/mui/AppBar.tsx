@@ -1,8 +1,5 @@
 import React from 'react';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import {AppBar as MuiAppBar, Alert, Toolbar, Box, Typography, Icon} from "@mui/material";
 import AuthButton from './AuthButton';
 import { useOptionalAuthContext } from '../AuthContext';
 import { toolbarBackgroundStyle } from '../../util/toolbar';
@@ -12,12 +9,27 @@ type AppBarProps = {
     version?: string;
     logo?: string;
     logoStyle?: any;
+    alertes?: any;
     menuButton: React.ReactNode,
     additionalToolbarComponents?: React.ReactElement | React.ReactElement[];
     additionalAuthComponents?: React.ReactElement | React.ReactElement[];
     style?: any;
     backgroundColor?: string;
     backgroundImg?: string;
+    objectesSyncSessio?: any;
+};
+
+const getAlertSeverity = (avisNivell: string) => {
+  switch (avisNivell) {
+    case "INFO":
+      return "info"; // Azul
+    case "WARNING":
+      return "warning"; // Amarillo
+    case "ERROR":
+      return "error"; // Rojo
+    default:
+      return "info"; // Por defecto INFO
+  }
 };
 
 export const AppBar: React.FC<AppBarProps> = (props) => {
@@ -26,12 +38,14 @@ export const AppBar: React.FC<AppBarProps> = (props) => {
         version,
         logo,
         logoStyle,
+        alertes,
         menuButton,
         additionalToolbarComponents,
         additionalAuthComponents,
         style,
         backgroundColor,
         backgroundImg,
+        objectesSyncSessio,
     } = props;
     const authContext = useOptionalAuthContext();
     const authButton = authContext != null ? <AuthButton additionalComponents={additionalAuthComponents} /> : null;
@@ -50,6 +64,15 @@ export const AppBar: React.FC<AppBarProps> = (props) => {
             {additionalToolbarComponents}
             {authButton}
         </Toolbar>
+        <div>
+            {
+                objectesSyncSessio?.avisos?.map((avis:any) => (
+                    <Alert key={avis.id} severity={getAlertSeverity(avis.avisNivell)}>
+                        <strong>{avis.assumpte}</strong>: {avis.missatge}
+                    </Alert>
+                ))
+            }
+        </div>
     </MuiAppBar>;
 }
 

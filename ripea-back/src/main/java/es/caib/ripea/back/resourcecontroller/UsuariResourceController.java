@@ -1,20 +1,13 @@
 package es.caib.ripea.back.resourcecontroller;
 
-import es.caib.ripea.back.base.controller.BaseMutableResourceController;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.OrganGestorDto;
-import es.caib.ripea.service.intf.model.UsuariResource;
-import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.EntitatService;
-import es.caib.ripea.service.intf.service.OrganGestorService;
-import io.swagger.v3.oas.annotations.Hidden;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +25,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import es.caib.ripea.back.base.controller.BaseMutableResourceController;
+import es.caib.ripea.back.helper.AnotacionsPendentsHelper;
+import es.caib.ripea.back.helper.ContingutEstaticHelper;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.ExpedientHelper;
+import es.caib.ripea.back.helper.FluxFirmaHelper;
+import es.caib.ripea.back.helper.MetaExpedientHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SeguimentEnviamentsUsuariHelper;
+import es.caib.ripea.back.helper.TasquesPendentsHelper;
+import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
+import es.caib.ripea.service.intf.base.util.SyncStoredSessionData;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.model.UsuariResource;
+import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.AvisService;
+import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Servei REST de gestió d'usuaris.
@@ -60,6 +72,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final EntitatService entitatService;
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
+    private final AvisService avisService;
 
     @Hidden
     @GetMapping("/actual/securityInfo")
@@ -129,6 +142,17 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         return getUsuariActualSecurityInfo(request);
+    }
+    
+    @Hidden
+    @GetMapping("/syncStoredSessionData")
+    @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
+    public ResponseEntity<SyncStoredSessionData> getSynchronyzedStoredSessionData(HttpServletRequest request) throws MethodArgumentNotValidException {
+    	SyncStoredSessionData ssda = new SyncStoredSessionData();
+    	//TODO: Afegir mes dades que necessiten ser sincronitzades sense intervencio del usuari actual, com el numero de anotacions sense llegir etc.
+    	//Unificar-ho en un metode en un servei i cachear-ho
+    	ssda.setAvisos(avisService.findActive());
+    	return ResponseEntity.ok(ssda);
     }
 
     @Hidden
