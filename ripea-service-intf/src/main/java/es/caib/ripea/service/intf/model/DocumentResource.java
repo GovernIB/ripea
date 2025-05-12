@@ -375,7 +375,7 @@ public class DocumentResource extends NodeResource {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class UpdateTipusDocumentFormAction extends MassiveAction implements Serializable {
+    public static class UpdateTipusDocumentFormAction extends MassiveAction {
     	@NotNull
     	private ResourceReference<MetaDocumentResource, Long> metaDocument;
     }
@@ -384,7 +384,7 @@ public class DocumentResource extends NodeResource {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class NotificarDocumentsZipFormAction extends UpdateTipusDocumentFormAction implements Serializable {
+    public static class NotificarDocumentsZipFormAction extends UpdateTipusDocumentFormAction {
     	@NotNull
     	private NtiOrigenEnumDto ntiOrigen;
     	@NotNull

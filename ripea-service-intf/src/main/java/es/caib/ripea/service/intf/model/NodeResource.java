@@ -27,6 +27,6 @@ public class NodeResource extends ContingutResource {
         @NotNull
         @NotEmpty
         private List<Long> ids;
-        private boolean masivo = false;
+        private boolean massivo = false;
     }
 }
