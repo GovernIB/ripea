@@ -115,7 +115,7 @@ const DocumentsGrid = (props:any) => {
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {createActions, actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, refresh);
+    const {createActions, actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, dataGridApiRef, refresh);
     const {actions: massiveActions, components: massiveComponents} = useContingutMassiveActions(entity, refresh);
 
     return <GridPage>
