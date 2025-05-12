@@ -43,6 +43,16 @@ import java.util.List;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientTascaResource.ACTION_CHANGE_PRIORITAT,
+                        formClass = ExpedientTascaResource.ChangePrioritatFormAction.class,
+                        requiresId = true), 
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientTascaResource.ACTION_CHANGE_DATALIMIT,
+                        formClass = ExpedientTascaResource.ChangeDataLimitFormAction.class,
+                        requiresId = true),                
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientTascaResource.ACTION_REBUTJAR_CODE,
                         formClass = ExpedientTascaResource.MotiuFormAction.class,
                         requiresId = true),
@@ -56,6 +66,8 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
     public static final String ACTION_CHANGE_ESTAT_CODE = "ACTION_CHANGE_ESTAT";
+    public static final String ACTION_CHANGE_PRIORITAT = "ACTION_CHANGE_PRIORITAT";
+    public static final String ACTION_CHANGE_DATALIMIT = "ACTION_CHANGE_DATALIMIT";
     public static final String ACTION_REABRIR_CODE = "ACTION_REABRIR";
     public static final String ACTION_REBUTJAR_CODE = "ACTION_REBUTJAR";
     public static final String ACTION_RETOMAR_CODE = "ACTION_RETOMAR";
@@ -103,6 +115,22 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     public static class ChangeEstatFormAction implements Serializable {
         @NotNull
         private TascaEstatEnumDto estat;
+    }
+    
+    @Getter
+    @Setter
+    public static class ChangePrioritatFormAction implements Serializable {
+        @NotNull
+        private PrioritatEnumDto prioritat;
+    }
+    
+    @Getter
+    @Setter
+    public static class ChangeDataLimitFormAction implements Serializable {
+    	@NotNull
+    	private Integer duracio;
+    	@NotNull
+    	private Date dataLimit;
     }
 
     @Getter

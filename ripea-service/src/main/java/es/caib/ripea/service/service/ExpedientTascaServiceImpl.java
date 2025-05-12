@@ -356,7 +356,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			cacheHelper.evictCountTasquesPendents(responsable.getCodi());
 		}
 
-		log(tasca, LogTipusEnumDto.CANVI_ESTAT);
+		tascaHelper.logAccioTasca(tasca, LogTipusEnumDto.CANVI_ESTAT);
 
 		return conversioTipusHelper.convertir(tasca,
 			ExpedientTascaDto.class);
@@ -386,7 +386,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			cacheHelper.evictCountTasquesPendents(responsable.getCodi());
 		}
 
-		log(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES);
+		tascaHelper.logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES);
 
 		return conversioTipusHelper.convertir(expedientTascaEntity,
 			ExpedientTascaDto.class);
@@ -413,7 +413,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		cacheHelper.evictCountTasquesPendents(delegat.getCodi());
 
-		log(expedientTascaEntity, LogTipusEnumDto.DELEGAR_TASCA);
+		tascaHelper.logAccioTasca(expedientTascaEntity, LogTipusEnumDto.DELEGAR_TASCA);
 
 		return conversioTipusHelper.convertir(expedientTascaEntity,
 			ExpedientTascaDto.class);
@@ -445,7 +445,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		cacheHelper.evictCountTasquesPendents(auth.getName());
 
-		log(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
+		tascaHelper.logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
 
 		return conversioTipusHelper.convertir(expedientTascaEntity,
 			ExpedientTascaDto.class);
@@ -583,7 +583,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		}
 
 		expedientTascaRepository.save(expedientTascaEntity);
-		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
+		tascaHelper.logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CREACIO);
 
 		emailHelper.enviarEmailCanviarEstatTasca(
 			expedientTascaEntity,
@@ -710,17 +710,10 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			"expedientTascaId=" + expedientTascaDto.getId() + ", " +
 			"dataLimit=" + expedientTascaDto.getDataLimit() + ")");
 
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(expedientTascaDto.getId());
-
-		//Si no ha canviat res en el DTO respecte del entity (info a BBDD), no fer cap acció
-		if (Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDataLimit(), expedientTascaDto.getDataLimit()) ||
-			Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDuracio(), expedientTascaDto.getDuracio())) {
-			expedientTascaEntity.updateDataLimit(expedientTascaDto.getDataLimit());
-			expedientTascaEntity.setDuracio(expedientTascaDto.getDuracio());
-			emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
-		}
-
-		log(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
+		ExpedientTascaEntity expedientTascaEntity = tascaHelper.updateDataLimit(
+				expedientTascaDto.getId(),
+				expedientTascaDto.getDataLimit(),
+				expedientTascaDto.getDuracio());
 
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
@@ -729,19 +722,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional(readOnly = true)
 	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
 		return tascaHelper.getValidacionsPendentsTasca(expedientTascaId);
-	}
-
-	private void log(ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
-		contingutLogHelper.log(
-			expedientTascaEntity.getExpedient(),
-			LogTipusEnumDto.MODIFICACIO,
-			expedientTascaEntity,
-			LogObjecteTipusEnumDto.TASCA,
-			tipusLog,
-			expedientTascaEntity.getMetaTasca().getNom(),
-			expedientTascaEntity.getComentaris().size() == 1 ? expedientTascaEntity.getComentaris().get(0).getText() : null, // expedientTascaEntity.getComentari(),
-			false,
-			false);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientTascaServiceImpl.class);

@@ -5,6 +5,8 @@ import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -28,7 +30,9 @@ public class TascaHelper {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private ConfigHelper configHelper;
+	@Autowired private EmailHelper emailHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
 
 	public List<MetaExpedientTascaValidacioDto> getValidacionsPendentsTasca(Long expedientTascaId) {
 		List<MetaExpedientTascaValidacioDto> resultat = new ArrayList<MetaExpedientTascaValidacioDto>();
@@ -166,4 +170,32 @@ public class TascaHelper {
 		return tasca;
 	}
 
+	public ExpedientTascaEntity updateDataLimit(Long tascaId, Date dataLimit, Integer duracio) {
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(tascaId);
+
+		//Si no ha canviat res en el DTO respecte del entity (info a BBDD), no fer cap acció
+		if (Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDataLimit(), dataLimit) ||
+			Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDuracio(), duracio)) {
+			expedientTascaEntity.updateDataLimit(dataLimit);
+			expedientTascaEntity.setDuracio(duracio);
+			emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
+		}
+		
+		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
+		
+		return expedientTascaEntity;
+	}
+	
+	public void logAccioTasca(ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
+		contingutLogHelper.log(
+			expedientTascaEntity.getExpedient(),
+			LogTipusEnumDto.MODIFICACIO,
+			expedientTascaEntity,
+			LogObjecteTipusEnumDto.TASCA,
+			tipusLog,
+			expedientTascaEntity.getMetaTasca().getNom(),
+			expedientTascaEntity.getComentaris().size() == 1 ? expedientTascaEntity.getComentaris().get(0).getText() : null, // expedientTascaEntity.getComentari(),
+			false,
+			false);
+	}
 }

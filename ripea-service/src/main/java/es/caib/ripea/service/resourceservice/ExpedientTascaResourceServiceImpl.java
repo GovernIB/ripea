@@ -8,12 +8,16 @@ import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourc
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.TascaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -22,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +51,9 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
     private final UsuariResourceRepository usuariResourceRepository;
 
+    private final TascaHelper tascaHelper;
+    private final ExcepcioLogHelper excepcioLogHelper;
+    
 	@PostConstruct
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
@@ -53,6 +61,8 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
+        register(ExpedientTascaResource.ACTION_CHANGE_PRIORITAT, new ChangePrioritatActionExecutor());
+        register(ExpedientTascaResource.ACTION_CHANGE_DATALIMIT, new ChangeDataLimitActionExecutor());
         register(ExpedientTascaResource.ACTION_REABRIR_CODE, new ReobrirActionExecutor());
         register(ExpedientTascaResource.ACTION_REBUTJAR_CODE, new RebutjarActionExecutor());
         register(ExpedientTascaResource.ACTION_RETOMAR_CODE, new RetomarActionExecutor());
@@ -72,14 +82,12 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     protected void afterConversion(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setMetaExpedientTascaDescription(entity.getMetaExpedientTasca().getDescripcio());
-
         resource.setObservadors(entity.getObservadors()
                 .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
                 .collect(Collectors.toList()));
-
         String user = SecurityContextHolder.getContext().getAuthentication().getName();
-        resource.setUsuariActualResponsable(Objects.equals(resource.getResponsableActual().getId(), user));
-        resource.setUsuariActualDelegat(resource.getDelegat() != null && Objects.equals(resource.getDelegat().getId(), user));
+       	resource.setUsuariActualResponsable(resource.getResponsableActual()!=null && Objects.equals(resource.getResponsableActual().getId(), user));
+        resource.setUsuariActualDelegat(resource.getDelegat()!=null && Objects.equals(resource.getDelegat().getId(), user));
     }
 
     // PerspectiveApplicator
@@ -216,10 +224,40 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {
-
-        }
+        public void onChange(ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {}
     }
+    
+    private class ChangePrioritatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangePrioritatFormAction, ExpedientTascaResource> {
+
+        @Override
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangePrioritatFormAction params) throws ActionExecutionException {
+            entity.setPrioritat(params.getPrioritat());
+            expedientTascaResourceRepository.save(entity);
+            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+        }
+
+        @Override
+        public void onChange(ExpedientTascaResource.ChangePrioritatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangePrioritatFormAction target) {}
+    }
+    
+    private class ChangeDataLimitActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeDataLimitFormAction, ExpedientTascaResource> {
+
+        @Override
+        public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangeDataLimitFormAction params) throws ActionExecutionException {
+        	try {
+        		tascaHelper.updateDataLimit(entity.getId(), params.getDataLimit(), params.getDuracio());
+        		return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ChangeDataLimitActionExecutor", e);
+				throw new ReportGenerationException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar la data límit de la tasca.");
+			}	
+        }
+
+        @Override
+        public void onChange(ExpedientTascaResource.ChangeDataLimitFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeDataLimitFormAction target) {}
+    }
+    
+    
     private class RebutjarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.MotiuFormAction, ExpedientTascaResource> {
 
         @Override

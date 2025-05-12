@@ -39,6 +39,7 @@ import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
@@ -90,6 +91,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ConfigHelper configHelper;
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
+    private final ContingutHelper contingutHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
@@ -578,26 +580,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
-//            if (!Objects.equals(params.getExpedient(), entity.getExpedient())){
-//                expedientResourceRepository.findById(params.getExpedient().getId())
-//                        .ifPresent(entity::setExpedient);
-//            }
-//
-//            if (params.getCarpeta()!=null){
-//                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getCarpeta().getId()).orElse(null);
-//                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
-//                    entity.setPare(contingut);
-//                    documentResourceRepository.save(entity);
-//                }
-//            } else {
-//                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getExpedient().getId()).orElse(null);
-//                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
-//                    entity.setPare(contingut);
-//                    documentResourceRepository.save(entity);
-//                }
-//            }
-//
-//            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        	
+        	if (params!=null && params.getIds()!=null && params.getIds().size()>0) {
+        		try {
+	        		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	        		boolean mourer = DocumentResource.MoureFormAction.Action.MOURE.equals(params.getAction());
+	    			for (Long contingutOrigenId: params.getIds()) {
+	    				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
+	    				if (mourer) {
+	    					contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId,configHelper.getRolActual());
+	    				} else {
+	    					contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu
+	    				}
+	    			}
+    			} catch (Exception e) {
+    				excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);
+    				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al mourer o copiar els documents seleccionats.");
+    			}	    			
+        	} else {
+        		throw new ActionExecutionException(getResourceClass(), null, code, "No s'ha indicat cap element per realitzar l'acció.");
+        	}
+
             return null;
         }
 
