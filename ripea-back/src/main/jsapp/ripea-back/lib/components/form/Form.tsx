@@ -187,7 +187,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const getId = () => calculatedId(id);
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
-    const getFieldsInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
+    const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
         // Obté les dades inicials.
         // Si és un formulari d'artefacte obté les dades dels camps
         // Si no és un formulari d'artefacte:
@@ -242,7 +242,7 @@ export const Form: React.FC<FormProps> = (props) => {
     }
     const refresh = () => {
         if (fields) {
-            getFieldsInitialData(id, fields, additionalData, initOnChangeRequest).
+            getInitialData(id, fields, additionalData, initOnChangeRequest).
                 then((initialData: any) => {
                     debug && logConsole.debug('Initial data loaded', initialData);
                     const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
