@@ -1,7 +1,7 @@
 import useDocumentDetail from "./DocumentDetail.tsx";
 import {useTranslation} from "react-i18next";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
-import {useResourceApiService} from "reactlib";
+import {MuiDataGridApiRef, useResourceApiService} from "reactlib";
 import useMoure from "../actions/Moure.tsx";
 import useHistoric from "../../Historic.tsx";
 import useNotificar from "../actions/Notificar.tsx";
@@ -39,7 +39,7 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-export const useContingutActions = (expedient:any, refresh?: () => void) => {
+export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
     const { t } = useTranslation();
     const { value: user, permisos } = useUserSession()
     const { value: entitat } = useEntitatSession()
@@ -79,6 +79,24 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
         return options.includes(value)
     }
 
+    const createDocumentActions = [
+        {
+            title: t('common.create')+"...",
+            icon: "description",
+            onClick: () => apiRef?.current?.showCreateDialog?.(),
+        },
+        {
+            title: "Consulta PINBAL...",
+            icon: "description",
+            disabled: true,
+        },
+        {
+            title: "Importar documentos...",
+            icon: "upload_file",
+            disabled: true,
+        },
+    ];
+
     const documentActions = [
         {
             title: t('page.document.acciones.detall'),
@@ -95,7 +113,7 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
             hidden: !potModificar(),
         },
         {
-            title: t('common.copy'),
+            title: t('common.copy')+"...",
             icon: "file_copy",
             showInMenu: true,
             hidden: !potModificar() || !user?.sessionScope?.isMostrarCopiar,
@@ -244,6 +262,7 @@ export const useContingutActions = (expedient:any, refresh?: () => void) => {
         {contentEviarPortafirmes}
     </>;
     return {
+        createActions: createDocumentActions,
         actions: [
             ...documentActions,
             ...expedientActions

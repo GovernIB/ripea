@@ -71,8 +71,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
-                        formClass = DocumentResource.MoureFormAction.class,
-                        requiresId = true),
+                        formClass = DocumentResource.MoureFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_PUBLICAR_CODE,
@@ -277,6 +276,13 @@ public class DocumentResource extends NodeResource {
         private ResourceReference<ExpedientResource, Long> expedient;
         private ResourceReference<CarpetaResource, Long> carpeta;
         private String motiu;
+        @NotNull
+        private Action action = Action.MOURE;
+
+        private enum Action {
+            MOURE,
+            COPIAR
+        }
     }
 
     @Getter

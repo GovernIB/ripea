@@ -242,9 +242,11 @@ const ExpedientGrid = () => {
                         return color
                             ?{
                                 'box-shadow': `${color} -6px 0px 0px`,
-                                'border-left': `6px solid ${color}`
+                                'border-left': `6px solid ${color}`,
                             }
-                            :{}
+                            :{
+                                'padding-left': '6px'
+                            }
                     }}
                 />
 

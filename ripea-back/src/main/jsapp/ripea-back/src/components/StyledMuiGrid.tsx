@@ -51,6 +51,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         toolbarHideCreate,
         toolbarMassiveActions,
         selectionActive,
+        staticSortModel,
         readOnly,
         onRowsChange,
         onRowCountChange,
@@ -183,6 +184,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
 
             titleDisabled
             disableColumnMenu
+            disableColumnSorting={!!staticSortModel}
+            staticSortModel={staticSortModel}
 
             selectionActive={selectionActive || !!toolbarMassiveActions}
             checkboxSelection={selectionActive || !!toolbarMassiveActions}
