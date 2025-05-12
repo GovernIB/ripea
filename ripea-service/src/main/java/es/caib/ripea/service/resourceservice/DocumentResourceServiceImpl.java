@@ -578,12 +578,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
-
-            if (!Objects.equals(params.getExpedient(), entity.getExpedient())){
-                expedientResourceRepository.findById(params.getExpedient().getId())
-                        .ifPresent(entity::setExpedient);
-            }
-
+//            if (!Objects.equals(params.getExpedient(), entity.getExpedient())){
+//                expedientResourceRepository.findById(params.getExpedient().getId())
+//                        .ifPresent(entity::setExpedient);
+//            }
+//
 //            if (params.getCarpeta()!=null){
 //                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getCarpeta().getId()).orElse(null);
 //                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
@@ -597,8 +596,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 //                    documentResourceRepository.save(entity);
 //                }
 //            }
-
-            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+//
+//            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+            return null;
         }
 
         @Override

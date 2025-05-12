@@ -115,7 +115,7 @@ const DocumentsGrid = (props:any) => {
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, refresh);
+    const {createActions, actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, dataGridApiRef, refresh);
     const {actions: massiveActions, components: massiveComponents} = useContingutMassiveActions(entity, refresh);
 
     return <GridPage>
@@ -134,9 +134,6 @@ const DocumentsGrid = (props:any) => {
                 expedient: {id: entity?.id},
                 metaExpedient: {id: entity?.metaExpedient?.id},
             }}
-            disableColumnSorting
-            rowHideUpdateButton={hiddenUpdate}
-            rowHideDeleteButton={hiddenDelete}
             apiRef={dataGridApiRef}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
@@ -191,31 +188,16 @@ const DocumentsGrid = (props:any) => {
                             variant: "outlined",
                             sx: {borderRadius: '4px',  minWidth: '20px', minHeight: '32px', py: 0}
                         }}
-                        actions={[
-                            {
-                                title: t('common.create')+"...",
-                                icon: "description",
-                                onClick: () => dataGridApiRef?.current?.showCreateDialog?.(),
-                            },
-                            {
-                                title: "Consulta PINBAL...",
-                                icon: "description",
-                                disabled: true,
-                            },
-                            {
-                                title: "Importar documentos...",
-                                icon: "upload_file",
-                                disabled: true,
-                            },
-                        ]}
+                        actions={createActions}
                     />,
                 }
             ]}
 
             toolbarMassiveActions={massiveActions}
-            // isRowSelectable={(data:any)=> typeof data?.id == 'number'}
             isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
-            toolbarHideCreate={entity?.agafatPer?.id != user?.codi}
+            toolbarHideCreate
+            rowHideUpdateButton={hiddenUpdate}
+            rowHideDeleteButton={hiddenDelete}
         />
         {components}
         {massiveComponents}
