@@ -19,7 +19,7 @@ const useMassiveActions = (refresh?: () => void) => {
             });
     }
 
-    const download 	= (ids: any[]): void => { massiveReport(ids, 'ACTION_DESCARREGAR_MASSIU', '', 'ZIP'); }
+    const download 	= (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', '', 'ZIP'); }
 
     return {download}
 }
