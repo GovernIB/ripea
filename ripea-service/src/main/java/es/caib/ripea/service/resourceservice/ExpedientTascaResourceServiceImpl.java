@@ -1,6 +1,25 @@
 package es.caib.ripea.service.resourceservice;
 
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaComentariResourceEntity;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
@@ -8,34 +27,27 @@ import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourc
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.TascaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
-import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.ExpedientTascaResource;
+import es.caib.ripea.service.intf.model.ExpedientTascaResource.DelegarTascaFormAction;
+import es.caib.ripea.service.intf.model.ExpedientTascaResource.ReassignarTascaFormAction;
 import es.caib.ripea.service.intf.model.MetaExpedientTascaResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de tasques.
@@ -51,8 +63,10 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
     private final UsuariResourceRepository usuariResourceRepository;
 
+    private final ConfigHelper configHelper;
     private final TascaHelper tascaHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
+    private final EntityComprovarHelper entityComprovarHelper;
     
 	@PostConstruct
 	public void init() {
@@ -61,21 +75,40 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         register(ExpedientTascaResource.Fields.duracio, new DuracioOnchangeLogicProcessor());
         register(ExpedientTascaResource.Fields.dataLimit, new DataLimitOnchangeLogicProcessor());
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
-        register(ExpedientTascaResource.ACTION_CHANGE_PRIORITAT, new ChangePrioritatActionExecutor());
-        register(ExpedientTascaResource.ACTION_CHANGE_DATALIMIT, new ChangeDataLimitActionExecutor());
+        register(ExpedientTascaResource.ACTION_CHANGE_PRIORITAT_CODE, new ChangePrioritatActionExecutor());
+        register(ExpedientTascaResource.ACTION_CHANGE_DATALIMIT_CODE, new ChangeDataLimitActionExecutor());
         register(ExpedientTascaResource.ACTION_REABRIR_CODE, new ReobrirActionExecutor());
         register(ExpedientTascaResource.ACTION_REBUTJAR_CODE, new RebutjarActionExecutor());
         register(ExpedientTascaResource.ACTION_RETOMAR_CODE, new RetomarActionExecutor());
+        register(ExpedientTascaResource.ACTION_REASSIGNAR_CODE, new ReassignarActionExecutor());
+        register(ExpedientTascaResource.ACTION_DELEGAR_CODE, new DelegarActionExecutor());
 	}
 
     @Override
-    protected void beforeCreateSave(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        List<String> ids = resource.getObservadors().stream()
-                .map(ResourceReference::getId)
-                .collect(Collectors.toList());
-        List<UsuariResourceEntity> entidades = usuariResourceRepository.findAllById(ids);
-        entity.setObservadors(entidades);
-        entity.setDataInici(new Date());
+    public ExpedientTascaResource create(ExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	try {
+    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    		ExpedientTascaEntity tascaCreada = tascaHelper.createTasca(entitatEntity.getId(), resource.getExpedient().getId(), toTascaDto(resource));
+    		resource.setId(tascaCreada.getId());
+    		return resource;
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
+    	}
+    	return null;
+    }
+    
+    private ExpedientTascaDto toTascaDto(ExpedientTascaResource resource) {
+    	ExpedientTascaDto resultat = new ExpedientTascaDto();
+    	resultat.setMetaExpedientTascaId(resource.getMetaExpedientTasca().getId());
+    	resultat.setResponsablesCodi(getIdsFromUsuarisResources(resource.getResponsables()));
+    	resultat.setObservadorsCodi(getIdsFromUsuarisResources(resource.getObservadors()));
+    	resultat.setDataLimit(resource.getDataLimit());
+    	resultat.setTitol(resource.getTitol());
+    	resultat.setDuracio(resource.getDuracio());
+    	resultat.setPrioritat(resource.getPrioritat());
+    	resultat.setObservacions(resource.getObservacions());
+    	resultat.setComentari(resource.getComentari());
+    	return resultat;
     }
 
     @Override
@@ -192,34 +225,24 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
     }
 
-    // ActionExecutor
-    private void changeEstat(ExpedientTascaResourceEntity entity, TascaEstatEnumDto estat){
-        switch (estat){
-            case INICIADA:
-                usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
-                        .ifPresent(entity::setResponsableActual);
-                break;
-            case AGAFADA:
-                break;
-            case PENDENT:
-                break;
-            case FINALITZADA:
-                entity.getExpedient().setEstatAdditional(entity.getMetaExpedientTasca().getEstatFinalitzarTasca());
-            case REBUTJADA:
-            case CANCELLADA:
-                entity.setDelegat(null);
-                break;
-        }
+    private void changeEstat(ExpedientTascaResourceEntity entity, TascaEstatEnumDto estat, String motiu) {
+    	List <MetaExpedientTascaValidacioDto> validacionsPendents = null;
+    	if (TascaEstatEnumDto.FINALITZADA.equals(estat)) {
+    		validacionsPendents = tascaHelper.getValidacionsPendentsTasca(entity.getId());
+    	}
 
-        entity.setEstat(estat);
+		if (validacionsPendents==null || validacionsPendents.size()==0) {
+			tascaHelper.canviarEstatTasca(entity.getId(), estat, motiu, configHelper.getRolActual());
+		} else {
+			throw new ActionExecutionException(getResourceClass(), entity.getId(), null, "La tasca té validacions pendents, no es pot finalitzar.");
+		}
     }
 
     private class ChangeEstatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeEstatFormAction, ExpedientTascaResource> {
 
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangeEstatFormAction params) throws ActionExecutionException {
-            changeEstat(entity, params.getEstat());
-            expedientTascaResourceRepository.save(entity);
+            changeEstat(entity, params.getEstat(), null);
             return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
         }
 
@@ -249,7 +272,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         		return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ChangeDataLimitActionExecutor", e);
-				throw new ReportGenerationException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar la data límit de la tasca.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar la data límit de la tasca.");
 			}	
         }
 
@@ -259,61 +282,96 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     
     
     private class RebutjarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.MotiuFormAction, ExpedientTascaResource> {
-
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.MotiuFormAction params) throws ActionExecutionException {
-            changeEstat(entity, TascaEstatEnumDto.REBUTJADA);
-            entity.setMotiuRebuig(params.getMotiu());
-            expedientTascaResourceRepository.save(entity);
+            changeEstat(entity, TascaEstatEnumDto.REBUTJADA, params.getMotiu());
             return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
         }
-
         @Override
         public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
 
         }
     }
+    
     private class ReobrirActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ReobrirFormAction, ExpedientTascaResource> {
-
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ReobrirFormAction params) throws ActionExecutionException {
-            if (params.getMotiu() != null) {
-                ExpedientTascaComentariResourceEntity expedientTascaComentariResourceEntity = new ExpedientTascaComentariResourceEntity();
-                expedientTascaComentariResourceEntity.setText(params.getMotiu());
-                entity.getComentaris().add(expedientTascaComentariResourceEntity);
-            }
-
-            changeEstat(entity, TascaEstatEnumDto.PENDENT);
-            usuariResourceRepository.findById(params.getResponsableActual().getId())
-                    .ifPresent(entity::setResponsableActual);
-            expedientTascaResourceRepository.save(entity);
-            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+			try {
+				tascaHelper.reobrirTasca(
+						entity.getId(),
+						getIdsFromUsuarisResources(params.getResponsables()),
+						params.getMotiu(),
+						configHelper.getRolActual());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ReobrirActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al reobrir la tasca.");
+			}
+			return null;
         }
-
         @Override
         public void onChange(ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
 
         }
     }
+    
     private class RetomarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.MotiuFormAction, ExpedientTascaResource> {
 
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.MotiuFormAction params) throws ActionExecutionException {
-            if (params.getMotiu() != null) {
-                ExpedientTascaComentariResourceEntity expedientTascaComentariResourceEntity = new ExpedientTascaComentariResourceEntity();
-                expedientTascaComentariResourceEntity.setText(params.getMotiu());
-                entity.getComentaris().add(expedientTascaComentariResourceEntity);
-            }
-
-            changeEstat(entity, TascaEstatEnumDto.PENDENT);
-            entity.setDelegat(null);
-            expedientTascaResourceRepository.save(entity);
-            return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
+			try {
+				tascaHelper.retomarTasca(entity.getId(), params.getMotiu());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/RetomarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al retomar la tasca.");
+			}
+			return null;
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
+        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {}
+    }
+    
+    private class ReassignarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ReassignarTascaFormAction, ExpedientTascaResource> {
 
+		@Override
+		public void onChange(ReassignarTascaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ReassignarTascaFormAction target) {	}
+
+		@Override
+		public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ReassignarTascaFormAction params) throws ActionExecutionException {
+			try {
+				tascaHelper.reassignarTasca(entity.getId(), getIdsFromUsuarisResources(params.getUsuaris()));
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ReassignarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al reassignar la tasca.");
+			}
+			return null;
+		}
+    }
+    
+    private class DelegarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.DelegarTascaFormAction, ExpedientTascaResource> {
+
+		@Override
+		public void onChange(DelegarTascaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DelegarTascaFormAction target) {}
+
+		@Override
+		public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, DelegarTascaFormAction params) throws ActionExecutionException {
+			try {
+				tascaHelper.delegarTasca(entity.getId(), params.getUsuari().getId(), params.getMotiu());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/DelegarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al delegar la tasca.");
+			}
+			return null;
+		}
+    }
+    
+    private List<String> getIdsFromUsuarisResources(List<ResourceReference<UsuariResource, String>> usuaris) {
+        List<String> resultat = new ArrayList<>();
+        if (usuaris != null) {
+            for (ResourceReference<UsuariResource, String> resource : usuaris) {
+                resultat.add(resource.getId());
+            }
         }
+        return resultat;
     }
 }

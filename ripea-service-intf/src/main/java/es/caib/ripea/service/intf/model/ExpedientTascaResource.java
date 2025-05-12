@@ -43,12 +43,22 @@ import java.util.List;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientTascaResource.ACTION_CHANGE_PRIORITAT,
+                        code = ExpedientTascaResource.ACTION_CHANGE_PRIORITAT_CODE,
                         formClass = ExpedientTascaResource.ChangePrioritatFormAction.class,
                         requiresId = true), 
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
-                        code = ExpedientTascaResource.ACTION_CHANGE_DATALIMIT,
+                        code = ExpedientTascaResource.ACTION_REASSIGNAR_CODE,
+                        formClass = ExpedientTascaResource.ReassignarTascaFormAction.class,
+                        requiresId = true), 
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientTascaResource.ACTION_DELEGAR_CODE,
+                        formClass = ExpedientTascaResource.DelegarTascaFormAction.class,
+                        requiresId = true),                 
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientTascaResource.ACTION_CHANGE_DATALIMIT_CODE,
                         formClass = ExpedientTascaResource.ChangeDataLimitFormAction.class,
                         requiresId = true),                
                 @ResourceConfigArtifact(
@@ -66,8 +76,10 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
     public static final String ACTION_CHANGE_ESTAT_CODE = "ACTION_CHANGE_ESTAT";
-    public static final String ACTION_CHANGE_PRIORITAT = "ACTION_CHANGE_PRIORITAT";
-    public static final String ACTION_CHANGE_DATALIMIT = "ACTION_CHANGE_DATALIMIT";
+    public static final String ACTION_CHANGE_PRIORITAT_CODE = "ACTION_CHANGE_PRIORITAT";
+    public static final String ACTION_CHANGE_DATALIMIT_CODE = "ACTION_CHANGE_DATALIMIT";
+    public static final String ACTION_REASSIGNAR_CODE = "ACTION_REASSIGNAR";
+    public static final String ACTION_DELEGAR_CODE = "ACTION_DELEGAR";
     public static final String ACTION_REABRIR_CODE = "ACTION_REABRIR";
     public static final String ACTION_REBUTJAR_CODE = "ACTION_REBUTJAR";
     public static final String ACTION_RETOMAR_CODE = "ACTION_RETOMAR";
@@ -109,6 +121,7 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private ResourceReference<UsuariResource, String> delegat;
 
     private List<ResourceReference<UsuariResource, String>> observadors = new ArrayList<>();
+    private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
 
     @Getter
     @Setter
@@ -137,7 +150,21 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     @Setter
     public static class ReobrirFormAction extends MotiuFormAction {
         @NotNull
-        private ResourceReference<UsuariResource, String> responsableActual;
+        private List<ResourceReference<UsuariResource, String>> responsables;
+    }
+    
+    @Getter
+    @Setter
+    public static class DelegarTascaFormAction extends MotiuFormAction {
+        @NotNull
+        private ResourceReference<UsuariResource, String> usuari;
+    }
+    
+    @Getter
+    @Setter
+    public static class ReassignarTascaFormAction implements Serializable {
+        @NotNull
+        private List<ResourceReference<UsuariResource, String>> usuaris;
     }
 
     @Getter

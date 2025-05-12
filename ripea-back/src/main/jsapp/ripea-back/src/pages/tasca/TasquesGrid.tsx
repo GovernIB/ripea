@@ -111,6 +111,7 @@ const TasquesGrid = (props: any) => {
             perspectives={perspectives}
             onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
             popupEditCreateActive
+			toolbarCreateTitle={"Nova tasca"}
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
                 expedient: {id: entity?.id},
