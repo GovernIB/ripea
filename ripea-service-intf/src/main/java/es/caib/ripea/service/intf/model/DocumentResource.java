@@ -284,7 +284,7 @@ public class DocumentResource extends NodeResource {
         @NotNull
         private Action action = Action.MOURE;
 
-        private enum Action {
+        public enum Action {
             MOURE,
             COPIAR
         }

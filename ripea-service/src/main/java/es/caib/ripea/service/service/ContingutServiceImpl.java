@@ -358,9 +358,7 @@ public class ContingutServiceImpl implements ContingutService {
 								firmaContingut, 
 								false, 
 								true);
-						
 					} 
-					
 					
 					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus, null);
 					
@@ -369,6 +367,7 @@ public class ContingutServiceImpl implements ContingutService {
 								document,
 								firmes.get(0).getFitxer());
 					}
+					
 					if (firmes == null && Utils.isEmpty(fitxer.getContingut())) {
 						throw new ValidationException("No es pot recuperar el document perquè no conté el contingut");
 					}
@@ -379,9 +378,7 @@ public class ContingutServiceImpl implements ContingutService {
 							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 							firmes,
 							arxiuEstat);
-					
 				}
-				
 
 			} else if (contingut instanceof CarpetaEntity) {
 				contingutHelper.arxiuPropagarModificacio((CarpetaEntity) contingut);
@@ -393,15 +390,12 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 	}
 	
-	
 	@Transactional
 	@Override
 	public boolean isDeleted(Long contingutId) {
-
 		ContingutEntity contingut = contingutRepository.getOne(contingutId);
 		return contingut.getEsborrat() != 0;
 	}
-	
 
 	@Transactional
 	@Override
@@ -416,99 +410,8 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
 				+ "contingutDestiId=" + contingutDestiId + ")");
-		ContingutEntity contingutOrigen = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutOrigenId,
-				true,
-				false,
-				false,
-				true, 
-				false, 
-				true, rolActual);
-		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutDestiId,
-				false,
-				false,
-				true,
-				false, 
-				false, 
-				true, rolActual);
 		
-		// Comprova que no es mou dins de un fill
-		if (contingutOrigen instanceof CarpetaEntity && contingutHelper.isCarpetaLogica()) {
-			comprovarContingutDesti(contingutOrigen, contingutDesti);
-		}
-		
-		// Comprova el tipus del contingut que es vol moure
-		if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
-			throw new ValidationException(
-					contingutOrigenId,
-					contingutOrigen.getClass(),
-					"Només es poden moure documents");
-		}
-		// No es poden moure documents firmats
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat() && !contingutHelper.isCarpetaLogica()) {
-				throw new ValidationException(
-						contingutOrigenId,
-						contingutOrigen.getClass(),
-						"No es poden moure documents firmats");
-			}
-		}
-		// Es comprova que el procediment orígen i destí son el mateix
-		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
-				contingutOrigen,
-				true,
-				false,
-				false, null);
-		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
-				contingutDesti,
-				true,
-				false,
-				false, null);
-		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
-			throw new ValidationException(
-					contingutOrigenId,
-					contingutOrigen.getClass(),
-					"Només es pot moure contingut entre dos expedients del mateix tipus");
-		}
-		// Comprova que el nom no sigui duplicat
-		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
-				contingutDesti,
-				contingutOrigen.getNom(),
-				0) != null;
-		if (nomDuplicat) {
-			throw new ValidationException(
-					contingutOrigenId,
-					ContingutEntity.class,
-					"Ja existeix un altre contingut amb el mateix nom dins el contingut destí ("
-							+ "contingutDestiId=" + contingutDestiId + ")");
-		}
-		// Realitza el moviment del contingut
-		ContingutMovimentEntity contingutMoviment = contingutHelper.ferIEnregistrarMoviment(
-				contingutOrigen,
-				contingutDesti,
-				null);
-		contingutLogHelper.log(
-				contingutOrigen,
-				LogTipusEnumDto.MOVIMENT,
-				contingutMoviment,
-				true,
-				true);
-		
-		if (contingutOrigen instanceof DocumentEntity){
-			contingutHelper.arxiuDocumentPropagarMoviment(
-					contingutOrigen.getArxiuUuid(),
-					contingutDesti,
-					expedientDesti.getArxiuUuid());
-		} else if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
-			pluginHelper.arxiuCarpetaMoure(
-					(CarpetaEntity)contingutOrigen,
-					contingutDesti.getArxiuUuid());
-		}
-
+		contingutHelper.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
 	}
 
 	@Transactional
@@ -523,87 +426,7 @@ public class ContingutServiceImpl implements ContingutService {
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
 				+ "contingutDestiId=" + contingutDestiId + ", "
 				+ "recursiu=" + recursiu + ")");
-		ContingutEntity contingutOrigen = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutOrigenId,
-				true,
-				false,
-				false,
-				false, 
-				false, true, null);
-		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutDestiId,
-				false,
-				false,
-				true,
-				false, 
-				false, true, null);
-		// Comprova el tipus del contingut que es vol moure
-		if (!(contingutOrigen instanceof DocumentEntity)) {
-			throw new ValidationException(
-					contingutOrigenId,
-					contingutOrigen.getClass(),
-					"Només es poden copiar documents");
-		}
-		// TODO Mirar què passa amb els documents firmats
-		if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat()) {
-				throw new ValidationException(
-						contingutOrigenId,
-						contingutOrigen.getClass(),
-						"No es poden copiar documents firmats");
-			}
-		}
-		// Es comprova que el procediment orígen i destí son el mateix
-		ExpedientEntity expedientOrigen = contingutHelper.getExpedientSuperior(
-				contingutOrigen,
-				true,
-				false,
-				false, null);
-		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
-				contingutDesti,
-				true,
-				false,
-				false, null);
-		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
-			throw new ValidationException(
-					contingutOrigenId,
-					contingutOrigen.getClass(),
-					"Només es pot moure contingut entre dos expedients del mateix tipus");
-		}
-		// Comprova que el nom no sigui duplicat
-		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
-				contingutDesti,
-				contingutOrigen.getNom(),
-				0) != null;
-		if (nomDuplicat) {
-			throw new ValidationException(
-					contingutOrigenId,
-					ContingutEntity.class,
-					"Ja existeix un altre contingut amb el mateix nom dins el contingut destí ("
-							+ "contingutDestiId=" + contingutDestiId + ")");
-		}
-		// Realitza la còpia del contingut
-		ContingutEntity contingutCopia = copiarContingut(
-				contingutOrigen.getEntitat(),
-				contingutOrigen,
-				contingutDesti,
-				recursiu);
-		contingutLogHelper.log(
-				contingutCopia,
-				LogTipusEnumDto.COPIA,
-				null,
-				null,
-				true,
-				true);
-		ContingutDto dto = contingutHelper.toContingutDto(
-				contingutOrigen, false, false);
-		contingutHelper.arxiuPropagarCopia(
-				contingutOrigen,
-				contingutDesti);
-		return dto;
+		return contingutHelper.copy(entitatId, contingutOrigenId, contingutDestiId, recursiu);
 	}
 
 	@Transactional
@@ -700,29 +523,21 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return contingutOrigen.getId();
 	}
-
 	
 	@Transactional(readOnly = true)
 	@Override
-	public Long getPareId(
-			Long contingutId) {
-		
+	public Long getPareId(Long contingutId) {
 		ContingutEntity contingut = contingutRepository.getOne(contingutId);
 		return contingut.getPare() != null ? contingut.getPare().getId() : null;
 	}
 	
 	@Transactional(readOnly = true)
 	@Override
-	public Long getExpedientId(
-			Long contingutId) {
-		
+	public Long getExpedientId(Long contingutId) {
 		ContingutEntity contingut = contingutRepository.getOne(contingutId);
 		return contingut.getExpedientPare().getId();
-	}
-	
-	
+	}	
 
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<ContingutDto> getFillsBasicInfo(
@@ -2231,154 +2046,6 @@ public class ContingutServiceImpl implements ContingutService {
 			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(fillId);
 			contingut.updateOrdre(ordre);
 		}
-	}
-	
-	/*private ContingutEntity contingutHelper.comprovarContingutDinsExpedient(
-			Long entitatId,
-			Long contingutId,
-			boolean comprovarEsNode,
-			boolean comprovarPermisReadEnNode,
-			boolean comprovarPermisWriteEnNode,
-			boolean comprovarPermisDeleteEnNode) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId);
-		// Comprova el permís de modificació de l'expedient superior
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				contingut,
-				true,
-				false,
-				true);
-		if (expedientSuperior != null) {
-			// Comprova que l'usuari actual te agafat l'expedient
-			UsuariEntity agafatPer = expedientSuperior.getAgafatPer();
-			if (agafatPer != null) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				if (!auth.getName().equals(agafatPer.getCodi())) {
-					throw new ValidationException(
-							contingutId,
-							ContingutEntity.class,
-							"L'expedient al qual pertany el contingut no està agafat per l'usuari actual (" +
-							"usuariActualCodi=" + auth.getName() + ")");
-				}
-			} else {
-				throw new ValidationException(
-						contingutId,
-						ContingutEntity.class,
-						"L'expedient al qual pertany el contingut no està agafat per cap usuari");
-			}
-			// Comprova els permisos per a modificar l'expedient
-			contingutHelper.comprovarPermisosNode(
-					expedientSuperior,
-					false,
-					true,
-					false);
-			if (comprovarEsNode) {
-				if (!(contingut instanceof NodeEntity)) {
-					throw new ValidationException(
-							contingutId,
-							ContingutEntity.class,
-							"El contingut no és un node");
-				}
-				NodeEntity node = (NodeEntity)contingut;
-				contingutHelper.comprovarPermisosNode(
-						node,
-						comprovarPermisReadEnNode,
-						comprovarPermisWriteEnNode,
-						comprovarPermisDeleteEnNode);
-			}
-		} else {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"No es pot modificar un contingut que no està associat a un expedient");
-		}
-		return contingut;
-	}*/
-
-	private void comprovarContingutDesti(ContingutEntity origen, ContingutEntity desti) {
-		if (desti == null)
-			return;
-		
-		ContingutEntity contingutPare = desti.getPare();
-		if (contingutPare == null || (contingutPare != null && ! contingutPare.equals(origen))) {
-			comprovarContingutDesti(origen, desti.getPare());
-			return;
-		}
-		
-		throw new ValidationException(
-				origen,
-				origen.getClass(),
-				"No es pot moure una carpeta a un fill");
-	}
-
-	private ContingutEntity copiarContingut(
-			EntitatEntity entitat,
-			ContingutEntity contingutOrigen,
-			ContingutEntity contingutDesti,
-			boolean recursiu) {
-		ContingutEntity creat = null;
-		if (contingutOrigen instanceof CarpetaEntity) {
-			CarpetaEntity carpetaOrigen = (CarpetaEntity)contingutOrigen;
-			CarpetaEntity carpetaNova = CarpetaEntity.getBuilder(
-					carpetaOrigen.getNom(),
-					contingutDesti,
-					entitat,
-					contingutDesti.getExpedient()).build();
-			creat = contingutRepository.save(carpetaNova);
-		} else if (contingutOrigen instanceof DocumentEntity) {
-			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			creat = documentHelper.crearDocumentDB(
-					documentOrigen.getDocumentTipus(),
-					documentOrigen.getNom(),
-					documentOrigen.getDescripcio(),
-					documentOrigen.getData(),
-					documentOrigen.getDataCaptura(),
-					documentOrigen.getNtiOrgano(),
-					documentOrigen.getNtiOrigen(),
-					documentOrigen.getNtiEstadoElaboracion(),
-					documentOrigen.getNtiTipoDocumental(),
-					documentOrigen.getMetaDocument(),
-					contingutDesti,
-					entitat,
-					contingutDesti.getExpedient(),
-					documentOrigen.getUbicacio(),
-					documentOrigen.getNtiIdDocumentoOrigen(),
-					null, 
-					documentOrigen.getDocumentFirmaTipus(), 
-					documentOrigen.getExpedientEstatAdditional());
-		}
-		if (creat != null) {
-			if (creat instanceof NodeEntity) {
-				NodeEntity nodeOrigen = (NodeEntity)contingutOrigen;
-				NodeEntity nodeDesti = (NodeEntity)creat;
-				for (DadaEntity dada: dadaRepository.findByNode(nodeOrigen)) {
-					DadaEntity dadaNova = DadaEntity.getBuilder(
-							dada.getMetaDada(),
-							nodeDesti,
-							dada.getValor(),
-							dada.getOrdre()).build();
-					dadaRepository.save(dadaNova);
-				}
-			}
-			if (recursiu) {
-				for (ContingutEntity fill: contingutOrigen.getFills()) {
-					if (fill instanceof CarpetaEntity || fill instanceof DocumentEntity) {
-						copiarContingut(
-								entitat,
-								fill,
-								creat,
-								recursiu);
-					}
-				}
-			}
-		}
-		return creat;
 	}
 
 	private ContingutEntity vincularContingut(

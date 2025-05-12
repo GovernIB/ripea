@@ -19,12 +19,9 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -339,7 +336,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class ExportarDocumentMassiu extends MassiveAction implements Serializable {
+    public static class ExportarDocumentMassiu extends MassiveAction {
 		private boolean carpetes = true;
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;
