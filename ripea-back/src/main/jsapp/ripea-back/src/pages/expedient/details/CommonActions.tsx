@@ -12,6 +12,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
+import useTancar from "../actions/Tancar.tsx";
 
 const iniciaDescargaBlob = (result: any) => {
     const url = URL.createObjectURL(result.blob);
@@ -45,7 +46,7 @@ export const useActions = (refresh?: () => void) => {
     }
 	
 	const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code :code, data:{ ids: [id], masivo: false }, fileType})
+	    return apiReport(undefined, {code :code, data:{ ids: [id], massivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
@@ -85,6 +86,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
     const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
+    const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
 
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
@@ -192,7 +194,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.close'),
             icon: "check",
             showInMenu: true,
-            // onClick: ,
+            onClick: handleTancar,
             disabled: (row:any) => !row?.potTancar,
             hidden: (row:any) => !potModificar(row) || isTancat(row),
         },
@@ -284,7 +286,7 @@ export const useCommonActions = (refresh?: () => void) => {
 		    icon: "delete",
 		    showInMenu: true,
 		    onClick: eliminar,
-		    hidden: (row:any) => isTancat(row),
+		    hidden: (row:any) => !potModificar(row),
 		},	
     ]
         .map(({ hidden, ...rest }) => ({
@@ -300,6 +302,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {assignarContent}
         {cambiarRelacionar}
         {contentExportDoc}
+        {contentTancar}
     </>;
 
     return {

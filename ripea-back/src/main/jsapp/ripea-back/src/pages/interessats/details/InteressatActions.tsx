@@ -7,18 +7,21 @@ import {
 import {InteressatsGridForm} from "../InteressatsGrid.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import {Divider} from "@mui/material";
+import useInteressatDetail from "./InteressatDetail.tsx";
 
-const useInteressatActions = (refresh?: () => void) => {
+const useActions = (apiRef:any,refresh?: () => void) => {
     const { t } = useTranslation();
+
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
     const {
         delete: apiDelete,
         patch: apiPatch,
         getOne
     } = useResourceApiService('interessatResource');
-    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
-    const confirmDialogButtons = useConfirmDialogButtons();
-    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
-    const apiRef = useRef<MuiFormDialogApi>();
 
     const createRepresentent = (id: any, row:any) => {
         apiRef.current?.show(undefined, {
@@ -34,7 +37,7 @@ const useInteressatActions = (refresh?: () => void) => {
                 refresh?.();
                 temporalMessageShow(null, 'Elemento creado', 'success');
             })
-            .catch((error) => {
+            .catch((error:any) => {
                 temporalMessageShow('Error', error.message, 'error');
             });
     }
@@ -44,7 +47,7 @@ const useInteressatActions = (refresh?: () => void) => {
                 refresh?.();
                 temporalMessageShow(null, 'Elemento modificado', 'success');
             })
-            .catch((error) => {
+            .catch((error:any) => {
                 temporalMessageShow('Error', error.message, 'error');
             });
     }
@@ -114,33 +117,67 @@ const useInteressatActions = (refresh?: () => void) => {
             });
     }
 
+    return {
+        createRepresentent,
+        updateRepresentent,
+        deleteRepresentent,
+        deleteInteressat,
+    }
+}
+
+const useInteressatActions = (readOnly:boolean,refresh?: () => void) => {
+    const { t } = useTranslation();
+
+    const apiRef = useRef<MuiFormDialogApi>();
+
+    const {
+        createRepresentent,
+        updateRepresentent,
+        deleteRepresentent,
+        deleteInteressat,
+    } = useActions(apiRef, refresh);
+    const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
+
     const actions = [
+        {
+            title: t('common.detail'),
+            icon: "info",
+            showInMenu: true,
+            onClick: handleDetail,
+            hidden: !readOnly,
+        },
         {
             title: t('page.interessat.actions.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteInteressat,
+            hidden: readOnly,
+        },
+        {
+            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            showInMenu: true,
+            hidden: readOnly,
         },
         {
             title: t('page.interessat.actions.createRep'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
-            disabled: (row: any) => row?.representant,
+            hidden: (row: any) => row?.representant || readOnly,
         },
         {
             title: t('page.interessat.actions.updateRep'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
-            disabled: (row: any) => !row?.representant,
+            hidden: (row: any) => !row?.representant || readOnly,
         },
         {
             title: t('page.interessat.actions.deleteRep'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,
-            disabled: (row: any) => !row?.representant,
+            hidden: (row: any) => !row?.representant || readOnly,
         },
     ];
 
@@ -152,6 +189,7 @@ const useInteressatActions = (refresh?: () => void) => {
         >
             <InteressatsGridForm/>
         </MuiFormDialog>
+        {dialogDetail}
     </>;
 
     return {

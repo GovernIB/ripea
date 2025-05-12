@@ -11,12 +11,14 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 import es.caib.ripea.service.intf.base.service.PermissionEvaluatorService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.resourceservice.AlertaResourceService;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import es.caib.ripea.service.intf.resourceservice.ContingutLogResourceService;
 import es.caib.ripea.service.intf.resourceservice.ContingutMovimentResourceService;
 import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentEnviamentInteressatResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentPortafirmesResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentPublicacioResourceService;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.resourceservice.EntitatResourceService;
@@ -471,6 +473,18 @@ public class EjbClientConfig {
 	@ConditionalOnWarDeployment
 	public LocalStatelessSessionProxyFactoryBean execucioMassivaContingutResourceServiceEjb() {
 		return getLocalEjbFactoyBean(ExecucioMassivaContingutResourceService.class);
+	}
+	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean documentPortafirmesResourceServiceEjb() {
+		return getLocalEjbFactoyBean(DocumentPortafirmesResourceService.class);
+	}
+
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean alertaResourceServiceEjb() {
+		return getLocalEjbFactoyBean(AlertaResourceService.class);
 	}
 	
 	/*

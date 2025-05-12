@@ -1,13 +1,17 @@
 import {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
-import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
 export const ToolbarButton = (props:any) => {
-    const { title, icon, children, ...other } = props;
+    const { title, icon, hidden, children, ...other } = props;
+
+    if (hidden){
+        return <></>
+    }
 
     return <Tooltip title={title}>
         <Button
@@ -47,9 +51,11 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         toolbarHideCreate,
         toolbarMassiveActions,
         selectionActive,
+        staticSortModel,
         readOnly,
         onRowsChange,
         onRowCountChange,
+        onRowSelectionModelChange,
         rowProps,
         ...others
     } = props
@@ -170,14 +176,16 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 onRowsChange?.(rows, info);
                 onRowCountChange?.(info?.totalElements);
             }}
-            rowSelectionModel={selectedRows}
-            onRowSelectionModelChange={(newSelection) => {
+            onRowSelectionModelChange={(newSelection, details) => {
                 // console.log('Selection changed:', newSelection);
                 setSelectedRows([...newSelection]);
+                onRowSelectionModelChange?.(newSelection, details);
             }}
 
             titleDisabled
             disableColumnMenu
+            disableColumnSorting={!!staticSortModel}
+            staticSortModel={staticSortModel}
 
             selectionActive={selectionActive || !!toolbarMassiveActions}
             checkboxSelection={selectionActive || !!toolbarMassiveActions}

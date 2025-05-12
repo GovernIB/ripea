@@ -10,7 +10,7 @@ const useMassiveActions = (refresh?: () => void)=> {
     const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService('expedientResource');
 
     const massiveAction = (ids:any[], code:string, msg:string) => {
-        return apiAction(undefined, {code :code, data:{ ids: ids, masivo: true }})
+        return apiAction(undefined, {code :code, data:{ ids: ids, massivo: true }})
 			.then(() => {
                 refresh?.()
                 temporalMessageShow(null, msg, 'info');
@@ -21,7 +21,7 @@ const useMassiveActions = (refresh?: () => void)=> {
     }
 	
 	const massiveReport = (ids:any[], code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code :code, data:{ ids: ids, masivo: true }, fileType})
+	    return apiReport(undefined, {code :code, data:{ ids: ids, massivo: true }, fileType})
 			.then(() => {
 			    refresh?.()
 			    temporalMessageShow(null, msg, 'info');

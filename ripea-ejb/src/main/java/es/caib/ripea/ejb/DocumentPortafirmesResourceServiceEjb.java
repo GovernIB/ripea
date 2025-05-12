@@ -10,23 +10,23 @@ import javax.ejb.Stateless;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.resourceservice.ContingutMovimentResourceService;
+import es.caib.ripea.service.intf.resourceservice.DocumentPortafirmesResourceService;
 import lombok.experimental.Delegate;
 
 @Stateless
 @RolesAllowed("**")
-public class ContingutMovimentResourceServiceEjb extends AbstractServiceEjb<ContingutMovimentResourceService> implements ContingutMovimentResourceService {
+public class DocumentPortafirmesResourceServiceEjb extends AbstractServiceEjb<DocumentPortafirmesResourceService> implements DocumentPortafirmesResourceService {
 
-	@Delegate private ContingutMovimentResourceService delegateService;
-	
-	protected void setDelegateService(ContingutMovimentResourceService delegateService) {
-		this.delegateService = delegateService;
-	}
+    @Delegate private DocumentPortafirmesResourceService delegateService;
+
+    protected void setDelegateService(DocumentPortafirmesResourceService delegateService) {
+        this.delegateService = delegateService;
+    }
 
 	@Override
 	public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params)

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -68,6 +69,7 @@ import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
+import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -89,11 +91,38 @@ public class DocumentHelper {
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	
 	public DocumentDto crearDocument(
+			Long entitatId,
 			DocumentDto document,
 			ContingutEntity pare,
-			ExpedientEntity expedient,
-			MetaDocumentEntity metaDocument,
+			boolean comprovarMetaExpedient,
 			boolean returnDetail) {
+		
+		ExpedientEntity expedient = pare.getExpedientPare();
+		
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
+		if (entitat!=null && !contingutHelper.checkUniqueContraint(document.getNom(), pare, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+			throw new ContingutNotUniqueException();
+		}
+		
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Creant nou document (" +
+					"expedient=" + expedient.getNom() + "(" + expedient.getId() + "), " +
+					"metaExpedient=" + expedient.getMetaExpedient().getNom() + "(" + expedient.getMetaExpedient().getId() + "))");
+		
+		MetaDocumentEntity metaDocument = null;
+		if (document.getMetaNode()!=null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					pare.getEntitat(),
+					expedient.getMetaExpedient(),
+					document.getMetaNode().getId(),
+					true,
+					comprovarMetaExpedient);
+		} else {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"No es pot crear un document sense un meta-document associat");
+		}
 		
 		//Casos en que han adjuntat document original i document firmat, pero el firmat ja conté el original (firmes attached)
 		if (document.getFitxerContingut()!=null && 
@@ -343,6 +372,11 @@ public class DocumentHelper {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
+		if (!contingutHelper.checkUniqueContraint(document.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+			throw new ContingutNotUniqueException();
+		}
+		
 		MetaDocumentEntity metaDocument = null;
 		List<ArxiuFirmaDto> firmes = null;
 		if (document.getMetaDocument() != null) {
@@ -586,6 +620,11 @@ public class DocumentHelper {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
+		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
+		if (!contingutHelper.checkUniqueContraint(documentEntity.getNom(), null, entitat, ContingutTipusEnumDto.DOCUMENT)) {
+			throw new ContingutNotUniqueException();
+		}
+		
 		MetaDocumentEntity metaDocument = null;
 		if (metaDocumentId != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
@@ -1711,6 +1750,28 @@ public class DocumentHelper {
 				zos);
 	}
 	
+	public FitxerDto getZipFromDocumentsIds(Long entitatId, List<Long> docsIdx) throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		FitxerDto resultat = new FitxerDto();
+		if (docsIdx != null) {
+			for (Long docId: docsIdx) {
+				FitxerDto fitxer = getFitxerAssociat(docId, null);
+				ZipEntry entry = new ZipEntry(revisarContingutNom(fitxer.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));
+				entry.setSize(fitxer.getContingut().length);
+				zos.putNextEntry(entry);
+				zos.write(fitxer.getContingut());
+				zos.closeEntry();
+			}
+			zos.close();
+
+			resultat.setContingut(baos.toByteArray());
+			resultat.setNom("Fitxers_"+System.currentTimeMillis()+".zip");
+			resultat.setContentType("application/zip");
+		}
+		return resultat;
+	}
+	
 	private static String revisarContingutNom(String nom) {
 		if (nom == null) {
 			return null;
@@ -1745,5 +1806,4 @@ public class DocumentHelper {
     }
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
-
 }

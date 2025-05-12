@@ -247,10 +247,10 @@ public class ExpedientHelper2 {
 				
 				//Crea un nou document a la mateixa ubicació que l'anterior, pero sense tipus (metaDocument=null) per evitar error de multiplicitat
 				DocumentDto nouDocument = documentHelper.crearDocument(
+						null,
 						docDto,
 						document.getPare(),
-						expedient,
-						null, //document.getMetaDocument()
+						false,
 						false);
 				
 				//Relacionam els dos documents, original i clon

@@ -23,10 +23,15 @@ const CardButton = (props:any) => {
     </Grid>
 }
 
+const isEmpty = (value:any[]) => {
+    console.log("hiddenIfEmpty", value)
+    return !value || value?.length === 0 || value?.every?.((item:any) => !item)
+}
+
 export const CardData = (props:any) => {
     const {title, header, children, xs, hidden, hiddenIfEmpty, buttons, cardProps, headerProps = cardHeader, ...other} = props;
 
-    if (hidden || (hiddenIfEmpty && (!children || children?.length === 0 || children?.every?.((item:any) => !item)))){
+    if (hidden || (hiddenIfEmpty && isEmpty(children))){
         return <></>
     }
 
@@ -48,7 +53,7 @@ export const CardData = (props:any) => {
 export const ContenidoData = (props:any) => {
     const {title, titleXs, children, textXs, xs, componentTitleProps, componentTextProps, hidden, hiddenIfEmpty, ...other} = props;
 
-    if (hidden || (hiddenIfEmpty && (!children || children?.length === 0 || children?.every?.((item:any) => !item)))){
+    if (hidden || (hiddenIfEmpty && isEmpty(children))){
         return <></>
     }
 

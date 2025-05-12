@@ -91,7 +91,6 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
-import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternNoTrobatException;
@@ -4875,10 +4874,10 @@ public class PluginHelper {
 							metaDocument,
 							resposta);
 					documentHelper.crearDocument(
+							null,
 							document,
 							notificacio.getDocument().getPare(),
-							expedient,
-							metaDocument,
+							true,
 							false);
 				}
 

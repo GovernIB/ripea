@@ -6,6 +6,7 @@ import {useResourceApiService} from "reactlib";
 const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
+const alertesKey = 'alertes';
 const organKey = 'organ';
 
 export const useUserSession = () => {
@@ -70,6 +71,31 @@ export const useUserSession = () => {
     };
 }
 
+export const useAlertesSessio = () => {
+
+    const { value, save } = useSession(alertesKey);
+
+    //Recuperar les alertes generals de l'aplicació.
+    //No depenen de cap acció del usuari, s'han de consultar periòdicament.
+    const fetchAlerta = async () => {
+        axios.get(userUrl+'/syncStoredSessionData')
+            .then((response) => {
+                save(response.data);
+            })
+            .catch((error) => {
+                console.error("Error al obtenir les alertes:", error);
+            });
+    };
+
+    useEffect(() => {
+        fetchAlerta(); // Cridada inicial
+        const interval = setInterval(fetchAlerta, 10000); //Cada 10 segons refrescar info
+        return () => clearInterval(interval);
+    }, []);
+
+    return { value, save };
+}
+
 export const useEntitatSession = () => {
     const { value, isInitialized, save, remove } = useSession(entitatKey)
     const { value: user } = useUserSession();
@@ -86,8 +112,10 @@ export const useEntitatSession = () => {
     }
 
     useEffect(()=>{
-        if (user?.entitatActualId && user?.entitatActualId != value?.id) {
-            refresh()
+        if (user && user?.entitatActualId) {
+            if (user?.entitatActualId != value?.id) {
+                refresh()
+            }
         } else {
             remove()
         }
@@ -106,6 +134,7 @@ export const useEntitatSession = () => {
 
     return { value, remove }
 }
+
 export const useOrganSession = () => {
     const { value, isInitialized, save, remove } = useSession(organKey)
     const { value: user } = useUserSession();
@@ -116,23 +145,23 @@ export const useOrganSession = () => {
     } = useResourceApiService('organGestorResource');
 
     const refresh = () => {
-        if (user?.organActualId && user?.organActualId != value?.id && apiIsReady){
-            apiGetOne(user?.organActualId)
-                .then((app) => save(app))
-                .catch(() => remove())
-        }
+        apiGetOne(user?.organActualId)
+            .then((app) => save(app))
+            .catch(() => remove())
     }
 
     useEffect(()=>{
         if (user && user?.organActualId) {
-            refresh()
+            if (user?.organActualId != value?.id) {
+                refresh()
+            }
         } else {
             remove()
         }
     },[user])
 
     useEffect(()=>{
-        if(!isInitialized()){
+        if(!isInitialized() && user?.organActualId && apiIsReady){
             save({});
             refresh()
         }

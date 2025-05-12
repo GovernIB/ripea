@@ -75,6 +75,11 @@ const translationEs = {
                 estat: "Estado",
                 prioritat: "Prioridad",
                 clasificacio: "Clasificación",
+
+                dataProgramada: "Fecha en que se hará efectivo el envio de la notificación a Notific@",
+                duracio: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
+                dataCaducitat: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
+                retard: "Dias que la notificación permanecerá en la sede antes de ser enviada via DEH o CIE",
             },
             tabs: {
                 contingut: "Contenido",
@@ -165,11 +170,15 @@ const translationEs = {
             title: "Interesado",
             rep: "Representante",
             detall: {
-                nif: "NIF",
+                nif: "NIF/CIF/NIE",
                 nom: "Nombre",
+                raoSocial: "Razón social",
                 llinatges: "Apellidos",
-                telefon: "Telefono",
-                email: "Email",
+                telefon: "Teléfono",
+                email: "Correo electrónico",
+                incapacitat: "Incapacidad",
+                direccio: "Dirección",
+                direccioPostal: "Dirección postal",
                 entregaDehObligat: "DEH obligada?",
             },
             actions: {
@@ -220,6 +229,7 @@ const translationEs = {
                 sincronitzar: "Sincronizar estado con archivo",
             },
             action: {
+                close: "Cerrar expediente",
                 changePrioritat: "Modificar prioridad del expediente",
                 changeEstat: "Modificar estado del expediente",
                 assignar: "Assignar expediente a usuario",
@@ -375,6 +385,7 @@ const translationEs = {
             },
         },
         notificacio: {
+            title: "Notificación",
             tabs: {
                 dades: "Datos",
                 errors: "Errores",

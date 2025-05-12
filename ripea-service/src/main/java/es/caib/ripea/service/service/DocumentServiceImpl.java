@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
@@ -85,7 +82,6 @@ import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
 import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ContingutDto;
 import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
@@ -119,7 +115,6 @@ import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaRespostaDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.service.intf.exception.ArxiuNotFoundDocumentException;
-import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
@@ -205,33 +200,11 @@ public class DocumentServiceImpl implements DocumentService {
 			}
 		}
 
-		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
-			throw new ContingutNotUniqueException();
-		}
-		ExpedientEntity expedient = pare.getExpedientPare();
-		if (cacheHelper.mostrarLogsCreacioContingut())
-			logger.info("[DOC] Creant nou document (" +
-					"expedient=" + expedient.getNom() + "(" + expedient.getId() + "), " +
-					"metaExpedient=" + expedient.getMetaExpedient().getNom() + "(" + expedient.getMetaExpedient().getId() + "))");
-		MetaDocumentEntity metaDocument = null;
-		if (document.getMetaDocument() != null) {
-			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					pare.getEntitat(),
-					expedient.getMetaExpedient(),
-					document.getMetaDocument().getId(),
-					true,
-					comprovarMetaExpedient);
-		} else {
-			throw new ValidationException(
-					"<creacio>",
-					ExpedientEntity.class,
-					"No es pot crear un document sense un meta-document associat");
-		}
 		DocumentDto documentDto = documentHelper.crearDocument(
+				entitatId,
 				document,
 				pare,
-				expedient,
-				metaDocument,
+				comprovarMetaExpedient,
 				true);
 
 		if (cacheHelper.mostrarLogsCreacioContingut())
@@ -285,10 +258,7 @@ public class DocumentServiceImpl implements DocumentService {
 					tascaId,
 					documentDto.getId());
 		}
-		
-		if (! checkCarpetaUniqueContraint(documentDto.getNom(), null, entitatId)) {
-			throw new ContingutNotUniqueException();
-		}
+
 		return documentHelper.updateDocument(
 				entitatId,
 				documentEntity,
@@ -345,13 +315,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		}
 
-		
-		if (!checkCarpetaUniqueContraint(
-				document.getNom(),
-				null,
-				entitatId)) {
-			throw new ContingutNotUniqueException();
-		}
 		return documentHelper.updateTipusDocumentDocument(
 				entitatId,
 				document,
@@ -1082,10 +1045,10 @@ public class DocumentServiceImpl implements DocumentService {
 			document.setPinbalIdpeticion(idPeticion);
 
 			DocumentDto docum = documentHelper.crearDocument(
+					entitatId,
 					document,
 					pare,
-					expedient,
-					metaDocument,
+					true,
 					true);
 			
 			DocumentEntity doc = documentRepository.getOne(docum.getId());
@@ -2102,12 +2065,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false);
 	}
-	
-	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
-		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
-		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
-	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
 
 	@Override

@@ -185,7 +185,7 @@ const Expedient = () => {
         {
             value: "interessats",
             label: t('page.contingut.tabs.interessats'),
-            content: <InteressatsGrid id={id} onRowCountChange={setNumInteressats}/>,
+            content: <InteressatsGrid entity={expedient} onRowCountChange={setNumInteressats}/>,
             badge: numInteressats ?? expedient?.numInteressats,
             hidden: !isExperientOrCarpeta(expedient),
         },

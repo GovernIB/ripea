@@ -3,7 +3,6 @@ import {Grid, Alert, Icon} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
-import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 
 const ErrorValidacio = (props:any) => {
     const {entity} = props;

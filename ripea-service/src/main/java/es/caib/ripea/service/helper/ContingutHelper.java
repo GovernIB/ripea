@@ -529,21 +529,7 @@ public class ContingutHelper {
 
         List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient);
         dto.setValid(errorsValidacio.isEmpty());
-        
-        boolean notificacionsCaducades = false;
-        List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
-        for (DocumentEntity document : documents) {
-	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
-	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
-	        	if (notificacionsPendents.get(0).isCaducada() && !notificacionsPendents.get(0).isNotificacioFinalitzada()) {
-	            	notificacionsCaducades = true;
-	            	break;
-	            }
-	        }
-	        if (notificacionsCaducades) break;
-        }
-        
-        dto.setNotificacionsCaducades(notificacionsCaducades);
+        dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
 		dto.setNumComentaris(expedient.getComentaris().size());
 		dto.setMetaNode(conversioTipusHelper.convertir(expedient.getMetaNode(), MetaExpedientDto.class));
@@ -591,7 +577,7 @@ public class ContingutHelper {
 		dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));
 		dto.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient)));
 		dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
-		dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));
+		dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(expedientHelper.expedientTeDocumentsDeAnotacionesNoMogutsASerieFinal(expedient));
 	}
 
 	private void setExpedientNomesPerLlista(ExpedientDto dto, ExpedientEntity expedient, String rolActual) {
