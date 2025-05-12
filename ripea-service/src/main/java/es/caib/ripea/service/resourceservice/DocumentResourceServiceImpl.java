@@ -630,10 +630,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public void onChange(NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
-            // TODO: isPermetreEnviamentPostal
-//            if (fieldName==null){
-//                target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
-//            }
+            if (fieldName==null){
+                target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
+            }
 
             if (fieldName!=null) {
                 switch (fieldName) {

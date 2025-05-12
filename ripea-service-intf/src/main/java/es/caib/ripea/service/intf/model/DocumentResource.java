@@ -335,6 +335,9 @@ public class DocumentResource extends NodeResource {
 
         @Transient
         private boolean permetreEnviamentPostal;
+
+        @Transient
+        private ResourceReference<ExpedientResource, Long> expedient;
     }
 
     @Getter
