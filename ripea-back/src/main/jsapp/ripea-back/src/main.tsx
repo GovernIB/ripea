@@ -14,6 +14,7 @@ import {
     ResourceApiProvider
 } from 'reactlib';
 import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
+import SseProvider from "./components/SseClient.tsx";
 
 dayjs.extend(duration);
 
@@ -55,14 +56,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
         <SessionStorageProvider>
-            <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <BrowserRouter basename={import.meta.env.BASE_URL}>
-                        <App />
-                    </BrowserRouter>
-                </ThemeProvider>
-             </ResourceApiProvider>
+            <SseProvider>
+                <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+                    <ThemeProvider theme={theme}>
+                        <CssBaseline />
+                        <BrowserRouter basename={import.meta.env.BASE_URL}>
+                            <App />
+                        </BrowserRouter>
+                    </ThemeProvider>
+                </ResourceApiProvider>
+            </SseProvider>
         </SessionStorageProvider>
         {/*</AuthProvider>*/}
     </React.StrictMode>,

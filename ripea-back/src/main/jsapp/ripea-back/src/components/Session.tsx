@@ -6,7 +6,7 @@ import {useResourceApiService} from "reactlib";
 const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
-const alertesKey = 'alertes';
+const avisosKey = 'avisos';
 const organKey = 'organ';
 
 export const useUserSession = () => {
@@ -72,25 +72,21 @@ export const useUserSession = () => {
 }
 
 export const useAlertesSessio = () => {
+    const { value, save } = useSession(avisosKey);
 
-    const { value, save } = useSession(alertesKey);
+    // Ara les alertes s'actualitzen automàticament via SSE
+    // No cal fer polling periòdic
 
-    //Recuperar les alertes generals de l'aplicació.
-    //No depenen de cap acció del usuari, s'han de consultar periòdicament.
-    const fetchAlerta = async () => {
-        axios.get(userUrl+'/syncStoredSessionData')
-            .then((response) => {
-                save(response.data);
-            })
-            .catch((error) => {
-                console.error("Error al obtenir les alertes:", error);
-            });
-    };
-
+    // Però fem una càrrega inicial per si el SSE encara no està connectat
     useEffect(() => {
-        fetchAlerta(); // Cridada inicial
-        const interval = setInterval(fetchAlerta, 10000); //Cada 10 segons refrescar info
-        return () => clearInterval(interval);
+        // // Recuperar les alertes generals de l'aplicació inicialment
+        // axios.get(userUrl+'/syncStoredSessionData')
+        //     .then((response) => {
+        //         save(response.data);
+        //     })
+        //     .catch((error) => {
+        //         console.error("Error al obtenir les alertes:", error);
+        //     });
     }, []);
 
     return { value, save };

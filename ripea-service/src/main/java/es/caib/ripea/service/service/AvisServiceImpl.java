@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.service.AvisService;
+import es.caib.ripea.service.intf.service.EventService;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ public class AvisServiceImpl implements AvisService {
 	@Autowired private AvisRepository avisRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private EventService eventService;
 
 	@Transactional
 	@Override
@@ -39,9 +41,11 @@ public class AvisServiceImpl implements AvisService {
 				avis.getAvisNivell(),
 				avis.getAvisAdministrador(),
 				avis.getEntitatId()).build();
-		return conversioTipusHelper.convertir(
-				avisRepository.save(entity),
+		AvisDto dto = conversioTipusHelper.convertir(
+				avisRepository.saveAndFlush(entity),
 				AvisDto.class);
+		eventService.notifyAvisosActius();
+		return dto;
 	}
 
 	@Transactional
@@ -58,9 +62,11 @@ public class AvisServiceImpl implements AvisService {
 				avis.getDataInici(),
 				avis.getDataFinal(),
 				avis.getAvisNivell());
-		return conversioTipusHelper.convertir(
-				avisEntity,
+		AvisDto dto = conversioTipusHelper.convertir(
+				avisRepository.saveAndFlush(avisEntity),
 				AvisDto.class);
+		eventService.notifyAvisosActius();
+		return dto;
 	}
 
 	@Transactional
@@ -73,9 +79,11 @@ public class AvisServiceImpl implements AvisService {
 				"activa=" + activa + ")");
 		AvisEntity avisEntity = avisRepository.getOne(id);
 		avisEntity.updateActiva(activa);
-		return conversioTipusHelper.convertir(
-				avisEntity,
+		AvisDto dto = conversioTipusHelper.convertir(
+				avisRepository.saveAndFlush(avisEntity),
 				AvisDto.class);
+		eventService.notifyAvisosActius();
+		return dto;
 	}
 
 	@Transactional
@@ -86,11 +94,13 @@ public class AvisServiceImpl implements AvisService {
 				"id=" + id +  ")");
 		
 		AvisEntity avisEntity = avisRepository.getOne(id);
-		avisRepository.delete(avisEntity);
-
-		return conversioTipusHelper.convertir(
+		AvisDto dto = conversioTipusHelper.convertir(
 				avisEntity,
 				AvisDto.class);
+		avisRepository.delete(avisEntity);
+		avisRepository.flush();
+		eventService.notifyAvisosActius();
+		return dto;
 	}
 
 	@Transactional(readOnly = true)
