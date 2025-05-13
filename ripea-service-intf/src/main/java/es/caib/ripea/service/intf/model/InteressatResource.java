@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -20,7 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Transient;
 
 @Getter
 @Setter
@@ -33,7 +34,7 @@ import org.springframework.data.annotation.Transient;
         artifacts = {
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
-                        code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
+                        code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),	              
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
@@ -95,12 +96,10 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	@NotNull
 	private ResourceReference<ExpedientResource, Long> expedient;
 	private ResourceReference<InteressatResource, Long> representant;
-    @Transient
-	private InteressatResource representantInfo;
-    @Transient
-    private ResourceReference<InteressatResource, Long> representat;
-    @Transient
-	private boolean hasRepresentats;
+    
+	@Transient private InteressatResource representantInfo;
+    @Transient private ResourceReference<InteressatResource, Long> representat;
+    @Transient private boolean hasRepresentats;
 
     @Transient
 	public String getCodiNom() {
@@ -111,6 +110,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
                 return getNomComplet();
         }
     }
+    
     @Transient
 	public String getNomComplet() {
 		switch (this.tipus) {

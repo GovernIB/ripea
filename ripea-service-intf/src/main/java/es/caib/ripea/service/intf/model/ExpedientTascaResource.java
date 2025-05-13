@@ -116,10 +116,8 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     @NotNull
     @ResourceField(onChangeActive = true)
     private ResourceReference<MetaExpedientTascaResource, Long> metaExpedientTasca;
-    @NotNull
     private ResourceReference<UsuariResource, String> responsableActual;
     private ResourceReference<UsuariResource, String> delegat;
-
     private List<ResourceReference<UsuariResource, String>> observadors = new ArrayList<>();
     private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
 

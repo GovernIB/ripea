@@ -268,15 +268,7 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Override
 	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType) {		
-		if (aplicacioService.getBooleanJbossProperty(PropertyConfig.VALIDATE_SIGNATURE_ATTACHED, true)) {
-			return pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(
-					contingut,
-					contentType);
-		} else {
-			return pluginHelper.detectSignedAttachedUsingPdfReader(
-					contingut, 
-					contentType);
-		}
+		return pluginHelper.detectaFirmaDocument(contingut, contentType);
 	}
 
     @Override

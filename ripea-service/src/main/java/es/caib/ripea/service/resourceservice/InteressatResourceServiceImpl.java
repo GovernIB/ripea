@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
@@ -32,6 +35,10 @@ import lombok.extern.slf4j.Slf4j;
 public class InteressatResourceServiceImpl extends BaseMutableResourceService<InteressatResource, Long, InteressatResourceEntity> implements InteressatResourceService {
 
     private final InteressatResourceRepository interessatResourceRepository;
+    
+    private final ConfigHelper configHelper;
+    private final ExcepcioLogHelper excepcioLogHelper;
+    private final EntityComprovarHelper entityComprovarHelper;
 
     @PostConstruct
     public void init() {
@@ -101,7 +108,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                             (previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatResourceEntity.getId()))
                             || (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatResourceEntity.getId()))
                     ){
-                        throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, "Un interesado no puede representarse a si mismo");
+                        throw new AnswerRequiredException(getResourceClass(), NOT_REPRESENT_HIMSELF, "Un interesado no puede representarse a si mismo");
                     }
 
 //                    if (!Objects.equals(interessatResourceEntity.getId(), previous.getId())) {
