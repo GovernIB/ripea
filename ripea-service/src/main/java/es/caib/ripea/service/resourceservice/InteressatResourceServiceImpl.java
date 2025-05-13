@@ -1,26 +1,25 @@
 package es.caib.ripea.service.resourceservice;
 
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -86,6 +85,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
         @Override
         public void onChange(
+                Serializable id,
                 InteressatResource previous,
                 String fieldName,
                 Object fieldValue,

@@ -87,6 +87,8 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	 * propagar com a canvis en altres camps, del recurs, que es retornaran com
 	 * a resposta.
 	 *
+	 * @param id
+	 *            clau primària del recurs.
 	 * @param previous
 	 *            informació del recurs abans del canvi.
 	 * @param fieldName
@@ -102,6 +104,7 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	 *            si es requereix alguna resposta addicional de l'usuari.
 	 */
 	Map<String, Object> onChange(
+			ID id,
 			R previous,
 			String fieldName,
 			Object fieldValue,

@@ -43,7 +43,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         }
 
         @Override
-        public void onChange(Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
 
         }
     }

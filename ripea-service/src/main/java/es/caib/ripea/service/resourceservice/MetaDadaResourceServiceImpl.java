@@ -1,24 +1,22 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DadaResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.MetaDadaResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDadaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de tasques.
