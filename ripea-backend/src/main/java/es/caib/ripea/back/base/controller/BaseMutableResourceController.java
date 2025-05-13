@@ -212,6 +212,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 		Object fieldValue = getOnChangeFieldValue(onChangeEvent, getResourceClass());
 		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
 		Map<String, Object> processat = getMutableResourceService().onChange(
+				(ID)onChangeEvent.getId(),
 				previous,
 				onChangeEvent.getFieldName(),
 				fieldValue,

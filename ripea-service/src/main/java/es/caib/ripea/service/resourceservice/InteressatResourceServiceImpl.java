@@ -18,6 +18,7 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,6 +87,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
         @Override
         public void onChange(
+                Serializable id,
                 InteressatResource previous,
                 String fieldName,
                 Object fieldValue,

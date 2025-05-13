@@ -18,6 +18,7 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -64,7 +65,7 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
         }
 
         @Override
-        public void onChange(DocumentEnviamentInteressatResource.AmpliarPalacFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentEnviamentInteressatResource.AmpliarPalacFormAction target) {
+        public void onChange(Serializable id, DocumentEnviamentInteressatResource.AmpliarPalacFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentEnviamentInteressatResource.AmpliarPalacFormAction target) {
 
         }
     }

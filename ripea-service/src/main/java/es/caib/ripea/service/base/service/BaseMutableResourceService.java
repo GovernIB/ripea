@@ -144,17 +144,20 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	@Override
 	@Transactional(readOnly = true)
 	public Map<String, Object> onChange(
+			ID id,
 			R previous,
 			String fieldName,
 			Object fieldValue,
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceFieldNotFoundException, AnswerRequiredException {
-		log.debug("Processing onChange event (previous={}, fieldName={}, fieldValue={}, answers={})",
+		log.debug("Processing onChange event (id={}, previous={}, fieldName={}, fieldValue={}, answers={})",
+				id,
 				previous,
 				fieldName,
 				fieldValue,
 				answers);
 		onChangeCheckIfFieldExists(getResourceClass(), fieldName);
 		return onChangeProcessRecursiveLogic(
+				id,
 				previous,
 				fieldName,
 				fieldValue,
@@ -186,6 +189,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ActionExecutor<E, P, ?> actionExecutor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
 			if (actionExecutor != null) {
 				actionExecutor.onChange(
+						null,
 						previous,
 						fieldName,
 						fieldValue,
@@ -275,7 +279,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected void beforeDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {}
 	protected void afterDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 
+	@Override
 	public void onChange(
+			Serializable id,
 			R previous,
 			String fieldName,
 			Object fieldValue,
@@ -284,6 +290,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			R target) {
 		if (onChangeLogicProcessorMap.get(fieldName) != null) {
 			onChangeLogicProcessorMap.get(fieldName).onChange(
+					id,
 					previous,
 					fieldName,
 					fieldValue,

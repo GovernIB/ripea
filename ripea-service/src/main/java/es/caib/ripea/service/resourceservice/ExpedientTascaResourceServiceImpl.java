@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -100,6 +101,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class MetaExpedientTascaOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
+                Serializable id,
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -133,6 +135,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class DuracioOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
+                Serializable id,
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -155,6 +158,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class DataLimitOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
+                Serializable id,
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -216,7 +220,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {
+        public void onChange(Serializable id, ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {
 
         }
     }
@@ -231,7 +235,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
+        public void onChange(Serializable id, ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
 
         }
     }
@@ -253,7 +257,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
+        public void onChange(Serializable id, ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
 
         }
     }
@@ -274,7 +278,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
+        public void onChange(Serializable id, ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
 
         }
     }

@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -388,7 +389,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(
-                DocumentResource previous,
+		        Serializable id,
+		        DocumentResource previous,
                 String fieldName,
                 Object fieldValue,
                 Map<String, AnswerRequiredException.AnswerValue> answers,
@@ -414,7 +416,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(
-                DocumentResource previous,
+		        Serializable id,
+		        DocumentResource previous,
                 String fieldName,
                 Object fieldValue,
                 Map<String, AnswerRequiredException.AnswerValue> answers,
@@ -458,7 +461,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class FirmaAdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(
-                DocumentResource previous,
+		        Serializable id,
+		        DocumentResource previous,
                 String fieldName,
                 Object fieldValue,
                 Map<String, AnswerRequiredException.AnswerValue> answers,
@@ -476,6 +480,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class HasFirmaOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(
+		        Serializable id,
                 DocumentResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -509,7 +514,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
+        public void onChange(Serializable id, DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
 
         }
     }
@@ -517,7 +522,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class CanviTipusDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.UpdateTipusDocumentFormAction, DocumentResource> {
 
 		@Override
-		public void onChange(UpdateTipusDocumentFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UpdateTipusDocumentFormAction target) {}
+		public void onChange(Serializable id, UpdateTipusDocumentFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UpdateTipusDocumentFormAction target) {}
 
 		@Override
 		public DocumentResource exec(String code, DocumentResourceEntity entity, UpdateTipusDocumentFormAction params) throws ActionExecutionException {
@@ -546,7 +551,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class NotificarDocumentsZipActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarDocumentsZipFormAction, DocumentResource> {
 
 		@Override
-		public void onChange(NotificarDocumentsZipFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsZipFormAction target) {}
+		public void onChange(Serializable id, NotificarDocumentsZipFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsZipFormAction target) {}
 
 		@Override
 		public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarDocumentsZipFormAction params) throws ActionExecutionException {
@@ -602,7 +607,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
+        public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
     
     private class PublicarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.PublicarFormAction, DocumentResource> {
@@ -622,13 +627,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
+        public void onChange(Serializable id, DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
     }
     
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
 
 		@Override
-		public void onChange(NotificarFormAction previous, String fieldName, Object fieldValue,
+		public void onChange(Serializable id, NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
             // TODO: isPermetreEnviamentPostal
 //            if (fieldName==null){
@@ -762,7 +767,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
+        public void onChange(Serializable id, DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
         	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte 
         	if (fieldName==null) {
         	} else { //És un camp concret el que s'ha canviat
