@@ -36,9 +36,9 @@ public class DocumentPublicacioResourceServiceEjb extends AbstractServiceEjb<Doc
 
 	@Override
 	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
-			P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
+			Serializable id, P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
 			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
-		return delegateService.artifactOnChange(type, code, previous, fieldName, fieldValue, answers);
+		return delegateService.artifactOnChange(type, code, id, previous, fieldName, fieldValue, answers);
 	}
 
 	@Override
