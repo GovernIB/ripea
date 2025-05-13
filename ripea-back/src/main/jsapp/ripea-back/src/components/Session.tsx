@@ -72,9 +72,9 @@ export const useUserSession = () => {
 }
 
 export const useAlertesSessio = () => {
-    const { value, save } = useSession(alertesKey);
-    const { value: user } = useUserSession();
-
+    const { value, save } = useSession(avisosKey);
+    // const { value: user } = useUserSession();
+    //
     // Recuperar les alertes generals de l'aplicació.
     // No depenen de cap acció del usuari, s'han de consultar periòdicament.
     // const fetchAlerta = async () => {
