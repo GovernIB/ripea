@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -141,6 +142,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class MetaExpedientTascaOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
+				Serializable id,
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -174,6 +176,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class DuracioOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
+		        Serializable id,
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -196,6 +199,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class DataLimitOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
         @Override
         public void onChange(
+		        Serializable id,
                 ExpedientTascaResource previous,
                 String fieldName,
                 Object fieldValue,
@@ -247,7 +251,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {}
+        public void onChange(Serializable id, ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {}
     }
     
     private class ChangePrioritatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangePrioritatFormAction, ExpedientTascaResource> {
@@ -260,7 +264,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ChangePrioritatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangePrioritatFormAction target) {}
+        public void onChange(Serializable id, ExpedientTascaResource.ChangePrioritatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangePrioritatFormAction target) {}
     }
     
     private class ChangeDataLimitActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeDataLimitFormAction, ExpedientTascaResource> {
@@ -277,7 +281,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.ChangeDataLimitFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeDataLimitFormAction target) {}
+        public void onChange(Serializable id, ExpedientTascaResource.ChangeDataLimitFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeDataLimitFormAction target) {}
     }
     
     
@@ -288,7 +292,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
             return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
         }
         @Override
-        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
+        public void onChange(Serializable id, ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {
 
         }
     }
@@ -309,7 +313,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 			return null;
         }
         @Override
-        public void onChange(ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
+        public void onChange(Serializable id, ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
 
         }
     }
@@ -328,13 +332,13 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {}
+        public void onChange(Serializable id, ExpedientTascaResource.MotiuFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.MotiuFormAction target) {}
     }
     
     private class ReassignarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ReassignarTascaFormAction, ExpedientTascaResource> {
 
 		@Override
-		public void onChange(ReassignarTascaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ReassignarTascaFormAction target) {	}
+		public void onChange(Serializable id, ReassignarTascaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ReassignarTascaFormAction target) {	}
 
 		@Override
 		public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ReassignarTascaFormAction params) throws ActionExecutionException {
@@ -351,7 +355,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class DelegarActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.DelegarTascaFormAction, ExpedientTascaResource> {
 
 		@Override
-		public void onChange(DelegarTascaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DelegarTascaFormAction target) {}
+		public void onChange(Serializable id, DelegarTascaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DelegarTascaFormAction target) {}
 
 		@Override
 		public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, DelegarTascaFormAction params) throws ActionExecutionException {
