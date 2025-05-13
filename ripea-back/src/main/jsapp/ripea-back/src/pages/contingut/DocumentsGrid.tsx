@@ -82,7 +82,7 @@ const columns = [
     {
         field: 'nom',
         flex: 0.5,
-        renderCell: (params: any) => <ContingutIcon entity={params?.row}>{params?.row.nom}</ContingutIcon>
+        renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
     },
     {
         field: 'descripcio',
@@ -125,7 +125,10 @@ const DocumentsGrid = (props:any) => {
             popupEditFormDialogResourceTitle={t('page.document.title')}
             columns={columns}
             paginationActive
-            filter={builder.eq('expedient.id', entity?.id)}
+            filter={builder.and(
+                builder.eq('expedient.id', entity?.id),
+                builder.eq('esborrat', 0),
+            )}
             perspectives={perspectives}
             staticSortModel={sortModel}
             popupEditCreateActive
