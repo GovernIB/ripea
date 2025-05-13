@@ -53,6 +53,7 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
@@ -364,19 +365,19 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 target.setFitxerTamany(adjunt.getContentLength());
                 target.setFitxerContentType(adjunt.getContentType());
 
-                // TODO: cambiar (DocumentService.checkIfSignedAttached())
-                SignatureInfoDto signatureInfoDto = new SignatureInfoDto(false);
+                if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
+                	
+                	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(adjunt.getContent(), adjunt.getContentType());
 
-                target.setHasFirma(signatureInfoDto.isSigned());
-                target.setValidacioFirmaCorrecte(!signatureInfoDto.isError());
-                target.setValidacioFirmaErrorMsg(signatureInfoDto.getErrorMsg());
+                    target.setHasFirma(signatureInfoDto.isSigned());
+                    target.setValidacioFirmaCorrecte(!signatureInfoDto.isError());
+                    target.setValidacioFirmaErrorMsg(signatureInfoDto.getErrorMsg());
 
-                if (signatureInfoDto.isSigned()) {
-//                    target.setNtiTipoFirma();
-                    target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-
-                    if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
-                        throw new AnswerRequiredException(InteressatResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
+                    if (signatureInfoDto.isSigned()) {
+                        target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+                        if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
+                            throw new AnswerRequiredException(InteressatResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
+                        }
                     }
                 }
             } else {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -101,6 +102,16 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_EXPORTAR_INTERESSATS_CODE,
+						formClass = ExpedientResource.MassiveAction.class,
+						requiresId = true),                
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_IMPORTAR_INTERESSATS_CODE,
+                        formClass = ExpedientResource.ImportarInteressatsFormAction.class,
+                        requiresId = true),                
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
@@ -154,6 +165,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
+	public static final String ACTION_EXPORTAR_INTERESSATS_CODE = "ACTION_EXPORTAR_INTERESSATS";
+	public static final String ACTION_IMPORTAR_INTERESSATS_CODE = "ACTION_IMPORTAR_INTERESSATS";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
@@ -341,5 +354,12 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull
         private String motiu;
         private List<Long> documentsPerFirmar;
+    }
+    
+    @Getter
+    @Setter
+    public static class ImportarInteressatsFormAction implements Serializable {
+    	@NotNull
+    	private FileReference fitxerJsonInteressats;
     }
 }

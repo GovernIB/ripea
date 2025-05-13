@@ -4272,8 +4272,16 @@ public class PluginHelper {
 		}
 	}
 
+	public SignatureInfoDto detectaFirmaDocument(byte[] contingut, String contentType) {
+		if (aplicacioService.getBooleanJbossProperty(PropertyConfig.VALIDATE_SIGNATURE_ATTACHED, true)) {
+			return detectSignedAttachedUsingValidateSignaturePlugin(contingut, contentType);
+		} else {
+			return detectSignedAttachedUsingPdfReader(contingut, contentType);
+		}
+	}
+	
 	/**
-	 * Aquesta funció es crina només en el OnChange de la modal de document, al seleccionar un fitxer, 
+	 * Aquesta funció es crida només en el OnChange de la modal de document, al seleccionar un fitxer, 
 	 * per saber si donar la opció de adjuntar firma separada o no.
 	 * 
 	 * Per tant el documentContingut es el del fitxer adjunt, nomes es comprova si ja té firma o no.

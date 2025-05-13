@@ -35,16 +35,15 @@ public class AlertaResourceServiceEjb extends AbstractServiceEjb<AlertaResourceS
 	}
 
 	@Override
-	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
-			P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
-			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
-		return delegateService.artifactOnChange(type, code, previous, fieldName, fieldValue, answers);
-	}
-
-	@Override
 	public <P extends Serializable> List<?> artifactReportGenerateData(Long id, String code, P params)
 			throws ArtifactNotFoundException, ReportGenerationException {
 		return delegateService.artifactReportGenerateData(id, code, params);
 	}
 
+	@Override
+	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
+			Serializable id, P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
+			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
+		return delegateService.artifactOnChange(type, code, id, previous, fieldName, fieldValue, answers);
+	}
 }
