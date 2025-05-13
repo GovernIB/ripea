@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ExpedientInteressatHelper {
@@ -125,7 +127,6 @@ public class ExpedientInteressatHelper {
 							interessatRepository.save(representantEntity),
 							InteressatDto.class);
 	}
-	
 	
 	@Transactional
 	public InteressatEntity createDB(
@@ -632,6 +633,105 @@ public class ExpedientInteressatHelper {
 		return arxiuPropagarInteressats(expedient, null);
 	}
 
+	public String importarInteressats(
+			Long entitatId,
+			Long expedientId,
+			String rolActual,
+			List<InteressatDto> interessats,
+			List<Long> seleccionats) {
+		
+		if (seleccionats!=null && seleccionats.size()>0) {
+
+			int numInteressatsUpd = 0;
+			int numInteressatsIns = 0;
+			Map<String, String> errorsInteressats = new HashMap<String, String>();
+			
+			if (interessats!=null && interessats.size()>0) {
+				
+				//Recuperam tots els InteressatDto del expedient, siguin interessats arrel o representants.
+				List<InteressatEntity> interessatsActualsExp = interessatRepository.findByExpedientId(expedientId);
+				
+				//Recorrem els interessats del JSON que s'ha importat
+				for (InteressatDto interessat : interessats) {
+					logger.debug(" - Importació del interessat "+interessat.getDocumentNum()+" a l'expedient "+expedientId);
+					//Si l'usuari ha marcat que el interessat s'ha de importar al expedient actual...
+					if (seleccionats.contains(interessat.getId())) {
+						
+						InteressatEntity interessatProcessar = getInteressatActualExpedientByDocNum(interessatsActualsExp, interessat.getDocumentNum());
+						if (interessatProcessar==null) {
+							//El create, crea el interessat associat al expedient, sense FK cap a representant, i amb es_representant=false
+							//És a dir, un interessat arrel del expedient.
+
+							InteressatDto interessatCreatDto = create(expedientId, interessat, true, PermissionEnumDto.WRITE, rolActual, true);
+							interessatProcessar = interessatRepository.getOne(interessatCreatDto.getId());
+							interessatsActualsExp.add(interessatProcessar);
+							numInteressatsIns++;
+							logger.debug("   > Interessat creat perque no existia al expedient.");
+
+						} else {
+							//El merge no toca ni la FK cap a representant, ni l'atribut es_representant
+							//per tant si era interessat haurà actualitzat el interessat, i si era representant, el representant.
+							interessatProcessar = mergeInteressat(interessatProcessar.getId(), interessat);
+							numInteressatsUpd++;
+							logger.debug("   > Interessat mergeat perque ja existia al expedient.");
+						}
+					}
+				}
+				
+				for (InteressatDto interessat : interessats) {
+					if (seleccionats.contains(interessat.getId())) {
+						//Un cop actualizades les dades generiques dels interessats, actualitzam les relacions interessat-representant entre ells
+						if (interessat.getRepresentant()!=null) {
+							InteressatEntity interessatProcessar = getInteressatActualExpedientByDocNum(interessatsActualsExp, interessat.getDocumentNum());
+							logger.debug(" - Importació del representant "+interessat.getRepresentant().getDocumentNum()+" del interessat "+interessat.getDocumentNum()+" a l'expedient "+expedientId);
+							//Si el representant amb numDoc no existeix al expedient (sigui com a representant o com a interessat), es crea com a nou interessat
+							InteressatEntity representantProcessar = getInteressatActualExpedientByDocNum(interessatsActualsExp, interessat.getRepresentant().getDocumentNum());
+							if (representantProcessar==null) {
+
+								InteressatDto representantCreatDto = create(expedientId, interessat.getRepresentant(), true, PermissionEnumDto.WRITE, rolActual, true);
+								representantProcessar = interessatRepository.getOne(representantCreatDto.getId());
+								representantProcessar.updateEsRepresentant(true);
+								logger.debug("   > S'ha creat el representant perque no existia al expedient.");
+
+							} else {
+								
+								representantProcessar = mergeInteressat(representantProcessar.getId(), interessat.getRepresentant());
+								logger.debug("   > S'ha mergeat el representant perque ja existia al expedient.");
+							}
+							
+							//Ara tenim el representant actualitzat o creat, pero encara no apunta al interessat que estam important
+							interessatProcessar.setRepresentant(representantProcessar);
+							logger.debug("   > El representant "+interessat.getRepresentant().getDocumentNum()+" s'ha associat al interessat "+interessatProcessar.getDocumentNum()+".");
+						}
+					}
+				}
+			}
+			
+			String resultatStr = "S'han importat <b>"+numInteressatsIns+"</b> nous interessats, i <b>"+numInteressatsUpd+"</b> s'han actualitzat.";
+			if (errorsInteressats.size()>0) {
+				resultatStr+="<br/>Els seguents interessats no s'han pogut importar:";
+				for (Map.Entry<String, String> entry : errorsInteressats.entrySet()) {
+					resultatStr+="<br/> - "+entry.getKey()+": "+entry.getValue();
+				}
+			}
+			return resultatStr;
+			
+		} else {
+			return "No s'ha seleccionat interessats per importar.";
+		}
+	}
+	
+	private InteressatEntity getInteressatActualExpedientByDocNum(List<InteressatEntity> interessatsActualsExp, String docNum) {
+		if (interessatsActualsExp!=null) {
+			for (InteressatEntity interessatExistent : interessatsActualsExp) {
+				if (interessatExistent.getDocumentNum().equalsIgnoreCase(docNum)) {
+					return interessatExistent;
+				}
+			}
+		}
+		return null;
+	}
+	
 	public Exception arxiuPropagarInteressats(
 			ExpedientEntity expedient,
 			InteressatEntity interessat) {
@@ -681,7 +781,14 @@ public class ExpedientInteressatHelper {
             }
 		}
 	}
-	
+
+	public List<InteressatDto> findByIds(List<Long> ids) {
+		List<InteressatDto> interessatsExportar = new ArrayList<InteressatDto>();
+		for (Long interessatId: ids) {
+			interessatsExportar.add(conversioTipusHelper.convertir(interessatRepository.findById(interessatId), InteressatDto.class));
+		}
+		return interessatsExportar;
+	}
 	
 	public List<InteressatEntity> findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
 			ExpedientEntity expedient) {
@@ -695,6 +802,4 @@ public class ExpedientInteressatHelper {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
-	
-	
 }

@@ -17,6 +17,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -32,6 +33,7 @@ import java.util.jar.Manifest;
  */
 @Slf4j
 @ConditionalOnWarDeployment
+@EnableAsync
 @SpringBootApplication(exclude = {
 		DataSourceAutoConfiguration.class, 
 		DataSourceTransactionManagerAutoConfiguration.class,

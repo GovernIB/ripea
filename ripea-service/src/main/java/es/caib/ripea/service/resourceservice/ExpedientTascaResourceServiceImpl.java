@@ -123,7 +123,16 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                 .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
                 .collect(Collectors.toList()));
         String user = SecurityContextHolder.getContext().getAuthentication().getName();
-       	resource.setUsuariActualResponsable(resource.getResponsableActual()!=null && Objects.equals(resource.getResponsableActual().getId(), user));
+        boolean usuariActualResponsable = false;
+        if (resource.getResponsables()!=null) {
+        	for (ResourceReference<UsuariResource,String> resp: resource.getResponsables()) {
+        		if (resp.getId().equals(user)) {
+        			usuariActualResponsable = true;
+        			break;
+        		}
+        	}
+        }
+       	resource.setUsuariActualResponsable(usuariActualResponsable);
         resource.setUsuariActualDelegat(resource.getDelegat()!=null && Objects.equals(resource.getDelegat().getId(), user));
     }
 
