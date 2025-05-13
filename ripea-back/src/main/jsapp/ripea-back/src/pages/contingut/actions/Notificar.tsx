@@ -1,11 +1,12 @@
 import {useEffect, useRef, useState} from "react";
-import {Grid, Alert} from "@mui/material";
+import {Grid, Alert, Button, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import useCreate from "../../interessats/actions/Create.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
 const Notificacio = (props:any) => {
@@ -87,16 +88,40 @@ const AdditionalInfo = (props:any) => {
 
 const NotificarForm = () => {
     const { t } = useTranslation();
-    const { data } = useFormContext();
+    const { data, apiRef: formApiRef } = useFormContext();
+
+    const { create, content } = useCreate(t('page.interessat.title'))
+    const onCreateInteressat = (result?:any)=> {
+        formApiRef?.current?.setFieldValue('interessats', [...data?.interessats, {
+            id: result?.id,
+            description: result?.codiNom
+        }])
+    }
 
     const interessatsFilter: string = builder.and(
         builder.eq("expedient.id", data?.expedient?.id),
+        builder.eq('esRepresentant', false),
     );
+    console.log("data", data)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus"/>
         <GridFormField xs={12} name="estat" required disabled/>
-        <GridFormField xs={12} name="interessats" multiple filter={interessatsFilter}/>
+
+        <GridFormField xs={9.6} name="interessats" multiple filter={interessatsFilter}/>
+        <Grid item xs={2.4}>
+            <Button
+                variant="outlined"
+                sx={{borderRadius: '4px', minHeight: '53px'}}
+                onClick={()=> {
+                    create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
+                }}
+            >
+                <Icon>add</Icon>Nou Interessat
+            </Button>
+            {content}
+        </Grid>
+
         <GridFormField xs={12} name="concepte" required/>
         <GridFormField xs={12} name="serveiTipus" required/>
         <GridFormField xs={12} name="descripcio" type={"textarea"}/>
@@ -104,7 +129,7 @@ const NotificarForm = () => {
         <GridFormField xs={6} name="duracio" componentProps={{title: t('page.contingut.detalle.duracio')}}/>
         <GridFormField xs={6} name="dataCaducitat" type={"date"} componentProps={{title: t('page.contingut.detalle.dataCaducitat')}}/>
         <GridFormField xs={12} name="retard" componentProps={{title: t('page.contingut.detalle.retard')}}/>
-        <GridFormField xs={12} name="entregaPostal" /*hidden={!data?.permetreEnviamentPostal}*//>
+        <GridFormField xs={12} name="entregaPostal" hidden={!data?.permetreEnviamentPostal}/>
 
         <Grid item xs={12}>
             <AdditionalInfo data={data}/>
@@ -133,7 +158,7 @@ const useNotificar = (refresh?: () => void) => {
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id,{
             nom: row?.nom,
-            expedient: {id: row?.expedient.id}
+            expedient: row?.expedient
         })
     }
     const onSuccess = () :void => {

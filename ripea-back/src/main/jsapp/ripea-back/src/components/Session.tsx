@@ -72,12 +72,13 @@ export const useUserSession = () => {
 }
 
 export const useAlertesSessio = () => {
-
     const { value, save } = useSession(alertesKey);
+    const { value: user } = useUserSession();
 
     //Recuperar les alertes generals de l'aplicació.
     //No depenen de cap acció del usuari, s'han de consultar periòdicament.
     const fetchAlerta = async () => {
+        if (user) {
         axios.get(userUrl+'/syncStoredSessionData')
             .then((response) => {
                 save(response.data);
@@ -85,6 +86,7 @@ export const useAlertesSessio = () => {
             .catch((error) => {
                 console.error("Error al obtenir les alertes:", error);
             });
+        }
     };
 
     useEffect(() => {

@@ -284,7 +284,7 @@ public class DocumentResource extends NodeResource {
         @NotNull
         private Action action = Action.MOURE;
 
-        private enum Action {
+        public enum Action {
             MOURE,
             COPIAR
         }
@@ -335,6 +335,9 @@ public class DocumentResource extends NodeResource {
 
         @Transient
         private boolean permetreEnviamentPostal;
+
+        @Transient
+        private ResourceReference<ExpedientResource, Long> expedient;
     }
 
     @Getter
