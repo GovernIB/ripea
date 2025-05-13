@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -28,7 +29,6 @@ import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaNodeResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
@@ -54,6 +54,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -61,6 +62,7 @@ import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -72,8 +74,10 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFo
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
@@ -124,6 +128,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_PUBLICAR_CODE, new PublicarActionExecutor());
         register(DocumentResource.ACTION_NOTIFICAR_CODE, new NotificarActionExecutor());
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
+        //Accions massives desde la pipella de contingut
+        register(DocumentResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
     }
@@ -167,24 +173,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
 
     private DocumentDto toDocumentDto(DocumentResource resource) {
-    	
     	DocumentDto resultat = new DocumentDto();
-    	
     	MetaNodeDto metaNode = new MetaNodeDto();
     	metaNode.setId(resource.getMetaDocument().getId());
     	resultat.setMetaNode(metaNode);
-    	
     	resultat.setPareId(resource.getPare()!=null?resource.getPare().getId():resource.getExpedient().getId());
-    	
     	resultat.setDocumentTipus(resource.getDocumentTipus());
     	resultat.setNom(resource.getNom());
     	resultat.setDescripcio(resource.getDescripcio());
     	resultat.setData(Calendar.getInstance().getTime());
-    	
     	resultat.setNtiOrigen(resource.getNtiOrigen());
     	resultat.setNtiEstadoElaboracion(resource.getNtiEstadoElaboracion());
     	resultat.setNtiIdDocumentoOrigen(resource.getNtiIdDocumentoOrigen());
-    	
     	resultat.setFitxerContingut(resource.getFitxerContingut());
     	resultat.setFitxerContentType(resource.getFitxerContentType());
     	resultat.setAmbFirma(resource.isAmbFirma());
@@ -200,7 +200,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     	resultat.setFirmaContingut(resource.getFirmaContingut());
     	resultat.setFirmaContentType(resource.getFirmaContentType());
-    	
     	return resultat;
     }
     
@@ -545,6 +544,45 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
     
+    private class DescarregarDocumentsMassiuZipGenerator implements ReportGenerator<DocumentResourceEntity, DocumentResource.MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+		@Override
+		public List<Serializable> generateData(String code, DocumentResourceEntity entity, MassiveAction params) throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getId():0l);
+			parametres.add(params);
+			return parametres;
+		}
+
+		@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+
+    		DownloadableFile resultat = null;
+    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
+
+    		try {
+
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+        		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
+            	resultat = new DownloadableFile(
+            			fitxerDto.getNom(),
+            			fitxerDto.getContentType(),
+	            		fitxerDto.getContingut());
+
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/descarregarDocumentsMassiuZip", e);
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al descarregar els documents seleccionats.");
+			}
+
+            return resultat;
+		}
+
+    }
+    
     private class NotificarDocumentsZipActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarDocumentsZipFormAction, DocumentResource> {
 
 		@Override
@@ -556,19 +594,29 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    		
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-        		//Guardam el fitxer a l'expedient
         		DocumentResourceEntity newZipFile = new DocumentResourceEntity();
-        		MetaNodeResourceEntity metaNodeResourceEntity = metaNodeResourceRepository.findById(params.getMetaDocument().getId()).get();
-        		newZipFile.setMetaNode(metaNodeResourceEntity);
-        		newZipFile.setNtiOrigen(params.getNtiOrigen());
-        		newZipFile.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
-        		newZipFile.setFitxerNom(fitxerDto.getNom());
-        		newZipFile.setFitxerContentType(fitxerDto.getContentType());
-        		newZipFile.setFitxerContingut(fitxerDto.getContingut());
-        		newZipFile.setFitxerTamany(fitxerDto.getTamany());
-        		newZipFile = documentResourceRepository.saveAndFlush(newZipFile);
-        		//TODO: Fer les accions posteriors a guardar a BBDD (Arxiu, validacio firmes, etc)
+        		//TODO
+//        		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();        		
+        		DocumentDto documentDto = new DocumentDto();
+            	MetaNodeDto metaNode = new MetaNodeDto();
+            	metaNode.setId(params.getMetaDocument().getId());
+            	documentDto.setMetaNode(metaNode);
+            	documentDto.setPareId(null); //TODO
+            	documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+            	documentDto.setNom(fitxerDto.getNom());
+            	documentDto.setData(Calendar.getInstance().getTime());
+            	documentDto.setNtiOrigen(params.getNtiOrigen());
+            	documentDto.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
+            	documentDto.setFitxerContingut(fitxerDto.getContingut());
+            	documentDto.setFitxerContentType(fitxerDto.getContentType());
+            	documentDto.setFitxerTamany((long)fitxerDto.getContentType().length());
+            	documentDto.setAmbFirma(false);
+            	documentDto.setData(Calendar.getInstance().getTime());
+            	//TODO falta passar-li el pare
+            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, null, true, false);        		
+        		newZipFile.setId(documentDto.getId());
         		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);
+        		
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsZipActionExecutor", e);
 				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al guardar el ZIP per notificar per els documents seleccionats.");

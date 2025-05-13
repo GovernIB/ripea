@@ -88,6 +88,10 @@ import lombok.experimental.FieldNameConstants;
                         formClass = DocumentResource.EnviarPortafirmesFormAction.class,
                         requiresId = true),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = DocumentResource.ACTION_DESCARREGAR_MASSIU,
+						formClass = DocumentResource.MassiveAction.class),	                
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE,
 						formClass = DocumentResource.NotificarDocumentsZipFormAction.class),
@@ -107,6 +111,8 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_MOURE_CODE = "MOURE";
     public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
     public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
+	//Accions massives desde la pipella de contingut
+	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
 

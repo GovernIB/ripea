@@ -130,11 +130,7 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_DESCARREGAR_MASSIU,
-						formClass = DocumentResource.MassiveAction.class),				
+						formClass = ExpedientResource.MassiveAction.class),			
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 
@@ -156,9 +152,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_ALLIBERAR_CODE = "ALLIBERAR";
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
-	
-	//Accions massives desde la pipella de contingut
-	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	
