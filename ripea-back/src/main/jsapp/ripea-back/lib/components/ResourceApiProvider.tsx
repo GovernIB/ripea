@@ -601,6 +601,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                         const onChangeLink = artifactState.links.get('formOnChange');
                         if (onChangeLink != null) {
                             const onChangeData = {
+                                id: args.id,
                                 previous: args.previous,
                                 fieldName: args.fieldName,
                                 fieldValue: args.fieldValue,

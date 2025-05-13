@@ -252,7 +252,9 @@ export const Form: React.FC<FormProps> = (props) => {
         idFromExternalResetRef.current = null;
     }
     const refresh = () => {
-        if (fields) {
+        if (initialDataProp != null) {
+            reset(initialDataProp);
+        } else if (fields) {
             getInitialData(id, fields, additionalData, initOnChangeRequest).
                 then((initialData: any) => {
                     debug && logConsole.debug('Initial data loaded', initialData);
