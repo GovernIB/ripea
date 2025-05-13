@@ -109,7 +109,7 @@ export const useActionReportLogic = (
     } = useResourceApiService(resourceName);
     const execAction: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (action != null) {
-            const requestArgs = { code: action, data };
+            const requestArgs = { id, code: action, data };
             apiArtifactAction(id, requestArgs).then((result: any) => {
                 onSuccess?.(result);
                 resolve(formDialogResultProcessor?.(result));
@@ -123,7 +123,7 @@ export const useActionReportLogic = (
     });
     const generateReport: FormDialogSubmitFn = (id: any, data?: any) => new Promise((resolve, reject) => {
         if (report != null) {
-            const requestArgs = { code: report, fileType: reportFileType, data };
+            const requestArgs = { id, code: report, fileType: reportFileType, data };
             apiArtifactReport(id, requestArgs).then((result: any) => {
                 saveAs?.(result.blob, result.fileName);
                 onSuccess?.(result);
