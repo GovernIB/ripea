@@ -1,8 +1,9 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {Grid} from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {Grid} from "@mui/material";
+import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
+import GridFormField from "../../../components/GridFormField.tsx";
 
 const DelegarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -11,17 +12,17 @@ const DelegarForm = () => {
     </Grid>
 }
 
-const Delegar = (props: { apiRef:any }) => {
+const Delegar = (props:any) => {
     const { t } = useTranslation();
-    const { apiRef } = props;
 
-    return <MuiFormDialog
+    return <FormActionDialog
         resourceName={"expedientTascaResource"}
         title={t('page.tasca.action.delegar')}
-        apiRef={apiRef}
+        action={'DELEGAR'}
+        {...props}
     >
         <DelegarForm/>
-    </MuiFormDialog>
+    </FormActionDialog>
 }
 
 const useDelegar = (refresh?: () => void) => {
@@ -30,18 +31,18 @@ const useDelegar = (refresh?: () => void) => {
 
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(id)
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, '', 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow('Error', error.message, 'error');
     }
 
     return {
         handleShow,
-        content: <Delegar apiRef={apiRef}/>
+        content: <Delegar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
 export default useDelegar;

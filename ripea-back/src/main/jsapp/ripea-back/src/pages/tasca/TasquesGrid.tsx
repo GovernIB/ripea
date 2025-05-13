@@ -24,7 +24,7 @@ const TasquesGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter} />
         <GridFormField xs={12} name="metaExpedientTascaDescription" readOnly disabled />
-        <GridFormField xs={12} name="responsableActual" />
+        <GridFormField xs={12} name="responsables" multiple />
         <GridFormField xs={12} name="observadors" multiple />
         <GridFormField xs={6} name="duracio" />
         <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{ disablePast: true }} />

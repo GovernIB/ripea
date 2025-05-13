@@ -1,7 +1,14 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.DocumentEnviamentInteressatResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -9,17 +16,10 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.model.DocumentEnviamentInteressatResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentEnviamentInteressatResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'expedients.

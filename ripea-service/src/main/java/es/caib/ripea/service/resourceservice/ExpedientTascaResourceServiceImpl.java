@@ -116,6 +116,9 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     protected void afterConversion(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setMetaExpedientTascaDescription(entity.getMetaExpedientTasca().getDescripcio());
+        resource.setResponsables(entity.getResponsables()
+                .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
+                .collect(Collectors.toList()));
         resource.setObservadors(entity.getObservadors()
                 .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
                 .collect(Collectors.toList()));

@@ -7,7 +7,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const ReobrirForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="responsable" required/>
+        <GridFormField xs={12} name="responsables" multiple required/>
         <GridFormField xs={12} name="motiu"/>
     </Grid>
 }
@@ -17,7 +17,7 @@ const Reobrir = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        action={"ACTION_REABRIR"}
+        action={"REABRIR"}
         title={t('page.tasca.action.reobrir')}
         {...props}
     >

@@ -3,6 +3,7 @@ package es.caib.ripea.service.intf.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.dto.*;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -20,24 +22,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentPublicacioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentVersioDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
-import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -88,6 +72,10 @@ import lombok.experimental.FieldNameConstants;
                         formClass = DocumentResource.EnviarPortafirmesFormAction.class,
                         requiresId = true),
 				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = DocumentResource.ACTION_DESCARREGAR_MASSIU,
+						formClass = DocumentResource.MassiveAction.class),	                
+				@ResourceConfigArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE,
 						formClass = DocumentResource.NotificarDocumentsZipFormAction.class),
@@ -107,6 +95,8 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_MOURE_CODE = "MOURE";
     public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
     public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
+	//Accions massives desde la pipella de contingut
+	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
 
@@ -387,10 +377,47 @@ public class DocumentResource extends NodeResource {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class NotificarDocumentsZipFormAction extends UpdateTipusDocumentFormAction {
+    public static class NotificarDocumentsZipFormAction extends MassiveAction {
     	@NotNull
     	private NtiOrigenEnumDto ntiOrigen;
     	@NotNull
     	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+        @NotNull
+        @ResourceField(onChangeActive = true)
+        private ResourceReference<MetaDocumentResource, Long> metaDocument;
+
+        @Transient
+        private ResourceReference<ExpedientResource, Long> expedient;
+    }
+
+    public DocumentDto toDocumentDto() {
+        DocumentDto resultat = new DocumentDto();
+        MetaNodeDto metaNode = new MetaNodeDto();
+        metaNode.setId(this.getMetaDocument().getId());
+        resultat.setMetaNode(metaNode);
+        resultat.setPareId(this.getPare()!=null?this.getPare().getId():this.getExpedient().getId());
+        resultat.setDocumentTipus(this.getDocumentTipus());
+        resultat.setNom(this.getNom());
+        resultat.setDescripcio(this.getDescripcio());
+        resultat.setData(Calendar.getInstance().getTime());
+        resultat.setNtiOrigen(this.getNtiOrigen());
+        resultat.setNtiEstadoElaboracion(this.getNtiEstadoElaboracion());
+        resultat.setNtiIdDocumentoOrigen(this.getNtiIdDocumentoOrigen());
+        resultat.setFitxerContingut(this.getFitxerContingut());
+        resultat.setFitxerContentType(this.getFitxerContentType());
+        resultat.setAmbFirma(this.isAmbFirma());
+        switch (this.getDocumentFirmaTipus()) {
+            case FIRMA_ADJUNTA:
+                resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+                break;
+            case FIRMA_SEPARADA:
+                resultat.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+                break;
+            default:
+                break;
+        }
+        resultat.setFirmaContingut(this.getFirmaContingut());
+        resultat.setFirmaContentType(this.getFirmaContentType());
+        return resultat;
     }
 }

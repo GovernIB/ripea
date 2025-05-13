@@ -1,8 +1,9 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {Grid} from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {Grid} from "@mui/material";
+import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
+import GridFormField from "../../../components/GridFormField.tsx";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const CambiarPrioritatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -12,17 +13,17 @@ const CambiarPrioritatForm = () => {
     </Grid>
 }
 
-const CambiarPrioritat = (props: { apiRef:any }) => {
+const CambiarPrioritat = (props:any) => {
     const { t } = useTranslation();
-    const { apiRef } = props;
 
-    return <MuiFormDialog
+    return <FormActionDialog
         resourceName={"expedientTascaResource"}
         title={t('page.tasca.action.changePrioritat')}
-        apiRef={apiRef}
+        action={'CHANGE_PRIORITAT'}
+        {...props}
     >
         <CambiarPrioritatForm/>
-    </MuiFormDialog>
+    </FormActionDialog>
 }
 
 const useCambiarPrioritat = (refresh?: () => void) => {
@@ -31,18 +32,18 @@ const useCambiarPrioritat = (refresh?: () => void) => {
 
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(id)
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, '', 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow('Error', error.message, 'error');
     }
 
     return {
         handleShow,
-        content: <CambiarPrioritat apiRef={apiRef}/>
+        content: <CambiarPrioritat apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
 export default useCambiarPrioritat;

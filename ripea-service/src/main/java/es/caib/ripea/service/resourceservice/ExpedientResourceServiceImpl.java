@@ -136,9 +136,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE, new FollowActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE, new UnFollowActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
-        
-        //Accions massives desde la pipella de contingut
-        register(ExpedientResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
 
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         
@@ -1012,45 +1009,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
-    }
-
-    private class DescarregarDocumentsMassiuZipGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
-
-		@Override
-		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
-
-		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
-			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():0l);
-			parametres.add(params);
-			return parametres;
-		}
-
-		@Override
-		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-
-    		DownloadableFile resultat = null;
-    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
-
-    		try {
-
-	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
-	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-        		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-            	resultat = new DownloadableFile(
-            			fitxerDto.getNom(),
-            			fitxerDto.getContentType(),
-	            		fitxerDto.getContingut());
-
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/descarregarDocumentsMassiuZip", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al descarregar els documents seleccionats.");
-			}
-
-            return resultat;
-		}
-
     }
 
     private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
