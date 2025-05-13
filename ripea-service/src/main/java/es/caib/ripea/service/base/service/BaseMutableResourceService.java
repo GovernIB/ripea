@@ -168,6 +168,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected <P extends Serializable> void internalArtifactOnChange(
 			ResourceArtifactType type,
 			String code,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -177,6 +178,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		super.internalArtifactOnChange(
 				type,
 				code,
+				id,
 				previous,
 				fieldName,
 				fieldValue,
@@ -187,7 +189,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ActionExecutor<E, P, ?> actionExecutor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
 			if (actionExecutor != null) {
 				actionExecutor.onChange(
-						null,
+						id,
 						previous,
 						fieldName,
 						fieldValue,
