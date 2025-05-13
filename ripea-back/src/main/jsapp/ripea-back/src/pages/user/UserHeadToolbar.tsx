@@ -9,6 +9,10 @@ import {useTranslation} from "react-i18next";
 import Load from "../../components/Load.tsx";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 
+const toProgramaAntic = (ref:string) => {
+    window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
+}
+
 const HeaderButton = (props:any) => {
     const { children, badgeContent, onClick, hidden, ...other } = props;
 
@@ -261,19 +265,19 @@ const MenuSupAdmin = () => {
         </HeaderButton>
 
         <HeaderMenu title={t('page.user.menu.monitoritzar')} buttonProps={{variant: "contained"}}>
-            <MenuItem>{t('page.user.menu.integracions')}</MenuItem>
-            <MenuItem>{t('page.user.menu.excepcions')}</MenuItem>
-            <MenuItem>{t('page.user.menu.monitor')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('integracio') }>{t('page.user.menu.integracions')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('excepcio') }>{t('page.user.menu.excepcions')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('monitor') }>{t('page.user.menu.monitor')}</MenuItem>
         </HeaderMenu>
 
         <HeaderMenu title={t('page.user.menu.config')} buttonProps={{variant: "contained"}}>
-            <MenuItem>{t('page.user.menu.props')}</MenuItem>
-            <MenuItem>{t('page.user.menu.pinbal')}</MenuItem>
-            <MenuItem>{t('page.user.menu.segonPla')}</MenuItem>
-            <MenuItem>{t('page.user.menu.plugins')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('config') }>{t('page.user.menu.props')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('pinbalServei') }>{t('page.user.menu.pinbal')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('scheduled') }>{t('page.user.menu.segonPla')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('plugin') }>{t('page.user.menu.plugins')}</MenuItem>
         </HeaderMenu>
 
-        <HeaderButton variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('avis') } variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.avisos')}</Typography>
         </HeaderButton>
     </>
@@ -287,50 +291,50 @@ const MenuAdmin = (props:any) => {
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
 
         <HeaderMenu title={t('page.user.menu.config')} buttonProps={{variant: "contained"}}>
-            <MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('metaExpedient') }>
                 <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
                     {t('page.user.menu.procediments')}
                 </StyledBadge>
             </MenuItem>
             { sessionScope?.isDocumentsGeneralsEnabled &&
-                <MenuItem>{t('page.user.menu.documents')}</MenuItem>
+                <MenuItem onClick={()=> toProgramaAntic('metaDocument') }>{t('page.user.menu.documents')}</MenuItem>
             }
 
             <Divider/>
 
             { sessionScope?.isTipusDocumentsEnabled &&
-                <MenuItem>{t('page.user.menu.nti')}</MenuItem>
+                <MenuItem onClick={()=> toProgramaAntic('tipusDocumental') }>{t('page.user.menu.nti')}</MenuItem>
             }
             { sessionScope?.isDominisEnabled &&
-                <MenuItem>{t('page.user.menu.nti')}</MenuItem>
+                <MenuItem onClick={()=> toProgramaAntic('domini') }>{t('page.user.menu.dominis')}</MenuItem>
             }
-            <MenuItem>{t('page.user.menu.dominis')}</MenuItem>
-            <MenuItem>{t('page.user.menu.organs')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('grup') }>{t('page.user.menu.grups')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('organgestor') }>{t('page.user.menu.organs')}</MenuItem>
             { sessionScope?.urlsInstruccioActiu &&
-                <MenuItem>{t('page.user.menu.url')}</MenuItem>
+                <MenuItem onClick={()=> toProgramaAntic('urlInstruccio') }>{t('page.user.menu.url')}</MenuItem>
             }
 
             <Divider/>
 
-            <MenuItem>{t('page.user.menu.permisos')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('permis') }>{t('page.user.menu.permisos')}</MenuItem>
         </HeaderMenu>
         <HeaderMenu title={t('page.user.menu.consultar')} buttonProps={{variant: "contained"}}>
-            <MenuItem>{t('page.user.menu.continguts')}</MenuItem>
-            <MenuItem>{t('page.user.menu.dadesEstadistiques')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('contingutAdmin') }>{t('page.user.menu.continguts')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('historic') }>{t('page.user.menu.dadesEstadistiques')}</MenuItem>
             { sessionScope?.revisioActiva &&
-                <MenuItem>{t('page.user.menu.revisar')}</MenuItem>
+                <MenuItem onClick={()=> toProgramaAntic('metaExpedientRevisio') }>{t('page.user.menu.revisar')}</MenuItem>
             }
-            <MenuItem>{t('page.user.menu.portafib')}</MenuItem>
-            <MenuItem>{t('page.user.menu.notib')}</MenuItem>
-            <MenuItem>{t('page.user.menu.pinbalEnviades')}</MenuItem>
-            <MenuItem>{t('page.user.menu.assignacio')}</MenuItem>
-            <MenuItem>{t('page.user.menu.pendents')}</MenuItem>
-            <MenuItem>{t('page.user.menu.comunicades')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('seguimentPortafirmes') }>{t('page.user.menu.portafib')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('seguimentNotificacions') }>{t('page.user.menu.notib')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('seguimentPinbal') }>{t('page.user.menu.pinbalEnviades')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('seguimentTasques') }>{t('page.user.menu.assignacio')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('seguimentExpedientsPendents') }>{t('page.user.menu.pendents')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('expedientPeticioComunicades') }>{t('page.user.menu.comunicades')}</MenuItem>
         </HeaderMenu>
     </>
 }
@@ -343,17 +347,17 @@ const MenuAdminOrgan = (props:any) => {
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
 
         <HeaderMenu title={t('page.user.menu.config')} buttonProps={{variant: "contained"}}>
-            <MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('metaExpedient') }>
                 <StyledBadge badgeContent={sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
                     {t('page.user.menu.procediments')}
                 </StyledBadge>
             </MenuItem>
-            <MenuItem>{t('page.user.menu.grups')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('grup') }>{t('page.user.menu.grups')}</MenuItem>
         </HeaderMenu>
     </>
 }
@@ -361,10 +365,10 @@ const MenuDissenyOrgan = () => {
     const { t } = useTranslation();
 
     return <>
-        <HeaderButton variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('metaExpedient') } variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.procediments')}</Typography>
         </HeaderButton>
-        <HeaderButton variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('grup') } variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.grups')}</Typography>
         </HeaderButton>
     </>
@@ -378,26 +382,26 @@ const MenuUsuari = (props:any) => {
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
-        <HeaderButton badgeContent={sessionScope?.countTasquesPendent} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('usuariTasca') } badgeContent={sessionScope?.countTasquesPendent} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.tasca')}</Typography>
         </HeaderButton>
         { sessionScope?.isCreacioFluxUsuariActiu &&
-            <HeaderButton variant={"contained"}>
+            <HeaderButton onClick={()=> toProgramaAntic('fluxusuari') } variant={"contained"}>
                 <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.flux')}</Typography>
             </HeaderButton>
         }
         { (sessionScope?.teAccesEstadistiques || sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu) &&
             <HeaderMenu title={t('page.user.menu.consultar')} buttonProps={{variant: "contained"}}>
                 { sessionScope?.teAccesEstadistiques &&
-                    <MenuItem>{t('page.user.menu.dadesEstadistiques')}</MenuItem>
+                    <MenuItem onClick={()=> toProgramaAntic('historic') }>{t('page.user.menu.dadesEstadistiques')}</MenuItem>
                 }
                 { sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu &&
                     <>
-                        <MenuItem>{t('page.user.menu.portafib')}</MenuItem>
-                        <MenuItem>{t('page.user.menu.notib')}</MenuItem>
+                        <MenuItem onClick={()=> toProgramaAntic('seguimentPortafirmes') }>{t('page.user.menu.portafib')}</MenuItem>
+                        <MenuItem onClick={()=> toProgramaAntic('seguimentNotificacions') }>{t('page.user.menu.notib')}</MenuItem>
                     </>
                 }
             </HeaderMenu>
@@ -415,22 +419,22 @@ const AccionesMassivas = (props:any) => {
         title={<Typography display={'inline'} variant={'subtitle2'}>{t('page.user.massive.title')}</Typography>}
         buttonProps={{variant: "contained"}}
     >
-        <MenuItem>{t('page.user.massive.portafirmes')}</MenuItem>
-        <MenuItem>{t('page.user.massive.firmar')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('massiu/portafirmes') }>{t('page.user.massive.portafirmes')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('massiu/firmasimpleweb') }>{t('page.user.massive.firmar')}</MenuItem>
         { sessionScope?.isConvertirDefinitiuActiu &&
-            <MenuItem>{t('page.user.massive.marcar')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('massiu/definitiu') }>{t('page.user.massive.marcar')}</MenuItem>
         }
-        <MenuItem>{t('page.user.massive.estat')}</MenuItem>
-        <MenuItem>{t('page.user.massive.tancar')}</MenuItem>
-        <MenuItem>{t('page.user.massive.custodiar')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('massiu/canviEstat') }>{t('page.user.massive.estat')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('massiu/tancament') }>{t('page.user.massive.tancar')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('seguimentArxiuPendents') }>{t('page.user.massive.custodiar')}</MenuItem>
         { sessionScope?.isUrlValidacioDefinida &&
-            <MenuItem>{t('page.user.massive.csv')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('massiu/csv') }>{t('page.user.massive.csv')}</MenuItem>
         }
-        <MenuItem>{t('page.user.massive.anexos')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('massiu/procesarAnnexosPendents') }>{t('page.user.massive.anexos')}</MenuItem>
         { isRolActualAdmin &&
-            <MenuItem>{t('page.user.massive.anotacio')}</MenuItem>
+            <MenuItem onClick={()=> toProgramaAntic('massiu/expedientPeticioCanviEstatDistribucio') }>{t('page.user.massive.anotacio')}</MenuItem>
         }
-        <MenuItem>{t('page.user.massive.prioritat')}</MenuItem>
+        <MenuItem onClick={()=> toProgramaAntic('massiu/canviPrioritats') }>{t('page.user.massive.prioritat')}</MenuItem>
         <Divider/>
         <MenuItem onClick={handleOpen}>{t('page.user.massive.masives')}</MenuItem>
         {dialog}
@@ -440,7 +444,7 @@ const MenuRevisor = () => {
     const { t } = useTranslation();
 
     return <>
-        <HeaderButton variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('metaExpedientRevisio') } variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.revisar')}</Typography>
         </HeaderButton>
     </>
