@@ -72,22 +72,30 @@ export const useUserSession = () => {
 }
 
 export const useAlertesSessio = () => {
-    const { value, save } = useSession(avisosKey);
+    const { value, save } = useSession(alertesKey);
+    const { value: user } = useUserSession();
 
-    // Ara les alertes s'actualitzen automàticament via SSE
-    // No cal fer polling periòdic
+    // Recuperar les alertes generals de l'aplicació.
+    // No depenen de cap acció del usuari, s'han de consultar periòdicament.
+    // const fetchAlerta = async () => {
+    //     if (user) {
+    //     axios.get(userUrl+'/syncStoredSessionData')
+    //         .then((response) => {
+    //             save(response.data);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error al obtenir les alertes:", error);
+    //         });
+    //     }
+    // };
+    //
+    // useEffect(() => {
+    //     fetchAlerta(); // Cridada inicial
+    //     const interval = setInterval(fetchAlerta, 10000); //Cada 10 segons refrescar info
+    //     return () => clearInterval(interval);
+    // }, []);
 
-    // Però fem una càrrega inicial per si el SSE encara no està connectat
-    useEffect(() => {
-        // // Recuperar les alertes generals de l'aplicació inicialment
-        // axios.get(userUrl+'/syncStoredSessionData')
-        //     .then((response) => {
-        //         save(response.data);
-        //     })
-        //     .catch((error) => {
-        //         console.error("Error al obtenir les alertes:", error);
-        //     });
-    }, []);
+    useEffect(() => {}, []);
 
     return { value, save };
 }

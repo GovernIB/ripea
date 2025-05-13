@@ -16,7 +16,7 @@ const Retomar = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        action={"ACTION_RETOMAR"}
+        action={"RETOMAR"}
         title={t('page.tasca.action.retomar')}
         {...props}
     >

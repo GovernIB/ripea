@@ -148,6 +148,7 @@ export const Form: React.FC<FormProps> = (props) => {
             return apiOnChange(id, args);
         } else if (resourceTypeCode != null) {
             const artifactArgs = {
+                id,
                 type: resourceType,
                 code: resourceTypeCode,
                 ...args
@@ -187,7 +188,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const getId = () => calculatedId(id);
     const getData = () => data;
     const dataGetValue = (callback: (state: any) => any) => callback(data);
-    const getFieldsInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
+    const getInitialData = React.useCallback(async (id: any, fields: any[], additionalData: any, initOnChangeRequest?: boolean): Promise<any> => {
         // Obté les dades inicials.
         // Si és un formulari d'artefacte obté les dades dels camps
         // Si no és un formulari d'artefacte:
@@ -196,7 +197,17 @@ export const Form: React.FC<FormProps> = (props) => {
         const getInitialDataFromApiGetOne = resourceType == null && id != null;
         const initialData = getInitialDataFromApiGetOne ? await apiGetOne(id, { data: { perspectives }, includeLinks: true }) : getInitialDataFromFields(fields);
         const mergedData = { ...initialData, ...additionalData };
-        return initOnChangeRequest ? await sendOnChangeRequest(id, { previous: mergedData }) : mergedData;
+        if (initOnChangeRequest) {
+            return new Promise<any>((resolve, reject) => {
+                sendOnChangeRequest(id, { previous: mergedData }).
+                then(onChangeData => {
+                    resolve({ ...mergedData, ...onChangeData });
+                }).
+                catch(reject);
+            })
+        } else {
+            return mergedData;
+        }
     }, [apiGetOne, sendOnChangeRequest]);
     const handleSubmissionErrors = (
         error: ResourceApiError,
@@ -229,19 +240,7 @@ export const Form: React.FC<FormProps> = (props) => {
             }
         }
     }
-    const refresh = () => {
-        if (fields) {
-            getFieldsInitialData(id, fields, additionalData, initOnChangeRequest).
-                then((initialData: any) => {
-                    debug && logConsole.debug('Initial data loaded', initialData);
-                    const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
-                    id != null && setApiActions(initialDataActions);
-                    reset({...initialDataWithoutLinks, ...initialDataProp});
-                });
-        }
-    }
     const reset = (data: any) => {
-        // Accions per a reiniciar l'estat del formulari
         dataDispatchAction({
             type: FormFieldDataActionType.RESET,
             payload: data,
@@ -252,13 +251,24 @@ export const Form: React.FC<FormProps> = (props) => {
         setFieldErrors(undefined);
         idFromExternalResetRef.current = null;
     }
+    const refresh = () => {
+        if (fields) {
+            getInitialData(id, fields, additionalData, initOnChangeRequest).
+                then((initialData: any) => {
+                    debug && logConsole.debug('Initial data loaded', initialData);
+                    const { _actions: initialDataActions, ...initialDataWithoutLinks } = initialData;
+                    id != null && setApiActions(initialDataActions);
+                    reset(initialDataWithoutLinks);
+                });
+        }
+    }
     const externalReset = (data?: any, id?: any) => {
         // Versió de reset per a cridar externament mitjançant l'API
         const mergedData = { ...getInitialDataFromFields(fields), ...additionalData, ...data };
         if (initOnChangeRequest) {
             sendOnChangeRequest(id, { previous: mergedData }).
                 then((changedData: any) => {
-                    reset(changedData);
+                    reset({ ...additionalData, ...changedData });
                     idFromExternalResetRef.current = id;
                 });
         } else {

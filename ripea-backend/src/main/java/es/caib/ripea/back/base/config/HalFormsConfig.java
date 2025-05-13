@@ -95,6 +95,15 @@ public class HalFormsConfig {
 						field,
 						resourceControllerClasses),
 				this::isResourceReferenceTypeMultipleAware);
+		ReflectionUtils.doWithFields(
+				resourceClass,
+				field -> configurationWithFieldEnumOptions(
+						halFormsConfigurationHolder,
+						resourceClass,
+						null,
+						field,
+						resourceControllerClasses),
+				this::isFieldEnumOptions);
 		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null) {
 			for (ResourceConfigArtifact artifact: resourceConfig.artifacts()) {
@@ -184,6 +193,43 @@ public class HalFormsConfig {
 		}
 	}
 
+	private void configurationWithFieldEnumOptions(
+			MutableHolder<HalFormsConfiguration> halFormsConfigurationHolder,
+			Class<?> resourceClass,
+			ResourceConfigArtifact artifact,
+			Field resourceField,
+			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+		log.debug("New HAL-FORMS field enum options (class={}, field={})", resourceClass, resourceField.getName());
+		Link remoteOptionsLink = getRemoteFieldEnumOptionsLink(
+				resourceClass,
+				artifact,
+				resourceField,
+				resourceControllerClasses);
+		if (remoteOptionsLink != null) {
+			Class<?> optionsResourceClass = artifact != null ? artifact.formClass() : resourceClass;
+			log.debug("New HAL-FORMS resource reference options (class={}, field={})", optionsResourceClass, resourceField.getName());
+			halFormsConfigurationHolder.setValue(
+					halFormsConfigurationHolder.getValue().withOptions(
+							optionsResourceClass,
+							resourceField.getName(),
+							metadata -> {
+								// Aquí hem de tornar a calcular el remoteOptionsLink perquè si no ho feim
+								// l'enllaç no inclou el prefix 'http://localhost:8080/webcontext'
+								Link repeatedRemoteOptionsLink = getRemoteFieldEnumOptionsLink(
+										resourceClass,
+										artifact,
+										resourceField,
+										resourceControllerClasses);
+								return HalFormsOptions.
+										remote(repeatedRemoteOptionsLink).
+										withValueField("value").
+										withPromptField("description").
+										withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
+										withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L);
+							}));
+		}
+	}
+
 	private boolean isEnumTypeMultipleAware(Field field) {
 		Class<?> fieldType = TypeUtil.getFieldTypeMultipleAware(field);
 		return fieldType != null && fieldType.isEnum();
@@ -192,6 +238,11 @@ public class HalFormsConfig {
 	private boolean isResourceReferenceTypeMultipleAware(Field field) {
 		Class<?> fieldType = TypeUtil.getFieldTypeMultipleAware(field);
 		return fieldType != null && ResourceReference.class.isAssignableFrom(fieldType);
+	}
+
+	private boolean isFieldEnumOptions(Field field) {
+		ResourceField resourceField = field.getAnnotation(ResourceField.class);
+		return resourceField != null && resourceField.enumType();
 	}
 
 	private FieldOption[] getInlineOptionsEnumConstants(Field field) {
@@ -245,6 +296,33 @@ public class HalFormsConfig {
 						"referencedResourceClass=" + referencedResourceClass + ")");
 				return null;
 			}
+		} else {
+			Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(resourceField);
+			log.error("Couldn't find resource controller class from field (" +
+					"resourceClass=" + resourceClass + "," +
+					"fieldName=" + resourceField.getName() + "," +
+					"referencedResourceClass=" + referencedResourceClass + ")");
+			return null;
+		}
+	}
+
+	private Link getRemoteFieldEnumOptionsLink(
+			Class<?> resourceClass,
+			ResourceConfigArtifact artifact,
+			Field resourceField,
+			Set<Class<ReadonlyResourceController>> resourceControllerClasses) {
+		Optional<Class<ReadonlyResourceController>> resourceControllerClass = resourceControllerClasses.stream().
+				filter(rc -> {
+					Class<?> controllerResourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
+							rc,
+							MutableResourceController.class,
+							0);
+					return controllerResourceClass.equals(resourceClass);
+				}).findFirst();
+		if (resourceControllerClass.isPresent()) {
+			Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)((Class<?>)resourceControllerClass.get());
+			return linkTo(methodOn(mutableResourceControllerClass).fieldEnumOptions(
+					resourceField.getName())).withRel(IanaLinkRelations.SELF_VALUE);
 		} else {
 			Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(resourceField);
 			log.error("Couldn't find resource controller class from field (" +

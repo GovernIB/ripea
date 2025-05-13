@@ -24,7 +24,8 @@ public class NodeResource extends ContingutResource {
     @Getter
     @Setter
     public static class MassiveAction implements Serializable {
-        @NotNull
+		private static final long serialVersionUID = -188470015982418846L;
+		@NotNull
         @NotEmpty
         private List<Long> ids;
         private boolean massivo = false;

@@ -3,15 +3,17 @@ import useMoure from "../actions/Moure.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useNotificarMassive from "../actions/NotificarMassive.tsx";
 import useCanviTipus from "../actions/CanviTipus.tsx";
+import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
 const useMassiveActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
     const {artifactReport: apiReport} = useResourceApiService('documentResource');
 
-    const massiveReport = (ids:any[], code:string, msg:string, fileType:any) => {
-        return apiReport(undefined, {code :code, data:{ ids: ids, masivo: true }, fileType})
-            .then(() => {
-                refresh?.()
+    const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
+        return apiReport(undefined, {code :code, data:{ ids: [id], massivo: false }, fileType})
+            .then((result) => {
+                refresh?.();
+                iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
@@ -29,7 +31,7 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
 
     const {download} = useMassiveActions(refresh)
     const {handleMassiveShow: handleMoure, content: contentMoure} = useMoure(refresh)
-    const {handleMassiveShow: handleNotificar, content: contentNotificar} = useNotificarMassive(refresh)
+    const {handleMassiveShow: handleNotificar, content: contentNotificar} = useNotificarMassive(entity, refresh)
     const {handleMassiveShow: handleCanviTipus, content: contentCanviTipus} = useCanviTipus(entity, refresh)
 
     const actions = [

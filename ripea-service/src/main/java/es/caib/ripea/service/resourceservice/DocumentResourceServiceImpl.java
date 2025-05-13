@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -28,17 +29,14 @@ import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaNodeResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaNodeResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
@@ -53,6 +51,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -60,10 +59,11 @@ import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
@@ -71,11 +71,12 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFo
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
+import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
-import es.caib.ripea.service.resourcehelper.DocumentResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,20 +85,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
 
-    private final DocumentResourceHelper documentResourceHelper;
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
+    private final ContingutHelper contingutHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     
-    private final ExpedientResourceRepository expedientResourceRepository;
-    private final ContingutResourceRepository contingutResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
-    private final MetaNodeResourceRepository metaNodeResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final ContingutRepository contingutRepository;
@@ -122,6 +120,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_PUBLICAR_CODE, new PublicarActionExecutor());
         register(DocumentResource.ACTION_NOTIFICAR_CODE, new NotificarActionExecutor());
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
+        //Accions massives desde la pipella de contingut
+        register(DocumentResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
     }
@@ -134,7 +134,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();
     		DocumentDto documentCreat = documentHelper.crearDocument(
     				entitatEntity.getId(),
-    				toDocumentDto(resource),
+                    resource.toDocumentDto(),
     				pare,
     				true,
     				false);
@@ -154,7 +154,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		DocumentDto documentCreat = documentHelper.updateDocument(
     				entitatEntity.getId(),
     				documentActual,
-    				toDocumentDto(resource),
+                    resource.toDocumentDto(),
     				true);
     		resource.setId(documentCreat.getId());
     		return resource;
@@ -162,44 +162,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
     	}
     	return null;
-    }
-
-    private DocumentDto toDocumentDto(DocumentResource resource) {
-    	
-    	DocumentDto resultat = new DocumentDto();
-    	
-    	MetaNodeDto metaNode = new MetaNodeDto();
-    	metaNode.setId(resource.getMetaDocument().getId());
-    	resultat.setMetaNode(metaNode);
-    	
-    	resultat.setPareId(resource.getPare()!=null?resource.getPare().getId():resource.getExpedient().getId());
-    	
-    	resultat.setDocumentTipus(resource.getDocumentTipus());
-    	resultat.setNom(resource.getNom());
-    	resultat.setDescripcio(resource.getDescripcio());
-    	resultat.setData(Calendar.getInstance().getTime());
-    	
-    	resultat.setNtiOrigen(resource.getNtiOrigen());
-    	resultat.setNtiEstadoElaboracion(resource.getNtiEstadoElaboracion());
-    	resultat.setNtiIdDocumentoOrigen(resource.getNtiIdDocumentoOrigen());
-    	
-    	resultat.setFitxerContingut(resource.getFitxerContingut());
-    	resultat.setFitxerContentType(resource.getFitxerContentType());
-    	resultat.setAmbFirma(resource.isAmbFirma());
-    	switch (resource.getDocumentFirmaTipus()) {
-		case FIRMA_ADJUNTA:
-			resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			break;
-		case FIRMA_SEPARADA:
-			resultat.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
-			break;
-		default:
-			break;
-		}
-    	resultat.setFirmaContingut(resource.getFirmaContingut());
-    	resultat.setFirmaContentType(resource.getFirmaContentType());
-    	
-    	return resultat;
     }
     
     @Override
@@ -221,7 +183,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         ));
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
-    
+
+    // PerspectiveApplicator
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -294,10 +257,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     // FieldDownloader
     private class AdjuntFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
-        public DownloadableFile download(
-                DocumentResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
+        public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
         	
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
@@ -314,13 +274,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             );
         }
     }
-    
     private class FirmaFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
-        public DownloadableFile download(
-                DocumentResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
+        public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
         	
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
@@ -337,13 +293,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             );
         }
     }
-    
     private class ImprimibleFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
-        public DownloadableFile download(
-                DocumentResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
+        public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
         	
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
@@ -360,13 +312,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             );
         }
     }
-    
     private class OriginalFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
-        public DownloadableFile download(
-                DocumentResourceEntity entity,
-                String fieldName,
-                OutputStream out) {
+        public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
         	
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
@@ -387,14 +335,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     // OnChangeLogicProcessor
     private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
-        public void onChange(
-                DocumentResource previous,
-                String fieldName,
-                Object fieldValue,
-                Map<String, AnswerRequiredException.AnswerValue> answers,
-                String[] previousFieldNames,
-                DocumentResource target) {
-
+        public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             if (fieldValue != null) {
                 ResourceReference<MetaDocumentResource, Long> resourceReference = (ResourceReference<MetaDocumentResource, Long>) fieldValue;
                 Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resourceReference.getId());
@@ -413,13 +354,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         private static final String ERROR_SIGNATURE_VALIDATION= "ERROR_SIGNATURE_VALIDATION";
 
         @Override
-        public void onChange(
-                DocumentResource previous,
-                String fieldName,
-                Object fieldValue,
-                Map<String, AnswerRequiredException.AnswerValue> answers,
-                String[] previousFieldNames,
-                DocumentResource target) {
+        public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
 
             if (fieldValue != null) {
                 FileReference adjunt = (FileReference) fieldValue;
@@ -457,13 +392,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     private class FirmaAdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
-        public void onChange(
-                DocumentResource previous,
-                String fieldName,
-                Object fieldValue,
-                Map<String, AnswerRequiredException.AnswerValue> answers,
-                String[] previousFieldNames,
-                DocumentResource target) {
+        public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
 
             if (fieldValue != null) {
                 FileReference adjunt = (FileReference) fieldValue;
@@ -475,13 +404,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     private class HasFirmaOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
-        public void onChange(
-                DocumentResource previous,
-                String fieldName,
-                Object fieldValue,
-                Map<String, AnswerRequiredException.AnswerValue> answers,
-                String[] previousFieldNames,
-                DocumentResource target) {
+        public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
 
             if (target.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA){
                 target.setDocumentFirmaTipus((fieldValue != null && (Boolean) fieldValue)
@@ -491,6 +414,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
     }
 
+    // ActionExecutor
     private class EnviarViaEmailActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarViaEmailFormAction, DocumentResource> {
 
         @Override
@@ -509,15 +433,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
+        public void onChange(Serializable id, DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
 
         }
     }
-    
     private class CanviTipusDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.UpdateTipusDocumentFormAction, DocumentResource> {
 
 		@Override
-		public void onChange(UpdateTipusDocumentFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UpdateTipusDocumentFormAction target) {}
+		public void onChange(Serializable id, UpdateTipusDocumentFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UpdateTipusDocumentFormAction target) {}
 
 		@Override
 		public DocumentResource exec(String code, DocumentResourceEntity entity, UpdateTipusDocumentFormAction params) throws ActionExecutionException {
@@ -542,11 +465,64 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			}
 		}
     }
-    
+    private class DescarregarDocumentsMassiuZipGenerator implements ReportGenerator<DocumentResourceEntity, DocumentResource.MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+		
+		@Override
+		public List<Serializable> generateData(String code, DocumentResourceEntity entity, MassiveAction params) throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getId():0l);
+			parametres.add(params);
+			return parametres;
+		}
+
+		@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+
+    		DownloadableFile resultat = null;
+    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
+
+    		try {
+
+	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
+	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+        		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
+            	resultat = new DownloadableFile(
+            			fitxerDto.getNom(),
+            			fitxerDto.getContentType(),
+	            		fitxerDto.getContingut());
+
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/descarregarDocumentsMassiuZip", e);
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al descarregar els documents seleccionats.");
+			}
+
+            return resultat;
+		}
+
+
+
+    }
     private class NotificarDocumentsZipActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarDocumentsZipFormAction, DocumentResource> {
 
 		@Override
-		public void onChange(NotificarDocumentsZipFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsZipFormAction target) {}
+		public void onChange(Serializable id, NotificarDocumentsZipFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsZipFormAction target) {
+            if (NotificarDocumentsZipFormAction.Fields.metaDocument.equals(fieldName)) {
+                if (fieldValue != null) {
+                    ResourceReference<MetaDocumentResource, Long> resourceReference = (ResourceReference<MetaDocumentResource, Long>) fieldValue;
+                    Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resourceReference.getId());
+                    optionalDocumentResource.ifPresent(metaDocumentResourceEntity -> {
+                        target.setNtiOrigen(metaDocumentResourceEntity.getNtiOrigen());
+                        target.setNtiEstadoElaboracion(metaDocumentResourceEntity.getNtiEstadoElaboracion());
+                    });
+                } else {
+                    target.setNtiOrigen(null);
+                    target.setNtiEstadoElaboracion(null);
+                }
+            }
+        }
 
 		@Override
 		public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarDocumentsZipFormAction params) throws ActionExecutionException {
@@ -554,57 +530,66 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    		
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-        		//Guardam el fitxer a l'expedient
         		DocumentResourceEntity newZipFile = new DocumentResourceEntity();
-        		MetaNodeResourceEntity metaNodeResourceEntity = metaNodeResourceRepository.findById(params.getMetaDocument().getId()).get();
-        		newZipFile.setMetaNode(metaNodeResourceEntity);
-        		newZipFile.setNtiOrigen(params.getNtiOrigen());
-        		newZipFile.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
-        		newZipFile.setFitxerNom(fitxerDto.getNom());
-        		newZipFile.setFitxerContentType(fitxerDto.getContentType());
-        		newZipFile.setFitxerContingut(fitxerDto.getContingut());
-        		newZipFile.setFitxerTamany(fitxerDto.getTamany());
-        		newZipFile = documentResourceRepository.saveAndFlush(newZipFile);
-        		//TODO: Fer les accions posteriors a guardar a BBDD (Arxiu, validacio firmes, etc)
+        		//TODO
+//        		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();        		
+        		DocumentDto documentDto = new DocumentDto();
+            	MetaNodeDto metaNode = new MetaNodeDto();
+            	metaNode.setId(params.getMetaDocument().getId());
+            	documentDto.setMetaNode(metaNode);
+            	documentDto.setPareId(null); //TODO
+            	documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+            	documentDto.setNom(fitxerDto.getNom());
+            	documentDto.setData(Calendar.getInstance().getTime());
+            	documentDto.setNtiOrigen(params.getNtiOrigen());
+            	documentDto.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
+            	documentDto.setFitxerContingut(fitxerDto.getContingut());
+            	documentDto.setFitxerContentType(fitxerDto.getContentType());
+            	documentDto.setFitxerTamany((long)fitxerDto.getContentType().length());
+            	documentDto.setAmbFirma(false);
+            	documentDto.setData(Calendar.getInstance().getTime());
+            	//TODO falta passar-li el pare
+            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, null, true, false);        		
+        		newZipFile.setId(documentDto.getId());
         		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);
+        		
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsZipActionExecutor", e);
 				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al guardar el ZIP per notificar per els documents seleccionats.");
 			}
 		}
     }
-    
     private class MoureActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.MoureFormAction, DocumentResource> {
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
-//            if (!Objects.equals(params.getExpedient(), entity.getExpedient())){
-//                expedientResourceRepository.findById(params.getExpedient().getId())
-//                        .ifPresent(entity::setExpedient);
-//            }
-//
-//            if (params.getCarpeta()!=null){
-//                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getCarpeta().getId()).orElse(null);
-//                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
-//                    entity.setPare(contingut);
-//                    documentResourceRepository.save(entity);
-//                }
-//            } else {
-//                ContingutResourceEntity contingut = contingutResourceRepository.findById(params.getExpedient().getId()).orElse(null);
-//                if (contingut!=null && !Objects.equals(entity.getPare(), contingut)){
-//                    entity.setPare(contingut);
-//                    documentResourceRepository.save(entity);
-//                }
-//            }
-//
-//            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        	
+        	if (params!=null && params.getIds()!=null && params.getIds().size()>0) {
+        		try {
+	        		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	        		boolean mourer = DocumentResource.MoureFormAction.Action.MOURE.equals(params.getAction());
+	    			for (Long contingutOrigenId: params.getIds()) {
+	    				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
+	    				if (mourer) {
+	    					contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId,configHelper.getRolActual());
+	    				} else {
+	    					contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu
+	    				}
+	    			}
+    			} catch (Exception e) {
+    				excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);
+    				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al mourer o copiar els documents seleccionats.");
+    			}	    			
+        	} else {
+        		throw new ActionExecutionException(getResourceClass(), null, code, "No s'ha indicat cap element per realitzar l'acció.");
+        	}
+
             return null;
         }
 
         @Override
-        public void onChange(DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
+        public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
-    
     private class PublicarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.PublicarFormAction, DocumentResource> {
 
         @Override
@@ -622,18 +607,16 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
+        public void onChange(Serializable id, DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
     }
-    
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
 
 		@Override
-		public void onChange(NotificarFormAction previous, String fieldName, Object fieldValue,
+		public void onChange(Serializable id, NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
-            // TODO: isPermetreEnviamentPostal
-//            if (fieldName==null){
-//                target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
-//            }
+            if (fieldName==null){
+                target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
+            }
 
             if (fieldName!=null) {
                 switch (fieldName) {
@@ -720,7 +703,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	return null;
 		}
     }
-    
     private class EnviarPortafirmesActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarPortafirmesFormAction, DocumentResource> {
 
         @Override
@@ -731,7 +713,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	
         	Long entitatId  = entity.getEntitat().getId();
         	Long documentId = entity.getId();
-        	String rolActual = ""; //TODO ha de arribar el controlador
+        	String rolActual = configHelper.getRolActual();
         	
         	DocumentEntity document = documentHelper.comprovarDocument(
         			entitatId,
@@ -762,9 +744,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
+        public void onChange(Serializable id, DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
         	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte 
         	if (fieldName==null) {
+        		//Carregam el valor del tipus de firma, consultant el meta-document
+        		MetaDocumentFirmaFluxTipusEnumDto fluxTipus = documentResourceRepository.findById((long)id).get().getMetaDocument().getPortafirmesFluxTipus();
+        		target.setPortafirmesFluxTipus(fluxTipus);
         	} else { //És un camp concret el que s'ha canviat
         	}
         }

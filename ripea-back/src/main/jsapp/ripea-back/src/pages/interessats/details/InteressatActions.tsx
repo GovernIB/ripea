@@ -1,16 +1,14 @@
+import {Divider} from "@mui/material";
 import {
-    MuiFormDialog, MuiFormDialogApi,
     useBaseAppContext,
     useConfirmDialogButtons,
     useResourceApiService
 } from "reactlib";
-import {InteressatsGridForm} from "../InteressatsGrid.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
-import {Divider} from "@mui/material";
 import useInteressatDetail from "./InteressatDetail.tsx";
+import useCreate from "../actions/Create.tsx";
 
-const useActions = (apiRef:any,refresh?: () => void) => {
+const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
@@ -23,34 +21,6 @@ const useActions = (apiRef:any,refresh?: () => void) => {
         getOne
     } = useResourceApiService('interessatResource');
 
-    const createRepresentent = (id: any, row:any) => {
-        apiRef.current?.show(undefined, {
-            expedient: {
-                id: row?.expedient?.id
-            },
-            representat: {
-                id: id
-            },
-            esRepresentant: true,
-        })
-            .then(() => {
-                refresh?.();
-                temporalMessageShow(null, 'Elemento creado', 'success');
-            })
-            .catch((error:any) => {
-                temporalMessageShow('Error', error.message, 'error');
-            });
-    }
-    const updateRepresentent = (id: any, row: any) => {
-        apiRef.current?.show(row?.representant?.id)
-            .then(() => {
-                refresh?.();
-                temporalMessageShow(null, 'Elemento modificado', 'success');
-            })
-            .catch((error:any) => {
-                temporalMessageShow('Error', error.message, 'error');
-            });
-    }
     const deleteRepresentent = (id: any, row: any) => {
         getOne(row?.representant?.id)
             .then((representant) => {
@@ -118,8 +88,6 @@ const useActions = (apiRef:any,refresh?: () => void) => {
     }
 
     return {
-        createRepresentent,
-        updateRepresentent,
         deleteRepresentent,
         deleteInteressat,
     }
@@ -128,15 +96,9 @@ const useActions = (apiRef:any,refresh?: () => void) => {
 const useInteressatActions = (readOnly:boolean,refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const apiRef = useRef<MuiFormDialogApi>();
-
-    const {
-        createRepresentent,
-        updateRepresentent,
-        deleteRepresentent,
-        deleteInteressat,
-    } = useActions(apiRef, refresh);
+    const {deleteRepresentent, deleteInteressat} = useActions(refresh);
     const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
+    const {createRepresentent, updateRepresentent, content} = useCreate(t('page.interessat.rep'), refresh)
 
     const actions = [
         {
@@ -182,13 +144,7 @@ const useInteressatActions = (readOnly:boolean,refresh?: () => void) => {
     ];
 
     const components=<>
-        <MuiFormDialog
-            resourceName={"interessatResource"}
-            title={t('page.interessat.rep')}
-            apiRef={apiRef}
-        >
-            <InteressatsGridForm/>
-        </MuiFormDialog>
+        {content}
         {dialogDetail}
     </>;
 

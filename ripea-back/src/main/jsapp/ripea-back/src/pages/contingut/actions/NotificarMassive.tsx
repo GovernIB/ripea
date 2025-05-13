@@ -27,7 +27,7 @@ const NotificarMassive = (props:any) => {
     </FormActionDialog>
 }
 
-const useNotificarMassive = (refresh?: () => void) => {
+const useNotificarMassive = (entity:any, refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -37,6 +37,10 @@ const useNotificarMassive = (refresh?: () => void) => {
         apiRef.current?.show?.(undefined, {
             ids: ids,
             massivo: true,
+            expedient: {
+                id: entity?.id,
+                description: entity?.nom
+            }
         })
     }
     const onSuccess = (result?: any) :void => {

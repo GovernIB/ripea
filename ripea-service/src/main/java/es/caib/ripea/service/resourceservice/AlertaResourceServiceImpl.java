@@ -1,8 +1,14 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.AlertaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.AlertaResourceRepository;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -11,11 +17,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.AlertaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Implementació del servei de gestió de tasques.
@@ -47,6 +48,6 @@ public class AlertaResourceServiceImpl extends BaseMutableResourceService<Alerta
         }
 
         @Override
-        public void onChange(ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+        public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
 }

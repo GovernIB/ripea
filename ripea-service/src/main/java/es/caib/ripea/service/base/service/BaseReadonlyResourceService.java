@@ -289,6 +289,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public <P extends Serializable> Map<String, Object> artifactOnChange(
 			ResourceArtifactType type,
 			String code,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -302,11 +303,13 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		if (artifact.getFormClass() != null) {
 			onChangeCheckIfFieldExists(artifact.getFormClass(), fieldName);
 			return onChangeProcessRecursiveLogic(
+					id,
 					previous,
 					fieldName,
 					fieldValue,
 					null,
-					(previous1,
+					(id2,
+					 previous1,
 					 fieldName1,
 					 fieldValue1,
 					 answers1,
@@ -314,6 +317,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					 target) -> internalArtifactOnChange(
 							type,
 							code,
+							id2,
 							previous1,
 							fieldName1,
 							fieldValue1,
@@ -600,6 +604,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	protected <P extends Serializable> Map<String, Object> onChangeProcessRecursiveLogic(
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -625,6 +630,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			P target = (P)factory.getProxy();
 			if (onChangeLogicProcessor != null) {
 				onChangeLogicProcessor.onChange(
+						id,
 						previous,
 						fieldName,
 						fieldValue,
@@ -653,6 +659,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 								previousFieldNamesWithChangedFieldName.add(fieldName);
 							}
 							Map<String, Object> changesPerField = onChangeProcessRecursiveLogic(
+									id,
 									(P)previousWithChanges,
 									changedFieldName,
 									changes.get(changedFieldName),
@@ -773,6 +780,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	protected <P extends Serializable> void internalArtifactOnChange(
 			ResourceArtifactType type,
 			String code,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -783,6 +791,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			ReportGenerator<E, P, ?> reportGenerator = (ReportGenerator<E, P, ?>) reportGeneratorMap.get(code);
 			if (reportGenerator != null) {
 				reportGenerator.onChange(
+						id,
 						previous,
 						fieldName,
 						fieldValue,
@@ -794,6 +803,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			FilterProcessor<P> filterProcessor = (FilterProcessor<P>)filterProcessorMap.get(code);
 			if (filterProcessor != null) {
 				filterProcessor.onChange(
+						id,
 						previous,
 						fieldName,
 						fieldValue,
@@ -1190,6 +1200,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		/**
 		 * Processa la lògica onChange d'un camp.
 		 *
+		 * @param id
+		 *            clau primària del recurs.
 		 * @param previous
 		 *            el recurs amb els valors previs a la modificació.
 		 * @param fieldName
@@ -1204,6 +1216,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		 *            el recurs emmagatzemat a base de dades.
 		 */
 		void onChange(
+				Serializable id,
 				R previous,
 				String fieldName,
 				Object fieldValue,

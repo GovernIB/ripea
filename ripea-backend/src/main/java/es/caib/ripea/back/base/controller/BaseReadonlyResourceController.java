@@ -360,6 +360,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		Map<String, Object> processat = getReadonlyResourceService().artifactOnChange(
 				type,
 				code,
+				onChangeEvent.getId(),
 				previous,
 				onChangeEvent.getFieldName(),
 				fieldValue,

@@ -5,10 +5,7 @@ import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.base.helper.ResourceReferenceToEntityHelper;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.exception.*;
-import es.caib.ripea.service.intf.base.model.FileReference;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +40,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	private final Map<String, ActionExecutor<E, ?, ?>> actionExecutorMap = new HashMap<>();
 	private final Map<String, OnChangeLogicProcessor<R>> onChangeLogicProcessorMap = new HashMap<>();
 	private final Map<String, FieldFileManager<E>> fieldFileManagerMap = new HashMap<>();
+	private final Map<String, FieldOptionsProvider> fieldOptionsProviderMap = new HashMap<>();
 
 	@Override
 	public R newResourceInstance() {
@@ -144,17 +142,20 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	@Override
 	@Transactional(readOnly = true)
 	public Map<String, Object> onChange(
+			ID id,
 			R previous,
 			String fieldName,
 			Object fieldValue,
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceFieldNotFoundException, AnswerRequiredException {
-		log.debug("Processing onChange event (previous={}, fieldName={}, fieldValue={}, answers={})",
+		log.debug("Processing onChange event (id={}, previous={}, fieldName={}, fieldValue={}, answers={})",
+				id,
 				previous,
 				fieldName,
 				fieldValue,
 				answers);
 		onChangeCheckIfFieldExists(getResourceClass(), fieldName);
 		return onChangeProcessRecursiveLogic(
+				id,
 				previous,
 				fieldName,
 				fieldValue,
@@ -167,6 +168,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected <P extends Serializable> void internalArtifactOnChange(
 			ResourceArtifactType type,
 			String code,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -176,6 +178,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		super.internalArtifactOnChange(
 				type,
 				code,
+				id,
 				previous,
 				fieldName,
 				fieldValue,
@@ -186,6 +189,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ActionExecutor<E, P, ?> actionExecutor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
 			if (actionExecutor != null) {
 				actionExecutor.onChange(
+						id,
 						previous,
 						fieldName,
 						fieldValue,
@@ -209,6 +213,18 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			return executor.exec(code, entity, params);
 		} else {
 			throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.ACTION, code);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<FieldOption> fieldEnumOptions(String fieldName) {
+		log.debug("Querying field enum options (fieldName={})", fieldName);
+		FieldOptionsProvider fieldOptionsProvider = fieldOptionsProviderMap.get(fieldName);
+		if (fieldOptionsProvider != null) {
+			return fieldOptionsProvider.getOptions(fieldName);
+		} else {
+			return null;
 		}
 	}
 
@@ -275,7 +291,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	protected void beforeDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {}
 	protected void afterDelete(E entity, Map<String, AnswerRequiredException.AnswerValue> answers) {}
 
+	@Override
 	public void onChange(
+			Serializable id,
 			R previous,
 			String fieldName,
 			Object fieldValue,
@@ -284,6 +302,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			R target) {
 		if (onChangeLogicProcessorMap.get(fieldName) != null) {
 			onChangeLogicProcessorMap.get(fieldName).onChange(
+					id,
 					previous,
 					fieldName,
 					fieldValue,
@@ -454,6 +473,12 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		fieldFileManagerMap.put(fieldName, fieldFileManager);
 	}
 
+	protected void register(
+			String fieldName,
+			FieldOptionsProvider fieldOptionsProvider) {
+		fieldOptionsProviderMap.put(fieldName, fieldOptionsProvider);
+	}
+
 	private E saveFlushAndRefresh(E entity) {
 		E saved = entityRepository.saveAndFlush(entity);
 		entityRepository.refresh(saved);
@@ -560,6 +585,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		 *             si es produeix algun error generant les dades.
 		 */
 		R exec(String code, E entity, P params) throws ActionExecutionException;
+	}
+
+	/**
+	 * Interfície a implementar per a retornar les opcions de camps enumerats.
+	 */
+	public interface FieldOptionsProvider {
+		List<FieldOption> getOptions(String fieldName);
 	}
 
 }

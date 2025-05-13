@@ -19,12 +19,9 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -133,11 +130,7 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE,
-						formClass = ExpedientResource.MassiveAction.class),
-				@ResourceConfigArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_DESCARREGAR_MASSIU,
-						formClass = DocumentResource.MassiveAction.class),				
+						formClass = ExpedientResource.MassiveAction.class),			
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 
@@ -159,9 +152,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_ALLIBERAR_CODE = "ALLIBERAR";
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
-	
-	//Accions massives desde la pipella de contingut
-	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	
@@ -339,7 +329,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
-    public static class ExportarDocumentMassiu extends MassiveAction implements Serializable {
+    public static class ExportarDocumentMassiu extends MassiveAction {
 		private boolean carpetes = true;
         private boolean versioImprimible = false;
         private FileNameOption nomFitxer = FileNameOption.ORIGINAL;

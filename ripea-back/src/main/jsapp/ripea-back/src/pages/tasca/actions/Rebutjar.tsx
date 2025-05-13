@@ -16,7 +16,7 @@ const Rebutjar = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        action={"ACTION_REBUTJAR"}
+        action={"REBUTJAR"}
         title={t('page.tasca.action.rebutjar')}
         {...props}
     >
