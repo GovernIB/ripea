@@ -148,6 +148,7 @@ export const Form: React.FC<FormProps> = (props) => {
             return apiOnChange(id, args);
         } else if (resourceTypeCode != null) {
             const artifactArgs = {
+                id,
                 type: resourceType,
                 code: resourceTypeCode,
                 ...args

@@ -3,9 +3,11 @@ package es.caib.ripea.back.base.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.OnChangeEvent;
 import es.caib.ripea.service.intf.base.model.Resource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
@@ -148,6 +150,15 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 			final String fieldName,
 			final RID id,
 			final String[] perspectives);
+
+	/**
+	 * Consulta les opcions disponibles per a un camp de tipus enumerat.
+	 *
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @return la llista d'opcions disponibles.
+	 */
+	ResponseEntity<CollectionModel<FieldOption>> fieldEnumOptions(final String fieldName);
 
 	/**
 	 * Execució d'una acció associada a un recurs.

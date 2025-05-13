@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ComponentNotFoundException;
-import es.caib.ripea.service.intf.base.model.OnChangeEvent;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.base.util.JsonUtil;
@@ -23,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -309,6 +307,16 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 				null,
 				null,
 				singleResourceBaseSelfLink);
+	}
+
+	@Override
+	@GetMapping(value = "/fields/{fieldName}/enumOptions")
+	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
+	public ResponseEntity<CollectionModel<FieldOption>> fieldEnumOptions(final String fieldName) {
+		log.debug("Consultant possibles valors del camp enumerat (fieldName={})", fieldName);
+		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
+		return ResponseEntity.ok(fieldOptions != null ? CollectionModel.of(fieldOptions) : CollectionModel.empty());
 	}
 
 	@Override

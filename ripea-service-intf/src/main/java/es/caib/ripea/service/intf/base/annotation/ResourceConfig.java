@@ -21,20 +21,20 @@ public @interface ResourceConfig {
 	String value() default "";
 	@AliasFor("value")
 	String name() default "";
-	public String resourceDescription() default "";
-	public String resourceDescriptionI18n() default "";
-	public String descriptionField() default "";
-	public String orderField() default "";
-	public ResourceSort[] defaultSortFields() default {};
-	public String[] quickFilterFields() default {};
-	public Class<? extends Resource> parentEntity() default Resource.class;
-	public ResourceConfigArtifact[] artifacts() default {};
+	String resourceDescription() default "";
+	String resourceDescriptionI18n() default "";
+	String descriptionField() default "";
+	String orderField() default "";
+	ResourceSort[] defaultSortFields() default {};
+	String[] quickFilterFields() default {};
+	Class<? extends Resource> parentEntity() default Resource.class;
+	ResourceConfigArtifact[] artifacts() default {};
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public @interface ResourceSort {
-		public String field() default "";
-		public org.springframework.data.domain.Sort.Direction direction() default org.springframework.data.domain.Sort.Direction.ASC;
+	@interface ResourceSort {
+		String field() default "";
+		org.springframework.data.domain.Sort.Direction direction() default org.springframework.data.domain.Sort.Direction.ASC;
 	}
 
 }

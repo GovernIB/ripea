@@ -126,9 +126,10 @@ export type ResourceApiArtifact = {
 };
 
 export type ResourceApiOnChangeArgs = ResourceApiRequestArgs & {
+    id?: any;
+    previous?: any;
     fieldName?: string;
     fieldValue?: any;
-    previous?: any;
 };
 
 export type ResourceApiArtifactsArgs = ResourceApiRequestArgs & {

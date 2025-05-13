@@ -1,9 +1,11 @@
 package es.caib.ripea.service.intf.base.service;
 
 import es.caib.ripea.service.intf.base.exception.*;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.Resource;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -130,5 +132,14 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 			ID id,
 			String code,
 			P params) throws ArtifactNotFoundException, ActionExecutionException;
+
+	/**
+	 * Consulta les opcions disponibles per a un camp de tipus enumerat.
+	 *
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @return la llista d'opcions disponibles.
+	 */
+	List<FieldOption> fieldEnumOptions(String fieldName);
 
 }

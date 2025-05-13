@@ -192,8 +192,8 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                     quickFilter: q,
                     filter,
                     sorts,
-                    namedQueries,
-                    perspectives,
+                    namedQuery: namedQueries,
+                    perspective: perspectives,
                     ...pageArgs
                 };
                 requestHref(dataSource.href, templateData).then((state) => {

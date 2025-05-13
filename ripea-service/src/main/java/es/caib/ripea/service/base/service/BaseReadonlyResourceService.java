@@ -289,6 +289,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public <P extends Serializable> Map<String, Object> artifactOnChange(
 			ResourceArtifactType type,
 			String code,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -302,12 +303,12 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		if (artifact.getFormClass() != null) {
 			onChangeCheckIfFieldExists(artifact.getFormClass(), fieldName);
 			return onChangeProcessRecursiveLogic(
-					null,
+					id,
 					previous,
 					fieldName,
 					fieldValue,
 					null,
-					(id,
+					(id2,
 					 previous1,
 					 fieldName1,
 					 fieldValue1,
@@ -316,6 +317,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 					 target) -> internalArtifactOnChange(
 							type,
 							code,
+							id2,
 							previous1,
 							fieldName1,
 							fieldValue1,
@@ -602,7 +604,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	protected <P extends Serializable> Map<String, Object> onChangeProcessRecursiveLogic(
-			ID id,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -778,6 +780,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	protected <P extends Serializable> void internalArtifactOnChange(
 			ResourceArtifactType type,
 			String code,
+			Serializable id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
@@ -788,7 +791,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			ReportGenerator<E, P, ?> reportGenerator = (ReportGenerator<E, P, ?>) reportGeneratorMap.get(code);
 			if (reportGenerator != null) {
 				reportGenerator.onChange(
-						null,
+						id,
 						previous,
 						fieldName,
 						fieldValue,
@@ -800,7 +803,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			FilterProcessor<P> filterProcessor = (FilterProcessor<P>)filterProcessorMap.get(code);
 			if (filterProcessor != null) {
 				filterProcessor.onChange(
-						null,
+						id,
 						previous,
 						fieldName,
 						fieldValue,
