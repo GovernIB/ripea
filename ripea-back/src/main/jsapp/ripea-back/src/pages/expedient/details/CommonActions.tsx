@@ -14,7 +14,7 @@ import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
 
-const iniciaDescargaBlob = (result: any) => {
+export const iniciaDescargaBlob = (result: any) => {
     const url = URL.createObjectURL(result.blob);
     const link = document.createElement('a');
     link.href = url;
