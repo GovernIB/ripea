@@ -75,14 +75,14 @@ import java.util.List;
 public class ExpedientTascaResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_RESPONSABLES_CODE = "RESPONSABLES_RESUM";
-    public static final String ACTION_CHANGE_ESTAT_CODE = "ACTION_CHANGE_ESTAT";
-    public static final String ACTION_CHANGE_PRIORITAT_CODE = "ACTION_CHANGE_PRIORITAT";
-    public static final String ACTION_CHANGE_DATALIMIT_CODE = "ACTION_CHANGE_DATALIMIT";
-    public static final String ACTION_REASSIGNAR_CODE = "ACTION_REASSIGNAR";
-    public static final String ACTION_DELEGAR_CODE = "ACTION_DELEGAR";
-    public static final String ACTION_REABRIR_CODE = "ACTION_REABRIR";
-    public static final String ACTION_REBUTJAR_CODE = "ACTION_REBUTJAR";
-    public static final String ACTION_RETOMAR_CODE = "ACTION_RETOMAR";
+    public static final String ACTION_CHANGE_ESTAT_CODE = "CHANGE_ESTAT";
+    public static final String ACTION_CHANGE_PRIORITAT_CODE = "CHANGE_PRIORITAT";
+    public static final String ACTION_CHANGE_DATALIMIT_CODE = "CHANGE_DATALIMIT";
+    public static final String ACTION_REASSIGNAR_CODE = "REASSIGNAR";
+    public static final String ACTION_DELEGAR_CODE = "DELEGAR";
+    public static final String ACTION_REABRIR_CODE = "REABRIR";
+    public static final String ACTION_REBUTJAR_CODE = "REBUTJAR";
+    public static final String ACTION_RETOMAR_CODE = "RETOMAR";
 
 //    @NotNull
     private Date dataInici;

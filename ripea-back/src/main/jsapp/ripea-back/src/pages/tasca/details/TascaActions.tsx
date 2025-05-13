@@ -1,7 +1,8 @@
 import {
-    useBaseAppContext,
+    useBaseAppContext, useConfirmDialogButtons,
     useResourceApiService,
 } from "reactlib";
+import {useTranslation} from "react-i18next";
 import useTascaDetail from "./TascaDetail.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
 import useReassignar from "../actions/Reassignar.tsx";
@@ -10,18 +11,19 @@ import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
-import {useTranslation} from "react-i18next";
 
 const useActions = (refresh?: () => void) => {
 
-    const {temporalMessageShow} = useBaseAppContext();
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const {
         artifactAction: apiAction
     } = useResourceApiService('expedientTascaResource');
 
     const changeEstat = (id:any, estat:string) => {
-        apiAction(id,{code:'ACTION_CHANGE_ESTAT', data:{estat}})
+        apiAction(id,{code:'CHANGE_ESTAT', data:{estat}})
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, '', 'success');
@@ -31,13 +33,26 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {changeEstat}
+    const cancelar = (id:any) => {
+        messageDialogShow(
+            '¿Seguro de que desea cancelar esta tarea?',
+            '',
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    changeEstat(id, 'CANCELLADA')
+                }
+            });
+    }
+
+    return {changeEstat, cancelar}
 }
 
 const useTascaActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const {changeEstat} = useActions(refresh)
+    const {changeEstat, cancelar} = useActions(refresh)
 
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
     const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
@@ -66,6 +81,9 @@ const useTascaActions = (refresh?: () => void) => {
             title: t('page.tasca.acciones.tramitar'),
             icon: "folder",
             showInMenu: true,
+            onClick: (id:any, row:any) => {
+                window.location.href = (`${import.meta.env.VITE_BASE_URL}contingut/${row?.expedient?.id}?tascaId=${id}`)
+            },
             disabled: disableResponsable,
             hidden: hideByEstat,
         },
@@ -89,7 +107,7 @@ const useTascaActions = (refresh?: () => void) => {
             title: t('page.tasca.acciones.cancel'),
             icon: "close",
             showInMenu: true,
-            onClick: (id: any)=> changeEstat(id,'CANCELLADA'),
+            onClick: cancelar,
             disabled: disableResponsable,
             hidden: hideByEstat,
         },

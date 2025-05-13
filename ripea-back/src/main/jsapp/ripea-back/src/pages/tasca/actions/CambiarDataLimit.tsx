@@ -1,8 +1,9 @@
-import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext} from "reactlib";
-import {Grid} from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
+import {Grid} from "@mui/material";
+import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
+import GridFormField from "../../../components/GridFormField.tsx";
 
 const CambiarFechaLimiteForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -12,17 +13,17 @@ const CambiarFechaLimiteForm = () => {
     </Grid>
 }
 
-const CambiarDataLimit = (props: { apiRef:any }) => {
+const CambiarDataLimit = (props:any) => {
     const { t } = useTranslation();
-    const { apiRef } = props;
 
-    return <MuiFormDialog
+    return <FormActionDialog
         resourceName={"expedientTascaResource"}
         title={t('page.tasca.action.changeDataLimit')}
-        apiRef={apiRef}
+        action={'CHANGE_DATALIMIT'}
+        {...props}
     >
         <CambiarFechaLimiteForm/>
-    </MuiFormDialog>
+    </FormActionDialog>
 }
 
 const useCambiarDataLimit = (refresh?: () => void) => {
@@ -31,18 +32,18 @@ const useCambiarDataLimit = (refresh?: () => void) => {
 
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(id)
-            .then(() => {
-                refresh?.()
-                temporalMessageShow(null, '', 'success');
-            })
-            .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
-            });
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, '', 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow('Error', error.message, 'error');
     }
 
     return {
         handleShow,
-        content: <CambiarDataLimit apiRef={apiRef}/>
+        content: <CambiarDataLimit apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
 export default useCambiarDataLimit;
