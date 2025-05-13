@@ -21,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
@@ -54,6 +56,7 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -64,6 +67,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
@@ -659,7 +663,20 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class ImportarInteressatsActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarInteressatsFormAction, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarInteressatsFormAction target) {}
+		public void onChange(Serializable id, ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarInteressatsFormAction target) {
+			try {
+				if (fieldName != null && fieldName.equals("fitxerJsonInteressats")) {
+					ObjectMapper objectMapper = new ObjectMapper();
+					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+					List<InteressatDto> lista = objectMapper.readValue(
+							((FileReference)fieldValue).getContent(),
+							new TypeReference<List<InteressatDto>>() {});
+					target.setInteressatsFitxer(lista);
+				}
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor.onChange", e);
+			}
+		}
 
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarInteressatsFormAction params) throws ActionExecutionException {
@@ -667,7 +684,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             	String rolActual = configHelper.getRolActual();
             	String entitatActual = configHelper.getEntitatActualCodi();
             	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-//				expedientInteressatHelper.importarInteressats(entitatEntity.getId(), entity.getId(), rolActual, null, params.get);
+				expedientInteressatHelper.importarInteressats(
+						entitatEntity.getId(),
+						entity.getId(),
+						rolActual,
+						params.getInteressatsPerImportar());
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/ImportarInteressatsActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());

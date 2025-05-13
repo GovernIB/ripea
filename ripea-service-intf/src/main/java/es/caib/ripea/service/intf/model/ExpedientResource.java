@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -22,6 +21,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
+import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -361,5 +361,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     public static class ImportarInteressatsFormAction implements Serializable {
     	@NotNull
     	private FileReference fitxerJsonInteressats;
+    	private List<InteressatDto> interessatsFitxer;
+    	private List<InteressatDto> interessatsPerImportar;
     }
 }

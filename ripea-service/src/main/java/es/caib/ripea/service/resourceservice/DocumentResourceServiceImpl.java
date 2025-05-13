@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourceentity.*;
+import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +27,6 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
@@ -95,7 +93,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
-    
+    private final CacheResourceHelper cacheResourceHelper;
+
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
@@ -182,6 +181,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 null,
                 null
         ));
+        resource.setErrors(cacheResourceHelper.findErrorsValidacioPerNode(entity));
+        resource.setValid(resource.getErrors().isEmpty());
+
+        resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
 
@@ -212,7 +215,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
         public <E extends ContingutResourceEntity> void getPathPare(E entity, List<ParentPath> path) {
             if (entity != null) {
-                ParentPath pathEntry = new ParentPath(entity.getId(), entity.getNom(), entity.getCreatedBy(), entity.getCreatedDate(), entity.getTipus());
+                ParentPath pathEntry = new ParentPath(
+                        entity.getId(),
+                        entity.getNom(),
+                        entity.getCreatedBy(),
+                        entity.getCreatedDate(),
+                        entity.getTipus(),
+                        new ArrayList<>()
+                );
                 pathEntry.setId(entity.getId());
                 path.add(pathEntry);
                 getPathPare(entity.getPare(), path);

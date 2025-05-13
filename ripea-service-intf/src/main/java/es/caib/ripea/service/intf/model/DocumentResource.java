@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.dto.*;
+import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -225,9 +226,12 @@ public class DocumentResource extends NodeResource {
     private int NumMetaDades;
     @Transient
     private boolean documentDeAnotacio;
+    @Transient
+    private boolean ambNotificacions;
     
     @Getter
     @Setter
+    @AllArgsConstructor
     public static class ParentPath {
         private Long id;
         private String nom;
@@ -236,14 +240,6 @@ public class DocumentResource extends NodeResource {
         private ContingutTipusEnumDto tipus;
 
         public List<String> treePath;
-
-        public ParentPath(Long id, String nom, String createdBy, LocalDateTime createdDate, ContingutTipusEnumDto tipus) {
-            this.id = id;
-            this.nom = nom;
-            this.createdBy = createdBy;
-            this.createdDate = createdDate;
-            this.tipus = tipus;
-        }
     }
 
     public String getFitxerExtension() {

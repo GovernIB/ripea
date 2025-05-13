@@ -1,19 +1,10 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
@@ -27,6 +18,7 @@ import es.caib.ripea.service.intf.model.DocumentResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "document")
@@ -146,6 +138,13 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 			name = "expedient_estat_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_document_fk"))	
 	private ExpedientEstatResourceEntity expedientEstatAdditional;
+
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
+    @Where(clause = "dtype = 'DocumentNotificacioEntity'")
+    private List<DocumentNotificacioResourceEntity> notificacions = new ArrayList<>();
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
+    @Where(clause = "dtype = 'DocumentPortafirmesEntity'")
+    private List<DocumentPortafirmesResourceEntity> portafirmes = new ArrayList<>();
 	
 	public MetaDocumentResourceEntity getMetaDocument() {
 		return (MetaDocumentResourceEntity)getMetaNode();

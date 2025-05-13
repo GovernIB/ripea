@@ -637,6 +637,20 @@ public class ExpedientInteressatHelper {
 			Long entitatId,
 			Long expedientId,
 			String rolActual,
+			List<InteressatDto> interessats) {
+		List<Long> seleccionats = new ArrayList<Long>();
+		if (interessats!=null) {
+			for (InteressatDto iDto: interessats) {
+				seleccionats.add(iDto.getId());			
+			}			
+		}
+		return importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
+	}
+	
+	public String importarInteressats(
+			Long entitatId,
+			Long expedientId,
+			String rolActual,
 			List<InteressatDto> interessats,
 			List<Long> seleccionats) {
 		
