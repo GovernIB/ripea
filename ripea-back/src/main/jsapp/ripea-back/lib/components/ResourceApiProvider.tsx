@@ -1032,7 +1032,8 @@ export const ResourceApiProvider = (props: ResourceApiProviderProps) => {
     }, []);
     const requestHref = React.useCallback((href: string, templateData?: any): Promise<State> => {
         if (kettingClientRef.current) {
-            const processedHref = parseTemplate(href).expand(templateData);
+            const isEmptyTemplateData = templateData == null || Object.keys(templateData).length === 0;
+            const processedHref = !isEmptyTemplateData ? parseTemplate(href).expand(templateData) : href;
             return getPromiseFromResourceLink(kettingClientRef.current.go(processedHref), undefined, true);
         } else {
             throw new Error('Ketting client not initialized');

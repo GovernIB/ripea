@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import { FormFieldCustomProps } from '../../form/FormField';
+import { useResourceApiContext } from '../../ResourceApiContext';
 import { useFormFieldCommon } from './FormFieldText';
 
 type FormFieldEnumProps = FormFieldCustomProps & {
@@ -27,10 +28,10 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         multiple: multipleProp,
         hiddenEnumValues,
     } = props;
+    const { requestHref } = useResourceApiContext();
     const [open, setOpen] = React.useState(false);
+    const [filteredOptions, setFilteredOptions] = React.useState<any>();
     const multiple = (field?.multiple || multipleProp) ?? false;
-    const options = field.options;
-    const filteredOptions = Object.fromEntries(Object.entries(options).filter(([key]) => hiddenEnumValues ? (Array.isArray(hiddenEnumValues) ? !hiddenEnumValues.includes(key) : hiddenEnumValues !== key) : true));
     const {
         helperText,
         title,
@@ -42,7 +43,28 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         startAdornment,
     };
     const valueMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? '');
-    return <TextField
+    React.useEffect(() => {
+        if (field.options != null) {
+            const options = field.options;
+            const filteredOptions = options != null ? Object.fromEntries(Object.entries(options).filter(([key]) => hiddenEnumValues ? (Array.isArray(hiddenEnumValues) ? !hiddenEnumValues.includes(key) : hiddenEnumValues !== key) : true)) : null;
+            setFilteredOptions(filteredOptions);
+        } else if (field.dataSource != null) {
+            const dataSource = field.dataSource;
+            const valueField = dataSource.valueField;
+            const labelField = dataSource.labelField;
+            const templateData = {};
+            requestHref(dataSource, templateData).then((state) => {
+                const options = state.getEmbedded().map(e => ({
+                    id: e.data[valueField],
+                    description: e.data[labelField],
+                }));
+                console.log('>>> options', options)
+            });
+        } else {
+            setFilteredOptions({});
+        }
+    }, [field]);
+    return filteredOptions && <TextField
         select
         name={name}
         label={!inline ? label : undefined}
@@ -69,7 +91,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 onOpen: () => setOpen(true),
                 renderValue: (value: any) => {
                     const selectedText = (v: any) => {
-                        const found = Object.entries(options).find(([key]) => key === v);
+                        const found = Object.entries(filteredOptions).find(([key]) => key === v);
                         return found?.[1];
                     }
                     return multiple ? value?.map((v: any) => selectedText(v)).join(', ') : selectedText(value);

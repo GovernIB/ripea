@@ -313,7 +313,10 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@GetMapping(value = "/fields/{fieldName}/enumOptions")
 	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
-	public ResponseEntity<CollectionModel<FieldOption>> fieldEnumOptions(final String fieldName) {
+	public ResponseEntity<CollectionModel<FieldOption>> fieldEnumOptions(
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName) {
 		log.debug("Consultant possibles valors del camp enumerat (fieldName={})", fieldName);
 		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
 		return ResponseEntity.ok(fieldOptions != null ? CollectionModel.of(fieldOptions) : CollectionModel.empty());

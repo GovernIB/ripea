@@ -201,11 +201,11 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                         id: e.data[valueField],
                         description: e.data[labelField],
                     }));
-                    const reponse = {
+                    const response = {
                         options,
                         page: state.data.page
                     };
-                    resolve(reponse);
+                    resolve(response);
                 }).catch(reject);
             });
         }

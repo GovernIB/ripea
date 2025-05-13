@@ -321,8 +321,8 @@ public class HalFormsConfig {
 				}).findFirst();
 		if (resourceControllerClass.isPresent()) {
 			Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)((Class<?>)resourceControllerClass.get());
-			return linkTo(methodOn(mutableResourceControllerClass).fieldEnumOptions(
-					resourceField.getName())).withRel(IanaLinkRelations.SELF_VALUE);
+			return linkTo(methodOn(mutableResourceControllerClass).fieldEnumOptions(resourceField.getName())).
+					withRel(IanaLinkRelations.SELF_VALUE);
 		} else {
 			Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(resourceField);
 			log.error("Couldn't find resource controller class from field (" +
