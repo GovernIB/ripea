@@ -21,9 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
@@ -47,7 +44,6 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
-import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -56,7 +52,6 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -67,7 +62,6 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
@@ -77,7 +71,6 @@ import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
-import es.caib.ripea.service.intf.model.ExpedientResource.ImportarInteressatsFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
@@ -116,7 +109,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
-    private final ExpedientInteressatHelper expedientInteressatHelper;
 
     @PostConstruct
     public void init() {
@@ -146,8 +138,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
 
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
-        register(ExpedientResource.ACTION_EXPORTAR_INTERESSATS_CODE, new ExportarInteressatsReportGenerator());
-        register(ExpedientResource.ACTION_IMPORTAR_INTERESSATS_CODE, new ImportarInteressatsActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -619,84 +609,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
 
-    private class ExportarInteressatsReportGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
-
-		@Override
-		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
-
-    	@Override
-		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    		try {
-    			Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
-    			ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);    			
-    			if (params!=null) {
-	    			entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
-	    			ObjectMapper objectMapper = new ObjectMapper();
-					objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, expedientInteressatHelper.findByIds(params.getIds()));
-					DownloadableFile resultat = new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());				
-					return resultat;
-    			} else {
-    				throw new ReportGenerationException(getResourceClass(), null, code, "No s'han seleccionat interessats.");
-    			}
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/ExportarInteressatsReportGenerator", e);
-				throw new ReportGenerationException(getResourceClass(), null, code, "S'ha produit un error al exportar els interessats seleccionats.");
-			} finally {
-				try {
-					baos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-    	}
-		
-		@Override
-		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, MassiveAction params) throws ReportGenerationException {
-			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():0l);
-			parametres.add(params);
-			return parametres;
-		}
-    }    
-    
-    private class ImportarInteressatsActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarInteressatsFormAction, Serializable> {
-
-		@Override
-		public void onChange(Serializable id, ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarInteressatsFormAction target) {
-			try {
-				if (fieldName != null && fieldName.equals("fitxerJsonInteressats")) {
-					ObjectMapper objectMapper = new ObjectMapper();
-					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-					List<InteressatDto> lista = objectMapper.readValue(
-							((FileReference)fieldValue).getContent(),
-							new TypeReference<List<InteressatDto>>() {});
-					target.setInteressatsFitxer(lista);
-				}
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor.onChange", e);
-			}
-		}
-
-		@Override
-		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarInteressatsFormAction params) throws ActionExecutionException {
-			try {
-            	String rolActual = configHelper.getRolActual();
-            	String entitatActual = configHelper.getEntitatActualCodi();
-            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
-				expedientInteressatHelper.importarInteressats(
-						entitatEntity.getId(),
-						entity.getId(),
-						rolActual,
-						params.getInteressatsPerImportar());
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/ImportarInteressatsActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
-			}
-			return null;
-		}
-    }
-    
     private class TancarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.TancarExpedientFormAction, Serializable> {
 		@Override
 		public void onChange(Serializable id, TancarExpedientFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, TancarExpedientFormAction target) {

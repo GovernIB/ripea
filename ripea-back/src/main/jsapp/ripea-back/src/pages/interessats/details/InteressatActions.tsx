@@ -7,8 +7,9 @@ import {
 import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate from "../actions/Create.tsx";
+import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
@@ -18,8 +19,20 @@ const useActions = (refresh?: () => void) => {
     const {
         delete: apiDelete,
         patch: apiPatch,
-        getOne
+        getOne,
+        artifactReport: apiReport,
     } = useResourceApiService('interessatResource');
+
+    const exportar = (ids:any[], entity:any) => {
+        return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
+            .then((result) => {
+                iniciaDescargaJSON(result);
+                temporalMessageShow(null, '', 'info');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
     const deleteRepresentent = (id: any, row: any) => {
         getOne(row?.representant?.id)
@@ -88,12 +101,13 @@ const useActions = (refresh?: () => void) => {
     }
 
     return {
+        exportar,
         deleteRepresentent,
         deleteInteressat,
     }
 }
 
-const useInteressatActions = (readOnly:boolean,refresh?: () => void) => {
+const useInteressatActions = (readOnly:boolean, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {deleteRepresentent, deleteInteressat} = useActions(refresh);

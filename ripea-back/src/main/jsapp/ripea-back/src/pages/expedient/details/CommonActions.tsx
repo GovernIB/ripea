@@ -24,6 +24,27 @@ export const iniciaDescargaBlob = (result: any) => {
     document.body.removeChild(link); // Limpieza
     URL.revokeObjectURL(url);
 }
+export const iniciaDescargaJSON = (result: any) => {
+    const data = result.blob;
+
+    const filename = result.fileName;
+
+    // 1. Convertir el objeto a una cadena JSON
+    const jsonStr = JSON.stringify(data, null, 2); // `null, 2` para formato legible
+
+    // 2. Crear un Blob con el contenido
+    const blob = new Blob([jsonStr], { type: "application/json" });
+
+    // 3. Crear un enlace temporal para descargar
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+
+    // 4. Disparar la descarga
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 export const useActions = (refresh?: () => void) => {
 	
