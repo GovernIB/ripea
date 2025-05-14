@@ -11,6 +11,7 @@ import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
+import {Divider} from "@mui/material";
 
 const useActions = (refresh?: () => void) => {
 
@@ -78,6 +79,10 @@ const useTascaActions = (refresh?: () => void) => {
             onClick: handleOpen,
         },
         {
+            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            showInMenu: true,
+        },
+        {
             title: t('page.tasca.acciones.tramitar'),
             icon: "folder",
             showInMenu: true,
@@ -120,6 +125,10 @@ const useTascaActions = (refresh?: () => void) => {
             hidden: hideByEstat,
         },
         {
+            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            showInMenu: true,
+        },
+        {
             title: t('page.tasca.acciones.reassignar'),
             icon: "person",
             showInMenu: true,
@@ -139,6 +148,10 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleRetomar,
             hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
+        },
+        {
+            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            showInMenu: true,
         },
         {
             title: t('page.tasca.acciones.upDataLimit'),

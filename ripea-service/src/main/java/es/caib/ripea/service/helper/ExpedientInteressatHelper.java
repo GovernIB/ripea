@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ExpedientInteressatHelper {
@@ -797,11 +798,10 @@ public class ExpedientInteressatHelper {
 	}
 
 	public List<InteressatDto> findByIds(List<Long> ids) {
-		List<InteressatDto> interessatsExportar = new ArrayList<InteressatDto>();
-		for (Long interessatId: ids) {
-			interessatsExportar.add(conversioTipusHelper.convertir(interessatRepository.findById(interessatId), InteressatDto.class));
-		}
-		return interessatsExportar;
+        return interessatRepository.findAllById(ids).stream()
+                .map(interessatEntity ->
+                     conversioTipusHelper.convertir(interessatEntity, InteressatDto.class)
+                ).collect(Collectors.toList());
 	}
 	
 	public List<InteressatEntity> findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Grid} from "@mui/material";
 import {
     GridPage,
@@ -8,8 +8,9 @@ import {useTranslation} from "react-i18next";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import useInteressatActions from "./details/InteressatActions.tsx";
+import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
+import useImport from "./actions/Import.tsx";
 
 export const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -63,6 +64,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {entity, onRowCountChange} = props
     const { t } = useTranslation();
     const {value: user} = useUserSession();
+    const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
     const apiRef = useMuiDataGridApiRef()
 
@@ -71,7 +73,9 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     }
 
     const readOnly = entity?.agafatPer?.id != user?.codi
-    const {actions, components} = useInteressatActions(readOnly,refresh)
+    const {actions, components} = useInteressatActions(readOnly, refresh)
+    const {exportar} = useActions(refresh);
+    const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
 
     return <GridPage>
         <StyledMuiGrid
@@ -98,18 +102,27 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             readOnly={readOnly}
             rowHideDeleteButton
 
+            selectionActive
+            onRowSelectionModelChange={(newSelection) => {
+                // console.log('Selection changed:', newSelection);
+                setSelectedRows([...newSelection]);
+            }}
             toolbarElementsWithPositions={[
                 {
                     position: 0,
-                    element: <ToolbarButton icon={'upload'}>Exportar...</ToolbarButton>
+                    element: <ToolbarButton icon={'upload'}
+                                            onClick={()=>exportar(selectedRows, entity)}
+                                            disabled={selectedRows?.length==0}
+                    >Exportar...</ToolbarButton>
                 },
                 {
                     position: 0,
-                    element: <ToolbarButton icon={'download'} hidden={readOnly}>Importar...</ToolbarButton>
+                    element: <ToolbarButton icon={'download'} onClick={()=>handleImport()} hidden={readOnly}>Importar...</ToolbarButton>
                 },
             ]}
         />
 
+        {contentImport}
         {components}
     </GridPage>
 }

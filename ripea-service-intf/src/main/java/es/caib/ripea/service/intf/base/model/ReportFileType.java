@@ -12,5 +12,6 @@ public enum ReportFileType {
 	XLSX,
 	DOCX,
 	PDF,
-	ZIP
+	ZIP,
+    JSON
 }

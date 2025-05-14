@@ -1,19 +1,20 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.base.model.*;
+import es.caib.ripea.service.intf.dto.InteressatDto;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
-import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
-import es.caib.ripea.service.intf.base.model.Resource;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
@@ -34,12 +35,22 @@ import lombok.experimental.FieldNameConstants;
         artifacts = {
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
-                        code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),	              
+                        code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = InteressatResource.ACTION_EXPORTAR_CODE,
+                        formClass = InteressatResource.ExportInteressatsFormAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = InteressatResource.ACTION_IMPORTAR_CODE,
+                        formClass = InteressatResource.ImportarInteressatsFormAction.class),
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
+    public static final String ACTION_EXPORTAR_CODE = "EXPORTAR";
+    public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
 
 	@NotNull
 	protected InteressatTipusEnum tipus = InteressatTipusEnum.InteressatPersonaFisicaEntity;
@@ -136,4 +147,28 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 			return null;
 		}
 	}
+
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class ImportarInteressatsFormAction implements Serializable {
+        @NotNull
+        @ResourceField(onChangeActive = true)
+        private FileReference fitxerJsonInteressats;
+        private List<InteressatDto> interessatsFitxer;
+        @NotNull
+        @NotEmpty
+        private List<InteressatDto> interessatsPerImportar;
+
+        @NotNull
+        private ResourceReference<ExpedientResource, Long> expedient;
+    }
+
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class ExportInteressatsFormAction extends NodeResource.MassiveAction {
+        @NotNull
+        private ResourceReference<ExpedientResource, Long> expedient;
+    }
 }
