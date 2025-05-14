@@ -77,10 +77,13 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @ResourceField(onChangeActive = true)
 	protected String documentNum;
 	@Size(max = 4)
+	@ResourceField(enumType = true)
 	protected String pais;
 	@Size(max = 2)
+	@ResourceField(enumType = true)
 	protected String provincia;
 	@Size(max = 5)
+	@ResourceField(enumType = true)
 	protected String municipi;
 	@Size(max = 160)
 	protected String adresa;

@@ -18,20 +18,26 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.*;
-import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
@@ -74,7 +80,9 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +103,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final EntityComprovarHelper entityComprovarHelper;
     private final CacheResourceHelper cacheResourceHelper;
 
+    private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
@@ -756,12 +765,53 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(Serializable id, DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
+        	
         	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte 
         	if (fieldName==null) {
+        		
+        		target.setMostrarFirmaParcial(configHelper.getAsBoolean(PropertyConfig.FIRMA_PARCIAL));
+        		target.setMostrarAvisFirmaParcial(configHelper.getAsBoolean(PropertyConfig.AVIS_FIRMA_PARCIAL));
+        		
         		//Carregam el valor del tipus de firma, consultant el meta-document
-        		MetaDocumentFirmaFluxTipusEnumDto fluxTipus = documentResourceRepository.findById((long)id).get().getMetaDocument().getPortafirmesFluxTipus();
-        		target.setPortafirmesFluxTipus(fluxTipus);
+        		Long idResource = null;
+        		if (id instanceof Integer) {
+        			idResource = ((Integer)id).longValue();
+        		} else {
+        			idResource = (Long)id;
+        		}
+        		
+        		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceRepository.findById(idResource).get().getMetaDocument();
+        		target.setPortafirmesFluxTipus(metaDocumentResourceEntity.getPortafirmesFluxTipus());
+        		
+        		if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
+        			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<ResourceReference<UsuariResource,String>>();
+        			if (metaDocumentResourceEntity.getPortafirmesResponsables()!=null) {
+        				String[] pfResponsables = metaDocumentResourceEntity.getPortafirmesResponsables().split(",");
+        				if (pfResponsables.length>0) {
+        					for (String codi : pfResponsables) {
+        						UsuariResourceEntity usuariEntity = usuariResourceRepository.findById(codi).orElseGet(null);
+        						if (usuariEntity!=null) {
+        							responsables.add(ResourceReference.toResourceReference(usuariEntity.getCodi(), usuariEntity.getNom()));
+        						} else {
+        							responsables.add(ResourceReference.toResourceReference(codi, codi));
+        						}
+        					}
+        				}
+        			}
+        			target.setResponsables(responsables);
+        		} else {
+        			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
+        		}
+        		
         	} else { //És un camp concret el que s'ha canviat
+        		if ("portafirmesEnviarFluxId".equals(fieldName)) {
+        			String idiomaUsuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get().getIdioma();
+        			target.setPortafirmesFluxUrl(pluginHelper.portafirmesRecuperarUrlPlantilla(
+        					fieldValue.toString(), 
+        					idiomaUsuari!=null?idiomaUsuari:"ca",
+        					null,
+        					false));
+        		}
         	}
         }
     }

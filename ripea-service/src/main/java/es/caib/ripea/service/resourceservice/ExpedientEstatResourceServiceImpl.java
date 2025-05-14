@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.parser.Filter;
+
 /**
  * Implementació del servei de gestió de estats d'expedient.
  *
@@ -18,4 +20,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExpedientEstatResourceServiceImpl extends BaseMutableResourceService<ExpedientEstatResource, Long, ExpedientEstatResourceEntity> implements ExpedientEstatResourceService {
 
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	return Filter.parse(currentSpringFilter).generate(); 
+    }
 }

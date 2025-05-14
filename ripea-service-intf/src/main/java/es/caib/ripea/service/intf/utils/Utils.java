@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Utils {
 	
@@ -531,4 +532,18 @@ public class Utils {
 		
 		return resultat;
 	}
+	
+    public static List<String> getIdsEnGruposMil(List<Long> ids) {
+    	int maxSize = 1000;
+    	if (ids!=null && ids.size()>0) {
+    		List<String> result = new ArrayList<>();
+    		for (int i = 0; i < ids.size(); i += maxSize) {
+                List<Long> subList = ids.subList(i, Math.min(i + maxSize, ids.size()));
+                String concatenated = subList.stream().map(String::valueOf).collect(Collectors.joining(","));
+                result.add(concatenated);
+            }
+    		return result;
+    	}
+    	return null;
+    }
 }

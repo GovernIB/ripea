@@ -357,6 +357,8 @@ public class DocumentResource extends NodeResource {
         @Transient
     	private String portafirmesFluxDescripcio;
         @Transient
+    	private String portafirmesFluxUrl;
+        @Transient
     	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
     }
     
