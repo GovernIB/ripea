@@ -26,12 +26,14 @@ const columns = [
     {
         field: 'nomComplet',//organNom
         headerName: '',
-        flex: 1,
+        flex: 0.75,
         valueFormatter: (value: any, row:any) => row?.organNom ?? value
     },
     {
         field: 'representant',
+        headerName: 'Representante',
         flex: 0.75,
+        valueFormatter: (value: any) => value ?value?.documentNum + " - " + value?.nom :'',
     },
 ];
 

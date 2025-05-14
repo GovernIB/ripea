@@ -42,10 +42,7 @@ import javax.validation.groups.Default;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -313,13 +310,54 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@GetMapping(value = "/fields/{fieldName}/enumOptions")
 	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
-	public ResponseEntity<CollectionModel<FieldOption>> fieldEnumOptions(
+	public ResponseEntity<CollectionModel<EntityModel<FieldOption>>> fieldEnumOptionsFindAll(
 			@PathVariable
 			@Parameter(description = "Nom del camp")
 			final String fieldName) {
 		log.debug("Consultant possibles valors del camp enumerat (fieldName={})", fieldName);
 		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
-		return ResponseEntity.ok(fieldOptions != null ? CollectionModel.of(fieldOptions) : CollectionModel.empty());
+		Link selfLink = linkTo(methodOn(getClass()).fieldEnumOptionsFindAll(fieldName)).withSelfRel();
+		if (fieldOptions != null) {
+			return ResponseEntity.ok(
+					CollectionModel.of(
+							fieldOptions.stream().
+									map(fo -> EntityModel.of(
+											fo,
+											linkTo(methodOn(getClass()).fieldEnumOptionsGetOne(fieldName, fo.getValue())).withSelfRel())).
+									collect(Collectors.toList()),
+							selfLink));
+		} else {
+			return ResponseEntity.ok(CollectionModel.empty(selfLink));
+		}
+	}
+
+	@Override
+	@GetMapping(value = "/fields/{fieldName}/enumOptions/{value}")
+	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
+	public ResponseEntity<EntityModel<FieldOption>> fieldEnumOptionsGetOne(
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName,
+			@PathVariable
+			@Parameter(description = "Valor de l'opció")
+			final String value) {
+		log.debug("Consultant d'un únic valor del camp enumerat (fieldName={}, value={})", fieldName, value);
+		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
+		FieldOption found = null;
+		if (fieldOptions != null) {
+			found = fieldOptions.stream().
+					filter(fo -> fo.getValue().equals(value)).
+					findFirst().orElse(null);
+		}
+		if (found != null) {
+			return ResponseEntity.ok(
+					EntityModel.of(
+							found,
+							linkTo(methodOn(getClass()).fieldEnumOptionsGetOne(fieldName, found.getValue())).withSelfRel()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 	@Override
