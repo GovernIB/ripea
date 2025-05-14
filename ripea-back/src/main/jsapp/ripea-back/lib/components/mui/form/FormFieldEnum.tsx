@@ -54,11 +54,12 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             const labelField = dataSource.labelField;
             const templateData = {};
             requestHref(dataSource, templateData).then((state) => {
-                const options = state.getEmbedded().map(e => ({
-                    id: e.data[valueField],
-                    description: e.data[labelField],
-                }));
-                console.log('>>> options', options)
+                const options: any = {};
+                state.getEmbedded().forEach(e => {
+                    options[e.data[valueField]] = e.data[labelField];
+                });
+                const filteredOptions = options != null ? Object.fromEntries(Object.entries(options).filter(([key]) => hiddenEnumValues ? (Array.isArray(hiddenEnumValues) ? !hiddenEnumValues.includes(key) : hiddenEnumValues !== key) : true)) : null;
+                setFilteredOptions(filteredOptions);
             });
         } else {
             setFilteredOptions({});
