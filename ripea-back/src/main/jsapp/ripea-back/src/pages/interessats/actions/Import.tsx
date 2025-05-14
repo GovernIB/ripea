@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import {DataGridPro} from "@mui/x-data-grid-pro";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -17,6 +17,11 @@ const columns = [
         field: 'documentNum',
         headerName: '',
         flex: 0.5,
+        renderCell: (params:any) => <>
+            {params?.row?.documentNum}
+            {params?.row?.jaExistentExpedient &&
+            <Icon color={"warning"} title={"Ya existe en el expediente"}>warning</Icon>}
+        </>
     },
     {
         field: 'nomComplet',//organNom
@@ -24,10 +29,10 @@ const columns = [
         flex: 1,
         valueFormatter: (value: any, row:any) => row?.organNom ?? value
     },
-    // {
-    //     field: 'representant',
-    //     flex: 0.75,
-    // },
+    {
+        field: 'representant',
+        flex: 0.75,
+    },
 ];
 
 const ImportForm = () => {
