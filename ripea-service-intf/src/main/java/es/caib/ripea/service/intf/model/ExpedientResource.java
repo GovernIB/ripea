@@ -260,9 +260,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	@Size(max = 1024)
 	private String prioritatMotiu;
 
-    @Transient
-    private ExpedientEstatResource estatAdditionalInfo;
-
+    @Transient private ExpedientEstatResource estatAdditionalInfo;
     @Transient private List<InteressatResource> interessats;
     @Transient private List<ResourceReference<UsuariResource, String>> seguidors;
     @Transient private boolean seguidor = false;
@@ -278,6 +276,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private int numTasques;
     @Transient private int numAlert;
     @Transient private boolean disableOrganGestor = false;
+    
     public String getTipusStr() {
         return this.getMetaExpedient() != null ? this.getMetaExpedient().getDescription() + " - " + ntiClasificacionSia : null;
     }
@@ -308,6 +307,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 		private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
+        private ResourceReference<ExpedientEstatResource, Long> estatAdditionalInfo;
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;

@@ -1,23 +1,16 @@
-import {
-    GridPage,
-    useMuiDataGridApiRef,
-} from 'reactlib';
+import {GridPage} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import useAnotacioActions from "./details/AnotacioActions.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import * as builder from "../../util/springFilterUtils.ts";
 
-const sortModel = [{field: 'registreInfo.data', sort: 'desc'}];
+const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
 
 const AnotacionsGrid = (props:any) => {
     const { id } = props;
     const { t } = useTranslation();
-    const apiRef = useMuiDataGridApiRef()
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
 
     const columns = [
         {
@@ -43,7 +36,7 @@ const AnotacionsGrid = (props:any) => {
         },
     ];
 
-    const {actions, components} = useAnotacioActions(refresh);
+    const {actions, components} = useAnotacioActions();
 
     return <GridPage>
         <StyledMuiGrid
@@ -54,7 +47,6 @@ const AnotacionsGrid = (props:any) => {
             columns={columns}
             rowAdditionalActions={actions}
             paginationActive
-            apiRef={apiRef}
             disableColumnSorting
             readOnly
         />

@@ -1,5 +1,25 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
@@ -8,11 +28,6 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "metaexpedient")
@@ -54,6 +69,9 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 	@Column(name = "gestio_amb_grups_activa", nullable = false)
 	private boolean gestioAmbGrupsActiva;
 
+	@OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
+	private Set<MetaExpedientOrganGestorResourceEntity> metaExpedientOrganGestors;
+	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "metaexpedient_grup",

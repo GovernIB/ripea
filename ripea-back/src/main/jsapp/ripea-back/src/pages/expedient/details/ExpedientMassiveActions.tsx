@@ -16,7 +16,7 @@ const useMassiveActions = (refresh?: () => void)=> {
                 temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
-                temporalMessageShow('Error', error?.message, 'error');
+                temporalMessageShow(null, error?.message, 'error');
             })
     }
 	
@@ -27,7 +27,7 @@ const useMassiveActions = (refresh?: () => void)=> {
 			    temporalMessageShow(null, msg, 'info');
 			})
 			.catch((error) => {
-			    temporalMessageShow('Error', error?.message, 'error');
+			    temporalMessageShow(null, error?.message, 'error');
 			});		
 	}
 
@@ -64,7 +64,7 @@ const useMassiveActions = (refresh?: () => void)=> {
 }
 
 const useExpedientMassiveActions = (refresh?: () => void)=> {
-
+    const { t } = useTranslation();
     const { value: user } = useUserSession();
 
     const {	agafar,
@@ -85,74 +85,74 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 
     const actions = [
         {
-            title: "Agafar",
+            title: t('page.expedient.acciones.agafar'),
             icon: "lock",
             onClick: agafar,
         },
         {
-            title: "Alliberar",
+            title: t('page.expedient.acciones.lliberar'),
             icon: "lock_open",
 			onClick: alliberar,
         },
 		{
-		    title: "Retornar",
+		    title: t('page.expedient.acciones.retornar'),
 		    icon: "undo",
 			onClick: retornar,
 		},		
         {
-            title: "Seguir",
+            title: t('page.expedient.acciones.follow'),
             icon: "person_add_alt1",
             onClick: follow,
         },
         {
-            title: "Deixar de seguir",
+            title: t('page.expedient.acciones.unfollow'),
             icon: "person_remove",
             onClick: unfollow,
         },
         {
-            title: "Esborrar",
+            title: t('common.delete'),
             icon: "delete",
 			onClick: esborrar,
         },
         {
-            title: "Exportar full de càlcul",
+            title: t('page.expedient.acciones.exportFullCalcul'),
             icon: "download",
 			onClick: exportExcel
         },
         {
-            title: "Exportar CSV",
+            title: t('page.expedient.acciones.exportCSV'),
             icon: "download",
 			onClick: exportCsv
         },
         {
-            title: "Exportar índex ZIP",
+            title: t('page.expedient.acciones.exportZIP'),
             icon: "download",
 			onClick: exportIndexZip
         },
         {
-            title: "Exportar índex PDF",
+            title: t('page.expedient.acciones.exportPDF'),
             icon: "download",
 			onClick: exportIndexPdf,
         },
 		{
-		    title: "Exportar índex Excel",
+            title: t('page.expedient.acciones.exportEXCEL'),
 		    icon: "download",
 			onClick: exportIndexXls,
             hidden: !(user?.sessionScope?.isExportacioExcelActiva),
 		},
         {
-            title: "Exportació ENI",
+            title: t('page.expedient.acciones.exportENI'),
             icon: "download",
 			onClick: exportEni
         },
 		{
-		    title: "Exportació INSIDE",
+            title: t('page.expedient.acciones.exportINSIDE'),
 		    icon: "download",
 			onClick: exportInside,
 			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
-            title: "Exportar els documents dels expedients seleccionats...",
+            title: t('page.expedient.acciones.export'),
             icon: "description",
             onClick: handleExportDoc,
         },

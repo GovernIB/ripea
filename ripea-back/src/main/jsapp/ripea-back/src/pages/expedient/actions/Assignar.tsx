@@ -34,7 +34,7 @@ const useAssignar = (refresh?: () => void) => {
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                error && temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow(null, error.message, 'error');
             });
     }
 

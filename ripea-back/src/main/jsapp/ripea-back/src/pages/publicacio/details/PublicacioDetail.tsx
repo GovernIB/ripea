@@ -1,9 +1,23 @@
 import {useState} from "react";
 import {Grid} from "@mui/material";
-import {BasePage, MuiDialog} from "reactlib";
+import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+
+const PublicacioDetail = (props:any) => {
+    const {entity} = props
+    const { t } = useTranslation();
+
+    return <Grid container direction={"row"} columnSpacing={1}>
+        <ContenidoData title={t('page.publicacio.detall.document')}>{entity?.document?.description}</ContenidoData>
+        <ContenidoData title={t('page.publicacio.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
+        <ContenidoData title={t('page.publicacio.detall.estat')}>{entity?.estat}</ContenidoData>
+        <ContenidoData title={t('page.publicacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
+        <ContenidoData title={t('page.publicacio.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
+        <ContenidoData title={t('page.publicacio.detall.observacions')} hiddenIfEmpty>{entity?.observacions}</ContenidoData>
+    </Grid>
+}
 
 const usePublicacioDetail = () => {
     const [open, setOpen] = useState(false);
@@ -39,16 +53,7 @@ const usePublicacioDetail = () => {
                 }
             }}
         >
-            <BasePage>
-                <Grid container direction={"row"} columnSpacing={1}>
-                    <ContenidoData title={t('page.publicacio.detall.document')}>{entity?.document?.description}</ContenidoData>
-                    <ContenidoData title={t('page.publicacio.detall.enviatData')}>{formatDate(entity?.enviatData)}</ContenidoData>
-                    <ContenidoData title={t('page.publicacio.detall.estat')}>{entity?.estat}</ContenidoData>
-                    <ContenidoData title={t('page.publicacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
-                    <ContenidoData title={t('page.publicacio.detall.assumpte')}>{entity?.assumpte}</ContenidoData>
-                    <ContenidoData title={t('page.publicacio.detall.observacions')} hiddenIfEmpty>{entity?.observacions}</ContenidoData>
-                </Grid>
-            </BasePage>
+            <PublicacioDetail entity={entity}/>
         </MuiDialog>
 
     return {

@@ -20,7 +20,7 @@ const NotificarMassive = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"MASSIVE_NOTIFICAR_ZIP"}
-        title={'Generar documento para notificar'}
+        title={t('page.document.action.notificarMasiva')}
         {...props}
     >
         <NotificarMassiveForm/>
@@ -28,6 +28,7 @@ const NotificarMassive = (props:any) => {
 }
 
 const useNotificarMassive = (entity:any, refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -44,9 +45,8 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
         })
     }
     const onSuccess = (result?: any) :void => {
-        console.log("result", result)
         if (result?.id) {
-            temporalMessageShow(null, 'Se ha generado un zip de los elementos seleccionados', 'success');
+            temporalMessageShow(null, t('page.document.dialog.generateZip'), 'success');
             handleNotificar(result?.id, result)
         }else {
             onError({message: ''})

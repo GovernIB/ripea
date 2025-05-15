@@ -1,12 +1,19 @@
+import {useRef, useState} from "react";
+import {Grid, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid} from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
+import * as builder from '../../../util/springFilterUtils.ts';
 
 const EviarPortafirmesForm = () => {
-    const {data} = useFormContext();
+    const {data, apiRef} = useFormContext();
+    const [open, setOpen] = useState<boolean>(true);
+
+    const filter = builder.and(
+        builder.neq('id', apiRef?.current?.getId()),
+        builder.eq('expedient.id', data?.expedient?.id),
+    )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="motiu"/>
@@ -17,11 +24,27 @@ const EviarPortafirmesForm = () => {
         <GridFormField xs={12} name="portafirmesSequenciaTipus" hidden={data?.portafirmesFluxTipus!='SIMPLE'} required/>
 
         {/* PORTAFIB */}
-        <GridFormField xs={12} name="annexos" multiple hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
-        <GridFormField xs={12} name="fluxFirma" hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+        <GridFormField xs={12} name="annexos" multiple filter={filter} hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+        <GridFormField xs={10} name="portafirmesEnviarFluxId"
+                       type={"text"} componentProps={{title: "Existe un flujo de firma predefinido. La creación de un nuevo flujo de firma implica sobrescribir el seleccionado."}}
+                       hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+
+        <GridButton
+            xs={1} onClick={()=>setOpen(!open)}
+            hidden={data?.portafirmesFluxTipus!='PORTAFIB'}
+        >
+            <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
+        </GridButton>
+        <GridButton xs={1} hidden={data?.portafirmesFluxTipus!='PORTAFIB'}>
+            <Icon sx={{m: 0}}>open_in_new</Icon>
+        </GridButton>
 
         <GridFormField xs={12} name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
         <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
+
+        <Grid item xs={12} hidden={!data?.portafirmesFluxUrl || !open}>
+            <iframe src={data?.portafirmesFluxUrl} width={'100%'} height={'500px'}></iframe>
+        </Grid>
     </Grid>
 }
 
@@ -46,6 +69,7 @@ const useEviarPortafirmes = (refresh?: () => void) => {
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id, {
             motiu: `Tramitació de l'expedient [${row?.expedient?.description}]`,
+            expedient: row?.expedient,
             metaDocument: row?.metaDocument,
         })
     }
@@ -54,7 +78,7 @@ const useEviarPortafirmes = (refresh?: () => void) => {
         temporalMessageShow(null, '', 'success');
     }
     const onError = (error:any) :void => {
-        temporalMessageShow('Error', error.message, 'error');
+        temporalMessageShow(null, error.message, 'error');
     }
 
     return {

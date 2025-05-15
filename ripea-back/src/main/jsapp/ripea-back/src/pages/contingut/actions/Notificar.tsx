@@ -1,9 +1,9 @@
 import {useEffect, useRef, useState} from "react";
-import {Grid, Alert, Button, Icon} from "@mui/material";
+import {Grid, Alert, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
+import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import useCreate from "../../interessats/actions/Create.tsx";
@@ -17,7 +17,7 @@ const Notificacio = (props:any) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { entity?.incapacitat == true && (!entity?.representant || entity?.representant?.incapacitat) &&
-            <Alert severity="warning">En caso de titular con incapacidad es obligatorio indicar un destinatario.</Alert>
+            <Alert severity="warning">{t('page.interessat.alert.incapacitat')}</Alert>
         }
 
         <CardData title={t('page.interessat.title')}>
@@ -102,25 +102,22 @@ const NotificarForm = () => {
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
-    console.log("data", data)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus"/>
         <GridFormField xs={12} name="estat" required disabled/>
 
-        <GridFormField xs={9.6} name="interessats" multiple filter={interessatsFilter}/>
-        <Grid item xs={2.4}>
-            <Button
-                variant="outlined"
-                sx={{borderRadius: '4px', minHeight: '53px'}}
-                onClick={()=> {
-                    create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
-                }}
-            >
-                <Icon>add</Icon>Nou Interessat
-            </Button>
-            {content}
-        </Grid>
+        <GridFormField xs={10} name="interessats" multiple filter={interessatsFilter}/>
+
+        <GridButton
+            xs={2}
+            onClick={()=> {
+                create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
+            }}
+        >
+            <Icon>add</Icon>{t('page.interessat.actions.new')}
+        </GridButton>
+        {content}
 
         <GridFormField xs={12} name="concepte" required/>
         <GridFormField xs={12} name="serveiTipus" required/>
@@ -144,6 +141,7 @@ const Notificar = (props:any) => {
         resourceName={"documentResource"}
         action={"NOTIFICAR"}
         title={(data:any)=> `${t('page.document.action.notificar')}: ${data.nom}`}
+        formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
         {...props}
         initialOnChange
     >
@@ -167,7 +165,7 @@ const useNotificar = (refresh?: () => void) => {
         window.location.reload();
     }
     const onError = (error:any) :void => {
-        temporalMessageShow('Error', error.message, 'error');
+        temporalMessageShow(null, error.message, 'error');
     }
 
     return {

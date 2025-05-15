@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.model.DocumentResource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -220,7 +221,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                 ExpedientTascaResource target) {
 
             if (fieldValue != null) {
-                LocalDate start =previous.getDataInici()!=null
+                LocalDate start = previous.getDataInici()!=null
                         ?(previous.getDataInici()).toInstant()
                         .atZone(ZoneId.systemDefault())
                         .toLocalDate()
@@ -293,7 +294,44 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         }
 
         @Override
-        public void onChange(Serializable id, ExpedientTascaResource.ChangeDataLimitFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeDataLimitFormAction target) {}
+        public void onChange(Serializable id, ExpedientTascaResource.ChangeDataLimitFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeDataLimitFormAction target) {
+            if (fieldName!=null) {
+                switch (fieldName) {
+                    case ExpedientTascaResource.ChangeDataLimitFormAction.Fields.duracio:
+                        if (fieldValue != null) {
+                            Date dataLimit = DateUtils.addDays(previous.getDataInici(), (Integer) fieldValue);
+                            if (previous.getDataLimit() == null || !DateUtils.isSameDay(previous.getDataLimit(), dataLimit)) {
+                                target.setDataLimit(dataLimit);
+                            }
+                        } else {
+                            if (previous.getDataLimit() != null) {
+                                target.setDataLimit(null);
+                            }
+                        }
+                        break;
+
+                    case ExpedientTascaResource.ChangeDataLimitFormAction.Fields.dataLimit:
+                        if (fieldValue != null) {
+                            LocalDate start = previous.getDataInici().toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate();
+                            LocalDate end = ((Date) fieldValue).toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate();
+                            int dias = (int) start.until(end, ChronoUnit.DAYS);
+
+                            if (!Objects.equals(previous.getDuracio(), dias)) {
+                                target.setDuracio(dias);
+                            }
+                        } else {
+                            if (previous.getDuracio() != null) {
+                                target.setDuracio(null);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
     }
     
     

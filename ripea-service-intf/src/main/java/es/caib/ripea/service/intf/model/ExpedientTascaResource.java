@@ -131,16 +131,23 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     @Getter
     @Setter
     public static class ChangePrioritatFormAction implements Serializable {
+        private String titol;
+        private ResourceReference<MetaExpedientTascaResource, Long> metaExpedientTasca;
         @NotNull
         private PrioritatEnumDto prioritat;
     }
     
     @Getter
     @Setter
+    @FieldNameConstants
     public static class ChangeDataLimitFormAction implements Serializable {
+        @NotNull
+    	private Date dataInici;
     	@NotNull
+        @ResourceField(onChangeActive = true)
     	private Integer duracio;
     	@NotNull
+        @ResourceField(onChangeActive = true)
     	private Date dataLimit;
     }
 

@@ -20,7 +20,7 @@ const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, msg, 'success');
             })
             .catch((error) => {
-                temporalMessageShow('Error', error?.message, 'error');
+                temporalMessageShow(null, error?.message, 'error');
             });
     }
 
@@ -31,7 +31,7 @@ const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
-                temporalMessageShow('Error', error?.message, 'error');
+                temporalMessageShow(null, error?.message, 'error');
             })
     }
 

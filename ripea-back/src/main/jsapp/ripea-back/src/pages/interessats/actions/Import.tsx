@@ -7,39 +7,40 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import Load from "../../../components/Load.tsx";
 
-const columns = [
-    {
-        field: 'tipus',
-        headerName: 'Interesados del fichero',
-        flex: 0.75,
-    },
-    {
-        field: 'documentNum',
-        headerName: '',
-        flex: 0.5,
-        renderCell: (params:any) => <>
-            {params?.row?.documentNum}
-            {params?.row?.jaExistentExpedient &&
-            <Icon color={"warning"} title={"Ya existe en el expediente"}>warning</Icon>}
-        </>
-    },
-    {
-        field: 'nomComplet',//organNom
-        headerName: '',
-        flex: 0.75,
-        valueFormatter: (value: any, row:any) => row?.organNom ?? value
-    },
-    {
-        field: 'representant',
-        headerName: 'Representante',
-        flex: 0.75,
-        valueFormatter: (value: any) => value ?value?.documentNum + " - " + value?.nom :'',
-    },
-];
-
 const ImportForm = () => {
+    const {t} = useTranslation();
     const {data, apiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
+
+    const columns = [
+        {
+            field: 'tipus',
+            headerName: t('page.interessat.grid.title'),
+            flex: 0.75,
+        },
+        {
+            field: 'documentNum',
+            headerName: '',
+            flex: 0.5,
+            renderCell: (params:any) => <>
+                {params?.row?.documentNum}
+                {params?.row?.jaExistentExpedient &&
+                    <Icon color={"warning"} title={"Ya existe en el expediente"}>warning</Icon>}
+            </>
+        },
+        {
+            field: 'nomComplet',//organNom
+            headerName: '',
+            flex: 0.75,
+            valueFormatter: (value: any, row:any) => row?.organNom ?? value
+        },
+        {
+            field: 'representant',
+            headerName: t('page.interessat.grid.representant'),
+            flex: 0.75,
+            valueFormatter: (value: any) => value ?value?.documentNum + " - " + value?.nom :'',
+        },
+    ];
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("interessatsPerImportar", data?.interessatsFitxer?.filter((i:any)=>selectedRows.includes(i.id)))
@@ -78,7 +79,7 @@ const Import = (props:any) => {
     return <FormActionDialog
         resourceName={"interessatResource"}
         action={"IMPORTAR"}
-        title={'Importar interesados'}
+        title={t('page.interessat.action.importar')}
         {...props}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'md'}}
     >
@@ -102,7 +103,7 @@ const useImport = (entity:any, refresh?: () => void) => {
         temporalMessageShow(null, '', 'success');
     }
     const onError = (error: any): void => {
-        temporalMessageShow('Error', error?.message, 'error');
+        temporalMessageShow(null, error?.message, 'error');
     }
 
     return {

@@ -12,8 +12,8 @@ const ExpedientFilterForm = (props:any) => {
     const { user } = props;
 
     return <>
-        <GridFormField xs={2} name="numero"/>
-        <GridFormField xs={4} name="nom"/>
+        <GridFormField xs={3} name="numero"/>
+        <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="estat"/>
         <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="organGestor"/>
@@ -21,7 +21,7 @@ const ExpedientFilterForm = (props:any) => {
         <GridFormField xs={3} name="dataCreacioInici"/>
         <GridFormField xs={3} name="dataCreacioFinal"/>
 
-        <GridFormField xs={2} name="numeroRegistre"/>
+        <GridFormField xs={3} name="numeroRegistre"/>
         <GridFormField xs={3} name="grup"/>
         <GridFormField xs={3} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
 

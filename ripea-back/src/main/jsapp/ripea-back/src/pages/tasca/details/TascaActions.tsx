@@ -14,7 +14,7 @@ import useRetomar from "../actions/Retomar.tsx";
 import {Divider} from "@mui/material";
 
 const useActions = (refresh?: () => void) => {
-
+    const { t } = useTranslation();
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
@@ -30,13 +30,13 @@ const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                temporalMessageShow('Error', error.message, 'error');
+                temporalMessageShow(null, error.message, 'error');
             });
     }
 
     const cancelar = (id:any) => {
         messageDialogShow(
-            '¿Seguro de que desea cancelar esta tarea?',
+            t('page.tasca.action.cancelar'),
             '',
             confirmDialogButtons,
             confirmDialogComponentProps)
@@ -127,6 +127,7 @@ const useTascaActions = (refresh?: () => void) => {
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
+            hidden: (row: any): boolean => row?.estat != 'PENDENT' || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.reassignar'),
@@ -152,6 +153,7 @@ const useTascaActions = (refresh?: () => void) => {
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
+            hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.upDataLimit'),

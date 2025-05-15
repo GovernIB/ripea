@@ -39,7 +39,7 @@ export const StyledEstat = (props:any) => {
     const { entity: expedient, icon } = props;
     const { t } = useTranslation();
 
-    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color, padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
+    const additionalStyle = { backgroundColor: expedient?.estatAdditionalInfo?.color, ...labelStyle }
 
     const style = expedient?.estatAdditionalInfo
         ? additionalStyle
@@ -58,31 +58,30 @@ export const StyledEstat = (props:any) => {
 export const StyledPrioritat = (props:any) => {
     const { entity: expedient } = props;
     const { t } = useTranslation();
-    const labelStyle = { padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px' }
 
-    let style;
+    let style:any = {};
 
     switch (expedient?.prioritat){
         case "D_MOLT_ALTA":
-            style = {backgroundColor: '#d99b9d', color: 'white', ...labelStyle}
+            style = {backgroundColor: '#d99b9d', color: 'white'}
             break;
         case "C_ALTA":
-            style = {backgroundColor: '#ffebae', ...labelStyle}
+            style = {backgroundColor: '#ffebae'}
             break;
         case "B_NORMAL":
-            style = {border: '1px dashed #AAA', ...labelStyle}
+            style = {border: '1px dashed #AAA'}
             break;
         case "A_BAIXA":
-            style = {backgroundColor: '#c3e8d1', ...labelStyle}
+            style = {backgroundColor: '#c3e8d1'}
             break;
     }
 
-    return <Typography variant="caption" sx={{...commonStyle, ...style }}>
+    return <Typography variant="caption" sx={{...commonStyle, ...labelStyle, ...style }}>
         {t(`enum.prioritat.${expedient?.prioritat}`)}
     </Typography>
 }
 
-const columns = [
+const beforeAvis = [
     {
         field: 'numero',
         flex: 0.75,
@@ -94,23 +93,9 @@ const columns = [
 	{
 	    field: 'tipusStr',
 	    flex: 1,
-	},	
-    {
-		headerName: 'Avisos',
-        field: 'avisos',
-        sortable: false,
-        disableColumnMenu: true,
-        flex: 0.5,
-        renderCell: (params: any) => (<>
-            {!params.row.valid && <Icon color={"warning"} title="validacio">warning_rounded</Icon>}
-            {params.row.errorLastEnviament && <Icon color={"error"} title="enviaments">mode_square</Icon>}
-            {params.row.errorLastNotificacio && <Icon color={"error"} title="notificacions">email_square</Icon>}
-            {params.row.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments">mode_square</Icon>}
-            {params.row.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">email_square</Icon>}
-            {params.row.alerta && <Icon color={"error"} title="alertes">warning_circle</Icon>}
-            {params.row.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning_triangle</Icon>}
-        </>),
-    },
+	},
+];
+const afterAvis = [
     {
         field: 'createdDate',
         flex: 1,
@@ -182,7 +167,24 @@ const ExpedientGrid = () => {
     const {actions: massiveActions, components: massiveComponents} = useMassiveActions(refresh);
 
     const columnsAddition = [
-        ...columns,
+        ...beforeAvis,
+        {
+            headerName: t('page.expedient.detall.avisos'),
+            field: 'avisos',
+            sortable: false,
+            disableColumnMenu: true,
+            flex: 0.5,
+            renderCell: (params: any) => (<>
+                {!params.row?.valid && <Icon color={"warning"} title={t('page.expedient.alert.validation')}>warning</Icon>}
+                {params.row?.errorLastEnviament && <Icon color={"error"} title="enviaments"></Icon>}
+                {params.row?.errorLastNotificacio && <Icon color={"error"} title="notificacions">mail</Icon>}
+                {params.row?.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments"></Icon>}
+                {params.row?.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">mail</Icon>}
+                {params.row?.alerta && <Icon color={"error"} title="alertes">warning</Icon>}
+                {params.row?.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning</Icon>}
+            </>),
+        },
+        ...afterAvis,
         {
             field: 'numComentaris',
             headerName: '',
@@ -234,7 +236,7 @@ const ExpedientGrid = () => {
                     rowHideUpdateButton
 					rowHideDeleteButton
                     selectionActive
-                    toolbarCreateTitle={t('page.expedient.nou')}
+                    toolbarCreateTitle={t('page.expedient.acciones.nou')}
                     toolbarMassiveActions={massiveActions}
 
                     rowProps={(row:any) => {

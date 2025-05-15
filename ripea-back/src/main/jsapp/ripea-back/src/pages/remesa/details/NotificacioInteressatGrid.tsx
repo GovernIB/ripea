@@ -1,9 +1,10 @@
 import {useState} from "react";
-import {MuiGrid, MuiDialog} from "reactlib";
+import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import useNotificacioInteressatActions from "./NotificacioInteressatActions.tsx";
+import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 
 const columns = [
     {
@@ -61,7 +62,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
                 }
             }}
         >
-            <MuiGrid
+            <StyledMuiGrid
                 resourceName={'documentEnviamentInteressatResource'}
                 perspectives={['DETAIL']}
                 columns={columns}

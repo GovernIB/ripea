@@ -40,13 +40,42 @@ const columns = [
     }
 ]
 
-const sortModel = [{ field: 'ordre', sort: 'asc' }]
+const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
 
+const DataGrid = (props:any) => {
+    const { entity, contingut, refresh } = props
+    const [numDades, setNumDades] = useState<number>(0);
+
+    return <StyledMuiGrid
+        resourceName={"dadaResource"}
+        filter={
+            builder.and(
+                builder.eq('metaDada.id', entity?.id),
+                builder.eq('node.id', contingut?.id),
+            )
+        }
+        staticSortModel={sortModel}
+        columns={columns}
+        popupEditCreateActive
+        popupEditFormContent={<DadaForm/>}
+        formAdditionalData={{
+            metaDada:{id: entity?.id},
+            node:{id: contingut?.id},
+            tipusValor: getDataFieldType(entity?.tipus),
+        }}
+        onRowCountChange={(count:number)=>{
+            setNumDades?.(count)
+            refresh?.()
+        }}
+        autoHeight
+        // height={162 + 52 * 4}
+        toolbarHideCreate={ numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+    />
+}
 const useDataGrid = (contingut:any, refresh?:() => void) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
-    const [numDades, setNumDades] = useState<number>(0);
 
     const handleOpen = (id:any, row:any) => {
         console.log(id, row)
@@ -76,31 +105,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
                 }
             }}
         >
-            <StyledMuiGrid
-                resourceName={"dadaResource"}
-                filter={
-                    builder.and(
-                        builder.eq('metaDada.id', entity?.id),
-                        builder.eq('node.id', contingut?.id),
-                    )
-                }
-                staticSortModel={sortModel}
-                columns={columns}
-                popupEditCreateActive
-                popupEditFormContent={<DadaForm/>}
-                formAdditionalData={{
-                    metaDada:{id: entity?.id},
-                    node:{id: contingut?.id},
-                    tipusValor: getDataFieldType(entity?.tipus),
-                }}
-                onRowsChange={(rows:any, info:any) => {
-                    setNumDades?.(info?.totalElements)
-                    refresh?.()
-                }}
-                autoHeight
-                // height={162 + 52 * 4}
-                toolbarHideCreate={ numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
-            />
+            <DataGrid entity={entity} contingut={contingut} refresh={refresh}/>
         </MuiDialog>
 
     return {

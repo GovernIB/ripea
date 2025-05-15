@@ -70,7 +70,7 @@ const RemesaGridForm = () => {
     </Grid>
 }
 
-const sortModel = [{field: 'id', sort: 'asc'}];
+const sortModel:any = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
@@ -128,7 +128,7 @@ const RemesaGrid = (props:any) => {
             rowAdditionalActions={actions}
             paginationActive
             apiRef={apiRef}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
             rowHideUpdateButton={(row:any) => row.tipus != 'MANUAL'}

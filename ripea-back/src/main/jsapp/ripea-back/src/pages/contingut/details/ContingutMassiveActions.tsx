@@ -17,7 +17,7 @@ const useMassiveActions = (refresh?: () => void) => {
                 temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
-                temporalMessageShow('Error', error?.message, 'error');
+                temporalMessageShow(null, error?.message, 'error');
             });
     }
 
@@ -51,7 +51,7 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
             onClick: (ids:any[])=>handleMoure(ids, entity),
         },
         {
-            title: "Cambiar tipo",
+            title: t('page.document.acciones.changeType'),
             icon: "edit",
             onClick: handleCanviTipus,
         },

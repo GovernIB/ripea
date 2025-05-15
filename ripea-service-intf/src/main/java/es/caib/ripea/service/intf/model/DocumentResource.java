@@ -328,8 +328,10 @@ public class DocumentResource extends NodeResource {
 
     @Getter
     @Setter
+    @FieldNameConstants
     public static class EnviarPortafirmesFormAction implements Serializable {
-        @NotNull
+		private static final long serialVersionUID = -763974048421192748L;
+		@NotNull
         private String motiu;
         @NotNull
         private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
@@ -337,7 +339,7 @@ public class DocumentResource extends NodeResource {
     	private boolean enviarCorreu;
         private List<ResourceReference<DocumentResource, Long>> annexos;
         
-        //Firma parcial
+        // Firma parcial
         private boolean firmaParcial;
         private boolean avisFirmaParcial;
         @Transient
@@ -349,13 +351,16 @@ public class DocumentResource extends NodeResource {
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
         private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 
-        //FLUX
+        // FLUX
         @Transient
+        @ResourceField(enumType = true, onChangeActive = true)
     	private String portafirmesEnviarFluxId;
+//        @Transient
+//    	private String portafirmesFluxNom;
+//        @Transient
+//    	private String portafirmesFluxDescripcio;
         @Transient
-    	private String portafirmesFluxNom;
-        @Transient
-    	private String portafirmesFluxDescripcio;
+    	private String portafirmesFluxUrl;
         @Transient
     	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
     }

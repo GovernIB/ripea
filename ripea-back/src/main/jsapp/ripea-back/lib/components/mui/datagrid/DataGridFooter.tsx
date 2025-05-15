@@ -53,12 +53,17 @@ const GridFooterPagination: React.FC<DataGridFooterPaginationProps> = (props) =>
     const page = useGridSelector(apiRef, gridPageSelector);
     const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
     const pageCount = pageInfo?.totalElements && pageSize ? Math.ceil(pageInfo.totalElements / pageSize) : undefined;
-    const pageRowCount = page === (pageCount ?? 0) - 1 ? pageInfo.totalElements % pageSize : pageSize;
-    const firstElementIndex = page * pageSize + 1;
+	const pageRowCount = pageInfo?.totalElements <= pageSize 
+	    ? pageInfo?.totalElements 
+	    : page === (pageCount ?? 0) - 1 
+	        ? pageInfo?.totalElements % pageSize || pageSize 
+	        : pageSize;
+	const firstElementIndex = page * pageSize + 1;
+	const lastElement = Math.min(firstElementIndex + pageRowCount - 1, pageInfo?.totalElements);
     const boxStyle = { display: 'flex', justifContent: 'flex-end', alignItems: 'center' };
     return <Box style={boxStyle}>
         <Box>
-            {pageInfo != null ? t('grid.pageInfo', { from: firstElementIndex, to: (firstElementIndex + pageRowCount - 1), count: pageInfo.totalElements }) : ''}
+            {pageInfo != null ? t('grid.pageInfo', { from: firstElementIndex, to: lastElement, count: pageInfo.totalElements }) : ''}
         </Box>
         <Pagination
             color="primary"

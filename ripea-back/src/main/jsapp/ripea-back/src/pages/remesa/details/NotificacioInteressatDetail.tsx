@@ -56,7 +56,7 @@ const Notific = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Typography hidden={entity?.notificacioInfo?.notificacioEstat != 'PENDENT'}>No enviado a Notific@</Typography>
+        <Typography hidden={entity?.notificacioInfo?.notificacioEstat != 'PENDENT'}>{t('page.notificacioInteressat.detall.noEnviat')}</Typography>
 
         <CardData title={t('page.notificacioInteressat.detall.datat')} hidden={entity?.notificacioInfo?.notificacioEstat == 'PENDENT'}>
             <ContenidoData title={t('page.notificacio.detall.notificacioEstat')}>{entity?.notificacioInfo?.notificacioEstat}</ContenidoData>

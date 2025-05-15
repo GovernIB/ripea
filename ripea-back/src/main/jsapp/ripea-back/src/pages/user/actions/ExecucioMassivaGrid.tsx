@@ -127,7 +127,7 @@ const useExecucioMassiva = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={"Histórico de acciones del elemento"}
+            title={t('page.user.action.masives', {name: user?.nom} )}
             componentProps={{fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {

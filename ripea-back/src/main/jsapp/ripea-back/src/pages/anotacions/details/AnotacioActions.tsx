@@ -1,12 +1,13 @@
 import useAnotacioDetail from "./AnotacioDetail.tsx";
+import {useTranslation} from "react-i18next";
 
-const useAnotacioActions = (refresh?: () => void) => {
-
+const useAnotacioActions = () => {
+    const { t } = useTranslation();
     const {handleOpen, dialog} = useAnotacioDetail();
 
     const actions = [
         {
-            title: "Detalle",
+            title: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleOpen,

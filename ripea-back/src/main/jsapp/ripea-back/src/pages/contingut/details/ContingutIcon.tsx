@@ -1,30 +1,32 @@
 import {Grid, Icon} from "@mui/material";
 import {useUserSession} from "../../../components/Session.tsx";
+import {useTranslation} from "react-i18next";
 
 const isInOptions = (value:string, ...options:string[]) => {
     return options.includes(value)
 }
 
 const ContingutIcon = (props:any) => {
+    const { t } = useTranslation();
     const {entity} = props;
 
     return <Grid display={"flex"} alignItems={"center"}>
         {entity?.tipus=="DOCUMENT" && <DocumentIcon entity={entity}/>}
         {entity?.tipus=="CARPETA" && <CarpetaIcon entity={entity}/>}
 
-        {entity?.valid == false && <Icon title={"Este contenido tiene errores de validación."} color={"warning"}>warning</Icon>}
+        {entity?.valid == false && <Icon title={t('page.contingut.alert.valid')} color={"warning"}>warning</Icon>}
         {entity?.tipus!="CARPETA" && !entity?.metaNode &&
-            <Icon title={"Este documento carece de un tipo de documento"}
+            <Icon title={t('page.contingut.alert.metaNode')}
                   color={"warning"}>warning</Icon>}
 
         {entity?.nom}
     </Grid>
 }
 const DocumentIcon = (props:any) => {
+    const { t } = useTranslation();
     const {entity} = props;
     const { value: user } = useUserSession();
 
-    // console.log(entity)
     const extension = entity?.fitxerExtension;
     return <>
         {/*{entity?.expedient && entity?.estat == 'OBERT' && <Icon>O</Icon>}*/}
@@ -40,29 +42,20 @@ const DocumentIcon = (props:any) => {
         {isInOptions(extension, 'mp3', 'wav') && <Icon>audio_file</Icon>}
         {isInOptions(extension, 'mpeg', 'avi') && <Icon>video_file</Icon>}
 
-        {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={"Documento importado"}>info</Icon>}
-        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={"Documento borrador"}>B</Icon>}
-        {isInOptions(entity?.estat, 'CUSTODIAT', 'FIRMAT', 'ADJUNT_FIRMAT') && <Icon title={"Documento firmado"} color={"success"}>edit</Icon>}
+        {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')}>info</Icon>}
+        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')}>B</Icon>}
+        {isInOptions(entity?.estat, 'CUSTODIAT', 'FIRMAT', 'ADJUNT_FIRMAT') && <Icon title={t('page.document.alert.firma')} color={"success"}>edit</Icon>}
 
-        {entity?.gesDocOriginalId &&
-            <Icon title={"Este documento contenía firmas inválidas y se ha clonado y firmado en servidor para poder guardarlo en el Archivo Digital. Se puede descargar el original desde el menú de acciones."}
-                  color={"warning"}>file_copy</Icon>}
+        {entity?.gesDocOriginalId && <Icon title={t('page.document.alert.original')} color={"warning"}>file_copy</Icon>}
 
         {isInOptions(entity?.estat, 'FIRMAT') && entity?.gesDocFirmatId &&
-            <Icon title={"Pendiente de custodiar documento firmado de portafrimes"}
-                  color={"warning"}>warning</Icon>}
+            <Icon title={t('page.document.alert.custodiar')} color={"warning"}>warning</Icon>}
 
         {entity?.pendentMoverArxiu && !entity?.gesDocOriginalId &&
-            <Icon title={"El documento de la anotación está pendiente de mover a la serie documental del procedimiento"}
-                  color={"warning"}>warning</Icon>}
+            <Icon title={t('page.document.alert.moure')} color={"warning"}>warning</Icon>}
 
-        {!entity?.validacioFirmaCorrecte &&//contingut.info.error.valid
-            <Icon title={entity?.validacioFirmaErrorMsg}
-                  color={"warning"}>warning</Icon>}
-
-        {isInOptions(entity?.estat, 'DEFINITIU') &&
-            <Icon title={"Document definitiu"}
-                  color={"success"}>check_box</Icon>}
+        {!entity?.validacioFirmaCorrecte && <Icon title={entity?.validacioFirmaErrorMsg} color={"warning"}>warning</Icon>}
+        {isInOptions(entity?.estat, 'DEFINITIU') && <Icon title={t('page.document.alert.definitiu')} color={"success"}>check_box</Icon>}
 
         {/*—------------------- INICI ICONES DE NOTIFICACIO —----------------------*/}
         {entity?.ambNotificacions && !entity?.errorDarreraNotificacio && isInOptions(entity?.estatDarreraNotificacio, 'PENDENT', 'REGISTRADA') &&
@@ -79,20 +72,16 @@ const DocumentIcon = (props:any) => {
         {/*—------------------- FI ICONES DE NOTIFICACIO —----------------------*/}
 
         {isInOptions(entity?.estat, 'FIRMA_PENDENT_VIAFIRMA', 'FIRMA_PENDENT') &&
-            <Icon title={"Pendiente de firmar"}
-                  color={"warning"}>edit</Icon>}
+            <Icon title={t('page.document.alert.firmaPendent')} color={"warning"}>edit</Icon>}
 
         {isInOptions(entity?.estat, 'FIRMA_PARCIAL') &&
-            <Icon title={"Firmado parcialmente"}
-                  >edit</Icon>}
+            <Icon title={t('page.document.alert.firmaParcial')}>edit</Icon>}
 
         {!isInOptions(entity?.estat, 'CUSTODIAT', 'REDACCIO' ) && entity?.errorEnviamentPortafirmes && !entity?.gesDocFirmatId &&
-            <Icon title={"Error al enviar al portafirmas"}
-                  color={"error"}>edit</Icon>}
+            <Icon title={t('page.document.alert.errorPortafirmes')} color={"error"}>edit</Icon>}
 
         {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
-            <Icon title={"Pendiente de guardar en archivo"}
-                  color={"warning"}>warning</Icon>}
+            <Icon title={t('page.document.alert.guardarPendent')} color={"warning"}>warning</Icon>}
     </>
 }
 const CarpetaIcon = (props:any) => {

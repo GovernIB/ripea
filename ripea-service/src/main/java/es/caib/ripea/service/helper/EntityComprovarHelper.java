@@ -35,9 +35,12 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.NodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.GrupDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -77,6 +80,9 @@ public class EntityComprovarHelper {
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	@Autowired private OrganGestorRepository organGestorRepository;
+	
+	@Autowired private GrupRepositoryCommnand grupRepositoryCommnand;
+	
 	@Autowired private PermisosHelper permisosHelper;
     @Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
@@ -85,6 +91,7 @@ public class EntityComprovarHelper {
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
+    @Autowired private MetaExpedientHelper metaExpedientHelper;
 
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,
@@ -222,58 +229,74 @@ public class EntityComprovarHelper {
 		return organGestor;
 	}
 	
+	public List<OrganGestorEntity> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId, String filter) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!permisosHelper.isGrantedAny(
+				organGestorId,
+				OrganGestorEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.DISSENY },
+				auth)) {
+			return new ArrayList<OrganGestorEntity>();
+		}
+		OrganGestorEntity organGestor = organGestorRepository.getOne(organGestorId);
+		List<OrganGestorEntity> organGestorsCanditats = organGestor.getAllChildren();
+		
+		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+		List<List<OrganGestorEntity>> sublists = org.apache.commons.collections4.ListUtils.partition(organGestorsCanditats, 1000);
+		List<OrganGestorEntity> filtrats = new ArrayList<>();
+		for (List<OrganGestorEntity> list : sublists) {
+			filtrats.addAll(
+					organGestorRepository.findByCanditatsAndFiltre(
+							list,
+							filter == null || filter.isEmpty(),
+							filter != null ? filter : ""));
+		}
+		return filtrats;
+	}
+	
+	public List<OrganGestorEntity> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter, boolean directOrganPermisRequired) {
+		
+		List<OrganGestorEntity> filtrats = new ArrayList<OrganGestorEntity>();
+		
+		EntitatEntity entitat = comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, 
+				false, 
+				false);
+		
+		// Cercam els metaExpedients amb permisos assignats directament
+		List<Long> metaExpedientIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ);
+		
+		// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
+		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty() && !directOrganPermisRequired) {
 
-//	public OrganGestorEntity comprovarOrganGestorPerRolUsuari(
-//			EntitatEntity entitat,
-//			Long id) {
-//		OrganGestorEntity organGestor = organGestorRepository.findOne(id);
-//		if (organGestor == null) {
-//			throw new NotFoundException(id, OrganGestorEntity.class);
-//		}
-//		if (!entitat.equals(organGestor.getEntitat())) {
-//			throw new ValidationException(
-//					id,
-//					MetaNodeEntity.class,
-//					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'òrgan gestor");
-//		}
-//
-//		// Cercam els metaExpedients amb permisos assignats directament
-//		List<Long> metaExpedientIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-//				MetaNodeEntity.class,
-//				ExtendedPermission.READ));
-//		List<Long> metaExpedientIdPermesosPerEntitat = null;
-//		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty()) {
-//			metaExpedientIdPermesosPerEntitat = metaExpedientRepository.findIdsByEntitat(entitat, metaExpedientIdPermesos);
-//		}
-//
-//		if (metaExpedientIdPermesosPerEntitat != null && !metaExpedientIdPermesosPerEntitat.isEmpty()) {
-//			//if user has assigned direct permissions for any metaexpedient of entitat, then he has permissions for all organs of this entitat
-//		} else {
-//			boolean existsInPermitted = false;
-//			List<OrganGestorEntity> organGestors = getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
-//
-//			for (OrganGestorEntity organGestorEntity : organGestors) {
-//				if (organGestorEntity.getId().equals(id)) {
-//					existsInPermitted = true;
-//				}
-//			}
-//
-//			if (!existsInPermitted) {
-//				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//				throw new SecurityException(
-//						"Sense permisos de consulta sobre l'òrgan gestor (" +
-//						"id=" + id + ", " +
-//				        "usuari=" + auth.getName() + ")");
-//			}
-//
-//		}
-//
-//		return organGestor;
-//	}
-	
-	
-	
-	
+			filtrats = organGestorRepository.findByEntitatAndFiltre(
+					entitat,
+					filter == null || filter.isEmpty(),
+					filter != null ? filter : "");
+		} else {
+			
+			List<OrganGestorEntity> organGestorsCanditats = getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
+			organGestorsCanditats = !organGestorsCanditats.isEmpty() ? organGestorsCanditats : null;
+			
+			if (Utils.isNotEmpty(organGestorsCanditats)) {
+				
+				// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+				List<List<OrganGestorEntity>> sublists = org.apache.commons.collections4.ListUtils.partition(organGestorsCanditats, 1000);
+
+				for (List<OrganGestorEntity> sublist : sublists) {
+					filtrats.addAll(
+							organGestorRepository.findByCanditatsAndFiltre(
+									sublist,
+									filter == null || filter.isEmpty(),
+									filter != null ? filter : ""));
+				}
+			}
+		}
+		return filtrats;
+	}	
 	
 	public List<OrganGestorEntity> getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(EntitatEntity entitat) {
 
@@ -303,9 +326,60 @@ public class EntityComprovarHelper {
 
 	    return organGestors;
 	}
-	
-	
 
+	public List<GrupEntity> findGrupsPermesosProcedimentsGestioActiva(
+			Long entitatId,
+			String rolActual, 
+			Long organGestorId) {
+		
+		EntitatEntity entitat = comprovarEntitat(entitatId);
+		
+		List<GrupEntity> grups = new ArrayList<>();
+		
+		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+				entitatId,
+				ExtendedPermission.READ,
+				true,
+				null, 
+				"IPA_ADMIN".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				null, 
+				false);
+		
+		boolean isAnyGestioAmbGrupsActiva = false;
+		for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
+			if (metaExpedientEntity.isGestioAmbGrupsActiva()) {
+				isAnyGestioAmbGrupsActiva = true;
+				break;
+			}
+		}
+		
+		if (isAnyGestioAmbGrupsActiva) {
+
+			List<String> codisOrgansFills = null;
+
+			if (organGestorId != null) {
+				OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
+				codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+			}
+
+			grups = grupRepositoryCommnand.findByEntitatAndOrgan(entitat, null, codisOrgansFills);
+			if ("tothom".equals(rolActual)) {
+				permisosHelper.filterGrantedAny(
+						grups,
+						new ObjectIdentifierExtractor<GrupEntity>() {
+							public Long getObjectIdentifier(GrupEntity entitat) {
+								return entitat.getId();
+							}
+						},
+						GrupEntity.class,
+						new Permission[] { ExtendedPermission.READ },
+						SecurityContextHolder.getContext().getAuthentication());
+			}
+		}
+		return grups;
+	}
+	
 	public MetaNodeEntity comprovarMetaNode(EntitatEntity entitat, Long id) {
 		MetaNodeEntity metaNode = metaNodeRepository.findById(id).orElse(null);
 		if (metaNode == null) {

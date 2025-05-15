@@ -4,33 +4,45 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
+
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
-import es.caib.ripea.service.helper.ExpedientInteressatHelper;
-import es.caib.ripea.service.intf.base.exception.*;
-import es.caib.ripea.service.intf.base.model.DownloadableFile;
-import es.caib.ripea.service.intf.base.model.FileReference;
-import es.caib.ripea.service.intf.base.model.ReportFileType;
-import es.caib.ripea.service.intf.dto.InteressatDto;
-import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.model.NodeResource;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
 
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExpedientInteressatHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +61,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ConfigHelper configHelper;
+    private final CacheHelper cacheHelper;
 
     private final InteressatResourceRepository interessatResourceRepository;
 
@@ -58,8 +71,51 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
+        
+        register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
+        register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
+        register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
     }
 
+    public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName) {
+			List<PaisDto> paisos = cacheHelper.findPaisos();
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (paisos!=null) {
+				for (PaisDto pais: paisos) {
+					resultat.add(new FieldOption(pais.getCodi(), pais.getNom()));
+				}
+			}
+			return resultat;
+		}
+	}
+    
+    public class ProvinciaFieldOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName) {
+			List<ProvinciaDto> provincies = cacheHelper.findProvincies();
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (provincies!=null) {
+				for (ProvinciaDto prov: provincies) {
+					resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
+				}
+			}
+			return resultat;
+		}
+	}
+    
+    public class PaisFieldOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName) {
+			List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia("07");
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (municipis!=null) {
+				for (MunicipiDto municipi: municipis) {
+					resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
+				}
+			}
+			return resultat;
+		}
+	}
+    
     @Override
     protected void afterConversion(InteressatResourceEntity entity, InteressatResource resource) {
         resource.setHasRepresentats(!entity.getRepresentats().isEmpty());
@@ -140,7 +196,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 Long expedientId = (Long)data.get(0);
                 ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
                 if (params!=null) {
-                    entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
+//                    entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
                     ObjectMapper objectMapper = new ObjectMapper();
                     objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, expedientInteressatHelper.findByIds(params.getIds()));
                     DownloadableFile resultat = new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());

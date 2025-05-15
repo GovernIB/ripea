@@ -27,7 +27,7 @@ export const iniciaDescargaBlob = (result: any) => {
 export const iniciaDescargaJSON = (result: any) => {
     const data = result.blob;
 
-    const filename = result.fileName;
+    const fileName = result.fileName;
 
     // 1. Convertir el objeto a una cadena JSON
     const jsonStr = JSON.stringify(data, null, 2); // `null, 2` para formato legible
@@ -35,15 +35,7 @@ export const iniciaDescargaJSON = (result: any) => {
     // 2. Crear un Blob con el contenido
     const blob = new Blob([jsonStr], { type: "application/json" });
 
-    // 3. Crear un enlace temporal para descargar
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-
-    // 4. Disparar la descarga
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    iniciaDescargaBlob({fileName, blob})
 }
 
 export const useActions = (refresh?: () => void) => {
@@ -62,7 +54,7 @@ export const useActions = (refresh?: () => void) => {
 			    temporalMessageShow(null, msg, 'success');
 			})
 			.catch((error) => {
-			    temporalMessageShow('Error', error?.message, 'error');
+			    temporalMessageShow(null, error?.message, 'error');
 			});		
     }
 	
@@ -73,22 +65,22 @@ export const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, msg, 'info');
 			})
 			.catch((error) => {
-			    temporalMessageShow('Error', error?.message, 'error');
+			    temporalMessageShow(null, error?.message, 'error');
 			});		
 	}
 
-    const follow	= (id: any): void => { action(id, 'FOLLOW', 	t('page.expedient.results.actionOk')); }
-    const unfollow	= (id: any): void => { action(id, 'UNFOLLOW',	t('page.expedient.results.actionOk')); }
-    const agafar	= (id: any): void => { action(id, 'AGAFAR',		t('page.expedient.results.actionOk')); }
-    const retornar	= (id: any) :void => { action(id, 'RETORNAR',	t('page.expedient.results.actionOk')); }
-	const alliberar	= (id: any) :void => { action(id, 'ALLIBERAR', 	t('page.expedient.results.actionOk')); }
-	const eliminar	= (id: any) :void => { action(id, 'ESBORRAR',	t('page.expedient.results.actionOk')); }
+    const follow= (id: any): void => { action(id, 'FOLLOW', t('page.expedient.results.actionOk')); }
+    const unfollow= (id: any): void => { action(id, 'UNFOLLOW', t('page.expedient.results.actionOk')); }
+    const agafar= (id: any): void => { action(id, 'AGAFAR', t('page.expedient.results.actionOk')); }
+    const retornar= (id: any) :void => { action(id, 'RETORNAR', t('page.expedient.results.actionOk')); }
+	const alliberar= (id: any) :void => { action(id, 'ALLIBERAR', t('page.expedient.results.actionOk')); }
+	const eliminar= (id: any) :void => { action(id, 'ESBORRAR', t('page.expedient.results.actionOk')); }
 	
 	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
 	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
-	const exportPdfEni	= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
-	const exportEni		= (id: any): void => { massiveReport(id, 'EXPORT_ENI', 		 t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
-	const exportInside  = (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', 	 t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportPdfEni= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportEni= (id: any): void => { massiveReport(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportInside= (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
     return {follow, unfollow, agafar, retornar, alliberar, eliminar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
 }
@@ -231,7 +223,7 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
         {
-            title: t('page.expedient.acciones.history'),
+            title: t('page.contingut.acciones.history'),
             icon: "list",
             showInMenu: true,
             onClick: handelHistoricOpen,
@@ -282,7 +274,7 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),
         },
         {
-            title: "Exportar los documentos...",
+            title: t('page.expedient.acciones.export'),
             icon: "description",
             showInMenu: true,
 			onClick: handleExportDoc,

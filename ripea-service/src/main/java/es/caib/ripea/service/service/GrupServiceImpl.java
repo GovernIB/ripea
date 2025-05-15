@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,6 @@ import es.caib.ripea.service.helper.OrganGestorCacheHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
-import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.GrupFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
@@ -48,7 +45,6 @@ import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.GrupService;
 import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Service
 public class GrupServiceImpl implements GrupService {
@@ -514,71 +510,20 @@ public class GrupServiceImpl implements GrupService {
 				GrupDto.class);
 	}
 	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
 			Long entitatId,
 			String rolActual, 
 			Long organGestorId) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		
-		List<GrupEntity> grups = new ArrayList<>();
-		
-		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
-				entitatId,
-				ExtendedPermission.READ,
-				true,
-				null, 
-				"IPA_ADMIN".equals(rolActual),
-				"IPA_ORGAN_ADMIN".equals(rolActual),
-				null, 
-				false);
-		
-		boolean isAnyGestioAmbGrupsActiva = false;
-		for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
-			if (metaExpedientEntity.isGestioAmbGrupsActiva()) {
-				isAnyGestioAmbGrupsActiva = true;
-				break;
-			}
-		}
-		
-		if (isAnyGestioAmbGrupsActiva) {
-
-			List<String> codisOrgansFills = null;
-
-			if (organGestorId != null) {
-				OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
-				codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
-			}
-
-			grups = grupRepositoryCommnand.findByEntitatAndOrgan(entitat, null, codisOrgansFills);
-			if ("tothom".equals(rolActual)) {
-				permisosHelper.filterGrantedAny(
-						grups,
-						new ObjectIdentifierExtractor<GrupEntity>() {
-							public Long getObjectIdentifier(GrupEntity entitat) {
-								return entitat.getId();
-							}
-						},
-						GrupEntity.class,
-						new Permission[] { ExtendedPermission.READ },
-						SecurityContextHolder.getContext().getAuthentication());
-			}
-		}
-		
 		return conversioTipusHelper.convertirList(
-				grups, 
+				entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitatId, rolActual, organGestorId), 
 				GrupDto.class);
 	}
 
-
 	@Transactional(readOnly = true)
 	@Override
-	public GrupDto findGrupById(
-			Long grupId) {
-		
+	public GrupDto findGrupById(Long grupId) {
 		return conversioTipusHelper.convertir(
 				grupRepository.findById(grupId),
 				GrupDto.class);

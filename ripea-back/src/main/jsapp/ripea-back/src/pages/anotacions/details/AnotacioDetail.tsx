@@ -82,7 +82,7 @@ const InformeRegistre = (props:any) => {
 
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <ContenidoData title={'Tipo'}>Entrada</ContenidoData>
+            <ContenidoData title={t('page.registre.detall.tipus')}>{t('page.registre.detall.entrada')}</ContenidoData>
             <ContenidoData title={t('page.registre.detall.identificador')}>{entity?.identificador}</ContenidoData>
             <ContenidoData title={t('page.registre.detall.data')}>{formatDate(entity?.data)}</ContenidoData>
             <ContenidoData title={t('page.registre.detall.oficina')}>{entity?.oficinaDescripcio} ({entity?.oficinaCodi})</ContenidoData>
@@ -144,7 +144,7 @@ const Interessats = (props:any) => {
         disableColumnSorting
         readOnly
         autoHeight
-        onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+        onRowCountChange={onRowCountChange}
     />
 }
 
@@ -208,7 +208,7 @@ const Annexos = (props:any) => {
         readOnly
         autoHeight
 
-        onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+        onRowCountChange={onRowCountChange}
     />
 }
 
