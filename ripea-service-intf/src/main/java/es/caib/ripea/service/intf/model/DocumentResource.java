@@ -206,9 +206,8 @@ public class DocumentResource extends NodeResource {
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
 
-    @Transient    private List<ParentPath> parentPath;
-    @Transient
-    public List<String> treePath;
+    @Transient private List<ParentPath> parentPath;
+    @Transient public List<String> treePath;
     @NotNull
     @Transient
     @ResourceField(onChangeActive = true)
@@ -217,17 +216,14 @@ public class DocumentResource extends NodeResource {
     @Transient
     @ResourceField(onChangeActive = true)
     public Boolean hasFirma;
-
-    @Transient
-    private ArxiuDetallDto arxiu;
-    @Transient
-    private List<DocumentVersioDto> versions;
-    @Transient
-    private int NumMetaDades;
-    @Transient
-    private boolean documentDeAnotacio;
-    @Transient
-    private boolean ambNotificacions;
+    @Transient private ArxiuDetallDto arxiu;
+    @Transient private List<DocumentVersioDto> versions;
+    @Transient private int NumMetaDades;
+    @Transient private boolean documentDeAnotacio;
+    @Transient private boolean ambNotificacions;
+    @Transient private boolean isFuncionariHabilitatDigitalib;
+    @ResourceField(enumType = true, onChangeActive = true)
+    @Transient private DigitalitzacioPerfilDto digitalitzacioPerfil;
     
     @Getter
     @Setter

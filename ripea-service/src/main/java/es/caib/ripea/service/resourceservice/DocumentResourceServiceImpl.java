@@ -46,6 +46,7 @@ import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -59,6 +60,7 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
@@ -70,6 +72,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
@@ -102,6 +105,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final CacheResourceHelper cacheResourceHelper;
+    private final RolHelper rolHelper;
 
     private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -135,14 +139,34 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         //Dades externes
         register(DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId, new FluxosFirmaFieldOptionsProvider());
+        register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
+        register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
     }
     
-    public static class FluxosFirmaFieldOptionsProvider implements FieldOptionsProvider {
+    public class PerfilsDigitalitzacioOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName) {
-			return List.of(
-					new FieldOption("iaNS5JGbBnw_TYqSKgQaHA==", "Flujo9972"),
-					new FieldOption("nOMxucuicdrXKB64kAE43g==", "Flux test 02"),
-					new FieldOption("f2FiWpkDL6OjwkFiRhrjmA==", "Flux Sion"));
+			List<DigitalitzacioPerfilDto> fluxosDto = pluginHelper.digitalitzacioPerfilsDisponibles();
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (fluxosDto!=null) {
+				for (DigitalitzacioPerfilDto flx: fluxosDto) {
+					resultat.add(new FieldOption(flx.getCodi(), flx.getNom()));
+				}
+			}
+			return resultat;
+		}
+	}
+    
+    public class FluxosFirmaFieldOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName) {
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
+			List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatEntity.getId(), false);
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (fluxosDto!=null) {
+				for (PortafirmesFluxRespostaDto flx: fluxosDto) {
+					resultat.add(new FieldOption(flx.getFluxId(), flx.getNom()));
+				}
+			}
+			return resultat;
 		}
 	}
     
@@ -363,7 +387,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
     }
 
-    // OnChangeLogicProcessor
+    private class DigitalitzacioPerfilOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
+        @Override
+        public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
+            if (fieldValue != null) {
+                target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
+            } else {
+            	//TODO iniciar procés de escaneig
+            }
+        }
+    }
+    
     private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
@@ -380,6 +414,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             }
         }
     }
+    
     private class AdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
 
         private static final String ERROR_SIGNATURE_VALIDATION= "ERROR_SIGNATURE_VALIDATION";

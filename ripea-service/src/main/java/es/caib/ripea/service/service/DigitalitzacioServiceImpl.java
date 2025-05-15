@@ -23,13 +23,7 @@ public class DigitalitzacioServiceImpl implements DigitalitzacioService {
 	@Override
 	public List<DigitalitzacioPerfilDto> getPerfilsDisponibles() {
 		logger.debug("Recuperant perfils disponibles");
-		String idioma = aplicacioService.getUsuariActual().getIdioma();
-		
-		if (idioma != null)
-			idioma = idioma.toLowerCase();
-		
-		List<DigitalitzacioPerfilDto> perfilsDisponibles = pluginHelper.digitalitzacioPerfilsDisponibles(idioma);
-		return perfilsDisponibles;
+		return pluginHelper.digitalitzacioPerfilsDisponibles();
 	}
 	
 	@Override

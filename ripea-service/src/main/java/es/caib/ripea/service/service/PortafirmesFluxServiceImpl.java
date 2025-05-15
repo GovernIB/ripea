@@ -1,17 +1,7 @@
 package es.caib.ripea.service.service;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
-import es.caib.ripea.persistence.repository.UsuariRepository;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.PortafirmesFluxService;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +10,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.PortafirmesFluxService;
 
 @Service
 public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
@@ -29,7 +31,6 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
-	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private UsuariRepository usuariRepository;
 	
 	@Override
@@ -114,43 +115,8 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
-		
 		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
-		
-		List<PortafirmesFluxRespostaDto> plantillesFiltrades = new ArrayList<PortafirmesFluxRespostaDto>();
-		List<PortafirmesFluxRespostaDto> plantilles = pluginHelper.portafirmesRecuperarPlantillesDisponibles(aplicacioService.getUsuariActual(), filtrar);
-		List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
-
-		for (PortafirmesFluxRespostaDto plantilla : plantilles) {
-			boolean isCurrentUserTemplate = false;
-			boolean isUserTemplate = false;
-
-			for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
-				if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId())
-						&& fluxFirmaUsuari.getUsuari().equals(usuari)) {
-					// Plantilla usuari actual
-					isCurrentUserTemplate = true;
-					break;
-				} else if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId())
-						&& !isCurrentUserTemplate) {
-					// Plantilla d'un altre usuari (no mostrar al llistat)
-					isUserTemplate = true;
-					break;
-				}
-			}
-
-			// Plantilles usuari actual i plantilles comuns
-			if (isCurrentUserTemplate
-					|| (!isCurrentUserTemplate && !plantillesFiltrades.contains(plantilla)) && !isUserTemplate) {
-				plantilla.setUsuariActual(isCurrentUserTemplate);
-				plantillesFiltrades.add(plantilla);
-			}
-		}
-		
-		return plantillesFiltrades;
+		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatId, filtrar);
 	}
 	
 	@Transactional
