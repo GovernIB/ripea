@@ -19,7 +19,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "codiINom")
 public class OrganGestorResource extends BaseAuditableResource<Long> {
-
+	private static final long serialVersionUID = 5991380448523763516L;
 	@NotNull
 	@Size(max = 64)
 	private String codi;
@@ -38,10 +38,8 @@ public class OrganGestorResource extends BaseAuditableResource<Long> {
 	private OrganEstatEnumDto estat;
 	@Size(max = 12)
 	private TipusTransicioEnumDto tipusTransicio;
-
 	private ResourceReference<EntitatResource, Long> entitat;
 	private ResourceReference<OrganGestorResource, Long> pare;
-	
 	public String getCodiINom() {
 		return codi + " - " + nom;
 	}

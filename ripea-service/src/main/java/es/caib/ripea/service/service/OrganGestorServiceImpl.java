@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +65,6 @@ import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.OrganGestorService;
-import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Service
@@ -758,79 +755,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolAdminOrDisseny(Long entitatId, Long organGestorId, String filter) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!permisosHelper.isGrantedAny(
-				organGestorId,
-				OrganGestorEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.DISSENY },
-				auth)) {
-			return new ArrayList<OrganGestorDto>();
-		}
-		OrganGestorEntity organGestor = organGestorRepository.getOne(organGestorId);
-		List<OrganGestorEntity> organGestorsCanditats = organGestor.getAllChildren();
-		
-		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
-		List<List<OrganGestorEntity>> sublists = org.apache.commons.collections4.ListUtils.partition(organGestorsCanditats, 1000);
-		List<OrganGestorEntity> filtrats = new ArrayList<>();
-		for (List<OrganGestorEntity> list : sublists) {
-			filtrats.addAll(
-					organGestorRepository.findByCanditatsAndFiltre(
-							list,
-							filter == null || filter.isEmpty(),
-							filter != null ? filter : ""));
-		}
-
-		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
+		return conversioTipusHelper.convertirList(
+				entityComprovarHelper.findAccessiblesUsuariActualRolAdminOrDisseny(entitatId, organGestorId, filter),
+				OrganGestorDto.class);
 	}
 	
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAccessiblesUsuariActualRolUsuari(Long entitatId, String filter, boolean directOrganPermisRequired) {
-		
-		List<OrganGestorEntity> filtrats = new ArrayList<OrganGestorEntity>();
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false, 
-				false, 
-				false);
-		
-		// Cercam els metaExpedients amb permisos assignats directament
-		List<Long> metaExpedientIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ);
-		
-		// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
-		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty() && !directOrganPermisRequired) {
-
-			filtrats = organGestorRepository.findByEntitatAndFiltre(
-					entitat,
-					filter == null || filter.isEmpty(),
-					filter != null ? filter : "");
-		} else {
-			
-			List<OrganGestorEntity> organGestorsCanditats = entityComprovarHelper.getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
-			organGestorsCanditats = !organGestorsCanditats.isEmpty() ? organGestorsCanditats : null;
-			
-			if (Utils.isNotEmpty(organGestorsCanditats)) {
-				
-				// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
-				List<List<OrganGestorEntity>> sublists = org.apache.commons.collections4.ListUtils.partition(organGestorsCanditats, 1000);
-
-				for (List<OrganGestorEntity> sublist : sublists) {
-					filtrats.addAll(
-							organGestorRepository.findByCanditatsAndFiltre(
-									sublist,
-									filter == null || filter.isEmpty(),
-									filter != null ? filter : ""));
-				}
-			}
-			
-		}
-		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
+		return conversioTipusHelper.convertirList(
+				entityComprovarHelper.findAccessiblesUsuariActualRolUsuari(entitatId, filter, directOrganPermisRequired),
+				OrganGestorDto.class);
 	}
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override
