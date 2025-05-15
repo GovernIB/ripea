@@ -185,7 +185,7 @@ const DocumentsGrid = (props:any) => {
                     element: <MenuActionButton
                         id={'createDocument'}
                         hidden={entity?.agafatPer?.id != user?.codi}
-                        buttonLabel={"Crear contenido"}
+                        buttonLabel={t('page.contingut.acciones.create')}
                         buttonProps={{
                             startIcon: <Icon>add</Icon>,
                             variant: "outlined",

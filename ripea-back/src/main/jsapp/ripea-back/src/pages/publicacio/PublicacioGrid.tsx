@@ -34,7 +34,7 @@ const PublicacioGridForm = () => {
     </Grid>
 }
 
-const sortModel = [{field: 'id', sort: 'asc'}];
+const sortModel:any = [{field: 'id', sort: 'asc'}];
 const columns = [
     {
         field: 'tipus',
@@ -89,7 +89,7 @@ const PublicacioGrid = (props:any) => {
             )}
             apiRef={apiRef}
             staticSortModel={sortModel}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
         />

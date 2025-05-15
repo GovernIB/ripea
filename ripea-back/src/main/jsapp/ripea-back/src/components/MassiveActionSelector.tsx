@@ -2,7 +2,6 @@ import React from 'react';
 import {Box, Button, ButtonGroup, Chip, Icon, Tooltip} from '@mui/material';
 import {useResourceApiService} from 'reactlib';
 import { useTranslation } from 'react-i18next';
-import { GridApiCommunity } from '@mui/x-data-grid';
 import {MenuActionButton} from "./MenuButton.tsx";
 
 export type MassiveActionProps = {
@@ -74,7 +73,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
             <MenuActionButton
                 id={'massiveOpcions'}
                 entity={selectedRows}
-                buttonLabel={'Opcions'}
+                buttonLabel={t('common.options')}
                 buttonProps={{
                     startIcon: <Chip label={selectedRows?.length} size="small" />,
                     disabled: selectedRows?.length === 0

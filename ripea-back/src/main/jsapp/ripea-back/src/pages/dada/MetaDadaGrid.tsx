@@ -7,7 +7,7 @@ const dadesFilter = (entity:any, dades:any[]) :any[] => {
     return dades.filter((dada)=>dada?.node?.id == entity?.id)
 }
 
-const sortModel = [{ field: 'ordre', sort: 'asc' }]
+const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
 const perspectives = ['DADES']
 
 const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) => void) }) => {

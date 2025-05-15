@@ -14,7 +14,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
 import Load from "../../../components/Load.tsx";
 
-const sortModel = [{ field: 'createdDate', sort: 'desc' }];
+const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
 
 const columns = [
@@ -136,14 +136,14 @@ const useRelacionar= (refresh?: () => void) => {
                     temporalMessageShow(null, '', 'success');
                 })
                 .catch((error) => {
-                    error && temporalMessageShow('Error', error.message, 'error');
+                    error && temporalMessageShow(null, error.message, 'error');
                 });
         }
     }
 
     const content =
         <MuiDialog
-            title={'Relacionar expediente'}
+            title={t('page.expedient.action.relacio')}
             open={open}
             closeCallback={handleClose}
             // title={entity?.nom}

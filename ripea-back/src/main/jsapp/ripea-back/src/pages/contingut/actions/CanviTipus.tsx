@@ -27,7 +27,7 @@ const CanviTipus = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"MASSIVE_CANVI_TIPUS"}
-        // title={''}
+        title={t('page.document.action.changeType')}
         {...props}
     >
         <CanviTipusForm entity={entity}/>

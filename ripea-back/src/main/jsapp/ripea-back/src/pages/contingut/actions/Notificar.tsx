@@ -17,7 +17,7 @@ const Notificacio = (props:any) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { entity?.incapacitat == true && (!entity?.representant || entity?.representant?.incapacitat) &&
-            <Alert severity="warning">En caso de titular con incapacidad es obligatorio indicar un destinatario.</Alert>
+            <Alert severity="warning">{t('page.interessat.alert.incapacitat')}</Alert>
         }
 
         <CardData title={t('page.interessat.title')}>
@@ -102,7 +102,6 @@ const NotificarForm = () => {
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
-    console.log("data", data)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus"/>
@@ -117,7 +116,7 @@ const NotificarForm = () => {
                     create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
                 }}
             >
-                <Icon>add</Icon>Nou Interessat
+                <Icon>add</Icon>{t('page.interessat.actions.new')}
             </Button>
             {content}
         </Grid>
@@ -167,7 +166,7 @@ const useNotificar = (refresh?: () => void) => {
         window.location.reload();
     }
     const onError = (error:any) :void => {
-        temporalMessageShow('Error', error.message, 'error');
+        temporalMessageShow(null, error.message, 'error');
     }
 
     return {

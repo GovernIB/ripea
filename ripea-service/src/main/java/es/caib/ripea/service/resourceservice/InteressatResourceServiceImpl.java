@@ -196,7 +196,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 Long expedientId = (Long)data.get(0);
                 ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
                 if (params!=null) {
-                    entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
+//                    entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
                     ObjectMapper objectMapper = new ObjectMapper();
                     objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, expedientInteressatHelper.findByIds(params.getIds()));
                     DownloadableFile resultat = new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());

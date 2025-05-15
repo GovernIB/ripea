@@ -21,7 +21,9 @@ const useCreate = (title:any, refresh?: () => void) => {
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error:any) => {
-                error && temporalMessageShow(null, error.message, 'error');
+                if(error) {
+                    temporalMessageShow(null, error.message, 'error');
+                }
             });
     }
 
@@ -35,7 +37,7 @@ const useCreate = (title:any, refresh?: () => void) => {
         })
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, 'Elemento creado', 'success');
+                temporalMessageShow(null, '', 'success');
             })
             .catch((error:any) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -45,7 +47,7 @@ const useCreate = (title:any, refresh?: () => void) => {
         apiRef.current?.show(row?.representant?.id)
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, 'Elemento modificado', 'success');
+                temporalMessageShow(null, '', 'success');
             })
             .catch((error:any) => {
                 temporalMessageShow(null, error?.message, 'error');

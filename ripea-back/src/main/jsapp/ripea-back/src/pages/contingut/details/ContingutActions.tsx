@@ -1,7 +1,7 @@
 import useDocumentDetail from "./DocumentDetail.tsx";
 import {useTranslation} from "react-i18next";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
-import {MuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {MuiDataGridApiRef, useBaseAppContext, useResourceApiService} from "reactlib";
 import useMoure from "../actions/Moure.tsx";
 import useHistoric from "../../Historic.tsx";
 import useNotificar from "../actions/Notificar.tsx";
@@ -10,27 +10,18 @@ import useEviarPortafirmes from "../actions/EviarPortafirmes.tsx";
 import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useEntitatSession, useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
-import {useCommonActions} from "../../expedient/details/CommonActions.tsx";
+import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/CommonActions.tsx";
 
 export const useActions = (refresh?: () => void) => {
-    const {
-        fieldDownload: apiDownload,
-    } = useResourceApiService('documentResource');
+    const {temporalMessageShow} = useBaseAppContext();
+    const {fieldDownload: apiDownload,} = useResourceApiService('documentResource');
 
     const downloadAdjunt = (id:any,fieldName:string) :void => {
         apiDownload(id,{fieldName})
             .then((result)=>{
-                const url = URL.createObjectURL(result.blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = result.fileName; // Usa el nombre recibido
-                document.body.appendChild(link);
-                link.click();
-
-                // Limpieza
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
                 refresh?.();
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, '', 'info');
             })
     }
 
@@ -86,12 +77,12 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
             onClick: () => apiRef?.current?.showCreateDialog?.(),
         },
         {
-            title: "Consulta PINBAL...",
+            title: t('page.document.acciones.pinbal'),
             icon: "description",
             disabled: true,
         },
         {
-            title: "Importar documentos...",
+            title: t('page.document.acciones.import'),
             icon: "upload_file",
             disabled: true,
         },
@@ -224,7 +215,7 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
             hidden: (row:any) => !(row?.estat == 'FIRMA_PENDENT' && row?.documentTipus == 'DIGITAL'),
         },
         {
-            title: t('page.document.acciones.history'),
+            title: t('page.contingut.acciones.history'),
             icon: "list",
             showInMenu: true,
             onClick: handleHistoricOpen,

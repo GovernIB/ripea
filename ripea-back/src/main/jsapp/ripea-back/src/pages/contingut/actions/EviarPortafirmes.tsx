@@ -54,7 +54,7 @@ const useEviarPortafirmes = (refresh?: () => void) => {
         temporalMessageShow(null, '', 'success');
     }
     const onError = (error:any) :void => {
-        temporalMessageShow('Error', error.message, 'error');
+        temporalMessageShow(null, error.message, 'error');
     }
 
     return {

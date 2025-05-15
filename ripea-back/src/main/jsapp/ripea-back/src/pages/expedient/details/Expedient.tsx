@@ -108,25 +108,25 @@ const ExpedientAlert = (props:any) => {
                            <Typography variant={"subtitle2"}>{t('page.expedient.acciones.agafar')}</Typography>
                        </IconButton>
                    }
-            >Es necesario reservar el expediente para poder modificarlo</Alert>
+            >{t('page.expedient.alert.owner')}</Alert>
         }
         { expedient?.numAlert!=0 && count!=0 &&
             <Alert severity="error" color="warning"
                    action={
                        <Button sx={{py: 0}} color={"inherit"} onClick={() => handelAlert(expedient?.id, expedient)}>
-                           <Typography variant={"subtitle2"}>Consultar</Typography>
+                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
-            >Este expediente tiene alertas pendientes de leer</Alert>
+            >{t('page.expedient.alert.alert')}</Alert>
         }
         { !expedient?.valid &&
             <Alert severity="warning"
                    action={
                        <Button sx={{py: 0}} color={"inherit"} onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
-                           <Typography variant={"subtitle2"}>Consultar</Typography>
+                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
                        </Button>
                    }
-            >Este expediente tiene errores de validación</Alert>
+            >{t('page.expedient.alert.validation')}</Alert>
         }
         {dialogAlert}
         {dialogErrorValidacio}

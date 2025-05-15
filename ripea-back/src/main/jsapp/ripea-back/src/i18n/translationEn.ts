@@ -13,6 +13,10 @@ const translationEn = {
         refresh: "Refresh",
         clear: "Clear",
         search: "Search",
+        options: "Options",
+        import: "Import",
+        export: "Export",
+        consult: "Consult",
     },
     enum: {
         rol: {
@@ -107,6 +111,23 @@ const translationEn = {
                 origen: "Origin",
                 desti: "Destination",
             },
+            acciones: {
+                create: "Create content",
+                history: "Action history",
+            },
+            action: {
+                history: "Element action history",
+            },
+            history: {
+                create: "Creation",
+                update: "Modification",
+                user: "User",
+                date: "Date",
+            },
+            alert: {
+                valid: "This content has validation errors",
+                metaNode: "This document lacks a document type"
+            },
         },
         anotacio: {
             tabs: {
@@ -144,6 +165,7 @@ const translationEn = {
                 prioritat: "Priority",
             },
             acciones: {
+                new: "New Task",
                 tramitar: "Process",
                 iniciar: "Start",
                 rebutjar: "Reject",
@@ -164,6 +186,7 @@ const translationEn = {
                 delegar: "Delegate Task",
                 changePrioritat: "Modify Task Priority",
                 changeDataLimit: "Change Deadline",
+                cancelar: "Are you sure you want to cancel this task?",
             },
         },
         interessat: {
@@ -182,10 +205,21 @@ const translationEn = {
                 entregaDehObligat: "DEH required?",
             },
             actions: {
+                new: "New Interested Party",
                 delete: "Delete Interested Party",
                 createRep: "Add Representative",
                 updateRep: "Modify Representative",
                 deleteRep: "Delete Representative",
+            },
+            action: {
+                importar: "Import stakeholders",
+            },
+            grid: {
+                title: "Stakeholders from the file",
+                representant: "Representative",
+            },
+            alert: {
+                incapacitat: "If the holder has a disability, a recipient must be specified.",
             },
             dialog: {
                 deleteTitle: "Delete Interested Party",
@@ -196,15 +230,16 @@ const translationEn = {
         },
         expedient: {
             title: "Expedient",
-            nou: "Nuevo expediente",
             filter: {
                 title: "Expedient Search"
             },
             detall: {
                 title: "Case Information",
                 agafatPer: "Taken by",
+                avisos: "Warnings",
             },
             acciones: {
+                nou: "New expedient",
                 detall: "Manage",
                 follow: "Follow",
                 unfollow: "Unfollow",
@@ -217,27 +252,42 @@ const translationEn = {
                 upEstat: "Change Status...",
                 relacio: "Relate...",
                 close: "Close...",
-                history: "Action History",
+                open: "Reopen",
                 download: "Download Documents...",
+                exportFullCalcul: "Export spreadsheet",
+                exportZIP: "Export ZIP Index",
                 exportPDF: "Export PDF Index",
+                exportCSV: "Export CSV Index",
                 exportEXCEL: "Export EXCEL index",
                 exportPDF_ENI: "PDF index and ENI export",
                 exportENI: "ENI export",
                 exportINSIDE: "INSIDE export",
+                export: "Export documents...",
                 infoArxiu: "Archive Information",
                 sincronitzar: "Synchronize Status with Archive",
             },
             action: {
+                close: "Close expedient",
                 changePrioritat: "Modify Expedient Priority",
                 changeEstat: "Modify Expedient Status",
                 assignar: "Assign Expedient to User",
+                exportZIP: "Export documents to ZIP",
+                relacio: "Relate case file",
+            },
+            alert: {
+                owner: "It is necessary to reserve the file to be able to modify it",
+                alert: "This file has unread pending alerts",
+                validation: "This file has validation errors",
+                borradors: "This file contains drafts that will be deleted when closing it. You have the option to mark the drafts to be signed with server signature before closing the file to avoid their deletion. If the documents contain any invalid signatures, they will be removed and the document will be re-signed on the server.",
+                notificacio: "This file contains expired notifications that are not finalized. An attempt will be made to update their status. If new information about pending notifications arrives, the certificate will be saved in Helium but not in the Digital Archive.",
+                documents: "This file contains annotation annex documents with errors. An attempt will be made to reprocess them upon closing, and if it is not possible to move them, a copy will be saved in the Digital Archive without the original signatures (both the original document and the copy will still be accessible from the file’s content tab).",
             },
             modal: {
                 seguidors: "Expedient followers",
             },
 			results: {
-				actionOk: 'Action executed.',
-				actionBackgroundOk: 'Action is executing on background.',
+				actionOk: "Action executed.",
+				actionBackgroundOk: "Action is executing on background.",
 			}
         },
         arxiu: {
@@ -307,6 +357,8 @@ const translationEn = {
                 tipoFirma: "Signature Type",
             },
             acciones: {
+                pinbal: "PINBAL consultation",
+                import: "Import documents",
                 detall: "Details",
                 move: "Move...",
                 vincular: "Link",
@@ -320,20 +372,38 @@ const translationEn = {
                 viaFirma: "Send viaFirma...",
                 mail: "Send via Email...",
                 seguiment: "Signature tracking",
-                history: "Action History",
                 infoArxiu: "Archive Information",
                 export: "EIN Export...",
                 notificar: "Notify or Communicate...",
                 comunicar: "Communicate...",
                 publicar: "Publish...",
                 descarregarImprimible: "Download printable version",
+                changeType: "Change type",
             },
             action: {
                 enviarEmail: "Send Document via Email",
                 enviarPortafirmes: "Send document to signature folder",
                 move: "Move Content",
                 notificar: "Create Document Notification",
+                notificarMasiva: "Generate document to notify",
                 publicar: "Create Publication",
+                changeType: "Change type",
+            },
+            dialog: {
+                generateZip: "A zip file has been generated with the selected items",
+            },
+            alert: {
+                import: "Document imported",
+                delete: "Draft document",
+                firma: "Signed document",
+                original: "This document contained invalid signatures and has been cloned and signed on the server to be saved in the Digital Archive. The original can be downloaded from the actions menu",
+                custodiar: "Pending custody of signed document from portafirmas",
+                moure: "The annotation’s document is pending to be moved to the procedure’s documentary series",
+                definitiu: "Final document",
+                firmaPendent: "Pending signature",
+                firmaParcial: "Partially signed",
+                errorPortafirmes: "Error sending to portafirmas",
+                guardarPendent: "Pending to save in archive",
             },
             versio: {
                 title: "Version",
@@ -355,6 +425,8 @@ const translationEn = {
                 destiDescripcio: "Destination",
             },
             detall: {
+                tipus: "Type",
+                entrada: "Entrance",
                 oficina: "Office",
                 extracte: "Extract",
                 observacions: "Observations",
@@ -419,6 +491,7 @@ const translationEn = {
                 notif: "Notific@",
             },
             detall: {
+                noEnviat: "Not send t Notific@",
                 title: "Shipping details",
                 datat: "Dated",
                 certificacio: "Certification",
@@ -518,6 +591,9 @@ const translationEn = {
                 anotacio: "Update annotation status in Distribution",
                 prioritat: "Change case priority",
                 masives: "View massive actions"
+            },
+            action: {
+                masives: "{{name}} mass executions",
             },
             perfil: {
                 title: "My profile",

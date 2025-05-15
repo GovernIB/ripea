@@ -115,7 +115,7 @@ const Dades = (props:any) => {
 
 const Errors = () => {
     return <BasePage>
-
+    {/*TODO: pestaña de errores de una remesa*/}
     </BasePage>
 }
 

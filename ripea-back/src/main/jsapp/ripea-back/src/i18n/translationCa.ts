@@ -13,6 +13,10 @@ const translationCa = {
         refresh: "Refrescar",
         clear: "Netejar",
         search: "Cercar",
+        options: "Opcions",
+        import: "Importar",
+        export: "Exportar",
+        consult: "Consultar",
     },
     enum: {
         rol: {
@@ -107,6 +111,23 @@ const translationCa = {
                 origen: "Origen",
                 desti: "Destí",
             },
+            acciones: {
+                create: "Crear contingut",
+                history: "Històric d'accions",
+            },
+            action: {
+                history: "Històric d'accions de l'element",
+            },
+            history: {
+                create: "Creació",
+                update: "Modificació",
+                user: "Usuari",
+                date: "Data",
+            },
+            alert: {
+                valid: "Aquest contingut té errors de validació",
+                metaNode: "Aquest document no té assignat un tipus de document"
+            },
         },
         anotacio: {
             tabs: {
@@ -144,6 +165,7 @@ const translationCa = {
                 prioritat: "Prioritat",
             },
             acciones: {
+                new: "Nova Tasca",
                 tramitar: "Tramitar",
                 iniciar: "Iniciar",
                 rebutjar: "Rebutjar",
@@ -164,6 +186,7 @@ const translationCa = {
                 delegar: "Delegar tasca",
                 changePrioritat: "Modificar prioritat de la tasca",
                 changeDataLimit: "Canviar data límit",
+                cancelar: "Esteu segur que voleu cancel·lar aquesta tasca?",
             },
         },
         interessat: {
@@ -182,10 +205,21 @@ const translationCa = {
                 entregaDehObligat: "DEH obligat?",
             },
             actions: {
+                new: "Nou Interessat",
                 delete: "Esborrar Interessat",
                 createRep: "Afegir Representant",
                 updateRep: "Modificar Representant",
                 deleteRep: "Esborrar Representant",
+            },
+            action: {
+                importar: "Importar interessats",
+            },
+            grid: {
+                title: "Interessatd del fitxer",
+                representant: "Representant",
+            },
+            alert: {
+                incapacitat: "En cas de titular amb discapacitat es obligatori indicar un destinatari.",
             },
             dialog: {
                 deleteTitle: "Esborrar interessat",
@@ -196,15 +230,16 @@ const translationCa = {
         },
         expedient: {
             title: "Expedient",
-            nou: "Nou expedient",
             filter: {
                 title: "Cercador d'expedients"
             },
             detall: {
                 title: "Informació de l'expedient",
                 agafatPer: "Agafat per",
+                avisos: "Avisos",
             },
             acciones: {
+                nou: "Nou expedient",
                 detall: "Gestionar",
                 follow: "Seguir",
                 unfollow: "Deixar de seguir",
@@ -217,27 +252,42 @@ const translationCa = {
                 upEstat: "Canviar estat...",
                 relacio: "Relacionar...",
                 close: "Tancar...",
-                history: "Històric d'accions",
+                open: "Reobrir",
                 download: "Descarregar documents...",
+                exportFullCalcul: "Exportar full de càlcul",
+                exportZIP: "Exportar índex ZIP",
                 exportPDF: "Exportar índex PDF",
+                exportCSV: "Exportar índex CSV",
                 exportEXCEL: "Exporta índex EXCEL",
                 exportPDF_ENI: "Índex PDF i exportació ENI",
                 exportENI: "Exportació ENI",
                 exportINSIDE: "Exportació INSIDE",
+                export: "Exportar eld documents...",
                 infoArxiu: "Informació arxiu",
                 sincronitzar: "Sincronitzar estat amb arxiu",
             },
             action: {
+                close: "Tancar expedient",
                 changePrioritat: "Modificar prioritat de l'expedient",
                 changeEstat: "Modificar estat de l'expedient",
                 assignar: "Assignar expedient a usuari",
+                exportZIP: "Exportar documents a ZIP",
+                relacio: "Relacionar expedients",
+            },
+            alert: {
+                owner: "Cal reservar l'expedient per poder modificar-lo",
+                alert: "Aquest expedient té alertes pendents de llegir",
+                validation: "Aquest expedient té errors de validació",
+                borradors: "Aquest expedient conté esborranys que s'eliminaran en tancar-lo. A continuació teniu l'opció de marcar els esborranys perquè siguin signats amb signatura de servidor abans del tancament de l'expedient i així evitar-ne l'eliminació. Si els documents contenen alguna signatura invàlida, aquestes s'eliminaran i es tornarà a signar el document al servidor.",
+                notificacio: "Aquest expedient conté notificacions caducades no finalitzades. S'intentarà actualitzar-ne l'estat. Si arriba nova informació de les notificacions pendents, es desarà el certificat a l'Helium, però no a l'Arxiu digital.",
+                documents: "Aquest expedient conté documents d'annexos d'anotacions amb errors. S'intentaran reprocessar en tancar-lo i, en cas que no sigui possible moure'ls, se'n desarà una còpia a l'Arxiu digital sense les signatures originals (tant el document original com la còpia es podran continuar consultant des de la pestanya de contingut de l'expedient).",
             },
             modal: {
                 seguidors: "Seguidors del expedient",
             },
 			results: {
-				actionOk: 'L&#39;acció s&#39;ha executat correctament.',
-				actionBackgroundOk: 'L&#39;acción s&#39;ha preparat per la seva execució en segon plà. Pot consultar l&#39;estat del procés des del llistat de execucions massives.',
+				actionOk: "L'acció s'ha executat correctament.",
+				actionBackgroundOk: "L'acción s'ha preparat per la seva execució en segon plà. Pot consultar l'estat del procés des del llistat de execucions massives.",
 			}
         },
         arxiu: {
@@ -307,6 +357,8 @@ const translationCa = {
                 tipoFirma: "Tipus de firma",
             },
             acciones: {
+                pinbal: "Consulta PINBAL...",
+                import: "Importar documents...",
                 detall: "Detalls",
                 move: "Moure...",
                 vincular: "Enllaçar",
@@ -320,20 +372,38 @@ const translationCa = {
                 viaFirma: "Enviar viaFirma...",
                 mail: "Enviar via email...",
                 seguiment: "Seguiment portafirmes",
-                history: "Històric d'accions",
                 infoArxiu: "Informació arxiu",
                 export: "Exportació EIN...",
                 notificar: "Notificar o comunicar...",
                 comunicar: "Comunicar...",
                 publicar: "Publicar...",
                 descarregarImprimible: "Descarregar versió imprimible",
+                changeType: "Cambiar tipus",
             },
             action: {
                 enviarEmail: "Enviar document per email",
                 enviarPortafirmes: "Enviar document a portafirmes",
                 move: "Moure contingut",
                 notificar: "Crear notificació document",
+                notificarMasiva: "Generar document per a notificar",
                 publicar: "Crear publicació",
+                changeType: "Cambiar tipus",
+            },
+            dialog: {
+                generateZip: "S'ha generat un zip dels elements seleccionats",
+            },
+            alert: {
+                import: "Document importat",
+                delete: "Document esborrat",
+                firma: "Document firmat",
+                original: "Aquest document contenia signatures invàlides i s'ha clonat i signat al servidor per poder desar-lo a l'Arxiu Digital. Es pot descarregar l'original des del menú d'accions",
+                custodiar: "Document signat del portafirmes pendent de custodiar",
+                moure: "El document de l'anotació està pendent de moure a la sèrie documental del procediment",
+                definitiu: "Document definitiu",
+                firmaPendent: "Pendent de firmar",
+                firmaParcial: "Firmat parcialment",
+                errorPortafirmes: "Error a l'enviar al portafirmes",
+                guardarPendent: "Pendent de gordar en arxivo",
             },
             versio: {
                 title: "Versió",
@@ -355,6 +425,8 @@ const translationCa = {
                 destiDescripcio: "Destinació",
             },
             detall: {
+                tipus: "Tipus",
+                entrada: "Entrada",
                 oficina: "Oficina",
                 extracte: "Extracte",
                 observacions: "Observacions",
@@ -419,6 +491,7 @@ const translationCa = {
                 notif: "Notific@",
             },
             detall: {
+                noEnviat: "No enviat a Notific@",
                 title: "Detall de l’enviament",
                 datat: "Datat",
                 certificacio: "Certificació",
@@ -518,6 +591,9 @@ const translationCa = {
                 anotacio: "Actualitzar estat de les anotacions a Distribució",
                 prioritat: "Canviar prioritat dels expedients",
                 masives: "Consultar accions massives"
+            },
+            action: {
+                masives: "Execucions massives de {{name}}",
             },
             perfil: {
                 title: "El meu perfil",

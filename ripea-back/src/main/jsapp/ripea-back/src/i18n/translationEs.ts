@@ -13,6 +13,10 @@ const translationEs = {
         refresh: "Refrescar",
         clear: "Limpiar",
         search: "Buscar",
+        options: "Opciones",
+        import: "Importar",
+        export: "Exportar",
+        consult: "Consultar",
     },
     enum: {
         rol: {
@@ -107,6 +111,23 @@ const translationEs = {
                 origen: "Origen",
                 desti: "Destino",
             },
+            acciones: {
+                create: "Crear contenido",
+                history: "Histórico de acciones",
+            },
+            action: {
+                history: "Histórico de acciones del elemento",
+            },
+            history: {
+                create: "Creación",
+                update: "Modificación",
+                user: "Usuario",
+                date: "Fecha",
+            },
+            alert: {
+                valid: "Este contenido tiene errores de validación",
+                metaNode: "Este documento carece de un tipo de documento"
+            },
         },
         anotacio: {
             tabs: {
@@ -144,6 +165,7 @@ const translationEs = {
                 prioritat: "Prioridad",
             },
             acciones: {
+                new: "Nueva Tarea",
                 tramitar: "Tramitar",
                 iniciar: "Iniciar",
                 rebutjar: "Rechazar",
@@ -164,6 +186,7 @@ const translationEs = {
                 delegar: "Delegar tarea",
                 changePrioritat: "Modificar prioridad de la tarea",
                 changeDataLimit: "Cambiar fecha limite",
+                cancelar: "¿Seguro de que desea cancelar esta tarea?",
             },
         },
         interessat: {
@@ -182,10 +205,21 @@ const translationEs = {
                 entregaDehObligat: "DEH obligada?",
             },
             actions: {
+                new: "Nuevo Interesado",
                 delete: "Borrar Interesado",
                 createRep: "Añadir Representante",
                 updateRep: "Modificar Representante",
                 deleteRep: "Borrar Representante",
+            },
+            action: {
+                importar: "Importar interesados",
+            },
+            grid: {
+                title: "Interesados del fichero",
+                representant: "Representante",
+            },
+            alert: {
+                incapacitat: "En caso de titular con incapacidad es obligatorio indicar un destinatario.",
             },
             dialog: {
                 deleteTitle: "Borrar interesado",
@@ -196,15 +230,16 @@ const translationEs = {
         },
         expedient: {
             title: "Expediente",
-            nou: "New expedient",
             filter: {
                 title: "Buscador de expedientes"
             },
             detall: {
                 title: "Información del expediente",
                 agafatPer: "Cogido por",
+                avisos: "Avisos",
             },
             acciones: {
+                nou: "New expedient",
                 detall: "Gestionar",
                 follow: "Seguir",
                 unfollow: "Dejar de seguir",
@@ -212,19 +247,22 @@ const translationEs = {
                 agafar: "Coger",
                 retornar: "Devolver",
                 lliberar: "Liberar",
-				eliminar: "Eliminar",
+                eliminar: "Eliminar",
                 upPrioritat: "Cambiar prioridad...",
                 upEstat: "Cambiar estado...",
                 relacio: "Relacionar...",
                 close: "Cerrar...",
                 open: "Reabrir",
-                history: "Histórico de acciones",
                 download: "Descargar documentos...",
+                exportFullCalcul: "Exportar hoja de cálculo",
+                exportZIP: "Exportar indice ZIP",
                 exportPDF: "Exportar indice PDF",
+                exportCSV: "Exportar indice CSV",
                 exportEXCEL: "Exportar índice EXCEL",
                 exportPDF_ENI: "Indice PDF y exportación ENI",
                 exportENI: "Exportación ENI",
                 exportINSIDE: "Exportación INSIDE",
+                export: "Exportar los documentos...",
                 infoArxiu: "Información archivo",
                 sincronitzar: "Sincronizar estado con archivo",
             },
@@ -233,14 +271,24 @@ const translationEs = {
                 changePrioritat: "Modificar prioridad del expediente",
                 changeEstat: "Modificar estado del expediente",
                 assignar: "Assignar expediente a usuario",
+                exportZIP: "Exportar documentos a ZIP",
+                relacio: "Relacionar expediente",
             },
-			modal: {
-				seguidors: "Seguidores del expediente",
-			},
-			results: {
-				actionOk: 'La acción se ha ejecutado correctamente.',
-				actionBackgroundOk: 'La acción se ha preparado para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.',
-			}		
+            alert: {
+                owner: "Es necesario reservar el expediente para poder modificarlo",
+                alert: "Este expediente tiene alertas pendientes de leer",
+                validation: "Este expediente tiene errores de validación",
+                borradors: "Este expediente contiene borradores que serán eliminados al cerrarlo. A continuación tiene la possibilidad de marcar los borradores para que sean firmados con firma de servidor antes del cierre del expediente y así se evitará su eliminación. Si los documentos contienen alguna firma inválida, éstas serán eliminadas, y se volverá a firmar el documento en servidor.",
+                notificacio: "Este expediente contiene notificaciones caducadas no finalizadas. Se intentará actualitzar su estado. Si llega nueva información de las notificaciones pendientes, se guardará el certificado en Helium, pero no en el Archivo digital.",
+                documents: "Este expediente contiene documentos de anexos de anotaciones con errores. Se intentarán reprocesar al cerrar, y en caso de que no sea posible moverlos, se guardará una copia de éstos en el Archivo digital sin las firmas originales (tanto el documento original como la copia, se podrán seguir consultando desde la pestaña de contenido del expediente).",
+            },
+            modal: {
+                seguidors: "Seguidores del expediente",
+            },
+            results: {
+                actionOk: "La acción se ha ejecutado correctamente.",
+                actionBackgroundOk: "La acción se ha preparado para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.",
+            }
         },
         arxiu: {
             detall: {
@@ -261,7 +309,7 @@ const translationEs = {
                 estadoElaboracion: "Estado elaboración",
                 tipoDocumental: "Tipo documental NTI",
                 format: "Formato nombre",
-                clasificacion: "Clasificació",
+                clasificacion: "Clasificación",
                 estat: "Estado",
                 interessats: "Interesados",
                 firmes: "Tipo de firma",
@@ -309,6 +357,8 @@ const translationEs = {
                 tipoFirma: "Tipo de firma",
             },
             acciones: {
+                pinbal: "Consulta PINBAL...",
+                import: "Importar documentos...",
                 detall: "Detalles",
                 move: "Mover...",
                 vincular: "Vincular",
@@ -322,20 +372,38 @@ const translationEs = {
                 viaFirma: "Enviar viaFirma...",
                 mail: "Enviar via email...",
                 seguiment: "Seguimiento portafirmas",
-                history: "Histórico de acciones",
                 infoArxiu: "Información archivo",
                 export: "Exportación EIN...",
                 notificar: "Notificar o comunicar...",
                 comunicar: "Comunicar...",
                 publicar: "Publicar...",
                 descarregarImprimible: "Descarregar versión imprimible",
+                changeType: "Cambiar tipo",
             },
             action: {
                 enviarEmail: "Enviar documento por email",
                 enviarPortafirmes: "Enviar documento a portafirmas",
                 move: "Mover contenido",
                 notificar: "Crear notificación documento",
+                notificarMasiva: "Generar documento para notificar",
                 publicar: "Crear publicación",
+                changeType: "Cambiar tipo",
+            },
+            dialog: {
+                generateZip: "Se ha generado un zip de los elementos seleccionados",
+            },
+            alert: {
+                import: "Documento importado",
+                delete: "Documento borrador",
+                firma: "Documento firmado",
+                original: "Este documento contenía firmas inválidas y se ha clonado y firmado en servidor para poder guardarlo en el Archivo Digital. Se puede descargar el original desde el menú de acciones",
+                custodiar: "Pendiente de custodiar documento firmado de portafrimes",
+                moure: "El documento de la anotación está pendiente de mover a la serie documental del procedimiento",
+                definitiu: "Documento definitivo",
+                firmaPendent: "Pendiente de firmar",
+                firmaParcial: "Firmado parcialmente",
+                errorPortafirmes: "Error al enviar al portafirmas",
+                guardarPendent: "Pendiente de guardar en archivo",
             },
             versio: {
                 title: "Versión",
@@ -357,6 +425,8 @@ const translationEs = {
                 destiDescripcio: "Destino",
             },
             detall: {
+                tipus: "Tipo",
+                entrada: "Entrada",
                 oficina: "Oficina",
                 extracte: "Extracto",
                 observacions: "Observaciones",
@@ -421,6 +491,7 @@ const translationEs = {
                 notif: "Notific@",
             },
             detall: {
+                noEnviat: "No enviado a Notific@",
                 title: "Detalle de envio",
                 datat: "Datado",
                 certificacio: "Certificación",
@@ -520,6 +591,9 @@ const translationEs = {
                 anotacio: "Actualizar estado de las anotaciones en Distribución",
                 prioritat: "Cambiar prioridad de expedientes",
                 masives: "Consultar acciones masivas",
+            },
+            action: {
+                masives: "Ejecuciones masivas de {{name}}",
             },
             perfil: {
                 title: "Mi perfil",

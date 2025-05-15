@@ -29,6 +29,7 @@ const columns = [
     },
 ]
 const TancarForm = () => {
+    const { t } = useTranslation();
     const {apiRef: formApiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [rowsCount, setRowsCount] = useState<any>();
@@ -71,12 +72,7 @@ const TancarForm = () => {
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <Grid item xs={12} hidden={!rowsCount}>
-            <Alert severity={"info"}>
-                Este expediente contiene borradores que serán eliminados al cerrarlo. A continuación tiene la
-                possibilidad de marcar los borradores para que sean firmados con firma de servidor antes del cierre del
-                expediente y así se evitará su eliminación. Si los documentos contienen alguna firma inválida, éstas
-                serán eliminadas, y se volverá a firmar el documento en servidor.
-            </Alert>
+            <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
         </Grid>
         <Grid item xs={12}>
             <Load value={selectedModel} noEffect>
@@ -97,19 +93,10 @@ const TancarForm = () => {
         </Grid>
 
         <Grid item xs={12} hidden={!entity?.conteNotificacionsCaducades}>
-            <Alert severity={"warning"}>
-                Este expediente contiene notificaciones caducadas no finalizadas. Se intentará actualitzar su
-                estado. Si llega nueva información de las notificaciones pendientes, se guardará el certificado en
-                Helium, pero no en el Archivo digital.
-            </Alert>
+            <Alert severity={"warning"}>{t('page.expedient.alert.notificacio')}</Alert>
         </Grid>
         <Grid item xs={12} hidden={!entity?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
-            <Alert severity={"warning"}>
-                Este expediente contiene documentos de anexos de anotaciones con errores. Se intentarán reprocesar
-                al cerrar, y en caso de que no sea posible moverlos, se guardará una copia de éstos en el Archivo
-                digital sin las firmas originales (tanto el documento original como la copia, se podrán seguir
-                consultando desde la pestaña de contenido del expediente).
-            </Alert>
+            <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
         </Grid>
 
         <GridFormField xs={12} name="motiu" type={"textarea"} required/>
@@ -140,7 +127,7 @@ const useTancar = (refresh?: () => void) => {
         temporalMessageShow(null, '', 'success');
     }
     const onError = (error: any): void => {
-        temporalMessageShow('Error', error?.message, 'error');
+        temporalMessageShow(null, error?.message, 'error');
     }
 
     return {

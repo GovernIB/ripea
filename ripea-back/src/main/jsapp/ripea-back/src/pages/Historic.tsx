@@ -53,7 +53,7 @@ const Accions = (props:any) => {
             staticSortModel={sortModel}
             columns={columnsAccions}
             rowAdditionalActions={actions}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             paginationActive
             height={162 + 52 * 4}
             toolbarHide
@@ -157,7 +157,7 @@ const Moviment = (props:any) => {
             filter={builder.eq('contingut.id', id)}
             staticSortModel={sortModel}
             columns={columnsMoviment}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             paginationActive
             height={162 + 52 * 4}
             toolbarHide
@@ -167,15 +167,17 @@ const Moviment = (props:any) => {
 }
 const Auditoria = (props:any) => {
     const { entity } = props;
+    const { t } = useTranslation();
+
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            <CardData title={"Creación"} xs={6}>
-                <ContenidoData title={"Usuario"}>{entity?.createdBy}</ContenidoData>
-                <ContenidoData title={"Fecha"} >{formatDate(entity?.createdDate)}</ContenidoData>
+            <CardData title={t('page.contingut.history.create')} xs={6}>
+                <ContenidoData title={t('page.contingut.history.user')}>{entity?.createdBy}</ContenidoData>
+                <ContenidoData title={t('page.contingut.history.date')} >{formatDate(entity?.createdDate)}</ContenidoData>
             </CardData>
-            <CardData title={"Modificación"} xs={6}>
-                <ContenidoData title={"Usuario"} >{entity?.lastModifiedBy}</ContenidoData>
-                <ContenidoData title={"Fecha"} >{formatDate(entity?.lastModifiedDate)}</ContenidoData>
+            <CardData title={t('page.contingut.history.update')} xs={6}>
+                <ContenidoData title={t('page.contingut.history.user')} >{entity?.lastModifiedBy}</ContenidoData>
+                <ContenidoData title={t('page.contingut.history.date')} >{formatDate(entity?.lastModifiedDate)}</ContenidoData>
             </CardData>
         </Grid>
     </BasePage>;
@@ -223,7 +225,7 @@ const useHistoric = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={"Histórico de acciones del elemento"}
+            title={t('page.contingut.action.history')}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {

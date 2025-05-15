@@ -109,9 +109,9 @@ const TasquesGrid = (props: any) => {
             paginationActive
             filter={builder.and(builder.eq('expedient.id', entity?.id))}
             perspectives={perspectives}
-            onRowsChange={(rows:any, info:any) => onRowCountChange?.(info?.totalElements)}
+            onRowCountChange={onRowCountChange}
             popupEditCreateActive
-			toolbarCreateTitle={"Nova tasca"}
+			toolbarCreateTitle={t('page.tasca.acciones.new')}
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
                 expedient: {id: entity?.id},

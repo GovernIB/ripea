@@ -7,9 +7,9 @@ import GridFormField from "../../../components/GridFormField.tsx";
 
 const CambiarFechaLimiteForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="dataInici" type={"date"} readOnly disabled/>
-        <GridFormField xs={6} name="duracio"/>
-        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}}/>
+        <GridFormField xs={12} name="dataInici" type={"date"} readOnly disabled required/>
+        <GridFormField xs={6} name="duracio" required/>
+        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}} required/>
     </Grid>
 }
 
@@ -30,15 +30,17 @@ const useCambiarDataLimit = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id)
+    const handleShow = (id:any, row:any) :void => {
+        apiRef.current?.show?.(id, {
+            dataInici: row?.dataInici
+        })
     }
     const onSuccess = () :void => {
         refresh?.()
         temporalMessageShow(null, '', 'success');
     }
     const onError = (error:any) :void => {
-        temporalMessageShow('Error', error.message, 'error');
+        temporalMessageShow(null, error.message, 'error');
     }
 
     return {

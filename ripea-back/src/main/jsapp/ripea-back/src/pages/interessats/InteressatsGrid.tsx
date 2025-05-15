@@ -33,7 +33,7 @@ export const InteressatsGridForm = () => {
 }
 
 const perspectives = ['REPRESENTANT']
-const sortModel = [{field: 'id', sort: 'asc'}]
+const sortModel:any = [{field: 'id', sort: 'asc'}]
 
 const columns = [
     {
@@ -98,7 +98,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             }}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
-            toolbarCreateTitle={"Nuevo interesado"}
+            toolbarCreateTitle={t('page.interest.acciones.new')}
             readOnly={readOnly}
             rowHideDeleteButton
 
@@ -113,11 +113,14 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     element: <ToolbarButton icon={'upload'}
                                             onClick={()=>exportar(selectedRows, entity)}
                                             disabled={selectedRows?.length==0}
-                    >Exportar...</ToolbarButton>
+                    >{t('common.export')}...</ToolbarButton>
                 },
                 {
                     position: 0,
-                    element: <ToolbarButton icon={'download'} onClick={()=>handleImport()} hidden={readOnly}>Importar...</ToolbarButton>
+                    element: <ToolbarButton icon={'download'}
+                                            onClick={()=>handleImport()}
+                                            hidden={readOnly}
+                    >{t('common.import')}...</ToolbarButton>
                 },
             ]}
         />

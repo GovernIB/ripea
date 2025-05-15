@@ -30,15 +30,18 @@ const useCambiarPrioritat = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id)
+    const handleShow = (id:any, row:any) :void => {
+        apiRef.current?.show?.(id, {
+            titol: row?.titol,
+            metaExpedientTasca: row?.metaExpedientTasca,
+        })
     }
     const onSuccess = () :void => {
         refresh?.()
         temporalMessageShow(null, '', 'success');
     }
     const onError = (error:any) :void => {
-        temporalMessageShow('Error', error.message, 'error');
+        temporalMessageShow(null, error.message, 'error');
     }
 
     return {
