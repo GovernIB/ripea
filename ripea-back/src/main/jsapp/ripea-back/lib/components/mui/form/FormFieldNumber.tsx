@@ -6,6 +6,15 @@ import { useFormContext } from '../../form/FormContext';
 import { FormFieldCustomProps } from '../../form/FormField';
 import { useFormFieldCommon } from './FormFieldText';
 
+type FormFieldNumberProps = FormFieldCustomProps & {
+    allowNegative?: boolean;
+    decimalSeparator?: boolean | string;
+    thousandSeparator?: boolean | string;
+    valueIsNumericString?: boolean;
+    prefix?: string;
+    suffix?: string;
+}
+
 type CustomProps = {
     name: string;
     onChange: (event: { target: { name: string; value: string } }) => void;
@@ -23,11 +32,15 @@ const NumericFormatCustom = React.forwardRef<NumericFormatProps, CustomProps>((p
     const { currentLanguage } = useBaseAppContext();
     const { fields } = useFormContext();
     const field = fields?.find(f => f.name === other.name);
-    const valueIsNumericString = field?.type === 'decimal';
+    const allowNegative = (other as any).min < 0;
     const decimalSeparator = getDecimalSeparator(currentLanguage);
     const thousandSeparator = getThousandSeparator(currentLanguage);
-    const allowNegative = (other as any).min < 0;
+    const valueIsNumericString = field?.type === 'decimal';
     return <NumericFormat
+        allowNegative={allowNegative}
+        decimalSeparator={decimalSeparator}
+        thousandSeparator={thousandSeparator}
+        valueIsNumericString={valueIsNumericString}
         {...other}
         getInputRef={ref}
         onValueChange={(values: any) => {
@@ -37,17 +50,10 @@ const NumericFormatCustom = React.forwardRef<NumericFormatProps, CustomProps>((p
                     value: values.value,
                 },
             });
-        }}
-        allowNegative={allowNegative}
-        valueIsNumericString={valueIsNumericString}
-        decimalSeparator={decimalSeparator}
-        thousandSeparator={thousandSeparator}
-        //prefix="$"
-        //suffix="€"
-        />;
+        }} />;
 });
 
-export const FormFieldNumber: React.FC<FormFieldCustomProps> = (props) => {
+export const FormFieldNumber: React.FC<FormFieldNumberProps> = (props) => {
     const {
         name,
         label,
@@ -60,6 +66,12 @@ export const FormFieldNumber: React.FC<FormFieldCustomProps> = (props) => {
         readOnly,
         onChange,
         componentProps,
+        allowNegative,
+        decimalSeparator,
+        thousandSeparator,
+        valueIsNumericString,
+        prefix,
+        suffix,
     } = props;
     const {
         helperText,
@@ -76,6 +88,12 @@ export const FormFieldNumber: React.FC<FormFieldCustomProps> = (props) => {
         min: field?.min,
         max: field?.max,
         step: field?.step,
+        allowNegative,
+        decimalSeparator,
+        thousandSeparator,
+        valueIsNumericString,
+        prefix,
+        suffix,
         style: { textAlign: 'right' },
     };
     return <TextField
