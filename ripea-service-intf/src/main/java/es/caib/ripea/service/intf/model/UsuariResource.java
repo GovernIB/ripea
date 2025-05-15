@@ -4,6 +4,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,7 @@ public class UsuariResource extends BaseResource<String> {
 	@Size(max = 200)
 	private String emailAlternatiu;
 	@Size(max = 2)
-	private String idioma;
+	private IdiomaEnumDto idioma;
 	private boolean inicialitzat = false;
 	@Size(max = 64)
 	private String rolActual;

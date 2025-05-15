@@ -3,6 +3,7 @@ package es.caib.ripea.service.resourceservice;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +49,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
+
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
         String rolActual		 = configHelper.getRolActual();

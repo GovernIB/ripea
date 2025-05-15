@@ -1,5 +1,5 @@
 import {
-    useFilterApiRef, useFormApiRef,
+    useFilterApiRef, useFormApiRef, useFormContext,
 } from 'reactlib';
 import {Grid} from "@mui/material";
 import {formatIso} from '../../util/dateUtils';
@@ -9,7 +9,14 @@ import {useUserSession} from "../../components/Session.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 
 const ExpedientFilterForm = (props:any) => {
+    const {data} = useFormContext()
     const { user } = props;
+
+    const filterMetaExpedient = builder.and(
+        builder.eq('organGestor.id', data?.organGestor?.id),
+        builder.eq('actiu', true),
+        builder.eq('revisioEstat', "'REVISAT'"),
+    );
 
     return <>
         <GridFormField xs={3} name="numero"/>
@@ -17,7 +24,7 @@ const ExpedientFilterForm = (props:any) => {
         <GridFormField xs={3} name="estat"/>
         <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="organGestor"/>
-        <GridFormField xs={3} name="metaExpedient"/>
+        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
         <GridFormField xs={3} name="dataCreacioInici"/>
         <GridFormField xs={3} name="dataCreacioFinal"/>
 

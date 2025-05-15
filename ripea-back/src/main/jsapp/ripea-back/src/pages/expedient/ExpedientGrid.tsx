@@ -29,7 +29,7 @@ const ExpedientGridForm = () => {
         <GridFormField xs={12} name="nom" />
         <GridFormField xs={12} name="organGestor" disabled={!!data?.id || data?.disableOrganGestor} /*TODO: filter={'organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre'}*/ />
         <GridFormField xs={12} name="sequencia" disabled />
-        <GridFormField xs={12} name="any" />
+        <GridFormField xs={12} name="any" thousandSeparator={false}/>
         <GridFormField xs={12} name="prioritat" required />
         <GridFormField xs={12} name="prioritatMotiu" hidden={data?.prioritat == 'B_NORMAL'} required />
     </Grid>

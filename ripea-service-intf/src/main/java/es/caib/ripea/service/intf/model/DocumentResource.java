@@ -335,8 +335,6 @@ public class DocumentResource extends NodeResource {
         private String motiu;
         @NotNull
         private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
-    	private Date dataInici;
-    	private boolean enviarCorreu;
         private List<ResourceReference<DocumentResource, Long>> annexos;
         
         // Firma parcial
