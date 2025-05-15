@@ -779,43 +779,32 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	
         	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte 
         	if (fieldName==null) {
-        		
         		target.setMostrarFirmaParcial(configHelper.getAsBoolean(PropertyConfig.FIRMA_PARCIAL));
         		target.setMostrarAvisFirmaParcial(configHelper.getAsBoolean(PropertyConfig.AVIS_FIRMA_PARCIAL));
         		
-        		//Carregam el valor del tipus de firma, consultant el meta-document
-        		Long idResource = null;
-        		if (id instanceof Integer) {
-        			idResource = ((Integer)id).longValue();
-        		} else {
-        			idResource = (Long)id;
-        		}
-        		
-        		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceRepository.findById(idResource).get().getMetaDocument();
+        		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceRepository.findById(((Integer)id).longValue()).get().getMetaDocument();
         		target.setPortafirmesFluxTipus(metaDocumentResourceEntity.getPortafirmesFluxTipus());
         		
         		if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
-        			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<ResourceReference<UsuariResource,String>>();
+        			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
         			if (metaDocumentResourceEntity.getPortafirmesResponsables()!=null) {
         				String[] pfResponsables = metaDocumentResourceEntity.getPortafirmesResponsables().split(",");
-        				if (pfResponsables.length>0) {
-        					for (String codi : pfResponsables) {
-        						UsuariResourceEntity usuariEntity = usuariResourceRepository.findById(codi).orElseGet(null);
-        						if (usuariEntity!=null) {
-        							responsables.add(ResourceReference.toResourceReference(usuariEntity.getCodi(), usuariEntity.getNom()));
-        						} else {
-        							responsables.add(ResourceReference.toResourceReference(codi, codi));
-        						}
-        					}
-        				}
-        			}
+                        for (String codi : pfResponsables) {
+                            UsuariResourceEntity usuariEntity = usuariResourceRepository.findById(codi).orElse(null);
+                            if (usuariEntity != null) {
+                                responsables.add(ResourceReference.toResourceReference(usuariEntity.getCodi(), usuariEntity.getNom()));
+                            } else {
+                                responsables.add(ResourceReference.toResourceReference(codi, codi));
+                            }
+                        }
+                    }
         			target.setResponsables(responsables);
         		} else {
         			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
         		}
         		
         	} else { //És un camp concret el que s'ha canviat
-        		if ("portafirmesEnviarFluxId".equals(fieldName)) {
+        		if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
         			String idiomaUsuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get().getIdioma();
         			target.setPortafirmesFluxUrl(pluginHelper.portafirmesRecuperarUrlPlantilla(
         					fieldValue.toString(), 

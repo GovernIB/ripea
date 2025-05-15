@@ -1,9 +1,9 @@
 import {useEffect, useRef, useState} from "react";
-import {Grid, Alert, Button, Icon} from "@mui/material";
+import {Grid, Alert, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
+import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import useCreate from "../../interessats/actions/Create.tsx";
@@ -107,19 +107,17 @@ const NotificarForm = () => {
         <GridFormField xs={12} name="tipus"/>
         <GridFormField xs={12} name="estat" required disabled/>
 
-        <GridFormField xs={9.6} name="interessats" multiple filter={interessatsFilter}/>
-        <Grid item xs={2.4}>
-            <Button
-                variant="outlined"
-                sx={{borderRadius: '4px', minHeight: '53px'}}
-                onClick={()=> {
-                    create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
-                }}
-            >
-                <Icon>add</Icon>{t('page.interessat.actions.new')}
-            </Button>
-            {content}
-        </Grid>
+        <GridFormField xs={10} name="interessats" multiple filter={interessatsFilter}/>
+
+        <GridButton
+            xs={2}
+            onClick={()=> {
+                create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
+            }}
+        >
+            <Icon>add</Icon>{t('page.interessat.actions.new')}
+        </GridButton>
+        {content}
 
         <GridFormField xs={12} name="concepte" required/>
         <GridFormField xs={12} name="serveiTipus" required/>
@@ -143,6 +141,7 @@ const Notificar = (props:any) => {
         resourceName={"documentResource"}
         action={"NOTIFICAR"}
         title={(data:any)=> `${t('page.document.action.notificar')}: ${data.nom}`}
+        formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
         {...props}
         initialOnChange
     >

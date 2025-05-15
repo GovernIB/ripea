@@ -98,7 +98,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             }}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
-            toolbarCreateTitle={t('page.interest.acciones.new')}
+            toolbarCreateTitle={t('page.interessat.actions.new')}
             readOnly={readOnly}
             rowHideDeleteButton
 

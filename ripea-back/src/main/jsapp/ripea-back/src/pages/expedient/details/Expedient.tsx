@@ -39,7 +39,7 @@ const Contenido = (props :any) => {
     </ContenidoData>
 }
 
-const border= { border: '1px solid #e3e3e3', borderRadius: '10px' };
+const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
 const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
