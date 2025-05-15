@@ -328,8 +328,10 @@ public class DocumentResource extends NodeResource {
 
     @Getter
     @Setter
+    @FieldNameConstants
     public static class EnviarPortafirmesFormAction implements Serializable {
-        @NotNull
+		private static final long serialVersionUID = -763974048421192748L;
+		@NotNull
         private String motiu;
         @NotNull
         private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
@@ -351,6 +353,7 @@ public class DocumentResource extends NodeResource {
 
         //FLUX
         @Transient
+        @ResourceField(enumType = true)
     	private String portafirmesEnviarFluxId;
         @Transient
     	private String portafirmesFluxNom;

@@ -31,7 +31,6 @@ import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientSequenciaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
@@ -55,7 +54,6 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
@@ -285,53 +283,33 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     @Override
-    protected void beforeCreateSave(
-            ExpedientResourceEntity entity,
-            ExpedientResource resource,
-            Map<String, AnswerRequiredException.AnswerValue> answers) {
-        entity.setMetaNode(entity.getMetaExpedient());
-
-        entity.setCodi(entity.getMetaExpedient().getCodi());
-
-        /** TODO: cambiar (ExpedientHelper.calcularNumero()) */
-        entity.setNumero(entity.getCodi() + "/" + entity.getSequencia() + "/" + entity.getAny());
-
-        entity.setEntitat(entity.getMetaExpedient().getEntitat());
-        entity.setTipus(ContingutTipusEnumDto.EXPEDIENT);
-        entity.setNtiIdentificador(Long.toString(System.currentTimeMillis()));
-        entity.setNtiOrgano(entity.getMetaExpedient().getEntitat().getUnitatArrel());
-        entity.setNtiFechaApertura(new Date());
-        entity.setNtiClasificacionSia(entity.getMetaExpedient().getClassificacio());
-    }
-
-    @Override
-    protected void afterCreateSave(
-            ExpedientResourceEntity entity,
-            ExpedientResource resource,
-            Map<String, AnswerRequiredException.AnswerValue> answers,
-            boolean anyOrderChanged) {
-        Optional<MetaExpedientSequenciaResourceEntity> metaExpedientSequenciaResourceEntity
-                = metaExpedientSequenciaResourceRepository.findByMetaExpedientAndAny(entity.getMetaExpedient(), resource.getAny());
-
-        metaExpedientSequenciaResourceEntity.ifPresentOrElse(
-                (metaExpedientSequencia) -> {
-                    metaExpedientSequencia.setValor(metaExpedientSequencia.getValor() + 1);
-                    metaExpedientSequenciaResourceRepository.save(metaExpedientSequencia);
-                },
-                () -> {
-                    MetaExpedientSequenciaResourceEntity metaExpedientSequencia = new MetaExpedientSequenciaResourceEntity();
-                    metaExpedientSequencia.setMetaExpedient(entity.getMetaExpedient());
-                    metaExpedientSequencia.setAny(resource.getAny());
-                    metaExpedientSequencia.setValor(resource.getSequencia() + 1);
-
-                    metaExpedientSequenciaResourceRepository.save(metaExpedientSequencia);
-                }
-        );
-    }
-
-    @Override
-    protected void beforeUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        entity.setMetaNode(entity.getMetaExpedient());
+    public ExpedientResource create(ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	try {
+    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    		
+			Long expedientId = expedientHelper.create(
+					entitatEntity.getId(),
+					resource.getMetaExpedient().getId(), //Not pot ser null
+					null,
+					resource.getOrganGestor().getId(), //Not pot ser null
+					resource.getAny(),
+					resource.getNom(),
+					null,
+					false,
+					null,
+					resource.getGrup()!=null?resource.getGrup().getId():null,
+					configHelper.getRolActual(),
+					resource.getPrioritat(),
+					resource.getPrioritatMotiu());
+			
+			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
+			
+			return null;
+			
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/expedient/create", ex);
+    	}
+    	return null;
     }
 
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {

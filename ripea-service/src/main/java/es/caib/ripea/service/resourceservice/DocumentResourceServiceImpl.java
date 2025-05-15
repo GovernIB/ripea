@@ -30,14 +30,12 @@ import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
@@ -54,6 +52,7 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -80,7 +79,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
-import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -133,7 +131,18 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
+        //Dades externes
+        register(DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId, new FluxosFirmaFieldOptionsProvider());
     }
+    
+    public static class FluxosFirmaFieldOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName) {
+			return List.of(
+					new FieldOption("iaNS5JGbBnw_TYqSKgQaHA==", "Flujo9972"),
+					new FieldOption("nOMxucuicdrXKB64kAE43g==", "Flux test 02"),
+					new FieldOption("f2FiWpkDL6OjwkFiRhrjmA==", "Flux Sion"));
+		}
+	}
     
     @Override
     public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
@@ -772,8 +781,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		target.setMostrarFirmaParcial(configHelper.getAsBoolean(PropertyConfig.FIRMA_PARCIAL));
         		target.setMostrarAvisFirmaParcial(configHelper.getAsBoolean(PropertyConfig.AVIS_FIRMA_PARCIAL));
 
+        		Long idResource = null;
+        		if (id instanceof Integer) {
+        			idResource = ((Integer)id).longValue();
+        		} else {
+        			idResource = (Long)id;
+        		}
+        		
         		//Carregam el valor del tipus de firma, consultant el meta-document
-        		MetaDocumentFirmaFluxTipusEnumDto fluxTipus = documentResourceRepository.findById((long)id).get().getMetaDocument().getPortafirmesFluxTipus();
+        		MetaDocumentFirmaFluxTipusEnumDto fluxTipus = documentResourceRepository.findById(idResource).get().getMetaDocument().getPortafirmesFluxTipus();
         		target.setPortafirmesFluxTipus(fluxTipus);
         	} else { //És un camp concret el que s'ha canviat
         		if ("portafirmesEnviarFluxId".equals(fieldName)) {
