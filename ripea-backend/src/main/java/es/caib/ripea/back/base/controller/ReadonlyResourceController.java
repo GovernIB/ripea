@@ -171,6 +171,41 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 			BindingResult bindingResult) throws ArtifactNotFoundException, JsonProcessingException, MethodArgumentNotValidException;
 
 	/**
+	 * Consulta les opcions disponibles per a emplenar un camp enumerat que pertany al formulari d'un artefacte.
+	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @return la llista d'opcions disponibles.
+	 */
+	ResponseEntity<CollectionModel<EntityModel<FieldOption>>> artifactFieldEnumOptionsFind(
+			final ResourceArtifactType type,
+			final String code,
+			final String fieldName);
+
+	/**
+	 * Consulta una de les opcions disponibles per a un camp de tipus enumerat.
+	 *
+	 * @param type
+	 *            el tipus de l'artefacte.
+	 * @param code
+	 *            el codi de l'artefacte.
+	 * @param fieldName
+	 *            nom del camp del recurs.
+	 * @param value
+	 *            valor de l'enumerat a retornar.
+	 * @return l'opció demanada.
+	 */
+	ResponseEntity<EntityModel<FieldOption>> artifactFieldEnumOptionsGetOne(
+			final ResourceArtifactType type,
+			final String code,
+			final String fieldName,
+			final String value);
+
+	/**
 	 * Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference que pertany
 	 * al formulari d'un artefacte.
 	 *

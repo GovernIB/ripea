@@ -310,13 +310,13 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@GetMapping(value = "/fields/{fieldName}/enumOptions")
 	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
-	public ResponseEntity<CollectionModel<EntityModel<FieldOption>>> fieldEnumOptionsFindAll(
+	public ResponseEntity<CollectionModel<EntityModel<FieldOption>>> fieldEnumOptionsFind(
 			@PathVariable
 			@Parameter(description = "Nom del camp")
 			final String fieldName) {
-		log.debug("Consultant possibles valors del camp enumerat (fieldName={})", fieldName);
+		log.debug("Consultant possibles valors pel camp enumerat (fieldName={})", fieldName);
 		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
-		Link selfLink = linkTo(methodOn(getClass()).fieldEnumOptionsFindAll(fieldName)).withSelfRel();
+		Link selfLink = linkTo(methodOn(getClass()).fieldEnumOptionsFind(fieldName)).withSelfRel();
 		if (fieldOptions != null) {
 			return ResponseEntity.ok(
 					CollectionModel.of(
@@ -333,7 +333,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 
 	@Override
 	@GetMapping(value = "/fields/{fieldName}/enumOptions/{value}")
-	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat")
+	@Operation(summary = "Consulta una de les opcions disponibles per a emplenar un camp enumerat")
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
 	public ResponseEntity<EntityModel<FieldOption>> fieldEnumOptionsGetOne(
 			@PathVariable
@@ -342,7 +342,7 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@PathVariable
 			@Parameter(description = "Valor de l'opció")
 			final String value) {
-		log.debug("Consultant d'un únic valor del camp enumerat (fieldName={}, value={})", fieldName, value);
+		log.debug("Consultant d'un únic valor pel camp enumerat (fieldName={}, value={})", fieldName, value);
 		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
 		FieldOption found = null;
 		if (fieldOptions != null) {

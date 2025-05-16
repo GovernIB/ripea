@@ -398,6 +398,85 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	@Override
+	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/enumOptions")
+	@Operation(summary = "Consulta les opcions disponibles per a emplenar un camp enumerat que pertany al formulari d'un artefacte.")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
+	public ResponseEntity<CollectionModel<EntityModel<FieldOption>>> artifactFieldEnumOptionsFind(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName) {
+		log.debug("Consultant possibles valors pel camp enumerat d'un artefacte (type={}, code={}, fieldName={})",
+				type,
+				code,
+				fieldName);
+		List<FieldOption> fieldOptions = getReadonlyResourceService().artifactFieldEnumOptions(
+				type,
+				code,
+				fieldName);
+		Link selfLink = linkTo(methodOn(getClass()).artifactFieldEnumOptionsFind(type, code, fieldName)).withSelfRel();
+		if (fieldOptions != null) {
+			return ResponseEntity.ok(
+					CollectionModel.of(
+							fieldOptions.stream().
+									map(fo -> EntityModel.of(
+											fo,
+											linkTo(methodOn(getClass()).artifactFieldEnumOptionsGetOne(type, code, fieldName, fo.getValue())).withSelfRel())).
+									collect(Collectors.toList()),
+							selfLink));
+		} else {
+			return ResponseEntity.ok(CollectionModel.empty(selfLink));
+		}
+	}
+
+	@Override
+	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/enumOptions/{value}")
+	@Operation(summary = "Consulta una de les opcions disponibles per a emplenar un camp enumerat que pertany al formulari d'un artefacte.")
+	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('OPTIONS'))")
+	public ResponseEntity<EntityModel<FieldOption>> artifactFieldEnumOptionsGetOne(
+			@PathVariable
+			@Parameter(description = "Tipus de l'artefacte")
+			final ResourceArtifactType type,
+			@PathVariable
+			@Parameter(description = "Codi de l'artefacte")
+			final String code,
+			@PathVariable
+			@Parameter(description = "Nom del camp")
+			final String fieldName,
+			@PathVariable
+			@Parameter(description = "Valor de l'opció")
+			final String value) {
+		log.debug("Consultant un únic valor pel camp enumerat d'un artefacte (type={}, code={}, fieldName={}, value={})",
+				type,
+				code,
+				fieldName,
+				value);
+		List<FieldOption> fieldOptions = getReadonlyResourceService().artifactFieldEnumOptions(
+				type,
+				code,
+				fieldName);
+		FieldOption found = null;
+		if (fieldOptions != null) {
+			found = fieldOptions.stream().
+					filter(fo -> fo.getValue().equals(value)).
+					findFirst().orElse(null);
+		}
+		if (found != null) {
+			return ResponseEntity.ok(
+					EntityModel.of(
+							found,
+							linkTo(methodOn(getClass()).artifactFieldEnumOptionsGetOne(type, code, fieldName, found.getValue())).withSelfRel()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	@Override
 	@GetMapping(value = "/artifacts/{type}/{code}/fields/{fieldName}/options")
 	@Operation(summary = "Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference " +
 			"que pertany al formulari d'un artefacte.")

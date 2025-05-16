@@ -294,7 +294,9 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String fieldName,
 			Object fieldValue,
 			Map<String, AnswerRequiredException.AnswerValue> answers) throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
-		log.debug("Processing onChange event (previous={}, fieldName={}, fieldValue={}, answers={})",
+		log.debug("Processing onChange event for artifact (type={}, code={}, previous={}, fieldName={}, fieldValue={}, answers={})",
+				type,
+				code,
 				previous,
 				fieldName,
 				fieldValue,
@@ -333,12 +335,35 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<FieldOption> artifactFieldEnumOptions(
+			ResourceArtifactType type,
+			String code,
+			String fieldName) {
+		log.debug("Querying field enum options for artifact (type={}, code={}, fieldName={})",
+				type,
+				code,
+				fieldName);
+		BaseMutableResourceService.FieldOptionsProvider fieldOptionsProvider = artifactGetFieldOptionsProvider(type, code);
+		if (fieldOptionsProvider != null) {
+			return fieldOptionsProvider.getOptions(fieldName);
+		} else {
+			log.warn("Couldn't find FieldOptionsProvider for artifact (resourceClass={}, type={}, code={}, fieldName={})",
+					getResourceClass(),
+					type,
+					code,
+					fieldName);
+			return null;
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public <P extends Serializable> List<?> artifactReportGenerateData(
 			ID id,
 			String code,
 			P params) throws ArtifactNotFoundException, ReportGenerationException {
 		log.debug("Generating report data (id={}, code={}, params={})", id, code, params);
-		ReportGenerator<E, P, ?> generator = (ReportGenerator<E, P, ?>) reportGeneratorMap.get(code);
+		ReportGenerator<E, P, ?> generator = (ReportGenerator<E, P, ?>)reportGeneratorMap.get(code);
 		if (generator != null) {
 			E entity = null;
 			if (id != null) {
@@ -706,6 +731,18 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			}
 		});
 		return clonedResource;
+	}
+
+	protected BaseMutableResourceService.FieldOptionsProvider artifactGetFieldOptionsProvider(
+			ResourceArtifactType type,
+			String code) {
+		BaseMutableResourceService.FieldOptionsProvider fieldOptionsProvider = null;
+		if (type == ResourceArtifactType.REPORT) {
+			fieldOptionsProvider = reportGeneratorMap.get(code);
+		} else if (type == ResourceArtifactType.FILTER) {
+			fieldOptionsProvider = filterProcessorMap.get(code);
+		}
+		return fieldOptionsProvider;
 	}
 
 	protected <C> C newClassInstance(Class<C> clazz) {
@@ -1232,7 +1269,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 * @param <P> classe dels paràmetres necessaris per a generar l'informe.
 	 * @param <R> classe de la llista de dades retornades al generar l'informe.
 	 */
-	public interface ReportGenerator<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable> extends BaseMutableResourceService.OnChangeLogicProcessor<P> {
+	public interface ReportGenerator<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable>
+			extends BaseMutableResourceService.OnChangeLogicProcessor<P>, BaseMutableResourceService.FieldOptionsProvider {
 		/**
 		 * Genera les dades per l'informe.
 		 *
@@ -1283,6 +1321,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		default URL getJasperReportUrl(String code, ReportFileType fileType) {
 			return null;
 		}
+		@Override
+		default List<FieldOption> getOptions(String fieldName) {
+			return new ArrayList<>();
+		}
 	}
 
 	/**
@@ -1290,7 +1332,12 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	 *
 	 * @param <R> classe del recurs que representa el filtre.
 	 */
-	public interface FilterProcessor<R extends Serializable> extends OnChangeLogicProcessor<R> {
+	public interface FilterProcessor<R extends Serializable>
+			extends BaseMutableResourceService.OnChangeLogicProcessor<R>, BaseMutableResourceService.FieldOptionsProvider {
+		@Override
+		default List<FieldOption> getOptions(String fieldName) {
+			return new ArrayList<>();
+		}
 	}
 
 	/**
