@@ -235,7 +235,6 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
         <div style={{
             display: 'flex',
             flexGrow: 1,
-            minWidth: 0,
             ...(!marginsDisabled ? { margin: '16px 24px' } : null)
         }}>
             {menuComponent}

@@ -160,10 +160,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         linkComponent={Link}
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
-            <div style={{ margin: '16px 24px' }}>
-                <button>Hola</button>
-                {children}
-            </div>
+            {children}
         </CustomLocalizationProvider>
     </MuiBaseApp>;
 }
