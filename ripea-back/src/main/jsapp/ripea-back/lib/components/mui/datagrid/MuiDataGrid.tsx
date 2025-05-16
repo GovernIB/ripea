@@ -33,6 +33,7 @@ import {
     DataCommonAdditionalAction,
     DataCommonShowCreateDialogFn,
     DataCommonShowUpdateDialogFn,
+    DataCommonTriggerDeleteFn,
 } from '../datacommon/MuiDataCommon';
 import { useDataToolbar, DataToolbarType } from '../datacommon/DataToolbar';
 import DataGridRow from './DataGridRow';
@@ -148,11 +149,14 @@ const rowArtifactShowCheck = (action: string | undefined, report: string | undef
 const getRowActionOnClick = (
     rowAction: DataCommonAdditionalAction,
     showCreateDialog: DataCommonShowCreateDialogFn,
-    showUpdateDialog: DataCommonShowUpdateDialogFn): DataGridActionItemOnClickFn | undefined => {
+    showUpdateDialog: DataCommonShowUpdateDialogFn,
+    triggerDelete: DataCommonTriggerDeleteFn): DataGridActionItemOnClickFn | undefined => {
     if (rowAction.clickShowCreateDialog) {
         return (_id, row) => showCreateDialog(row);
     } else if (rowAction.clickShowUpdateDialog) {
         return (id, row) => showUpdateDialog(id, row);
+    } else if (rowAction.clickTriggerDelete) {
+        return (id) => triggerDelete(id);
     } else {
         return rowAction.onClick;
     }
@@ -163,6 +167,7 @@ const rowActionsToGridActionsCellItems = (
     params: GridRowParams,
     showCreateDialog: DataCommonShowCreateDialogFn,
     showUpdateDialog: DataCommonShowUpdateDialogFn,
+    triggerDelete: DataCommonTriggerDeleteFn,
     artifacts: any[] | undefined,
     forceDisabled?: boolean): React.ReactElement[] => {
     const actions: React.ReactElement[] = [];
@@ -172,7 +177,7 @@ const rowActionsToGridActionsCellItems = (
         const rowArtifactShow = rowArtifactShowCheck(rowAction.action, rowAction.report, artifacts);
         const rowActionLinkTo = (typeof rowAction.linkTo === 'function') ? rowAction.linkTo?.(params.row) : rowAction.linkTo?.replace('{{id}}', '' + params.id);
         const rowActionLinkState = (typeof rowAction.linkState === 'function') ? rowAction.linkState?.(params.row) : rowAction.linkState;
-        const rowActionOnClick = getRowActionOnClick(rowAction, showCreateDialog, showUpdateDialog);
+        const rowActionOnClick = getRowActionOnClick(rowAction, showCreateDialog, showUpdateDialog, triggerDelete);
         const showInMenu = (typeof rowAction.showInMenu === 'function') ? rowAction.showInMenu(params.row) : rowAction.showInMenu;
         const disabled = forceDisabled || ((typeof rowAction.disabled === 'function') ? rowAction.disabled(params.row) : rowAction.disabled);
         const hidden = (typeof rowAction.hidden === 'function') ? rowAction.hidden(params.row) : rowAction.hidden;
@@ -199,6 +204,7 @@ const useGridColumns = (
     fields: any[] | undefined,
     showCreateDialog: DataCommonShowCreateDialogFn,
     showUpdateDialog: DataCommonShowUpdateDialogFn,
+    triggerDelete: DataCommonTriggerDeleteFn,
     artifacts: any[] | undefined,
     rowModesModel?: GridRowModesModel) => {
     const { currentLanguage } = useResourceApiContext();
@@ -253,6 +259,7 @@ const useGridColumns = (
                         params,
                         showCreateDialog,
                         showUpdateDialog,
+                        triggerDelete,
                         artifacts,
                         anyRowInEditMode && !isEditMode);
                 },
@@ -421,6 +428,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         formDialogComponent,
         showCreateDialog,
         showUpdateDialog,
+        triggerDelete,
     } = useDataCommonEditable(
         resourceName,
         readOnly ?? false,
@@ -483,6 +491,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         fields,
         showCreateDialog,
         showUpdateDialog,
+        triggerDelete,
         artifacts,
         otherProps.rowModesModel);
     const apiRef = React.useRef<MuiDataGridApi>({

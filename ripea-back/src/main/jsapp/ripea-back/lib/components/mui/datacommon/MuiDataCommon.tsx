@@ -26,12 +26,14 @@ export type DataCommonAdditionalAction = {
     report?: string;
     clickShowCreateDialog?: boolean;
     clickShowUpdateDialog?: boolean;
+    clickTriggerDelete?: boolean;
     onClick?: (id: any, row: any, event: React.MouseEvent) => void;
 };
 
 export type DataCommonExportFn = (fields?: string[], fileType?: ExportFileType, forceUnpaged?: boolean) => void;
 export type DataCommonShowCreateDialogFn = (row?: any) => void;
 export type DataCommonShowUpdateDialogFn = (id: any, row?: any) => void;
+export type DataCommonTriggerDeleteFn = (id: any) => void;
 
 export const useApiDataCommon = (
     resourceName: string,
@@ -216,7 +218,7 @@ export const useDataCommonEditable = (
                 // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
             });
     }
-    const doDelete = (id: any) => {
+    const triggerDelete = (id: any) => {
         messageDialogShow(
             t('datacommon.delete.single.title'),
             t('datacommon.delete.single.confirm'),
@@ -259,7 +261,7 @@ export const useDataCommonEditable = (
     !readOnly && rowEditActions.push({
         title: t('datacommon.delete.title'),
         icon: 'delete',
-        onClick: doDelete,
+        onClick: triggerDelete,
         disabled: rowDisableDeleteButton,
         hidden: rowHideDeleteButton,
         showInMenu: true,
@@ -287,5 +289,6 @@ export const useDataCommonEditable = (
         formDialogComponent,
         showCreateDialog,
         showUpdateDialog,
+        triggerDelete,
     };
 }
