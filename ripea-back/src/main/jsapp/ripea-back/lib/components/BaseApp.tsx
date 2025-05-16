@@ -25,8 +25,7 @@ type I18nHandleLanguageChangeFn = (lang?: string) => void;
 type I18nAddResourceBundleCallback = (lang: string, ns: string, bundle: any) => void;
 
 type ContentComponentSlots = {
-    appbar: React.ReactElement;
-    footer?: React.ReactElement;
+    appbar?: React.ReactElement;
     menu?: React.ReactElement;
     offline: React.ReactElement;
 };
@@ -52,10 +51,8 @@ export type BaseAppProps = React.PropsWithChildren & {
 export type BaseAppContentComponentProps = React.PropsWithChildren & {
     offline: boolean;
     appReady: boolean;
-    marginsDisabled: boolean;
     contentExpandsToAvailableHeight: boolean;
     appbarComponent?: React.ReactElement;
-    footerComponent?: React.ReactElement;
     menuComponent?: React.ReactElement;
     offlineComponent?: React.ReactElement;
     legacyMargins?: boolean;
@@ -220,17 +217,12 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
     const {
         offline,
         appReady,
-        marginsDisabled,
         contentExpandsToAvailableHeight,
         appbarComponent,
-        footerComponent,
         menuComponent,
         offlineComponent,
         children,
     } = props;
-    const margins = {
-        margin: '16px 24px',
-    };
     const mainBoxHeight = contentExpandsToAvailableHeight ? '100vh' : undefined;
     const childrenOrOfflineComponent = !offline ? children : offlineComponent;
     return <div style={{ display: 'flex', flexDirection: 'column', height: mainBoxHeight }}>
@@ -238,7 +230,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
         <div style={{
             display: 'flex',
             flexGrow: 1,
-            ...(!marginsDisabled ? margins : null)
+            minHeight: 0,
         }}>
             {menuComponent}
             <main style={{
@@ -248,7 +240,6 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                 {appReady ? childrenOrOfflineComponent : null}
             </main>
         </div>
-        {footerComponent}
     </div>;
 }
 
@@ -271,10 +262,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         contentComponentSlots,
         children,
     } = props;
-    // TODO: undo
     const { offline } = useResourceApiContext();
-    // const offline  = false;
-    const [marginsDisabled, setMarginsDisabled] = React.useState<boolean>(false);
     const [contentExpandsToAvailableHeight, setContentExpandsToAvailableHeight] = React.useState<boolean>(false);
     const getLinkComponent = () => linkComponent;
     const {
@@ -308,7 +296,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     } = useUserSession(code, persistentSession ?? false);
     const context = {
         getFormFieldComponent,
-        setMarginsDisabled,
         contentExpandsToAvailableHeight,
         setContentExpandsToAvailableHeight,
         getLinkComponent,
@@ -339,10 +326,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         <ContentComponentDefault
             offline={offline}
             appReady={appReady}
-            marginsDisabled={marginsDisabled}
             contentExpandsToAvailableHeight={contentExpandsToAvailableHeight}
             appbarComponent={contentComponentSlots.appbar}
-            footerComponent={contentComponentSlots.footer}
             menuComponent={contentComponentSlots.menu}
             offlineComponent={contentComponentSlots.offline}>
             {children}

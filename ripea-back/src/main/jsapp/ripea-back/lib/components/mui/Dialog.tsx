@@ -1,5 +1,8 @@
 import React from 'react';
-import {Dialog as MuiDialog, IconButton, DialogTitle, DialogContent, DialogContentText, Icon} from '@mui/material';
+import MuiDialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import { DialogButton, ContentDialogShowFn, MessageDialogShowFn } from '../BaseAppContext';
 import { useMessageDialogButtons, useConfirmDialogButtons } from '../AppButtons';
 import DialogButtons from './DialogButtons';
@@ -103,23 +106,12 @@ export const Dialog: React.FC<DialogProps> = (props) => {
         ref,
         children,
     } = props;
-
-    const closeSiNoClickFora = (event: React.MouseEvent, reason?: string) => {
-        if (reason === "backdropClick") return; // Evita cerrar por clic en fondo
-        closeCallback();
-    };
-
     return <MuiDialog
         open={open}
-        onClose={closeSiNoClickFora}
+        onClose={() => closeCallback()}
         ref={ref}
         {...componentProps}>
-        {<DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f5f5f5", borderBottom: "1px solid #e3e3e3", padding: "5px 24px" }}>
-            <span>{title?title:""}</span>
-            <IconButton onClick={() => closeCallback()} aria-label="close">
-                <Icon>close</Icon>
-            </IconButton>
-        </DialogTitle>}
+        {title && <DialogTitle>{title}</DialogTitle>}
         <DialogContent>{children}</DialogContent>
         {buttons && <DialogButtons
             buttons={buttons}

@@ -24,22 +24,20 @@ import { FormFieldRange } from './form/FormFieldRange';
 import { FormFieldFile } from './form/FormFieldFile';
 
 export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
-    title?: string | React.ReactElement;
-    footer?: React.ReactElement;
-    version?: string;
-    logo?: string;
-    logoStyle?: any;
+    headerTitle?: string;
+    headerVersion?: string;
+    headerLogo?: string;
+    headerLogoStyle?: any;
+    headerAppbarStyle?: any;
+    headerAppbarBackgroundColor?: string;
+    headerAppbarBackgroundImg?: string;
+    headerAdditionalComponents?: React.ReactElement | React.ReactElement[];
+    headerAdditionalAuthComponents?: React.ReactElement | React.ReactElement[];
     menuTitle?: string;
     menuEntries?: MenuEntry[];
     menuOnTitleClose?: () => void;
     menuShrinkDisabled?: boolean;
-    menuWidth?: number,
-    additionalHeaderComponents?: React.ReactElement | React.ReactElement[];
-    additionalAuthComponents?: React.ReactElement | React.ReactElement[];
-    appbarStyle?: any;
-    appbarBackgroundColor?: string;
-    appbarBackgroundImg?: string;
-    objectesSyncSessio?: any;
+    menuWidth?: number;
 };
 
 const baseFormFieldComponents = [{
@@ -145,24 +143,22 @@ const useMenu = (
 
 export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
     const {
-        title,
-        footer,
-        version,
-        logo,
-        logoStyle,
+        headerTitle,
+        headerVersion,
+        headerLogo,
+        headerLogoStyle,
+        headerAppbarStyle,
+        headerAppbarBackgroundColor,
+        headerAppbarBackgroundImg,
+        headerAdditionalComponents,
+        headerAdditionalAuthComponents,
         menuTitle,
         menuEntries,
         menuOnTitleClose,
         menuShrinkDisabled,
         menuWidth,
-        appbarStyle,
-        appbarBackgroundColor,
-        appbarBackgroundImg,
         formFieldComponents,
-        additionalHeaderComponents,
-        additionalAuthComponents,
         children,
-        objectesSyncSessio,
         ...otherProps
     } = props;
     const mergedFormFieldComponents = [...baseFormFieldComponents, ...(formFieldComponents ?? [])];
@@ -174,30 +170,30 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         menuEntries,
         menuOnTitleClose,
         menuWidth);
-    const appbarComponent = <AppBar
-        title={title}
-        version={version}
-        logo={logo}
-        logoStyle={logoStyle}
-        objectesSyncSessio={objectesSyncSessio}
+    const appbarComponent = headerTitle != null ? <AppBar
+        title={headerTitle}
+        version={headerVersion}
+        logo={headerLogo}
+        logoStyle={headerLogoStyle}
         menuButton={!menuShrinkDisabled && menuEntries != null ? menuButton : undefined}
-        additionalToolbarComponents={additionalHeaderComponents}
-        additionalAuthComponents={additionalAuthComponents}
-        style={appbarStyle}
-        backgroundColor={appbarBackgroundColor}
-        backgroundImg={appbarBackgroundImg} />;
+        additionalToolbarComponents={headerAdditionalComponents}
+        additionalAuthComponents={headerAdditionalAuthComponents}
+        style={headerAppbarStyle}
+        backgroundColor={headerAppbarBackgroundColor}
+        backgroundImg={headerAppbarBackgroundImg} /> : undefined;
     const offlineComponent = <OfflineMessage />;
     return <BaseApp
         formFieldComponents={mergedFormFieldComponents}
         {...otherProps}
         contentComponentSlots={{
             appbar: appbarComponent,
-            footer,
             menu: menuComponent,
             offline: offlineComponent,
         }}>
-        <MuiComponentsConfigurer />
-        {children}
+        <>
+            <MuiComponentsConfigurer />
+            {children}
+        </>
     </BaseApp>;
 }
 
