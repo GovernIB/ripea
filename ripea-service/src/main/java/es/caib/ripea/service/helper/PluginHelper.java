@@ -79,8 +79,10 @@ import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
@@ -89,8 +91,11 @@ import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternNoTrobatException;
@@ -256,7 +261,11 @@ public class PluginHelper {
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+	@Autowired private UsuariRepository usuariRepository;
 
     PluginHelper(UsuariHelper usuariHelper) {
         this.usuariHelper = usuariHelper;
@@ -3411,10 +3420,15 @@ public class PluginHelper {
 		}
 	}
 
-	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles(String idioma) {
+	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles() {
 
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		
+		if (idioma != null)
+			idioma = idioma.toLowerCase();
+		
 		accioParams.put("idioma",idioma);
 		List<DigitalitzacioPerfilDto> perfilsDto = new ArrayList<DigitalitzacioPerfilDto>();
 		DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
@@ -3738,23 +3752,25 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
-			UsuariDto usuariActual,
-			boolean filtrar) {
+	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(Long entitatId, boolean filtrar) {
 
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+		List<PortafirmesFluxRespostaDto> plantillesFiltrades = new ArrayList<PortafirmesFluxRespostaDto>();
 		List<PortafirmesFluxRespostaDto> respostesDto = new ArrayList<PortafirmesFluxRespostaDto>();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		try {
 			List<PortafirmesFluxResposta> plantilles = null;
 			if (filtrar) {
 				plantilles = portafirmesPlugin.recuperarPlantillesPerFiltre(
-						usuariActual.getIdioma(),
-						usuariActual.getCodi());
+						usuari.getIdioma(),
+						usuari.getCodi());
 			} else {
 				plantilles = portafirmesPlugin.recuperarPlantillesDisponibles(
-						usuariActual.getIdioma());
+						usuari.getIdioma());
 			}
 
 			if (plantilles != null) {
@@ -3768,6 +3784,33 @@ public class PluginHelper {
 							resposta);
 				}
 			}
+			
+			List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
+
+			for (PortafirmesFluxRespostaDto plantilla : respostesDto) {
+				boolean isCurrentUserTemplate = false;
+				boolean isUserTemplate = false;
+
+				for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
+					if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && fluxFirmaUsuari.getUsuari().equals(usuari)) {
+						// Plantilla usuari actual
+						isCurrentUserTemplate = true;
+						break;
+					} else if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && !isCurrentUserTemplate) {
+						// Plantilla d'un altre usuari (no mostrar al llistat)
+						isUserTemplate = true;
+						break;
+					}
+				}
+
+				// Plantilles usuari actual i plantilles comuns
+				if (isCurrentUserTemplate
+						|| (!isCurrentUserTemplate && !plantillesFiltrades.contains(plantilla)) && !isUserTemplate) {
+					plantilla.setUsuariActual(isCurrentUserTemplate);
+					plantillesFiltrades.add(plantilla);
+				}
+			}
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(

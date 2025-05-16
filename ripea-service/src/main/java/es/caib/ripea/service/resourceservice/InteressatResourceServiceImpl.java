@@ -77,7 +77,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
     }
 
-    public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
+    public class PaisFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName) {
 			List<PaisDto> paisos = cacheHelper.findPaisos();
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
@@ -103,7 +103,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 		}
 	}
     
-    public class PaisFieldOptionsProvider implements FieldOptionsProvider {
+    public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName) {
 			List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia("07");
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
