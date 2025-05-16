@@ -21,7 +21,7 @@ const commonStyle = { p: 0.5, display: 'flex', alignItems: 'center', borderRadiu
 const obertStyle = { border: '1px dashed #AAA', ...labelStyle }
 const tancatStyle = { backgroundColor: 'grey', color: 'white', ...labelStyle }
 
-const ExpedientGridForm = () => {
+export const ExpedientGridForm = () => {
     const { data }  = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -176,12 +176,12 @@ const ExpedientGrid = () => {
             flex: 0.5,
             renderCell: (params: any) => (<>
                 {!params.row?.valid && <Icon color={"warning"} title={t('page.expedient.alert.validation')}>warning</Icon>}
-                {params.row?.errorLastEnviament && <Icon color={"error"} title="enviaments"></Icon>}
-                {params.row?.errorLastNotificacio && <Icon color={"error"} title="notificacions">mail</Icon>}
-                {params.row?.ambEnviamentsPendents && <Icon color={"primary"} title="enviaments"></Icon>}
-                {params.row?.ambNotificacionsPendents && <Icon color={"primary"} title="notificacions">mail</Icon>}
-                {params.row?.alerta && <Icon color={"error"} title="alertes">warning</Icon>}
-                {params.row?.arxiuUuid == null && <Icon color={"error"} title="pendentGuardarArxiu">warning</Icon>}
+                {params.row?.errorEnviament && <Icon color={"error"} title={t('page.expedient.alert.errorEnviament')}>edit</Icon>}
+                {params.row?.errorNotificacio && <Icon color={"error"} title={t('page.expedient.alert.errorNotificacio')}>mail</Icon>}
+                {params.row?.ambEnviamentsPendents && <Icon color={"primary"} title={t('page.expedient.alert.ambEnviamentsPendents')}>edit</Icon>}
+                {params.row?.ambNotificacionsPendents && <Icon color={"primary"} title={t('page.expedient.alert.ambNotificacionsPendents')}>mail</Icon>}
+                {params.row?.alert && <Icon color={"error"} title={t('page.expedient.alert.alert')}>error</Icon>}
+                {params.row?.arxiuUuid == null && <Icon color={"error"} title={t('page.contingut.alert.guardarPendent')}>warning</Icon>}
             </>),
         },
         ...afterAvis,
@@ -233,7 +233,6 @@ const ExpedientGrid = () => {
                     onRowDoubleClick={(row:any) => navigate(`/contingut/${row?.id}`)}
                     rowAdditionalActions={actions}
                     paginationActive
-                    rowHideUpdateButton
 					rowHideDeleteButton
                     selectionActive
                     toolbarCreateTitle={t('page.expedient.acciones.nou')}

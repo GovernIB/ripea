@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import usePublicacioDetail from "./PublicacioDetail.tsx";
 
-const usePublicacioActions = (refresh?: () => void) => {
+const usePublicacioActions = () => {
     const { t } = useTranslation();
 
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = usePublicacioDetail();
@@ -12,6 +12,12 @@ const usePublicacioActions = (refresh?: () => void) => {
             icon: "info",
             showInMenu: true,
             onClick: handleDetallOpen,
+        },
+        {
+            title: t('common.update'),
+            icon: 'edit',
+            showInMenu: true,
+            clickShowUpdateDialog: true,
         },
     ];
 

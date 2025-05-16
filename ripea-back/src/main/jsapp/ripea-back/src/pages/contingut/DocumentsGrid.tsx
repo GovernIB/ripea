@@ -14,7 +14,7 @@ import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
-import {useUserSession} from "../../components/Session.tsx";
+import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const DocumentsGridForm = () => {
     const { data } = useFormContext();
@@ -105,7 +105,6 @@ const columns = [
 const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
-    const {value: user} = useUserSession();
 
     const dataGridApiRef = useMuiDataGridApiRef()
     const [treeView, setTreeView] = useState<boolean>(true);
@@ -115,7 +114,7 @@ const DocumentsGrid = (props:any) => {
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {createActions, actions, hiddenUpdate, hiddenDelete, components} = useContingutActions(entity, dataGridApiRef, refresh);
+    const {createActions, actions, hiddenDelete, components} = useContingutActions(entity, dataGridApiRef, refresh);
     const {actions: massiveActions, components: massiveComponents} = useContingutMassiveActions(entity, refresh);
 
     return <GridPage>
@@ -184,7 +183,7 @@ const DocumentsGrid = (props:any) => {
                     position: 3,
                     element: <MenuActionButton
                         id={'createDocument'}
-                        hidden={entity?.agafatPer?.id != user?.codi}
+                        hidden={!potModificar(entity)}
                         buttonLabel={t('page.contingut.acciones.create')}
                         buttonProps={{
                             startIcon: <Icon>add</Icon>,
@@ -199,7 +198,6 @@ const DocumentsGrid = (props:any) => {
             toolbarMassiveActions={massiveActions}
             isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
             toolbarHideCreate
-            rowHideUpdateButton={hiddenUpdate}
             rowHideDeleteButton={hiddenDelete}
         />
         {components}

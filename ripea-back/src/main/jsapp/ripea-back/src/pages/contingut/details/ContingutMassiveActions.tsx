@@ -4,6 +4,7 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useNotificarMassive from "../actions/NotificarMassive.tsx";
 import useCanviTipus from "../actions/CanviTipus.tsx";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
+import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const useMassiveActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
@@ -44,16 +45,19 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
             title: t('page.document.acciones.notificar'),
             icon: "mail",
             onClick: handleNotificar,
+            hidden: !potModificar(entity),
         },
         {
             title: t('page.document.acciones.move'),
             icon: "open_with",
             onClick: (ids:any[])=>handleMoure(ids, entity),
+            hidden: !potModificar(entity),
         },
         {
             title: t('page.document.acciones.changeType'),
             icon: "edit",
             onClick: handleCanviTipus,
+            hidden: !potModificar(entity),
         },
     ]
 

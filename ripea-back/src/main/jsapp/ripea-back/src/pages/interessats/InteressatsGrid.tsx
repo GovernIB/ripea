@@ -7,10 +7,10 @@ import {
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {useUserSession} from "../../components/Session.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
+import {potModificar} from "../expedient/details/Expedient.tsx";
 
 export const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -63,7 +63,6 @@ interface DetailGridProps {
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {entity, onRowCountChange} = props
     const { t } = useTranslation();
-    const {value: user} = useUserSession();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
     const apiRef = useMuiDataGridApiRef()
@@ -72,8 +71,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
         apiRef?.current?.refresh()
     }
 
-    const readOnly = entity?.agafatPer?.id != user?.codi
-    const {actions, components} = useInteressatActions(readOnly, refresh)
+    const {actions, components} = useInteressatActions(entity, refresh)
     const {exportar} = useActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
 
@@ -99,7 +97,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             toolbarCreateTitle={t('page.interessat.actions.new')}
-            readOnly={readOnly}
+            toolbarHideCreate={!potModificar(entity)}
             rowHideDeleteButton
 
             selectionActive
@@ -119,7 +117,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     position: 0,
                     element: <ToolbarButton icon={'download'}
                                             onClick={()=>handleImport()}
-                                            hidden={readOnly}
+                                            hidden={!potModificar(entity)}
                     >{t('common.import')}...</ToolbarButton>
                 },
             ]}

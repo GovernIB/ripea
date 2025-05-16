@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const DadaForm = () => {
     const { data }  = useFormContext();
@@ -69,7 +70,8 @@ const DataGrid = (props:any) => {
         }}
         autoHeight
         // height={162 + 52 * 4}
-        toolbarHideCreate={ numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        toolbarHideCreate={ !potModificar(contingut) || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        rowHideDeleteButton={false}
     />
 }
 const useDataGrid = (contingut:any, refresh?:() => void) => {

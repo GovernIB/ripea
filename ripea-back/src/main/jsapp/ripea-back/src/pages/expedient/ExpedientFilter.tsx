@@ -1,12 +1,10 @@
-import {
-    useFilterApiRef, useFormApiRef, useFormContext,
-} from 'reactlib';
 import {Grid} from "@mui/material";
-import {formatIso} from '../../util/dateUtils';
-import * as builder from '../../util/springFilterUtils';
-import GridFormField from "../../components/GridFormField.tsx";
+import {useFormContext,} from 'reactlib';
+import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
+import {formatIso} from '../../util/dateUtils';
+import * as builder from '../../util/springFilterUtils';
 
 const ExpedientFilterForm = (props:any) => {
     const {data} = useFormContext()
@@ -32,10 +30,11 @@ const ExpedientFilterForm = (props:any) => {
         <GridFormField xs={3} name="grup"/>
         <GridFormField xs={3} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
 
-        <Grid item xs={user?.rolActual == "tothom" ?6 :4}></Grid>
-        <GridFormField xs={2} name="agafat" type={"checkbox"}/>
-        <GridFormField xs={2} name="pendentFirmar" type={"checkbox"}/>
-        <GridFormField xs={2} name="seguit" type={"checkbox"} hidden={user?.rolActual != "tothom"}/>
+        <Grid item xs={user?.rolActual == "tothom" ?6 :3}></Grid>
+
+        <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
+        <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
+        <GridButtonField xs={1} name={'seguit'} icon={'group_add'} hidden={user?.rolActual != "tothom"}/>
     </>
 }
 
@@ -82,16 +81,14 @@ const springFilterBuilder = (data: any) :string => {
 
 const ExpedientFilter = (props:any) => {
     const {onSpringFilterChange} = props;
-    const filterRef = useFilterApiRef();
-    const formApiRef = useFormApiRef();
 
     const { value: user } = useUserSession();
 
     const additionalSpringFilterBuilder = (data: any) :string => {
         return builder.and(
             springFilterBuilder(data),
-            data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`),
-            data.seguit && (
+            (user?.rolActual != "tothom") && data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`),
+            (user?.rolActual == "tothom") && data.seguit && (
                 builder.exists(
                     builder.eq("seguidors.codi", `'${user.codi}'`)
                 )
@@ -102,8 +99,6 @@ const ExpedientFilter = (props:any) => {
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        apiRef={filterRef}
-        formApiRef={formApiRef}
         componentProps={{ style: {minHeight: '206px' } }}
         springFilterBuilder={additionalSpringFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}

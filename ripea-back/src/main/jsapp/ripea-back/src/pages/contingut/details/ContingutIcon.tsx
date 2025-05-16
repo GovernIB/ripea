@@ -32,15 +32,16 @@ const DocumentIcon = (props:any) => {
         {/*{entity?.expedient && entity?.estat == 'OBERT' && <Icon>O</Icon>}*/}
         {/*{entity?.expedient && entity?.estat != 'OBERT' && <Icon>T</Icon>}*/}
 
-        {isInOptions(extension, 'pdf') && <Icon>picture_as_pdf</Icon>}
-        {isInOptions(extension, 'doc', 'docx', 'odt') && <Icon>description</Icon>}
-        {isInOptions(extension, 'xls', 'xlsx', 'ods') && <Icon>description</Icon>}
-        {isInOptions(extension, 'zip') && <Icon>folder_zip</Icon>}
-        {isInOptions(extension, 'xsig', 'xml', 'json', 'html') && <Icon>folder_code</Icon>}
-        {isInOptions(extension, 'jpeg', 'png', 'bmp', 'jpg') && <Icon>image</Icon>}
-        {isInOptions(extension, 'txt') && <Icon>description</Icon>}
-        {isInOptions(extension, 'mp3', 'wav') && <Icon>audio_file</Icon>}
-        {isInOptions(extension, 'mpeg', 'avi') && <Icon>video_file</Icon>}
+        {isInOptions(extension, 'pdf') ?<Icon>picture_as_pdf</Icon>
+        :isInOptions(extension, 'doc', 'docx', 'odt') ?<Icon>description</Icon>
+        :isInOptions(extension, 'xls', 'xlsx', 'ods') ?<Icon>description</Icon>
+        :isInOptions(extension, 'zip') ?<Icon>folder_zip</Icon>
+        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon>folder_code</Icon>
+        :isInOptions(extension, 'jpeg', 'png', 'bmp', 'jpg') ?<Icon>image</Icon>
+        :isInOptions(extension, 'txt') ?<Icon>description</Icon>
+        :isInOptions(extension, 'mp3', 'wav') ?<Icon>audio_file</Icon>
+        :isInOptions(extension, 'mpeg', 'avi') ?<Icon>video_file</Icon>
+        :<Icon title={t('page.document.title')} >description</Icon>}
 
         {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')}>info</Icon>}
         {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')}>B</Icon>}
@@ -81,7 +82,7 @@ const DocumentIcon = (props:any) => {
             <Icon title={t('page.document.alert.errorPortafirmes')} color={"error"}>edit</Icon>}
 
         {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
-            <Icon title={t('page.document.alert.guardarPendent')} color={"warning"}>warning</Icon>}
+            <Icon title={t('page.contingut.alert.guardarPendent')} color={"warning"}>warning</Icon>}
     </>
 }
 const CarpetaIcon = (props:any) => {

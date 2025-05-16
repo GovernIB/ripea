@@ -11,6 +11,7 @@ import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useEntitatSession, useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/CommonActions.tsx";
+import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
@@ -30,12 +31,10 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
+export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
     const { t } = useTranslation();
-    const { value: user, permisos } = useUserSession()
+    const { value: user } = useUserSession()
     const { value: entitat } = useEntitatSession()
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
 
     const {apiDownload} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
@@ -57,14 +56,6 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
     const isFirmaActiva = (row:any) => {
         return isInOptions(row?.estat, 'REDACCIO', 'FIRMA_PARCIAL') && isDigitalOrImportat(row) && !isInOptions(row?.fitxerExtension, 'zip')
     }
-
-    // Expedient
-    const isTancat= () => expedient?.estat != "OBERT"
-    const isAgafatUsuariActual = () => expedient?.agafatPer?.id == user?.codi
-    const isAdminOAdminOrgan = () => (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == expedient?.organGestor?.id) )
-    const isUsuariActualWrite = () => expedient?.usuariActualWrite
-    const potModificar = () => (isAgafatUsuariActual() && isUsuariActualWrite() || isAdminOAdminOrgan()) && !isTancat();
-    // //
 
     const isInOptions = (value:string, ...options:string[]) => {
         return options.includes(value)
@@ -96,24 +87,32 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
             onClick: handleDetallOpen,
         },
         {
+            title: t('common.update'),
+            icon: 'edit',
+            showInMenu: true,
+            clickShowUpdateDialog: true,
+            disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
+            hidden: (row:any) => !potModificar(entity) || !isDocument(row) || !permesModificarCustodiats || isInOptions(row?.estat, 'FIRMA_PENDENT'),
+        },
+        {
             title: t('page.document.acciones.move'),
             icon: "open_with",
             showInMenu: true,
             onClick: handleMoureShow,
             disabled: (row:any) => row?.gesDocAdjuntId!=null,
-            hidden: !potModificar(),
+            hidden: !potModificar(entity),
         },
         {
             title: t('common.copy')+"...",
             icon: "file_copy",
             showInMenu: true,
-            hidden: !potModificar() || !user?.sessionScope?.isMostrarCopiar,
+            hidden: !potModificar(entity) || !user?.sessionScope?.isMostrarCopiar,
         },
         {
             title: t('page.document.acciones.vincular'),
             icon: "link",
             showInMenu: true,
-            hidden: !potModificar() || !user?.sessionScope?.isMostrarVincular,
+            hidden: !potModificar(entity) || !user?.sessionScope?.isMostrarVincular,
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
@@ -122,29 +121,30 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
         {
             title: t('page.document.acciones.imprimible'),
             icon: "download",
-			onClick: (id:any) => apiDownload(id, 'imprimible'),
             showInMenu: true,
-            hidden: (row:any) => !isDigitalOrImportat(row) || isInOptions(row?.estat, 'DEFINITIU', 'FIRMA_PARCIAL') || isInOptions(row?.fitxerExtension, 'xsig') || user?.sessionScope?.imprimibleNoFirmats,
+			onClick: (id:any) => apiDownload(id, 'imprimible'),
+            disabled: (row:any) => isInOptions(row?.fitxerExtension, 'xsig'),
+            hidden: (row:any) => !isDigitalOrImportat(row) || !(isInOptions(row?.estat, 'DEFINITIU', 'FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
         },
         {
             title: t('common.download'),
             icon: "download",
-			onClick: (id:any) => apiDownload(id, 'adjunt'),
             showInMenu: true,
+			onClick: (id:any) => apiDownload(id, 'adjunt'),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {
             title: t('page.document.acciones.original'),
             icon: "download",
-			onClick: (id:any) => apiDownload(id, 'original'),
             showInMenu: true,
+			onClick: (id:any) => apiDownload(id, 'original'),
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
             title: t('page.document.acciones.firma'),
             icon: "download",
-			onClick: (id:any) => apiDownload(id, 'firmaAdjunt'),
             showInMenu: true,
+			onClick: (id:any) => apiDownload(id, 'firmaAdjunt'),
             hidden: (row:any) => !isDigitalOrImportat(row) || row?.ntiTipoFirma != "TF04"
         },
         {
@@ -165,38 +165,38 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
             icon: "mail",
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
-            // disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            // hidden : (row:any) => !potModificar() || !row?.metaNode?.firmaPortafirmesActiva || !isFirmaActiva(row),
+            disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
+            hidden : (row:any) => !potModificar(entity) || !row?.metaNode?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.firmar'),
             icon: "edit_document",
             showInMenu: true,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potModificar() || !row?.metaNode?.firmaPassarelaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !potModificar(entity) || !row?.metaNode?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.viaFirma'),
             icon: "edit_document",
             showInMenu: true,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potModificar() || !row?.metaNode?.firmaBiometricaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !potModificar(entity) || !row?.metaNode?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
-            title: expedient?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
+            title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
                 ? t('page.document.acciones.notificar')
                 : t('page.document.acciones.comunicar'),
             icon: "mail",
             showInMenu: true,
             onClick: handleNotificarShow,
-            hidden: (row:any) => !potModificar() || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
+            hidden: (row:any) => !potModificar(entity) || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
         },
         {
             title: t('page.document.acciones.publicar'),
             icon: "publish",
             showInMenu: true,
             onClick: handlePublicarShow,
-            hidden: (row:any) => !potModificar() || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
+            hidden: (row:any) => !potModificar(entity) || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
         },
         {
             title: t('page.document.acciones.mail'),
@@ -258,8 +258,7 @@ export const useContingutActions = (expedient:any, apiRef:MuiDataGridApiRef, ref
             ...documentActions,
             ...expedientActions
         ],
-        hiddenUpdate: (row:any) => !potModificar() || !isDocument(row) || !permesModificarCustodiats || (row?.arxiuUuid==null || row?.gesDocFirmatId != null) || !isInOptions(row?.estat, 'CUSTODIAT', 'FIRMAT', 'FIRMA_PARCIAL', 'DEFINITIU'),
-        hiddenDelete: (row:any) => !potModificar() || !isDocument(row),
+        hiddenDelete: (row:any) => !potModificar(entity) || !isDocument(row),
         components
     }
 }

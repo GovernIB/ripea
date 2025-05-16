@@ -126,7 +126,8 @@ const translationCa = {
             },
             alert: {
                 valid: "Aquest contingut té errors de validació",
-                metaNode: "Aquest document no té assignat un tipus de document"
+                metaNode: "Aquest document no té assignat un tipus de document",
+                guardarPendent: "Pendent de gordar en arxivo",
             },
         },
         anotacio: {
@@ -281,6 +282,10 @@ const translationCa = {
                 borradors: "Aquest expedient conté esborranys que s'eliminaran en tancar-lo. A continuació teniu l'opció de marcar els esborranys perquè siguin signats amb signatura de servidor abans del tancament de l'expedient i així evitar-ne l'eliminació. Si els documents contenen alguna signatura invàlida, aquestes s'eliminaran i es tornarà a signar el document al servidor.",
                 notificacio: "Aquest expedient conté notificacions caducades no finalitzades. S'intentarà actualitzar-ne l'estat. Si arriba nova informació de les notificacions pendents, es desarà el certificat a l'Helium, però no a l'Arxiu digital.",
                 documents: "Aquest expedient conté documents d'annexos d'anotacions amb errors. S'intentaran reprocessar en tancar-lo i, en cas que no sigui possible moure'ls, se'n desarà una còpia a l'Arxiu digital sense les signatures originals (tant el document original com la còpia es podran continuar consultant des de la pestanya de contingut de l'expedient).",
+                errorEnviament: "Aquest expedient té enviaments amb errors",
+                errorNotificacio: "Aquest expedient té notificacions amb errors",
+                ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portafirmes",
+                ambNotificacionsPendents: "Aquest expedient té notificacions pendents",
             },
             modal: {
                 seguidors: "Seguidors del expedient",
@@ -355,6 +360,7 @@ const translationCa = {
                 csv: "CSV",
                 csvRegulacion: "Regulació del CSV",
                 tipoFirma: "Tipus de firma",
+                flux: "Existeix un flux de firma predefinit. La creació d’un nou flux de firma implica sobreescriure el seleccionat.",
             },
             acciones: {
                 pinbal: "Consulta PINBAL...",
@@ -403,7 +409,6 @@ const translationCa = {
                 firmaPendent: "Pendent de firmar",
                 firmaParcial: "Firmat parcialment",
                 errorPortafirmes: "Error a l'enviar al portafirmes",
-                guardarPendent: "Pendent de gordar en arxivo",
             },
             versio: {
                 title: "Versió",
