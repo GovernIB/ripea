@@ -51,6 +51,7 @@ export type BaseAppProps = React.PropsWithChildren & {
 export type BaseAppContentComponentProps = React.PropsWithChildren & {
     offline: boolean;
     appReady: boolean;
+    marginsDisabled: boolean;
     contentExpandsToAvailableHeight: boolean;
     appbarComponent?: React.ReactElement;
     menuComponent?: React.ReactElement;
@@ -217,6 +218,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
     const {
         offline,
         appReady,
+        marginsDisabled,
         contentExpandsToAvailableHeight,
         appbarComponent,
         menuComponent,
@@ -231,6 +233,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
             display: 'flex',
             flexGrow: 1,
             minHeight: 0,
+            ...(!marginsDisabled ? { margin: '16px 24px' } : null)
         }}>
             {menuComponent}
             <main style={{
@@ -263,6 +266,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         children,
     } = props;
     const { offline } = useResourceApiContext();
+    const [marginsDisabled, setMarginsDisabled] = React.useState<boolean>(false);
     const [contentExpandsToAvailableHeight, setContentExpandsToAvailableHeight] = React.useState<boolean>(false);
     const getLinkComponent = () => linkComponent;
     const {
@@ -296,6 +300,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     } = useUserSession(code, persistentSession ?? false);
     const context = {
         getFormFieldComponent,
+        setMarginsDisabled,
         contentExpandsToAvailableHeight,
         setContentExpandsToAvailableHeight,
         getLinkComponent,
@@ -326,6 +331,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         <ContentComponentDefault
             offline={offline}
             appReady={appReady}
+            marginsDisabled={marginsDisabled}
             contentExpandsToAvailableHeight={contentExpandsToAvailableHeight}
             appbarComponent={contentComponentSlots.appbar}
             menuComponent={contentComponentSlots.menu}

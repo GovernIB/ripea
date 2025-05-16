@@ -27,7 +27,7 @@ export type DialogButton = {
 
 export type BaseAppContextType = {
     getFormFieldComponent: (type?: string) => React.FC<FormFieldCustomProps> | undefined;
-    //setMarginsDisabled: (marginsDisabled: boolean) => void;
+    setMarginsDisabled: (marginsDisabled: boolean) => void;
     contentExpandsToAvailableHeight: boolean;
     setContentExpandsToAvailableHeight: (expand: boolean) => void;
     getLinkComponent: () => any;
