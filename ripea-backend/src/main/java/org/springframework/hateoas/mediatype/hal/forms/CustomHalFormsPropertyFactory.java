@@ -126,7 +126,6 @@ public class CustomHalFormsPropertyFactory {
 						metadata.getName(),
 						Size.class);
 				if (size != null && String.class.isAssignableFrom(resolvedType)) {
-					inputType = "text";
 					minValue = null;
 					maxValue = null;
 				}

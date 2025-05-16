@@ -125,6 +125,15 @@ public class HalFormsConfig {
 									field,
 									resourceControllerClasses),
 							this::isResourceReferenceTypeMultipleAware);
+					ReflectionUtils.doWithFields(
+							artifact.formClass(),
+							field -> configurationWithFieldEnumOptions(
+									halFormsConfigurationHolder,
+									resourceClass,
+									artifact,
+									field,
+									resourceControllerClasses),
+							this::isFieldEnumOptions);
 				}
 
 			}
@@ -320,9 +329,17 @@ public class HalFormsConfig {
 					return controllerResourceClass.equals(resourceClass);
 				}).findFirst();
 		if (resourceControllerClass.isPresent()) {
-			Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)((Class<?>)resourceControllerClass.get());
-			return linkTo(methodOn(mutableResourceControllerClass).fieldEnumOptionsFindAll(resourceField.getName())).
-					withRel(IanaLinkRelations.SELF_VALUE);
+			if (artifact == null) {
+				Class<MutableResourceController> mutableResourceControllerClass = (Class<MutableResourceController>)((Class<?>)resourceControllerClass.get());
+				return linkTo(methodOn(mutableResourceControllerClass).fieldEnumOptionsFind(resourceField.getName())).
+						withRel(IanaLinkRelations.SELF_VALUE);
+			} else {
+				return linkTo(methodOn(resourceControllerClass.get()).artifactFieldEnumOptionsFind(
+						artifact.type(),
+						artifact.code(),
+						resourceField.getName())).
+						withRel(IanaLinkRelations.SELF_VALUE);
+			}
 		} else {
 			Class<?> referencedResourceClass = TypeUtil.getReferencedResourceClass(resourceField);
 			log.error("Couldn't find resource controller class from field (" +

@@ -158,17 +158,17 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 	 *            nom del camp del recurs.
 	 * @return la llista d'opcions disponibles.
 	 */
-	ResponseEntity<CollectionModel<EntityModel<FieldOption>>> fieldEnumOptionsFindAll(
+	ResponseEntity<CollectionModel<EntityModel<FieldOption>>> fieldEnumOptionsFind(
 			final String fieldName);
 
 	/**
-	 * Consulta les opcions disponibles per a un camp de tipus enumerat.
+	 * Consulta una de les opcions disponibles per a un camp de tipus enumerat.
 	 *
 	 * @param fieldName
 	 *            nom del camp del recurs.
 	 * @param value
 	 *            valor de l'enumerat a retornar.
-	 * @return la llista d'opcions disponibles.
+	 * @return l'opció demanada.
 	 */
 	ResponseEntity<EntityModel<FieldOption>> fieldEnumOptionsGetOne(
 			final String fieldName,

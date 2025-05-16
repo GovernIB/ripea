@@ -165,42 +165,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	}
 
 	@Override
-	protected <P extends Serializable> void internalArtifactOnChange(
-			ResourceArtifactType type,
-			String code,
-			Serializable id,
-			P previous,
-			String fieldName,
-			Object fieldValue,
-			Map<String, AnswerRequiredException.AnswerValue> answers,
-			String[] previousFieldsChanged,
-			P target) {
-		super.internalArtifactOnChange(
-				type,
-				code,
-				id,
-				previous,
-				fieldName,
-				fieldValue,
-				answers,
-				previousFieldsChanged,
-				target);
-		if (type == ResourceArtifactType.ACTION) {
-			ActionExecutor<E, P, ?> actionExecutor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
-			if (actionExecutor != null) {
-				actionExecutor.onChange(
-						id,
-						previous,
-						fieldName,
-						fieldValue,
-						answers,
-						previousFieldsChanged,
-						target);
-			}
-		}
-	}
-
-	@Override
 	@Transactional
 	public <P extends Serializable> Serializable artifactActionExec(ID id, String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
 		log.debug("Executing action (id={}, code={}, params={})", id, code, params);
@@ -224,6 +188,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		if (fieldOptionsProvider != null) {
 			return fieldOptionsProvider.getOptions(fieldName);
 		} else {
+			log.warn("Couldn't find FieldOptionsProvider (resourceClass={}, fieldName={})", getResourceClass(), fieldName);
 			return null;
 		}
 	}
@@ -310,6 +275,55 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 					previousFieldsChanged,
 					target);
 		}
+	}
+
+	@Override
+	protected <P extends Serializable> void internalArtifactOnChange(
+			ResourceArtifactType type,
+			String code,
+			Serializable id,
+			P previous,
+			String fieldName,
+			Object fieldValue,
+			Map<String, AnswerRequiredException.AnswerValue> answers,
+			String[] previousFieldsChanged,
+			P target) {
+		super.internalArtifactOnChange(
+				type,
+				code,
+				id,
+				previous,
+				fieldName,
+				fieldValue,
+				answers,
+				previousFieldsChanged,
+				target);
+		if (type == ResourceArtifactType.ACTION) {
+			ActionExecutor<E, P, ?> actionExecutor = (ActionExecutor<E, P, ?>)actionExecutorMap.get(code);
+			if (actionExecutor != null) {
+				actionExecutor.onChange(
+						id,
+						previous,
+						fieldName,
+						fieldValue,
+						answers,
+						previousFieldsChanged,
+						target);
+			}
+		}
+	}
+
+	@Override
+	protected BaseMutableResourceService.FieldOptionsProvider artifactGetFieldOptionsProvider(
+			ResourceArtifactType type,
+			String code) {
+		BaseMutableResourceService.FieldOptionsProvider fieldOptionsProvider = null;
+		if (type == ResourceArtifactType.ACTION) {
+			fieldOptionsProvider = actionExecutorMap.get(code);
+		} else {
+			fieldOptionsProvider = super.artifactGetFieldOptionsProvider(type, code);
+		}
+		return fieldOptionsProvider;
 	}
 
 	protected ID buildPkChechingIfEntityAlreadyExists(R resource) {
@@ -569,7 +583,8 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 * @param <P> classe dels paràmetres necessaris per a executar l'acció.
 	 * @param <R> classe de la resposta retornada com a resultat.
 	 */
-	public interface ActionExecutor<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable> extends OnChangeLogicProcessor<P> {
+	public interface ActionExecutor<E extends ResourceEntity<?, ?>, P extends Serializable, R extends Serializable>
+			extends OnChangeLogicProcessor<P>, FieldOptionsProvider {
 		/**
 		 * Executa l'acció.
 		 *
@@ -585,6 +600,10 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		 *             si es produeix algun error generant les dades.
 		 */
 		R exec(String code, E entity, P params) throws ActionExecutionException;
+		@Override
+		default List<FieldOption> getOptions(String fieldName) {
+			return new ArrayList<>();
+		}
 	}
 
 	/**
