@@ -10,6 +10,7 @@ import { useFormFieldCommon } from './FormFieldText';
 type FormFieldEnumProps = FormFieldCustomProps & {
     multiple?: boolean;
     hiddenEnumValues?: string[];
+    requestParams?: any;
 };
 
 export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
@@ -27,6 +28,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         componentProps,
         multiple: multipleProp,
         hiddenEnumValues,
+        requestParams,
     } = props;
     const { requestHref } = useResourceApiContext();
     const [open, setOpen] = React.useState(false);
@@ -52,8 +54,9 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             const dataSource = field.dataSource;
             const valueField = dataSource.valueField;
             const labelField = dataSource.labelField;
-            const templateData = {};
-            requestHref(dataSource, templateData).then((state) => {
+            const templateData = requestParams;
+            const href = dataSource.href + (templateData != null ? '{?' + Object.keys(templateData).join(',') + '}' : '');
+            requestHref(href, templateData).then((state) => {
                 const options: any = {};
                 state.getEmbedded().forEach(e => {
                     options[e.data[valueField]] = e.data[labelField];
