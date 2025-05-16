@@ -85,6 +85,7 @@ import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
@@ -207,7 +208,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	}
     	return null;
     }
-    
+
     @Override
     protected void afterConversion(DocumentResourceEntity entity, DocumentResource resource) {
         if(entity.getMetaNode()!=null) {
@@ -230,6 +231,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+        resource.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
     }
 
     // PerspectiveApplicator
@@ -441,7 +443,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     if (signatureInfoDto.isSigned()) {
                         target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
                         if (signatureInfoDto.isError() && !answers.containsKey(ERROR_SIGNATURE_VALIDATION)) {
-                            throw new AnswerRequiredException(InteressatResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
+                            throw new AnswerRequiredException(DocumentResource.class, ERROR_SIGNATURE_VALIDATION, signatureInfoDto.getErrorMsg());
                         }
                     }
                 }

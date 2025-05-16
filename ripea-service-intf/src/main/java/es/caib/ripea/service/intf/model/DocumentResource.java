@@ -222,6 +222,7 @@ public class DocumentResource extends NodeResource {
     @Transient private boolean documentDeAnotacio;
     @Transient private boolean ambNotificacions;
     @Transient private boolean isFuncionariHabilitatDigitalib;
+    @Transient private boolean isPluginSummarizeActiu;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private DigitalitzacioPerfilDto digitalitzacioPerfil;
     
