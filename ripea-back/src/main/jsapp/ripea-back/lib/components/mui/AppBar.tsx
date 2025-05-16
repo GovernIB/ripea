@@ -8,7 +8,7 @@ import { useOptionalAuthContext } from '../AuthContext';
 import { toolbarBackgroundStyle } from '../../util/toolbar';
 
 type AppBarProps = {
-    title: string;
+    title: string | React.ReactElement;
     version?: string;
     logo?: string;
     logoStyle?: any;

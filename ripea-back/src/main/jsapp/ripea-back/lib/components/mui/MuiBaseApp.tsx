@@ -24,7 +24,7 @@ import { FormFieldRange } from './form/FormFieldRange';
 import { FormFieldFile } from './form/FormFieldFile';
 
 export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
-    headerTitle?: string;
+    headerTitle?: string | React.ReactElement;
     headerVersion?: string;
     headerLogo?: string;
     headerLogoStyle?: any;
@@ -33,6 +33,7 @@ export type MuiBaseAppProps = Omit<BaseAppProps, 'contentComponentSlots'> & {
     headerAppbarBackgroundImg?: string;
     headerAdditionalComponents?: React.ReactElement | React.ReactElement[];
     headerAdditionalAuthComponents?: React.ReactElement | React.ReactElement[];
+    footer?: React.ReactElement;
     menuTitle?: string;
     menuEntries?: MenuEntry[];
     menuOnTitleClose?: () => void;
@@ -152,6 +153,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         headerAppbarBackgroundImg,
         headerAdditionalComponents,
         headerAdditionalAuthComponents,
+        footer,
         menuTitle,
         menuEntries,
         menuOnTitleClose,
@@ -187,6 +189,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
         {...otherProps}
         contentComponentSlots={{
             appbar: appbarComponent,
+            footer,
             menu: menuComponent,
             offline: offlineComponent,
         }}>

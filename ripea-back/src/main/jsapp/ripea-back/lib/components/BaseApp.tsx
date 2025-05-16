@@ -26,6 +26,7 @@ type I18nAddResourceBundleCallback = (lang: string, ns: string, bundle: any) => 
 
 type ContentComponentSlots = {
     appbar?: React.ReactElement;
+    footer?: React.ReactElement;
     menu?: React.ReactElement;
     offline: React.ReactElement;
 };
@@ -54,6 +55,7 @@ export type BaseAppContentComponentProps = React.PropsWithChildren & {
     marginsDisabled: boolean;
     contentExpandsToAvailableHeight: boolean;
     appbarComponent?: React.ReactElement;
+    footerComponent?: React.ReactElement;
     menuComponent?: React.ReactElement;
     offlineComponent?: React.ReactElement;
     legacyMargins?: boolean;
@@ -221,6 +223,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
         marginsDisabled,
         contentExpandsToAvailableHeight,
         appbarComponent,
+        footerComponent,
         menuComponent,
         offlineComponent,
         children,
@@ -232,7 +235,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
         <div style={{
             display: 'flex',
             flexGrow: 1,
-            minHeight: 0,
+            minWidth: 0,
             ...(!marginsDisabled ? { margin: '16px 24px' } : null)
         }}>
             {menuComponent}
@@ -243,6 +246,7 @@ const ContentComponentDefault: React.FC<BaseAppContentComponentProps> = (props) 
                 {appReady ? childrenOrOfflineComponent : null}
             </main>
         </div>
+        {footerComponent}
     </div>;
 }
 
@@ -334,6 +338,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             marginsDisabled={marginsDisabled}
             contentExpandsToAvailableHeight={contentExpandsToAvailableHeight}
             appbarComponent={contentComponentSlots.appbar}
+            footerComponent={contentComponentSlots.footer}
             menuComponent={contentComponentSlots.menu}
             offlineComponent={contentComponentSlots.offline}>
             {children}

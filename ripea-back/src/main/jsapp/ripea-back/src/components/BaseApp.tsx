@@ -23,7 +23,7 @@ import uenegroma from '../assets/uenegroma.png';
 import feder7 from '../assets/feder7.png';
 import una_manera from '../assets/una_manera.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
-import {useAlertesSessio} from "../components/Session.tsx";
+//import {useAlertesSessio} from "../components/Session.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -128,17 +128,25 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
-    const { value } = useAlertesSessio();
-
+    //const { value } = useAlertesSessio();
     return <MuiBaseApp
         code={code}
-        logo={logo}
-        logoStyle={logoStyle}
-        appbarStyle={style}
-        title={title}
+        headerTitle={title}
+        headerLogo={logo}
+        headerLogoStyle={logoStyle}
+        headerVersion={version}
+        headerAppbarStyle={style}
+        headerAppbarBackgroundColor={appbarBackgroundColor}
+        headerAppbarBackgroundImg={appbarBackgroundImg}
+        headerAdditionalComponents={[<UserHeadToolbar/>]}
+        headerAdditionalAuthComponents={availableLanguages?.length ? [
+            <AuthLanguageSelector
+                key="sel_lang"
+                languages={availableLanguages}
+                sx={{ mr: 2 }} />
+        ] : undefined}
         footer={<Footer title="RIPEA" version={version} logos={[uenegroma,feder7,una_manera]}/>}
-        version={version}
-        objectesSyncSessio={value}
+        //objectesSyncSessio={value}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}
@@ -150,18 +158,12 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         routerUseLocationPath={useLocationPath}
         routerAnyHistoryEntryExist={anyHistoryEntryExist}
         linkComponent={Link}
-        menuEntries={baseAppMenuEntries}
-        additionalHeaderComponents={[<UserHeadToolbar/>]}
-        additionalAuthComponents={availableLanguages?.length ? [
-            <AuthLanguageSelector
-                key="sel_lang"
-                languages={availableLanguages}
-                sx={{ mr: 2 }} />
-        ] : undefined}
-        appbarBackgroundColor={appbarBackgroundColor}
-        appbarBackgroundImg={appbarBackgroundImg}>
+        menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
-            {children}
+            <div style={{ margin: '16px 24px' }}>
+                <button>Hola</button>
+                {children}
+            </div>
         </CustomLocalizationProvider>
     </MuiBaseApp>;
 }
