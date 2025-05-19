@@ -128,7 +128,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE, new FollowActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE, new UnFollowActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_DELETE_CODE, new DeleteActionExecutor());
-
+        register(ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE, new ReobrirActionExecutor());
+        
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
@@ -550,6 +551,30 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         @Override
         public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
+    }
+    
+    private class ReobrirActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+			try {
+				String entitatActual = configHelper.getEntitatActualCodi();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+	        	if (params.isMassivo()) {
+	        		//TODO: No soportat
+	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de reobrir expedient massiu no esta soportada.");
+	        	} else {
+	        		expedientHelper.reobrir(entitatEntity.getId(), params.getIds().get(0));
+	        	}
+	        	return null;
+			} catch (Exception ex) {
+				excepcioLogHelper.addExcepcio("/expedient/ReobrirActionExecutor", ex);
+				throw new ActionExecutionException(getResourceClass(), null, code, ex.getMessage());
+			}
+		}
     }
     
     private class DeleteActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {

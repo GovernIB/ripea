@@ -2088,6 +2088,35 @@ public class ExpedientHelper {
 		return document;
 	}
 	
+	public void reobrir(Long entitatId, Long id) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				id,
+				true,
+				false,
+				true,
+				false,
+				false,
+				null);
+		
+		if (!configHelper.getAsBoolean(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT))
+			throw new ValidationException("La reobertura d'expedients no està activa");
+
+		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
+		
+		if (configHelper.getAsBoolean(PropertyConfig.TANCAMENT_LOGIC) && expedient.getTancatData() != null)
+			throw new ValidationException("La reobertura d'aquest expedient no és possible. Està tancat a l'arxiu.");
+		
+		if (expedient.isTancamentProgramat()) // Tancat en diferit
+			expedient.removeTancamentProgramat();
+
+		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
+		
+		if (!configHelper.getAsBoolean(PropertyConfig.TANCAMENT_LOGIC))
+			pluginHelper.arxiuExpedientReobrir(expedient);
+		
+		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
+	}
+	
 	private String getOrgans(Document documentArxiu) {
 		String organs = null;
 		if (documentArxiu.getMetadades().getOrgans() != null) {

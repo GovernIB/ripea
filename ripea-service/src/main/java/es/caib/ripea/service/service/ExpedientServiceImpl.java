@@ -1,33 +1,18 @@
 package es.caib.ripea.service.service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.ZipOutputStream;
-
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,15 +29,11 @@ import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientComentariEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
-import es.caib.ripea.persistence.entity.ExpedientTascaComentariEntity;
-import es.caib.ripea.persistence.entity.InteressatEntity;
-import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
@@ -61,7 +42,6 @@ import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
-import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
@@ -79,7 +59,6 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
-import es.caib.ripea.service.helper.CsvHelper;
 import es.caib.ripea.service.helper.DateHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -108,7 +87,6 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
-import es.caib.ripea.service.intf.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
@@ -949,51 +927,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 					checkPerMassiuAdmin).getNom();
 		}
 	}
-	
 
 	@Transactional
 	@Override
 	public void reobrir(Long entitatId, Long id) {
 		logger.debug("Reobrint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				true,
-				false,
-				true,
-				false,
-				false,
-				null);
-		
-		if (!isPermesReobrir())
-			throw new ValidationException("La reobertura d'expedients no està activa");
-
-		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
-		
-		if (isTancamentLogicActiu() && expedient.getTancatData() != null)
-			throw new ValidationException("La reobertura d'aquest expedient no és possible. Està tancat a l'arxiu.");
-		
-		if (expedient.isTancamentProgramat()) // Tancat en diferit
-			expedient.removeTancamentProgramat();
-
-		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
-		
-		if (! isTancamentLogicActiu())
-			pluginHelper.arxiuExpedientReobrir(expedient);
-		
-		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
+		expedientHelper.reobrir(entitatId, id);
 	}
-
 	
 	@Transactional
 	@Override
-	public Exception guardarExpedientArxiu(
-			Long expId) {
-		
+	public Exception guardarExpedientArxiu(Long expId) {
 		synchronized (SynchronizationHelper.get0To99Lock(expId, SynchronizationHelper.locksExpedients)) {
 			return expedientHelper.guardarExpedientArxiu(expId);
 		}
 	}
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1957,10 +1905,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
 		return usuari.getVistaMoureActual();
 	}
-	
-	private boolean isPermesReobrir() {
-		return configHelper.getAsBoolean(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT);
-	}
 
 	private boolean isIncorporacioDuplicadaPermesa() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
@@ -1977,19 +1921,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private boolean isImportacioRelacionatsActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA);
 	}
-
-	private boolean isTancamentLogicActiu() {
-		return configHelper.getAsBoolean(PropertyConfig.TANCAMENT_LOGIC);
-	}
-	
-	private List<Long> toListLong(List<Serializable> original) {
-		List<Long> listLong = new ArrayList<Long>(original.size());
-		for (Serializable s: original) { 
-			listLong.add((Long)s); 
-		}
-		return listLong;
-	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);
-
 }

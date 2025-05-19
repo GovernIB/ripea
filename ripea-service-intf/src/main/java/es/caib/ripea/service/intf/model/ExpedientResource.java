@@ -99,6 +99,10 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientResource.ACTION_TANCAR_CODE,
                         formClass = ExpedientResource.TancarExpedientFormAction.class,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
+                        formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,
@@ -152,6 +156,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_ALLIBERAR_CODE = "ALLIBERAR";
 	public static final String ACTION_MASSIVE_RETORNAR_CODE = "RETORNAR";
 	public static final String ACTION_MASSIVE_DELETE_CODE = "ESBORRAR";
+	public static final String ACTION_MASSIVE_REOBRIR_CODE = "REOBRIR";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	
