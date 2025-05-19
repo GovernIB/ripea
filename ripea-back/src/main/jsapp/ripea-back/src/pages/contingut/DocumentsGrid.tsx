@@ -39,11 +39,11 @@ const DocumentsGridForm = () => {
     const [descripcio, setDescripcio] = useState<string>("");
     const [adjunt, setAdjunt] = useState<File | null>(null);
 
-    useEffect(() => {
-        console.log("Estado de adjunt:", adjunt);
-        console.log("Estado de nom:", nom);
-        console.log("Estado de descripcio:", descripcio);
-    }, [adjunt, nom, descripcio]);
+    // useEffect(() => {
+    //     console.log("Estado de adjunt:", adjunt);
+    //     console.log("Estado de nom:", nom);
+    //     console.log("Estado de descripcio:", descripcio);
+    // }, [adjunt, nom, descripcio]);
 
     const handleFileChange = (event: any) => { setAdjunt(event); };
 
