@@ -72,6 +72,10 @@ import lombok.experimental.FieldNameConstants;
                         code = DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE,
                         formClass = DocumentResource.EnviarPortafirmesFormAction.class,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_RESUM_IA,
+                        formClass = DocumentResource.ResumIaFormAction.class),                
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = DocumentResource.ACTION_DESCARREGAR_MASSIU,
@@ -93,6 +97,7 @@ public class DocumentResource extends NodeResource {
     public static final String PERSPECTIVE_PATH_CODE = "PATH";
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
+    public static final String ACTION_RESUM_IA = "RESUM_IA";
     public static final String ACTION_MOURE_CODE = "MOURE";
     public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
     public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
@@ -222,7 +227,7 @@ public class DocumentResource extends NodeResource {
     @Transient private boolean documentDeAnotacio;
     @Transient private boolean ambNotificacions;
     @Transient private boolean isFuncionariHabilitatDigitalib;
-    @Transient private boolean isPluginSummarizeActiu;
+    @Transient private boolean isPluginSummarizeActiu=true;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private DigitalitzacioPerfilDto digitalitzacioPerfil;
     
@@ -367,6 +372,15 @@ public class DocumentResource extends NodeResource {
     public static class UpdateTipusDocumentFormAction extends MassiveAction {
     	@NotNull
     	private ResourceReference<MetaDocumentResource, Long> metaDocument;
+    }
+    
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class ResumIaFormAction implements Serializable {
+    	@NotNull
+    	private FileReference adjunt;
     }
     
     @Getter

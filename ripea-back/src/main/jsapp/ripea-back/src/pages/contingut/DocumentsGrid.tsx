@@ -1,15 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {FormControl, Grid, InputLabel, Select, MenuItem, Icon} from "@mui/material";
-import {
-    GridPage,
-    useFormContext,
-    useMuiDataGridApiRef,
-} from 'reactlib';
+import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
 import {useContingutActions} from "./details/ContingutActions.tsx";
 import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
-import GridFormField from "../../components/GridFormField.tsx";
+import GridFormField, {GridButton} from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
@@ -17,21 +13,57 @@ import * as builder from '../../util/springFilterUtils.ts';
 import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const DocumentsGridForm = () => {
+    const { t } = useTranslation();
     const { data } = useFormContext();
+    const {artifactAction: apiAction} = useResourceApiService('documentResource');
+
+	const actualizarDatos = async () => {
+        debugger;
+        if (adjunt) {
+            apiAction(undefined, {code :"RESUM_IA", data:{ adjunt: adjunt }})
+            .then((result)=>{
+                if (result) {
+                    setNom(result.titol);
+                    setDescripcio(result.resum);
+                }
+            });
+        }
+	};
 
     const metaDocumentFilter :string = builder.and(
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("actiu", true),
     );
 
+    const [nom, setNom] = useState<string>("");
+    const [descripcio, setDescripcio] = useState<string>("");
+    const [adjunt, setAdjunt] = useState<File | null>(null);
+
+    useEffect(() => {
+        console.log("Estado de adjunt:", adjunt);
+        console.log("Estado de nom:", nom);
+        console.log("Estado de descripcio:", descripcio);
+    }, [adjunt, nom, descripcio]);
+
+    const handleFileChange = (event: any) => { setAdjunt(event); };
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
+
+        {/* <GridFormField xs={data.isPluginSummarizeActiu?9:12} name="nom"/> */}
+        {/* <Button sx={{minWidth: '40px', display: 'flex'}} hidden={!data.isPluginSummarizeActiu} onClick={actualizarDatos}/> */}
+        
+        <GridFormField xs={11} name="nom" value={nom}/>
+        <GridButton xs={1} name="isPluginSummarizeActiu" disabled={!adjunt} icon="assistant" onClick={actualizarDatos} title={t('page.document.detall.summarize')}>
+            <Icon>assistant</Icon>IA
+        </GridButton>
+        {/* <Button variant="outlined" onClick={actualizarDatos}>IA</Button> */}
+
+        <GridFormField xs={12} name="descripcio" type={"textarea"} value={descripcio}/>
         <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
-        <GridFormField xs={12} name="adjunt" type={"file"} required/>
+        <GridFormField xs={12} name="adjunt" type={"file"} required onChange={handleFileChange}/>
         <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>
         <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled/>
         <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus!="FIRMA_SEPARADA"} required/>

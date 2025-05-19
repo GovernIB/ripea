@@ -73,6 +73,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
@@ -134,6 +135,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_PUBLICAR_CODE, new PublicarActionExecutor());
         register(DocumentResource.ACTION_NOTIFICAR_CODE, new NotificarActionExecutor());
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
+        register(DocumentResource.ACTION_RESUM_IA, new ResumIaActionExecutor());
         //Accions massives desde la pipella de contingut
         register(DocumentResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
@@ -658,6 +660,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
+    
+    private class ResumIaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ResumIaFormAction, Resum> {
+
+        @Override
+        public Resum exec(String code, DocumentResourceEntity entity, DocumentResource.ResumIaFormAction params) throws ActionExecutionException {
+        	try {
+        		return pluginHelper.getSummarize(params.getAdjunt().getContent(), params.getAdjunt().getContentType());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/ResumIaActionExecutor", e);
+				return new Resum();
+			}
+        }
+
+        @Override
+        public void onChange(Serializable id, DocumentResource.ResumIaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.ResumIaFormAction target) {}
+    }
+    
     private class PublicarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.PublicarFormAction, DocumentResource> {
 
         @Override
@@ -677,6 +696,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
     }
+    
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
 
 		@Override

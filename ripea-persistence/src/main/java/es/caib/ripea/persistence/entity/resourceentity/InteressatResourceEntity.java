@@ -112,4 +112,40 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
 		}
 		return false;
     }
+    
+	public String getCodiNom() {
+		String resultat = null;
+        switch (this.tipus) {
+            case InteressatPersonaFisicaEntity:
+            	resultat = documentNum + " - " + getNomComplet();
+            default:
+            	resultat = getNomComplet();
+        }
+        return (" - ".equals(resultat)?null:resultat);
+      }
+	
+	public String getNomComplet() {
+		switch (this.tipus) {
+		case InteressatPersonaFisicaEntity:
+			StringBuilder sb = new StringBuilder();
+			if (nom != null) {
+				sb.append(nom);
+			}
+			if (llinatge1 != null) {
+				sb.append(" ");
+				sb.append(llinatge1);
+				if (llinatge2 != null) {
+					sb.append(" ");
+					sb.append(llinatge2);
+				}
+			}
+			return sb.toString();	
+		case InteressatPersonaJuridicaEntity:
+			return raoSocial;
+		case InteressatAdministracioEntity:
+			return organCodi;
+		default:
+			return null;
+		}
+	}
 }

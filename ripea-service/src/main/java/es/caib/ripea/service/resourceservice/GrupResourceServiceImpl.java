@@ -90,7 +90,7 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
 				grupsIds.add(grup.getId());
 			}
 		} else {
-			grupsIds.add(-1l); //No te permisos sobre cap grup, forçam a que no apareixi cap 
+			grupsIds.add(0l); //No te permisos sobre cap grup, forçam a que no apareixi cap 
 		}
 		
 		Filter filtreGrupsPermesos = null;

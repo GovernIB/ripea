@@ -79,7 +79,6 @@ const translationEs = {
                 estat: "Estado",
                 prioritat: "Prioridad",
                 clasificacio: "Clasificación",
-
                 dataProgramada: "Fecha en que se hará efectivo el envio de la notificación a Notific@",
                 duracio: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
                 dataCaducitat: "Días naturales\nLa notificación estará disponible hasta las 23:59:59 del día introducido, expirando a las 00:00 del día siguiente. Sólo se aplica a Notificaciones Electrónicas. Puede indicarse tanto en número de días naturales, como con una fecha concreta.",
@@ -361,6 +360,7 @@ const translationEs = {
                 csvRegulacion: "Regulación del CSV",
                 tipoFirma: "Tipo de firma",
                 flux: "Existe un flujo de firma predefinido. La creación de un nuevo flujo de firma implica sobrescribir el seleccionado.",
+                summarize: "Generar título y descripción con inteligencia artificial.\n(Requiere haber adjuntado un documento previamente)",
             },
             acciones: {
                 pinbal: "Consulta PINBAL...",

@@ -1,9 +1,11 @@
 package es.caib.ripea.service.intf.dto;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class Resum {
+public class Resum implements Serializable {
 	
 	private String error;
     private String resum;
