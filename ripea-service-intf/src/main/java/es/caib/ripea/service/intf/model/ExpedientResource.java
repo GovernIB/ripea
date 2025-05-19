@@ -101,6 +101,14 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_SYNC_ARXIU,
+                        formClass = ExpedientResource.MassiveAction.class),                
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = ExpedientResource.ACTION_EXPORT_SELECTED_DOCS,
+                        formClass = ExpedientResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
@@ -159,6 +167,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_REOBRIR_CODE = "REOBRIR";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
+	public static final String ACTION_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
+	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";

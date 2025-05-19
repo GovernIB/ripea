@@ -117,7 +117,8 @@ public class ExecucioMassivaHelper {
 			FileNameOption nomFitxer,
 			boolean isVersioImprimible,
 			boolean carpetes,
-			double actualMbFitxer) {
+			double actualMbFitxer,
+			List<Long> documentsInclosos) {
 		
 		List<ContingutEntity> contingutsExp = new ArrayList<>();
 		List<DocumentDto> docsExp = new ArrayList<DocumentDto>();
@@ -126,77 +127,82 @@ public class ExecucioMassivaHelper {
 		if (contingutsExp != null && contingutsExp.size()>0) {
 
 			for (ContingutEntity contingutExpedient : contingutsExp) {
+				
 				if (ContingutTipusEnumDto.DOCUMENT.equals(contingutExpedient.getTipus())) {
-					DocumentEntity documentEntity = (DocumentEntity)contingutExpedient;
-
-					DocumentDto doc = new DocumentDto();
-					doc.setId(documentEntity.getId());
-
-					FitxerDto fitxerDto = null;
 					
-					//Configuració de l'execució massiva: Versió imprimible o original del fitxer
-					if (isVersioImprimible) {
-						try {
-							//La versió imprimible pot no estar disponible si el document no esta definitiu (signat)
-							fitxerDto = pluginHelper.arxiuDocumentVersioImprimible(documentEntity);
-						} catch (Exception notImpr) {
+					if (documentsInclosos==null || documentsInclosos.contains(contingutExpedient.getId())) {
+						
+						DocumentEntity documentEntity = (DocumentEntity)contingutExpedient;
+	
+						DocumentDto doc = new DocumentDto();
+						doc.setId(documentEntity.getId());
+	
+						FitxerDto fitxerDto = null;
+						
+						//Configuració de l'execució massiva: Versió imprimible o original del fitxer
+						if (isVersioImprimible) {
+							try {
+								//La versió imprimible pot no estar disponible si el document no esta definitiu (signat)
+								fitxerDto = pluginHelper.arxiuDocumentVersioImprimible(documentEntity);
+							} catch (Exception notImpr) {
+								//Si no té uuid l'intentará obtenir el gestorDocumental amb el identificador "getGesDocAdjuntId"
+								fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
+							}
+						} else {
 							//Si no té uuid l'intentará obtenir el gestorDocumental amb el identificador "getGesDocAdjuntId"
 							fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
 						}
-					} else {
-						//Si no té uuid l'intentará obtenir el gestorDocumental amb el identificador "getGesDocAdjuntId"
-						fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
-					}
-
-					actualMbFitxer = actualMbFitxer + (fitxerDto.getContingut().length / (1024.0 * 1024.0));
-
-					doc.setFitxerContingut(fitxerDto.getContingut());
-
-					String nomDoc = null;
-					//Configuració de l'execució massiva: Nom del fitxer dins el ZIP
-					if (nomFitxer!=null) {
-						switch (nomFitxer) {
-						case TITLE:
-							nomDoc = documentEntity.getNom().replaceAll("/", "_");
-							nomDoc = nomDoc + documentEntity.getExtensio();
-							break;
-						case TYPE_TITLE:
-							nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
-							nomDoc = nomDoc + " - " + documentEntity.getNom().replaceAll("/", "_");
-							nomDoc = nomDoc + documentEntity.getExtensio();
-							break;
-						case TYPE_ORIGINAL:
-							nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
-							nomDoc = nomDoc + " - " + documentEntity.getFitxerNom().replaceAll("/", "_");
-							break;								
-						default:
-							nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
-							break;
-						}
-					}
-					//Valor per defecte del nom del fitxer
-					if (nomDoc==null) {
-						nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
-					}
-
-					//Configuració de l'execució massiva: Estructura de carpetes = al expedient
-					if (carpetes) {
-						if (documentEntity.getPare()!=null) {
-							ContingutEntity pare = documentEntity.getPare();
-							while (pare!=null) {
-								//Ens aturam abans de arribar a nivell de expedient
-								if (pare.getPare()!=null) {
-									nomDoc = pare.getNom().replaceAll("/", "_") + "/" + nomDoc;
-								}
-								pare = pare.getPare(); //Pujam fins a l'arrel
+	
+						actualMbFitxer = actualMbFitxer + (fitxerDto.getContingut().length / (1024.0 * 1024.0));
+	
+						doc.setFitxerContingut(fitxerDto.getContingut());
+	
+						String nomDoc = null;
+						//Configuració de l'execució massiva: Nom del fitxer dins el ZIP
+						if (nomFitxer!=null) {
+							switch (nomFitxer) {
+							case TITLE:
+								nomDoc = documentEntity.getNom().replaceAll("/", "_");
+								nomDoc = nomDoc + documentEntity.getExtensio();
+								break;
+							case TYPE_TITLE:
+								nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
+								nomDoc = nomDoc + " - " + documentEntity.getNom().replaceAll("/", "_");
+								nomDoc = nomDoc + documentEntity.getExtensio();
+								break;
+							case TYPE_ORIGINAL:
+								nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
+								nomDoc = nomDoc + " - " + documentEntity.getFitxerNom().replaceAll("/", "_");
+								break;								
+							default:
+								nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
+								break;
 							}
 						}
+						//Valor per defecte del nom del fitxer
+						if (nomDoc==null) {
+							nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
+						}
+	
+						//Configuració de l'execució massiva: Estructura de carpetes = al expedient
+						if (carpetes) {
+							if (documentEntity.getPare()!=null) {
+								ContingutEntity pare = documentEntity.getPare();
+								while (pare!=null) {
+									//Ens aturam abans de arribar a nivell de expedient
+									if (pare.getPare()!=null) {
+										nomDoc = pare.getNom().replaceAll("/", "_") + "/" + nomDoc;
+									}
+									pare = pare.getPare(); //Pujam fins a l'arrel
+								}
+							}
+						}
+						
+						nomDoc = ("[" + expedient.getNumero() + "] " + expedient.getNom()).replaceAll("/", "_") + "/" + nomDoc;
+						
+						doc.setFitxerNom(nomDoc);
+						docsExp.add(doc);
 					}
-					
-					nomDoc = ("[" + expedient.getNumero() + "] " + expedient.getNom()).replaceAll("/", "_") + "/" + nomDoc;
-					
-					doc.setFitxerNom(nomDoc);
-					docsExp.add(doc);
 				}
 			}
 		} else {

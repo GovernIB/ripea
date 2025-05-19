@@ -344,7 +344,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 								execucioMassiva.getNomFitxer(),
 								execucioMassiva.getVersioImprimible().booleanValue(),
 								execucioMassiva.getCarpetes().booleanValue(),
-								actualMbFitxer));
+								actualMbFitxer,
+								null));
 				
 				if (Calendar.getInstance().getTimeInMillis()>maxTempsProces) {
 					execucioMassivaContingutEntity.updateError(new Date(), "El procés ha superat el limit de temps definit per la seva execució: "+maxMinExec+" min. Intenteu seleccionar menys expedients.");

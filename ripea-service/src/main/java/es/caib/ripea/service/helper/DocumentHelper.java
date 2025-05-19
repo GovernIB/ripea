@@ -48,6 +48,7 @@ import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
@@ -1027,8 +1028,61 @@ public class DocumentHelper {
 		}
 	}
 	
+	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
+			Long entitatId,
+			Long expedientId,
+			List<ArbreJsonDto> selectedElements,
+			String rolActual,
+			Long tascaId) throws IOException {
+		entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				false, 
+				false, 
+				false, 
+				true, 
+				false);
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId, 
+				false, 
+				true, 
+				false, 
+				false, 
+				false, 
+				rolActual);
+		
+		FitxerDto resultat = new FitxerDto();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		
+		cercarCrearEntradaSelectedDocument(selectedElements, zos, tascaId, rolActual);
+
+		zos.close();
+		
+		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
+		resultat.setContentType("application/zip");
+		resultat.setContingut(baos.toByteArray());
+		
+		return resultat;
+	}
 	
-	
+	private void cercarCrearEntradaSelectedDocument(List<ArbreJsonDto> childrens, ZipOutputStream zos, Long tascaId, String rolActual) throws IOException {
+		for (ArbreJsonDto children: childrens) {
+			Long contingutId = Long.valueOf(children.getId());
+			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+			if (contingut instanceof DocumentEntity) {
+				// Si és document, crear document dins zip mantenint l'estructura
+				crearEntradaDocument(
+						zos, 
+						contingutId, 
+						tascaId, 
+						rolActual);
+			} else {
+				// Fills
+				cercarCrearEntradaSelectedDocument(children.getChildren(), zos, tascaId, rolActual);
+			}
+		}
+	}
 	
 	public void actualitzarFitxerDB(
 			DocumentEntity document,

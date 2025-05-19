@@ -1,6 +1,5 @@
 package es.caib.ripea.service.service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +73,6 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ViaFirmaHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
@@ -437,9 +434,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 	}
 	
-	
-	
-	
 	@Override
 	public String firmaSimpleWebStart(
 			FitxerDto fitxerPerFirmar,
@@ -457,11 +451,8 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 	
 	@Override
-	public FirmaResultatDto firmaSimpleWebEnd(
-			String transactionID) {
-
+	public FirmaResultatDto firmaSimpleWebEnd(String transactionID) {
 		return pluginHelper.firmaSimpleWebEnd(transactionID);
-
 	}
 	
 	@Transactional(readOnly = true)
@@ -485,50 +476,9 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<Long> findIdsAllDocumentsOfExpedient(
-			Long expedientId) {
-		
+	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId) {
 		return documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
 	}
-
-//	@Transactional(readOnly = true)
-//	@Override
-//	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
-//			Long id, 
-//			Long expedientId,
-//			String rolActual,
-//			Long tascaId) throws IOException {
-//		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-//				expedientId, 
-//				false, 
-//				true, 
-//				false, 
-//				false, 
-//				false, 
-//				rolActual);
-//		
-//		FitxerDto resultat = new FitxerDto();
-//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//		ZipOutputStream zos = new ZipOutputStream(baos);
-//		
-//		List<Long> documents = documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
-//		
-//		for (Long documentId : documents) {
-//			documentHelper.crearEntradaDocument(
-//					zos, 
-//					documentId, 
-//					tascaId, 
-//					rolActual);
-//		}
-//
-//		zos.close();
-//		
-//		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
-//		resultat.setContentType("application/zip");
-//		resultat.setContingut(baos.toByteArray());
-//		
-//		return resultat;
-//	}
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -538,55 +488,7 @@ public class DocumentServiceImpl implements DocumentService {
 			List<ArbreJsonDto> selectedElements,
 			String rolActual,
 			Long tascaId) throws IOException {
-		entityComprovarHelper.comprovarEntitat(
-				entitatId, 
-				false, 
-				false, 
-				false, 
-				true, 
-				false);
-		
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId, 
-				false, 
-				true, 
-				false, 
-				false, 
-				false, 
-				rolActual);
-		
-		FitxerDto resultat = new FitxerDto();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ZipOutputStream zos = new ZipOutputStream(baos);
-		
-		cercarCrearEntradaSelectedDocument(selectedElements, zos, tascaId, rolActual);
-
-		zos.close();
-		
-		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
-		resultat.setContentType("application/zip");
-		resultat.setContingut(baos.toByteArray());
-		
-		return resultat;
-	}
-	
-	private void cercarCrearEntradaSelectedDocument(List<ArbreJsonDto> childrens, ZipOutputStream zos, Long tascaId, String rolActual) throws IOException {
-		for (ArbreJsonDto children: childrens) {
-			Long contingutId = Long.valueOf(children.getId());
-			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
-			
-			if (contingut instanceof DocumentEntity) {
-				// Si és document, crear document dins zip mantenint l'estructura
-				documentHelper.crearEntradaDocument(
-						zos, 
-						contingutId, 
-						tascaId, 
-						rolActual);
-			} else {
-				// Fills
-				cercarCrearEntradaSelectedDocument(children.getChildren(), zos, tascaId, rolActual);
-			}
-		}
+		return documentHelper.descarregarAllDocumentsOfExpedientWithSelectedFolders(entitatId, expedientId, selectedElements, rolActual, tascaId);
 	}
 
 	@Transactional(readOnly = true)
