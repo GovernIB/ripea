@@ -418,7 +418,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		List<FieldOption> fieldOptions = getReadonlyResourceService().artifactFieldEnumOptions(
 				type,
 				code,
-				fieldName);
+				fieldName,
+				HttpRequestUtil.getCurrentHttpRequest().get().getParameterMap());
 		Link selfLink = linkTo(methodOn(getClass()).artifactFieldEnumOptionsFind(type, code, fieldName)).withSelfRel();
 		if (fieldOptions != null) {
 			return ResponseEntity.ok(
@@ -459,7 +460,8 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 		List<FieldOption> fieldOptions = getReadonlyResourceService().artifactFieldEnumOptions(
 				type,
 				code,
-				fieldName);
+				fieldName,
+				HttpRequestUtil.getCurrentHttpRequest().get().getParameterMap());
 		FieldOption found = null;
 		if (fieldOptions != null) {
 			found = fieldOptions.stream().

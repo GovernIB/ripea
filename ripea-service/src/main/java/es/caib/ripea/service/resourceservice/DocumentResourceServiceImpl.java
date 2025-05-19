@@ -145,7 +145,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     
     public class PerfilsDigitalitzacioOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName) {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			List<DigitalitzacioPerfilDto> fluxosDto = pluginHelper.digitalitzacioPerfilsDisponibles();
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
 			if (fluxosDto!=null) {
@@ -158,7 +158,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	}
     
     public class FluxosFirmaFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName) {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
 			List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatEntity.getId(), false);
 			List<FieldOption> resultat = new ArrayList<FieldOption>();

@@ -138,8 +138,12 @@ public interface MutableResourceService<R extends Resource<? extends Serializabl
 	 *
 	 * @param fieldName
 	 *            nom del camp del recurs.
+	 * @param requestParameterMap
+	 *            paràmetres de la petició.
 	 * @return la llista d'opcions disponibles.
 	 */
-	List<FieldOption> fieldEnumOptions(String fieldName);
+	List<FieldOption> fieldEnumOptions(
+			String fieldName,
+			Map<String,String[]> requestParameterMap);
 
 }
