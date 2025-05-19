@@ -131,7 +131,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.Fields.firmaAdjunt, new FirmaAdjuntOnchangeLogicProcessor());
         register(DocumentResource.Fields.hasFirma, new HasFirmaOnchangeLogicProcessor());
         register(DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE, new EnviarViaEmailActionExecutor());
-        register(DocumentResource.ACTION_MOURE_CODE, new MoureActionExecutor());
+        register(DocumentResource.ACTION_MOURE_CODE, new MoureCopiarVincularActionExecutor());
         register(DocumentResource.ACTION_PUBLICAR_CODE, new PublicarActionExecutor());
         register(DocumentResource.ACTION_NOTIFICAR_CODE, new NotificarActionExecutor());
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
@@ -630,7 +630,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			}
 		}
     }
-    private class MoureActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.MoureFormAction, DocumentResource> {
+    private class MoureCopiarVincularActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.MoureFormAction, DocumentResource> {
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.MoureFormAction params) throws ActionExecutionException {
@@ -638,14 +638,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	if (params!=null && params.getIds()!=null && params.getIds().size()>0) {
         		try {
 	        		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-	        		boolean mourer = DocumentResource.MoureFormAction.Action.MOURE.equals(params.getAction());
 	    			for (Long contingutOrigenId: params.getIds()) {
 	    				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
-	    				if (mourer) {
-	    					contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId,configHelper.getRolActual());
-	    				} else {
-	    					contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu
-	    				}
+	    				switch (params.getAction()) {
+						case MOURE:
+							contingutHelper.move(entitatEntity.getId(), contingutOrigenId, contingutDestiId,configHelper.getRolActual());							
+							break;
+						case COPIAR:
+							contingutHelper.copy(entitatEntity.getId(), contingutOrigenId, contingutDestiId, false); //No recursiu
+							break;
+						case VINCULAR:
+							//Recursiu igual que a ContingutController.vincular (POST)
+							contingutHelper.link(entitatEntity.getId(), contingutOrigenId, contingutDestiId, true);
+							break;
+						default:
+							break;
+						}
 	    			}
     			} catch (Exception e) {
     				excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);

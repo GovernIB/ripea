@@ -274,7 +274,8 @@ public class DocumentResource extends NodeResource {
 
         public enum Action {
             MOURE,
-            COPIAR
+            COPIAR,
+            VINCULAR
         }
     }
 
