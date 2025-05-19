@@ -49,16 +49,10 @@ const DocumentsGridForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
-
-        {/* <GridFormField xs={data.isPluginSummarizeActiu?9:12} name="nom"/> */}
-        {/* <Button sx={{minWidth: '40px', display: 'flex'}} hidden={!data.isPluginSummarizeActiu} onClick={actualizarDatos}/> */}
-        
-        <GridFormField xs={11} name="nom" value={nom}/>
-        <GridButton xs={1} name="isPluginSummarizeActiu" disabled={!adjunt} icon="assistant" onClick={actualizarDatos} title={t('page.document.detall.summarize')}>
+        <GridFormField xs={data.isPluginSummarizeActiu?11:12} name="nom" value={nom}/>
+        <GridButton xs={1} hidden={!data.isPluginSummarizeActiu} name="isPluginSummarizeActiu" disabled={!adjunt} icon="assistant" onClick={actualizarDatos} title={t('page.document.detall.summarize')}>
             <Icon>assistant</Icon>IA
         </GridButton>
-        {/* <Button variant="outlined" onClick={actualizarDatos}>IA</Button> */}
-
         <GridFormField xs={12} name="descripcio" type={"textarea"} value={descripcio}/>
         <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
