@@ -652,13 +652,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/{documentId}/urlValidacio", method = RequestMethod.GET)
 	@ResponseBody
 	public String getUrlValidacio(HttpServletRequest request, @PathVariable Long documentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String urlValidacio = aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL);
-		DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
-		if (documentDto!=null && documentDto.getNtiCsv()!=null) {
-			return urlValidacio + documentDto.getNtiCsv();
-		}
-		return urlValidacio;
+		return documentService.getEnllacCsv(getEntitatActualComprovantPermisos(request).getId(), documentId);
 	}
 
 	@RequestMapping(value = "/{documentId}/convertir", method = RequestMethod.GET)

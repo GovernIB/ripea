@@ -140,6 +140,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
+        register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
         //Dades externes
         register(DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId, new FluxosFirmaFieldOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
@@ -668,6 +669,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
+    }
+    
+    private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.GetCsvFormAction, String> {
+
+		@Override
+		public void onChange(Serializable id, DocumentResource.GetCsvFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource.GetCsvFormAction target) {}
+
+		@Override
+		public String exec(String code, DocumentResourceEntity entity, DocumentResource.GetCsvFormAction params) throws ActionExecutionException {
+			try {
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				return documentHelper.getEnllacCsv(entitatEntity.getId(), entity.getId());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/CsvLinkActionExecutor", e);
+				return "";
+			}
+		}
     }
     
     private class ResumIaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ResumIaFormAction, Resum> {

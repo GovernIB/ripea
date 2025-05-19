@@ -1028,6 +1028,15 @@ public class DocumentHelper {
 		}
 	}
 	
+	public String getEnllacCsv(Long entitatId, Long documentId) {
+		String urlValidacio = configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL);
+		DocumentEntity documentEntity = documentRepository.findById(documentId).orElse(null);
+		if (Utils.hasValue(urlValidacio) && documentEntity!=null && documentEntity.getNtiCsv()!=null) {
+			return urlValidacio + documentEntity.getNtiCsv();
+		}
+		return null;
+	}
+	
 	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
 			Long entitatId,
 			Long expedientId,

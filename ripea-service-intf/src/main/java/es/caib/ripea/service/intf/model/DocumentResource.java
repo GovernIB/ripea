@@ -55,6 +55,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_GET_CSV_LINK,
+                        formClass = DocumentResource.GetCsvFormAction.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
                         formClass = DocumentResource.MoureFormAction.class),
                 @ResourceConfigArtifact(
@@ -101,6 +106,7 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_MOURE_CODE = "MOURE";
     public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
     public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
+    public static final String ACTION_GET_CSV_LINK = "GET_CSV_LINK";
 	//Accions massives desde la pipella de contingut
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
@@ -261,6 +267,10 @@ public class DocumentResource extends NodeResource {
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
     }
 
+    @Getter
+    @Setter
+    public static class GetCsvFormAction implements Serializable {}
+    
     @Getter
     @Setter
     public static class MoureFormAction extends ExpedientResource.MassiveAction {

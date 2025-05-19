@@ -26,6 +26,8 @@ import javax.annotation.security.PermitAll;
 @PreAuthorize("isAuthenticated()")
 public interface DocumentService {
 
+	@PreAuthorize("isAuthenticated()")
+	public String getEnllacCsv(Long entitatId, Long documentId);
 	/**
 	 * Crea un nou document a dins un contenidor.
 	 * 

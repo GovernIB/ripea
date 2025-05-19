@@ -73,6 +73,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ViaFirmaHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
@@ -86,6 +87,7 @@ import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
@@ -1981,5 +1983,10 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return null;
 	}
-	
+
+	@Override
+	@Transactional(readOnly = true)
+	public String getEnllacCsv(Long entitatId, Long documentId) {
+		return documentHelper.getEnllacCsv(entitatId, documentId);
+	}
 }
