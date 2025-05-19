@@ -1,5 +1,5 @@
 import {Grid, Icon} from "@mui/material";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridPage} from "reactlib";
 import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -68,12 +68,7 @@ const columns = [
 const PublicacioGrid = (props:any) => {
     const { id, onRowCountChange } = props;
 
-    const apiRef = useMuiDataGridApiRef()
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
-
-    const {actions, components} = usePublicacioActions(refresh);
+    const {actions, components} = usePublicacioActions();
 
     return <GridPage>
         <StyledMuiGrid
@@ -87,7 +82,6 @@ const PublicacioGrid = (props:any) => {
             filter={builder.and(
                 builder.eq('expedient.id', id)
             )}
-            apiRef={apiRef}
             staticSortModel={sortModel}
             onRowCountChange={onRowCountChange}
             disableColumnSorting

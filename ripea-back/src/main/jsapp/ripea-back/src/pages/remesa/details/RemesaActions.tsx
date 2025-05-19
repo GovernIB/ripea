@@ -5,7 +5,6 @@ import {
     useResourceApiService
 } from "reactlib";
 import useNotificacioInteressatGrid from "./NotificacioInteressatGrid.tsx";
-
 const useActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -41,6 +40,13 @@ const useRemesaActions = (refresh?: () => void) => {
             icon: "info",
             showInMenu: true,
             onClick: handleDetallOpen,
+        },
+        {
+            title: t('common.update'),
+            icon: 'edit',
+            showInMenu: true,
+            clickShowUpdateDialog: true,
+            hidden: (row:any) => row.tipus != 'MANUAL',
         },
         {
             title: t('page.notificacio.acciones.actualitzarEstat'),

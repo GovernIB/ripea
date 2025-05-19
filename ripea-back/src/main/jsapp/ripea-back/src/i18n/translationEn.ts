@@ -126,7 +126,8 @@ const translationEn = {
             },
             alert: {
                 valid: "This content has validation errors",
-                metaNode: "This document lacks a document type"
+                metaNode: "This document lacks a document type",
+                guardarPendent: "Pending to save in archive",
             },
         },
         anotacio: {
@@ -281,6 +282,10 @@ const translationEn = {
                 borradors: "This file contains drafts that will be deleted when closing it. You have the option to mark the drafts to be signed with server signature before closing the file to avoid their deletion. If the documents contain any invalid signatures, they will be removed and the document will be re-signed on the server.",
                 notificacio: "This file contains expired notifications that are not finalized. An attempt will be made to update their status. If new information about pending notifications arrives, the certificate will be saved in Helium but not in the Digital Archive.",
                 documents: "This file contains annotation annex documents with errors. An attempt will be made to reprocess them upon closing, and if it is not possible to move them, a copy will be saved in the Digital Archive without the original signatures (both the original document and the copy will still be accessible from the file’s content tab).",
+                errorEnviament: "This case file has deliveries with errors",
+                errorNotificacio: "This case file has notifications with errors",
+                ambEnviamentsPendents: "This case file has pending deliveries to Portafirmas",
+                ambNotificacionsPendents: "This case file has pending notifications",
             },
             modal: {
                 seguidors: "Expedient followers",
@@ -355,6 +360,7 @@ const translationEn = {
                 csv: "CSV",
                 csvRegulacion: "CSV Regulation",
                 tipoFirma: "Signature Type",
+                flux: "There is a predefined signature flow. Creating a new signature flow will overwrite the selected one.",
             },
             acciones: {
                 pinbal: "PINBAL consultation",
@@ -403,7 +409,6 @@ const translationEn = {
                 firmaPendent: "Pending signature",
                 firmaParcial: "Partially signed",
                 errorPortafirmes: "Error sending to portafirmas",
-                guardarPendent: "Pending to save in archive",
             },
             versio: {
                 title: "Version",

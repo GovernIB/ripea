@@ -133,6 +133,22 @@ const ExpedientAlert = (props:any) => {
     </Load>
 }
 
+export const potModificar = (entity:any) => {
+    const { value: user, permisos } = useUserSession()
+    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
+    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
+
+    // Expedient
+    const isTancat= () => entity?.estat != "OBERT"
+    const isAgafatUsuariActual = () => entity?.agafatPer?.id == user?.codi
+    const isAdminOAdminOrgan = () => (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == entity?.organGestor?.id) )
+    const isUsuariActualWrite = () => entity?.usuariActualWrite
+    const potModificar = () => (isAgafatUsuariActual() && isUsuariActualWrite() || isAdminOAdminOrgan()) && !isTancat();
+    // //
+
+    return potModificar();
+}
+
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();

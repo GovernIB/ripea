@@ -3,6 +3,7 @@ import {Box, Button, ButtonGroup, Chip, Icon, Tooltip} from '@mui/material';
 import {useResourceApiService} from 'reactlib';
 import { useTranslation } from 'react-i18next';
 import {MenuActionButton} from "./MenuButton.tsx";
+import Load from "./Load.tsx";
 
 export type MassiveActionProps = {
     title?: string;
@@ -43,7 +44,8 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
         setSelectedRows([]);
     };
 
-    return <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>
+    return <Load value={actions.filter(a=>!a?.hidden).length>0} noEffect>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>
         {/* Selection buttons */}
         <ButtonGroup
             variant="outlined"
@@ -81,7 +83,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                 actions={actions}
             />
         </ButtonGroup>
-    </Box>;
+    </Box></Load>;
 };
 
 export default MassiveActionSelector;

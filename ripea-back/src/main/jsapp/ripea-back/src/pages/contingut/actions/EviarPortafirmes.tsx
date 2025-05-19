@@ -7,6 +7,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
 
 const EviarPortafirmesForm = () => {
+    const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
     const [open, setOpen] = useState<boolean>(true);
 
@@ -26,7 +27,7 @@ const EviarPortafirmesForm = () => {
         {/* PORTAFIB */}
         <GridFormField xs={12} name="annexos" multiple filter={filter} hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
         <GridFormField xs={10} name="portafirmesEnviarFluxId"
-                       type={"text"} componentProps={{title: "Existe un flujo de firma predefinido. La creación de un nuevo flujo de firma implica sobrescribir el seleccionado."}}
+                       componentProps={{title: t('page.document.detall.flux')}}
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
 
         <GridButton

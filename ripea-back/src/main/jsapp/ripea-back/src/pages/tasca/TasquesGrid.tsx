@@ -12,6 +12,7 @@ import useTascaActions from "./details/TascaActions.tsx";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
+import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -61,10 +62,12 @@ const columns = [
     {
         field: 'responsablesStr',
         flex: 0.5,
+        sortable: false,
     },
     {
         field: 'responsableActual',
         flex: 0.5,
+        sortable: false,
     },
     {
         field: 'estat',
@@ -77,6 +80,7 @@ const columns = [
     },
 ];
 
+const sortModel:any = [{field: 'id', sort: 'asc'}];
 const TasquesGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
@@ -98,7 +102,8 @@ const TasquesGrid = (props: any) => {
             />
         },
     ]
-    const { actions, components } = useTascaActions(apiRef?.current?.refresh);
+
+    const { actions, components } = useTascaActions(entity, apiRef?.current?.refresh);
 
     return <GridPage>
         <StyledMuiGrid
@@ -109,6 +114,7 @@ const TasquesGrid = (props: any) => {
             paginationActive
             filter={builder.and(builder.eq('expedient.id', entity?.id))}
             perspectives={perspectives}
+            sortModel={sortModel}
             onRowCountChange={onRowCountChange}
             popupEditCreateActive
 			toolbarCreateTitle={t('page.tasca.acciones.new')}
@@ -118,7 +124,7 @@ const TasquesGrid = (props: any) => {
                 metaExpedient: {id: entity?.metaExpedient?.id},
             }}
             rowAdditionalActions={actions}
-            rowHideUpdateButton
+            toolbarHideCreate={!potModificar(entity)}
             rowHideDeleteButton
         />
         {components}

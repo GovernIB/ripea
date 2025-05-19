@@ -8,6 +8,7 @@ import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate from "../actions/Create.tsx";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
+import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -107,7 +108,7 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-const useInteressatActions = (readOnly:boolean, refresh?: () => void) => {
+const useInteressatActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {deleteRepresentent, deleteInteressat} = useActions(refresh);
@@ -120,40 +121,47 @@ const useInteressatActions = (readOnly:boolean, refresh?: () => void) => {
             icon: "info",
             showInMenu: true,
             onClick: handleDetail,
-            hidden: !readOnly,
+            hidden: potModificar(entity),
+        },
+        {
+            title: t('common.update'),
+            icon: 'edit',
+            showInMenu: true,
+            clickShowUpdateDialog: true,
+            hidden: !potModificar(entity),
         },
         {
             title: t('page.interessat.actions.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteInteressat,
-            hidden: readOnly,
+            hidden: !potModificar(entity),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
-            hidden: readOnly,
+            hidden: !potModificar(entity),
         },
         {
             title: t('page.interessat.actions.createRep'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
-            hidden: (row: any) => row?.representant || readOnly,
+            hidden: (row: any) => row?.representant || !potModificar(entity),
         },
         {
             title: t('page.interessat.actions.updateRep'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
-            hidden: (row: any) => !row?.representant || readOnly,
+            hidden: (row: any) => !row?.representant || !potModificar(entity),
         },
         {
             title: t('page.interessat.actions.deleteRep'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,
-            hidden: (row: any) => !row?.representant || readOnly,
+            hidden: (row: any) => !row?.representant || !potModificar(entity),
         },
     ];
 

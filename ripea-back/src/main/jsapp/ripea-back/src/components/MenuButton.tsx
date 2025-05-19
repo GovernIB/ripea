@@ -91,7 +91,7 @@ export const MenuActionButton = (props:MenuActionButtonProps) => {
         {actions.map((action:any) =>
                 // action?.showInMenu
                 !(typeof action.hidden === 'function' ? action.hidden(entity) : action.hidden)
-                && (action?.linkTo == null && action?.clickShowUpdateDialog == null)
+                && (!action?.linkTo && !action?.clickShowUpdateDialog)
                 && <MenuItem onClick={()=>
                     entity?.id
                         ? action?.onClick?.(entity?.id, entity)

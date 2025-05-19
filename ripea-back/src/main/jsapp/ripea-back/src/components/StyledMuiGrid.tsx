@@ -196,6 +196,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             toolbarHideExport
             toolbarHideQuickFilter
             toolbarElementsWithPositions={toolbarElements}
+            rowHideUpdateButton
+            // rowHideDeleteButton
             readOnly={readOnly}
         />
     </>

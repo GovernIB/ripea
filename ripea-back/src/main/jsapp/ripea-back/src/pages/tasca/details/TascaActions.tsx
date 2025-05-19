@@ -1,3 +1,4 @@
+import {Divider} from "@mui/material";
 import {
     useBaseAppContext, useConfirmDialogButtons,
     useResourceApiService,
@@ -11,7 +12,7 @@ import useReobrir from "../actions/Reobrir.tsx";
 import useCambiarDataLimit from "../actions/CambiarDataLimit.tsx";
 import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import useRetomar from "../actions/Retomar.tsx";
-import {Divider} from "@mui/material";
+import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -50,7 +51,7 @@ const useActions = (refresh?: () => void) => {
     return {changeEstat, cancelar}
 }
 
-const useTascaActions = (refresh?: () => void) => {
+const useTascaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {changeEstat, cancelar} = useActions(refresh)
@@ -68,7 +69,11 @@ const useTascaActions = (refresh?: () => void) => {
         return !row?.usuariActualResponsable && !row?.usuariActualDelegat;
     }
     const hideByEstat = (row: any): boolean => {
-        return row?.estat == 'CANCELLADA' || row?.estat == 'FINALITZADA' || row?.estat == 'REBUTJADA';
+        return isInOptions(row?.estat, 'CANCELLADA', 'FINALITZADA', 'REBUTJADA');
+    }
+
+    const isInOptions = (value:string, ...options:string[]) => {
+        return options.includes(value)
     }
 
     const actions = [
@@ -81,6 +86,7 @@ const useTascaActions = (refresh?: () => void) => {
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
+            hidden: !potModificar(entity),
         },
         {
             title: t('page.tasca.acciones.tramitar'),
@@ -90,7 +96,7 @@ const useTascaActions = (refresh?: () => void) => {
                 window.location.href = (`${import.meta.env.VITE_BASE_URL}contingut/${row?.expedient?.id}?tascaId=${id}`)
             },
             disabled: disableResponsable,
-            hidden: hideByEstat,
+            hidden: (row:any)=> !potModificar(entity) || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.iniciar'),
@@ -98,7 +104,7 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'INICIADA'),
             disabled: disableResponsable,
-            hidden: (row: any): boolean => row?.estat != 'PENDENT',
+            hidden: (row: any) => !potModificar(entity) || row?.estat != 'PENDENT',
         },
         {
             title: t('page.tasca.acciones.rebutjar'),
@@ -106,7 +112,7 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleRebutjar,
             disabled: disableResponsable,
-            hidden: (row: any): boolean => row?.estat != 'PENDENT',
+            hidden: (row: any) => !potModificar(entity) || row?.estat != 'PENDENT',
         },
         {
             title: t('page.tasca.acciones.cancel'),
@@ -122,59 +128,59 @@ const useTascaActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'FINALITZADA'),
             disabled: disableResponsable,
-            hidden: hideByEstat,
+            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
-            hidden: (row: any): boolean => row?.estat != 'PENDENT' || hideByEstat(row),
+            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.reassignar'),
             icon: "person",
             showInMenu: true,
             onClick: handleReassignar,
-            hidden: hideByEstat,
+            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.delegar'),
             icon: "turn_right",
             showInMenu: true,
             onClick: handleDelegar,
-            hidden: (row: any): boolean => row?.delegat != null || hideByEstat(row),
+            hidden: (row: any) => !potModificar(entity) || row?.delegat != null || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.retomar'),
             icon: "close",
             showInMenu: true,
             onClick: handleRetomar,
-            hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any) => !potModificar(entity) || row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}}/>,
             showInMenu: true,
-            hidden: (row: any): boolean => row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any) => !potModificar(entity) || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.upDataLimit'),
             icon: "info",
             showInMenu: true,
             onClick: handleCambiarDataLimit,
-            hidden: hideByEstat,
+            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.upPrioritat'),
             icon: "schedule",
             showInMenu: true,
             onClick: handleCambiarPrioritat,
-            hidden: hideByEstat,
+            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.reobrir'),
             icon: "undo",
             showInMenu: true,
             onClick: handleReobrir,
-            hidden: (row: any): boolean => row?.estat != 'FINALITZADA',
+            hidden: (row: any) => !potModificar(entity) || row?.estat != 'FINALITZADA',
         },
     ];
 
@@ -191,7 +197,7 @@ const useTascaActions = (refresh?: () => void) => {
 
     return {
         actions,
-        components
+        components,
     }
 }
 export default useTascaActions;
