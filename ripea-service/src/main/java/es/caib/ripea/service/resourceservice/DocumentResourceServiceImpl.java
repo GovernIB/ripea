@@ -234,6 +234,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
         resource.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
+        resource.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
     }
 
     // PerspectiveApplicator
