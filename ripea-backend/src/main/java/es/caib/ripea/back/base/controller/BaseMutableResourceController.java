@@ -9,6 +9,7 @@ import es.caib.ripea.service.intf.base.exception.ComponentNotFoundException;
 import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.base.permission.ResourcePermissions;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
+import es.caib.ripea.service.intf.base.util.HttpRequestUtil;
 import es.caib.ripea.service.intf.base.util.JsonUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -315,7 +316,9 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@Parameter(description = "Nom del camp")
 			final String fieldName) {
 		log.debug("Consultant possibles valors pel camp enumerat (fieldName={})", fieldName);
-		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
+		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(
+				fieldName,
+				HttpRequestUtil.getCurrentHttpRequest().get().getParameterMap());
 		Link selfLink = linkTo(methodOn(getClass()).fieldEnumOptionsFind(fieldName)).withSelfRel();
 		if (fieldOptions != null) {
 			return ResponseEntity.ok(
@@ -343,7 +346,9 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			@Parameter(description = "Valor de l'opció")
 			final String value) {
 		log.debug("Consultant d'un únic valor pel camp enumerat (fieldName={}, value={})", fieldName, value);
-		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(fieldName);
+		List<FieldOption> fieldOptions = getMutableResourceService().fieldEnumOptions(
+				fieldName,
+				HttpRequestUtil.getCurrentHttpRequest().get().getParameterMap());
 		FieldOption found = null;
 		if (fieldOptions != null) {
 			found = fieldOptions.stream().

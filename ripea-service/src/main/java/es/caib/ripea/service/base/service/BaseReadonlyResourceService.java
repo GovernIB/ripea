@@ -338,20 +338,23 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public List<FieldOption> artifactFieldEnumOptions(
 			ResourceArtifactType type,
 			String code,
-			String fieldName) {
-		log.debug("Querying field enum options for artifact (type={}, code={}, fieldName={})",
+			String fieldName,
+			Map<String,String[]> requestParameterMap) {
+		log.debug("Querying field enum options for artifact (type={}, code={}, fieldName={}, requestParameterMap={})",
 				type,
 				code,
-				fieldName);
+				fieldName,
+				requestParameterMap);
 		BaseMutableResourceService.FieldOptionsProvider fieldOptionsProvider = artifactGetFieldOptionsProvider(type, code);
 		if (fieldOptionsProvider != null) {
-			return fieldOptionsProvider.getOptions(fieldName);
+			return fieldOptionsProvider.getOptions(fieldName, requestParameterMap);
 		} else {
-			log.warn("Couldn't find FieldOptionsProvider for artifact (resourceClass={}, type={}, code={}, fieldName={})",
+			log.warn("Couldn't find FieldOptionsProvider for artifact (resourceClass={}, type={}, code={}, fieldName={}, requestParameterMap={})",
 					getResourceClass(),
 					type,
 					code,
-					fieldName);
+					fieldName,
+					requestParameterMap);
 			return null;
 		}
 	}
@@ -1322,7 +1325,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			return null;
 		}
 		@Override
-		default List<FieldOption> getOptions(String fieldName) {
+		default List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			return new ArrayList<>();
 		}
 	}
@@ -1335,7 +1338,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public interface FilterProcessor<R extends Serializable>
 			extends BaseMutableResourceService.OnChangeLogicProcessor<R>, BaseMutableResourceService.FieldOptionsProvider {
 		@Override
-		default List<FieldOption> getOptions(String fieldName) {
+		default List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			return new ArrayList<>();
 		}
 	}

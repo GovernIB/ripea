@@ -182,13 +182,18 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<FieldOption> fieldEnumOptions(String fieldName) {
-		log.debug("Querying field enum options (fieldName={})", fieldName);
+	public List<FieldOption> fieldEnumOptions(
+			String fieldName,
+			Map<String,String[]> requestParameterMap) {
+		log.debug("Querying field enum options (fieldName={}, requestParameterMap={})", fieldName, requestParameterMap);
 		FieldOptionsProvider fieldOptionsProvider = fieldOptionsProviderMap.get(fieldName);
 		if (fieldOptionsProvider != null) {
-			return fieldOptionsProvider.getOptions(fieldName);
+			return fieldOptionsProvider.getOptions(fieldName, requestParameterMap);
 		} else {
-			log.warn("Couldn't find FieldOptionsProvider (resourceClass={}, fieldName={})", getResourceClass(), fieldName);
+			log.warn("Couldn't find FieldOptionsProvider (resourceClass={}, fieldName={}, requestParameterMap={})",
+					getResourceClass(),
+					fieldName,
+					requestParameterMap);
 			return null;
 		}
 	}
@@ -601,7 +606,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		 */
 		R exec(String code, E entity, P params) throws ActionExecutionException;
 		@Override
-		default List<FieldOption> getOptions(String fieldName) {
+		default List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			return new ArrayList<>();
 		}
 	}
@@ -610,7 +615,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	 * Interfície a implementar per a retornar les opcions de camps enumerats.
 	 */
 	public interface FieldOptionsProvider {
-		List<FieldOption> getOptions(String fieldName);
+		List<FieldOption> getOptions(
+				String fieldName,
+				Map<String,String[]> requestParameterMap);
 	}
 
 }

@@ -78,7 +78,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     }
 
     public class PaisFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName) {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			List<PaisDto> paisos = cacheHelper.findPaisos();
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
 			if (paisos!=null) {
@@ -91,7 +91,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	}
     
     public class ProvinciaFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName) {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			List<ProvinciaDto> provincies = cacheHelper.findProvincies();
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
 			if (provincies!=null) {
@@ -104,7 +104,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	}
     
     public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName) {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia("07");
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
 			if (municipis!=null) {
@@ -115,7 +115,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 			return resultat;
 		}
 	}
-    
+
     @Override
     protected void afterConversion(InteressatResourceEntity entity, InteressatResource resource) {
         resource.setHasRepresentats(!entity.getRepresentats().isEmpty());

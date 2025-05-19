@@ -180,12 +180,15 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	 *            el codi de l'artefacte.
 	 * @param fieldName
 	 *            nom del camp del recurs.
+	 * @param requestParameterMap
+	 *            paràmetres de la petició.
 	 * @return la llista d'opcions disponibles.
 	 */
 	List<FieldOption> artifactFieldEnumOptions(
 			ResourceArtifactType type,
 			String code,
-			String fieldName);
+			String fieldName,
+			Map<String,String[]> requestParameterMap);
 
 	/**
 	 * Genera les dades de l'informe.
