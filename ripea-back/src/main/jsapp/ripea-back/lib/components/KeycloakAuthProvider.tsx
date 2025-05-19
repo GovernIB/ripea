@@ -57,7 +57,7 @@ const kcNewInstance = (
         setTokenParsed(keycloak.tokenParsed);
     }
     keycloak.onAuthError = (errorData: KeycloakError) => {
-        logConsole.error('Callback onAuthError', '[' + errorData.error + ']', errorData.error_description);
+        logConsole.error('Callback onAuthError', '[' + errorData?.error + ']', errorData?.error_description);
         setIsAuthenticated(false);
         setToken(undefined);
         setTokenParsed(undefined);
