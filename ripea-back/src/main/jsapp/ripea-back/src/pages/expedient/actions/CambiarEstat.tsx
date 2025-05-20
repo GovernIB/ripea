@@ -1,7 +1,7 @@
 import {MuiFormDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
+import {useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 
 const CambiarEstatForm = () => {
@@ -22,6 +22,7 @@ export const CambiarEstat = (props: { apiRef:any }) => {
         resourceName={"expedientResource"}
         title={t('page.expedient.action.changeEstat')}
         apiRef={apiRef}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
     >
         <CambiarEstatForm/>
     </MuiFormDialog>
