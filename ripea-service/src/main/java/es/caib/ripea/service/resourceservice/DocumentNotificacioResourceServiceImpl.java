@@ -32,6 +32,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     @Override
     protected void afterConversion(DocumentNotificacioResourceEntity entity, DocumentNotificacioResource resource) {
         resource.setFitxerNom(entity.getDocument().getFitxerNom());
+        resource.setHasDocumentInteressats(!entity.getDocumentInteressats().isEmpty());
     }
 
     // ActionExecutor

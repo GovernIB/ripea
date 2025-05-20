@@ -106,7 +106,8 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientResource.ACTION_EXPORT_SELECTED_DOCS,
-                        formClass = ExpedientResource.MassiveAction.class),
+                        formClass = ExpedientResource.MassiveAction.class,
+                        requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,

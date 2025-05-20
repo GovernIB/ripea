@@ -1,6 +1,6 @@
 import {
     useResourceApiService,
-    useBaseAppContext,
+    useBaseAppContext, useConfirmDialogButtons,
 } from 'reactlib';
 import useAssignar from "../actions/Assignar.tsx";
 import useCambiarEstat from "../actions/CambiarEstat.tsx";
@@ -13,6 +13,7 @@ import {Divider} from "@mui/material";
 import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
+import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 
 export const iniciaDescargaBlob = (result: any) => {
     const url = URL.createObjectURL(result.blob);
@@ -39,16 +40,17 @@ export const iniciaDescargaJSON = (result: any) => {
 }
 
 export const useActions = (refresh?: () => void) => {
-	
-    const {temporalMessageShow} = useBaseAppContext();
-	const { t } = useTranslation();
+    const { t } = useTranslation();
     const {
         artifactAction: apiAction,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons();
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 	
     const action = (id:any, code:string, msg:string) => {
-        return apiAction(undefined, {code :code, data:{ ids: [id], massivo: false }})
+        return apiAction(undefined, {code: code, data:{ ids: [id], massivo: false }})
 			.then(() => {
 			    refresh?.()
 			    temporalMessageShow(null, msg, 'success');
@@ -59,7 +61,7 @@ export const useActions = (refresh?: () => void) => {
     }
 	
 	const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code :code, data:{ ids: [id], massivo: false }, fileType})
+	    return apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
@@ -69,12 +71,50 @@ export const useActions = (refresh?: () => void) => {
 			});		
 	}
 
+    const reobrir= (id: any): void => {
+        messageDialogShow(
+            '',
+            '',
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    action(id, 'REOBRIR', t('page.expedient.results.actionOk'));
+                }
+            });
+    }
     const follow= (id: any): void => { action(id, 'FOLLOW', t('page.expedient.results.actionOk')); }
     const unfollow= (id: any): void => { action(id, 'UNFOLLOW', t('page.expedient.results.actionOk')); }
     const agafar= (id: any): void => { action(id, 'AGAFAR', t('page.expedient.results.actionOk')); }
     const retornar= (id: any) :void => { action(id, 'RETORNAR', t('page.expedient.results.actionOk')); }
 	const alliberar= (id: any) :void => { action(id, 'ALLIBERAR', t('page.expedient.results.actionOk')); }
-	const eliminar= (id: any) :void => { action(id, 'ESBORRAR', t('page.expedient.results.actionOk')); }
+    const syncArxiu= (id: any): void => {
+        apiAction(undefined, {code: 'SYNC_ARXIU', data:{ ids: [id], massivo: false }})
+            .then((result) => {
+                const success = result.filter((r:any)=>r?.codi=='OK')
+                // const info = result.filter((r:any)=>r?.codi=='INFO')
+                const error = result.filter((r:any)=>r?.codi=='ERROR')
+
+                success?.length>0 && temporalMessageShow(null, success.map((r:any)=><p>{r?.valor}</p>), 'success');
+                // info?.length>0 && temporalMessageShow(null, info.map((r:any)=><p>{r?.valor}</p>), 'info');
+                error?.length>0 && temporalMessageShow(null, error.map((r:any)=><p>{r?.valor}</p>), 'error');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+	const eliminar= (id: any) :void => {
+        messageDialogShow(
+            '',
+            '',
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    action(id, 'ESBORRAR', t('page.expedient.results.actionOk'));
+                }
+            });
+    }
 	
 	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
 	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
@@ -82,7 +122,21 @@ export const useActions = (refresh?: () => void) => {
 	const exportEni= (id: any): void => { massiveReport(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 	const exportInside= (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
-    return {follow, unfollow, agafar, retornar, alliberar, eliminar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside}
+    return {
+        reobrir,
+        follow,
+        unfollow,
+        agafar,
+        retornar,
+        alliberar,
+        eliminar,
+        exportIndexPdf,
+        exportIndexXls,
+        exportPdfEni,
+        exportEni,
+        exportInside,
+        syncArxiu,
+    }
 }
 
 export const useCommonActions = (refresh?: () => void) => {
@@ -91,7 +145,21 @@ export const useCommonActions = (refresh?: () => void) => {
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
 
-    const {follow, unfollow, agafar, retornar, alliberar, eliminar, exportIndexPdf, exportIndexXls, exportPdfEni, exportEni, exportInside} = useActions(refresh);
+    const {
+        reobrir,
+        follow,
+        unfollow,
+        agafar,
+        retornar,
+        alliberar,
+        eliminar,
+        exportIndexPdf,
+        exportIndexXls,
+        exportPdfEni,
+        exportEni,
+        exportInside,
+        syncArxiu,
+    } = useActions(refresh);
     const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
@@ -100,6 +168,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
     const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
     const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
+    const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments(refresh);
 
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
@@ -125,11 +194,11 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
         },
         {
-            title: t('common.update'),
+            title: t('common.update')+'...',
             icon: 'edit',
             showInMenu: true,
-            hidden: isTancat,
             clickShowUpdateDialog: true,
+            hidden: isTancat,
         },
         {
             title: t('page.expedient.acciones.follow'),
@@ -215,7 +284,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.open'),
             icon: "undo",
             showInMenu: true,
-            // onClick: ,
+            onClick: reobrir,
             hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData),
         },
         {
@@ -232,7 +301,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.download'),
             icon: "download",
             showInMenu: true,
-            // onClick: ,
+            onClick: handleDescargarDocuments,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
@@ -292,7 +361,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.acciones.sincronitzar'),
             icon: "autorenew",
             showInMenu: true,
-            // onClick: ,
+            onClick: syncArxiu,
         },
 		{
 		    title: t('page.expedient.acciones.eliminar'),
@@ -316,6 +385,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {cambiarRelacionar}
         {contentExportDoc}
         {contentTancar}
+        {contentDescargarDocuments}
     </>;
 
     return {

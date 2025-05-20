@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import useAmpliarPlac from "../actions/AmpliarPlac.tsx";
 import useNotificacioInteressatDetail from "./NotificacioInteressatDetail.tsx";
 
-const useNotificacioInteressatActions = (refresh?: () => void) => {
+const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {handleOpen, dialog} = useNotificacioInteressatDetail();
@@ -20,8 +20,15 @@ const useNotificacioInteressatActions = (refresh?: () => void) => {
             icon: "edit_calendar",
             showInMenu: true,
             onClick: handleShow,
-            hidden: (row:any) => row?.finalitzat,
-        }
+            hidden: (row:any) => row?.finalitzat || entity?.notificacioEstat == 'PROCESSADA',
+        },
+        {
+            title: t('page.notificacioInteressat.acciones.certificat'),
+            icon: "download",
+            showInMenu: true,
+            // onClick: ,
+            hidden: (row:any) => !row?.enviamentCertificacioData,
+        },
     ]
 
     const components = <>

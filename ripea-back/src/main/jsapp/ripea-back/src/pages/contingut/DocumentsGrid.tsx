@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {FormControl, Grid, InputLabel, Select, MenuItem, Icon} from "@mui/material";
 import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -14,50 +14,40 @@ import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const DocumentsGridForm = () => {
     const { t } = useTranslation();
-    const { data } = useFormContext();
+    const { data, apiRef } = useFormContext();
     const {artifactAction: apiAction} = useResourceApiService('documentResource');
 
-	const actualizarDatos = async () => {
-        debugger;
-        if (adjunt) {
-            apiAction(undefined, {code :"RESUM_IA", data:{ adjunt: adjunt }})
-            .then((result)=>{
-                if (result) {
-                    setNom(result.titol);
-                    setDescripcio(result.resum);
-                }
-            });
+    const actualizarDatos = () => {
+        if (data?.adjunt) {
+            apiAction(undefined, {code :"RESUM_IA", data:{ adjunt: data?.adjunt }})
+                .then((result)=>{
+                    if (result) {
+                        apiRef?.current?.setFieldValue("nom", result.titol)
+                        apiRef?.current?.setFieldValue("descripcio", result.resum)
+                    }
+                });
         }
-	};
+    };
 
     const metaDocumentFilter :string = builder.and(
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("actiu", true),
     );
 
-    const [nom, setNom] = useState<string>("");
-    const [descripcio, setDescripcio] = useState<string>("");
-    const [adjunt, setAdjunt] = useState<File | null>(null);
-
-    // useEffect(() => {
-    //     console.log("Estado de adjunt:", adjunt);
-    //     console.log("Estado de nom:", nom);
-    //     console.log("Estado de descripcio:", descripcio);
-    // }, [adjunt, nom, descripcio]);
-
-    const handleFileChange = (event: any) => { setAdjunt(event); };
-
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
-        <GridFormField xs={data.isPluginSummarizeActiu?11:12} name="nom" value={nom}/>
-        <GridButton xs={1} hidden={!data.isPluginSummarizeActiu} name="isPluginSummarizeActiu" disabled={!adjunt} icon="assistant" onClick={actualizarDatos} title={t('page.document.detall.summarize')}>
+        <GridFormField xs={data.isPluginSummarizeActiu ?11 :12} name="nom"/>
+        <GridButton xs={1} title={t('page.document.detall.summarize')}
+                    onClick={actualizarDatos}
+                    disabled={!data?.adjunt}
+                    hidden={!data.isPluginSummarizeActiu}>
             <Icon>assistant</Icon>IA
         </GridButton>
-        <GridFormField xs={12} name="descripcio" type={"textarea"} value={descripcio}/>
+        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
         <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
-        <GridFormField xs={12} name="adjunt" type={"file"} required onChange={handleFileChange}/>
+        <GridFormField xs={12} name="adjunt" type={"file"} required/>
         <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>
         <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled/>
         <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus!="FIRMA_SEPARADA"} required/>
@@ -145,91 +135,91 @@ const DocumentsGrid = (props:any) => {
 
     return <GridPage>
         <Load value={entity}>
-        <StyledMuiGrid
-            resourceName="documentResource"
-            popupEditFormDialogResourceTitle={t('page.document.title')}
-            columns={columns}
-            paginationActive
-            filter={builder.and(
-                builder.eq('expedient.id', entity?.id),
-                builder.eq('esborrat', 0),
-            )}
-            perspectives={perspectives}
-            staticSortModel={sortModel}
-            popupEditCreateActive
-            popupEditFormContent={<DocumentsGridForm/>}
-            formAdditionalData={{
-                expedient: {id: entity?.id},
-                metaExpedient: {id: entity?.metaExpedient?.id},
-            }}
-            apiRef={dataGridApiRef}
-            rowAdditionalActions={actions}
-            onRowCountChange={onRowCountChange}
-            treeData={treeView}
-            treeDataAdditionalRows={(_rows:any) => {
-                const additionalRows :any[] = [];
+            <StyledMuiGrid
+                resourceName="documentResource"
+                popupEditFormDialogResourceTitle={t('page.document.title')}
+                columns={columns}
+                paginationActive
+                filter={builder.and(
+                    builder.eq('expedient.id', entity?.id),
+                    builder.eq('esborrat', 0),
+                )}
+                perspectives={perspectives}
+                staticSortModel={sortModel}
+                popupEditCreateActive
+                popupEditFormContent={<DocumentsGridForm/>}
+                formAdditionalData={{
+                    expedient: {id: entity?.id},
+                    metaExpedient: {id: entity?.metaExpedient?.id},
+                }}
+                apiRef={dataGridApiRef}
+                rowAdditionalActions={actions}
+                onRowCountChange={onRowCountChange}
+                treeData={treeView}
+                treeDataAdditionalRows={(_rows:any) => {
+                    const additionalRows :any[] = [];
 
-                if(_rows!=null && vista == "carpeta") {
-                    for (const row of _rows) {
-                        const aditionalRow = row.parentPath
-                            ?.filter((a: any) => a.id != row.id
-                                && !additionalRows.map((b)=>b.id).includes(a.id)
-                                && !additionalRows.map((b)=>b.nom).includes(a.nom))
-                        aditionalRow && additionalRows.push(...aditionalRow);
+                    if(_rows!=null && vista == "carpeta") {
+                        for (const row of _rows) {
+                            const aditionalRow = row.parentPath
+                                ?.filter((a: any) => a.id != row.id
+                                    && !additionalRows.map((b)=>b.id).includes(a.id)
+                                    && !additionalRows.map((b)=>b.nom).includes(a.nom))
+                            aditionalRow && additionalRows.push(...aditionalRow);
+                        }
+                        setTreeView(additionalRows?.length > 0)
+                    }else {
+                        setTreeView(true)
                     }
-                    setTreeView(additionalRows?.length > 0)
-                }else {
-                    setTreeView(true)
-                }
-                // console.log('>>> additionalRows', additionalRows)
-                return additionalRows;
-            }}
-            getTreeDataPath={(row:any) :string[] => {
-                switch (vista) {
-                    case "estat": return [`${row.estat}`, `${row.nom}`];
-                    case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
-                    default: return row.treePath;
-                }
-            }}
+                    // console.log('>>> additionalRows', additionalRows)
+                    return additionalRows;
+                }}
+                getTreeDataPath={(row:any) :string[] => {
+                    switch (vista) {
+                        case "estat": return [`${row.estat}`, `${row.nom}`];
+                        case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
+                        default: return row.treePath;
+                    }
+                }}
 
-            isGroupExpandedByDefault={() => expand}
-            toolbarElementsWithPositions={[
-                {
-                    position: 0,
-                    element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView}/>,
-                },
-                {
-                    position: 1,
-                    element: <TreeViewSelector value={vista} onChange={(value:any) => {
-                        setVista(value);
-                        refresh();
-                    }} />,
-                },
-                {
-                    position: 3,
-                    element: <MenuActionButton
-                        id={'createDocument'}
-                        hidden={!potModificar(entity)}
-                        buttonLabel={t('page.contingut.acciones.create')}
-                        buttonProps={{
-                            startIcon: <Icon>add</Icon>,
-                            variant: "outlined",
-                            sx: {borderRadius: '4px',  minWidth: '20px', minHeight: '32px', py: 0}
-                        }}
-                        actions={createActions}
-                    />,
-                }
-            ]}
+                isGroupExpandedByDefault={() => expand}
+                toolbarElementsWithPositions={[
+                    {
+                        position: 0,
+                        element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView}/>,
+                    },
+                    {
+                        position: 1,
+                        element: <TreeViewSelector value={vista} onChange={(value:any) => {
+                            setVista(value);
+                            refresh();
+                        }} />,
+                    },
+                    {
+                        position: 3,
+                        element: <MenuActionButton
+                            id={'createDocument'}
+                            hidden={!potModificar(entity)}
+                            buttonLabel={t('page.contingut.acciones.create')}
+                            buttonProps={{
+                                startIcon: <Icon>add</Icon>,
+                                variant: "outlined",
+                                sx: {borderRadius: '4px',  minWidth: '20px', minHeight: '32px', py: 0}
+                            }}
+                            actions={createActions}
+                        />,
+                    }
+                ]}
 
-            toolbarMassiveActions={massiveActions}
-            isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
-            toolbarHideCreate
-            rowHideDeleteButton={hiddenDelete}
+                toolbarMassiveActions={massiveActions}
+                isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
+                toolbarHideCreate
+                rowHideDeleteButton={hiddenDelete}
 
-            popupEditFormComponentProps={{ initOnChangeRequest: true }}
-        />
-        {components}
-        {massiveComponents}
+                popupEditFormComponentProps={{ initOnChangeRequest: true }}
+            />
+            {components}
+            {massiveComponents}
         </Load>
     </GridPage>
 }

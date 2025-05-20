@@ -487,7 +487,6 @@ const translationEn = {
                 notificacioInteressat: "Shipments",
                 justificant: "Shipping receipt",
                 documentEnviat: "Sent document",
-                certificat: "Certification",
             },
         },
         notificacioInteressat: {
@@ -514,6 +513,7 @@ const translationEn = {
             acciones: {
                 ampliarPlac: "Extend deadline",
                 downloadDoc: "Download document",
+                certificat: "Certification",
             },
             action: {
                 ampliarPlac: "Extension of the shipping batch deadlines",

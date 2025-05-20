@@ -1,6 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
 import java.util.Date;
+
+import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
@@ -18,10 +21,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @ResourceConfig(
         quickFilterFields = { "nom" },
-        descriptionField = "nom"
+        descriptionField = "nom",
+		artifacts = {
+            @ResourceConfigArtifact(
+                    type = ResourceArtifactType.ACTION,
+                    code = DocumentPortafirmesResource.ACTION_CANCEL_FIRMA,
+                    formClass = Serializable.class,
+                    requiresId = true),
+		}
 )
 public class DocumentPortafirmesResource extends DocumentEnviamentResource {
 
+	private static final long serialVersionUID = -2165194144445671882L;
+
+	public static final String ACTION_CANCEL_FIRMA = "CANCEL_FIRMA";
+	
 	private PortafirmesPrioritatEnumDto prioritat;
 	private Date caducitatData;
 	private String documentTipus;
@@ -34,4 +48,6 @@ public class DocumentPortafirmesResource extends DocumentEnviamentResource {
 	private String motiuRebuig;
 	private Boolean avisFirmaParcial;
 	private Boolean firmaParcial;
+	
+	@Transient private String urlFluxSeguiment;
 }

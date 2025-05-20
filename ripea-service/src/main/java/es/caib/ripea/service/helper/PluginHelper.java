@@ -5405,9 +5405,10 @@ public class PluginHelper {
 	public String firmaSimpleWebStart(
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
-			UsuariDto usuariActual,
 			String urlReturnToRipea) {
 
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		
 		String accioDescripcio = "Iniciant firma simple";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("motiu", motiu);

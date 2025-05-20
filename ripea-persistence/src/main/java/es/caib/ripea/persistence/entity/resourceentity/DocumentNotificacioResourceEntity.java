@@ -1,5 +1,8 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import lombok.Getter;
@@ -8,11 +11,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -59,6 +58,13 @@ public class DocumentNotificacioResourceEntity extends DocumentEnviamentResource
     @Column(name = "notificacio_estat")
     @Enumerated(EnumType.STRING)
     protected DocumentNotificacioEstatEnumDto notificacioEstat;
+
+    @OneToMany(
+            mappedBy = "notificacio",
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    protected Set<DocumentEnviamentInteressatResourceEntity> documentInteressats = new HashSet<>();
+
     
 	public boolean isNotificacioFinalitzada() {
 		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(

@@ -1251,19 +1251,13 @@ public class ContingutHelper {
 		}
 		return contingut;
 	}
-
 	
-	public DocumentEntity comprovarDocumentPerTasca(
-			Long tascaId,
-			Long documentId) {
-		
+	public DocumentEntity comprovarDocumentPerTasca(Long tascaId, Long documentId) {
 		comprovarContingutPertanyTascaAccesible(tascaId, documentId);
-		DocumentEntity document = documentRepository.getOne(
-				documentId);
-
+		DocumentEntity document = documentRepository.getOne(documentId);
 		return document;
 	}
-
+	
 	public ContingutEntity comprovarContingutPertanyTascaAccesible(
 			Long tascaId,
 			Long contingutId) {
