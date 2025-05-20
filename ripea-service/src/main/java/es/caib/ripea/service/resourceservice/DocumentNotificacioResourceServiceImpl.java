@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentNotificacioResourceRepository;
@@ -26,8 +27,10 @@ import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
@@ -56,7 +59,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     public void init() {
         register(DocumentNotificacioResource.ACTION_ACTUALITZAR_ESTAT_CODE, new ActualitzarEstatActionExecutor());
         register(DocumentNotificacioResource.ACTION_DESCARREGAR_JUSTIFICANT, new JustificantReportGenerator());
-        register(DocumentNotificacioResource.ACTION_ELIMINAR, new EliminarNotificacioActionExecutor());
+//        register(DocumentNotificacioResource.ACTION_ELIMINAR, new EliminarNotificacioActionExecutor());
     }
 
     @Override
@@ -65,6 +68,19 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         resource.setHasDocumentInteressats(!entity.getDocumentInteressats().isEmpty());
     }
 
+    @Override
+    protected void beforeDelete(DocumentNotificacioResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {
+    	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+    	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatEntity.getId(), entity.getDocument().getId(), false, true);
+    	if (document!=null) {
+    		if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(entity.getTipus())) {
+    			throw new ResourceNotDeletedException(getResourceClass(), entity.getId().toString(), "Nomes es poden eliminar notificacions manuals.");
+    		}
+    	} else {
+    		throw new ResourceNotDeletedException(getResourceClass(), entity.getId().toString(), "Modificació del document de la notificació no permés.");
+    	}
+    }
+    
     private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
 
         @Override
@@ -88,6 +104,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
     }
     
+    /*
     private class EliminarNotificacioActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
 
 		@Override
@@ -106,7 +123,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
             }
 		}
     }
-    
+    */
     private class JustificantReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, DocumentNotificacioResource.MassiveAction, Serializable> {
 
 		@Override

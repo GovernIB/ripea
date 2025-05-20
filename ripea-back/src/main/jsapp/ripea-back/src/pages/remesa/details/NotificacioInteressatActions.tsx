@@ -16,7 +16,7 @@ const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
             onClick: handleOpen,
         },
 		{
-		    title: t('page.notificacio.acciones.certificat'),
+		    title: t('page.notificacioInteressat.acciones.certificat'),
 		    icon: "download",
 		    showInMenu: true,
 		    hidden: (row:any) => row.enviamentCertificacioData != null,
