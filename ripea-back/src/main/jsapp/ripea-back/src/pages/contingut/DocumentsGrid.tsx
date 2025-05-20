@@ -225,6 +225,8 @@ const DocumentsGrid = (props:any) => {
             isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
             toolbarHideCreate
             rowHideDeleteButton={hiddenDelete}
+
+            popupEditFormComponentProps={{ initOnChangeRequest: true }}
         />
         {components}
         {massiveComponents}
