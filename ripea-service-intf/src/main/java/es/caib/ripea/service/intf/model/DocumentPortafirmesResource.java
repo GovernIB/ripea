@@ -2,9 +2,9 @@ package es.caib.ripea.service.intf.model;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
-import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
-import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
@@ -34,4 +34,6 @@ public class DocumentPortafirmesResource extends DocumentEnviamentResource {
 	private String motiuRebuig;
 	private Boolean avisFirmaParcial;
 	private Boolean firmaParcial;
+	
+	@Transient private String urlFluxSeguiment;
 }
