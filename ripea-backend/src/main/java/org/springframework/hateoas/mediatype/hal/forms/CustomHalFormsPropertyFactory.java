@@ -115,6 +115,8 @@ public class CustomHalFormsPropertyFactory {
 					if (multipleType != null && (ResourceReference.class.isAssignableFrom(multipleType) || multipleType.isEnum())) {
 						inputType = "search";
 					}
+				} else if (String.class.isAssignableFrom(resolvedType)) {
+					inputType = "text";
 				}
 			}
 
