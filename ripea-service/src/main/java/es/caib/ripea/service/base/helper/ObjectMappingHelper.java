@@ -2,6 +2,7 @@ package es.caib.ripea.service.base.helper;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.exception.ObjectMappingException;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -92,7 +93,9 @@ public class ObjectMappingHelper {
 							ResourceEntity<?, ?> entity = (ResourceEntity<?, ?>)sourceField.get(source);
 							ResourceReference<?, ?> resourceReference = null;
 							if (entity != null) {
-								resourceReference = toResourceReference(entity);
+								resourceReference = ResourceReference.toResourceReference(
+										(Serializable)entity.getId(),
+										getResourceEntityDescription(entity, targetField));
 							}
 							setFieldValue(
 									target,
@@ -182,54 +185,48 @@ public class ObjectMappingHelper {
 		return null;
 	}
 
-	private ResourceReference<?, ?> toResourceReference(
-			ResourceEntity<?, ?> entity) {
-		return ResourceReference.toResourceReference(
-				(Serializable)entity.getId(),
-				//entity.getEntityDescription());
-				getResourceEntityDescription(entity));
-	}
-
-	private String getResourceEntityDescription(ResourceEntity<?, ?> persistable) {
+	private String getResourceEntityDescription(
+			ResourceEntity<?, ?> entity,
+			Field targetField) {
+		String descriptionFieldName = null;
 		Class<? extends Resource<?>> resourceClass = TypeUtil.getArgumentClassFromGenericSuperclass(
-				persistable.getClass(),
+				entity.getClass(),
 				ResourceEntity.class,
 				0);
-		String descriptionFieldName = getResourceDescriptionFieldName(resourceClass);
+		ResourceField resourceField = targetField.getAnnotation(ResourceField.class);
+		if (resourceField != null && !resourceField.descriptionField().isEmpty()) {
+			descriptionFieldName = resourceField.descriptionField();
+		} else {
+			ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
+			if (resourceConfig != null) {
+				String descriptionField = resourceConfig.descriptionField();
+				if (!descriptionField.isEmpty()) {
+					descriptionFieldName = descriptionField;
+				} else {
+					log.warn(
+							"Couldn't find description field for resource class {}: ResourceConfig.descriptionField not configured",
+							resourceClass.getName());
+				}
+			} else {
+				log.warn(
+						"Couldn't find description field for resource class {}: ResourceConfig annotation not found",
+						resourceClass.getName());
+			}
+		}
 		if (descriptionFieldName != null) {
 			try {
 				return (String)getFieldValue(
-						persistable,
+						entity,
 						descriptionFieldName);
 			} catch (Exception ex) {
 				log.warn(
 						"Couldn't find description field {} in entity class {}",
 						descriptionFieldName,
-						persistable.getClass().getName(),
+						entity.getClass().getName(),
 						ex);
 			}
 		}
-		return resourceClass.getSimpleName() + " (id=" + persistable.getId() + ")";
-	}
-
-	private String getResourceDescriptionFieldName(Class<? extends Resource<?>> resourceClass) {
-		ResourceConfig resourceConfig = resourceClass.getAnnotation(ResourceConfig.class);
-		if (resourceConfig != null) {
-			String descriptionField = resourceConfig.descriptionField();
-			if (!descriptionField.isEmpty()) {
-				return descriptionField;
-			} else {
-				log.warn(
-						"Couldn't find description field for resource class {}: ResourceConfig.descriptionField not configured",
-						resourceClass.getName());
-				return null;
-			}
-		} else {
-			log.warn(
-					"Couldn't find description field for resource class {}: ResourceConfig annotation not found",
-					resourceClass.getName());
-			return null;
-		}
+		return resourceClass.getSimpleName() + " (id=" + entity.getId() + ")";
 	}
 
 	private boolean isSimpleType(Class<?> type) {
