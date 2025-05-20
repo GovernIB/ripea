@@ -1,35 +1,54 @@
-import useRemesaDetail from "./RemesaDetail.tsx";
-import {useTranslation} from "react-i18next";
 import {
     useBaseAppContext,
     useResourceApiService
 } from "reactlib";
+import {useTranslation} from "react-i18next";
 import useNotificacioInteressatGrid from "./NotificacioInteressatGrid.tsx";
+import useRemesaDetail from "./RemesaDetail.tsx";
+import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
+
 const useActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const {
         artifactAction: apiAction,
+        artifactReport: apiReport,
     } = useResourceApiService('documentNotificacioResource');
 
-    const actualitzarEstat = (id: any) => {
-        apiAction(id, {code: 'ACTUALITZAR_ESTAT'})
+    const action = (id:any, code:any, mssg:any) => {
+        apiAction(id, {code})
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, mssg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+    const report = (id:any, code:any, mssg:any, fileType:any) => {
+        apiReport(id, {code, fileType})
+            .then((result) => {
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, mssg, 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
             });
     }
 
-    return {actualitzarEstat}
+    const actualitzarEstat = (id: any) => action(id, 'ACTUALITZAR_ESTAT', '');
+    const justificant = (id: any) => report(id, 'DESCARREGAR_JUSTIFICANT', '', 'ZIP');
+
+    return {
+        actualitzarEstat,
+        justificant,
+    }
 }
 
 const useRemesaActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const {actualitzarEstat} = useActions(refresh)
+    const {actualitzarEstat, justificant} = useActions(refresh)
 
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useRemesaDetail();
     const {handleOpen: handleNotificacioOpen, dialog: dialogNotificacio} = useNotificacioInteressatGrid(refresh);
@@ -65,12 +84,14 @@ const useRemesaActions = (refresh?: () => void) => {
             title: t('page.notificacio.acciones.justificant'),
             icon: "download",
             showInMenu: true,
-            hidden: (row:any) => row.estat != 'PENDENT',
+            onClick: justificant,
+            hidden: (row:any) => row.estat == 'PENDENT',
         },
 		{
 		    title: t('common.delete'),
 		    icon: 'delete',
 		    showInMenu: true,
+            clickTriggerDelete: true,
 		    hidden: (row:any) => row.tipus != 'MANUAL',
 		},		
     ];
