@@ -714,8 +714,10 @@ public interface DocumentService {
 
 	@PreAuthorize("isAuthenticated()")
 	public String firmaSimpleWebStart(
-			FitxerDto fitxerPerFirmar,
-			String motiu, String base);
+			Long entitatActualId,
+			Long documentId,
+			String motiu,
+			String base);
 
 	@PreAuthorize("isAuthenticated()")
 	public FirmaResultatDto firmaSimpleWebEnd(String transactionID);

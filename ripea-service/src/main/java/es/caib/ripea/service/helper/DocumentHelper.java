@@ -47,6 +47,7 @@ import es.caib.ripea.persistence.entity.NodeEntity;
 import es.caib.ripea.persistence.repository.DocumentPublicacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.service.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
@@ -1387,11 +1388,74 @@ public class DocumentHelper {
 		}
 	}
 
+	public void processarFirmaClient(
+			Long entitatId,
+			Long documentId,
+			String arxiuNom, 
+			byte[] arxiuContingut, 
+			String rolActual, 
+			Long tascaId) {
+		
+		String identificador = generarIdentificadorFirmaClient(entitatId, documentId);
+		
+		logger.debug("Custodiar identificador firma applet ("
+				+ "identificador=" + identificador + ")");
+		ObjecteFirmaApplet objecte = null;
+		try {
+			objecte = firmaAppletHelper.firmaAppletDesxifrar(
+					identificador,
+					DocumentFirmaAppletHelper.CLAU_SECRETA);
+		} catch (Exception ex) {
+			throw new RuntimeException(
+					"Error al desxifrar l'identificador per la firma via applet (" +
+					"identificador=" + identificador + ")",
+					ex);
+		}
+		if (objecte != null) {
+			
+			DocumentEntity document = null;
+			
+			if (tascaId == null) {
+				document = comprovarDocument(
+						objecte.getEntitatId(),
+						objecte.getDocumentId(),
+						false,
+						true,
+						false,
+						false, 
+						false, 
+						rolActual);
 
-	////
-	// COMPROVACIONS PERMISOS
-	////
+			} else {
+				document = contingutHelper.comprovarDocumentPerTasca(
+						tascaId,
+						documentId);
+			}
 
+			firmaAppletHelper.processarFirmaClient(
+					identificador,
+					changeExtensioToPdf(arxiuNom),
+					arxiuContingut,
+					document);
+		} else {
+			logger.error(
+					"No s'han trobat les dades del document amb identificador applet (" +
+					"identificador=" + identificador + ")");
+			throw new RuntimeException(
+					"No s'han trobat les dades del document amb identificador applet (" +
+					"identificador=" + identificador + ")");
+		}
+	}
+
+	private String changeExtensioToPdf(String nom) {
+		int indexPunt = nom.lastIndexOf(".");
+		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
+			return nom.substring(0,indexPunt)+ ".pdf";
+		} else {
+			return nom;
+		}
+	}
+	
 	public DocumentEntity comprovarDocument(
 			Long entitatId,
 			Long id,

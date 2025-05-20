@@ -50,7 +50,6 @@ import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
-import es.caib.ripea.service.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.service.helper.CacheHelper;
@@ -73,7 +72,6 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ViaFirmaHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
@@ -87,7 +85,6 @@ import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
-import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
@@ -409,7 +406,6 @@ public class DocumentServiceImpl implements DocumentService {
 		
 	}
 	
-	
 	@Override
 	public String firmaSimpleWebStartMassiu(
 			Set<Long> ids,
@@ -426,30 +422,26 @@ public class DocumentServiceImpl implements DocumentService {
 			fitxersPerFirmar.add(fitxerPerFirmar);
 		}
 
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		
 		return pluginHelper.firmaSimpleWebStart(
 				fitxersPerFirmar,
 				motiu,
-				usuariActual, 
 				urlReturnToRipea);
-
 	}
 	
 	@Override
 	public String firmaSimpleWebStart(
-			FitxerDto fitxerPerFirmar,
+			Long entitatActualId,
+			Long documentId,
 			String motiu, 
 			String urlReturnToRipea) {
-
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		
+		FitxerDto fitxerPerFirmar = convertirPdfPerFirmaClient(entitatActualId, documentId);
+		fitxerPerFirmar.setId(documentId);
 		
 		return pluginHelper.firmaSimpleWebStart(
 				Arrays.asList(fitxerPerFirmar),
 				motiu,
-				usuariActual, 
 				urlReturnToRipea);
-
 	}
 	
 	@Override
@@ -1724,61 +1716,8 @@ public class DocumentServiceImpl implements DocumentService {
 			byte[] arxiuContingut, 
 			String rolActual, 
 			Long tascaId) {
-		
-		String identificador = documentHelper.generarIdentificadorFirmaClient(
-				entitatId,
-				documentId);
-		
-		logger.debug("Custodiar identificador firma applet ("
-				+ "identificador=" + identificador + ")");
-		ObjecteFirmaApplet objecte = null;
-		try {
-			objecte = firmaAppletHelper.firmaAppletDesxifrar(
-					identificador,
-					DocumentFirmaAppletHelper.CLAU_SECRETA);
-		} catch (Exception ex) {
-			throw new RuntimeException(
-					"Error al desxifrar l'identificador per la firma via applet (" +
-					"identificador=" + identificador + ")",
-					ex);
-		}
-		if (objecte != null) {
-			
-			DocumentEntity document = null;
-			
-			if (tascaId == null) {
-				document = documentHelper.comprovarDocument(
-						objecte.getEntitatId(),
-						objecte.getDocumentId(),
-						false,
-						true,
-						false,
-						false, 
-						false, 
-						rolActual);
-
-			} else {
-				document = contingutHelper.comprovarDocumentPerTasca(
-						tascaId,
-						documentId);
-			}
-
-			firmaAppletHelper.processarFirmaClient(
-					identificador,
-					changeExtensioToPdf(arxiuNom),
-					arxiuContingut,
-					document);
-		} else {
-			logger.error(
-					"No s'han trobat les dades del document amb identificador applet (" +
-					"identificador=" + identificador + ")");
-			throw new RuntimeException(
-					"No s'han trobat les dades del document amb identificador applet (" +
-					"identificador=" + identificador + ")");
-		}
+		documentHelper.processarFirmaClient(entitatId, documentId, arxiuNom, arxiuContingut, rolActual, tascaId);
 	}
-	
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -1809,16 +1748,6 @@ public class DocumentServiceImpl implements DocumentService {
 				false);
 		return (DocumentDto) contingutDto;
 	}
-	
-	private String changeExtensioToPdf(String nom) {
-		int indexPunt = nom.lastIndexOf(".");
-		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
-			return nom.substring(0,indexPunt)+ ".pdf";
-		} else {
-			return nom;
-		}
-	}
-	
 	
 	@Transactional
 	@Override

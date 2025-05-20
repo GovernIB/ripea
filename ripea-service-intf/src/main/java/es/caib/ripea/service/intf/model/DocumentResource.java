@@ -56,8 +56,18 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GET_CSV_LINK,
-                        formClass = DocumentResource.GetCsvFormAction.class,
+                        formClass = Serializable.class,
                         requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_FIRMA_WEB_INI,
+                        formClass = DocumentResource.IniciarFirmaSimple.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_FIRMA_WEB_FIN,
+                        formClass = DocumentResource.FinalitzarFirmaSimple.class,
+                        requiresId = true),                 
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
@@ -107,6 +117,8 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
     public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
     public static final String ACTION_GET_CSV_LINK = "GET_CSV_LINK";
+    public static final String ACTION_FIRMA_WEB_INI = "FIRMA_WEB_INI";
+    public static final String ACTION_FIRMA_WEB_FIN = "FIRMA_WEB_FIN";
 	//Accions massives desde la pipella de contingut
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
@@ -266,10 +278,20 @@ public class DocumentResource extends NodeResource {
         private String email;
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
     }
-
+    
     @Getter
     @Setter
-    public static class GetCsvFormAction implements Serializable {}
+    public static class IniciarFirmaSimple implements Serializable {
+    	@NotNull
+    	private String motiu;
+    }
+    
+    @Getter
+    @Setter
+    public static class FinalitzarFirmaSimple implements Serializable {
+    	@NotNull
+    	private String transactionId;
+    }
     
     @Getter
     @Setter

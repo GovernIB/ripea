@@ -550,11 +550,13 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	@Override
 	@RolesAllowed("**")
 	public String firmaSimpleWebStart(
-			FitxerDto fitxerPerFirmar,
+			Long entitatActualId,
+			Long documentId,
 			String motiu, 
 			String urlReturnToRipea) {
 		return delegateService.firmaSimpleWebStart(
-				fitxerPerFirmar,
+				entitatActualId,
+				documentId,
 				motiu, 
 				urlReturnToRipea);
 	}

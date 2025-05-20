@@ -60,6 +60,7 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
@@ -68,6 +69,7 @@ import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -75,7 +77,10 @@ import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.DocumentResource.FinalitzarFirmaSimple;
+import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
@@ -141,6 +146,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
+        register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
+        register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
         //Dades externes
         register(DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId, new FluxosFirmaFieldOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
@@ -671,13 +678,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
     
-    private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.GetCsvFormAction, String> {
+    private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, String> {
 
 		@Override
-		public void onChange(Serializable id, DocumentResource.GetCsvFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource.GetCsvFormAction target) {}
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
 
 		@Override
-		public String exec(String code, DocumentResourceEntity entity, DocumentResource.GetCsvFormAction params) throws ActionExecutionException {
+		public String exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				return documentHelper.getEnllacCsv(entitatEntity.getId(), entity.getId());
@@ -685,6 +692,67 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				excepcioLogHelper.addExcepcio("/document/CsvLinkActionExecutor", e);
 				return "";
 			}
+		}
+    }
+
+    private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, String> {
+
+		@Override
+		public void onChange(Serializable id, IniciarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaSimple target) {
+			//initialOnChange --> Carregar un valor per defecte per el motiu
+			if (fieldName==null) {
+				String expNom = documentResourceRepository.findById(((Integer)id).longValue()).get().getExpedient().getNom();
+				target.setMotiu("Tramitació del expedient RIPEA: "+expNom);
+			}
+		}
+
+		@Override
+		public String exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
+			try {
+				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/" + entity.getId() + "/firmaSimpleWebEnd";
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				FitxerDto fitxerDto = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), entity.getId());
+				return pluginHelper.firmaSimpleWebStart(Arrays.asList(fitxerDto), params.getMotiu(), urlReturnToRipea);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFirmaWebActionExecutor", e);
+				return null;
+			}
+		}
+    }    
+    
+    private class FinalitzarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.FinalitzarFirmaSimple, CodiValorDto> {
+
+		@Override
+		public void onChange(Serializable id, FinalitzarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, FinalitzarFirmaSimple target) {}
+
+		@Override
+		public CodiValorDto exec(String code, DocumentResourceEntity entity, FinalitzarFirmaSimple params) throws ActionExecutionException {
+			try {
+				FirmaResultatDto firmaResultat = pluginHelper.firmaSimpleWebEnd(params.getTransactionId());
+				if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
+
+					if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
+						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+						documentHelper.processarFirmaClient(
+								entitatEntity.getId(),
+								entity.getId(),
+								firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
+								firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
+								configHelper.getRolActual(),
+								null);
+						return new CodiValorDto("OK", "document.controller.firma.passarela.final.ok");
+					} else {
+						return new CodiValorDto("ERROR", firmaResultat.getSignatures().get(0).getMsg());
+					}
+				} else if (firmaResultat.getStatus() == StatusEnumDto.WARNING) {
+					return new CodiValorDto("WARNING", firmaResultat.getMsg());
+				} else if (firmaResultat.getStatus() == StatusEnumDto.ERROR) {
+					return new CodiValorDto("ERROR", firmaResultat.getMsg());
+				}
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/FinalitzarFirmaWebActionExecutor", e);
+			}
+			return null;
 		}
     }
     
