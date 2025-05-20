@@ -11,7 +11,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentNotificacioResourceRepository;
