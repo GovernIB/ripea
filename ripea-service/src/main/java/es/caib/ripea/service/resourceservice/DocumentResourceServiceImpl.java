@@ -5,20 +5,13 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -686,16 +679,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
     
-    private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, String> {
+    private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
 
 		@Override
-		public String exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+		public Serializable exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-				return documentHelper.getEnllacCsv(entitatEntity.getId(), entity.getId());
+
+                Map<String, String> result = new HashMap<>();
+                result.put("url", documentHelper.getEnllacCsv(entitatEntity.getId(), entity.getId()));
+
+                return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/CsvLinkActionExecutor", e);
 				return "";
@@ -726,8 +723,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				return null;
 			}
 		}
-    }    
-    
+    }
+
     private class FinalitzarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.FinalitzarFirmaSimple, CodiValorDto> {
 
 		@Override
@@ -763,7 +760,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			return null;
 		}
     }
-    
+
     private class ResumIaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ResumIaFormAction, Resum> {
 
         @Override
@@ -779,7 +776,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource.ResumIaFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.ResumIaFormAction target) {}
     }
-    
+
     private class PublicarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.PublicarFormAction, DocumentResource> {
 
         @Override
@@ -799,10 +796,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource.PublicarFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.PublicarFormAction target) {}
     }
-    
+
     private class NotificarActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarFormAction, DocumentResource> {
 
-		@Override
+        @Override
 		public void onChange(Serializable id, NotificarFormAction previous, String fieldName, Object fieldValue,
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
             if (fieldName==null){
@@ -848,21 +845,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarFormAction params) throws ActionExecutionException {
         	try {
-            	
-	        	List<Long> interessatsIds = new ArrayList<Long>();
+	        	List<Long> interessatsIds = params.getInteressats().stream()
+                        .map(ResourceReference::getId)
+                        .collect(Collectors.toList());
 	        	boolean anyInteressatIsAdministracio = false;
-	        	if (params.getInteressats()!=null) {
-	        		for (ResourceReference<InteressatResource, Long> interessat: params.getInteressats()) {
-	        			interessatsIds.add(interessat.getId());
-	        			InteressatResourceEntity ie = interessatResourceRepository.findById(interessat.getId()).get();
-	        			if (InteressatTipusEnum.InteressatAdministracioEntity.equals(ie.getTipus())) {
-	        				anyInteressatIsAdministracio = true;
-	        			}
-	        			if (params.getEntregaPostal()!=null && params.getEntregaPostal().booleanValue() && !ie.adressaCompleta()) {
-	        				throw new ActionExecutionException(ie.getClass(), ie.getId(), code, "notificacio.controller.reject.postal");
-	        			}
-	        		}
-	        	}
+                List<InteressatResourceEntity> interessatResourceEntityList = interessatResourceRepository.findAllById(interessatsIds);
+
+                for (InteressatResourceEntity interessatResourceEntity: interessatResourceEntityList) {
+                    if (InteressatTipusEnum.InteressatAdministracioEntity.equals(interessatResourceEntity.getTipus())) {
+                        anyInteressatIsAdministracio = true;
+                    }
+                    if (params.getEntregaPostal()!=null && params.getEntregaPostal() && !interessatResourceEntity.adressaCompleta()) {
+                        throw new ActionExecutionException(interessatResourceEntity.getClass(), interessatResourceEntity.getId(), code, "notificacio.controller.reject.postal");
+                    }
+                }
 	        	
 	        	if (DocumentNotificacioTipusEnumDto.COMUNICACIO.equals(params.getTipus()) && 
 	        		"application/zip".equals(entity.getFitxerContentType()) &&
@@ -877,7 +873,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        	notificacioDto.setTipus(params.getTipus());
 	        	notificacioDto.setInteressatsIds(interessatsIds); //El helper notifica al representant si és necessari
 	        	notificacioDto.setServeiTipusEnum(params.getServeiTipus());
-	        	notificacioDto.setEntregaPostal(params.getEntregaPostal()!=null?params.getEntregaPostal().booleanValue():false);
+	        	notificacioDto.setEntregaPostal(params.getEntregaPostal() != null && params.getEntregaPostal());
 	        	notificacioDto.setObservacions(params.getDescripcio());
 	        	notificacioDto.setAssumpte(params.getConcepte());
 				notificacioDto.setDataProgramada(params.getDataProgramada()); 
@@ -895,6 +891,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
     private class EnviarPortafirmesActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarPortafirmesFormAction, DocumentResource> {
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<>();
+
+            if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
+                EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
+                List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatEntity.getId(), false);
+
+                if (fluxosDto != null) {
+                    for (PortafirmesFluxRespostaDto flx : fluxosDto) {
+                        resultat.add(new FieldOption(flx.getFluxId(), flx.getNom()));
+                    }
+                }
+            }
+            return resultat;
+        }
 
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {

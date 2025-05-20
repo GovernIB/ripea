@@ -42,6 +42,27 @@ const useRemesaActions = (refresh?: () => void) => {
             onClick: handleDetallOpen,
         },
         {
+            title: t('page.notificacio.acciones.actualitzarEstat'),
+            icon: "sync",
+            showInMenu: true,
+            onClick: actualitzarEstat,
+            hidden: (row:any) => row.notificacioEstat == 'PROCESSADA',
+        },
+        {
+            title: t('page.notificacio.acciones.notificacioInteressat'),
+            icon: "send",
+            showInMenu: true,
+            onClick: handleNotificacioOpen,
+            hidden: (row:any) => !row.hasDocumentInteressats,
+        },
+        {
+            title: t('page.notificacio.acciones.justificant'),
+            icon: "download",
+            showInMenu: true,
+            // onClick: ,
+            hidden: (row:any) => row.notificacioEstat == 'PENDENT',
+        },
+        {
             title: t('common.update'),
             icon: 'edit',
             showInMenu: true,
@@ -49,30 +70,11 @@ const useRemesaActions = (refresh?: () => void) => {
             hidden: (row:any) => row.tipus != 'MANUAL',
         },
         {
-            title: t('page.notificacio.acciones.actualitzarEstat'),
-            icon: "sync",
+            title: t('common.delete'),
+            icon: 'delete',
             showInMenu: true,
-            onClick: actualitzarEstat,
-            hidden: (row:any) => row.estat == 'PROCESSADA',
-        },
-        {
-            title: t('page.notificacio.acciones.notificacioInteressat'),
-            icon: "send",
-            showInMenu: true,
-            onClick: handleNotificacioOpen,
-            hidden: (row:any) => row.estat == 'PROCESSADA',
-        },
-        {
-            title: t('page.notificacio.acciones.justificant'),
-            icon: "download",
-            showInMenu: true,
-            hidden: (row:any) => row.estat == 'PENDENT',
-        },
-        {
-            title: t('page.notificacio.acciones.certificat'),
-            icon: "download",
-            showInMenu: true,
-            hidden: () => true, /* enviamentCertificacio */
+            clickTriggerDelete: true,
+            hidden: (row:any) => row.tipus != 'MANUAL',
         },
     ];
 

@@ -487,7 +487,6 @@ const translationCa = {
                 notificacioInteressat: "Enviaments",
                 justificant: "Justificant d’enviament",
                 documentEnviat: "Document enviat",
-                certificat: "Certificació",
             },
         },
         notificacioInteressat: {
@@ -514,6 +513,7 @@ const translationCa = {
             acciones: {
                 ampliarPlac: "Amplia el termini",
                 downloadDoc: "Descarregar document",
+                certificat: "Certificació",
             },
             action: {
                 ampliarPlac: "Ampliació del termini dels enviaments de la remesa",

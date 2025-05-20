@@ -1,21 +1,23 @@
-import useDocumentDetail from "./DocumentDetail.tsx";
-import {useTranslation} from "react-i18next";
-import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
+import {Divider} from "@mui/material";
 import {MuiDataGridApiRef, useBaseAppContext, useResourceApiService} from "reactlib";
-import useMoure from "../actions/Moure.tsx";
+import {useTranslation} from "react-i18next";
+import {useEntitatSession, useUserSession} from "../../../components/Session.tsx";
+import useDocumentDetail from "./DocumentDetail.tsx";
 import useHistoric from "../../Historic.tsx";
+import useInformacioArxiu from "../../InformacioArxiu.tsx";
+import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/CommonActions.tsx";
+import {potModificar} from "../../expedient/details/Expedient.tsx";
+import useMoure, {useCopiar, useVincular} from "../actions/Moure.tsx";
 import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
 import useEviarPortafirmes from "../actions/EviarPortafirmes.tsx";
-import useInformacioArxiu from "../../InformacioArxiu.tsx";
-import {useEntitatSession, useUserSession} from "../../../components/Session.tsx";
-import {Divider} from "@mui/material";
-import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/CommonActions.tsx";
-import {potModificar} from "../../expedient/details/Expedient.tsx";
+import useVisualitzar from "../actions/Visualitzar.tsx";
+import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
+import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
-    const {fieldDownload: apiDownload,} = useResourceApiService('documentResource');
+    const {artifactAction: apiAction, fieldDownload: apiDownload} = useResourceApiService('documentResource');
 
     const downloadAdjunt = (id:any,fieldName:string) :void => {
         apiDownload(id,{fieldName})
@@ -26,8 +28,26 @@ export const useActions = (refresh?: () => void) => {
             })
     }
 
+    const enllacCSV = (id:any) => {
+        apiAction(id, {code: 'GET_CSV_LINK'})
+            .then((result) => {
+                navigator.clipboard.writeText(result?.url)
+                    .then(()=>{
+                        temporalMessageShow(null, '', 'success');
+                    })
+                    .catch((error) => {
+                        temporalMessageShow(null, error?.message, 'error');
+                    });
+
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
     return {
         apiDownload: downloadAdjunt,
+        getLinkCSV: enllacCSV
     }
 }
 
@@ -36,11 +56,15 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const { value: user } = useUserSession()
     const { value: entitat } = useEntitatSession()
 
-    const {apiDownload} = useActions(refresh)
+    const {apiDownload, getLinkCSV} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
+    const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
+    const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(potModificar(entity), refresh);
     const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
     const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
+    const {handleShow: handleCopiarShow, content: contentCopiar} = useCopiar(refresh);
+    const {handleShow: handleVincularShow, content: contentVincular} = useVincular(refresh);
     const {handleShow: handleEnviarViaEmailShow, content: contentEnviarViaEmail} = useEnviarViaEmail(refresh);
     const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
     const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
@@ -106,17 +130,20 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('common.copy')+"...",
             icon: "file_copy",
             showInMenu: true,
+            onClick: handleCopiarShow,
             hidden: !potModificar(entity) || !user?.sessionScope?.isMostrarCopiar,
         },
         {
             title: t('page.document.acciones.vincular'),
             icon: "link",
             showInMenu: true,
+            onClick: handleVincularShow,
             hidden: !potModificar(entity) || !user?.sessionScope?.isMostrarVincular,
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
         },
         {
             title: t('page.document.acciones.imprimible'),
@@ -151,6 +178,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('page.document.acciones.view'),
             icon: "search",
             showInMenu: true,
+            onClick: handleVisualitzarOpen,
             disabled: (row:any) => !isInOptions(row?.fitxerExtension, 'pdf', 'odt', 'docx'),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
@@ -158,6 +186,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('page.document.acciones.csv'),
             icon: "file_copy",
             showInMenu: true,
+            onClick: getLinkCSV,
             hidden: (row:any) => !isInOptions(row?.estat, 'DEFINITIU', 'CUSTODIAT') || !user?.sessionScope?.isUrlValidacioDefinida,
         },
         {
@@ -166,21 +195,23 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden : (row:any) => !potModificar(entity) || !row?.metaNode?.firmaPortafirmesActiva || !isFirmaActiva(row),
+            hidden : (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.firmar'),
             icon: "edit_document",
             showInMenu: true,
+            // onClick: ,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potModificar(entity) || !row?.metaNode?.firmaPassarelaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.viaFirma'),
             icon: "edit_document",
             showInMenu: true,
+            // onClick: ,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potModificar(entity) || !row?.metaNode?.firmaBiometricaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
             title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
@@ -205,14 +236,16 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleEnviarViaEmailShow,
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
-            showInMenu: true,
-        },
-        {
             title: t('page.document.acciones.seguiment'),
             icon: "info",
             showInMenu: true,
+            onClick: handleSeguimentOpen,
             hidden: (row:any) => !(row?.estat == 'FIRMA_PENDENT' && row?.documentTipus == 'DIGITAL'),
+        },
+        {
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
         },
         {
             title: t('page.contingut.acciones.history'),
@@ -231,6 +264,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('page.document.acciones.export'),
             icon: "download",
             showInMenu: true,
+            // onClick: ,
             disabled: true,
         },
     ]
@@ -245,12 +279,16 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {expedientComponents}
         {dialogDetall}
         {dialogHistoric}
+        {dialogVisualitzar}
         {arxiuDialog}
         {contentMoure}
+        {contentCopiar}
+        {contentVincular}
         {contentEnviarViaEmail}
         {contentNotificar}
         {contentPublicar}
         {contentEviarPortafirmes}
+        {dialogSeguiment}
     </>;
     return {
         createActions: createDocumentActions,

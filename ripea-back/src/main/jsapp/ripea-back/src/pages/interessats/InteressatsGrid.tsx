@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Grid} from "@mui/material";
 import {
-    GridPage,
+    GridPage, useFormContext,
     useMuiDataGridApiRef,
 } from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -13,6 +13,8 @@ import useImport from "./actions/Import.tsx";
 import {potModificar} from "../expedient/details/Expedient.tsx";
 
 export const InteressatsGridForm = () => {
+    const {data} = useFormContext()
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus" required/>
         <GridFormField xs={12} name="documentTipus" required/>
@@ -21,8 +23,8 @@ export const InteressatsGridForm = () => {
         <GridFormField xs={6} name="llinatge1"/>
         <GridFormField xs={6} name="llinatge2"/>
         <GridFormField xs={6} name="pais"/>
-        <GridFormField xs={6} name="provincia"/>
-        <GridFormField xs={6} name="municipi"/>
+        <GridFormField xs={6} name="provincia" requestParams={{pais: data?.pais}}/>
+        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
         <GridFormField xs={6} name="codiPostal"/>
         <GridFormField xs={12} name="adresa" type={"textarea"}/>
         <GridFormField xs={6} name="email"/>

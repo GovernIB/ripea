@@ -3,7 +3,7 @@ import useExportarDocuments from "../actions/ExportarDocuments.tsx";
 import { useTranslation } from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 
-const useMassiveActions = (refresh?: () => void)=> {
+export const useMassiveActions = (refresh?: () => void)=> {
 	
     const {temporalMessageShow} = useBaseAppContext();
 	const { t } = useTranslation();
@@ -37,7 +37,7 @@ const useMassiveActions = (refresh?: () => void)=> {
     const follow	= (ids: any[]): void => { massiveAction(ids, 'FOLLOW', t('page.expedient.results.actionBackgroundOk'));}
     const unfollow 	= (ids: any[]): void => { massiveAction(ids, 'UNFOLLOW', t('page.expedient.results.actionBackgroundOk'));}
 	const esborrar 	= (ids: any[]): void => { massiveAction(ids, 'ESBORRAR', t('page.expedient.results.actionBackgroundOk'));}
-	
+
 	const exportExcel 	= (ids: any[]): void => { massiveReport(ids, 'EXPORT_EXCEL', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
 	const exportCsv		= (ids: any[]): void => { massiveReport(ids, 'EXPORT_CSV', t('page.expedient.results.actionBackgroundOk'), 'CSV');}
 	const exportIndexZip= (ids: any[]): void => { massiveReport(ids, 'EXPORT_INDEX_ZIP', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}

@@ -17,24 +17,22 @@ const MoureForm = () => {
                        disabled={!data?.expedient}
                        filter={builder.and(builder.eq('expedient.id', data?.expedient?.id))}/>
         <GridFormField xs={12} name="motiu"/>
-        <GridFormField xs={12} name="action" required/>
+        {/*<GridFormField xs={12} name="action" required/>*/}
     </Grid>
 }
 
 const Moure = (props:any) => {
-    const { t } = useTranslation();
-
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"MOURE"}
-        title={t('page.document.action.move')}
         {...props}
     >
         <MoureForm/>
     </FormActionDialog>
 }
 
-const useMoure = (refresh?: () => void) => {
+export const useMoure = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -46,6 +44,7 @@ const useMoure = (refresh?: () => void) => {
             contingut: row?.nom,
             expedient: row?.expedient,
             carpeta: carpeta,
+            action: 'MOURE',
         })
     }
     const handleMassiveShow = (ids:any[], entity:any) :void => {
@@ -56,6 +55,7 @@ const useMoure = (refresh?: () => void) => {
                 id: entity?.id,
                 description: entity?.nom,
             },
+            action: 'MOURE',
         })
     }
     const onSuccess = () :void => {
@@ -69,7 +69,87 @@ const useMoure = (refresh?: () => void) => {
     return {
         handleShow,
         handleMassiveShow,
-        content: <Moure apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Moure apiRef={apiRef} title={t('page.document.action.move')} onSuccess={onSuccess} onError={onError}/>
+    }
+}
+export const useCopiar = (refresh?: () => void) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (id:any, row:any) :void => {
+        const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
+        apiRef.current?.show?.(undefined, {
+            ids: [id],
+            massivo: false,
+            contingut: row?.nom,
+            expedient: row?.expedient,
+            carpeta: carpeta,
+            action: 'COPIAR',
+        })
+    }
+    const handleMassiveShow = (ids:any[], entity:any) :void => {
+        apiRef.current?.show?.(undefined, {
+            ids: ids,
+            massivo: true,
+            expedient: {
+                id: entity?.id,
+                description: entity?.nom,
+            },
+            action: 'COPIAR',
+        })
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, '', 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow(null, error.message, 'error');
+    }
+
+    return {
+        handleShow,
+        handleMassiveShow,
+        content: <Moure apiRef={apiRef} title={''} onSuccess={onSuccess} onError={onError}/>
+    }
+}
+export const useVincular = (refresh?: () => void) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const handleShow = (id:any, row:any) :void => {
+        const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
+        apiRef.current?.show?.(undefined, {
+            ids: [id],
+            massivo: false,
+            contingut: row?.nom,
+            expedient: row?.expedient,
+            carpeta: carpeta,
+            action: 'VINCULAR',
+        })
+    }
+    const handleMassiveShow = (ids:any[], entity:any) :void => {
+        apiRef.current?.show?.(undefined, {
+            ids: ids,
+            massivo: true,
+            expedient: {
+                id: entity?.id,
+                description: entity?.nom,
+            },
+            action: 'VINCULAR',
+        })
+    }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, '', 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow(null, error.message, 'error');
+    }
+
+    return {
+        handleShow,
+        handleMassiveShow,
+        content: <Moure apiRef={apiRef} title={''} onSuccess={onSuccess} onError={onError}/>
     }
 }
 export default useMoure;
