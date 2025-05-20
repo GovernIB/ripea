@@ -487,7 +487,6 @@ const translationEs = {
                 notificacioInteressat: "Envios",
                 justificant: "Justificante de envio",
                 documentEnviat: "Documento enviado",
-                certificat: "Certificación",
             },
         },
         notificacioInteressat: {
@@ -514,6 +513,7 @@ const translationEs = {
             acciones: {
                 ampliarPlac: "Ampliar plazo",
                 downloadDoc: "Descargar documento",
+                certificat: "Certificación",
             },
             action: {
                 ampliarPlac: "Ampliación del plazo de los envíos de la remesa",

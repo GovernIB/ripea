@@ -8,6 +8,7 @@ import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 import java.io.Serializable;
 import java.util.*;
@@ -60,6 +61,9 @@ public class DocumentNotificacioResource extends DocumentEnviamentResource {
     private boolean ambRegistres;
     private Date dataEnviada;
     private Date dataFinalitzada;
+
+    @Transient
+    private boolean hasDocumentInteressats;
 
     private ResourceReference<OrganGestorResource, Long> emisor;
     

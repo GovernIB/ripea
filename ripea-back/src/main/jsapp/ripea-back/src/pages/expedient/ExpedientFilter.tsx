@@ -16,10 +16,15 @@ const ExpedientFilterForm = (props:any) => {
         builder.eq('revisioEstat', "'REVISAT'"),
     );
 
+    const filtErestatAdditionalInfo = builder.and(
+        builder.eq('metaExpedient.id', data?.metaExpedient?.id),
+    );
+
     return <>
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="estat"/>
+        <GridFormField xs={3} name="estatAdditionalInfo" filter={filtErestatAdditionalInfo} hidden/>
         <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="organGestor"/>
         <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>

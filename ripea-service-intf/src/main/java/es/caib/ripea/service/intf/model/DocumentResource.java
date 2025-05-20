@@ -334,6 +334,7 @@ public class DocumentResource extends NodeResource {
         private DocumentNotificacioTipusEnumDto tipus;
         @NotNull
         private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
+        @NotNull
         @NotEmpty
         private List<ResourceReference<InteressatResource, Long>> interessats = new ArrayList<>();
         @NotNull

@@ -12,7 +12,7 @@ const ExpedientActionButton = (props:{entity:any}) => {
         window.location.reload();
     }
 
-    const {actions, components} = useCommonActions(refresh);
+    const {actions, components} = useCommonActions();
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
 
     const additionalActions = actions.map((a:any)=>{

@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;

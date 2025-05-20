@@ -10,8 +10,8 @@ const useMassiveActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
     const {artifactReport: apiReport} = useResourceApiService('documentResource');
 
-    const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
-        return apiReport(undefined, {code :code, data:{ ids: [id], massivo: false }, fileType})
+    const massiveReport = (ids:any, code:string, msg:string, fileType:any) => {
+        return apiReport(undefined, {code :code, data:{ ids, massivo: true }, fileType})
             .then((result) => {
                 refresh?.();
                 iniciaDescargaBlob(result);
@@ -22,7 +22,7 @@ const useMassiveActions = (refresh?: () => void) => {
             });
     }
 
-    const download 	= (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', '', 'ZIP'); }
+    const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', '', 'ZIP'); }
 
     return {download}
 }
