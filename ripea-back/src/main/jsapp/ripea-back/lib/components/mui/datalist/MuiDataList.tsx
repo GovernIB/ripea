@@ -74,6 +74,7 @@ export type MuiDataListProps = {
     popupEditFormDialogTitle?: string;
     popupEditFormDialogResourceTitle?: string;
     popupEditFormDialogComponentProps?: any;
+    popupEditFormComponentProps?: any;
 };
 
 const fieldDescription = (name: string, value: any, fields: any[] | undefined) => {
@@ -181,6 +182,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
         popupEditFormDialogComponentProps,
+        popupEditFormComponentProps,
     } = props;
     const theme = useTheme();
     const {
@@ -209,6 +211,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         findDisabled,
         findArgs,
         quickFilterInitialValue,
+        undefined,
         { sx: { ml: 1 } });
     const {
         toolbarAddElement,
@@ -236,6 +239,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
         popupEditFormDialogComponentProps,
+        popupEditFormComponentProps,
         apiCurrentActions,
         apiDelete,
         refresh);
