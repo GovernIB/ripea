@@ -1,18 +1,38 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentNotificacioResourceRepository;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DocumentNotificacioHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
+import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'expedients.
@@ -24,9 +44,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceService<DocumentNotificacioResource, Long, DocumentNotificacioResourceEntity> implements DocumentNotificacioResourceService {
 
+	private final ConfigHelper configHelper;
+	private final PluginHelper pluginHelper;
+	private final DocumentHelper documentHelper;
+	private final ExcepcioLogHelper excepcioLogHelper;
+	private final EntityComprovarHelper entityComprovarHelper;
+	private final DocumentNotificacioHelper documentNotificacioHelper;
+	private final DocumentNotificacioResourceRepository documentNotificacioResourceRepository;
+	
     @PostConstruct
     public void init() {
         register(DocumentNotificacioResource.ACTION_ACTUALITZAR_ESTAT_CODE, new ActualitzarEstatActionExecutor());
+        register(DocumentNotificacioResource.ACTION_DESCARREGAR_JUSTIFICANT, new JustificantReportGenerator());
+        register(DocumentNotificacioResource.ACTION_ELIMINAR, new EliminarNotificacioActionExecutor());
     }
 
     @Override
@@ -34,17 +64,83 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         resource.setFitxerNom(entity.getDocument().getFitxerNom());
     }
 
-    // ActionExecutor
     private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
 
         @Override
         public DocumentNotificacioResource exec(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
-            return null;
+            try {
+            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+            	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatEntity.getId(), entity.getDocument().getId(), false, true);
+            	if (document!=null) {
+            		documentNotificacioHelper.actualitzarEstat(entity.getId());
+            	} else {
+            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar l'estat de la notificació: No es té permis sobre el document.");
+            	}
+            	return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/DocumentNotificacioResource", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar l'estat de la notificació.");
+            }
         }
 
         @Override
-        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+        public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+    }
+    
+    private class EliminarNotificacioActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
 
-        }
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public DocumentNotificacioResource exec(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
+            try {
+            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+            	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatEntity.getId(), entity.getDocument().getId(), false, true);
+            	documentNotificacioHelper.delete(entity.getId(), document);
+            	return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/EliminarNotificacioActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al eliminar la notificació.");
+            }
+		}
+    }
+    
+    private class JustificantReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, DocumentNotificacioResource.MassiveAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+		@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+			
+			DownloadableFile resultat = null;
+			Long notificacioId = data.get(0)!=null?(Long)data.get(0):null;
+			DocumentNotificacioResource.MassiveAction params = (DocumentNotificacioResource.MassiveAction)data.get(1);
+			
+			if (params.isMassivo()) {
+				throw new ReportGenerationException(DocumentNotificacioResource.class, notificacioId, code, "La generació de justificants massiu per notificacions no esta implementat.");
+			} else {
+				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(notificacioId).get();
+				RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioResourceEntity.getNotificacioIdentificador());
+				if (resposta.isError()) {
+					throw new ReportGenerationException(DocumentNotificacioResource.class, notificacioId, code, "La descarrega del justificant de la notificacio ha fallat: "+resposta.getErrorDescripcio());
+				} else {
+	            	resultat = new DownloadableFile(
+	            			"justificantEnviament_"+notificacioId+".pdf",
+	            			"application/pdf",
+	            			resposta.getJustificant());
+				}
+			}
+			return resultat;
+		}
+		
+		@Override
+		public List<Serializable> generateData(String code, DocumentNotificacioResourceEntity entity, MassiveAction params) throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getId():0l);
+			parametres.add(params);
+			return parametres;
+		}
     }
 }

@@ -15,6 +15,12 @@ const useNotificacioInteressatActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleOpen,
         },
+		{
+		    title: t('page.notificacio.acciones.certificat'),
+		    icon: "download",
+		    showInMenu: true,
+		    hidden: (row:any) => row.enviamentCertificacioData != null,
+		},
         {
             title: t('page.notificacioInteressat.acciones.ampliarPlac'),
             icon: "edit_calendar",

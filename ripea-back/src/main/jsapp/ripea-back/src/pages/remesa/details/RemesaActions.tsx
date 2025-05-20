@@ -60,20 +60,19 @@ const useRemesaActions = (refresh?: () => void) => {
             icon: "send",
             showInMenu: true,
             onClick: handleNotificacioOpen,
-            hidden: (row:any) => row.estat == 'PROCESSADA',
         },
         {
             title: t('page.notificacio.acciones.justificant'),
             icon: "download",
             showInMenu: true,
-            hidden: (row:any) => row.estat == 'PENDENT',
+            hidden: (row:any) => row.estat != 'PENDENT',
         },
-        {
-            title: t('page.notificacio.acciones.certificat'),
-            icon: "download",
-            showInMenu: true,
-            hidden: () => true, /* enviamentCertificacio */
-        },
+		{
+		    title: t('common.delete'),
+		    icon: 'delete',
+		    showInMenu: true,
+		    hidden: (row:any) => row.tipus != 'MANUAL',
+		},		
     ];
 
     const components = <>
