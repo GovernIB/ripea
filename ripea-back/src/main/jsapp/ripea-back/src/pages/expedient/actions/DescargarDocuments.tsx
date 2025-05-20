@@ -69,7 +69,6 @@ const DescargarDocumentsForm = () => {
         isRowSelectable={(data:any)=> data?.row?.id}
         readOnly
 
-
         onRowSelectionModelChange={(newSelection) => {
             setSelectedRows([...newSelection]);
         }}

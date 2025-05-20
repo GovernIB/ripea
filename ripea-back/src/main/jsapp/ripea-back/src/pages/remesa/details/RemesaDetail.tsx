@@ -5,66 +5,6 @@ import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
-import * as builder from "../../../util/springFilterUtils.ts";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-
-const columns = [
-    {
-        field: 'interessat',
-        flex: 1,
-    },
-    {
-        field: 'enviamentDatatEstat',
-        flex: 0.5,
-    },
-    {
-        field: 'enviamentDatatData',
-        flex: 1,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'enviamentDatatOrigen',
-        flex: 0.5,
-    },
-    {
-        field: 'registreNumeroFormatat',
-        flex: 0.75,
-    },
-    {
-        field: 'registreData',
-        flex: 1,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-    {
-        field: 'enviamentCertificacioOrigen',
-        flex: 0.75,
-    },
-    {
-        field: 'enviamentCertificacioData',
-        flex: 1,
-        valueFormatter: (value: any) => formatDate(value)
-    },
-]
-
-const sortModel:any = [{field: 'id', sort: 'asc'}]
-
-const EnviamentInteressatGrid = (props:any) => {
-    const {entity} = props;
-
-    return <StyledMuiGrid
-        resourceName={'documentEnviamentInteressatResource'}
-        // perspectives={['']}
-        columns={columns}
-        filter={builder.and(
-            builder.eq('notificacio.id', entity?.id)
-        )}
-        staticSortModel={sortModel}
-        toolbarHide
-        disableColumnSorting
-        readOnly
-        autoHeight
-    />;
-}
 
 const Dades = (props:any) => {
     const {entity} = props;
@@ -104,10 +44,6 @@ const Dades = (props:any) => {
                       ]}
             >
                 <ContenidoData title={t('page.notificacio.detall.fitxerNom')} xs={10}>{entity?.fitxerNom}</ContenidoData>
-            </CardData>
-
-            <CardData title={t('page.notificacio.acciones.notificacioInteressat')}>
-                <EnviamentInteressatGrid entity={entity}/>
             </CardData>
         </Grid>
     </BasePage>

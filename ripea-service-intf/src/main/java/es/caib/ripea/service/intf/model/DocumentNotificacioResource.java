@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
 
+import java.io.Serializable;
 import java.util.*;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -23,11 +27,24 @@ import java.util.*;
                 type = ResourceArtifactType.ACTION,
                 code = DocumentNotificacioResource.ACTION_ACTUALITZAR_ESTAT_CODE,
                 requiresId = true),
+            @ResourceConfigArtifact(
+                    type = ResourceArtifactType.ACTION,
+                    code = DocumentNotificacioResource.ACTION_ELIMINAR,
+                    formClass = Serializable.class,
+                    requiresId = true),
+			@ResourceConfigArtifact(
+					type = ResourceArtifactType.REPORT,
+					code = DocumentNotificacioResource.ACTION_DESCARREGAR_JUSTIFICANT,
+					formClass = DocumentNotificacioResource.MassiveAction.class),				
         }
 )
 public class DocumentNotificacioResource extends DocumentEnviamentResource {
 
-    public static final String ACTION_ACTUALITZAR_ESTAT_CODE = "ACTUALITZAR_ESTAT";
+	private static final long serialVersionUID = -1924617628889102191L;
+	
+	public static final String ACTION_ACTUALITZAR_ESTAT_CODE	= "ACTUALITZAR_ESTAT";
+    public static final String ACTION_DESCARREGAR_JUSTIFICANT	= "DESCARREGAR_JUSTIFICANT";
+    public static final String ACTION_ELIMINAR					= "DELETE_NOTIFICACIO";
 
     private DocumentNotificacioTipusEnumDto tipus;
     private Date dataProgramada;
@@ -49,4 +66,14 @@ public class DocumentNotificacioResource extends DocumentEnviamentResource {
     private boolean hasDocumentInteressats;
 
     private ResourceReference<OrganGestorResource, Long> emisor;
+    
+    @Getter
+    @Setter
+    public static class MassiveAction implements Serializable {
+		private static final long serialVersionUID = 2652981509368050812L;
+		@NotNull
+        @NotEmpty
+        private List<Long> ids;
+        private boolean massivo = false;
+    }
 }

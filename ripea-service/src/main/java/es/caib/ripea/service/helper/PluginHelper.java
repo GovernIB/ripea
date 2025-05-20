@@ -92,6 +92,7 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
@@ -263,6 +264,7 @@ public class PluginHelper {
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	
+	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
 	@Autowired private UsuariRepository usuariRepository;
@@ -4754,9 +4756,10 @@ public class PluginHelper {
 		}
 	}
 
-	public byte[] notificacioConsultarIDescarregarCertificacio(
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
 
+		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.getOne(documentEnviamentInteressatId);
+		
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));

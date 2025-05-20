@@ -203,19 +203,20 @@ public class DocumentNotificacioHelper {
 		
 	}
 	
+	public void actualitzarEstat(Long documentEnviamentId) {
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findById(documentEnviamentId).get();
+		for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacio.getDocumentEnviamentInteressats()) {
+			actualitzarEstat(documentEnviamentInteressatEntity);
+		}
+	}
+	
 	public void actualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-
 		pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
-
 	}
 		
 	public byte[] getCertificacio(Long documentEnviamentInteressatId) {
-		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.getOne(
-				documentEnviamentInteressatId);
-		return pluginHelper.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatEntity);
+		return pluginHelper.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatId);
 	}
-	
-
 	
 	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {
 		logAll(notificacioEntity, tipusLog, param1, notificacioEntity.getAssumpte());

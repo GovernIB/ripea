@@ -1,9 +1,9 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {useGridApiRef} from "@mui/x-data-grid-pro";
 import {
     useBaseAppContext,
     useResourceApiService,
-    MuiDialog
+    MuiDialog, MuiFormDialog, useFormContext, MuiFormDialogApi
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -13,6 +13,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
 import Load from "../../../components/Load.tsx";
+import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
@@ -69,22 +70,26 @@ const ActionFilter = (props:any) => {
     </StyledMuiFilter>
 }
 
-const Relacionar= (props:any) => {
-    const {entity, gridApiRef} = props;
+const RelacionarForm= () => {
+    const {data, apiRef} = useFormContext();
     const [springFilter, setSpringFilter] = useState<string>();
+    const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
     const selectionModel = useMemo(()=>{
-        return entity?.relacionatsAmb?.map((a:any)=>a.id)
-    }, [entity])
+        return data?.relacionatsAmb?.map((a:any) => a.id)
+    }, [])
 
-    return <Load value={entity && selectionModel} noEffect>
+    useEffect(() => {
+        apiRef?.current?.setFieldValue("relacionatsAmb", selectedRows?.map(id => ({ id })))
+    }, [selectedRows]);
+
+    return <Load value={selectionModel} noEffect>
         <ActionFilter onSpringFilterChange={setSpringFilter}/>
         <StyledMuiGrid
             resourceName={'expedientResource'}
-            datagridApiRef={gridApiRef}
             columns={columns}
             filter={builder.and(
-                builder.neq('id', entity?.id),
+                builder.neq('id', apiRef?.current?.getId()),
                 springFilter
             )}
             sortModel={sortModel}
@@ -94,94 +99,50 @@ const Relacionar= (props:any) => {
             // TODO: check seleccionados al inicio
             rowSelectionModel={selectionModel}
 
+            onRowSelectionModelChange={(newSelection) => {
+                setSelectedRows([...newSelection]);
+            }}
+
             height={162 + 52 * 4}
             paginationActive
             readOnly
         />
     </Load>
 }
-const useRelacionar= (refresh?: () => void) => {
+
+const Relacionar = (props:any) => {
     const { t } = useTranslation();
 
-    const [open, setOpen] = useState(false);
-    const [entity, setEntity] = useState<any>();
+    return <MuiFormDialog
+        resourceName={'expedientResource'}
+        title={t('page.expedient.action.relacio')}
+        {...props}
+    >
+        <RelacionarForm/>
+    </MuiFormDialog>
+}
 
-    const handleShow = (id:any, row:any) => {
-        console.log(id, row);
-        setEntity(row);
-        setOpen(true);
-    }
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const gridApiRef=useGridApiRef()
-
-    const {
-        isReady: apiIsReady,
-        patch: apiPatch
-    } = useResourceApiService('expedientResource');
+const useRelacionar= (refresh?: () => void) => {
+    const formApiRef = useRef<MuiFormDialogApi>()
     const {temporalMessageShow} = useBaseAppContext();
 
-    const relacionarAll = () => {
-        relacionar([...gridApiRef.current.getSelectedRows().keys()])
-    }
-
-    const relacionar = (ids:any[]) => {
-        if (apiIsReady) {
-            apiPatch(entity?.id, {data: {relacionatsAmb: ids.map(id=>{ return {id:id}} )}})
-                .then(() => {
-                    refresh?.()
-                    temporalMessageShow(null, '', 'success');
-                })
-                .catch((error) => {
-                    error && temporalMessageShow(null, error.message, 'error');
-                });
-        }
-    }
-
-    const content =
-        <MuiDialog
-            title={t('page.expedient.action.relacio')}
-            open={open}
-            closeCallback={handleClose}
-            // title={entity?.nom}
-            componentProps={{ fullWidth: true, maxWidth: 'xl', height: 'max-content'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    icon: 'close'
-                },
-                {
-                    value: 'relacio',
-                    text: t('page.expedient.acciones.relacio'),
-                    icon: 'link',
-                    componentProps: {
-                        variant: "contained",
-                        style: {
-                            borderRadius: '4px',
-                        },
-                    }
-                },
-            ]}
-            buttonCallback={(value :any) :void=>{
-                if (value=='close') {
-                    handleClose();
+    const handleShow = (id:any, row:any) :void => {
+        console.log(id, row)
+        formApiRef.current?.show?.(id,{ relacionatsAmb: row?.relacionatsAmb })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error:any) :void => {
+                if (error) {
+                    temporalMessageShow(null, error.message, 'error');
                 }
-                if (value=='relacio') {
-                    relacionarAll();
-                    handleClose();
-                }
-            }}
-        >
-            <Relacionar entity={entity} gridApiRef={gridApiRef}/>
-    </MuiDialog>
+            });
+    }
 
     return {
         handleShow,
-        content
+        content: <Relacionar apiRef={formApiRef}/>
     }
 }
 export default useRelacionar;

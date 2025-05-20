@@ -1774,10 +1774,8 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional
 	@Override
-	public void notificacioActualitzarEstat(
-			String identificador) {
-		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByNotificacioIdentificador(
-				identificador);
+	public void notificacioActualitzarEstat(String identificador) {
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByNotificacioIdentificador(identificador);
 		try {
 
 			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacio.getDocumentEnviamentInteressats()) {
@@ -1793,25 +1791,15 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional
 	@Override
-	public void notificacioActualitzarEstat(
-			Long id) {
-		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.getOne(id);
+	public void notificacioActualitzarEstat(Long id) {
 		try {
-
-			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacio.getDocumentEnviamentInteressats()) {
-				documentNotificacioHelper.actualitzarEstat(documentEnviamentInteressatEntity);
-			}
-			
+			documentNotificacioHelper.actualitzarEstat(id);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de notificacions";
 			logger.error(errorDescripcio, ex);
 			throw new RuntimeException(ex);
 		}
 	}
-	
-	
-	
-	
 	
 	@Transactional
 	@Override
@@ -1819,25 +1807,19 @@ public class DocumentServiceImpl implements DocumentService {
 		documentHelper.actualitzarEstatADefinititu(documentId);
 	}
 	
-	
 	@Transactional
 	@Override
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
 		return documentNotificacioHelper.getCertificacio(documentEnviamentInteressatId);
 	}
 	
-	
 	@Override
 	@Transactional
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId) {
-		
 		DocumentNotificacioEntity documentNotificacioEntity = documentNotificacioRepository.getOne(notificacioId);
-
 		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getNotificacioIdentificador());
 		return conversioTipusHelper.convertir(resposta, RespostaJustificantEnviamentNotibDto.class);
 	}
-
-
 
 	@Override
 	@Transactional

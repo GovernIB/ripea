@@ -420,49 +420,17 @@ public class DocumentEnviamentController extends BaseUserController {
 			return "redirect:../../expedient";
 	}
 	
-	
 	@RequestMapping(value = "/{enviamentId}/descarregarCertificacio", method = RequestMethod.GET)
 	public String notificacioConsultarIDescarregarCertificacio(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable Long enviamentId) throws IOException {
-
 		writeFileToResponse(
 				"certificacio.pdf",
 				documentService.notificacioConsultarIDescarregarCertificacio(enviamentId),
 				response);
 		return null;
 	}
-	
-	
-	
-
-	/*@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/refrescar")
-	public String notificacioRefrescar(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			@PathVariable Long notificacioId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		boolean fetaAmbExit = documentEnviamentService.notificacioRetry(
-				entitatActual.getId(),
-				documentId,
-				notificacioId);
-		if (fetaAmbExit) {
-			MissatgesHelper.success(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.notificacio.reintent.ok"));
-		} else {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.notificacio.reintent.error"));
-		}
-		return "redirect:info";
-	}*/
 
 	@RequestMapping(value = "/{documentId}/publicar", method = RequestMethod.GET)
 	public String publicarGet(
