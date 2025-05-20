@@ -3,16 +3,19 @@ import MuiDialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import Icon from '@mui/material/Icon';
+import IconButton from '@mui/material/IconButton';
 import { DialogButton, ContentDialogShowFn, MessageDialogShowFn } from '../BaseAppContext';
 import { useMessageDialogButtons, useConfirmDialogButtons } from '../AppButtons';
 import DialogButtons from './DialogButtons';
 
 export type DialogProps = React.PropsWithChildren & {
     open: boolean;
-    closeCallback: () => void;
+    closeCallback: (reason: string) => void;
     title?: string | null;
     buttons?: DialogButton[];
     buttonCallback?: (value: any) => void;
+    closeIcon?: boolean;
     componentProps?: any;
     ref?: React.RefObject<HTMLDivElement | null>;
 };
@@ -20,7 +23,12 @@ export type DialogProps = React.PropsWithChildren & {
 export const useContentDialog: ((
     dialogButtons?: DialogButton[],
     validateFn?: (value?: any) => Promise<boolean>,
-    resolveValueFn?: (value?: any) => any) => [ContentDialogShowFn, React.ReactElement, React.RefObject<HTMLDivElement | null>]) = (dialogButtons, validateFn, resolveValueFn) => {
+    resolveValueFn?: (value?: any) => any,
+    closeFn?: (reason?: string) => boolean) => [ContentDialogShowFn, React.ReactElement, React.RefObject<HTMLDivElement | null>]) = (
+        dialogButtons,
+        validateFn,
+        resolveValueFn,
+        closeFn) => {
     const defaultDialogButtons = useConfirmDialogButtons();
     const [open, setOpen] = React.useState<boolean>(false);
     const [title, setTitle] = React.useState<string | null>();
@@ -65,10 +73,13 @@ export const useContentDialog: ((
             setOpen(false);
         }
     }
-    const closeCallback = () => {
-        // S'ha tancat la modal amb la 'X' o s'ha fet click a fora de la finestra
-        rejectFn?.(undefined);
-        setOpen(false);
+    const closeCallback = (reason: string) => {
+        // S'ha tancat la modal amb la 'x' o s'ha fet click a fora de la finestra
+        const doClose = closeFn != null ? closeFn(reason) : true;
+        if (doClose) {
+            rejectFn?.(undefined);
+            setOpen(false);
+        }
     }
     const dialogComponent = <Dialog
         open={open}
@@ -102,16 +113,29 @@ export const Dialog: React.FC<DialogProps> = (props) => {
         closeCallback,
         title,
         buttons,
+        closeIcon = true,
         componentProps,
         ref,
         children,
     } = props;
     return <MuiDialog
         open={open}
-        onClose={() => closeCallback()}
+        onClose={(_event, reason) => closeCallback(reason)}
         ref={ref}
         {...componentProps}>
         {title && <DialogTitle>{title}</DialogTitle>}
+        {closeIcon && <IconButton
+            aria-label="close"
+            onClick={() => closeCallback('buttonClick')}
+            size="small"
+            sx={(theme) => ({
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: theme.palette.grey[500],
+            })}>
+            <Icon fontSize="small">close</Icon>
+        </IconButton>}
         <DialogContent>{children}</DialogContent>
         {buttons && <DialogButtons
             buttons={buttons}

@@ -38,7 +38,8 @@ export type UseFormDialogFn = (
     customSubmitErrorMessage?: string,
     defaultFormContent?: React.ReactNode,
     defaultDialogComponentProps?: any,
-    defaultFormComponentProps?: any) => [FormDialogShowFn, React.ReactElement];
+    defaultFormComponentProps?: any,
+    closeFn?: (reason?: string) => boolean) => [FormDialogShowFn, React.ReactElement];
 
 export const useFormDialog: UseFormDialogFn = (
     resourceName: string,
@@ -49,7 +50,8 @@ export const useFormDialog: UseFormDialogFn = (
     customSubmitErrorMessage?: string,
     defaultFormContent?: React.ReactNode,
     defaultDialogComponentProps?: any,
-    defaultFormComponentProps?: any) => {
+    defaultFormComponentProps?: any,
+    closeFn?: (reason?: string) => boolean) => {
     const formApiRef = React.useRef<FormApi | any>({});
     const formDialogButtons = useFormDialogButtons();
     const [open, setOpen] = React.useState<boolean>(false);
@@ -110,10 +112,13 @@ export const useFormDialog: UseFormDialogFn = (
             setOpen(false);
         }
     }
-    const closeCallback = () => {
-        // S'ha tancat la modal amb la 'X' o s'ha fet click a fora de la finestra
-        rejectFn?.(undefined);
-        setOpen(false);
+    const closeCallback = (reason: string) => {
+        // S'ha tancat la modal amb la 'x' o s'ha fet click a fora de la finestra
+        const doClose = closeFn != null ? closeFn(reason) : true;
+        if (doClose) {
+            rejectFn?.(undefined);
+            setOpen(false);
+        }
     }
     const dialogComponent = <FormDialog
         resourceName={resourceName}

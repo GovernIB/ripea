@@ -22,6 +22,7 @@ export const CambiarEstat = (props: { apiRef:any }) => {
         resourceName={"expedientResource"}
         title={t('page.expedient.action.changeEstat')}
         apiRef={apiRef}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
     >
         <CambiarEstatForm/>
     </MuiFormDialog>

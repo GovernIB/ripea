@@ -96,7 +96,8 @@ export const useActionReportLogic = (
     formDialogComponentPropsArg?: any,
     formDialogResultProcessor?: (result?: any) => React.ReactElement,
     onSuccess?: (result?: any) => void,
-    onError?: (error?: any) => void) => {
+    onError?: (error?: any) => void,
+    dialogCloseCallback?: (reason?: string) => boolean) => {
     const { t, messageDialogShow, saveAs } = useBaseAppContext();
     const actionDialogButtons = useActionDialogButtons();
     const reportDialogButtons = useReportDialogButtons();
@@ -145,7 +146,9 @@ export const useActionReportLogic = (
         action ? execAction : generateReport,
         action ? t('actionreport.action.error') : t('actionreport.report.error'),
         formDialogContent,
-        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report });
+        null,
+        { resourceType: action ? 'action' : 'report', resourceTypeCode: action ?? report },
+        dialogCloseCallback);
     const exec = (id: any, dialogTitle?: any, formAdditionalData?: any, formDialogComponentProps?: any) => {
         if (hasForm && !dialogDisabled) {
             const formDialogTitle = apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
