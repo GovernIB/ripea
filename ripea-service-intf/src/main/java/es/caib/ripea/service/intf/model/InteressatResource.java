@@ -118,40 +118,12 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 
     @Transient
 	public String getCodiNom() {
-		String resultat = null;
-        switch (this.tipus) {
-            case InteressatPersonaFisicaEntity:
-            	resultat = documentNum + " - " + getNomComplet();
-            default:
-            	resultat = getNomComplet();
-        }
-        return (" - ".equals(resultat)?null:resultat);
+    	return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
     }
     
     @Transient
 	public String getNomComplet() {
-		switch (this.tipus) {
-		case InteressatPersonaFisicaEntity:
-			StringBuilder sb = new StringBuilder();
-			if (nom != null) {
-				sb.append(nom);
-			}
-			if (llinatge1 != null) {
-				sb.append(" ");
-				sb.append(llinatge1);
-				if (llinatge2 != null) {
-					sb.append(" ");
-					sb.append(llinatge2);
-				}
-			}
-			return sb.toString();	
-		case InteressatPersonaJuridicaEntity:
-			return raoSocial;
-		case InteressatAdministracioEntity:
-			return organCodi;
-		default:
-			return null;
-		}
+    	return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
 	}
 
     @Getter

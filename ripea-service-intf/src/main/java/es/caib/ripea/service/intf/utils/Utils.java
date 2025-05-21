@@ -1,12 +1,5 @@
 package es.caib.ripea.service.intf.utils;
 
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.security.crypto.codec.Base64;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -29,6 +22,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.security.crypto.codec.Base64;
+
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 
 public class Utils {
 	
@@ -546,4 +548,40 @@ public class Utils {
     	}
     	return null;
     }
+    
+	public static String getCodiNom(InteressatTipusEnum tipus, String documentNum, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
+		String resultat = null;
+        switch (tipus) {
+            case InteressatPersonaFisicaEntity:
+            	resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
+            default:
+            	resultat = getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
+        }
+        return (" - ".equals(resultat)?null:resultat);
+    }
+
+	public static String getNomComplet(InteressatTipusEnum tipus, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
+		switch (tipus) {
+		case InteressatPersonaFisicaEntity:
+			StringBuilder sb = new StringBuilder();
+			if (nom != null) {
+				sb.append(nom);
+			}
+			if (llinatge1 != null) {
+				sb.append(" ");
+				sb.append(llinatge1);
+				if (llinatge2 != null) {
+					sb.append(" ");
+					sb.append(llinatge2);
+				}
+			}
+			return sb.toString();	
+		case InteressatPersonaJuridicaEntity:
+			return raoSocial;
+		case InteressatAdministracioEntity:
+			return organCodi;
+		default:
+			return null;
+		}
+	}
 }

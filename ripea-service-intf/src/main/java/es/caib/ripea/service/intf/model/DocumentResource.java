@@ -11,8 +11,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.dto.*;
-import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,6 +21,29 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPublicacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -244,8 +265,8 @@ public class DocumentResource extends NodeResource {
     @Transient private int NumMetaDades;
     @Transient private boolean documentDeAnotacio;
     @Transient private boolean ambNotificacions;
-    @Transient private boolean isFuncionariHabilitatDigitalib;
-    @Transient private boolean isPluginSummarizeActiu;
+    @Transient private boolean funcionariHabilitatDigitalib;
+    @Transient private boolean pluginSummarizeActiu;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private DigitalitzacioPerfilDto digitalitzacioPerfil;
     

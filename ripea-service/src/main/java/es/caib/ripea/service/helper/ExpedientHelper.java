@@ -32,6 +32,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -385,6 +386,125 @@ public class ExpedientHelper {
 		return exception == null;
 	}
 
+	public void relacioCreate(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				id,
+				true,
+				false,
+				true,
+				false,
+				false,
+				rolActual);
+		ExpedientEntity toRelate = entityComprovarHelper.comprovarExpedient(
+				relacionatId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+
+		boolean alreadyRelatedTo = false;
+		for (ExpedientEntity relacionatPer : toRelate.getRelacionatsAmb()) {
+			if (relacionatPer.getId().equals(expedient.getId())) {
+				alreadyRelatedTo = true;
+			}
+		}
+		// checking if inverse relation doesnt already exist
+		if (alreadyRelatedTo) {
+			throw new ValidationException("Expedient ja relacionat");
+		}
+		expedient.addRelacionat(toRelate);
+		contingutLogHelper.log(
+				expedient, 
+				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+					@Override
+					public String getId() {
+						return id + "#" + relacionatId;
+					}
+					@Override
+					public boolean isNew() {
+						return false;
+					}
+				},
+				LogObjecteTipusEnumDto.RELACIO,
+				LogTipusEnumDto.CREACIO,
+				id.toString(),
+				relacionatId.toString(),
+				false,
+				false);
+		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
+		if (isPropagarRelacioActiva) {
+			pluginHelper.arxiuExpedientEnllacar(
+					expedient, 
+					toRelate);
+		}
+	}
+	
+	public boolean relacioDelete(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				id,
+				true,
+				false,
+				true,
+				false,
+				false,
+				rolActual);
+		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
+				relacionatId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+		boolean trobat = true;
+		if (expedient.getRelacionatsAmb().contains(relacionat)) {
+			expedient.removeRelacionat(relacionat);
+		} else if (relacionat.getRelacionatsAmb().contains(expedient)) {
+			relacionat.removeRelacionat(expedient);
+		} else {
+			trobat = false;
+		}
+		if (trobat) {
+			contingutLogHelper.log(
+					expedient, 
+					LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
+						@Override
+						public String getId() {
+							return id + "#" + relacionatId;
+						}
+						@Override
+						public boolean isNew() {
+							return false;
+						}
+		
+					},
+					LogObjecteTipusEnumDto.RELACIO,
+					LogTipusEnumDto.ELIMINACIO,
+					id.toString(),
+					relacionatId.toString(),
+					false,
+					false);
+		}
+		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
+		if (isPropagarRelacioActiva) {
+			try {
+				//provar desenllaçar fill del pare des del pare
+				pluginHelper.arxiuExpedientDesenllacar(
+						expedient, 
+						relacionat);
+			} catch (Exception e) {
+				logger.debug(e.getMessage());
+				//provar desenllaçar fill del pare des del fill
+				pluginHelper.arxiuExpedientDesenllacar(
+						relacionat, 
+						expedient);
+			}
+		}
+		return trobat;
+	}
+	
 	@Transactional
 	public void associateInteressats(
 			Long expedientId,

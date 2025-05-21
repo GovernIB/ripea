@@ -358,4 +358,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String motiu;
         private List<Long> documentsPerFirmar;
     }
+    
+    public boolean estaRelacionatAmb(Long id) {
+    	if (this.getRelacionatsAmb()!=null) {
+    		for (ResourceReference<ExpedientResource, Long> relacionatAmb: this.getRelacionatsAmb()) {
+    			if (relacionatAmb.getId().equals(id)) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
 }

@@ -44,6 +44,7 @@ import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,11 +93,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     public class ProvinciaFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			List<ProvinciaDto> provincies = cacheHelper.findProvincies();
+			String[] requestParam = requestParameterMap.get(InteressatResource.Fields.pais);
+			String paisCodi = requestParam!=null?requestParam[0]:"";
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (provincies!=null) {
-				for (ProvinciaDto prov: provincies) {
-					resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
+			if (paisCodi!=null && paisCodi.equals("724")) {
+				List<ProvinciaDto> provincies = cacheHelper.findProvincies();
+				if (provincies!=null) {
+					for (ProvinciaDto prov: provincies) {
+						resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
+					}
 				}
 			}
 			return resultat;
@@ -105,11 +110,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia("07");
+			String[] requestParam = requestParameterMap.get(InteressatResource.Fields.provincia);
+			String provinciaCodi = requestParam!=null?requestParam[0]:"";
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (municipis!=null) {
-				for (MunicipiDto municipi: municipis) {
-					resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
+			if (Utils.hasValue(provinciaCodi)) {
+				List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia(provinciaCodi);
+				if (municipis!=null) {
+					for (MunicipiDto municipi: municipis) {
+						resultat.add(new FieldOption(municipi.getCodi(), municipi.getNom()));
+					}
 				}
 			}
 			return resultat;

@@ -1067,135 +1067,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	@SuppressWarnings("serial")
 	public void relacioCreate(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug(
 				"Relacionant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "relacionatId=" +
 						relacionatId + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				true,
-				false,
-				true,
-				false,
-				false,
-				rolActual);
-		ExpedientEntity toRelate = entityComprovarHelper.comprovarExpedient(
-				relacionatId,
-				false,
-				true,
-				false,
-				false,
-				false,
-				rolActual);
-
-		boolean alreadyRelatedTo = false;
-		for (ExpedientEntity relacionatPer : toRelate.getRelacionatsAmb()) {
-			if (relacionatPer.getId().equals(expedient.getId())) {
-				alreadyRelatedTo = true;
-			}
-		}
-		// checking if inverse relation doesnt already exist
-		if (alreadyRelatedTo) {
-			throw new ValidationException("Expedient ja relacionat");
-		}
-		expedient.addRelacionat(toRelate);
-		contingutLogHelper.log(
-				expedient, 
-				LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-					@Override
-					public String getId() {
-						return id + "#" + relacionatId;
-					}
-					@Override
-					public boolean isNew() {
-						return false;
-					}
-				},
-				LogObjecteTipusEnumDto.RELACIO,
-				LogTipusEnumDto.CREACIO,
-				id.toString(),
-				relacionatId.toString(),
-				false,
-				false);
-		boolean isPropagarRelacioActiva = isProgaparRelacioActiva();
-		if (isPropagarRelacioActiva) {
-			pluginHelper.arxiuExpedientEnllacar(
-					expedient, 
-					toRelate);
-		}
+		expedientHelper.relacioCreate(entitatId, id, relacionatId, rolActual);
 	}
 
 	@Transactional
 	@Override
-	@SuppressWarnings("serial")
 	public boolean relacioDelete(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug(
 				"Esborrant la relació de l'expedient amb un altre expedient (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ", " + "relacionatId=" + relacionatId + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				true,
-				false,
-				true,
-				false,
-				false,
-				rolActual);
-		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
-				relacionatId,
-				false,
-				true,
-				false,
-				false,
-				false,
-				rolActual);
-		boolean trobat = true;
-		if (expedient.getRelacionatsAmb().contains(relacionat)) {
-			expedient.removeRelacionat(relacionat);
-		} else if (relacionat.getRelacionatsAmb().contains(expedient)) {
-			relacionat.removeRelacionat(expedient);
-		} else {
-			trobat = false;
-		}
-		if (trobat) {
-			contingutLogHelper.log(
-					expedient, 
-					LogTipusEnumDto.MODIFICACIO, new Persistable<String>() {
-						@Override
-						public String getId() {
-							return id + "#" + relacionatId;
-						}
-						@Override
-						public boolean isNew() {
-							return false;
-						}
-		
-					},
-					LogObjecteTipusEnumDto.RELACIO,
-					LogTipusEnumDto.ELIMINACIO,
-					id.toString(),
-					relacionatId.toString(),
-					false,
-					false);
-		}
-		boolean isPropagarRelacioActiva = isProgaparRelacioActiva();
-		if (isPropagarRelacioActiva) {
-			try {
-				//provar desenllaçar fill del pare des del pare
-				pluginHelper.arxiuExpedientDesenllacar(
-						expedient, 
-						relacionat);
-			} catch (Exception e) {
-				logger.debug(e.getMessage());
-				//provar desenllaçar fill del pare des del fill
-				pluginHelper.arxiuExpedientDesenllacar(
-						relacionat, 
-						expedient);
-			}
-		}
-		return trobat;
+		return  expedientHelper.relacioDelete(entitatId, id, relacionatId, rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -1909,11 +1796,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private boolean isIncorporacioDuplicadaPermesa() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
 	}
-	
-	private boolean isProgaparRelacioActiva() {
-		return configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
-	}
-	
+
 	private boolean isIncorporacioJustificantActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT);
 	}

@@ -49,6 +49,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
@@ -64,6 +65,7 @@ import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -81,7 +83,6 @@ import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
-import es.caib.ripea.service.resourceservice.DocumentResourceServiceImpl.InitialOnChangeDocumentResourceLogicProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -276,6 +277,36 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         return filtreResultat.generate();
     }
+    
+    @Override
+    protected void afterUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	//Relacionam els nous expedients seleccionats
+    	if (resource.getRelacionatsAmb()!=null) {
+    		for (ResourceReference<ExpedientResource, Long> relacionatAmb: resource.getRelacionatsAmb()) {
+    			try {
+    				expedientHelper.relacioCreate(entity.getEntitat().getId(), entity.getId(), relacionatAmb.getId(), configHelper.getRolActual());
+    			} catch (ValidationException ex) {
+    				//Ja relacionat 
+    			}
+    		}
+    	}
+    	
+    	//Eliminam els que ja no estan relacionats
+    	if (entity.getRelacionatsAmb()!=null) {
+    		for (ExpedientResourceEntity relacionat: entity.getRelacionatsAmb()) {
+    			if (!resource.estaRelacionatAmb(relacionat.getId())) {
+    				expedientHelper.relacioDelete(entity.getEntitat().getId(), entity.getId(), relacionat.getId(), configHelper.getRolActual());
+    			}
+    		}
+    	}
+    }
+    
+    /*@Override
+    protected boolean beforeUpdateEntity(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
+    	
+
+    	return true;
+    }*/
     
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
@@ -1235,6 +1266,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             }
         }
     }
+    
     private static class FilterOnchangeLogicProcessor implements FilterProcessor<ExpedientFilterForm> {
 
         @Override

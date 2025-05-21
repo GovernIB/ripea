@@ -36,11 +36,11 @@ const DocumentsGridForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
-        <GridFormField xs={data.isPluginSummarizeActiu ?11 :12} name="nom"/>
+        <GridFormField xs={data.pluginSummarizeActiu ?11 :12} name="nom"/>
         <GridButton xs={1} title={t('page.document.detall.summarize')}
                     onClick={actualizarDatos}
                     disabled={!data?.adjunt}
-                    hidden={!data.isPluginSummarizeActiu}>
+                    hidden={!data.pluginSummarizeActiu}>
             <Icon>assistant</Icon>IA
         </GridButton>
         <GridFormField xs={12} name="descripcio" type={"textarea"}/>

@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
@@ -104,6 +106,14 @@ public class InteressatResourceEntity extends BaseAuditableEntity<InteressatReso
     @OneToMany(mappedBy = "representant", cascade = {CascadeType.DETACH}, fetch = FetchType.LAZY)
     protected List<InteressatResourceEntity> representats;
 
+	public String getCodiNom() {
+		return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
+    }
+
+	public String getNomComplet() {
+		return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
+	}
+    
     public boolean adressaCompleta() {
 		if (Utils.isEmpty(this.getPais()) || Utils.isEmpty(this.getProvincia()) ||
 			Utils.isEmpty(this.getMunicipi()) || Utils.isEmpty(this.getCodiPostal()) ||
