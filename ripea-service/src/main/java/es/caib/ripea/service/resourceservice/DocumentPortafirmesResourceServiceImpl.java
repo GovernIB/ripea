@@ -51,7 +51,7 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
     		UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
     		resource.setUrlFluxSeguiment(pluginHelper.portafirmesRecuperarUrlEstatFluxFirmes(
     				Long.valueOf(entity.getPortafirmesId()),
-    				usuari.getIdioma()!=null?usuari.getIdioma():"ca"));
+    				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca"));
     	} catch (Exception ex) {
     		//No s'ha pogut carregar la URL del fluxe
     	}

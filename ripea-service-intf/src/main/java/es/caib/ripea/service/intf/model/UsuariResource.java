@@ -34,12 +34,10 @@ public class UsuariResource extends BaseResource<String> {
 	private String email;
 	@Size(max = 200)
 	private String emailAlternatiu;
-	@Size(max = 2)
 	private IdiomaEnumDto idioma;
 	private boolean inicialitzat = false;
 	@Size(max = 64)
 	private String rolActual;
-	@Size(max = 64)
 	private ContingutVistaEnumDto vistaActual;
 	private Long numElementsPagina;
 	private boolean rebreEmailsAgrupats = true;

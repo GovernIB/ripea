@@ -15,6 +15,7 @@ import javax.persistence.Transient;
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import lombok.Getter;
@@ -39,23 +40,14 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	private String email;
 	@Column(name = "email_alternatiu", length = 200)
 	private String emailAlternatiu;
-	@Column(name="idioma", length = 2)
-	private String idioma;
+	@Column(name="idioma")
+	@Enumerated(EnumType.STRING)
+	private IdiomaEnumDto idioma;
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
-//	@ManyToMany(
-//			cascade = CascadeType.ALL,
-//			fetch = FetchType.EAGER)
-//	@JoinTable(
-//			name = BaseConfig.DB_PREFIX + "usuari_viafirma_ripea",
-//			joinColumns = {@JoinColumn(name = "ripea_user_codi")},
-//			inverseJoinColumns = {@JoinColumn(name = "viafirma_user_codi")})
-//	private Set<ViaFirmaUsuariEntity> viaFirmaUsuaris = new HashSet<ViaFirmaUsuariEntity>();
-
 	@Column(name="rol_actual", length = 64)
 	private String rolActual;
-
-	@Column(name="vista_actual", length = 64)
+	@Column(name="vista_actual")
 	@Enumerated(EnumType.STRING)
 	private ContingutVistaEnumDto vistaActual = ContingutVistaEnumDto.TREETABLE_PER_CARPETA;
 
@@ -64,13 +56,10 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 
 	@Column(name = "emails_agrupats")
 	private boolean rebreEmailsAgrupats = true;
-
 	@Column(name = "avisos_noves_anotacions")
 	private boolean rebreAvisosNovesAnotacions;
-
 	@Column(name = "emails_canvi_estat_revisio")
 	private boolean rebreEmailsCanviEstatRevisio = true;
-
 	@Column(name = "exp_list_data_darrer_env")
 	private boolean expedientListDataDarrerEnviament = false;
 	@Column(name = "exp_list_agafat_per")
