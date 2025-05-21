@@ -14,6 +14,7 @@ import useEviarPortafirmes from "../actions/EviarPortafirmes.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
+import useFirmaNevegador from "../actions/FirmaNevegador.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
@@ -69,6 +70,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
     const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
     const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEviarPortafirmes(refresh);
+    const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNevegador();
 
     const permesModificarCustodiats= () => entitat?.isPermesModificarCustodiats;
 
@@ -201,7 +203,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('page.document.acciones.firmar'),
             icon: "edit_document",
             showInMenu: true,
-            // onClick: ,
+            onClick: handleFirmaShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
             hidden: (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
@@ -289,6 +291,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentPublicar}
         {contentEviarPortafirmes}
         {dialogSeguiment}
+        {contentFirma}
     </>;
     return {
         createActions: createDocumentActions,

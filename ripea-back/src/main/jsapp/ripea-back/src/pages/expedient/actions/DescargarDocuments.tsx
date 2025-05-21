@@ -2,8 +2,8 @@ import {useEffect, useRef, useState} from "react";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
-import * as builder from "../../../util/springFilterUtils.ts";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const sortModel = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]

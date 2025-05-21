@@ -133,7 +133,7 @@ const ExpedientAlert = (props:any) => {
     </Load>
 }
 
-export const potModificar = (entity:any) => {
+export const potModificar = (entity:any) :boolean => {
     const { value: user, permisos } = useUserSession()
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
     const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
@@ -143,10 +143,9 @@ export const potModificar = (entity:any) => {
     const isAgafatUsuariActual = () => entity?.agafatPer?.id == user?.codi
     const isAdminOAdminOrgan = () => (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == entity?.organGestor?.id) )
     const isUsuariActualWrite = () => entity?.usuariActualWrite
-    const potModificar = () => (isAgafatUsuariActual() && isUsuariActualWrite() || isAdminOAdminOrgan()) && !isTancat();
     // //
 
-    return potModificar();
+    return (isAgafatUsuariActual() && isUsuariActualWrite() || isAdminOAdminOrgan()) && !isTancat();
 }
 
 const Expedient = () => {

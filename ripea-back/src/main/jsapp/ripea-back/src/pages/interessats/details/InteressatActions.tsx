@@ -138,8 +138,9 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             hidden: !potModificar(entity),
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
             hidden: !potModificar(entity),
         },
         {

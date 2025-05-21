@@ -66,7 +66,6 @@ const springFilterBuilder = (data: any) :string => {
         builder.eq("grup.codi", data.grup?.id),
         builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
 
-
         data.pendentFirmar && (
             builder.exists(
                 builder.and(

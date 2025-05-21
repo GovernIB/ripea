@@ -8,18 +8,22 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.service.intf.base.model.*;
-import es.caib.ripea.service.intf.dto.InteressatDto;
-import es.caib.ripea.service.intf.utils.Utils;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.FileReference;
+import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -120,7 +124,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	public String getCodiNom() {
     	return Utils.getCodiNom(this.tipus, this.documentNum, this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);
     }
-    
+
     @Transient
 	public String getNomComplet() {
     	return Utils.getNomComplet(this.tipus,this.nom, this.llinatge1, this.llinatge2, this.raoSocial, this.organCodi);

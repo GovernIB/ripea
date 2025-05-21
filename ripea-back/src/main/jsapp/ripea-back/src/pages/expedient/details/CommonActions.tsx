@@ -215,8 +215,9 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !row?.seguidor || !isUsuariActualWrite(row),// si el usuario actual no es seguidor
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
         },
         {
             title: t('page.expedient.acciones.assignar'),
@@ -226,8 +227,9 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !isAdminOAdminOrgan(row),// si el usuario actual no admin o organo
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
             hidden: (row:any) => !isAdminOAdminOrgan(row),
         },
         {
@@ -288,8 +290,9 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData),
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
         },
         {
             title: t('page.contingut.acciones.history'),

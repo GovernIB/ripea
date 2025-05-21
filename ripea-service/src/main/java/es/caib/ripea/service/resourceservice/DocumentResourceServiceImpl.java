@@ -280,6 +280,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         entity.getCreatedBy(),
                         entity.getCreatedDate(),
                         entity.getTipus(),
+                        entity.getArxiuUuid(),
                         new ArrayList<>()
                 );
                 pathEntry.setId(entity.getId());
@@ -701,7 +702,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
 
-    private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, String> {
+    private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, IniciarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciarFirmaSimple target) {
@@ -713,12 +714,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
 
 		@Override
-		public String exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
+		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
 			try {
 				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/" + entity.getId() + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				FitxerDto fitxerDto = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), entity.getId());
-				return pluginHelper.firmaSimpleWebStart(Arrays.asList(fitxerDto), params.getMotiu(), urlReturnToRipea);
+
+                Map<String, String> result = new HashMap<>();
+                result.put("url", pluginHelper.firmaSimpleWebStart(Arrays.asList(fitxerDto), params.getMotiu(), urlReturnToRipea));
+                return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFirmaWebActionExecutor", e);
 				return null;
