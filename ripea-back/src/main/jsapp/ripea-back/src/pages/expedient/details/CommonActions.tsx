@@ -42,6 +42,7 @@ export const iniciaDescargaJSON = (result: any) => {
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {
+        patch: apiPatch,
         artifactAction: apiAction,
 		artifactReport: apiReport,
     } = useResourceApiService('expedientResource');
@@ -122,6 +123,29 @@ export const useActions = (refresh?: () => void) => {
 	const exportEni= (id: any): void => { massiveReport(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 	const exportInside= (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
+    const eliminarRelacio = (id:any, row:any, relacioId:any) => {
+        messageDialogShow(
+            '',
+            '',
+            confirmDialogButtons,
+            confirmDialogComponentProps)
+            .then((value: any) => {
+                if (value) {
+                    const relacionatsPer:any = row?.relacionatsPer.filter((r:any)=>r.id!=relacioId);
+                    const relacionatsAmb:any = row?.relacionatsAmb.filter((r:any)=>r.id!=relacioId);
+
+                    apiPatch(id,{data: {relacionatsPer, relacionatsAmb} })
+                        .then(() => {
+                            refresh?.()
+                            temporalMessageShow(null, '', 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
+                }
+            });
+    }
+
     return {
         reobrir,
         follow,
@@ -136,6 +160,7 @@ export const useActions = (refresh?: () => void) => {
         exportEni,
         exportInside,
         syncArxiu,
+        eliminarRelacio
     }
 }
 

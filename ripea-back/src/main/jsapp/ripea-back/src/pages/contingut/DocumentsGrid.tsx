@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {FormControl, Grid, InputLabel, Select, MenuItem, Icon} from "@mui/material";
+import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -8,9 +9,9 @@ import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
 import GridFormField, {GridButton} from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
+import {potModificar} from "../expedient/details/Expedient.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
-import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const DocumentsGridForm = () => {
     const { t } = useTranslation();
@@ -95,11 +96,11 @@ const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) =
 const sortModel = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
 const columns = [
-    {
-        field: 'nom',
-        flex: 0.5,
-        renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
-    },
+    // {
+    //     field: 'nom',
+    //     flex: 0.5,
+    //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
+    // },
     {
         field: 'descripcio',
         flex: 0.5,
@@ -155,7 +156,19 @@ const DocumentsGrid = (props:any) => {
                 apiRef={dataGridApiRef}
                 rowAdditionalActions={actions}
                 onRowCountChange={onRowCountChange}
-                treeData={treeView}
+
+                groupingColDef={{
+                    headerName: t('page.contingut.grid.nom'),
+                    valueFormatter: (value:any, row:any) => {
+                        return row?.id ?<ContingutIcon entity={row}/> :value;
+                    },
+                    renderCell: (params: any) => {
+                        return treeView
+                            ?<GridTreeDataGroupingCell {...params}/>
+                            :params.formattedValue
+                    },
+                }}
+                treeData
                 treeDataAdditionalRows={(_rows:any) => {
                     const additionalRows :any[] = [];
 

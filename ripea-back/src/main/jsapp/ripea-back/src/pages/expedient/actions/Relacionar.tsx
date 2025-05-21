@@ -86,6 +86,9 @@ const RelacionarForm= () => {
             columns={columns}
             filter={builder.and(
                 builder.neq('id', apiRef?.current?.getId()),
+                // builder.exists(
+                //     builder.neq('relacionatsAmb.id', 1)
+                // ),
                 springFilter
             )}
             sortModel={sortModel}
@@ -123,7 +126,6 @@ const useRelacionar= (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
-        console.log(id, row)
         formApiRef.current?.show?.(id,{ relacionatsAmb: row?.relacionatsAmb })
             .then(() => {
                 refresh?.()

@@ -70,6 +70,9 @@ const translationCa = {
             tasca: "Comentaris de la tasca",
         },
         contingut: {
+            grid: {
+                nom: 'Nom',
+            },
             detalle: {
                 numero: "Número",
                 titol: "Títol",

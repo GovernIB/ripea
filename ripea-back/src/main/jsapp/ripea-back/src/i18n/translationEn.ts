@@ -70,6 +70,9 @@ const translationEn = {
             tasca: "Task Comments",
         },
         contingut: {
+            grid: {
+                nom: 'Name',
+            },
             detalle: {
                 numero: "Number",
                 titol: "Title",

@@ -43,6 +43,7 @@ const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
 const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
+    const {eliminarRelacio} = useActions(()=>window.location.reload())
 
     const relacionats :any[] = [...new Set([
         ...expedient?.relacionatsPer ?? [],
@@ -52,9 +53,10 @@ const ExpedientsRelacionats = (props:any) => {
     return <CardData title={'Expedients relacionats'} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
         {
             relacionats?.map((relacionat:any) =>
-                <Typography key={relacionat?.id} variant={"caption"}>
+                <Typography key={relacionat?.id} variant={"caption"} display={"flex"} alignItems={"center"}>
                     <Icon fontSize={"inherit"}>folder</Icon>
                     <Link href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
+                    <IconButton onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}><Icon>delete</Icon></IconButton>
                 </Typography>
             )
         }
