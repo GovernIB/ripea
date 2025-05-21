@@ -37,9 +37,9 @@ import es.caib.ripea.service.intf.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
@@ -458,7 +458,7 @@ public class DocumentResource extends NodeResource {
 
     public DocumentDto toDocumentDto() {
         DocumentDto resultat = new DocumentDto();
-        MetaNodeDto metaNode = new MetaNodeDto();
+        MetaDocumentDto metaNode = new MetaDocumentDto();
         metaNode.setId(this.getMetaDocument().getId());
         resultat.setMetaNode(metaNode);
         resultat.setPareId(this.getPare()!=null?this.getPare().getId():this.getExpedient().getId());

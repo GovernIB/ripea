@@ -23,7 +23,8 @@ import uenegroma from '../assets/uenegroma.png';
 import feder7 from '../assets/feder7.png';
 import una_manera from '../assets/una_manera.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
-//import {useAlertesSessio} from "../components/Session.tsx";
+import {Alert} from "@mui/material";
+import {useAlertesSessio} from "../components/Session.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -51,6 +52,19 @@ export type BaseAppProps = React.PropsWithChildren & {
 const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
+
+const getAlertSeverity = (avisNivell: string) => {
+  switch (avisNivell) {
+    case "INFO":
+      return "info"; // Azul
+    case "WARNING":
+      return "warning"; // Amarillo
+    case "ERROR":
+      return "error"; // Rojo
+    default:
+      return "info"; // Por defecto INFO
+  }
+};
 
 const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
     const [processedMenuEntries, setprocessedMenuEntries] = React.useState<MenuEntry[]>();
@@ -128,7 +142,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
-    //const { value } = useAlertesSessio();
+    const { value } = useAlertesSessio();
     return <MuiBaseApp
         code={code}
         headerTitle={title}
@@ -146,7 +160,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 sx={{ mr: 2 }} />
         ] : undefined}
         footer={<Footer title="RIPEA" version={version} logos={[uenegroma,feder7,una_manera]}/>}
-        //objectesSyncSessio={value}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}
@@ -160,6 +173,15 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         linkComponent={Link}
         menuEntries={baseAppMenuEntries}>
         <CustomLocalizationProvider>
+            <div>
+                {
+                    value?.avisos?.map((avis:any) => (
+                        <Alert key={avis.id} severity={getAlertSeverity(avis.avisNivell)}>
+                            <strong>{avis.assumpte}</strong>: {avis.missatge}
+                        </Alert>
+                    ))
+                }
+            </div>
             {children}
         </CustomLocalizationProvider>
     </MuiBaseApp>;

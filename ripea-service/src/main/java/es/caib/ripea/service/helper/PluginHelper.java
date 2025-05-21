@@ -3855,48 +3855,6 @@ public class PluginHelper {
 		return esborrat;
 	}
 
-	// public List<PortafirmesBlockDto> portafirmesRecuperarBlocksFirma(String
-	// idPlantilla, String idTransaccio, boolean portafirmesFluxAsync, String
-	// portafirmesId, String idioma) {
-	//
-	// List<PortafirmesBlockDto> blocksDto = null;
-	// String accioDescripcio = "Tancant flux de firma";
-	// long t0 = System.currentTimeMillis();
-	// try {
-	// List<PortafirmesBlockInfo> portafirmesBlocks =
-	// portafirmesPluginrecuperarBlocksFirmes(idPlantilla, idTransaccio,
-	// portafirmesFluxAsync,
-	// new Long(portafirmesId), idioma);
-	// if (portafirmesBlocks != null) {
-	// blocksDto = new ArrayList<PortafirmesBlockDto>();
-	// for (PortafirmesBlockInfo portafirmesBlockInfo : portafirmesBlocks) {
-	// PortafirmesBlockDto blockDto = new PortafirmesBlockDto();
-	// List<PortafirmesBlockInfoDto> signersInfoDto = new
-	// ArrayList<PortafirmesBlockInfoDto>();
-	// if (portafirmesBlockInfo.getSigners() != null) {
-	// for (PortafirmesBlockSignerInfo portafirmesBlockSignerInfo :
-	// portafirmesBlockInfo.getSigners()) {
-	// PortafirmesBlockInfoDto signerInfoDto = new PortafirmesBlockInfoDto();
-	// signerInfoDto.setSignerCodi(portafirmesBlockSignerInfo.getSignerCodi());
-	// signerInfoDto.setSignerId(portafirmesBlockSignerInfo.getSignerId());
-	// signerInfoDto.setSignerNom(portafirmesBlockSignerInfo.getSignerNom());
-	// signersInfoDto.add(signerInfoDto);
-	// }
-	// }
-	// blockDto.setSigners(signersInfoDto);
-	// blocksDto.add(blockDto);
-	// }
-	// }
-	// } catch (Exception ex) {
-	// String errorDescripcio = "Error al accedir al plugin de portafirmes";
-	// this.integracioHelper.addAccioError("PFIRMA", accioDescripcio, null,
-	// IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0,
-	// errorDescripcio, ex);
-	// throw new SistemaExternException("PFIRMA", errorDescripcio, ex);
-	// }
-	// return blocksDto;
-	// }
-
 	public String portafirmesRecuperarUrlEstatFluxFirmes(
 			long portafirmesId,
 			String idioma) {

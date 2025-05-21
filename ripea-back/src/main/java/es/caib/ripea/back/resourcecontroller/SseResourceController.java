@@ -1,11 +1,12 @@
 package es.caib.ripea.back.resourcecontroller;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
-import es.caib.ripea.service.intf.service.EventService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
+import es.caib.ripea.service.intf.service.EventService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador per a enviar esdeveniments SSE (Server-Sent Events) al client.
@@ -35,6 +38,7 @@ public class SseResourceController {
 
     // Emmagatzemar els emitters actius
     private final List<SseEmitter> clients = new CopyOnWriteArrayList<>();
+    private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
 
     private enum EventType {
         CONNECT,
@@ -58,6 +62,18 @@ public class SseResourceController {
         onSubscribe(emitter);
         return emitter;
     }
+    
+//    @GetMapping("/subscribe/{expedientId}")
+//    public SseEmitter streamExpedient(Long expedientId) {
+//        SseEmitter emitter = new SseEmitter(0L);
+//        clientsExpedient.put(expedientId, clientsE.);
+//        clients.add(emitter);
+//        emitter.onCompletion(() -> clients.remove(emitter));        // quan el client tanca o es desconnecta
+//        emitter.onTimeout(() -> clients.remove(emitter));           // també per si la connexió cau
+//        emitter.onError((e) -> clients.remove(emitter));  // per si hi ha error de xarxa
+//        onSubscribe(emitter);
+//        return emitter;
+//    }
 
     private void onSubscribe(SseEmitter emitter) {
         // Al moment de subscriure enviem un missatge de connexió
