@@ -7,8 +7,13 @@ const isInOptions = (value:string, ...options:string[]) => {
 }
 
 const ContingutIcon = (props:any) => {
-    const { t } = useTranslation();
     const {entity} = props;
+    const { t } = useTranslation();
+    const { value: user } = useUserSession();
+
+    if (!entity?.arxiuUuid){
+        console.log("error", entity)
+    }
 
     return <Grid display={"flex"} alignItems={"center"}>
         {entity?.tipus=="DOCUMENT" && <DocumentIcon entity={entity}/>}
@@ -20,12 +25,14 @@ const ContingutIcon = (props:any) => {
                   color={"warning"}>warning</Icon>}
 
         {entity?.nom}
+
+        {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
+            <Icon title={t('page.contingut.alert.guardarPendent')} color={"error"}>warning</Icon>}
     </Grid>
 }
 const DocumentIcon = (props:any) => {
     const { t } = useTranslation();
     const {entity} = props;
-    const { value: user } = useUserSession();
 
     const extension = entity?.fitxerExtension;
     return <>
@@ -80,13 +87,10 @@ const DocumentIcon = (props:any) => {
 
         {!isInOptions(entity?.estat, 'CUSTODIAT', 'REDACCIO' ) && entity?.errorEnviamentPortafirmes && !entity?.gesDocFirmatId &&
             <Icon title={t('page.document.alert.errorPortafirmes')} color={"error"}>edit</Icon>}
-
-        {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
-            <Icon title={t('page.contingut.alert.guardarPendent')} color={"warning"}>warning</Icon>}
     </>
 }
 const CarpetaIcon = (props:any) => {
-    const {entity} = props;
+    const {} = props;
 
     return <>
         <Icon>folder</Icon>

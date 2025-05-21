@@ -356,20 +356,22 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = entity.getRelacionatsAmb().stream()
+                    .filter(expedientResourceEntity -> expedientResourceEntity.getEsborrat()==0)
                     .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
-                            .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
-                                    expedientResource.getId(),
-                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
-                            ))
+                    .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
+                            expedientResource.getId(),
+                            "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
+                    ))
                     .collect(Collectors.toList());
             resource.setRelacionatsAmb(relacionatsAmb);
 
             List<ResourceReference<ExpedientResource, Long>> relacionatsPer = entity.getRelacionatsPer().stream()
+                    .filter(expedientResourceEntity -> expedientResourceEntity.getEsborrat()==0)
                     .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
-                            .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
-                                    expedientResource.getId(),
-                                    "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
-                            ))
+                    .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
+                            expedientResource.getId(),
+                            "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
+                    ))
                     .collect(Collectors.toList());
             resource.setRelacionatsPer(relacionatsPer);
         }

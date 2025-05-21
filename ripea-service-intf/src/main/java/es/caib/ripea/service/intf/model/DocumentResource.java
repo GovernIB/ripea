@@ -258,6 +258,7 @@ public class DocumentResource extends NodeResource {
         private String createdBy;
         private LocalDateTime createdDate;
         private ContingutTipusEnumDto tipus;
+        private String arxiuUuid;
 
         public List<String> treePath;
     }

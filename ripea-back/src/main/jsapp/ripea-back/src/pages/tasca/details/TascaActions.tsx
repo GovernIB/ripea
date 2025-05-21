@@ -84,8 +84,9 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             onClick: handleOpen,
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
             hidden: !potModificar(entity),
         },
         {
@@ -131,8 +132,9 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
             hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
         },
         {
@@ -157,8 +159,9 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row: any) => !potModificar(entity) || row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}}/>,
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
+            disabled: true,
             hidden: (row: any) => !potModificar(entity) || row?.usuariActualDelegat || hideByEstat(row),
         },
         {

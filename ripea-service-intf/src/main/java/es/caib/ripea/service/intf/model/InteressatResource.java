@@ -10,7 +10,6 @@ import javax.validation.constraints.Size;
 
 import es.caib.ripea.service.intf.base.model.*;
 import es.caib.ripea.service.intf.dto.InteressatDto;
-import es.caib.ripea.service.intf.utils.Utils;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -118,16 +117,14 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 
     @Transient
 	public String getCodiNom() {
-		String resultat = null;
         switch (this.tipus) {
             case InteressatPersonaFisicaEntity:
-            	resultat = documentNum + " - " + getNomComplet();
+            	return documentNum + " - " + getNomComplet();
             default:
-            	resultat = getNomComplet();
+                return getNomComplet();
         }
-        return (" - ".equals(resultat)?null:resultat);
     }
-    
+
     @Transient
 	public String getNomComplet() {
 		switch (this.tipus) {
@@ -144,7 +141,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 					sb.append(llinatge2);
 				}
 			}
-			return sb.toString();	
+			return sb.toString();
 		case InteressatPersonaJuridicaEntity:
 			return raoSocial;
 		case InteressatAdministracioEntity:
