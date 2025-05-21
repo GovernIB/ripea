@@ -24,6 +24,7 @@ const MoureForm = () => {
 const Moure = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
+        action={'MOURE'}
         {...props}
     >
         <MoureForm/>

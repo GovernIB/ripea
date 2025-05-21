@@ -4,7 +4,7 @@ import {useCommonActions} from "./CommonActions.tsx";
 import {useTranslation} from "react-i18next";
 import useModifyExpedient from "../actions/ModifyExpedient.tsx";
 
-const ExpedientActionButton = (props:{entity:any}) => {
+const ExpedientActionButton = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
 
@@ -12,7 +12,7 @@ const ExpedientActionButton = (props:{entity:any}) => {
         window.location.reload();
     }
 
-    const {actions, components} = useCommonActions();
+    const {actions, components} = useCommonActions(refresh);
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
 
     const additionalActions = actions.map((a:any)=>{

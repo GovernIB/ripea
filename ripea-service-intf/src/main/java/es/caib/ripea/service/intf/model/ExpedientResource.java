@@ -300,8 +300,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient
     private ArxiuDetallDto arxiu;
 
-    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
-    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
+    private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
+    private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
     @Transient private List<ResourceReference<DocumentResource, Long>> documentObligatorisAlTancar = new ArrayList<>();
 
     @Transient private boolean conteDocuments;

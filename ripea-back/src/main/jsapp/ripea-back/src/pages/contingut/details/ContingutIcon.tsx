@@ -11,10 +11,6 @@ const ContingutIcon = (props:any) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
-    if (!entity?.arxiuUuid){
-        console.log("error", entity)
-    }
-
     return <Grid display={"flex"} alignItems={"center"}>
         {entity?.tipus=="DOCUMENT" && <DocumentIcon entity={entity}/>}
         {entity?.tipus=="CARPETA" && <CarpetaIcon entity={entity}/>}
