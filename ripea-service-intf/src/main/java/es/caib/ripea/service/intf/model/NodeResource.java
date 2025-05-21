@@ -20,7 +20,6 @@ public class NodeResource extends ContingutResource {
 	@Transient private boolean valid;
     @Transient private List<ValidacioErrorResource> errors;
 	protected ResourceReference<MetaNodeResource, Long> metaNode;
-    @Transient MetaNodeResource metaNodeInfo;
 	
     @Getter
     @Setter
