@@ -5,13 +5,21 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +64,6 @@ import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
@@ -80,7 +87,6 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -247,7 +253,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
     }
 
-    // PerspectiveApplicator
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -983,10 +988,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		
         	} else { //És un camp concret el que s'ha canviat
         		if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
-        			String idiomaUsuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get().getIdioma();
+        			UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         			target.setPortafirmesFluxUrl(pluginHelper.portafirmesRecuperarUrlPlantilla(
         					fieldValue.toString(), 
-        					idiomaUsuari!=null?idiomaUsuari:"ca",
+        					usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca",
         					null,
         					false));
         		}

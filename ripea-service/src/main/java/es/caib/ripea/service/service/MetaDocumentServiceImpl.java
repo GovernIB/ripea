@@ -1,8 +1,5 @@
 package es.caib.ripea.service.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -25,8 +22,6 @@ import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
@@ -39,7 +34,6 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
-import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
@@ -56,14 +50,12 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private MetaNodeHelper metaNodeHelper;
-	@Autowired private ContingutHelper contenidorHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
-	@Autowired private CacheHelper cacheHelper;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
 
@@ -678,10 +670,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocumentEntitiy, 
 				MetaDocumentDto.class);
 	}
-	
-
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -690,47 +678,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			Long contingutId, 
 			Long metaExpedientId, 
 			boolean findAllMarkDisponiblesPerCreacio) {
-		logger.debug("Consulta de meta-documents actius per a creació ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "contingutId=" + contingutId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				true, 
-				false);
-		
-		List<MetaDocumentEntity> metaDocuments = new ArrayList<>();
-		if (contingutId != null) {
-			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-					contingutId);
-			ExpedientEntity expedient = contenidorHelper.getExpedientSuperior(
-					contingut,
-					true,
-					false,
-					false, 
-					null);
-			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
-					entitat,
-					expedient, 
-					null, 
-					findAllMarkDisponiblesPerCreacio);
-		} else {
-			MetaExpedientEntity metaExpedient =  metaExpedientRepository.getOne(metaExpedientId);
-			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
-					entitat,
-					null, 
-					metaExpedient, 
-					findAllMarkDisponiblesPerCreacio);
-		}
-
-		return conversioTipusHelper.convertirList(
-				metaDocuments,
-				MetaDocumentDto.class);
+		logger.debug("Consulta de meta-documents actius per a creació (entitatId=" + entitatId +  ", contingutId=" + contingutId +  ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,false,false,false,true,false);
+		List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findActiusPerCreacio(entitat, contingutId, metaExpedientId, findAllMarkDisponiblesPerCreacio);
+		return conversioTipusHelper.convertirList(metaDocuments, MetaDocumentDto.class);
 	}
-
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -740,114 +692,15 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		logger.debug("Consulta de meta-documents actius per a modificació ("
 				+ "entitatId=" + entitatId +  ", "
 				+ "documentId=" + documentId +  ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				true, 
-				false);
-		DocumentEntity document = entityComprovarHelper.comprovarDocument(
-				entitat,
-				null,
-				documentId,
-				false,
-				false,
-				false,
-				false);
-		ExpedientEntity expedientSuperior = contenidorHelper.getExpedientSuperior(
-				document,
-				true,
-				false,
-				false, null);
-		// Han de ser els mateixos que per a la creació però afegit el meta-document
-		// del document que es vol modificar
-		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
-				entitat,
-				expedientSuperior, 
-				null, 
-				false);
-		if (document.getMetaDocument() != null && !metaDocuments.contains(document.getMetaDocument())) {
-			metaDocuments.add(document.getMetaDocument());
-		}
-		Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){
-		     public int compare(MetaDocumentEntity o1, MetaDocumentEntity o2){
-		         if(o1.getNom().toLowerCase() == o2.getNom().toLowerCase())
-		             return 0;
-		         return o1.getNom().toLowerCase().compareTo(o2.getNom().toLowerCase()) < -1 ? -1 : 1;
-		     }
-		});
-		return conversioTipusHelper.convertirList(
-				metaDocuments,
-				MetaDocumentDto.class);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,false,false,false,true,false);
+		List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findActiusPerModificacio(entitat, documentId);
+		return conversioTipusHelper.convertirList(metaDocuments, MetaDocumentDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
 		return pluginHelper.portafirmesFindDocumentTipus();
-	}
-
-
-	private List<MetaDocumentEntity> findMetaDocumentsDisponiblesPerCreacio(
-			EntitatEntity entitat,
-			ExpedientEntity expedient, 
-			MetaExpedientEntity metaExpedient, 
-			boolean findAllMarkDisponiblesPerCreacio) {
-		
-		long t1 = System.currentTimeMillis();
-		
-		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
-		
-		// Dels meta-documents actius pel meta-expedient només deixa els que encara es poden afegir segons la multiplicitat.
-		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndActiuTrue(
-				expedient != null ? expedient.getMetaExpedient() : metaExpedient);
-		
-		if (expedient != null ? expedient.getMetaExpedient().isPermetMetadocsGenerals() : metaExpedient.isPermetMetadocsGenerals()) {
-			metaDocumentsDelMetaExpedient.addAll(metaDocumentRepository.findWithoutMetaExpedient());
-		}
-		
-		if (expedient != null) {
-			
-			// Nomes retorna els documents que no s'hagin esborrat
-			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
-					expedient,
-					0);
-			
-			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
-				boolean afegir = true;
-				for (DocumentEntity document: documents) {
-					if (document.getMetaNode() != null && document.getMetaNode().equals(metaDocument)) {
-						if (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1))
-							afegir = false;
-						break;
-					}
-				}
-				if (findAllMarkDisponiblesPerCreacio) {
-					metaDocument.setLeftPerCreacio(afegir);
-					metaDocuments.add(metaDocument);
-				} else {
-					if (afegir) {
-						metaDocuments.add(metaDocument);
-					}
-				}
-			}
-			Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){
-			     public int compare(MetaDocumentEntity o1, MetaDocumentEntity o2){
-			         if(o1.getNom().toLowerCase() == o2.getNom().toLowerCase())
-			             return 0;
-			         return o1.getNom().toLowerCase().compareTo(o2.getNom().toLowerCase()) < -1 ? -1 : 1;
-			     }
-			});
-		} else {
-			metaDocuments = metaDocumentsDelMetaExpedient;
-		}
-
-		
-    	if (expedient != null && cacheHelper.mostrarLogsRendiment())
-    		logger.info("findMetaDocumentsDisponiblesPerCreacio time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
-		
-		return metaDocuments;
 	}
 
 	@Override

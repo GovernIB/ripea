@@ -1,26 +1,42 @@
 package es.caib.ripea.service.helper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 
 @Component
 public class MetaDocumentHelper {
 	
-	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private CacheHelper cacheHelper;
+	
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private DocumentRepository documentRepository;
 	
 	public MetaDocumentEntity update(
 			Long metaExpedientId,
@@ -150,6 +166,120 @@ public class MetaDocumentHelper {
 	
 	public MetaDocumentEntity findByCodiAndProcediment(MetaExpedientEntity metaExpedientEntity, String codi) {
 		return metaDocumentRepository.findByMetaExpedientAndCodi(metaExpedientEntity, codi);
+	}
+	
+	public List<MetaDocumentEntity> findActiusPerCreacio(EntitatEntity entitat, Long contingutId, Long metaExpedientId, boolean findAllMarkDisponiblesPerCreacio) {
+		
+		List<MetaDocumentEntity> metaDocuments = new ArrayList<>();
+		
+		if (contingutId != null) {
+			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+					contingutId);
+			ExpedientEntity expedient = contingutHelper.getExpedientSuperior(
+					contingut,
+					true,
+					false,
+					false, 
+					null);
+			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
+					entitat,
+					expedient, 
+					null, 
+					findAllMarkDisponiblesPerCreacio);
+		} else {
+			MetaExpedientEntity metaExpedient =  metaExpedientRepository.getOne(metaExpedientId);
+			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
+					entitat,
+					null, 
+					metaExpedient, 
+					findAllMarkDisponiblesPerCreacio);
+		}
+		return metaDocuments;
+	}
+	
+	public List<MetaDocumentEntity> findActiusPerModificacio(EntitatEntity entitat, Long documentId) {
+		
+		DocumentEntity document = entityComprovarHelper.comprovarDocument(entitat,null,documentId,false,false,false,false);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(document, true,false,false, null);
+		// Han de ser els mateixos que per a la creació però afegit el meta-document
+		// del document que es vol modificar
+		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
+				entitat,
+				expedientSuperior, 
+				null, 
+				false);
+		if (document.getMetaDocument() != null && !metaDocuments.contains(document.getMetaDocument())) {
+			metaDocuments.add(document.getMetaDocument());
+		}
+		Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){
+		     public int compare(MetaDocumentEntity o1, MetaDocumentEntity o2){
+		         if(o1.getNom().toLowerCase() == o2.getNom().toLowerCase())
+		             return 0;
+		         return o1.getNom().toLowerCase().compareTo(o2.getNom().toLowerCase()) < -1 ? -1 : 1;
+		     }
+		});
+		return metaDocuments;
+	}
+	
+	private List<MetaDocumentEntity> findMetaDocumentsDisponiblesPerCreacio(
+			EntitatEntity entitat,
+			ExpedientEntity expedient, 
+			MetaExpedientEntity metaExpedient, 
+			boolean findAllMarkDisponiblesPerCreacio) {
+		
+		long t1 = System.currentTimeMillis();
+		
+		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
+		
+		// Dels meta-documents actius pel meta-expedient només deixa els que encara es poden afegir segons la multiplicitat.
+		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndActiuTrue(
+				expedient != null ? expedient.getMetaExpedient() : metaExpedient);
+		
+		if (expedient != null ? expedient.getMetaExpedient().isPermetMetadocsGenerals() : metaExpedient.isPermetMetadocsGenerals()) {
+			metaDocumentsDelMetaExpedient.addAll(metaDocumentRepository.findWithoutMetaExpedient());
+		}
+		
+		if (expedient != null) {
+			
+			// Nomes retorna els documents que no s'hagin esborrat
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
+					expedient,
+					0);
+			
+			for (MetaDocumentEntity metaDocument: metaDocumentsDelMetaExpedient) {
+				boolean afegir = true;
+				for (DocumentEntity document: documents) {
+					if (document.getMetaNode() != null && document.getMetaNode().equals(metaDocument)) {
+						if (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1))
+							afegir = false;
+						break;
+					}
+				}
+				if (findAllMarkDisponiblesPerCreacio) {
+					metaDocument.setLeftPerCreacio(afegir);
+					metaDocuments.add(metaDocument);
+				} else {
+					if (afegir) {
+						metaDocuments.add(metaDocument);
+					}
+				}
+			}
+			Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){
+			     public int compare(MetaDocumentEntity o1, MetaDocumentEntity o2){
+			         if(o1.getNom().toLowerCase() == o2.getNom().toLowerCase())
+			             return 0;
+			         return o1.getNom().toLowerCase().compareTo(o2.getNom().toLowerCase()) < -1 ? -1 : 1;
+			     }
+			});
+		} else {
+			metaDocuments = metaDocumentsDelMetaExpedient;
+		}
+
+		
+    	if (expedient != null && cacheHelper.mostrarLogsRendiment())
+    		logger.info("findMetaDocumentsDisponiblesPerCreacio time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		
+		return metaDocuments;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentHelper.class);
