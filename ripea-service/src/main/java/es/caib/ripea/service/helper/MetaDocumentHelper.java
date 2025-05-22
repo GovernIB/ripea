@@ -221,7 +221,7 @@ public class MetaDocumentHelper {
 		return metaDocuments;
 	}
 	
-	private List<MetaDocumentEntity> findMetaDocumentsDisponiblesPerCreacio(
+	public List<MetaDocumentEntity> findMetaDocumentsDisponiblesPerCreacio(
 			EntitatEntity entitat,
 			ExpedientEntity expedient, 
 			MetaExpedientEntity metaExpedient, 
