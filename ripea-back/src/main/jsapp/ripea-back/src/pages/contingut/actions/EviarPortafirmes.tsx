@@ -11,7 +11,8 @@ const EviarPortafirmesForm = () => {
     const {data, apiRef} = useFormContext();
     const [open, setOpen] = useState<boolean>(true);
 
-    const filter = builder.and(
+    const filterResponsables = builder.neq('nif', null)
+    const filterAnnexos = builder.and(
         builder.neq('id', apiRef?.current?.getId()),
         builder.eq('expedient.id', data?.expedient?.id),
     )
@@ -21,11 +22,19 @@ const EviarPortafirmesForm = () => {
         <GridFormField xs={12} name="prioritat" required/>
 
         {/* SIMPLE */}
-        <GridFormField xs={12} name="responsables" multiple hidden={data?.portafirmesFluxTipus!='SIMPLE'} required/>
+        <GridFormField xs={12} name="responsables" multiple
+                       filter={filterResponsables}
+                       hidden={data?.portafirmesFluxTipus!='SIMPLE'}/>
+        <GridFormField xs={12} name={"nifsManuals"} multiple
+                       hidden={data?.portafirmesFluxTipus!='SIMPLE'}/>
+        <GridFormField xs={12} name={"carrecs"} multiple
+                       hidden={data?.portafirmesFluxTipus!='SIMPLE'}/>
         <GridFormField xs={12} name="portafirmesSequenciaTipus" hidden={data?.portafirmesFluxTipus!='SIMPLE'} required/>
 
         {/* PORTAFIB */}
-        <GridFormField xs={12} name="annexos" multiple filter={filter} hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+        <GridFormField xs={12} name="annexos" multiple
+                       filter={filterAnnexos}
+                       hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
         <GridFormField xs={10} name="portafirmesEnviarFluxId"
                        componentProps={{title: t('page.document.detall.flux')}}
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>

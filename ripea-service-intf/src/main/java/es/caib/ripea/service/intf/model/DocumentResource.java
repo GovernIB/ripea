@@ -395,7 +395,7 @@ public class DocumentResource extends NodeResource {
         private String motiu;
         @NotNull
         private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
-        private List<ResourceReference<DocumentResource, Long>> annexos;
+        private List<ResourceReference<DocumentResource, Long>> annexos = new ArrayList<>();
         
         // Firma parcial
         private boolean firmaParcial;
@@ -407,16 +407,15 @@ public class DocumentResource extends NodeResource {
 
         // SIMPLE
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+        private List<String> nifsManuals = new ArrayList<>();
+        @ResourceField(enumType = true)
+        private List<String> carrecs = new ArrayList<>();
         private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 
         // FLUX
         @Transient
         @ResourceField(enumType = true, onChangeActive = true)
     	private String portafirmesEnviarFluxId;
-//        @Transient
-//    	private String portafirmesFluxNom;
-//        @Transient
-//    	private String portafirmesFluxDescripcio;
         @Transient
     	private String portafirmesFluxUrl;
         @Transient
