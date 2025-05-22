@@ -53,7 +53,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	    				expedientEntity.getEntitat(),
 	    				expedientEntity,
 	    				expedientEntity.getMetaExpedient(),
-	    				true);	    		
+	    				false);	    		
 	    	} else if (Stream.of(split[0]).anyMatch("UPDATE_DOC"::equals)) {
 	    		DocumentEntity documentEntity = documentRepository.findById(Long.parseLong(split[1])).get();
 	    		expedientEntity = documentEntity.getExpedient();

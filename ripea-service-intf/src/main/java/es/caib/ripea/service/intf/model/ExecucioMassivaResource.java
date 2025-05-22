@@ -1,22 +1,26 @@
 package es.caib.ripea.service.intf.model;
+import java.util.Date;
+
+import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.FileNameOption;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Transient;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 public class ExecucioMassivaResource extends BaseAuditableResource<Long> {
 
+	private static final long serialVersionUID = -316479369072429836L;
+	
     private ExecucioMassivaTipusDto tipus;
     private Date dataInici;
     private Date dataFi;

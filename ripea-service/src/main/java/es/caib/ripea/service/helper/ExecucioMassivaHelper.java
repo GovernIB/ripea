@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +38,7 @@ import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
@@ -63,6 +66,7 @@ public class ExecucioMassivaHelper {
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private PluginHelper pluginHelper;
+	@Autowired private ConfigHelper configHelper;
 	@Autowired private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private ExpedientHelper expedientHelper;
@@ -71,6 +75,27 @@ public class ExecucioMassivaHelper {
 	@Autowired private DocumentHelper documentHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	
+	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
+		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
+			FitxerDto resultat = new FitxerDto();
+			String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR) + execucioMassiva.getDocumentNom();
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(directoriDesti));
+				resultat.setContingut(bytes);
+				if (execucioMassiva.getDocumentNom().lastIndexOf("/")>0) {
+					resultat.setNom(execucioMassiva.getDocumentNom().substring(execucioMassiva.getDocumentNom().lastIndexOf("/")));
+				} else {
+					resultat.setNom(execucioMassiva.getDocumentNom());
+				}
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+			return resultat;
+		}
+		return null;
+	}
 	
 	public ByteArrayOutputStream getZipFromDocuments(List<DocumentDto> docsExp) throws IOException {
 		

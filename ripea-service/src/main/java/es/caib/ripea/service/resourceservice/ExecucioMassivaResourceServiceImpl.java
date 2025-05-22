@@ -1,24 +1,47 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.ExecucioMassivaContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExecucioMassivaResourceEntity;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.model.ExecucioMassivaResource;
 import es.caib.ripea.service.intf.resourceservice.ExecucioMassivaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceService<ExecucioMassivaResource, Long, ExecucioMassivaResourceEntity> implements ExecucioMassivaResourceService {
-    @Override
+    
+	private final ExecucioMassivaHelper execucioMassivaHelper;
+	
+    @PostConstruct
+    public void init() {
+    	register(ExecucioMassivaResource.Fields.documentNom, new DocumentFieldDownloader());
+    }
+	
+    private class DocumentFieldDownloader implements FieldDownloader<ExecucioMassivaResourceEntity> {
+        @Override
+        public DownloadableFile download(ExecucioMassivaResourceEntity entity, String fieldName, OutputStream out) {
+        	FitxerDto fitxerDto = execucioMassivaHelper.descarregarDocumentExecMassiva(entity.getEntitat().getId(), entity.getId());
+            return new DownloadableFile(fitxerDto.getNom(),fitxerDto.getContentType(),fitxerDto.getContingut());
+        }
+    }
+    
+	@Override
     protected void afterConversion(ExecucioMassivaResourceEntity entity, ExecucioMassivaResource resource) {
         List<ExecucioMassivaContingutResourceEntity> continguts = entity.getContinguts();
         Map<ExecucioMassivaEstatDto, List<ExecucioMassivaContingutResourceEntity>> contingutMap = continguts.stream()

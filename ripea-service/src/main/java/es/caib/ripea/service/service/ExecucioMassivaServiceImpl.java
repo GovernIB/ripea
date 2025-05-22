@@ -3,9 +3,6 @@ package es.caib.ripea.service.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -130,24 +127,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Override
 	@Transactional(readOnly = true)
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
-		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
-		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
-			FitxerDto resultat = new FitxerDto();
-			String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR) + execucioMassiva.getDocumentNom();
-            try {
-                byte[] bytes = Files.readAllBytes(Paths.get(directoriDesti));
-				resultat.setContingut(bytes);
-				if (execucioMassiva.getDocumentNom().lastIndexOf("/")>0) {
-					resultat.setNom(execucioMassiva.getDocumentNom().substring(execucioMassiva.getDocumentNom().lastIndexOf("/")));
-				} else {
-					resultat.setNom(execucioMassiva.getDocumentNom());
-				}
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-			return resultat;
-		}
-		return null;
+		return execucioMassivaHelper.descarregarDocumentExecMassiva(entitatId, execMassivaId);
 	}
 
 	@Transactional

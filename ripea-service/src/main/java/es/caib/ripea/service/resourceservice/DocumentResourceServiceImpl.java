@@ -80,6 +80,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.FinalitzarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
@@ -191,6 +192,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				false);
     		resource.setId(documentCreat.getId());
     		return resource;
+    	} catch (ValidationException ex) {
+    		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
     	}
