@@ -3,15 +3,14 @@ import {FormField, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
 
 export const GridButton = (props:any) => {
-    const { onClick, buttonProps, children, ...other} = props;
+    const { title, xs, children, hidden, ...other} = props;
 
-    return <Grid item {...other}>
+    return <Grid item title={title} xs={xs} hidden={hidden}>
         <Button
             variant="outlined"
             sx={{ borderRadius: '4px', width: '100%', height: '100%'}}
             style={{margin: 0}}
-            onClick={onClick}
-            {...buttonProps}
+            {...other}
         >
             {children}
         </Button>
@@ -26,9 +25,7 @@ export const GridButtonField = (props:any) => {
         onClick={()=>{
             apiRef?.current?.setFieldValue(name, !data?.[name])
         }}
-        buttonProps={{
-            variant: data?.[name] ?"contained":"outlined"
-        }}
+        variant={ data?.[name] ?"contained":"outlined" }
         {...other}
     >
         <Icon sx={{m: 0}}>{icon}</Icon>

@@ -312,6 +312,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setNumSeguidors(entity.getSeguidors().size());
+        resource.setNumAlert(entity.getAlertes().size());
         usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
 
@@ -360,7 +361,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumPublicacions(entity.getPublicacions().size());
             resource.setNumRemeses(entity.getNotificacions().size());
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
-            resource.setNumAlert(entity.getAlertes().size());
         }
     }
     

@@ -99,7 +99,7 @@ const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) =
     </Grid>
 }
 
-const sortModel = [{field: 'id', sort: 'desc'}]
+const sortModel:any = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
 const columns = [
     // {

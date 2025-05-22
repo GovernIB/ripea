@@ -1,18 +1,41 @@
 import {useTranslation} from "react-i18next";
 import {useEffect, useRef, useState} from "react";
-import {MuiDialog, useMuiDataGridApiRef} from "reactlib";
+import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {Chip, Checkbox, FormControlLabel, LinearProgress, Box} from "@mui/material";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
-const StyledLinearProgress = (props:any) => {
+const useActions = () => {
+    const {
+        fieldDownload: apiDownload
+    } = useResourceApiService('execucioMassivaResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const download = (id: any) => {
+        apiDownload(id, {fieldName: 'documentNom'})
+            .then((result) => {
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, '', 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {
+        download
+    }
+}
+
+const StyledLinearProgress = (props: any) => {
     const {sx, textColor = "white", children, ...other} = props
 
     return <Box position="relative" width="100%" sx={{ml: 1}}>
-        <LinearProgress variant="determinate" {...other} sx={{width: '100%', borderRadius: '4px', ...sx}} />
+        <LinearProgress variant="determinate" {...other} sx={{width: '100%', borderRadius: '4px', ...sx}}/>
         <Box
             color={textColor}
             position="absolute"
@@ -37,16 +60,16 @@ const columns = [
     {
         field: 'executades',
         flex: 0.75,
-        renderCell: (params:any) => {
+        renderCell: (params: any) => {
             const row = params?.row;
             const value = 100 - row?.pendents * 100 / row?.executades
 
             return <>
-                <Chip label={row?.executades} size="small" />
+                <Chip label={row?.executades} size="small"/>
                 <StyledLinearProgress
                     color={'success'}
                     value={value}
-                    sx={{ height: '15px' }}
+                    sx={{height: '15px'}}
                 >
                     {value}%
                 </StyledLinearProgress>
@@ -56,7 +79,8 @@ const columns = [
     {
         field: 'errors',
         flex: 0.5,
-        renderCell: (params:any) => <Chip label={params?.row?.errors} size="small" color={params?.row?.errors ?'error' :'default'} />
+        renderCell: (params: any) => <Chip label={params?.row?.errors} size="small"
+                                           color={params?.row?.errors ? 'error' : 'default'}/>
     },
     {
         field: 'dataInici',
@@ -77,15 +101,16 @@ const columns = [
         flex: 0.5,
     },
 ]
-const sortModel:any = [{ field: 'createdDate', sort: 'asc' }];
+const sortModel: any = [{field: 'createdDate', sort: 'desc'}];
 const useExecucioMassiva = () => {
     const {t} = useTranslation();
     const [open, setOpen] = useState(false);
     const [isRefresh, setRefresh] = useState(false);
-    const { value: user } = useUserSession();
+    const {value: user} = useUserSession();
 
     const gridApiRef = useMuiDataGridApiRef();
 
+    const {download} = useActions();
     const {handleOpen: handleContingutOpen, dialog: dialogContingut, refresh} = useExecucioMassivaContingut();
 
     const handleOpen = () => {
@@ -96,38 +121,45 @@ const useExecucioMassiva = () => {
         setOpen(false);
     };
 
-    const actions:any = [
+    const actions: any = [
         {
             title: t('common.detail'),
             icon: "info",
-            // showInMenu: true,
+            showInMenu: true,
             onClick: handleContingutOpen,
+        },
+        {
+            title: t('common.download'),
+            icon: 'download',
+            showInMenu: true,
+            onClick: download,
+            hidden: (row: any) => !row?.documentNom,
         }
     ]
 
     const intervalRef = useRef<any>();
     useEffect(() => {
-       intervalRef.current = {open, isRefresh}
+        intervalRef.current = {open, isRefresh}
 
-       if (open && isRefresh) {
-           const interval = setInterval(() => {
-               const {open: openRef, isRefresh: isRefreshRef} = intervalRef.current;
-               if (openRef && isRefreshRef) {
-                   gridApiRef?.current?.refresh?.();
-                   refresh?.()
-               } else {
-                   clearInterval(interval);
-               }
-           }, 10000); // 10000 milisegundos = 10 segundos
-           return ()=> clearInterval(interval)
-       }
+        if (open && isRefresh) {
+            const interval = setInterval(() => {
+                const {open: openRef, isRefresh: isRefreshRef} = intervalRef.current;
+                if (openRef && isRefreshRef) {
+                    gridApiRef?.current?.refresh?.();
+                    refresh?.()
+                } else {
+                    clearInterval(interval);
+                }
+            }, 10000); // 10000 milisegundos = 10 segundos
+            return () => clearInterval(interval)
+        }
     }, [open, isRefresh]);
 
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.user.action.masives', {name: user?.nom} )}
+            title={t('page.user.action.masives', {name: user?.nom})}
             componentProps={{fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {
@@ -145,9 +177,8 @@ const useExecucioMassiva = () => {
             <Load value={user} noEffect>
                 <StyledMuiGrid
                     resourceName={'execucioMassivaResource'}
-                    filter={builder.eq('createdBy', `'${user?.codi}'`)}
                     apiRef={gridApiRef}
-                    sortModel={sortModel}
+                    staticSortModel={sortModel}
                     columns={columns}
                     rowAdditionalActions={actions}
                     paginationActive
@@ -157,16 +188,18 @@ const useExecucioMassiva = () => {
                     toolbarElementsWithPositions={[
                         {
                             position: 0,
-                            element: <FormControlLabel control={<Checkbox checked={isRefresh} onClick={()=>setRefresh(!isRefresh)}/>} label="10s refresh" />,
+                            element: <FormControlLabel
+                                control={<Checkbox checked={isRefresh} onClick={() => setRefresh(!isRefresh)}/>}
+                                label="10s refresh"/>,
                         }
                     ]}
-                    rowProps={(row:any)=>{
+                    rowProps={(row: any) => {
                         const color =
-                            row?.errors ?'red'
-                            :row?.pendents ?'orange'
-                            :row?.finalitzades ?'green'
-                            :row?.cancelats ?'grey'
-                            :''
+                            row?.errors ? 'red'
+                                : row?.pendents ? 'orange'
+                                    : row?.finalitzades ? 'green'
+                                        : row?.cancelats ? 'grey'
+                                            : ''
                         return {
                             'box-shadow': `${color} -6px 0px 0px`,
                             'border-left': `6px solid ${color}`
@@ -208,7 +241,7 @@ const columnsContingut = [
         valueFormatter: (value: any) => formatDate(value),
     },
 ]
-const sortModelContingut:any = [{ field: 'ordre', sort: 'asc' }];
+const sortModelContingut: any = [{field: 'ordre', sort: 'asc'}];
 
 const estatColor = {
     'ESTAT_FINALITZAT': 'green',
@@ -236,7 +269,7 @@ const useExecucioMassivaContingut = () => {
         }
     };
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (id: any, row: any) => {
         console.log(id, row)
         setEntityId(id)
         setOpen(true);
@@ -274,7 +307,7 @@ const useExecucioMassivaContingut = () => {
                 height={162 + 52 * 4}
                 readOnly
 
-                rowProps={(row:any)=>{
+                rowProps={(row: any) => {
                     const color = estatColor?.[row?.estat];
                     return {
                         'box-shadow': `${color} -6px 0px 0px`,
