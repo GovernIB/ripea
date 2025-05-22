@@ -46,6 +46,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -67,6 +68,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntitatRepository entitatRepository;
+    @Autowired private EventService eventService;
 
 	@Override
 	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
@@ -156,6 +158,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		usuari.updateRolActual(rolActual);
 
 		cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
+		eventService.notifyAnotacionsPendents();
 	}
 	
 	@Transactional
@@ -333,6 +336,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void evictCountAnotacionsPendents(String usuariCodi) {
 		logger.debug("Evict count anotacions per usuari");
 		cacheHelper.evictCountAnotacionsPendents(usuariCodi);
+		eventService.notifyAnotacionsPendents();
 	}
 
 	@Override

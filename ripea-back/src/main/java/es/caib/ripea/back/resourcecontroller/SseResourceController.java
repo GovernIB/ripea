@@ -2,6 +2,7 @@ package es.caib.ripea.back.resourcecontroller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,57 +36,52 @@ import lombok.extern.slf4j.Slf4j;
 public class SseResourceController {
 
     private final EventService eventService;
-
-    // Emmagatzemar els emitters actius
     private final List<SseEmitter> clients = new CopyOnWriteArrayList<>();
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
-
     private enum EventType {
-        CONNECT,
-        AVISOS;
-
-        public String getEventName() {
-            return name().toLowerCase();
-        }
-        public static EventType fromEventName(String name) {
-            return EventType.valueOf(name.toUpperCase());
-        }
+        CONNECT, AVISOS, NOTIFICACIONS, TASQUES;
+        public String getEventName() { return name().toLowerCase(); }
+        public static EventType fromEventName(String name) { return EventType.valueOf(name.toUpperCase()); }
     }
 
     @GetMapping("/subscribe")
     public SseEmitter stream() {
         SseEmitter emitter = new SseEmitter(0L);
         clients.add(emitter);
-        emitter.onCompletion(() -> clients.remove(emitter));        // quan el client tanca o es desconnecta
-        emitter.onTimeout(() -> clients.remove(emitter));           // també per si la connexió cau
-        emitter.onError((e) -> clients.remove(emitter));  // per si hi ha error de xarxa
-        onSubscribe(emitter);
+        emitter.onCompletion(() -> clients.remove(emitter)); // quan el client tanca o es desconnecta
+        emitter.onTimeout(() -> clients.remove(emitter)); // també per si la connexió cau
+        emitter.onError((e) -> clients.remove(emitter)); // per si hi ha error de xarxa
+        onSubscribeEmisorGlobal(emitter);
         return emitter;
     }
     
-//    @GetMapping("/subscribe/{expedientId}")
-//    public SseEmitter streamExpedient(Long expedientId) {
-//        SseEmitter emitter = new SseEmitter(0L);
-//        clientsExpedient.put(expedientId, clientsE.);
-//        clients.add(emitter);
-//        emitter.onCompletion(() -> clients.remove(emitter));        // quan el client tanca o es desconnecta
-//        emitter.onTimeout(() -> clients.remove(emitter));           // també per si la connexió cau
-//        emitter.onError((e) -> clients.remove(emitter));  // per si hi ha error de xarxa
-//        onSubscribe(emitter);
-//        return emitter;
-//    }
+    @GetMapping("/subscribe/{expedientId}")
+    public SseEmitter streamExpedient(Long expedientId) {
+        SseEmitter emitter = new SseEmitter(0L);
+        List<SseEmitter> emisorsExpedient = new ArrayList<SseEmitter>();
+        if (clientsExpedient.containsKey(expedientId)) {
+        	emisorsExpedient = clientsExpedient.get(expedientId);
+        	emisorsExpedient.add(emitter);
+        } else {
+        	emisorsExpedient = new ArrayList<SseEmitter>();
+        	emisorsExpedient.add(emitter);
+        }
+        clientsExpedient.put(expedientId, emisorsExpedient);
+        emitter.onCompletion(() -> clientsExpedient.get(expedientId).remove(emitter)); // quan el client tanca o es desconnecta
+        emitter.onTimeout(() -> clientsExpedient.get(expedientId).remove(emitter)); // també per si la connexió cau
+        emitter.onError((e) -> clientsExpedient.get(expedientId).remove(emitter));  // per si hi ha error de xarxa
+        onSubscribeEmisorExpedient(expedientId, emitter);
+        return emitter;
+    }
 
-    private void onSubscribe(SseEmitter emitter) {
+    private void onSubscribeEmisorExpedient(Long expedientId, SseEmitter emitter) {
         // Al moment de subscriure enviem un missatge de connexió
         try {
             emitter.send(SseEmitter.event()
                     .name(EventType.CONNECT.getEventName())
                     .data("Connexió establerta a " + LocalDateTime.now())
                     .id(String.valueOf(System.currentTimeMillis())));
-
-            // Un cop renviat el missatge de connexió correctament, enviem un missatge amb els avisos actius
-            var event = eventService.getAvisosActiusEvent();
-            emitter.send(SseEmitter.event().name(EventType.AVISOS.getEventName()).data(event));
+            // No hi ha en principi dades inicials per l'expedient.
         } catch (IOException e) {
             log.error("Error enviant esdeveniment inicial SSE", e);
             emitter.complete();
@@ -94,7 +90,30 @@ public class SseResourceController {
             log.error("Error inesperat onSubscribe", e);
             emitter.completeWithError(e);
         }
-
+    }
+    
+    private void onSubscribeEmisorGlobal(SseEmitter emitter) {
+        // Al moment de subscriure enviem un missatge de connexió
+        try {
+            emitter.send(SseEmitter.event()
+                    .name(EventType.CONNECT.getEventName())
+                    .data("Connexió establerta a " + LocalDateTime.now())
+                    .id(String.valueOf(System.currentTimeMillis())));
+            // Un cop renviat el missatge de connexió correctament, enviem un missatge amb les dades inicials
+            var avisosActius = eventService.getAvisosActiusEvent();
+            var anotacionsPendents = eventService.getAnotacionsPendents();
+            var tasquesPendents = eventService.getTasquesPendents();
+            emitter.send(SseEmitter.event().name(EventType.AVISOS.getEventName()).data(avisosActius));
+            emitter.send(SseEmitter.event().name(EventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));
+            emitter.send(SseEmitter.event().name(EventType.TASQUES.getEventName()).data(tasquesPendents));
+        } catch (IOException e) {
+            log.error("Error enviant esdeveniment inicial SSE", e);
+            emitter.complete();
+            clients.remove(emitter);
+        } catch (Exception e) {
+            log.error("Error inesperat onSubscribe", e);
+            emitter.completeWithError(e);
+        }
     }
 
     @Async
@@ -112,5 +131,4 @@ public class SseResourceController {
             }
         }
     }
-
 }

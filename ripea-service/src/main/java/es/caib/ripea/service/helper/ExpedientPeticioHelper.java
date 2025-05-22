@@ -42,6 +42,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -65,6 +66,7 @@ public class ExpedientPeticioHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private PluginHelper pluginHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
+    @Autowired private EventService eventService;
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
@@ -114,6 +116,7 @@ public class ExpedientPeticioHelper {
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null) {
 			cacheHelper.evictAllCountAnotacionsPendents();
+			eventService.notifyAnotacionsPendents();
 		}
 	}
 	

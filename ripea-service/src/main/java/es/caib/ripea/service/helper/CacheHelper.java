@@ -716,7 +716,6 @@ public class CacheHelper {
 	public void evictFindRolsAmbCodi(String usuariCodi) {
 	}
 	
-	
 	@Cacheable(value = "readAclById", key="#oid")
 	public Acl readAclById(ObjectIdentity oid) {
 		Acl acl = null;
@@ -728,11 +727,7 @@ public class CacheHelper {
 	}
 
 	@CacheEvict(value = "readAclById", key="#oid")
-	public void evictReadAclById(ObjectIdentity oid) {
-	}
-	
-	
-	
+	public void evictReadAclById(ObjectIdentity oid) {}
 
 	@Cacheable(value = "anotacionsUsuari", key="{#usuariCodi}")
 	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {

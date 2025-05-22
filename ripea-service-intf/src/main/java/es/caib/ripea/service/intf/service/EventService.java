@@ -10,11 +10,12 @@ import javax.annotation.security.PermitAll;
  * 
  * @author RIPEA
  */
-//@PreAuthorize("isAuthenticated()")
 @PermitAll
 public interface EventService {
-
     public void notifyAvisosActius();
+    public void notifyAnotacionsPendents();
+    public void notifyTasquesPendents();
     public AvisosActiusEvent getAvisosActiusEvent();
-
+    public long getAnotacionsPendents();
+    public long getTasquesPendents();
 }

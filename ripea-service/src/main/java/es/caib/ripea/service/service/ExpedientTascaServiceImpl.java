@@ -50,6 +50,7 @@ import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientTascaService;
 
 @Service
@@ -59,6 +60,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
 	@Autowired private ExpedientTascaComentariRepository expedientTascaComentariRepository;
+	
+	@Autowired private EventService eventService;
+	
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private UsuariRepository usuariRepository;
@@ -321,6 +325,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			"tascaEstat=" + tascaEstat +
 			")");
 		ExpedientTascaEntity tasca = tascaHelper.canviarEstatTasca(tascaId, tascaEstat, motiu, rolActual);
+		eventService.notifyTasquesPendents();
 		return conversioTipusHelper.convertir(tasca, ExpedientTascaDto.class);
 	}
 
@@ -332,6 +337,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			"responsablesCodi=" + responsablesCodi +
 			")");
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.reassignarTasca(expedientTascaId, responsablesCodi);
+		eventService.notifyTasquesPendents();
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
@@ -342,6 +348,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		String delegatCodi,
 		String comentari) {
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.delegarTasca(expedientTascaId, delegatCodi, comentari);
+		eventService.notifyTasquesPendents();
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
@@ -349,6 +356,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Override
 	public ExpedientTascaDto cancelarDelegacio(Long expedientTascaId, String comentari) {
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.retomarTasca(expedientTascaId, comentari);
+		eventService.notifyTasquesPendents();
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
@@ -373,6 +381,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	public ExpedientTascaDto createTasca(Long entitatId, Long expedientId, ExpedientTascaDto expedientTasca) {
 		logger.debug("Creant nou representant (entitatId=" + entitatId + ", expedientId=" + expedientId + ", expedientTasca=" + expedientTasca + ")");
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.createTasca(entitatId, expedientId, expedientTasca);
+		eventService.notifyTasquesPendents();
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 

@@ -82,6 +82,7 @@ import es.caib.ripea.service.intf.dto.RegistreDto;
 import es.caib.ripea.service.intf.dto.RegistreJustificantDto;
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -110,6 +111,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private GrupRepository grupRepository;
+	@Autowired private EventService eventService;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -455,16 +457,17 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			expedientPeticioEntity.setEstatCanviatDistribucio(false);
 		}
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
-		if (entitatAnotacio != null)
+		if (entitatAnotacio != null) {
 			cacheHelper.evictAllCountAnotacionsPendents();
+			eventService.notifyAnotacionsPendents();
+		}
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override
 	public void evictCountAnotacionsPendents(Long entitatId) {
-//		EntitatEntity entitat = entitatRepository.findOne(entitatId);
 		cacheHelper.evictAllCountAnotacionsPendents();
+		eventService.notifyAnotacionsPendents();
 	}
 	
 	@Transactional
