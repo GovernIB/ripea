@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "codiAndNom")
+@ResourceConfig(quickFilterFields = { "codi", "nom", "nif" }, descriptionField = "codiAndNom")
 public class UsuariResource extends BaseResource<String> {
 
 	@NotNull

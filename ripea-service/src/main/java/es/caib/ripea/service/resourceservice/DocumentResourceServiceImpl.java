@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -149,7 +150,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
         register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
         //Dades externes
-        register(DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId, new FluxosFirmaFieldOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
@@ -171,20 +171,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			if (fluxosDto!=null) {
 				for (DigitalitzacioPerfilDto flx: fluxosDto) {
 					resultat.add(new FieldOption(flx.getCodi(), flx.getNom()));
-				}
-			}
-			return resultat;
-		}
-	}
-    
-    public class FluxosFirmaFieldOptionsProvider implements FieldOptionsProvider {
-		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
-			List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatEntity.getId(), false);
-			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (fluxosDto!=null) {
-				for (PortafirmesFluxRespostaDto flx: fluxosDto) {
-					resultat.add(new FieldOption(flx.getFluxId(), flx.getNom()));
 				}
 			}
 			return resultat;
@@ -917,6 +903,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     }
                 }
             }
+            if (DocumentResource.EnviarPortafirmesFormAction.Fields.carrecs.equals(fieldName)) {
+                try {
+                    resultat = pluginHelper.portafirmesRecuperarCarrecs().stream()
+                            .map(carrec -> new FieldOption(carrec.getUsuariPersonaNif(), carrec.getCarrecName()))
+                            .collect(Collectors.toList());
+                } catch (Exception e) {}
+            }
             return resultat;
         }
 
@@ -971,6 +964,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		
         		if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
         			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+        			List<String> nifs = new ArrayList<>();
         			if (metaDocumentResourceEntity.getPortafirmesResponsables()!=null) {
         				String[] pfResponsables = metaDocumentResourceEntity.getPortafirmesResponsables().split(",");
                         for (String codi : pfResponsables) {
@@ -978,11 +972,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                             if (usuariEntity != null) {
                                 responsables.add(ResourceReference.toResourceReference(usuariEntity.getCodi(), usuariEntity.getNom()));
                             } else {
-                                responsables.add(ResourceReference.toResourceReference(codi, codi));
+                                nifs.add(codi);
                             }
                         }
                     }
         			target.setResponsables(responsables);
+        			target.setNifsManuals(nifs);
         		} else {
         			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
         		}
