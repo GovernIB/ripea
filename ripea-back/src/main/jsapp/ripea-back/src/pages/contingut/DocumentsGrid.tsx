@@ -19,7 +19,7 @@ const DocumentsGridForm = () => {
     const {artifactAction: apiAction} = useResourceApiService('documentResource');
 
     const actualizarDatos = () => {
-        if (data?.adjunt) {
+        if (data?.adjunt && data.pluginSummarizeActiu) {
             apiAction(undefined, {code :"RESUM_IA", data:{ adjunt: data?.adjunt }})
                 .then((result)=>{
                     if (result) {
@@ -36,7 +36,13 @@ const DocumentsGridForm = () => {
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument" filter={metaDocumentFilter}/>
+        <GridFormField xs={12} name="metaDocument"
+                       namedQueries={
+                           apiRef?.current?.getId()
+                               ?[`UPDATE_DOC#${apiRef?.current?.getId()}`]
+                               :[`CREATE_NEW_DOC#${data?.expedient?.id}`]
+                       }
+                       filter={metaDocumentFilter}/>
         <GridFormField xs={data.pluginSummarizeActiu ?11 :12} name="nom"/>
         <GridButton xs={1} title={t('page.document.detall.summarize')}
                     onClick={actualizarDatos}
