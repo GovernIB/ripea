@@ -11,10 +11,12 @@ import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(quickFilterFields = { "codi", "nom" }, descriptionField = "nom")
 public class MetaDocumentResource extends MetaNodeResource {
 

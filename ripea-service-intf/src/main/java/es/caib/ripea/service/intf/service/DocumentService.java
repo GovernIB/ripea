@@ -424,6 +424,18 @@ public interface DocumentService {
 			String administrationId,
 			String name) throws NotFoundException;
 
+	@PermitAll
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres);
+
+	@PermitAll
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable);	
+	
 	/**
 	 * Retorna la informació del darrer enviament a portafirmes del document.
 	 * 
@@ -700,17 +712,6 @@ public interface DocumentService {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId)  throws SistemaExternException;
-
-	@PreAuthorize("isAuthenticated()")
-	public void portafirmesCallbackIntegracioOk(
-			String descripcio,
-			Map<String, String> parametres);
-
-	public void portafirmesCallbackIntegracioError(
-			String descripcio,
-			Map<String, String> parametres,
-			String errorDescripcio,
-			Throwable throwable);
 
 	@PreAuthorize("isAuthenticated()")
 	public String firmaSimpleWebStart(
