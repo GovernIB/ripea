@@ -212,7 +212,31 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 			String name) {
 		return delegateService.portafirmesCallback(documentId, estat, motiuRebuig, administrationId, name);
 	}
+	
+	@Override
+	@PermitAll
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres) {
+		delegateService.portafirmesCallbackIntegracioOk(
+				descripcio,
+				parametres);
 
+	}
+
+	@Override
+	@PermitAll
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable) {
+		delegateService.portafirmesCallbackIntegracioError(
+				descripcio,
+				parametres,
+				errorDescripcio,
+				throwable);
+	}	
 
 	@Override
 	@RolesAllowed("**")
@@ -520,31 +544,6 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 				rolActual,
 				permission,
 				tascaId);
-	}
-
-	@Override
-	@PermitAll
-	public void portafirmesCallbackIntegracioOk(
-			String descripcio,
-			Map<String, String> parametres) {
-		delegateService.portafirmesCallbackIntegracioOk(
-				descripcio,
-				parametres);
-
-	}
-
-	@Override
-	@RolesAllowed("**")
-	public void portafirmesCallbackIntegracioError(
-			String descripcio,
-			Map<String, String> parametres,
-			String errorDescripcio,
-			Throwable throwable) {
-		delegateService.portafirmesCallbackIntegracioError(
-				descripcio,
-				parametres,
-				errorDescripcio,
-				throwable);
 	}
 
 	@Override
