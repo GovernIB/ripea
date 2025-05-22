@@ -251,6 +251,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
         resource.setHasFirma(resource.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+        resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaDocument()), MetaDocumentResource.class));
     }
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {

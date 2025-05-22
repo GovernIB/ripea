@@ -197,7 +197,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden : (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
+            hidden : (row:any) => !potModificar(entity) || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.firmar'),
@@ -205,7 +205,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleFirmaShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !potModificar(entity) || !row?.metaDocumentInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.acciones.viaFirma'),
@@ -213,7 +213,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             // onClick: ,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potModificar(entity) || !row?.metaNodeInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !potModificar(entity) || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
             title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
