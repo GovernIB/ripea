@@ -72,7 +72,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final EntitatService entitatService;
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
-    private final AvisService avisService;
 
     @Hidden
     @GetMapping("/actual/securityInfo")
@@ -142,17 +141,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         return getUsuariActualSecurityInfo(request);
-    }
-    
-    @Hidden
-    @GetMapping("/syncStoredSessionData")
-    @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
-    public ResponseEntity<SyncStoredSessionData> getSynchronyzedStoredSessionData(HttpServletRequest request) throws MethodArgumentNotValidException {
-    	SyncStoredSessionData ssda = new SyncStoredSessionData();
-    	//TODO: Afegir mes dades que necessiten ser sincronitzades sense intervencio del usuari actual, com el numero de anotacions sense llegir etc.
-    	//Unificar-ho en un metode en un servei i cachear-ho
-    	ssda.setAvisos(avisService.findActive());
-    	return ResponseEntity.ok(ssda);
     }
 
     @Hidden

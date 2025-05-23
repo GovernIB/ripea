@@ -294,7 +294,7 @@ public class ExecucioMassivaHelper {
 						new Date(), 
 						error);
 			}
-			execucioMassivaContingutRepository.save(emc);
+			execucioMassivaContingutRepository.saveAndFlush(emc);
 		}
 	}
 	

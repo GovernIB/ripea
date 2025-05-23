@@ -3,6 +3,7 @@ package es.caib.ripea.back.interceptor;
 import es.caib.ripea.back.helper.ContingutEstaticHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
@@ -40,6 +41,10 @@ public class LlistaEntitatsInterceptor implements AsyncHandlerInterceptor {
 		EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
 		if (entitatDto != null) {
 			entitatService.setConfigEntitat(entitatDto);
+		}
+		OrganGestorDto organGestorDto = EntitatHelper.getOrganGestorActual(request);
+		if (organGestorDto!=null) {
+			aplicacioService.actualitzarOrganCodi(organGestorDto.getCodi());
 		}
 		return true;
 	}

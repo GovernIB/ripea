@@ -3,7 +3,6 @@ package es.caib.ripea.service.resourceservice;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -16,14 +15,11 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.OrganGestorCacheHelper;
-import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.OrganGestorResource;
 import es.caib.ripea.service.intf.resourceservice.OrganGestorResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,9 +36,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 	private final OrganGestorRepository organGestorRepository;
 	
 	private final ConfigHelper configHelper;
-	private final PermisosHelper permisosHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
-	private final OrganGestorCacheHelper organGestorCacheHelper;
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
@@ -50,13 +44,11 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
         String rolActual		 = configHelper.getRolActual();
-        Permission permis = ExtendedPermission.READ;
 		boolean isAdmin = "IPA_ADMIN".equals(rolActual);
 		boolean isAdminOrgan = "IPA_ORGAN_ADMIN".equals(rolActual);
 		boolean isDissenyOrgan = "IPA_DISSENY".equals(rolActual);
 		boolean isSuper = "IPA_SUPER".equals(rolActual);
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
-		
         Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         
         Filter filtreResultat = null;
@@ -80,14 +72,16 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         		
 		        if (isAdminOrgan || isDissenyOrgan) {
 		        	
-		        	//Organs sobre els quals té permisos de amdinistrador o disseny
-		        	List<OrganGestorEntity> organsGestorsAdminDisseny = entityComprovarHelper.findAccessiblesUsuariActualRolAdminOrDisseny(
-		        			entitat.getId(),
-		        			null,
-		        			currentSpringFilter);    	
-					for (OrganGestorEntity ogCodi: organsGestorsAdminDisseny) {
-						organsIds.add(ogCodi.getId());
-					}
+		        	if (organActualCodi!=null) {
+			        	//Organs sobre els quals té permisos de amdinistrador o disseny
+			        	List<OrganGestorEntity> organsGestorsAdminDisseny = entityComprovarHelper.findAccessiblesUsuariActualRolAdminOrDisseny(
+			        			entitat.getId(),
+			        			organGestorRepository.findByCodi(organActualCodi).getId(),
+			        			null);
+						for (OrganGestorEntity ogCodi: organsGestorsAdminDisseny) {
+							organsIds.add(ogCodi.getId());
+						}
+		        	}
 		        } else {
 		        	//Organs amb permisos de lectura
 		        	List<OrganGestorEntity> organsGestorsUsuari = entityComprovarHelper.findAccessiblesUsuariActualRolUsuari(entitat.getId(), null, true);
@@ -99,13 +93,12 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 		        /**
 		         * Organs gestors amb permisos
 		         */
-		        String ogCodi = MetaExpedientResource.Fields.organGestor + ".id";
 		        Filter filtreOrgansPermesos = null;
 		        List<String> grupsOrgansPermesosClausulesIn = Utils.getIdsEnGruposMil(organsIds);
 		        if (grupsOrgansPermesosClausulesIn!=null) {
 			        for (String aux: grupsOrgansPermesosClausulesIn) {
 				        if (aux != null && !aux.isEmpty()) {
-			        		filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(ogCodi + " IN (" + aux + ")"));
+			        		filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse("id" + " IN (" + aux + ")"));
 				        }
 			        }
 		        }

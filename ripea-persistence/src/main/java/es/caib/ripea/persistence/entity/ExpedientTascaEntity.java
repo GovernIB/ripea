@@ -255,4 +255,16 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		return comentariText;
 	}
 
+	public List<String> getResponsablesCodis() {
+		List<String> resultat = new ArrayList<String>();
+		if (this.responsableActual!=null) {
+			resultat.add(this.responsableActual.getCodi());
+		}
+		if (this.getResponsables()!=null) {
+			for (UsuariEntity usuariResponsable: this.getResponsables()) {
+				resultat.add(usuariResponsable.getCodi());
+			}
+		}
+		return resultat;
+	}
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSession } from './SessionStorageContext';
+import {useUserSession} from "./Session.tsx";
 
 // Keys for session storage
 const avisosKey = 'avisos';
@@ -23,6 +24,7 @@ export const SseClient: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const { save: saveConnected } = useSession(sseConnectedKey);
   const { save: saveAvisos } = useSession(avisosKey);
+  const { value: user } = useUserSession();
 
   useEffect(() => {
     // Funció per a connectar amb el servidor SSE
@@ -34,7 +36,7 @@ export const SseClient: React.FC = () => {
 
       // Crear una nova connexió
       const apiUrl = import.meta.env.VITE_API_URL || '/api/';
-      const sseUrl = `${apiUrl}sse/subscribe`;
+      const sseUrl = `${apiUrl}sse/subscribe/user/`+user?.codi;
 
       const eventSource = new EventSource(sseUrl, { withCredentials: true });
       eventSourceRef.current = eventSource;

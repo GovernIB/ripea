@@ -286,6 +286,13 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			outContent.close();
 			execucioMassiva.setDocumentNom(documentNom);
 			
+			//Marcam tots els elements de la exec massiva com a finalitzats
+			if(execucioMassiva.getContinguts()!=null) {
+				for (ExecucioMassivaContingutEntity emc: execucioMassiva.getContinguts()) {
+					emc.updateFinalitzat(new Date());
+				}
+			}
+			
 		} catch (Exception exc) {
 			//En aquets cas, no es pot saber quin expedient ha fallat, els marcam a tots com a error
 			for (ExecucioMassivaContingutEntity execucioMassivaContingutEntity : execucioMassiva.getContinguts()) {

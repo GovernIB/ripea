@@ -21,7 +21,9 @@ import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.AvisDto;
+import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
+import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,46 +61,53 @@ public class EventServiceImpl implements EventService {
     @Override
     public void notifyAnotacionsPendents() {
     	try {
-    		var event = getAnotacionsPendents();
+    		Map<String, Long> anotacionsUsuaris = new HashMap<String, Long>();
+    		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacionsUsuaris);
     		log.debug("notifyAnotacionsPendents a clients");
-    		eventPublisher.publishEvent(event);
+    		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
     		log.error("Erro al notifyAnotacionsPendents a clients", ex);
     	}
     }
     
     @Override
-    public void notifyTasquesPendents() {
+    public void notifyTasquesPendents(List<String> usuarisAfectats) {
     	try {
-    		var event = getTasquesPendents();
     		log.debug("notifyTasquesPendents a clients");
-    		eventPublisher.publishEvent(event);
+    		Map<String, Long> tasquesUsuaris = new HashMap<String, Long>();
+    		if (usuarisAfectats!=null) {
+    			for (String usuari: usuarisAfectats) {
+    				tasquesUsuaris.put(usuari, getTasquesPendents(usuari));
+    			}
+    		}
+    		TasquesPendentsEvent resultat = new TasquesPendentsEvent(tasquesUsuaris);
+    		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
     		log.error("Erro al notifyTasquesPendents a clients", ex);
     	}
     }
     
 	@Override
-	public long getAnotacionsPendents() {
+	public long getAnotacionsPendents(String usuariCodi) {
 		try {
-			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(configHelper.getOrganActualCodi());
+			EntitatEntity entitatEntity = entitatRepository.findByCodi(usuariCodi);
+			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(usuariCodi);
 			return cacheHelper.countAnotacionsPendents(
 					entitatEntity,
 					configHelper.getRolActual(),
 					SecurityContextHolder.getContext().getAuthentication().getName(),
 					organGestorEntity.getId());
 		} catch (Exception ex) {
-			return 0l; //Es fan cridades inicials, quant encara no hi ha entitat en sessio.
+			return 0l;
 		}
 	}
 
 	@Override
-	public long getTasquesPendents() {
+	public long getTasquesPendents(String usuariCodi) {
 		try {
-			return cacheHelper.countTasquesPendents(SecurityContextHolder.getContext().getAuthentication().getName());
+			return cacheHelper.countTasquesPendents(usuariCodi);
 		} catch (Exception ex) {
-			return 0l; //Es fan cridades inicials, quant encara no hi ha entitat en sessio.
+			return 0l;
 		}			
 	}
     

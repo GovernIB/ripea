@@ -202,7 +202,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         /**
          * Meta expedient - Organs gestors amb permisos (permis ACL a OrganGestorEntity)
          */
-        String ogId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.metaExpedient + ".id";
+        String ogId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
         Filter filtreOrgansPermesos = null;
         List<String> grupsOrgansPermesosClausulesIn = permisosPerExpedients.getIdsOrgansGruposMil();
         if (grupsOrgansPermesosClausulesIn!=null) {
@@ -263,19 +263,21 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         		combinedComunsAnd);
         
         //No aplica filtre permis directe procediment
-        if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER")) {
-            Filter filtreProcedimentPermisDirecte = FilterBuilder.or(
-            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
-            		filtreProcedimentsPermesos
-            );
-            combinedFilterProcedimentsOr = FilterBuilder.and(combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
+        Filter filtreProcedimentPermisDirecte = null;
+        if (!rolActual.equals("IPA_ADMIN") && 
+        	!rolActual.equals("IPA_SUPER") && 
+        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null && 
+        	permisosPerExpedients.getIdsMetaExpedientsPermesos().size()>0) {
+	            filtreProcedimentPermisDirecte = FilterBuilder.or(
+	            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
+	            		filtreProcedimentsPermesos
+	            );
         }
         
         Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
-        
-        Filter filtreResultat = FilterBuilder.and(filtreNoEliminats, filtreEntitatSessio, combinedFilterProcedimentsOr);
-
-        return filtreResultat.generate();
+        Filter filtreResultat = FilterBuilder.and(filtreNoEliminats, filtreEntitatSessio, combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
+        String resultat = filtreResultat.generate();
+        return resultat;
     }
     
     @Override

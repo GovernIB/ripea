@@ -11,6 +11,7 @@ import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class TascaHelper {
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	
+	@Autowired private EventService eventService;
 	
 	@Autowired private EntityComprovarHelper entityComprovarHelper;	
 	@Autowired private ConfigHelper configHelper;
@@ -278,6 +281,11 @@ public class TascaHelper {
 		expedientTascaRepository.save(expedientTascaEntity);
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CREACIO);
 		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, null);
+		
+		List<String> responsablesNotificar = expedientTascaEntity.getResponsablesCodis();
+		if (responsablesNotificar.size()>0) {
+			eventService.notifyTasquesPendents(responsablesNotificar);
+		}
 		
 		return expedientTascaEntity;
 	}

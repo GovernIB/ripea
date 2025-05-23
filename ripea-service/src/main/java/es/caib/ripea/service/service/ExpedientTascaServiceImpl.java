@@ -325,7 +325,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			"tascaEstat=" + tascaEstat +
 			")");
 		ExpedientTascaEntity tasca = tascaHelper.canviarEstatTasca(tascaId, tascaEstat, motiu, rolActual);
-		eventService.notifyTasquesPendents();
+		eventService.notifyTasquesPendents(null);
 		return conversioTipusHelper.convertir(tasca, ExpedientTascaDto.class);
 	}
 
@@ -337,7 +337,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			"responsablesCodi=" + responsablesCodi +
 			")");
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.reassignarTasca(expedientTascaId, responsablesCodi);
-		eventService.notifyTasquesPendents();
+		eventService.notifyTasquesPendents(null);
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
@@ -348,7 +348,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		String delegatCodi,
 		String comentari) {
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.delegarTasca(expedientTascaId, delegatCodi, comentari);
-		eventService.notifyTasquesPendents();
+		eventService.notifyTasquesPendents(null);
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
@@ -356,7 +356,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Override
 	public ExpedientTascaDto cancelarDelegacio(Long expedientTascaId, String comentari) {
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.retomarTasca(expedientTascaId, comentari);
-		eventService.notifyTasquesPendents();
+		eventService.notifyTasquesPendents(null);
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 
@@ -381,7 +381,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	public ExpedientTascaDto createTasca(Long entitatId, Long expedientId, ExpedientTascaDto expedientTasca) {
 		logger.debug("Creant nou representant (entitatId=" + entitatId + ", expedientId=" + expedientId + ", expedientTasca=" + expedientTasca + ")");
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.createTasca(entitatId, expedientId, expedientTasca);
-		eventService.notifyTasquesPendents();
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
 	}
 

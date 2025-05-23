@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -1754,19 +1755,30 @@ public class ExpedientHelper {
 			boolean exportar,
 			String format) throws IOException {
 		
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatActualId, false, false, false, true, false);
+		EntitatEntity entitatActual = null;
 
+		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+			entitatActual = entitatRepository.findById(entitatActualId).get(); //Cridada desde execucio massiva
+		} else {
+			entitatActual = entityComprovarHelper.comprovarEntitat(entitatActualId, false, false, false, true, false);
+		}
+		
 		//Comprovar permis de lectura per els expedients
 		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
 		for (Long expedientId : expedientIds) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
-					expedientId,
-					false,
-					true,
-					false,
-					false,
-					false,
-					null);
+			ExpedientEntity expedient = null;
+			if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+				expedient = expedientRepository.findById(expedientId).get();
+			} else {
+				expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
+						expedientId,
+						false,
+						true,
+						false,
+						false,
+						false,
+						null);
+			}
 			expedients.add(expedient);
 		}
 		
@@ -2686,7 +2698,12 @@ public class ExpedientHelper {
 	}
 
 	public FitxerDto exportacio(Long entitatId, Collection<Long> expedientIds, String format) throws IOException {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		EntitatEntity entitat = null;
+		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+			entitat = entitatRepository.findById(entitatId).get(); //Cridada desde execucio massiva
+		} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		}
 		List<Long> ids = new ArrayList<>(expedientIds != null ? expedientIds : new ArrayList<Long>());
 		List<ExpedientEntity> expedients = expedientRepositoryCommnand.findByEntitatAndIdInOrderByIdAsc(entitat, ids);
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(expedientIds);
@@ -2712,13 +2729,15 @@ public class ExpedientHelper {
 		int dadesIndex = 0;
 		for (ExpedientEntity expedient : expedients) {
 			
-			entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					expedient.getMetaExpedient().getId(),
-					true,
-					false,
-					false,
-					false, false, null, null);
+			if(!"SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+				entityComprovarHelper.comprovarMetaExpedient(
+						entitat,
+						expedient.getMetaExpedient().getId(),
+						true,
+						false,
+						false,
+						false, false, null, null);
+			}
 			
 			String[] fila = new String[numColumnes];
 			fila[0] = expedient.getNumero();

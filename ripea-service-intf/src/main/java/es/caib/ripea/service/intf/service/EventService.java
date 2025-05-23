@@ -2,6 +2,8 @@ package es.caib.ripea.service.intf.service;
 
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 
+import java.util.List;
+
 import javax.annotation.security.PermitAll;
 
 /**
@@ -14,8 +16,8 @@ import javax.annotation.security.PermitAll;
 public interface EventService {
     public void notifyAvisosActius();
     public void notifyAnotacionsPendents();
-    public void notifyTasquesPendents();
+    public void notifyTasquesPendents(List<String> usuarisAfectats);
     public AvisosActiusEvent getAvisosActiusEvent();
-    public long getAnotacionsPendents();
-    public long getTasquesPendents();
+    public long getAnotacionsPendents(String usuariCodi);
+    public long getTasquesPendents(String usuariCodi);
 }

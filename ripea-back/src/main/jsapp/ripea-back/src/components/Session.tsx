@@ -73,30 +73,7 @@ export const useUserSession = () => {
 
 export const useAlertesSessio = () => {
     const { value, save } = useSession(avisosKey);
-    // const { value: user } = useUserSession();
-    //
-    // Recuperar les alertes generals de l'aplicació.
-    // No depenen de cap acció del usuari, s'han de consultar periòdicament.
-    // const fetchAlerta = async () => {
-    //     if (user) {
-    //     axios.get(userUrl+'/syncStoredSessionData')
-    //         .then((response) => {
-    //             save(response.data);
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error al obtenir les alertes:", error);
-    //         });
-    //     }
-    // };
-    //
-    // useEffect(() => {
-    //     fetchAlerta(); // Cridada inicial
-    //     const interval = setInterval(fetchAlerta, 10000); //Cada 10 segons refrescar info
-    //     return () => clearInterval(interval);
-    // }, []);
-
     useEffect(() => {}, []);
-
     return { value, save };
 }
 
