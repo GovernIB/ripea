@@ -344,12 +344,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			
 			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 			
-			return null;
+			ExpedientResource resultat = new ExpedientResource();
+			resultat.setId(expedientId);
+			return resultat;
 			
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/expedient/create", ex);
+    		throw ex;
     	}
-    	return null;
     }
 
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
