@@ -154,8 +154,10 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		if (ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat)) {
 			try {
 				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
-				documentViaFirma.getDocument().updateEstat(
-						DocumentEstatEnumDto.REDACCIO);
+				if (! document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
+					documentViaFirma.getDocument().updateEstat(
+							DocumentEstatEnumDto.REDACCIO);
+				}
 				documentViaFirma.updateProcessat(
 						false,
 						new Date());
