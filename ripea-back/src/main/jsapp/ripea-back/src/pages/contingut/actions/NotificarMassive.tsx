@@ -1,14 +1,18 @@
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import useNotificar from "./Notificar.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const NotificarMassiveForm = () => {
+    const {data} = useFormContext()
+    const filterMetaDocument = builder.eq('metaExpedient.id', data?.metaExpedient?.id)
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument" required/>
+        <GridFormField xs={12} name="metaDocument" filter={filterMetaDocument} required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
     </Grid>
@@ -41,7 +45,8 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
             expedient: {
                 id: entity?.id,
                 description: entity?.nom
-            }
+            },
+            metaExpedient: entity?.metaExpedient,
         })
     }
     const onSuccess = (result?: any) :void => {

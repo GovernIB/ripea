@@ -18,10 +18,12 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
@@ -30,6 +32,7 @@ import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
@@ -58,7 +61,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
-
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private CacheHelper cacheHelper;
+	
 	@Transactional
 	@Override
 	public MetaDocumentDto create(
@@ -309,6 +314,18 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
 		}
+		
+		if (metaExpedient != null) {
+			List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndMetaExpedientAndEstatAndEsborrat(
+					entitat, 
+					metaExpedient, 
+					ExpedientEstatEnumDto.OBERT, 
+					0);
+			for (ExpedientEntity expedient: expedients) {
+				cacheHelper.evictErrorsValidacioPerNode(expedient);
+			}
+		}
+		
 		return conversioTipusHelper.convertir(
 				metaDocument,
 				MetaDocumentDto.class);

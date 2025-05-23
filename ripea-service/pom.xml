@@ -222,4 +222,22 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>apb</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.fundaciobit.plugins</groupId>
+					<artifactId>plugin-arxiu-apb</artifactId>
+					<version>1.0.3</version>
+					<exclusions>
+						<exclusion>
+							<groupId>org.fundaciobit.plugins</groupId>
+							<artifactId>plugin-arxiu-api</artifactId>
+						</exclusion>
+					</exclusions>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

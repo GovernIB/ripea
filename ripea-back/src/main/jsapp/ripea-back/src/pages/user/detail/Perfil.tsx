@@ -24,7 +24,7 @@ const PerfilFrom = () =>{
             <GridFormField xs={12} name="rols"
                            value={user?.auth}
                            disabled readOnly multiple/>
-            <GridFormField xs={12} name="idioma"/>
+            <GridFormField xs={12} name="idioma" required/>
         </CardData>
 
         <CardData title={t('page.user.perfil.correu')}>

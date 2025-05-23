@@ -1,16 +1,16 @@
 import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
-const CanviTipusForm = (props:any) => {
-    const {entity} = props;
+const CanviTipusForm = () => {
+    const {data} = useFormContext();
 
     const filter = builder.and(
-        builder.eq('metaExpedient.id', entity.metaExpedient?.id),
+        builder.eq('metaExpedient.id', data?.metaExpedient?.id),
         builder.eq('actiu', true),
         builder.eq('pinbalActiu', false),
     )
@@ -21,7 +21,6 @@ const CanviTipusForm = (props:any) => {
 }
 
 const CanviTipus = (props:any) => {
-    const {entity} = props;
     const { t } = useTranslation();
 
     return <FormActionDialog
@@ -30,7 +29,7 @@ const CanviTipus = (props:any) => {
         title={t('page.document.action.changeType')}
         {...props}
     >
-        <CanviTipusForm entity={entity}/>
+        <CanviTipusForm/>
     </FormActionDialog>
 }
 
@@ -42,6 +41,7 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
         apiRef.current?.show?.(undefined, {
             ids: ids,
             massivo: true,
+            metaExpedient: entity?.metaExpedient,
         })
     }
     const onSuccess = () :void => {
@@ -54,7 +54,7 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
 
     return {
         handleMassiveShow,
-        content: <CanviTipus apiRef={apiRef} entity={entity} onSuccess={onSuccess} onError={onError}/>
+        content: <CanviTipus apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
 export default useCanviTipus;

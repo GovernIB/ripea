@@ -82,7 +82,6 @@ const translationEn = {
                 estat: "Status",
                 prioritat: "Priority",
                 clasificacio: "Classification",
-
                 dataProgramada: "Date on which the notification will be effectively sent to Notific@",
                 duracio: "Calendar days\nThe notification will be available until 23:59:59 of the entered day, expiring at 00:00 of the following day. Only applies to Electronic Notifications. You can indicate either a number of calendar days or a specific date.",
                 dataCaducitat: "Calendar days\nThe notification will be available until 23:59:59 of the entered day, expiring at 00:00 of the following day. Only applies to Electronic Notifications. You can indicate either a number of calendar days or a specific date.",
@@ -294,7 +293,9 @@ const translationEn = {
                 seguidors: "Expedient followers",
             },
 			results: {
-				actionOk: "Action executed.",
+                checkDelete: 'Are you sure you want to delete this item?',
+                checkRelacio: 'Are you sure you want to delete this relationship?',
+                actionOk: "Action executed.",
 				actionBackgroundOk: "Action is executing on background.",
 			}
         },
@@ -364,6 +365,7 @@ const translationEn = {
                 csvRegulacion: "CSV Regulation",
                 tipoFirma: "Signature Type",
                 flux: "There is a predefined signature flow. Creating a new signature flow will overwrite the selected one.",
+                summarize: "Generate title and description using artificial intelligence.\n(Requires a document to be attached beforehand)",
             },
             acciones: {
                 pinbal: "PINBAL consultation",

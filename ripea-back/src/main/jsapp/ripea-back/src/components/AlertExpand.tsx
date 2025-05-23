@@ -1,9 +1,10 @@
 import {useState} from "react";
 import {Alert, Collapse, Icon, IconButton} from "@mui/material";
 import Box from "@mui/material/Box";
+import AlertTitle from "@mui/material/AlertTitle";
 
 const AlertExpand = (props:any) => {
-    const {label, children, ...other} = props
+    const { title, label, children, ...other} = props
     const [verDetalles, setVerDetalles] = useState(false);
 
     const toggleDetalles = () => setVerDetalles((prev) => !prev);
@@ -22,6 +23,7 @@ const AlertExpand = (props:any) => {
                 </IconButton>
             }
         >
+            {title && <AlertTitle sx={{m: 0}}>{title}</AlertTitle>}
             {label}
             <Collapse in={verDetalles}>
                 <Box mt={1}>

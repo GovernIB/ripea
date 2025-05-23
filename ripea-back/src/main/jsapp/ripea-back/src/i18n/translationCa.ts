@@ -293,7 +293,9 @@ const translationCa = {
                 seguidors: "Seguidors del expedient",
             },
 			results: {
-				actionOk: "L'acció s'ha executat correctament.",
+                checkDelete: 'Esteu segur que voleu esborrar aquest element?',
+                checkRelacio: 'Esteu segur que voleu esborrar aquesta relació?',
+                actionOk: "L'acció s'ha executat correctament.",
 				actionBackgroundOk: "L'acción s'ha preparat per la seva execució en segon plà. Pot consultar l'estat del procés des del llistat de execucions massives.",
 			}
         },

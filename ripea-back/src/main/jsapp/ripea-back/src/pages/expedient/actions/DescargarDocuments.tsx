@@ -5,7 +5,7 @@ import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
-const sortModel = [{field: 'id', sort: 'desc'}]
+const sortModel:any = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
 const columns = [
     {

@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {useEffect, useRef, useState} from "react";
 import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {Chip, Checkbox, FormControlLabel, LinearProgress, Box} from "@mui/material";
+import {Chip, Checkbox, FormControlLabel, LinearProgress, Box, Icon} from "@mui/material";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Load from "../../../components/Load.tsx";
@@ -217,6 +217,21 @@ const useExecucioMassiva = () => {
     }
 }
 
+const StyledEstat = (props:any) => {
+    const {entity} = props;
+
+    const estat = entity?.estat
+
+    return <>
+        {estat == 'ESTAT_FINALITZAT' && <Icon color={"success"}>check_circle</Icon>}
+        {estat == 'ESTAT_ERROR' && <Icon title={entity?.error} color={"error"}>error</Icon>}
+        {estat == 'ESTAT_PENDENT' && <Icon color={"warning"}>schedule</Icon>}
+        {estat == 'ESTAT_CANCELAT' && <Icon color={"disabled"}>check_circle</Icon>}
+
+        {estat}
+    </>
+}
+
 const columnsContingut = [
     {
         field: 'elementTipus',
@@ -229,6 +244,7 @@ const columnsContingut = [
     {
         field: 'estat',
         flex: 0.5,
+        renderCell: (params: any) => <StyledEstat entity={params.row}/>,
     },
     // {
     //     field: 'dataInici',

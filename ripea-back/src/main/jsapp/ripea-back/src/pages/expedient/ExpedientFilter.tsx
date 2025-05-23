@@ -16,7 +16,7 @@ const ExpedientFilterForm = (props:any) => {
         builder.eq('revisioEstat', "'REVISAT'"),
     );
 
-    const filtErestatAdditionalInfo = builder.and(
+    const filtErestatAdditional = builder.and(
         builder.eq('metaExpedient.id', data?.metaExpedient?.id),
     );
 
@@ -24,7 +24,9 @@ const ExpedientFilterForm = (props:any) => {
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="estat"/>
-        <GridFormField xs={3} name="estatAdditionalInfo" filter={filtErestatAdditionalInfo} hidden/>
+        <GridFormField xs={3} name="estatAdditional" filter={filtErestatAdditional}
+                       disabled={!data?.metaExpedient || data?.estat=='TANCAT'}
+                       readOnly={!data?.metaExpedient || data?.estat=='TANCAT'}/>
         <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="organGestor"/>
         <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
@@ -35,7 +37,7 @@ const ExpedientFilterForm = (props:any) => {
         <GridFormField xs={3} name="grup"/>
         <GridFormField xs={3} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
 
-        <Grid item xs={user?.rolActual == "tothom" ?6 :3}></Grid>
+        <Grid item xs={3} hidden={user?.rolActual!="tothom"}/>
 
         <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
         <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
@@ -49,6 +51,7 @@ const springFilterBuilder = (data: any) :string => {
         builder.like("numero", data.numero),
         builder.like("nom", data.nom),
         data.estat && builder.equals("estat",`'TANCAT'`, (data.estat==='TANCAT')),
+        data.estat!='TANCAT' && builder.eq("estatAdditional.id", data.estatAdditional?.id),
         builder.exists(
             builder.or(
                 builder.like("interessats.documentNum", data.interessat),
