@@ -17,7 +17,7 @@ const ErrorValidacio = (props:any) => {
             {
                 errors.map((error:any)=>
                     error?.metaDada && <Grid item xs={12}>
-					<Alert 
+					<Alert key={error?.id}
 					iconMapping={{
 					    warning: <Icon>create</Icon>,
 					  }}

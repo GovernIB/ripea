@@ -72,8 +72,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEviarPortafirmes(refresh);
     const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNevegador();
 
-    const permesModificarCustodiats= () => entitat?.isPermesModificarCustodiats;
-
     const isDocument= (row:any) => row?.tipus=="DOCUMENT";
     const isDigitalOrImportat = (row:any) => {
         return isInOptions(row.documentTipus, 'DIGITAL', 'IMPORTAT');
@@ -118,7 +116,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             clickShowUpdateDialog: true,
             disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
-            hidden: (row:any) => !potModificar(entity) || !isDocument(row) || !permesModificarCustodiats || isInOptions(row?.estat, 'FIRMA_PENDENT'),
+            hidden: (row:any) => !potModificar(entity) || !isDocument(row) || !entitat?.isPermesModificarCustodiats || isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
             title: t('page.document.acciones.move'),
@@ -129,7 +127,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: !potModificar(entity),
         },
         {
-            title: t('common.copy')+"...",
+            title: t('page.document.acciones.copy'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiarShow,
@@ -153,7 +151,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'imprimible'),
             disabled: (row:any) => isInOptions(row?.fitxerExtension, 'xsig'),
-            hidden: (row:any) => !isDigitalOrImportat(row) || !(isInOptions(row?.estat, 'DEFINITIU', 'FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
+            hidden: (row:any) => !isDigitalOrImportat(row) || !( (row?.arxiuEstat=='DEFINITIU' || row?.estat=='FIRMA_PARCIAL') || user?.sessionScope?.imprimibleNoFirmats),
         },
         {
             title: t('common.download'),

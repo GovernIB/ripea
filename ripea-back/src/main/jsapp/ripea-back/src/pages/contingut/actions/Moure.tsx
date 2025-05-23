@@ -73,6 +73,7 @@ export const useMoure = (refresh?: () => void) => {
     }
 }
 export const useCopiar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -109,10 +110,14 @@ export const useCopiar = (refresh?: () => void) => {
     return {
         handleShow,
         handleMassiveShow,
-        content: <Moure apiRef={apiRef} title={''} onSuccess={onSuccess} onError={onError}/>
+        content: <Moure apiRef={apiRef}
+                        title={t('page.document.action.copy')}
+                        onSuccess={onSuccess}
+                        onError={onError}/>
     }
 }
 export const useVincular = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -149,7 +154,10 @@ export const useVincular = (refresh?: () => void) => {
     return {
         handleShow,
         handleMassiveShow,
-        content: <Moure apiRef={apiRef} title={''} onSuccess={onSuccess} onError={onError}/>
+        content: <Moure apiRef={apiRef}
+                        title={t('page.document.action.vincular')}
+                        onSuccess={onSuccess}
+                        onError={onError}/>
     }
 }
 export default useMoure;
