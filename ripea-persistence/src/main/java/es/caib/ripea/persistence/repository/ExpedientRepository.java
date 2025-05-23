@@ -854,4 +854,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	List<ExpedientEntity> findByMetaExpedientAndEsborrat(
 			MetaExpedientEntity metaExpedient, 
 			int esborrat);
+	
+	List<ExpedientEntity> findByEntitatAndMetaExpedientAndEstatAndEsborrat(
+			EntitatEntity entitat,
+			MetaExpedientEntity metaExpedient, 
+			ExpedientEstatEnumDto estat,
+			int esborrat);
 }

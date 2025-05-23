@@ -221,7 +221,7 @@ public class CacheHelper {
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 			
 			// Valida documents específics del meta-node
-			List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndMultiplicitatIn(
+			List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndMultiplicitatInAndActiuTrue(
 					expedient.getMetaExpedient(),
 					new MultiplicitatEnumDto [] {
 						MultiplicitatEnumDto.M_1,
