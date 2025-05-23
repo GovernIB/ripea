@@ -132,7 +132,7 @@ const UserHeadToolbar = (props:any) => {
 
     return <Load value={entitatId || organId || rol} noEffect>
         <Grid container rowSpacing={1} columnSpacing={1} item xs={8}>
-        <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'}>
+        <Grid item xs={12} display={'flex'} flexDirection={'row'} justifyContent={'end'} alignItems={"center"}>
             { !isRolActualSupAdmin &&
                 <>
                     <HeaderSelect
@@ -153,24 +153,6 @@ const UserHeadToolbar = (props:any) => {
                 </>
             }
 
-            { (isRolActualOrganAdmin || isRolActualDissenyOrgan) &&
-                <>
-                    <HeaderSelect
-                        value={organId}
-                        onChange={setOrganId}
-                        icon={<Icon fontSize={"inherit"}>badge</Icon>}
-                        color={textColor}
-                    >
-                        {
-                            permisos?.organs?.map((rol:any) =>
-                                <MenuItem key={rol.codi} value={rol.id}>{rol.nom}</MenuItem>
-                            )
-                        }
-                    </HeaderSelect>
-                    <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
-                </>
-            }
-
             <HeaderSelect
                 value={rol}
                 onChange={setRol}
@@ -185,6 +167,24 @@ const UserHeadToolbar = (props:any) => {
             </HeaderSelect>
 
             <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
+
+            { (isRolActualOrganAdmin || isRolActualDissenyOrgan) &&
+                <>
+                    <HeaderSelect
+                        value={organId}
+                        onChange={setOrganId}
+                        icon={<Icon fontSize={"inherit"}>apartment</Icon>}
+                        color={textColor}
+                    >
+                        {
+                            permisos?.organs?.map((rol:any) =>
+                                <MenuItem key={rol.codi} value={rol.id}>{rol.nom}</MenuItem>
+                            )
+                        }
+                    </HeaderSelect>
+                    <Divider orientation="vertical" variant="middle" flexItem sx={{mx :1, bgcolor: textColor}}/>
+                </>
+            }
 
             <HeaderMenu
                 title={<><Icon fontSize={"inherit"}>person</Icon>{user?.nom}</>
