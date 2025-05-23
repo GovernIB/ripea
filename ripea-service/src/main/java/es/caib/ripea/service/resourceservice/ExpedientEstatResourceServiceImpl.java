@@ -20,8 +20,4 @@ import com.turkraft.springfilter.parser.Filter;
 @RequiredArgsConstructor
 public class ExpedientEstatResourceServiceImpl extends BaseMutableResourceService<ExpedientEstatResource, Long, ExpedientEstatResourceEntity> implements ExpedientEstatResourceService {
 
-    @Override
-    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	return Filter.parse(currentSpringFilter).generate(); 
-    }
 }

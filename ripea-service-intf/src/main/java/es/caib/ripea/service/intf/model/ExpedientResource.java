@@ -323,7 +323,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 		private String numero;
         private String nom;
         private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
-        private ResourceReference<ExpedientEstatResource, Long> estatAdditionalInfo;
+        private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;

@@ -107,7 +107,7 @@ export const useActions = (refresh?: () => void) => {
 	const eliminar= (id: any) :void => {
         messageDialogShow(
             '',
-            '',
+            t('page.expedient.result.checkDelete'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -126,7 +126,7 @@ export const useActions = (refresh?: () => void) => {
     const eliminarRelacio = (id:any, row:any, relacioId:any) => {
         messageDialogShow(
             '',
-            '',
+            t('page.expedient.result.checkRelacio'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {

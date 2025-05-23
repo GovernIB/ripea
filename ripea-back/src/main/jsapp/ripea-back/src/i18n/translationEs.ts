@@ -293,6 +293,8 @@ const translationEs = {
                 seguidors: "Seguidores del expediente",
             },
             results: {
+                checkDelete: '¿Está seguro de que quiere borrar este elemento?',
+                checkRelacio: '¿Está seguro de que quiere borrar esta relación?',
                 actionOk: "La acción se ha ejecutado correctamente.",
                 actionBackgroundOk: "La acción se ha preparado para su ejecución en segundo plano. Puede consultar el estado del proceso desde el listado de acciones masivas.",
             }

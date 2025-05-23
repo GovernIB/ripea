@@ -61,7 +61,7 @@ public class UsuariResource extends BaseResource<String> {
         return  codi + " - " + nom;
     }
 
-	@Size(max = 16)
+//	@Size(max = 16)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
 
 	@Override

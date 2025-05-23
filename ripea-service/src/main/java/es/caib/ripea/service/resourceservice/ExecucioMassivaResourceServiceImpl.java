@@ -7,6 +7,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.service.helper.ConfigHelper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import es.caib.ripea.persistence.entity.resourceentity.ExecucioMassivaContingutResourceEntity;
@@ -27,12 +32,27 @@ import lombok.extern.slf4j.Slf4j;
 public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceService<ExecucioMassivaResource, Long, ExecucioMassivaResourceEntity> implements ExecucioMassivaResourceService {
     
 	private final ExecucioMassivaHelper execucioMassivaHelper;
-	
+	private final ConfigHelper configHelper;
+
     @PostConstruct
     public void init() {
     	register(ExecucioMassivaResource.Fields.documentNom, new DocumentFieldDownloader());
     }
-	
+
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+        String rolActual = configHelper.getRolActual();
+
+        if (!"IPA_ADMIN".equals(rolActual)){
+            Filter baseSpringFilter = (currentSpringFilter != null && !currentSpringFilter.isEmpty())? Filter.parse(currentSpringFilter):null;
+            return FilterBuilder.and(
+                    baseSpringFilter,
+                    FilterBuilder.equal(BaseAuditableEntity.Fields.createdBy, SecurityContextHolder.getContext().getAuthentication().getName())
+            ).generate();
+        }
+        return currentSpringFilter;
+    }
+
     private class DocumentFieldDownloader implements FieldDownloader<ExecucioMassivaResourceEntity> {
         @Override
         public DownloadableFile download(ExecucioMassivaResourceEntity entity, String fieldName, OutputStream out) {
