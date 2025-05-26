@@ -14,26 +14,12 @@ const ErrorValidacio = (props:any) => {
     const expedientAmbInteressatObligatori = errors?.some((error:any)=>error?.expedientWithoutInteressats);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            {
-                errors.map((error:any)=>
-                    error?.metaDada && <Grid item xs={12}>
-					<Alert key={error?.id}
-					iconMapping={{
-					    warning: <Icon>create</Icon>,
-					  }}
-					 severity="warning">{t('page.alert.errors.metaDada')} {error?.metaDada?.nom} ({error?.metaDada?.tipus})</Alert></Grid>
-                )
-			}
-			{
-                errors.map((error:any)=>
-                    error?.metaDocument && <Grid item xs={12}>
-					<Alert 
-					iconMapping={{
-					    warning: <Icon>insert_drive_file</Icon>,
-					  }}
-					severity="warning" >{t('page.alert.errors.metaDocument')} {error?.metaDocument?.nom}</Alert></Grid> 
-                )
-            }
+        {
+            errors.map((error:any)=> <>
+                {error?.metaDada && <Grid item xs={12}><Alert key={`metaDada-${error?.id}`} severity="warning" icon={<Icon>create</Icon>}>{t('page.alert.errors.metaDada')} {error?.metaDada?.nom} ({error?.metaDada?.tipus})</Alert></Grid>}
+                {error?.metaDocument && <Grid item xs={12}><Alert key={`metaDocument-${error?.id}`} severity="warning" icon={<Icon>insert_drive_file</Icon>}>{t('page.alert.errors.metaDocument')} {error?.metaDocument?.nom}</Alert></Grid>}
+            </>)
+        }
         <Grid item xs={12} hidden={!hiHaDocumentsSenseMetaNode}><Alert severity="warning">{t('page.alert.errors.metaNode')}</Alert></Grid>
         <Grid item xs={12} hidden={!hiHaNotificacionsNoFinalitzades}><Alert severity="warning">{t('page.alert.errors.noFinalitzades')}</Alert></Grid>
         <Grid item xs={12} hidden={!expedientAmbInteressatObligatori}><Alert severity="warning">{t('page.alert.errors.interessatObligatori')}</Alert></Grid>

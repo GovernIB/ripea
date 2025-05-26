@@ -6,9 +6,9 @@ import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import {formatIso} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
 
-const ExpedientFilterForm = (props:any) => {
+const ExpedientFilterForm = () => {
     const {data} = useFormContext()
-    const { user } = props;
+    const { value: user } = useUserSession();
 
     const filterMetaExpedient = builder.and(
         builder.eq('organGestor.id', data?.organGestor?.id),
@@ -45,7 +45,7 @@ const ExpedientFilterForm = (props:any) => {
     </>
 }
 
-const springFilterBuilder = (data: any) :string => {
+const springFilterBuilder = (data:any, user:any) :string => {
     let filterStr :string = '';
     filterStr += builder.and(
         builder.like("numero", data.numero),
@@ -67,7 +67,7 @@ const springFilterBuilder = (data: any) :string => {
 
         builder.like("registresImportats", data.numeroRegistre),
         builder.eq("grup.codi", data.grup?.id),
-        builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
+        (user?.rolActual != "tothom") && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
 
         data.pendentFirmar && (
             builder.exists(
@@ -81,6 +81,12 @@ const springFilterBuilder = (data: any) :string => {
             )
         ),
 
+        data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`),
+        (user?.rolActual == "tothom") && data.seguit && (
+            builder.exists(
+                builder.eq("seguidors.codi", `'${user.codi}'`)
+            )
+        )
     )
     // console.log('>>> springFilterBuilder:', filterStr)
     return filterStr;
@@ -88,29 +94,16 @@ const springFilterBuilder = (data: any) :string => {
 
 const ExpedientFilter = (props:any) => {
     const {onSpringFilterChange} = props;
-
     const { value: user } = useUserSession();
-
-    const additionalSpringFilterBuilder = (data: any) :string => {
-        return builder.and(
-            springFilterBuilder(data),
-            (user?.rolActual != "tothom") && data.agafat && builder.eq("agafatPer.codi", `'${user.codi}'`),
-            (user?.rolActual == "tothom") && data.seguit && (
-                builder.exists(
-                    builder.eq("seguidors.codi", `'${user.codi}'`)
-                )
-            )
-        )
-    }
 
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
         componentProps={{ style: {minHeight: '206px' } }}
-        springFilterBuilder={additionalSpringFilterBuilder}
+        springFilterBuilder={(data:any)=>springFilterBuilder(data, user)}
         onSpringFilterChange={onSpringFilterChange}
     >
-        <ExpedientFilterForm user={user}/>
+        <ExpedientFilterForm/>
     </StyledMuiFilter>
 }
 

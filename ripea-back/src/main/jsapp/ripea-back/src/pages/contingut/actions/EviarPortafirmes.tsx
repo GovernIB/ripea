@@ -1,15 +1,32 @@
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Grid, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
+import {useFluxCreateSessio} from "../../../components/SseExpedient.tsx";
 
 const EviarPortafirmesForm = () => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
+    const {value: flux} = useFluxCreateSessio()
+
     const [open, setOpen] = useState<boolean>(true);
+    const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(flux){
+            if(!flux?.error){
+                apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", {
+                    id: flux?.fluxId,
+                    description: flux?.nom +' - '+ flux?.descripcio
+                })
+                setOpen(true)
+                setOpenNewFlux(false)
+            }
+        }
+    }, [flux]);
 
     const filterResponsables = builder.neq('nif', null)
     const filterAnnexos = builder.and(
@@ -45,7 +62,13 @@ const EviarPortafirmesForm = () => {
         >
             <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
         </GridButton>
-        <GridButton xs={1} hidden={data?.portafirmesFluxTipus!='PORTAFIB'}>
+        <GridButton
+            xs={1} onClick={()=>{
+                setOpen(false)
+                setOpenNewFlux(true)
+            }}
+            hidden={data?.portafirmesFluxTipus!='PORTAFIB'}
+        >
             <Icon sx={{m: 0}}>open_in_new</Icon>
         </GridButton>
 
@@ -54,6 +77,10 @@ const EviarPortafirmesForm = () => {
 
         <Grid item xs={12} hidden={!data?.portafirmesFluxUrl || !open}>
             <iframe src={data?.portafirmesFluxUrl} width={'100%'} height={'500px'}></iframe>
+        </Grid>
+
+        <Grid item xs={12} hidden={!data?.urlInicioFlujoFirma || !openNewFlux}>
+            <iframe src={data?.urlInicioFlujoFirma} width={'100%'} height={'500px'}></iframe>
         </Grid>
     </Grid>
 }

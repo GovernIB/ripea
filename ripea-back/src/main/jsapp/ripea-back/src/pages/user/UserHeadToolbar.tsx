@@ -8,6 +8,7 @@ import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import Load from "../../components/Load.tsx";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
+import {useNotificacionsSessio, useTasquesSessio} from "../../components/SseClient.tsx";
 
 const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
@@ -284,6 +285,7 @@ const MenuSupAdmin = () => {
 }
 const MenuAdmin = (props:any) => {
     const {sessionScope} = props;
+    const { value: numNotif } = useNotificacionsSessio()
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -291,7 +293,7 @@ const MenuAdmin = (props:any) => {
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
-        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={numNotif} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
 
@@ -340,6 +342,7 @@ const MenuAdmin = (props:any) => {
 }
 const MenuAdminOrgan = (props:any) => {
     const {sessionScope} = props;
+    const { value: numNotif } = useNotificacionsSessio()
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -347,7 +350,7 @@ const MenuAdminOrgan = (props:any) => {
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
-        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={numNotif} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
 
@@ -375,6 +378,8 @@ const MenuDissenyOrgan = () => {
 }
 const MenuUsuari = (props:any) => {
     const {sessionScope} = props;
+    const { value: numNotif } = useNotificacionsSessio()
+    const { value: numTasc } = useTasquesSessio()
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -382,10 +387,10 @@ const MenuUsuari = (props:any) => {
         <HeaderButton onClick={()=>{navigate('/expedient')}} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.expedient')}</Typography>
         </HeaderButton>
-        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={sessionScope?.countAnotacionsPendents} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('expedientPeticio') } badgeContent={numNotif} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.anotacions')}</Typography>
         </HeaderButton>
-        <HeaderButton onClick={()=> toProgramaAntic('usuariTasca') } badgeContent={sessionScope?.countTasquesPendent} variant={"contained"}>
+        <HeaderButton onClick={()=> toProgramaAntic('usuariTasca') } badgeContent={numTasc} variant={"contained"}>
             <Typography display={'inline'} variant={'subtitle2'}>{t('page.user.menu.tasca')}</Typography>
         </HeaderButton>
         { sessionScope?.isCreacioFluxUsuariActiu &&

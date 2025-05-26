@@ -36,7 +36,7 @@ const Dada = (props:any) => {
     const { entity, onRowCountChange } = props
 
     return <GridPage>
-        <Box width={'100%'} height={162 + 52 + 4}>
+        <Box width={'100%'} height={162 + 52 * 4}>
             <MetaDadaGrid entity={entity} onRowCountChange={onRowCountChange}/>
         </Box>
     </GridPage>
@@ -147,7 +147,7 @@ const useDocumentDetail = () => {
             title={entity?.nom}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={buttons}
-            buttonCallback={(value :any) :void=>{
+            buttonCallback={(value :any) :void => {
                 switch (value){
                     case 'download':
                         break;

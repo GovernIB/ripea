@@ -175,7 +175,6 @@ const ExpedientGrid = () => {
             headerName: t('page.expedient.detall.avisos'),
             field: 'avisos',
             sortable: false,
-            disableColumnMenu: true,
             flex: 0.5,
             renderCell: (params: any) => (<>
                 {!params.row?.valid &&
@@ -199,7 +198,6 @@ const ExpedientGrid = () => {
             field: 'numComentaris',
             headerName: '',
             sortable: false,
-            disableColumnMenu: true,
             flex: 0.25,
             renderCell: (params: any) => <CommentDialog
                 entity={params?.row}
@@ -212,7 +210,6 @@ const ExpedientGrid = () => {
             field: 'numSeguidors',
             headerName: '',
             sortable: false,
-            disableColumnMenu: true,
             flex: 0.25,
             renderCell: (params: any) => <FollowersDialog entity={params?.row}/>
         },

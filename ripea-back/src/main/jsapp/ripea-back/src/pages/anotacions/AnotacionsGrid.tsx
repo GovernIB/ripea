@@ -41,7 +41,7 @@ const AnotacionsGrid = (props:any) => {
     return <GridPage>
         <StyledMuiGrid
             resourceName="expedientPeticioResource"
-            filter={builder.and(builder.eq('expedient.id', id))}
+            filter={builder.eq('expedient.id', id)}
             staticSortModel={sortModel}
             perspectives={perspectives}
             columns={columns}

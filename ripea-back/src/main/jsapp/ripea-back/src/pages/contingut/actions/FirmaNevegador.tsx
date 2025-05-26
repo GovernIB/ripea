@@ -1,9 +1,10 @@
-import {useRef} from "react";
+import {useEffect, useRef} from "react";
 import {Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
+import {useFirmaFinalitzadaSessio} from "../../../components/SseExpedient.tsx";
 
 const FirmaNevegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -11,8 +12,8 @@ const FirmaNevegadorForm = () => {
     </Grid>
 }
 
-const FirmaNevegador = (props:any) => {
-    const {  } = useTranslation();
+const FirmaNevegador = (props: any) => {
+    const {} = useTranslation();
 
     return <FormActionDialog
         resourceName={"documentResource"}
@@ -29,13 +30,27 @@ export const useFirmaNevegador = () => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
+    const handleShow = (id: any): void => {
         apiRef.current?.show?.(id)
     }
-    const formDialogResultProcessor = (result:any) => {
+    const formDialogResultProcessor = (result: any) => {
+        const {value: firma} = useFirmaFinalitzadaSessio();
+
+        useEffect(() => {
+            if (firma) {
+                const severiry =
+                    firma?.status == 'OK' ? 'success'
+                        : firma?.status == 'WARNING' ? 'warning'
+                            : firma?.status == 'ERROR' ? 'error'
+                                : 'info'
+
+                temporalMessageShow(null, firma?.msg, severiry);
+            }
+        }, [firma]);
+
         return <iframe src={result?.url} width={'100%'} height={'500px'}/>
     }
-    const onError = (error:any) :void => {
+    const onError = (error: any): void => {
         temporalMessageShow(null, error.message, 'error');
     }
 

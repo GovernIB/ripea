@@ -6,7 +6,6 @@ import {useResourceApiService} from "reactlib";
 const userUrl :string = import.meta.env.VITE_API_URL + 'usuari';
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
-const avisosKey = 'avisos';
 const organKey = 'organ';
 
 export const useUserSession = () => {
@@ -69,12 +68,6 @@ export const useUserSession = () => {
         save: apiSave,
         remove: apiRemove,
     };
-}
-
-export const useAlertesSessio = () => {
-    const { value, save } = useSession(avisosKey);
-    useEffect(() => {}, []);
-    return { value, save };
 }
 
 export const useEntitatSession = () => {

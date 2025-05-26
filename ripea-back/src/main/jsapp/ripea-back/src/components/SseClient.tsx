@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSession } from './SessionStorageContext';
 import {useUserSession} from "./Session.tsx";
 
 // Keys for session storage
 const avisosKey = 'avisos';
+const notificacionsKey = 'notificacions';
+const tasquesKey = 'tasques';
 const sseConnectedKey = 'sseConnected';
 
 /**
@@ -14,6 +16,18 @@ export const useSseClient = () => {
   const { value: connected } = useSession(sseConnectedKey);
   return { connected };
 };
+export const useAlertesSessio = () => {
+    const { value } = useSession(avisosKey);
+    return { value };
+}
+export const useNotificacionsSessio = () => {
+    const { value } = useSession(notificacionsKey);
+    return { value };
+}
+export const useTasquesSessio = () => {
+    const { value } = useSession(tasquesKey);
+    return { value };
+}
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -21,9 +35,10 @@ export const useSseClient = () => {
  */
 export const SseClient: React.FC = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const { save: saveConnected } = useSession(sseConnectedKey);
   const { save: saveAvisos } = useSession(avisosKey);
+  const { save: saveNotificacon } = useSession(notificacionsKey);
+  const { save: saveTasques } = useSession(tasquesKey);
   const { value: user } = useUserSession();
 
   useEffect(() => {
@@ -36,7 +51,7 @@ export const SseClient: React.FC = () => {
 
       // Crear una nova connexió
       const apiUrl = import.meta.env.VITE_API_URL || '/api/';
-      const sseUrl = `${apiUrl}sse/subscribe/user/`+user?.codi;
+      const sseUrl = `${apiUrl}sse/subscribe/user/${user?.codi}`;
 
       const eventSource = new EventSource(sseUrl, { withCredentials: true });
       eventSourceRef.current = eventSource;
@@ -44,20 +59,8 @@ export const SseClient: React.FC = () => {
       // Gestionar l'esdeveniment de connexió
       eventSource.addEventListener('connect', (event) => {
         console.log('SSE connectat:', event.data);
-        setIsConnected(true);
         saveConnected(true);
       });
-
-      // // Gestionar l'esdeveniment de dades de sessió
-      // eventSource.addEventListener('sessionData', (event) => {
-      //   try {
-      //     const sessionData = JSON.parse(event.data);
-      //     console.log('SSE sessionData rebut:', sessionData);
-      //     saveAvisos(sessionData);
-      //   } catch (error) {
-      //     console.error('Error processant dades de sessió SSE:', error);
-      //   }
-      // });
 
       // Gestionar l'esdeveniment d'alerta
       eventSource.addEventListener('avisos', (event) => {
@@ -70,7 +73,6 @@ export const SseClient: React.FC = () => {
             avisosUsuari: avisosRebuts.avisosUsuari || [], // Llista d'objectes d'usuari
             avisosAdmin: avisosRebuts.avisosAdmin || {},   // Map d'alertes d'administrador
           };
-
 
           // Obtenir les alertes actuals de sessionStorage directament
           let prevAvisos;
@@ -92,10 +94,31 @@ export const SseClient: React.FC = () => {
         }
       });
 
+      // Gestionar l'esdeveniment de notificació
+      eventSource.addEventListener('notificacions', (event) => {
+        try {
+          const notificacionsRebudes = JSON.parse(event.data);
+          console.log('SSE notificacions rebuts:', notificacionsRebudes);
+          saveNotificacon(notificacionsRebudes || 0)
+        } catch (error) {
+          console.error('Error processant notificacions SSE:', error);
+        }
+      });
+
+      // Gestionar l'esdeveniment de tasques
+      eventSource.addEventListener('tasques', (event) => {
+        try {
+          const tasquesRebudes = JSON.parse(event.data);
+          console.log('SSE tasques rebuts:', tasquesRebudes);
+          saveTasques(tasquesRebudes || 0)
+        } catch (error) {
+          console.error('Error processant tasques SSE:', error);
+        }
+      });
+
       // Gestionar errors
       eventSource.onerror = (error) => {
         console.error('Error de connexió SSE:', error);
-        setIsConnected(false);
         saveConnected(false);
 
         // Tancar la connexió actual
@@ -118,7 +141,6 @@ export const SseClient: React.FC = () => {
         eventSourceRef.current.close();
         eventSourceRef.current = null;
       }
-      setIsConnected(false);
       saveConnected(false);
     };
   }, []);

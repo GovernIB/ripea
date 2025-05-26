@@ -24,7 +24,7 @@ import feder7 from '../assets/feder7.png';
 import una_manera from '../assets/una_manera.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import {Alert} from "@mui/material";
-import {useAlertesSessio} from "../components/Session.tsx";
+import {useAlertesSessio} from "./SseClient.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;

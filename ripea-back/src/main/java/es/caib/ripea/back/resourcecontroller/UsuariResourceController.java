@@ -147,8 +147,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private Map<String, Object> getUsuariActualAdditionalInfo(HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
-        response.put("countTasquesPendent", TasquesPendentsHelper.countTasquesPendents(request));
+//        response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
+//        response.put("countTasquesPendent", TasquesPendentsHelper.countTasquesPendents(request));
         response.put("organsNoSincronitzats", MetaExpedientHelper.getOrgansNoSincronitzats(request));
         response.put("urlsInstruccioActiu", ExpedientHelper.isUrlsInstruccioActiu(request));
         response.put("revisioActiva", MetaExpedientHelper.getRevisioActiva(request));

@@ -79,7 +79,8 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 			exportIndexPdf,
 			exportIndexXls,
 			exportEni,
-			exportInside} = useMassiveActions(refresh);
+			exportInside
+    } = useMassiveActions(refresh);
 
     const {handleMassiveShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
 

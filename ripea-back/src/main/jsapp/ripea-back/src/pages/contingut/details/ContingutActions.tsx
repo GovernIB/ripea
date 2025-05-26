@@ -111,7 +111,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleDetallOpen,
         },
         {
-            title: t('common.update'),
+            title: t('common.update')+'...',
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
@@ -141,7 +141,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: !potModificar(entity) || !user?.sessionScope?.isMostrarVincular,
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            title: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
         },
@@ -243,7 +243,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !(row?.estat == 'FIRMA_PENDENT' && row?.documentTipus == 'DIGITAL'),
         },
         {
-            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            title: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
         },

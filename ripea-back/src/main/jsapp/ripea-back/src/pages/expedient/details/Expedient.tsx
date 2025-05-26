@@ -4,7 +4,7 @@ import {
     GridPage,
     useResourceApiService,
 } from 'reactlib';
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {Typography, Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -24,6 +24,7 @@ import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio from "./ErrorValidacio.tsx";
+import SseExpedient from "../../../components/SseExpedient.tsx";
 
 const Contenido = (props :any) => {
     const { title, children } = props;
@@ -237,6 +238,8 @@ const Expedient = () => {
     ]
 
     return <GridPage>
+        <SseExpedient id={id}/>
+
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
                 <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
