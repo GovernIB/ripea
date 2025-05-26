@@ -29,25 +29,24 @@ const FirmaNevegador = (props: any) => {
 export const useFirmaNevegador = () => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
+    const {value: firma} = useFirmaFinalitzadaSessio();
+
+    useEffect(() => {
+        if (firma) {
+            const severiry =
+                firma?.status == 'OK' ? 'success'
+                    : firma?.status == 'WARNING' ? 'warning'
+                        : firma?.status == 'ERROR' ? 'error'
+                            : 'info'
+
+            temporalMessageShow(null, firma?.msg, severiry);
+        }
+    }, [firma]);
 
     const handleShow = (id: any): void => {
         apiRef.current?.show?.(id)
     }
     const formDialogResultProcessor = (result: any) => {
-        const {value: firma} = useFirmaFinalitzadaSessio();
-
-        useEffect(() => {
-            if (firma) {
-                const severiry =
-                    firma?.status == 'OK' ? 'success'
-                        : firma?.status == 'WARNING' ? 'warning'
-                            : firma?.status == 'ERROR' ? 'error'
-                                : 'info'
-
-                temporalMessageShow(null, firma?.msg, severiry);
-            }
-        }, [firma]);
-
         return <iframe src={result?.url} width={'100%'} height={'500px'}/>
     }
     const onError = (error: any): void => {
