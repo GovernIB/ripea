@@ -562,4 +562,10 @@ public interface ExpedientService {
 	
 	@PreAuthorize("isAuthenticated()")
 	public MoureDestiVistaEnumDto getVistaMoureUsuariActual();
+	
+	@PreAuthorize("isAuthenticated()")
+	public ExpedientDto findByNumeroExpedient(
+			Long entitatId, 
+			String numeroExpedient, 
+			String rolActual);
 }

@@ -1295,7 +1295,40 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return hasAnyPermissions;
 	}
 
-	
+	@Transactional(readOnly = true)
+	@Override
+	public ExpedientDto findByNumeroExpedient(
+			Long entitatId,
+			String numeroExpedient,
+			String rolActual) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				false, 
+				false);
+		
+		ExpedientEntity expedientEntity = expedientRepository.findByNumeroExpedientAndFiltre(
+				entitat,
+				numeroExpedient != null ? numeroExpedient : "");
+		
+		entityComprovarHelper.comprovarExpedientNewTransaction(
+				expedientEntity.getId(),
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+		
+		ExpedientDto expedientDto = new ExpedientDto();
+		expedientDto.setId(expedientEntity.getId());
+		expedientDto.setNom(expedientEntity.getNom());
+		expedientDto.setNumero(expedientEntity.getNumero());
+		
+		return expedientDto;
+	}
 
 	private ResultDto<ExpedientDto> findAmbFiltrePaginat(
 			Long entitatId,

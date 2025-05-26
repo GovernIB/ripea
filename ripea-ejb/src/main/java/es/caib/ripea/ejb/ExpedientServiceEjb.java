@@ -505,4 +505,11 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	public String retornaUser(Long entitatId, Long id) throws NotFoundException {
 		return delegateService.retornaUser(entitatId, id);
 	}
+	
+	@Override
+	@RolesAllowed("**")
+	public ExpedientDto findByNumeroExpedient(Long entitatId, String numeroExpedient, String rolActual) {
+		return delegateService.findByNumeroExpedient(entitatId, numeroExpedient, rolActual);
+	}
+	
 }
