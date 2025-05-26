@@ -860,4 +860,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			MetaExpedientEntity metaExpedient, 
 			ExpedientEstatEnumDto estat,
 			int esborrat);
+
+	@Query(	"select " +
+			"    distinct e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and (lower(e.numero) like lower(:numeroExpedient)) "
+			)
+	ExpedientEntity findByNumeroExpedientAndFiltre(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("numeroExpedient") String numeroExpedient);
+	
 }

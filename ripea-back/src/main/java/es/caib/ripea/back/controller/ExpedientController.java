@@ -513,7 +513,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		return get(request, null, model);
 	}
 	
-	@RequestMapping(value = "/{expedientId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{expedientId:\\d+}", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long expedientId, Model model) {
 		
 		if (RolHelper.isRolActualDissenyadorOrgan(request)) {
@@ -1941,6 +1941,20 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "redirect:/expedient";
 		}
 	}
+	
+	// No funciona con barras incluso codificadas (%2F)
+	@RequestMapping(value = "/{numeroExpedient:^(?!\\d+$).*}", method = RequestMethod.GET)
+	public String getExpedientByNumero(
+			HttpServletRequest request,
+			@PathVariable String numeroExpedient) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = expedientService.findByNumeroExpedient(
+				entitat.getId(), 
+				numeroExpedient, 
+				getRolActual(request));
+		
+		return "redirect:/contingut/" + expedient.getId();
+	}	
 
 	private void emplenarFiltreRelacionats(
 			HttpServletRequest request, 
