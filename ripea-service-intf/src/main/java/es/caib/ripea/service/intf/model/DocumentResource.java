@@ -84,16 +84,16 @@ import lombok.experimental.FieldNameConstants;
                         code = DocumentResource.ACTION_FIRMA_WEB_INI,
                         formClass = DocumentResource.IniciarFirmaSimple.class,
                         requiresId = true),
-                @ResourceConfigArtifact(
-                        type = ResourceArtifactType.ACTION,
-                        code = DocumentResource.ACTION_FIRMA_WEB_FIN,
-                        formClass = DocumentResource.FinalitzarFirmaSimple.class,
-                        requiresId = true),
-                @ResourceConfigArtifact(
-                        type = ResourceArtifactType.ACTION,
-                        code = DocumentResource.ACTION_FLUX_WEB_INI,
-                        formClass = Serializable.class,
-                        requiresId = true),             
+//                @ResourceConfigArtifact(
+//                        type = ResourceArtifactType.ACTION,
+//                        code = DocumentResource.ACTION_FIRMA_WEB_FIN,
+//                        formClass = DocumentResource.FinalitzarFirmaSimple.class,
+//                        requiresId = true),
+//                @ResourceConfigArtifact(
+//                        type = ResourceArtifactType.ACTION,
+//                        code = DocumentResource.ACTION_FLUX_WEB_INI,
+//                        formClass = Serializable.class,
+//                        requiresId = true),             
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
@@ -145,8 +145,8 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_GET_CSV_LINK = "GET_CSV_LINK";
   //Flux de firma i firma en navegador
     public static final String ACTION_FIRMA_WEB_INI = "FIRMA_WEB_INI";
-    public static final String ACTION_FIRMA_WEB_FIN = "FIRMA_WEB_FIN";
-    public static final String ACTION_FLUX_WEB_INI  = "FLUX_WEB_INI";
+//    public static final String ACTION_FIRMA_WEB_FIN = "FIRMA_WEB_FIN";
+//    public static final String ACTION_FLUX_WEB_INI  = "FLUX_WEB_INI";
 	//Accions massives desde la pipella de contingut
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
@@ -276,7 +276,6 @@ public class DocumentResource extends NodeResource {
     @Transient private boolean pluginSummarizeActiu;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private DigitalitzacioPerfilDto digitalitzacioPerfil;
-
     @Transient private MetaDocumentResource metaDocumentInfo;
     
     @Getter
@@ -317,12 +316,12 @@ public class DocumentResource extends NodeResource {
     	private String motiu;
     }
     
-    @Getter
-    @Setter
-    public static class FinalitzarFirmaSimple implements Serializable {
-    	@NotNull
-    	private String transactionId;
-    }
+//    @Getter
+//    @Setter
+//    public static class FinalitzarFirmaSimple implements Serializable {
+//    	@NotNull
+//    	private String transactionId;
+//    }
     
     @Getter
     @Setter
@@ -423,10 +422,9 @@ public class DocumentResource extends NodeResource {
         @Transient
         @ResourceField(enumType = true, onChangeActive = true)
     	private String portafirmesEnviarFluxId;
-        @Transient
-    	private String portafirmesFluxUrl;
-        @Transient
-    	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+        @Transient private String portafirmesFluxUrl;
+        @Transient private String urlInicioFlujoFirma;
+        @Transient private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
     }
     
     @Getter
@@ -476,7 +474,7 @@ public class DocumentResource extends NodeResource {
         resultat.setData(Calendar.getInstance().getTime());
         resultat.setNtiOrigen(this.getNtiOrigen());
         resultat.setNtiEstadoElaboracion(this.getNtiEstadoElaboracion());
-        resultat.setNtiIdDocumentoOrigen(this.getNtiIdDocumentoOrigen());
+        resultat.setNtiIdDocumentoOrigen(this.getNtiIdDocumentoOrigen());        resultat.setFitxerNom(this.fitxerNom);
         resultat.setFitxerContingut(this.getFitxerContingut());
         resultat.setFitxerContentType(this.getFitxerContentType());
         resultat.setAmbFirma(this.isAmbFirma());

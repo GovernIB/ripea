@@ -385,7 +385,7 @@ const translationEn = {
                 mail: "Send via Email...",
                 seguiment: "Signature tracking",
                 infoArxiu: "Archive Information",
-                export: "EIN Export...",
+                export: "ENI Export...",
                 notificar: "Notify or Communicate...",
                 comunicar: "Communicate...",
                 publicar: "Publish...",

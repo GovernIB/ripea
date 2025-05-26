@@ -385,7 +385,7 @@ const translationCa = {
                 mail: "Enviar via email...",
                 seguiment: "Seguiment portafirmes",
                 infoArxiu: "Informació arxiu",
-                export: "Exportació EIN...",
+                export: "Exportació ENI...",
                 notificar: "Notificar o comunicar...",
                 comunicar: "Comunicar...",
                 publicar: "Publicar...",

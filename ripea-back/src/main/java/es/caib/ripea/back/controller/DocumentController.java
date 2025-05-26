@@ -46,10 +46,12 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
+import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DocumentEnviamentService;
 import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
@@ -69,6 +71,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	@Autowired private ContingutService contingutService;
 	@Autowired private ExpedientInteressatService expedientInteressatService;
 	@Autowired private OrganGestorService organGestorService;
+	@Autowired private EventService eventService;
 
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -476,6 +479,32 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		return "redirect:" + urlRedirectToPortafib;
 	}
 
+	@RequestMapping(value = "/event/{documentId}/firmaSimpleWebEnd")
+	@ResponseBody
+	public String firmaSimpleWebEndAmbEvent(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long documentId,
+			@RequestParam(value = "transactionID", required = true) String transactionID,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) throws Exception {
+		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
+		Long expedientId = null;
+		if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
+			if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
+				expedientId = documentService.processarFirmaClient(
+						getEntitatActualComprovantPermisos(request).getId(),
+						documentId,
+						firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
+						firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
+						RolHelper.getRolActual(request),
+						tascaId);
+			}
+		}
+		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
+		eventService.notifyFirmaNavegadorFinalitzada(ffe);
+		return "";
+	}
+	
 	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd")
 	public String firmaSimpleWebEnd(
 			HttpServletRequest request,

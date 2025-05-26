@@ -385,7 +385,7 @@ const translationEs = {
                 mail: "Enviar via email...",
                 seguiment: "Seguimiento portafirmas",
                 infoArxiu: "Información archivo",
-                export: "Exportación EIN...",
+                export: "Exportación ENI...",
                 notificar: "Notificar o comunicar...",
                 comunicar: "Comunicar...",
                 publicar: "Publicar...",

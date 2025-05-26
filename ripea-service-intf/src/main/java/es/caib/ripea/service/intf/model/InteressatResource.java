@@ -18,9 +18,12 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -152,5 +155,21 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static class ExportInteressatsFormAction extends NodeResource.MassiveAction {
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
+    }
+    
+    public InteressatDto toDocumentDto() {
+    	InteressatDto resultat = null;
+    	switch (this.tipus) {
+		case InteressatPersonaFisicaEntity:
+			resultat = new InteressatPersonaFisicaDto();
+			break;
+		case InteressatPersonaJuridicaEntity:
+			resultat = new InteressatPersonaJuridicaDto();
+			break;
+		case InteressatAdministracioEntity:
+			resultat = new InteressatAdministracioDto();
+			break;
+    	}
+        return resultat;
     }
 }

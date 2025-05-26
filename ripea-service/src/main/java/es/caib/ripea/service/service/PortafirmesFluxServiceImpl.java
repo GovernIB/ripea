@@ -15,16 +15,12 @@ import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.PortafirmesFluxService;
 
 @Service
@@ -32,7 +28,6 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private AplicacioService aplicacioService;
-	@Autowired private EventService eventService;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	
@@ -50,19 +45,8 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 	}
 	
 	@Override
-	public PortafirmesFluxRespostaDto recuperarFluxFirma(Long expedientId, String idTransaccio) {
-		logger.debug("(Recuperant flux de firma (idTransaccio=" + idTransaccio +")");
-		PortafirmesFluxRespostaDto pfrDto = pluginHelper.portafirmesRecuperarFluxDeFirma(idTransaccio);
-		if (expedientId!=null) {
-			CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, pfrDto);
-			eventService.notifyFluxFirmaFinalitzat(fluxEvent);
-		}
-		return pfrDto;
-	}
-	
-	@Override
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String idTransaccio) {
-		return recuperarFluxFirma(null, idTransaccio);
+		return pluginHelper.portafirmesRecuperarFluxDeFirma(idTransaccio);
 	}
 	
 	@Override

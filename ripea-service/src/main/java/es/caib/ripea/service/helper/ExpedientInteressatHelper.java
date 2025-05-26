@@ -53,6 +53,18 @@ public class ExpedientInteressatHelper {
 			PermissionEnumDto permission, 
 			String rolActual, 
 			boolean comprovarAgafat){
+		InteressatEntity ie = createInteressatEntity(expedientId, interessat, propagarArxiu, permission, rolActual, comprovarAgafat);
+		return conversioTipusHelper.convertir(ie, InteressatDto.class);
+	}
+	
+	@Transactional
+	public InteressatEntity createInteressatEntity(
+			Long expedientId,
+			InteressatDto interessat,
+			boolean propagarArxiu,
+			PermissionEnumDto permission, 
+			String rolActual, 
+			boolean comprovarAgafat){
 		
 		logger.debug("Creant nou interessat (expedientId=" + expedientId + ", interessat=" + interessat + ")");
 
@@ -65,9 +77,7 @@ public class ExpedientInteressatHelper {
 		
 		cacheHelper.evictErrorsValidacioPerNode(expedient);
 		
-		return conversioTipusHelper.convertir(
-							interessatEntity,
-							InteressatDto.class);
+		return interessatEntity;
 	}
 
 	@Transactional

@@ -348,14 +348,14 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 
 	@Override
 	@RolesAllowed("**")
-	public void processarFirmaClient(
+	public Long processarFirmaClient(
 			Long entitatId,
 			Long documentId,
 			String arxiuNom, 
 			byte[] arxiuContingut, 
 			String rolActual, 
 			Long tascaId) {
-		delegateService.processarFirmaClient(
+		return delegateService.processarFirmaClient(
 				entitatId,
 				documentId,
 				arxiuNom, 

@@ -1709,14 +1709,14 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional
 	@Override
-	public void processarFirmaClient(
+	public Long processarFirmaClient(
 			Long entitatId,
 			Long documentId,
 			String arxiuNom, 
 			byte[] arxiuContingut, 
 			String rolActual, 
 			Long tascaId) {
-		documentHelper.processarFirmaClient(entitatId, documentId, arxiuNom, arxiuContingut, rolActual, tascaId);
+		return documentHelper.processarFirmaClient(entitatId, documentId, arxiuNom, arxiuContingut, rolActual, tascaId);
 	}
 	
 	@Transactional(readOnly = true)

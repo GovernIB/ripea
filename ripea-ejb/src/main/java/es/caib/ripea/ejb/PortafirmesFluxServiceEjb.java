@@ -34,13 +34,7 @@ public class PortafirmesFluxServiceEjb extends AbstractServiceEjb<PortafirmesFlu
 				urlReturn, 
 				isPlantilla);
 	}
-	
-	@Override
-	@RolesAllowed("**")
-	public PortafirmesFluxRespostaDto recuperarFluxFirma(Long expedientId, String transactionId) {
-		return delegateService.recuperarFluxFirma(expedientId, transactionId);
-	}
-	
+
 	@Override
 	@RolesAllowed("**")
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId) {

@@ -577,7 +577,7 @@ public interface DocumentService {
 	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public void processarFirmaClient(
+	public Long processarFirmaClient(
 			Long entitatId,
 			Long documentId,
 			String arxiuNom, 

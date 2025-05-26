@@ -260,13 +260,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: arxiuhandleOpen,
             disabled: (row:any) => !row?.arxiuUuid,
         },
-        {
-            title: t('page.document.acciones.export'),
-            icon: "download",
-            showInMenu: true,
-            // onClick: ,
-            disabled: true,
-        },
     ]
         .map(({ hidden, ...rest }) => ({
             ...rest,

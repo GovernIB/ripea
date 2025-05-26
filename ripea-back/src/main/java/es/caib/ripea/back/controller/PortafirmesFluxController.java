@@ -4,25 +4,37 @@
  */
 package es.caib.ripea.back.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.helper.SessioHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.FluxFirmaUsuariDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.DocumentService;
+import es.caib.ripea.service.intf.service.EventService;
+import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.service.PortafirmesFluxService;
 
 /**
  * Controlador per definir fluxos de firma
@@ -35,16 +47,12 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private FluxFirmaUsuariService fluxFirmaUsuariService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private PortafirmesFluxService portafirmesFluxService;
+	@Autowired private DocumentService documentService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private FluxFirmaUsuariService fluxFirmaUsuariService;
+	@Autowired private EventService eventService;
 	
 	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
@@ -101,14 +109,26 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
-	@RequestMapping(value = "/portafirmes/flux/returnurl/{expedientId}/{transactionId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/portafirmes/flux/event/{expedientId}/{transactionId}", method = RequestMethod.GET)
 	@ResponseBody
 	public String transaccioEstat(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@PathVariable String transactionId,
 			Model model) {
-		portafirmesFluxService.recuperarFluxFirma(expedientId, transactionId);
+		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
+		if (!resposta.isError() && resposta.getFluxId() != null) {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
+			flux.setNom(resposta.getNom());
+			flux.setDescripcio(resposta.getDescripcio());
+			flux.setPortafirmesFluxId(resposta.getFluxId());
+			fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
+		}
+		if (expedientId!=null) {
+			CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
+			eventService.notifyFluxFirmaFinalitzat(fluxEvent);
+		}
 		return "";
 	}
 	
@@ -154,8 +174,6 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		}
 		return "portafirmesModalTancar";
 	}
-	
-	
 	
 	@RequestMapping(value = "/{documentId}/portafirmes/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody

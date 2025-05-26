@@ -1388,7 +1388,7 @@ public class DocumentHelper {
 		}
 	}
 
-	public void processarFirmaClient(
+	public Long processarFirmaClient(
 			Long entitatId,
 			Long documentId,
 			String arxiuNom, 
@@ -1437,6 +1437,9 @@ public class DocumentHelper {
 					changeExtensioToPdf(arxiuNom),
 					arxiuContingut,
 					document);
+			
+			return document.getExpedient().getId();
+			
 		} else {
 			logger.error(
 					"No s'han trobat les dades del document amb identificador applet (" +

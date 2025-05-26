@@ -62,7 +62,6 @@ import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
-import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
@@ -71,7 +70,6 @@ import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPublicacioDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
-import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -80,10 +78,8 @@ import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
-import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
-import es.caib.ripea.service.intf.model.DocumentResource.FinalitzarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
@@ -150,9 +146,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
         //Flux de firma i firma en navegador
-        register(DocumentResource.ACTION_FLUX_WEB_INI, new IniciarFluxFirmaWebActionExecutor());
+//        register(DocumentResource.ACTION_FLUX_WEB_INI, new IniciarFluxFirmaWebActionExecutor());
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
-        register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
+//        register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
         //Dades externes
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
@@ -703,12 +699,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class IniciarFluxFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, String> {
 
 		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {
+			
+		}
 
 		@Override
 		public String exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
-				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/portafirmes/flux/returnurl/"+entity.getExpedient().getId()+"/";
+				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/portafirmes/flux/event/"+entity.getExpedient().getId()+"/";
 				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
 				return transaccioResponse.getUrlRedireccio();
 			} catch (Exception e) {
@@ -732,7 +730,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
 			try {
-				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/" + entity.getId() + "/firmaSimpleWebEnd";
+				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/event/" + entity.getId() + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				FitxerDto fitxerDto = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), entity.getId());
 
@@ -746,41 +744,41 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
 
-    private class FinalitzarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.FinalitzarFirmaSimple, CodiValorDto> {
-
-		@Override
-		public void onChange(Serializable id, FinalitzarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, FinalitzarFirmaSimple target) {}
-
-		@Override
-		public CodiValorDto exec(String code, DocumentResourceEntity entity, FinalitzarFirmaSimple params) throws ActionExecutionException {
-			try {
-				FirmaResultatDto firmaResultat = pluginHelper.firmaSimpleWebEnd(params.getTransactionId());
-				if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
-
-					if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
-						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-						documentHelper.processarFirmaClient(
-								entitatEntity.getId(),
-								entity.getId(),
-								firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
-								firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
-								configHelper.getRolActual(),
-								null);
-						return new CodiValorDto("OK", "document.controller.firma.passarela.final.ok");
-					} else {
-						return new CodiValorDto("ERROR", firmaResultat.getSignatures().get(0).getMsg());
-					}
-				} else if (firmaResultat.getStatus() == StatusEnumDto.WARNING) {
-					return new CodiValorDto("WARNING", firmaResultat.getMsg());
-				} else if (firmaResultat.getStatus() == StatusEnumDto.ERROR) {
-					return new CodiValorDto("ERROR", firmaResultat.getMsg());
-				}
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/FinalitzarFirmaWebActionExecutor", e);
-			}
-			return null;
-		}
-    }
+//    private class FinalitzarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.FinalitzarFirmaSimple, CodiValorDto> {
+//
+//		@Override
+//		public void onChange(Serializable id, FinalitzarFirmaSimple previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, FinalitzarFirmaSimple target) {}
+//
+//		@Override
+//		public CodiValorDto exec(String code, DocumentResourceEntity entity, FinalitzarFirmaSimple params) throws ActionExecutionException {
+//			try {
+//				FirmaResultatDto firmaResultat = pluginHelper.firmaSimpleWebEnd(params.getTransactionId());
+//				if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
+//
+//					if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
+//						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+//						documentHelper.processarFirmaClient(
+//								entitatEntity.getId(),
+//								entity.getId(),
+//								firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
+//								firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
+//								configHelper.getRolActual(),
+//								null);
+//						return new CodiValorDto("OK", "document.controller.firma.passarela.final.ok");
+//					} else {
+//						return new CodiValorDto("ERROR", firmaResultat.getSignatures().get(0).getMsg());
+//					}
+//				} else if (firmaResultat.getStatus() == StatusEnumDto.WARNING) {
+//					return new CodiValorDto("WARNING", firmaResultat.getMsg());
+//				} else if (firmaResultat.getStatus() == StatusEnumDto.ERROR) {
+//					return new CodiValorDto("ERROR", firmaResultat.getMsg());
+//				}
+//			} catch (Exception e) {
+//				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/FinalitzarFirmaWebActionExecutor", e);
+//			}
+//			return null;
+//		}
+//    }
 
     private class ResumIaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ResumIaFormAction, Resum> {
 
@@ -983,7 +981,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		target.setMostrarFirmaParcial(configHelper.getAsBoolean(PropertyConfig.FIRMA_PARCIAL));
         		target.setMostrarAvisFirmaParcial(configHelper.getAsBoolean(PropertyConfig.AVIS_FIRMA_PARCIAL));
         		
-        		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceRepository.findById(((Integer)id).longValue()).get().getMetaDocument();
+        		DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(((Integer)id).longValue()).get();
+        		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceEntity.getMetaDocument();
         		target.setPortafirmesFluxTipus(metaDocumentResourceEntity.getPortafirmesFluxTipus());
         		
         		if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
@@ -1004,6 +1003,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         			target.setNifsManuals(nifs);
         		} else {
         			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
+
+        			String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/portafirmes/flux/event/"+documentResourceEntity.getExpedient().getId()+"/";
+    				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
+    				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());
         		}
         		
         	} else { //És un camp concret el que s'ha canviat
