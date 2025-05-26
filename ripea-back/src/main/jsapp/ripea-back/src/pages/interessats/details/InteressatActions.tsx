@@ -8,7 +8,7 @@ import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate from "../actions/Create.tsx";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
-import {potModificar} from "../../expedient/details/Expedient.tsx";
+import {potModificar as potModificarExpedient} from "../../expedient/details/Expedient.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -56,9 +56,7 @@ export const useActions = (refresh?: () => void) => {
                                     });
                             } else {
                                 apiPatch(id, {
-                                    data: {
-                                        representant: null,
-                                    }
+                                    data: { representant: null }
                                 })
                                     .then(() => {
                                         refresh?.();
@@ -79,9 +77,7 @@ export const useActions = (refresh?: () => void) => {
                 if (value) {
                     if (row?.hasRepresentats) {
                         apiPatch(id, {
-                            data: {
-                                esRepresentant: true,
-                            }
+                            data: { esRepresentant: true }
                         })
                             .then(() => {
                                 refresh?.();
@@ -115,54 +111,56 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
     const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
     const {createRepresentent, updateRepresentent, content} = useCreate(t('page.interessat.rep'), refresh)
 
+    const potModificar:boolean = potModificarExpedient(entity)
+
     const actions = [
         {
             title: t('common.detail'),
             icon: "info",
             showInMenu: true,
             onClick: handleDetail,
-            hidden: potModificar(entity),
+            hidden: () => potModificar,
         },
         {
             title: t('common.update'),
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
-            hidden: !potModificar(entity),
+            hidden: () => !potModificar,
         },
         {
             title: t('page.interessat.actions.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteInteressat,
-            hidden: !potModificar(entity),
+            hidden: () => !potModificar,
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: !potModificar(entity),
+            hidden: () => !potModificar,
         },
         {
             title: t('page.interessat.actions.createRep'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
-            hidden: (row: any) => row?.representant || !potModificar(entity),
+            hidden: (row: any) => row?.representant || !potModificar,
         },
         {
             title: t('page.interessat.actions.updateRep'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
-            hidden: (row: any) => !row?.representant || !potModificar(entity),
+            hidden: (row: any) => !row?.representant || !potModificar,
         },
         {
             title: t('page.interessat.actions.deleteRep'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,
-            hidden: (row: any) => !row?.representant || !potModificar(entity),
+            hidden: (row: any) => !row?.representant || !potModificar,
         },
     ];
 

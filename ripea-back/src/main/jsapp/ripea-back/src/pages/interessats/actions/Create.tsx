@@ -30,9 +30,7 @@ const useCreate = (title:any, refresh?: () => void) => {
     const createRepresentent = (id: any, row:any) => {
         apiRef.current?.show(undefined, {
             expedient: row?.expedient,
-            representat: {
-                id: id
-            },
+            representat: { id: id },
             esRepresentant: true,
         })
             .then(() => {

@@ -238,7 +238,7 @@ const Expedient = () => {
     ]
 
     return <GridPage>
-        <SseExpedient id={id}/>
+        {/*<SseExpedient id={id}/>*/}
 
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
