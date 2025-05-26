@@ -153,12 +153,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void setRolUsuariActual(String rolActual) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Actualitzant rol de usuari actual");
-
 		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
 		usuari.updateRolActual(rolActual);
-
 		cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
-		eventService.notifyAnotacionsPendents();
+		eventService.notifyAnotacionsPendents(List.of(auth.getName()));
 	}
 	
 	@Transactional
@@ -336,7 +334,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void evictCountAnotacionsPendents(String usuariCodi) {
 		logger.debug("Evict count anotacions per usuari");
 		cacheHelper.evictCountAnotacionsPendents(usuariCodi);
-		eventService.notifyAnotacionsPendents();
 	}
 
 	@Override

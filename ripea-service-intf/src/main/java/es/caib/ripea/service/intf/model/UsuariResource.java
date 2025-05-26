@@ -9,6 +9,8 @@ import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
@@ -18,6 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(quickFilterFields = { "codi", "nom", "nif" }, descriptionField = "codiAndNom")
 public class UsuariResource extends BaseResource<String> {
 

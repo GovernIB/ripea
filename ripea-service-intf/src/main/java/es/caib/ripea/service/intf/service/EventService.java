@@ -1,10 +1,12 @@
 package es.caib.ripea.service.intf.service;
 
-import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
-
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
+
+import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
+import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 
 /**
  * Declaració dels mètodes per a la gestió d'esdeveniments SSE (Server-Sent Events).
@@ -15,8 +17,10 @@ import javax.annotation.security.PermitAll;
 @PermitAll
 public interface EventService {
     public void notifyAvisosActius();
-    public void notifyAnotacionsPendents();
+    public void notifyAnotacionsPendents(List<String> usuarisAfectats);
     public void notifyTasquesPendents(List<String> usuarisAfectats);
+    public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent);
+    public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent);
     public AvisosActiusEvent getAvisosActiusEvent();
     public long getAnotacionsPendents(String usuariCodi);
     public long getTasquesPendents(String usuariCodi);

@@ -104,8 +104,6 @@ public class ExpedientPeticioHelper {
 		}
 	}
 
-	
-
 	public void canviEstatExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
 
 		expedientPeticioEntity.updateEstat(expedientPeticioEstatEnumDto);
@@ -116,7 +114,6 @@ public class ExpedientPeticioHelper {
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null) {
 			cacheHelper.evictAllCountAnotacionsPendents();
-			eventService.notifyAnotacionsPendents();
 		}
 	}
 	

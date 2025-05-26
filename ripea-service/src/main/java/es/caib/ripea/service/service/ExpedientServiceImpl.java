@@ -104,6 +104,7 @@ import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -141,6 +142,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired private EmailHelper emailHelper;
+	@Autowired private EventService eventService;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -257,7 +259,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
 				}
 				expedientDto.setProcessatOk(processatOk);
-
+				
+				try {
+					eventService.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
+				} catch (Exception ex) {
+					logger.error("Error al actualitzar les anotacions pendents a travers del Socket", ex);
+				}
+				
 			} else {
 
 				for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
@@ -347,6 +355,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (processatOk) {
 			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
 			expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
+			
+			try {
+				eventService.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
+			} catch (Exception ex) {
+				logger.error("Error al actualitzar les anotacions pendents a travers del Socket", ex);
+			}
 		}
 		return processatOk;
 	}

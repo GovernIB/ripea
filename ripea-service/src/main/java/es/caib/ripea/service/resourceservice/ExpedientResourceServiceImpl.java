@@ -34,8 +34,10 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEnti
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -49,7 +51,6 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
@@ -96,13 +97,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
 
+	private final ExpedientRepository expedientRepository;
+	private final OrganGestorRepository organGestorRepository;
+	
     private final UsuariResourceRepository usuariResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
-    private final OrganGestorRepository organGestorRepository;
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
+    private final CacheHelper cacheHelper;
     private final ConfigHelper configHelper;
     private final ExpedientHelper expedientHelper;
     private final ContingutHelper contingutHelper;
@@ -302,14 +306,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		}
     	}
     }
-    
-    /*@Override
-    protected boolean beforeUpdateEntity(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotUpdatedException {
-    	
 
-    	return true;
-    }*/
-    
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setNumComentaris(entity.getComentaris().size());
@@ -317,11 +314,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         resource.setNumAlert(entity.getAlertes().size());
         usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
-
-        /*/////////////////////////////////////////////////*/
         resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
         expedientResourceHelper.setPotTancar(entity, resource);
-        /*/////////////////////////////////////////////////*/
+        ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
+        resource.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity));
+		resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
+		resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity));
+		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
     }
 
     @Override

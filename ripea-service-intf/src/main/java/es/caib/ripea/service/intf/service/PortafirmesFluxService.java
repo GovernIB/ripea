@@ -44,6 +44,9 @@ public interface PortafirmesFluxService {
 	@PreAuthorize("isAuthenticated()")
 	public PortafirmesFluxRespostaDto recuperarFluxFirma(String transactionId);
 	
+	@PreAuthorize("isAuthenticated()")
+	public PortafirmesFluxRespostaDto recuperarFluxFirma(Long expedientId, String transactionId);
+	
 	/**
 	 * Tanca un transacció.
 	 * 

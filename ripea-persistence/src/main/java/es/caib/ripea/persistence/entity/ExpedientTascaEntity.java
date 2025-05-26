@@ -3,16 +3,34 @@
  */
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
-import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 
 /**
  * Classe del model de dades que representa una tasca del expedient.
@@ -255,14 +273,23 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		return comentariText;
 	}
 
-	public List<String> getResponsablesCodis() {
+	public List<String> getResponsablesAndObservadorsCodis(boolean includeObservadors) {
 		List<String> resultat = new ArrayList<String>();
 		if (this.responsableActual!=null) {
 			resultat.add(this.responsableActual.getCodi());
 		}
 		if (this.getResponsables()!=null) {
 			for (UsuariEntity usuariResponsable: this.getResponsables()) {
-				resultat.add(usuariResponsable.getCodi());
+				if (!resultat.contains(usuariResponsable.getCodi())) {
+					resultat.add(usuariResponsable.getCodi());
+				}
+			}
+		}
+		if (includeObservadors && this.getObservadors()!=null) {
+			for (UsuariEntity usuariObservador: this.getObservadors()) {
+				if (!resultat.contains(usuariObservador.getCodi())) {
+					resultat.add(usuariObservador.getCodi());
+				}
 			}
 		}
 		return resultat;

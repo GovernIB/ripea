@@ -19,6 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
+import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,11 +42,18 @@ public class SseResourceController {
 
     private final EventService eventService;
     private final Map<String, SseEmitter> clientsUsuaris = new HashMap<>();
+    //En cas de un expedient, el emmiter es una llista, perque pot estar obert per varis usuaris simultaniament.
     private final Map<Long, List<SseEmitter>> clientsExpedient = new HashMap<>();
-    private enum EventType {
-        CONNECT, AVISOS, NOTIFICACIONS, TASQUES;
+    private enum UserEventType {
+        USER_CONNECT, AVISOS, NOTIFICACIONS, TASQUES;
         public String getEventName() { return name().toLowerCase(); }
-        public static EventType fromEventName(String name) { return EventType.valueOf(name.toUpperCase()); }
+        public static UserEventType fromEventName(String name) { return UserEventType.valueOf(name.toUpperCase()); }
+    }
+    
+    private enum ExpedientEventType {
+        EXP_CONNECT, FLUX_CREAT, FIRMA_FINALITZADA;
+        public String getEventName() { return name().toLowerCase(); }
+        public static ExpedientEventType fromEventName(String name) { return ExpedientEventType.valueOf(name.toUpperCase()); }
     }
 
     /**
@@ -66,16 +75,16 @@ public class SseResourceController {
         // Al moment de subscriure enviem un missatge de connexió
         try {
             emitter.send(SseEmitter.event()
-                    .name(EventType.CONNECT.getEventName())
+                    .name(UserEventType.USER_CONNECT.getEventName())
                     .data("Connexió establerta a " + LocalDateTime.now())
                     .id(String.valueOf(System.currentTimeMillis())));
             // Un cop renviat el missatge de connexió correctament, enviem un missatge amb les dades inicials
             var avisosActius = eventService.getAvisosActiusEvent();
             var anotacionsPendents = eventService.getAnotacionsPendents(usuariCodi);
             var tasquesPendents = eventService.getTasquesPendents(usuariCodi);
-            emitter.send(SseEmitter.event().name(EventType.AVISOS.getEventName()).data(avisosActius));
-            emitter.send(SseEmitter.event().name(EventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));
-            emitter.send(SseEmitter.event().name(EventType.TASQUES.getEventName()).data(tasquesPendents));
+            emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisosActius));
+            emitter.send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));
+            emitter.send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(tasquesPendents));
         } catch (IOException e) {
             log.error("Error enviant esdeveniment inicial SSE", e);
             emitter.complete();
@@ -113,7 +122,7 @@ public class SseResourceController {
         // Al moment de subscriure enviem un missatge de connexió
         try {
             emitter.send(SseEmitter.event()
-                    .name(EventType.CONNECT.getEventName())
+                    .name(ExpedientEventType.EXP_CONNECT.getEventName())
                     .data("Connexió establerta a " + LocalDateTime.now())
                     .id(String.valueOf(System.currentTimeMillis())));
             // No hi ha en principi dades inicials per l'expedient.
@@ -141,7 +150,7 @@ public class SseResourceController {
     		while (iterator.hasNext()) {
     			Map.Entry<String, SseEmitter> entry = iterator.next();
                 try {
-                	entry.getValue().send(SseEmitter.event().name(EventType.AVISOS.getEventName()).data(avisos));
+                	entry.getValue().send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisos));
                 } catch (IOException e) {
                 	clientsUsuaris.remove(entry.getKey());
                 }
@@ -162,7 +171,7 @@ public class SseResourceController {
 	            	Iterator<Map.Entry<String, Long>> tascaInterator = tasques.getTasquesPendentsUsuaris().entrySet().iterator();
 	            	Map.Entry<String, Long> usuariTasca = tascaInterator.next();
 	            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
-	            		usuariClient.getValue().send(SseEmitter.event().name(EventType.TASQUES.getEventName()).data(usuariTasca.getValue()));
+	            		usuariClient.getValue().send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(usuariTasca.getValue()));
 	            	}
 	            } catch (IOException e) {
 	            	clientsUsuaris.remove(usuariClient.getKey());
@@ -184,10 +193,54 @@ public class SseResourceController {
 	            	Iterator<Map.Entry<String, Long>> tascaInterator = anotacions.getAnotacionsPendentsUsuaris().entrySet().iterator();
 	            	Map.Entry<String, Long> usuariTasca = tascaInterator.next();
 	            	if (usuariTasca.getKey().equals(usuariClient.getKey())) {
-	            		usuariClient.getValue().send(SseEmitter.event().name(EventType.NOTIFICACIONS.getEventName()).data(usuariTasca.getValue()));
+	            		usuariClient.getValue().send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(usuariTasca.getValue()));
 	            	}
 	            } catch (IOException e) {
 	            	clientsUsuaris.remove(usuariClient.getKey());
+	            }
+	        }
+    	}
+    }
+    
+    @Async
+    @EventListener
+    public void handleEventFlux(CreacioFluxFinalitzatEvent fluxEvent) {
+    	if (fluxEvent!=null && fluxEvent.getExpedientId()!=null) {
+			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
+			//Els avisos s'envien a tots els usuaris connectats
+			while (iterator.hasNext()) {
+				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
+	            try {
+	            	if (fluxEvent.getExpedientId().equals(expedientClient.getKey())) {
+	            		for(SseEmitter emisor: expedientClient.getValue()) {
+	            			emisor.send(SseEmitter.event().name(ExpedientEventType.FLUX_CREAT.getEventName()).data(fluxEvent.getFluxCreat()));
+	            		}
+	            	}
+	            } catch (IOException e) {
+	            	clientsExpedient.remove(expedientClient.getKey());
+	            }
+	        }
+    	}
+    }
+    
+    @Async
+    @EventListener
+    public void handleEventFlux(FirmaFinalitzadaEvent firmaEvent) {
+    	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
+			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
+			//Els avisos s'envien a tots els usuaris connectats
+			while (iterator.hasNext()) {
+				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
+	            try {
+	            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
+	            		for(SseEmitter emisor: expedientClient.getValue()) {
+	            			emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
+	            		}
+	            	}
+	            } catch (IOException e) {
+	            	clientsExpedient.remove(expedientClient.getKey());
 	            }
 	        }
     	}

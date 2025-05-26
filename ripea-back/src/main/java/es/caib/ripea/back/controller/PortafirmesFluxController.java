@@ -101,6 +101,17 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
+	@RequestMapping(value = "/portafirmes/flux/returnurl/{expedientId}/{transactionId}", method = RequestMethod.GET)
+	@ResponseBody
+	public String transaccioEstat(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable String transactionId,
+			Model model) {
+		portafirmesFluxService.recuperarFluxFirma(expedientId, transactionId);
+		return "";
+	}
+	
 	@RequestMapping(value = "/portafirmes/flux/returnurl/{transactionId}", method = RequestMethod.GET)
 	public String transaccioEstat(
 			HttpServletRequest request,

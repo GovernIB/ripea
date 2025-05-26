@@ -23,6 +23,8 @@ import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
+import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -59,11 +61,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void notifyAnotacionsPendents() {
+    public void notifyAnotacionsPendents(List<String> usuarisAfectats) {
+    	//Aquesta funció es crida desde EmailHelper. Notificam als mateixos que rebràn el mail. TODO: ¿eliminar enviament de mail?  
+    	//Grup, organ gestor i tenint en compte rols.
     	try {
-    		Map<String, Long> anotacionsUsuaris = new HashMap<String, Long>();
-    		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacionsUsuaris);
-    		log.debug("notifyAnotacionsPendents a clients");
+    		log.debug("notifyTasquesPendents a clients");
+    		Map<String, Long> anotacioUsuaris = new HashMap<String, Long>();
+    		if (usuarisAfectats!=null) {
+    			for (String usuari: usuarisAfectats) {
+    				anotacioUsuaris.put(usuari, getAnotacionsPendents(usuari));
+    			}
+    		}
+    		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacioUsuaris);
     		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
     		log.error("Erro al notifyAnotacionsPendents a clients", ex);
@@ -84,6 +93,24 @@ public class EventServiceImpl implements EventService {
     		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
     		log.error("Erro al notifyTasquesPendents a clients", ex);
+    	}
+    }
+    
+    @Override
+    public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
+    	try {
+    		eventPublisher.publishEvent(fluxEvent);
+    	} catch (Exception ex) {
+    		log.error("Erro al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
+    	}
+    }
+    
+    @Override
+    public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
+    	try {
+    		eventPublisher.publishEvent(firmaEvent);
+    	} catch (Exception ex) {
+    		log.error("Erro al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
     	}
     }
     

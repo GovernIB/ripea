@@ -67,7 +67,7 @@ const ExpedientInfo = (props:any) => {
     const {entity: expedient, xs} = props;
     const { t } = useTranslation();
 
-    return <CardData title={t('page.expedient.detall.title')} direction={'column'} xs={xs} cardProps={{backgroundColor: '#f5f5f5 !important'}}>
+    return <CardData title={t('page.expedient.detall.title')} direction={'column'} xs={xs}>
         <Load value={expedient} noEffect>
             <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
             <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>

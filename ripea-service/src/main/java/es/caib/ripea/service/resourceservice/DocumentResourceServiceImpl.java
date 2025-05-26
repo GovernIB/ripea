@@ -77,6 +77,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
@@ -148,6 +149,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
+        //Flux de firma i firma en navegador
+        register(DocumentResource.ACTION_FLUX_WEB_INI, new IniciarFluxFirmaWebActionExecutor());
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
         register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
         //Dades externes
@@ -697,6 +700,24 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
 
+    private class IniciarFluxFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, String> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public String exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/portafirmes/flux/returnurl/"+entity.getExpedient().getId()+"/";
+				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
+				return transaccioResponse.getUrlRedireccio();
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFluxFirmaWebActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al iniciar flux de firma: "+e.getMessage()); 
+			}
+		}
+    }
+    
     private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, Serializable> {
 
 		@Override
@@ -720,7 +741,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFirmaWebActionExecutor", e);
-				return null;
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al iniciar firma en navegador: "+e.getMessage());
 			}
 		}
     }

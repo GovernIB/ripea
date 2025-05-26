@@ -180,9 +180,9 @@ const ExpedientGrid = () => {
             renderCell: (params: any) => (<>
                 {!params.row?.valid &&
                     <Icon color={"warning"} title={t('page.expedient.alert.validation')}>warning</Icon>}
-                {params.row?.errorEnviament &&
+                {params.row?.errorLastEnviament &&
                     <Icon color={"error"} title={t('page.expedient.alert.errorEnviament')}>edit</Icon>}
-                {params.row?.errorNotificacio &&
+                {params.row?.errorLastNotificacio &&
                     <Icon color={"error"} title={t('page.expedient.alert.errorNotificacio')}>mail</Icon>}
                 {params.row?.ambEnviamentsPendents &&
                     <Icon color={"primary"} title={t('page.expedient.alert.ambEnviamentsPendents')}>edit</Icon>}

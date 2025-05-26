@@ -14,7 +14,6 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
-import es.caib.ripea.service.intf.service.EventService;
 
 @Component
 public class AnotacioDistribucioHelper {
@@ -24,7 +23,6 @@ public class AnotacioDistribucioHelper {
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private PluginHelper pluginHelper;
-	@Autowired private EventService eventService;
 
 	public void consultarIGuardarAnotacioPeticioPendent(
 			Long expedientPeticioId,
@@ -102,7 +100,6 @@ public class AnotacioDistribucioHelper {
 				EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
 				if (entitatAnotacio != null) {
 					cacheHelper.evictAllCountAnotacionsPendents();
-					eventService.notifyAnotacionsPendents();
 				}
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())

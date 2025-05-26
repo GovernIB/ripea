@@ -88,7 +88,12 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_FIRMA_WEB_FIN,
                         formClass = DocumentResource.FinalitzarFirmaSimple.class,
-                        requiresId = true),                 
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_FLUX_WEB_INI,
+                        formClass = Serializable.class,
+                        requiresId = true),             
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
@@ -138,8 +143,10 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_PUBLICAR_CODE = "PUBLICAR";
     public static final String ACTION_NOTIFICAR_CODE = "NOTIFICAR";
     public static final String ACTION_GET_CSV_LINK = "GET_CSV_LINK";
+  //Flux de firma i firma en navegador
     public static final String ACTION_FIRMA_WEB_INI = "FIRMA_WEB_INI";
     public static final String ACTION_FIRMA_WEB_FIN = "FIRMA_WEB_FIN";
+    public static final String ACTION_FLUX_WEB_INI  = "FLUX_WEB_INI";
 	//Accions massives desde la pipella de contingut
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";

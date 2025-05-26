@@ -3232,23 +3232,31 @@ public class PluginHelper {
 	}
 
 	public PortafirmesIniciFluxRespostaDto portafirmesIniciarFluxDeFirma(
-			String idioma,
 			boolean isPlantilla,
-			String nom,
-			String descripcio,
-			boolean descripcioVisible,
 			String urlReturn) throws SistemaExternException {
+		
 		String accioDescripcio = "Iniciant flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		PortafirmesIniciFluxRespostaDto transaccioResponseDto = new PortafirmesIniciFluxRespostaDto();
 		try {
+			
+			UsuariDto usuariDto = aplicacioService.getUsuariActual();
+			String idioma = usuariDto.getIdioma();
+			String usuariCodi = usuariDto.getCodi();
+			
+			Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
+			boolean saveUserActual = false;
+			if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
+				saveUserActual = true;
+			}
+			
 			PortafirmesIniciFluxResposta transaccioResponse = portafirmesPlugin.iniciarFluxDeFirma(
 					idioma,
 					isPlantilla,
-					nom,
-					descripcio,
-					descripcioVisible,
+					null,
+					saveUserActual ? "user=" + usuariCodi : null,
+					!saveUserActual,
 					urlReturn);
 			if (transaccioResponse != null) {
 				transaccioResponseDto.setIdTransaccio(
@@ -3297,6 +3305,7 @@ public class PluginHelper {
 						resposta.getEstat() != null ? PortafirmesFluxEstatDto.valueOf(
 								resposta.getEstat().toString()) : null);
 			}
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(

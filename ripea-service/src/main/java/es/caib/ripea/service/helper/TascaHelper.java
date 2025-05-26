@@ -282,10 +282,8 @@ public class TascaHelper {
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CREACIO);
 		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, null);
 		
-		List<String> responsablesNotificar = expedientTascaEntity.getResponsablesCodis();
-		if (responsablesNotificar.size()>0) {
-			eventService.notifyTasquesPendents(responsablesNotificar);
-		}
+		//Notificar event als usuaris afectats
+		eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(true));
 		
 		return expedientTascaEntity;
 	}
@@ -321,6 +319,10 @@ public class TascaHelper {
 		}
 		emailHelper.enviarEmailCancelarDelegacioTasca(expedientTascaEntity, delegat, comentari);
 		cacheHelper.evictCountTasquesPendents(auth.getName());
+		
+		//Notificar event als usuaris afectats
+		eventService.notifyTasquesPendents(List.of(auth.getName()));
+		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
 		return expedientTascaEntity;
 	}
@@ -338,6 +340,10 @@ public class TascaHelper {
 
 		emailHelper.enviarEmailDelegarTasca(expedientTascaEntity);
 		cacheHelper.evictCountTasquesPendents(delegat.getCodi());
+		
+		//Notificar event als usuaris afectats
+		eventService.notifyTasquesPendents(List.of(delegat.getCodi()));
+		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.DELEGAR_TASCA);
 		return expedientTascaEntity;
 	}
@@ -356,6 +362,10 @@ public class TascaHelper {
 		for (UsuariEntity responsable : expedientTascaEntity.getResponsables()) {
 			cacheHelper.evictCountTasquesPendents(responsable.getCodi());
 		}
+		
+		//Notificar event als usuaris afectats
+		eventService.notifyTasquesPendents(expedientTascaEntity.getResponsablesAndObservadorsCodis(false));
+		
 		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES);
 		return expedientTascaEntity;
 	}
@@ -415,7 +425,16 @@ public class TascaHelper {
 		for (UsuariEntity responsable : tasca.getResponsables()) {
 			cacheHelper.evictCountTasquesPendents(responsable.getCodi());
 		}
+		
+		if (tasca.getObservadors() != null) {
+			for (UsuariEntity observador : tasca.getObservadors()) {
+				cacheHelper.evictCountTasquesPendents(observador.getCodi());
+			}
+		}
 
+		//Notificar event als usuaris afectats
+		eventService.notifyTasquesPendents(tasca.getResponsablesAndObservadorsCodis(true));
+		
 		logAccioTasca(tasca, LogTipusEnumDto.CANVI_ESTAT);
 		
 		return tasca;

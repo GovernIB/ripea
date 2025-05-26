@@ -9,6 +9,7 @@ import es.caib.ripea.service.intf.base.permission.UserPermissionInfo.PermisosEnt
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.UsuariResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -35,6 +39,16 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 
     private final UsuariResourceHelper usuariResourceHelper;
 
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	Filter filtreBase = (Utils.hasValue(currentSpringFilter))?Filter.parse(currentSpringFilter):null;
+//    	Filter filtreNif = FilterBuilder.isNotNull(UsuariResource.Fields.nif);
+    	Filter filtreNom1 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "%SYSTEM%"));
+    	Filter filtreNom2 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "$%"));
+    	Filter filtreResultat = FilterBuilder.and(filtreBase, filtreNom1, filtreNom2);
+    	return filtreResultat.generate();
+    }
+    
     @Transactional(readOnly = true)
     @Override
     public UserPermissionInfo getCurrentUserPermissionInfo() {

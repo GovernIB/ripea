@@ -53,6 +53,8 @@ import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -73,7 +75,9 @@ public class EmailHelper {
     @Autowired private DocumentRepository documentRepository;
     @Autowired private UsuariRepository usuariRepository;
     @Autowired private DocumentHelper documentHelper;
-
+    
+    @Autowired private EventService eventService;
+    
 	public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
 			UsuariEntity usuariOriginal,
@@ -296,25 +300,26 @@ public class EmailHelper {
 		metaExpComnt.updateEmailEnviat(true);
 	}
 
+	public List<String> getCodisUsuarisAfectatsAnotacio(Long expedientPeticioId) {
+		List<UsuariAnotacioDto> aux = dadesUsuarisAfectatsAnotacio(expedientPeticioId);
+		List<String> resultat = new ArrayList<String>();
+		for (UsuariAnotacioDto u: aux) {
+			resultat.add(u.getCodi());
+		}
+		return resultat;
+	}
+	
+	public List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio(Long expedientPeticioId) {
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void novaAnotacioPendent(Long expedientPeticioId) {
-
-		long t1 = System.currentTimeMillis();
-		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-			logger.info("novaAnotacioPendent start (id=" + expedientPeticioId + ")");
-
+		long t2 = System.currentTimeMillis();
+		List<UsuariAnotacioDto> resultat = new ArrayList<UsuariAnotacioDto>();
+		
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
 		OrganGestorEntity organ = organGestorRepository.findByCodi(registre.getDestiCodi());
-
-		List<String> emailsNoAgrupats = new ArrayList<>();
-		List<String> emailsAgrupats = new ArrayList<>();
-
-		long t2 = System.currentTimeMillis();
-		// Administradors d'entitats
+		
 		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -327,22 +332,18 @@ public class EmailHelper {
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
 			if (granted) {
-				addDestinatari(
-						dadesUsuari.getCodi(),
-						emailsNoAgrupats,
-						emailsAgrupats,
-						EventTipusEnumDto.NOVA_ANOTACIO,
-						"Email nova anotació. Permission: Administració de entitat: " + entitat.getId() + ", user: " + dadesUsuari.getCodi());
+				UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADMIN, null, null);
+				resultat.add(aux);
 			}
 		}
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) time:  " + (System.currentTimeMillis() - t2) + " ms");
-
+		
 		if (metaExpedient != null) {
 			boolean isProcedimentNoComu = metaExpedient.getOrganGestor() != null;
 
 			long t3 = System.currentTimeMillis();
-			// Administradors d'òrgans
+
 			List<DadesUsuari> dadesUsuarisAdminOrgan = pluginHelper.dadesUsuariFindAmbGrup("IPA_ORGAN_ADMIN");
 
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -359,19 +360,14 @@ public class EmailHelper {
 								new Permission[] { ExtendedPermission.ADMINISTRATION },
 								dadesUsuari.getCodi());
 						if (granted) {
-							addDestinatari(
-									dadesUsuari.getCodi(),
-									emailsNoAgrupats,
-									emailsAgrupats,
-									EventTipusEnumDto.NOVA_ANOTACIO,
-									"Email nova anotació. Permission: Administració de òrgan (no comuns): " + orgId + ", user: " + dadesUsuari.getCodi());
+							UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADM_ORG, orgId, null);
+							resultat.add(aux);
 						}
 					}
 
 				} else {
 					if (organ != null) {
-						List<Long> organPathIds = organGestorHelper.findParesIds(organ.getId(),
-								true);
+						List<Long> organPathIds = organGestorHelper.findParesIds(organ.getId(), true);
 						for (Long orgId : organPathIds) {
 							boolean granted = permisosHelper.isGrantedAll(
 									orgId,
@@ -379,12 +375,8 @@ public class EmailHelper {
 									new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU },
 									dadesUsuari.getCodi());
 							if (granted) {
-								addDestinatari(
-										dadesUsuari.getCodi(),
-										emailsNoAgrupats,
-										emailsAgrupats,
-										EventTipusEnumDto.NOVA_ANOTACIO,
-										"Email nova anotació. Permission: Administració de òrgan (comuns): " + orgId + ", user: " + dadesUsuari.getCodi());
+								UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, orgId, null);
+								resultat.add(aux);
 							}
 						}
 					}
@@ -467,13 +459,53 @@ public class EmailHelper {
 			}
 
 			for (PermisDto permisDto : usuarisAmbPermis) {
-				addDestinatari(
-						permisDto.getPrincipalNom(),
-						emailsNoAgrupats,
-						emailsAgrupats,
-						EventTipusEnumDto.NOVA_ANOTACIO,
-						"Email nova anotació. Permission on objects ACL: " + metaExpedient.getId() + ", user: " + permisDto.getPrincipalNom());
+				UsuariAnotacioDto aux = new UsuariAnotacioDto(permisDto.getPrincipalNom(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, null, metaExpedient.getId());
+				resultat.add(aux);
 			}
+		}
+		
+		return resultat;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void novaAnotacioPendent(Long expedientPeticioId) {
+
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("novaAnotacioPendent start (id=" + expedientPeticioId + ")");
+
+		//Usuaris per notificar SSE
+		List<String> usuarisAfectats = new ArrayList<String>();
+		//Usuaris per enviar mail
+		List<String> emailsNoAgrupats = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		
+		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
+		RegistreEntity registre = expedientPeticio.getRegistre();
+		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
+		EntitatEntity entitat = registre.getEntitat();
+		OrganGestorEntity organ = organGestorRepository.findByCodi(registre.getDestiCodi());
+		
+		List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio = dadesUsuarisAfectatsAnotacio(expedientPeticioId);
+
+		for (UsuariAnotacioDto userAnotacio: dadesUsuarisAfectatsAnotacio) {
+			String logMsg = "Email nova anotació. ";
+			switch (userAnotacio.getTipusUsuari()) {
+			case ADMIN:
+				logMsg = logMsg + "Permission: Administració de entitat: " + entitat.getId() + ", user: " + userAnotacio.getCodi();
+				break;
+			case ADM_ORG:
+				logMsg = logMsg + "Permission: Administració de òrgan (no comuns): " + userAnotacio.getOrganId() + ", user: " + userAnotacio.getCodi();
+				break;
+			case ADM_ORG_COMUN:
+				logMsg = logMsg + "Permission: Administració de òrgan (comuns): " + userAnotacio.getOrganId() + ", user: " + userAnotacio.getCodi();
+				break;
+			default:
+				logMsg = logMsg + "Permission on objects ACL metaExp: " + userAnotacio.getMetaExpedientId() + ", user: " + userAnotacio.getCodi();
+				break;
+			}
+			addDestinatari(userAnotacio.getCodi(), emailsNoAgrupats, emailsAgrupats, EventTipusEnumDto.NOVA_ANOTACIO, logMsg);
+			usuarisAfectats.add(userAnotacio.getCodi());
 		}
 
 		String subject = getPrefixRipea() + " Nova anotació pendent";
@@ -489,6 +521,8 @@ public class EmailHelper {
 			text += "\tProcediment: " + metaExpedient.getCodiSiaINom() + "\n";
 		}
 
+		eventService.notifyAnotacionsPendents(usuarisAfectats);
+		
 		sendOrSaveEmail(
 				emailsNoAgrupats,
 				emailsAgrupats,
