@@ -6,6 +6,7 @@ import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
 import {useFluxCreateSession} from "../../../components/SseExpedient.tsx";
+import Iframe from "../../../components/Iframe.tsx";
 
 const EviarPortafirmesForm = () => {
     const { t } = useTranslation();
@@ -76,11 +77,11 @@ const EviarPortafirmesForm = () => {
         <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
 
         <Grid item xs={12} hidden={!data?.portafirmesFluxUrl || !open}>
-            <iframe src={data?.portafirmesFluxUrl} width={'100%'} height={'500px'}></iframe>
+            <Iframe src={data?.portafirmesFluxUrl}/>
         </Grid>
 
         <Grid item xs={12} hidden={!data?.urlInicioFlujoFirma || !openNewFlux}>
-            <iframe src={data?.urlInicioFlujoFirma} width={'100%'} height={'500px'}></iframe>
+            <Iframe src={data?.urlInicioFlujoFirma}/>
         </Grid>
     </Grid>
 }

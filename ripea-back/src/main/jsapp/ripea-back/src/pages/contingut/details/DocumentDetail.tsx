@@ -149,7 +149,7 @@ const useDocumentDetail = () => {
             open={open}
             closeCallback={handleClose}
             title={entity?.nom}
-            componentProps={{ fullWidth: true, maxWidth: 'md'}}
+            componentProps={{ fullWidth: true, maxWidth: 'md' }}
             buttons={buttons}
             buttonCallback={(value :any) :void => {
                 switch (value){

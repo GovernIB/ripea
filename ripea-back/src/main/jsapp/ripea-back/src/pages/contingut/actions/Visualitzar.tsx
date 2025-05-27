@@ -2,6 +2,7 @@ import {useState} from "react";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
+import Iframe from "../../../components/Iframe.tsx";
 
 const getUrl = (id:any) => {
     return `${import.meta.env.VITE_BASE_URL}contingut/document/${id}/getPDF`
@@ -11,7 +12,7 @@ const Visualitzar = (props:any) => {
     const {entity} = props;
 
     return <Load value={entity}>
-        <iframe src={getUrl(entity?.id)} width={'100%'} height={'500px'}></iframe>
+        <Iframe src={getUrl(entity?.id)}/>
     </Load>
 }
 

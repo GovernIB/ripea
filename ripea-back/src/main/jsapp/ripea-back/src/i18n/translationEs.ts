@@ -350,6 +350,8 @@ const translationEs = {
             tabs: {
                 resum: "Contenido",
                 version: "Versiones",
+                file: "Fichero",
+                scaner: "Escaneo",
             },
             detall: {
                 fitxerNom: "Nombre del fichero",
@@ -366,6 +368,7 @@ const translationEs = {
                 tipoFirma: "Tipo de firma",
                 flux: "Existe un flujo de firma predefinido. La creación de un nuevo flujo de firma implica sobrescribir el seleccionado.",
                 summarize: "Generar título y descripción con inteligencia artificial.\n(Requiere haber adjuntado un documento previamente)",
+                documentOrigenFormat: "Formato: ES_<Órgano>_<AAAA>_<ID_específico>",
             },
             acciones: {
                 pinbal: "Consulta PINBAL...",
@@ -417,6 +420,7 @@ const translationEs = {
                 firmaPendent: "Pendiente de firmar",
                 firmaParcial: "Firmado parcialmente",
                 errorPortafirmes: "Error al enviar al portafirmas",
+                funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
             },
             versio: {
                 title: "Versión",

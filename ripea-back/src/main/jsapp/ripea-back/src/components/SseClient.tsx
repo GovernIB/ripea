@@ -23,7 +23,14 @@ const useSseClientSession = () => {
             };
             save(containerRef.current)
         },
-        remove
+        remove: (key:string) => {
+            containerRef.current = {
+                ...containerRef.current,
+                [key]: undefined
+            };
+            save(containerRef.current)
+        },
+        removeAll: remove
     }
 }
 
@@ -54,7 +61,7 @@ export const useTasquesSession = () => {
  */
 export const SseClient: React.FC = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
-  const { save: saveSession, remove } = useSseClientSession();
+  const { save: saveSession, removeAll } = useSseClientSession();
   const { value: user } = useUserSession();
 
   const addEventListener = (eventSource: EventSource, key: string) => {
@@ -124,7 +131,7 @@ export const SseClient: React.FC = () => {
         eventSourceRef.current.close();
         eventSourceRef.current = null;
       }
-      remove()
+      removeAll()
       saveSession(sseConnectedKey, false)
     };
   }, []);

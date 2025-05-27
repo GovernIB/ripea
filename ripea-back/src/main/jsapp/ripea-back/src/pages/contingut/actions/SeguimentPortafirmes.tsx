@@ -6,6 +6,7 @@ import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import * as builder from '../../../util/springFilterUtils.ts'
+import Iframe from "../../../components/Iframe.tsx";
 
 const SeguimentPortafirmes = (props:any) => {
     const {entity} = props;
@@ -23,7 +24,7 @@ const SeguimentPortafirmes = (props:any) => {
             </CardData>
 
             <Grid item xs={6}>
-                <iframe src={entity?.urlFluxSeguiment} width={'100%'} height={'100%'}></iframe>
+                <Iframe src={entity?.urlFluxSeguiment}/>
             </Grid>
         </Grid>
     </Load>

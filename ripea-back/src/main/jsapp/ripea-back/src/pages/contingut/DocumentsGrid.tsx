@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {FormControl, Grid, InputLabel, Select, MenuItem, Icon} from "@mui/material";
+import {FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert} from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
 import {useTranslation} from "react-i18next";
@@ -12,6 +12,30 @@ import Load from "../../components/Load.tsx";
 import {potModificar} from "../expedient/details/Expedient.tsx";
 import {MenuActionButton} from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
+import TabComponent from "../../components/TabComponent.tsx";
+import Iframe from "../../components/Iframe.tsx";
+
+const ScanerTabForm = () => {
+    const { data } = useFormContext();
+    const { t } = useTranslation();
+
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="ntiIdDocumentoOrigen" componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}  required/>
+        <GridFormField xs={12} name="digitalitzacioPerfil" required/>
+
+        <Iframe src={data?.digitalitzacioProcesUrl}/>
+    </Grid>
+}
+const FileTabForm = () => {
+    const { data } = useFormContext();
+
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={12} name="adjunt" type={"file"} required/>
+        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>
+        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled/>
+        <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus!="FIRMA_SEPARADA"} required/>
+    </Grid>
+}
 
 const DocumentsGridForm = () => {
     const { t } = useTranslation();
@@ -35,6 +59,21 @@ const DocumentsGridForm = () => {
         builder.eq("actiu", true),
     );
 
+    const tabs = [
+        {
+            value: "file",
+            label: t('page.document.tabs.file'),
+            content: <FileTabForm/>,
+        },
+        {
+            value: "scaner",
+            label: t('page.document.tabs.scaner'),
+            content: data?.funcionariHabilitatDigitalib
+                ?<ScanerTabForm/>
+                :<Alert severity={"warning"} sx={{width: '100%'}}>{t('page.document.alert.funcionariHabilitatDigitalib')}</Alert>,
+        }
+    ];
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaDocument"
                        namedQueries={
@@ -54,10 +93,13 @@ const DocumentsGridForm = () => {
         <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required/>
         <GridFormField xs={12} name="ntiOrigen" required/>
         <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
-        <GridFormField xs={12} name="adjunt" type={"file"} required/>
-        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>
-        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled/>
-        <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus!="FIRMA_SEPARADA"} required/>
+
+        <Grid item xs={12}>
+            <TabComponent
+                tabs={tabs}
+                variant="scrollable"
+            />
+        </Grid>
     </Grid>
 }
 
@@ -155,6 +197,7 @@ const DocumentsGrid = (props:any) => {
                 staticSortModel={sortModel}
                 popupEditCreateActive
                 popupEditFormContent={<DocumentsGridForm/>}
+                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: true }}
                 formAdditionalData={{
                     expedient: {id: entity?.id},
                     metaExpedient: {id: entity?.metaExpedient?.id},

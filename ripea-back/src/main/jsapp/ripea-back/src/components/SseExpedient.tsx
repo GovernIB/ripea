@@ -21,7 +21,14 @@ const useSseExpedientSession = () => {
             };
             save(containerRef.current)
         },
-        remove
+        remove: (key:string) => {
+            containerRef.current = {
+                ...containerRef.current,
+                [key]: undefined
+            };
+            save(containerRef.current)
+        },
+        removeAll: remove
     }
 }
 
@@ -41,7 +48,7 @@ export const useFirmaFinalitzadaSession = () => {
 export const SseExpedient: React.FC<any> = (props:any) => {
     const {id} = props
     const eventSourceRef = useRef<EventSource | null>(null);
-    const { save: saveSession, remove } = useSseExpedientSession();
+    const { save: saveSession, removeAll } = useSseExpedientSession();
 
     const addEventListener = (eventSource: EventSource, key: string) => {
         eventSource.addEventListener(key, (event) => {
@@ -107,7 +114,7 @@ export const SseExpedient: React.FC<any> = (props:any) => {
                 eventSourceRef.current.close();
                 eventSourceRef.current = null;
             }
-            remove()
+            removeAll()
             saveSession(sseConnectedKey, false);
         };
     }, []);

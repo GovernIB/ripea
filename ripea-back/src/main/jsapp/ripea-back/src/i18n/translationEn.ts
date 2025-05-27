@@ -350,6 +350,8 @@ const translationEn = {
             tabs: {
                 resum: "Content",
                 version: "Versions",
+                file: "File",
+                scaner: "Scan",
             },
             detall: {
                 fitxerNom: "File Name",
@@ -366,6 +368,7 @@ const translationEn = {
                 tipoFirma: "Signature Type",
                 flux: "There is a predefined signature flow. Creating a new signature flow will overwrite the selected one.",
                 summarize: "Generate title and description using artificial intelligence.\n(Requires a document to be attached beforehand)",
+                documentOrigenFormat: "Format: ES_<Body>_<AAAA>_<Specific_ID>",
             },
             acciones: {
                 pinbal: "PINBAL consultation",
@@ -417,6 +420,7 @@ const translationEn = {
                 firmaPendent: "Pending signature",
                 firmaParcial: "Partially signed",
                 errorPortafirmes: "Error sending to portafirmas",
+                funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB"
             },
             versio: {
                 title: "Version",

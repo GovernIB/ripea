@@ -350,6 +350,8 @@ const translationCa = {
             tabs: {
                 resum: "Contingut",
                 version: "Versions",
+                file: "Fitxer",
+                scaner: "Escaneig",
             },
             detall: {
                 fitxerNom: "Nom del fitxer",
@@ -366,6 +368,7 @@ const translationCa = {
                 tipoFirma: "Tipus de firma",
                 flux: "Existeix un flux de firma predefinit. La creació d’un nou flux de firma implica sobreescriure el seleccionat.",
                 summarize: "Generar titol i descripció amb inteligència artificial.\n(Requereix haver adjuntat un document prèviament)",
+                documentOrigenFormat: "Format: ES_<Òrgan>_<AAAA>_<ID_específic>",
             },
             acciones: {
                 pinbal: "Consulta PINBAL...",
@@ -417,6 +420,7 @@ const translationCa = {
                 firmaPendent: "Pendent de firmar",
                 firmaParcial: "Firmat parcialment",
                 errorPortafirmes: "Error a l'enviar al portafirmes",
+                funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB"
             },
             versio: {
                 title: "Versió",
