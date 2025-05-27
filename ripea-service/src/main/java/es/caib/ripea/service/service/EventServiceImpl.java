@@ -117,16 +117,18 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public long getAnotacionsPendents(String usuariCodi) {
 		try {
-			EntitatEntity entitatEntity = entitatRepository.findByCodi(usuariCodi);
-			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(usuariCodi);
-			return cacheHelper.countAnotacionsPendents(
-					entitatEntity,
-					configHelper.getRolActual(),
-					SecurityContextHolder.getContext().getAuthentication().getName(),
-					organGestorEntity.getId());
-		} catch (Exception ex) {
-			return 0l;
-		}
+			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+			if (entitatEntity!=null) {
+				OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(usuariCodi);
+				return cacheHelper.countAnotacionsPendents(
+						entitatEntity,
+						configHelper.getRolActual(),
+						SecurityContextHolder.getContext().getAuthentication().getName(),
+						organGestorEntity!=null?organGestorEntity.getId():null);
+			}
+		} catch (Exception ex) {}
+		
+		return 0l;
 	}
 
 	@Override

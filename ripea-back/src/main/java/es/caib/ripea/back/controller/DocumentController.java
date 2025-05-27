@@ -480,7 +480,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	}
 
 	@RequestMapping(value = "/event/{documentId}/firmaSimpleWebEnd")
-	@ResponseBody
+//	@ResponseBody
 	public String firmaSimpleWebEndAmbEvent(
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -501,8 +501,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			}
 		}
 		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
+		//TODO: Això ara no tendrá afecte, ja que es portafib passa a pantalla completa i es recarrega sencera.
 		eventService.notifyFirmaNavegadorFinalitzada(ffe);
-		return "";
+		return "redirect:/contingut/" + expedientId; // + "?tascaId=" + (tascaId == null ? "" : tascaId);
 	}
 	
 	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd")

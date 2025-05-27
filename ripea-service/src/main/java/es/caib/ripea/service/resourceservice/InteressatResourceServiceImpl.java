@@ -20,14 +20,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -62,8 +65,10 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ConfigHelper configHelper;
+    private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
 
+    private final ExpedientRepository expedientRepository;
     private final InteressatResourceRepository interessatResourceRepository;
 
     @PostConstruct
@@ -129,13 +134,19 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     protected void afterConversion(InteressatResourceEntity entity, InteressatResource resource) {
         resource.setHasRepresentats(!entity.getRepresentats().isEmpty());
     }
-
+    
     @Override
     protected void beforeCreateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
         if(resource.getRepresentat()!=null){
             Optional<InteressatResourceEntity> interessatResourceEntity = interessatResourceRepository.findById(resource.getRepresentat().getId());
             interessatResourceEntity.ifPresent((interessat)->interessat.setRepresentant(entity));
         }
+    }
+    
+    @Override
+    protected void afterCreateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	ExpedientEntity expedient = expedientRepository.findById(entity.getExpedient().getId()).get();
+    	pluginHelper.arxiuExpedientActualitzar(expedient);
     }
 
     @Override

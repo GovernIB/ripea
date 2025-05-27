@@ -116,16 +116,24 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			@PathVariable String transactionId,
 			Model model) {
-		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-		if (!resposta.isError() && resposta.getFluxId() != null) {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
-			flux.setNom(resposta.getNom());
-			flux.setDescripcio(resposta.getDescripcio());
-			flux.setPortafirmesFluxId(resposta.getFluxId());
-			fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
-		}
-		if (expedientId!=null) {
+		try {
+			PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
+			if (!resposta.isError() && resposta.getFluxId() != null) {
+				EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+				FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
+				flux.setNom(resposta.getNom());
+				flux.setDescripcio(resposta.getDescripcio());
+				flux.setPortafirmesFluxId(resposta.getFluxId());
+				fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
+			}
+			if (expedientId!=null) {
+				CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
+				eventService.notifyFluxFirmaFinalitzat(fluxEvent);
+			}
+		} catch (Exception ex) {
+			PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
+			resposta.setError(true);
+			resposta.setDescripcio("Error al recuperar i guardar el flux creat: "+transactionId+". "+ex.getMessage());
 			CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
 			eventService.notifyFluxFirmaFinalitzat(fluxEvent);
 		}
