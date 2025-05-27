@@ -45,7 +45,8 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
 			UsuariDto usuariActual,
-			String urlReturnToRipea) {
+			String urlReturnToRipea,
+			String iframeVista) {
 		
 		if (getPropertyDebug())
 			log.info("firmaSimpleWebStart " + getPropertyEndpoint());
@@ -113,7 +114,8 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			FirmaSimpleStartTransactionRequest startTransactionInfo = new FirmaSimpleStartTransactionRequest(
 					transactionID,
 					urlReturnToRipea,
-					FirmaSimpleStartTransactionRequest.VIEW_IFRAME);
+					iframeVista);
+					//FirmaSimpleStartTransactionRequest.VIEW_IFRAME);
 
 			String urlRedirectToPortafib = api.startTransaction(startTransactionInfo);
 			
@@ -134,9 +136,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 				}
 			}
 			throw new RuntimeException(msg, e);
-
 		}
-
 	}
 	
 	@Override

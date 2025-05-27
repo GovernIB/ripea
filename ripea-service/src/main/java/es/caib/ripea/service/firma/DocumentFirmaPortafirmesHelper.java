@@ -1,5 +1,21 @@
 package es.caib.ripea.service.firma;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
@@ -11,21 +27,39 @@ import es.caib.ripea.persistence.repository.PortafirmesBlockRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.helper.AlertaHelper;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.ExceptionHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesBlockDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.*;
 
 @Component
 public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
@@ -275,18 +309,12 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					// ============================== SAVE IN ARXIU ==========================					
 					if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
 						
-						List<ArxiuFirmaDto> firmes = null;
-						if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
-							firmes = pluginHelper.validaSignaturaObtenirFirmes(
+						List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
 									portafirmesDocument.getArxiuNom(),
 									portafirmesDocument.getArxiuContingut(),
 									null,
 									"application/pdf",
 									true);
-						} else {
-							ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(portafirmesDocument.getArxiuNom(), portafirmesDocument.getArxiuContingut());
-							firmes = Arrays.asList(firma);
-						}
 						
 						document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 						documentHelper.actualitzarFitxerFormatAPdf(document);
@@ -298,12 +326,9 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 								firmes,
 								arxiuEstat);
 
-
 					} else { // i am not sure if cades is supported
-						FitxerDto fitxer = documentHelper.getFitxerAssociatFirmat(
-								document, 
-								null);
 						
+						FitxerDto fitxer = documentHelper.getFitxerAssociatFirmat(document, null);
 						ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 						arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
 						arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
@@ -321,7 +346,6 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						}
 						arxiuFirma.setDetalls(detalls);
 						arxiuFirma.setAutofirma(true);
-						
 						
 						if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY) {
 							pluginHelper.arxiuPropagarFirmaSeparada(
@@ -344,10 +368,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						document.setGesDocFirmatId(null);
 					}
 					
-					actualitzarInfoDocumentPortafirmesGuardatArxiu(
-							documentPortafirmes,
-							documentEstatAnterior);
-					
+					actualitzarInfoDocumentPortafirmesGuardatArxiu(documentPortafirmes, documentEstatAnterior);
 
 				} catch (Exception ex) {
 					logger.error("Error al custodiar document de portafirmes (" +
@@ -360,7 +381,6 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							null);
 					throw ex;
 				}
-				
 				
 			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
 			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {

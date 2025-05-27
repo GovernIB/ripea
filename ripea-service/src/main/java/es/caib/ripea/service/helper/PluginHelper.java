@@ -4387,114 +4387,127 @@ public class PluginHelper {
 		accioParams.put("firmaContentType", firmaContentType);
 		
 		long t0 = System.currentTimeMillis();
-		IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin();
-		if (nomFitxer==null) {nomFitxer="ContingutFirma";}
+		List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
+		IValidateSignaturePluginWrapper validaSignaturaPlugin = null;
+		
 		try {
-			
-			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
-			if (firmaContingut != null) {
-				validationRequest.setSignedDocumentData(documentContingut);
-				validationRequest.setSignatureData(firmaContingut);
-			} else {
-				validationRequest.setSignatureData(documentContingut);
-			}
-
-			SignatureRequestedInformation sri = new SignatureRequestedInformation();
-			sri.setReturnSignatureTypeFormatProfile(true);
-			sri.setReturnCertificateInfo(true);
-			sri.setReturnValidationChecks(false);
-			sri.setValidateCertificateRevocation(false);
-			sri.setReturnCertificates(true);
-			sri.setReturnTimeStampInfo(true);
-			validationRequest.setSignatureRequestedInformation(sri);
-			
-			ValidateSignatureResponse validateSignatureResponse = validaSignaturaPlugin.getPlugin().validateSignature(validationRequest);
-
-			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
-			if (validationStatus.getStatus() != 1 && throwExceptionIfNotValid) {
-				throw new RuntimeException(validationStatus.getErrorMsg());
-			}
-
-			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
-			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
-			ArxiuFirmaDto firma = new ArxiuFirmaDto();
-			if (validateSignatureResponse.getSignatureDetailInfo() != null) {
-				for (SignatureDetailInfo signatureInfo : validateSignatureResponse.getSignatureDetailInfo()) {
-					ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
-					signatureInfo.getSignDate();
-					TimeStampInfo timeStampInfo = signatureInfo.getTimeStampInfo();
-					if (timeStampInfo != null) {
-						detall.setData(timeStampInfo.getCreationTime());
-					} else {
-						detall.setData(signatureInfo.getSignDate());
-					}
-					InformacioCertificat certificateInfo = signatureInfo.getCertificateInfo();
-					if (certificateInfo != null) {
-						
-						if (certificateInfo.getNifResponsable() != null)
-							detall.setResponsableNif(certificateInfo.getNifResponsable());
-						else
-							detall.setResponsableNif(certificateInfo.getEntitatSubscriptoraNif());
-						
-						if (certificateInfo.getNomCompletResponsable() != null)
-							detall.setResponsableNom(certificateInfo.getNomCompletResponsable());
-						else
-							detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
-						
-						detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
-					}
-
-					if (isObtenirDataFirmaFromAtributDocument() && detall.getResponsableNif() != null) {
-						try {
-							PDDocument document = PDDocument.load(new ByteArrayInputStream(documentContingut));
-							for (PDSignature signature : document.getSignatureDictionaries()) {
-								if (signature.getName() != null && signature.getName().contains(detall.getResponsableNif())) {
-									detall.setData(signature.getSignDate().getTime());
-								}
-							}
-							document.close();
-						} catch (IOException ex) {
-							logger.error(
-									"Hi ha hagut un problema recuperant l'hora de firma: " + ex.getMessage());
-						}
-					}
-
-					detalls.add(detall);
-				}
-				firma.setAutofirma(false);
+		
+			if (getPropertyArxiuFirmaDetallsActiu()) {
+				
+				validaSignaturaPlugin = getValidaSignaturaPlugin();
+				
+				if (nomFitxer==null) {nomFitxer="ContingutFirma";}
+				
+				ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
 				if (firmaContingut != null) {
-					firma.setContingut(firmaContingut);
+					validationRequest.setSignedDocumentData(documentContingut);
+					validationRequest.setSignatureData(firmaContingut);
 				} else {
-					firma.setContingut(documentContingut);
+					validationRequest.setSignatureData(documentContingut);
 				}
-				firma.setDetalls(detalls);
-				firma.setPerfil(ArxiuConversions.toArxiuFirmaPerfilEnum(validateSignatureResponse.getSignProfile()));
-				firma.setTipus(
-						ArxiuConversions.toArxiuFirmaTipusEnum(
-								validateSignatureResponse.getSignType(),
-								validateSignatureResponse.getSignFormat()));
-				firma.setTipusMime(firmaContentType);
-				if (ArxiuFirmaTipusEnumDto.CADES_DET.equals(firma.getTipus())) {
-					firma.setFitxerNom(nomFitxer+"_signature.csig");
-				} else {
-					firma.setFitxerNom(nomFitxer);
+	
+				SignatureRequestedInformation sri = new SignatureRequestedInformation();
+				sri.setReturnSignatureTypeFormatProfile(true);
+				sri.setReturnCertificateInfo(true);
+				sri.setReturnValidationChecks(false);
+				sri.setValidateCertificateRevocation(false);
+				sri.setReturnCertificates(true);
+				sri.setReturnTimeStampInfo(true);
+				validationRequest.setSignatureRequestedInformation(sri);
+				
+				ValidateSignatureResponse validateSignatureResponse = validaSignaturaPlugin.getPlugin().validateSignature(validationRequest);
+	
+				ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+				if (validationStatus.getStatus() != 1 && throwExceptionIfNotValid) {
+					throw new RuntimeException(validationStatus.getErrorMsg());
 				}
-				firmes.add(firma);
+	
+				List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+				ArxiuFirmaDto firma = new ArxiuFirmaDto();
+				if (validateSignatureResponse.getSignatureDetailInfo() != null) {
+					for (SignatureDetailInfo signatureInfo : validateSignatureResponse.getSignatureDetailInfo()) {
+						ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+						signatureInfo.getSignDate();
+						TimeStampInfo timeStampInfo = signatureInfo.getTimeStampInfo();
+						if (timeStampInfo != null) {
+							detall.setData(timeStampInfo.getCreationTime());
+						} else {
+							detall.setData(signatureInfo.getSignDate());
+						}
+						InformacioCertificat certificateInfo = signatureInfo.getCertificateInfo();
+						if (certificateInfo != null) {
+							
+							if (certificateInfo.getNifResponsable() != null)
+								detall.setResponsableNif(certificateInfo.getNifResponsable());
+							else
+								detall.setResponsableNif(certificateInfo.getEntitatSubscriptoraNif());
+							
+							if (certificateInfo.getNomCompletResponsable() != null)
+								detall.setResponsableNom(certificateInfo.getNomCompletResponsable());
+							else
+								detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
+							
+							detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
+						}
+	
+						if (isObtenirDataFirmaFromAtributDocument() && detall.getResponsableNif() != null) {
+							try {
+								PDDocument document = PDDocument.load(new ByteArrayInputStream(documentContingut));
+								for (PDSignature signature : document.getSignatureDictionaries()) {
+									if (signature.getName() != null && signature.getName().contains(detall.getResponsableNif())) {
+										detall.setData(signature.getSignDate().getTime());
+									}
+								}
+								document.close();
+							} catch (IOException ex) {
+								logger.error(
+										"Hi ha hagut un problema recuperant l'hora de firma: " + ex.getMessage());
+							}
+						}
+	
+						detalls.add(detall);
+					}
+					firma.setAutofirma(false);
+					if (firmaContingut != null) {
+						firma.setContingut(firmaContingut);
+					} else {
+						firma.setContingut(documentContingut);
+					}
+					firma.setDetalls(detalls);
+					firma.setPerfil(ArxiuConversions.toArxiuFirmaPerfilEnum(validateSignatureResponse.getSignProfile()));
+					firma.setTipus(
+							ArxiuConversions.toArxiuFirmaTipusEnum(
+									validateSignatureResponse.getSignType(),
+									validateSignatureResponse.getSignFormat()));
+					firma.setTipusMime(firmaContentType);
+					if (ArxiuFirmaTipusEnumDto.CADES_DET.equals(firma.getTipus())) {
+						firma.setFitxerNom(nomFitxer+"_signature.csig");
+					} else {
+						firma.setFitxerNom(nomFitxer);
+					}
+					firmes.add(firma);
+				}		
+			} else {
+				ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(nomFitxer, documentContingut);
+				firmes = Arrays.asList(firma);
 			}
+			
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_VALIDASIG,
 					accioDescripcio,
-					validaSignaturaPlugin.getEndpoint(),
+					validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			
 			return firmes;
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error validant la firma del document: " + ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_VALIDASIG,
 					accioDescripcio,
-					validaSignaturaPlugin.getEndpoint(),
+					validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0,
@@ -5375,7 +5388,8 @@ public class PluginHelper {
 	public String firmaSimpleWebStart(
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
-			String urlReturnToRipea) {
+			String urlReturnToRipea,
+			String iframeVista) {
 
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		
@@ -5395,7 +5409,8 @@ public class PluginHelper {
 					fitxersPerFirmar,
 					motiu,
 					usuariActual,
-					urlReturnToRipea);
+					urlReturnToRipea,
+					iframeVista);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_FIRMASIMPLE,
 					accioDescripcio,

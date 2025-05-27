@@ -27,7 +27,7 @@ public class LlistaRolsInterceptor implements AsyncHandlerInterceptor {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
+		if (request.getUserPrincipal()!=null && !ContingutEstaticHelper.isContingutEstatic(request)) {
 			RolHelper.processarCanviRols(request, aplicacioService, organGestorService);
 			RolHelper.setRolActualFromDb(request, aplicacioService);
 		}

@@ -1,22 +1,37 @@
 package es.caib.ripea.service.firma;
 
-import com.sun.jersey.core.util.Base64;
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.List;
+import com.sun.jersey.core.util.Base64;
+
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
@@ -45,19 +60,9 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 		logAll(document, LogTipusEnumDto.FIRMA_CLIENT, null, null);
 		logFirmat(document);
 		
-		
-		List<ArxiuFirmaDto> firmes = null;
-		if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
-			firmes = pluginHelper.validaSignaturaObtenirFirmes(arxiuNom, arxiuContingut, null, "application/pdf", true);
-		} else {
-			ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(arxiuNom, arxiuContingut);
-			firmes = Arrays.asList(firma);
-		}
-		
+		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(arxiuNom, arxiuContingut, null, "application/pdf", true);
 		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
-		
 		document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-		
 		documentHelper.actualitzarFitxerFormatAPdf(document);
 		
 		ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
@@ -67,7 +72,6 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 				arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
 				firmes,
 				arxiuEstat);
-		
 	}
 
 	public SecretKeySpec buildKey(String message) throws Exception {

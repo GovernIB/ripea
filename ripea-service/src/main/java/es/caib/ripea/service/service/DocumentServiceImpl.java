@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -425,7 +426,8 @@ public class DocumentServiceImpl implements DocumentService {
 		return pluginHelper.firmaSimpleWebStart(
 				fitxersPerFirmar,
 				motiu,
-				urlReturnToRipea);
+				urlReturnToRipea,
+				FirmaSimpleStartTransactionRequest.VIEW_IFRAME);
 	}
 	
 	@Override
@@ -441,7 +443,8 @@ public class DocumentServiceImpl implements DocumentService {
 		return pluginHelper.firmaSimpleWebStart(
 				Arrays.asList(fitxerPerFirmar),
 				motiu,
-				urlReturnToRipea);
+				urlReturnToRipea,
+				FirmaSimpleStartTransactionRequest.VIEW_IFRAME);
 	}
 	
 	@Override

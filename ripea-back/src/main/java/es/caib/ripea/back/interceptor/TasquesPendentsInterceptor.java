@@ -20,10 +20,9 @@ public class TasquesPendentsInterceptor implements AsyncHandlerInterceptor {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		TasquesPendentsHelper.countTasquesPendents(
-				request,
-				expedientTascaService);
+		if (request.getUserPrincipal()!=null) {
+			TasquesPendentsHelper.countTasquesPendents(request, expedientTascaService);
+		}
 		return true;
 	}
-
 }

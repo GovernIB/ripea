@@ -20,7 +20,9 @@ public class SeguimentEnviamentsUsuariInterceptor implements AsyncHandlerInterce
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		SeguimentEnviamentsUsuariHelper.setMostrarSeguimentEnviamentsUsuari(request, aplicacioService);
+		if (request.getUserPrincipal()!=null) {
+			SeguimentEnviamentsUsuariHelper.setMostrarSeguimentEnviamentsUsuari(request, aplicacioService);
+		}
 		return true;
 	}
 	

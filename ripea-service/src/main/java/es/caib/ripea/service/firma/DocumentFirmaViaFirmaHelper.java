@@ -1,12 +1,9 @@
 package es.caib.ripea.service.firma;
 
-import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
-import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -14,10 +11,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
+import es.caib.ripea.service.helper.AlertaHelper;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.IntegracioHelper;
+import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
 
 @Component
 public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
@@ -105,16 +119,8 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 				if (viaFirmaDocument != null) {
 					byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
 					documentViaFirma.updateProcessat(true, new Date());
-					List<ArxiuFirmaDto> firmes = null;
-					if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
-						firmes = pluginHelper.validaSignaturaObtenirFirmes(viaFirmaDocument.getNomFitxer(), contingut, null, "application/pdf", true);
-					} else {
-						ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(viaFirmaDocument.getNomFitxer(), contingut);
-						firmes = Arrays.asList(firma);
-					}
-					
+					List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(viaFirmaDocument.getNomFitxer(), contingut, null, "application/pdf", true);
 					document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-					
 					ArxiuEstatEnumDto arxiuEstat =  documentViaFirma.isFirmaParcial() ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
 					contingutHelper.arxiuPropagarModificacio(
 							document,

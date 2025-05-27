@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.AvisHelper;
@@ -12,30 +9,20 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Interceptor per a comptar els elements pendents de les bústies
- * de l'usuari actual.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 @Component
 public class AvisosInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
-	private AvisService avisService;
-
-
+	@Autowired private AvisService avisService;
 
 	@Override
 	public boolean preHandle(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		
-		AvisHelper.findAvisos(
-				request,
-				avisService);
+
+		if (request.getUserPrincipal()!=null) {
+			AvisHelper.findAvisos(request, avisService);
+		}
 		return true;
 	}
-
 }

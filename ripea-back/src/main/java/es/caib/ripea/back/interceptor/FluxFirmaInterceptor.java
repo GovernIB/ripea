@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.interceptor;
 
 import es.caib.ripea.back.helper.FluxFirmaHelper;
@@ -20,18 +17,16 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class FluxFirmaInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private AplicacioService aplicacioService;
 	
 	@Override
 	public boolean preHandle(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		FluxFirmaHelper.setCreacioFluxUsuariActiu(
-				request, 
-				aplicacioService);
+		if (request.getUserPrincipal()!=null) {
+			FluxFirmaHelper.setCreacioFluxUsuariActiu(request, aplicacioService);
+		}
 		return true;
 	}
-
 }

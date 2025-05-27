@@ -1413,24 +1413,24 @@ public class DocumentHelper {
 		}
 		if (objecte != null) {
 			
-			DocumentEntity document = null;
+			DocumentEntity document = documentRepository.findById(documentId).get();
 			
-			if (tascaId == null) {
-				document = comprovarDocument(
-						objecte.getEntitatId(),
-						objecte.getDocumentId(),
-						false,
-						true,
-						false,
-						false, 
-						false, 
-						rolActual);
-
-			} else {
-				document = contingutHelper.comprovarDocumentPerTasca(
-						tascaId,
-						documentId);
-			}
+//			if (tascaId == null) {
+//				document = comprovarDocument(
+//						objecte.getEntitatId(),
+//						objecte.getDocumentId(),
+//						false,
+//						true,
+//						false,
+//						false, 
+//						false, 
+//						rolActual);
+//
+//			} else {
+//				document = contingutHelper.comprovarDocumentPerTasca(
+//						tascaId,
+//						documentId);
+//			}
 
 			firmaAppletHelper.processarFirmaClient(
 					identificador,

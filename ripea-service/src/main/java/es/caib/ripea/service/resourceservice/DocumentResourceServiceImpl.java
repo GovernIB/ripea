@@ -20,7 +20,9 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,8 @@ import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceReposit
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -113,6 +117,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final EntityComprovarHelper entityComprovarHelper;
     private final CacheResourceHelper cacheResourceHelper;
     private final RolHelper rolHelper;
+	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
+	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
 
     private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -764,12 +770,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
 			try {
-				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/event/" + entity.getId() + "/firmaSimpleWebEnd";
+				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/" + entity.getId() + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				FitxerDto fitxerDto = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), entity.getId());
 
                 Map<String, String> result = new HashMap<>();
-                result.put("url", pluginHelper.firmaSimpleWebStart(Arrays.asList(fitxerDto), params.getMotiu(), urlReturnToRipea));
+                result.put("url", pluginHelper.firmaSimpleWebStart(Arrays.asList(fitxerDto), params.getMotiu(), urlReturnToRipea, FirmaSimpleStartTransactionRequest.VIEW_FULLSCREEN));
                 return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/IniciarFirmaWebActionExecutor", e);
@@ -989,20 +995,41 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					false, 
 					rolActual);
         	
-			/*firmaPortafirmesHelper.portafirmesEnviar(
+        	//Unificar els portafirmes responsables en un array de NIFS
+        	List<String> pfResponsables = new ArrayList<String>();
+        	if (params.getResponsables()!=null) {
+        		for (ResourceReference <UsuariResource, String> usuari: params.getResponsables()) {
+        			pfResponsables.add(usuari.getId());
+        		}
+        	}
+        	if (params.getNifsManuals()!=null) {
+        		pfResponsables.addAll(params.getNifsManuals());
+        	}
+        	if (params.getCarrecs()!=null) {
+        		pfResponsables.addAll(params.getCarrecs());
+        	}
+        	
+        	List<Long> annexosIds = new ArrayList<Long>();
+        	if (params.getAnnexos()!=null) {
+        		for (ResourceReference <DocumentResource, Long> annex: params.getAnnexos()) {
+        			annexosIds.add(annex.getId());
+        		}
+        	}
+        	
+			firmaPortafirmesHelper.portafirmesEnviar(
 					entitatId,
 					document,
 					params.getMotiu(),
 					params.getPrioritat(),
 					null,
-					portafirmesFluxId,
-					portafirmesResponsables,
-					portafirmesSeqTipus,
-					portafirmesFluxTipus,
-					annexosIds,
-					transaccioId,
-					avisFirmaParcial,
-					firmaParcial);*/
+					params.getPortafirmesEnviarFluxId(),
+					pfResponsables.toArray(new String[0]),
+					params.getPortafirmesSequenciaTipus(),
+					params.getPortafirmesFluxTipus(),
+					annexosIds.toArray(new Long[0]),
+					null,
+					params.isAvisFirmaParcial(),
+					params.isFirmaParcial());
         	
         	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
         }

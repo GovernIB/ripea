@@ -31,22 +31,23 @@ public class ExpedientsInterceptor implements AsyncHandlerInterceptor {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		ExpedientHelper.accesUsuariExpedients(
-				request, 
-				metaExpedientService);
-		ExpedientHelper.accesUsuariEstadistiques(
-				request, 
-				metaExpedientService);
-		ExpedientHelper.setConversioDefinitiu(
-				request, 
-				aplicacioService);
-		ExpedientHelper.setUrlValidacioDefinida(
-				request, 
-				aplicacioService);
-		ExpedientHelper.setUrlsInstruccioActiu(
-				request, 
-				aplicacioService);
+		if (request.getUserPrincipal()!=null) {
+			ExpedientHelper.accesUsuariExpedients(
+					request, 
+					metaExpedientService);
+			ExpedientHelper.accesUsuariEstadistiques(
+					request, 
+					metaExpedientService);
+			ExpedientHelper.setConversioDefinitiu(
+					request, 
+					aplicacioService);
+			ExpedientHelper.setUrlValidacioDefinida(
+					request, 
+					aplicacioService);
+			ExpedientHelper.setUrlsInstruccioActiu(
+					request, 
+					aplicacioService);
+		}
 		return true;
 	}
-
 }

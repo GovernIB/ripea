@@ -12,7 +12,9 @@ public interface FirmaWebPlugin extends RipeaEndpointPluginInfo {
 	public String firmaSimpleWebStart(
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
-			UsuariDto usuariActual, String base);
+			UsuariDto usuariActual,
+			String base,
+			String iframeVista);
 
 	public FirmaResultatDto firmaSimpleWebEnd(String transactionID);
 }

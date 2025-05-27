@@ -32,19 +32,21 @@ public class LlistaEntitatsInterceptor implements AsyncHandlerInterceptor {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-			EntitatHelper.processarCanviEntitats(request, entitatService, aplicacioService);
-			EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-			EntitatHelper.processarCanviOrganGestor(request, aplicacioService);
-			EntitatHelper.findEntitatsAccessibles(request, entitatService);
-		}
-		EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
-		if (entitatDto != null) {
-			entitatService.setConfigEntitat(entitatDto);
-		}
-		OrganGestorDto organGestorDto = EntitatHelper.getOrganGestorActual(request);
-		if (organGestorDto!=null) {
-			aplicacioService.actualitzarOrganCodi(organGestorDto.getCodi());
+		if (request.getUserPrincipal()!=null) {
+			if (!ContingutEstaticHelper.isContingutEstatic(request)) {
+				EntitatHelper.processarCanviEntitats(request, entitatService, aplicacioService);
+				EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+				EntitatHelper.processarCanviOrganGestor(request, aplicacioService);
+				EntitatHelper.findEntitatsAccessibles(request, entitatService);
+			}
+			EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+			if (entitatDto != null) {
+				entitatService.setConfigEntitat(entitatDto);
+			}
+			OrganGestorDto organGestorDto = EntitatHelper.getOrganGestorActual(request);
+			if (organGestorDto!=null) {
+				aplicacioService.actualitzarOrganCodi(organGestorDto.getCodi());
+			}
 		}
 		return true;
 	}
