@@ -404,7 +404,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             if (fieldValue != null) {
             	UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-            	String urlReturn = configHelper.getConfig(PropertyConfig.BASE_URL) + "/event/resultatScan/"+target.getExpedient().getId()+"/";
+            	String urlReturn = configHelper.getConfig(PropertyConfig.BASE_URL) + "/event/resultatScan/"+previous.getExpedient().getId()+"/";
         		DigitalitzacioTransaccioRespostaDto respostaDto = pluginHelper.digitalitzacioIniciarProces(
         				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca",
         				fieldValue.toString(),
