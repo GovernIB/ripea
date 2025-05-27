@@ -54,6 +54,7 @@ public class DigitalitzacioPluginMock extends RipeaAbstractPluginProperties impl
 		resposta.setIdTransaccio(String.valueOf(System.currentTimeMillis()));
 		resposta.setReturnScannedFile(true);
 		resposta.setReturnSignedFile(false);
+		resposta.setUrlRedireccio("http://localhost:8080/ripeaback/modal/digitalitzacio/mock");
 		return resposta;
 	}
 

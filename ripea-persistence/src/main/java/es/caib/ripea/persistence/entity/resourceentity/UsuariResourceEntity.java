@@ -17,6 +17,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -108,4 +109,13 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 		return codi + " - " + nom;
 	}
 
+	public UsuariDto toUsuariDto() {
+		UsuariDto resultat = new UsuariDto();
+		resultat.setIdioma(this.getIdioma().toString());
+		resultat.setCodi(this.getCodi());
+		resultat.setNom(this.getNom());
+		resultat.setNif(this.getNif());
+		resultat.setEmail(this.getEmail());
+		return resultat;
+	}
 }

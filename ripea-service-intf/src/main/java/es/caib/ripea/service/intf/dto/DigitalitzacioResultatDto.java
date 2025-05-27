@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DigitalitzacioResultatDto {
-
 	private boolean error;
 	private String errorDescripcio;
 	private DigitalitzacioEstatDto estat;
@@ -16,7 +15,4 @@ public class DigitalitzacioResultatDto {
 	private String eniTipoFirma;
 	private Integer resolucion;
 	private String idioma;
-	
-
-		
 }

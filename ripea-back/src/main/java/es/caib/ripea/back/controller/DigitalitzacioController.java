@@ -4,15 +4,13 @@
  */
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.helper.ExceptionHelper;
-import es.caib.ripea.back.helper.RequestSessionHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.DigitalitzacioService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +22,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.ripea.back.helper.ExceptionHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.DigitalitzacioService;
+import es.caib.ripea.service.intf.service.EventService;
 
 /**
  * Controlador per al manteniment de documents.
@@ -43,10 +47,9 @@ public class DigitalitzacioController extends BaseUserController {
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
 	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
 	
-	@Autowired
-	private DigitalitzacioService digitalitzacioService;
-	@Autowired
-	private AplicacioService aplicacioService;
+	@Autowired private DigitalitzacioService digitalitzacioService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private EventService eventService;
 	
 	@RequestMapping(value = "/perfils", method = RequestMethod.GET)
 	@ResponseBody
@@ -135,6 +138,18 @@ public class DigitalitzacioController extends BaseUserController {
 		return "digitalitzacioIframeTancar";
 	}
 
+	@RequestMapping(value = "/event/resultatScan/{idExpedient}/{idTransaccio}", method = RequestMethod.GET)
+	public String recuperarResultatScanEvent(
+			HttpServletRequest request,
+			@PathVariable Long idExpedient,
+			@PathVariable String idTransaccio,
+			Model model) {
+		DigitalitzacioResultatDto resposta = recuperaResultatEscaneig(idTransaccio, true, true);
+		ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
+		eventService.notifyScanFinalitzat(sfe);
+		return "";
+	}
+	
 	@RequestMapping(value = "/recuperarResultat/{idTransaccio}", method = RequestMethod.GET)
 	public String recuperarResultat(
 			HttpServletRequest request,
@@ -147,14 +162,7 @@ public class DigitalitzacioController extends BaseUserController {
 				request,
 				SESSION_ATTRIBUTE_RETURN_SIGNED);
 		
-		DigitalitzacioResultatDto resposta = digitalitzacioService.recuperarResultat(
-				idTransaccio,
-				returnScannedFile,
-				returnSignedFile);
-		
-		if (aplicacioService.propertyBooleanFindByKey(PropertyConfig.DIGITALITZACIO_PLUGIN_DEBUG, false)) {
-			logger.info("Recuperar resultat scan: " + ToStringBuilder.reflectionToString(resposta));
-		}
+		DigitalitzacioResultatDto resposta = recuperaResultatEscaneig(idTransaccio, returnScannedFile, returnSignedFile);
 		
 		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
@@ -171,6 +179,19 @@ public class DigitalitzacioController extends BaseUserController {
 			model.addAttribute("nomDocument", resposta.getNomDocument());
 		}
 		return "digitalitzacioIframeTancar";
+	}
+	
+	private DigitalitzacioResultatDto recuperaResultatEscaneig(String idTransaccio, boolean returnScannedFile, boolean returnSignedFile) {
+		DigitalitzacioResultatDto resposta = digitalitzacioService.recuperarResultat(
+				idTransaccio,
+				returnScannedFile,
+				returnSignedFile);
+		
+		if (aplicacioService.propertyBooleanFindByKey(PropertyConfig.DIGITALITZACIO_PLUGIN_DEBUG, false)) {
+			logger.info("Recuperar resultat scan: " + ToStringBuilder.reflectionToString(resposta));
+		}
+		
+		return resposta;
 	}
 	
 	@RequestMapping(value = "/descarregarResultat/{idTransaccio}", method = RequestMethod.GET)

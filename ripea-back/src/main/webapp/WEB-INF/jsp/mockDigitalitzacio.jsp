@@ -4,16 +4,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
-
 <html>
 <head>
-
 <rip:modalHead/>
-</head>
-	
-<body>		
-<a href="<c:url value="/digitalitzacio/recuperarResultatMock/12345"/>" class="btn btn-default">Recuperar resultat</a>
-
+</head>	
+<body>
+Aquesta es una finestra ficticia que nomes hauria de aparéixer en entorns de desenvolupament.
+<a href="<c:url value="/digitalitzacio/recuperarResultatMock/12345"/>" class="btn btn-default">Recuperar resultat del escaneig</a>
 </body>
 </html>

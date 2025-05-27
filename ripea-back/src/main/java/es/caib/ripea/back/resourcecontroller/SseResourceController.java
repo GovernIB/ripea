@@ -21,6 +21,7 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +52,7 @@ public class SseResourceController {
     }
     
     private enum ExpedientEventType {
-        EXP_CONNECT, FLUX_CREAT, FIRMA_FINALITZADA;
+        EXP_CONNECT, FLUX_CREAT, FIRMA_FINALITZADA, SCAN_FINALITZAT;
         public String getEventName() { return name().toLowerCase(); }
         public static ExpedientEventType fromEventName(String name) { return ExpedientEventType.valueOf(name.toUpperCase()); }
     }
@@ -226,7 +227,7 @@ public class SseResourceController {
     
     @Async
     @EventListener
-    public void handleEventFlux(FirmaFinalitzadaEvent firmaEvent) {
+    public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
     	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
 			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
 			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
@@ -237,6 +238,28 @@ public class SseResourceController {
 	            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
 	            		for(SseEmitter emisor: expedientClient.getValue()) {
 	            			emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
+	            		}
+	            	}
+	            } catch (IOException e) {
+	            	clientsExpedient.remove(expedientClient.getKey());
+	            }
+	        }
+    	}
+    }
+    
+    @Async
+    @EventListener
+    public void handleEventScan(ScanFinalitzatEvent scanEvent) {
+    	if (scanEvent!=null && scanEvent.getExpedientId()!=null) {
+			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
+			//Els avisos s'envien a tots els usuaris connectats
+			while (iterator.hasNext()) {
+				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
+	            try {
+	            	if (scanEvent.getExpedientId().equals(expedientClient.getKey())) {
+	            		for(SseEmitter emisor: expedientClient.getValue()) {
+	            			emisor.send(SseEmitter.event().name(ExpedientEventType.SCAN_FINALITZAT.getEventName()).data(scanEvent.getResposta()));
 	            		}
 	            	}
 	            } catch (IOException e) {

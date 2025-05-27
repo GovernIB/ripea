@@ -63,6 +63,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
@@ -402,10 +403,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             if (fieldValue != null) {
-                target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
-            } else {
-            	//TODO iniciar procés de escaneig
-            }
+            	UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+            	String urlReturn = configHelper.getConfig(PropertyConfig.BASE_URL) + "/event/resultatScan/"+target.getExpedient().getId()+"/";
+        		DigitalitzacioTransaccioRespostaDto respostaDto = pluginHelper.digitalitzacioIniciarProces(
+        				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca",
+        				fieldValue.toString(),
+        				usuari.toUsuariDto(), 
+        				urlReturn);
+        		target.setDigitalitzacioProcesUrl(respostaDto.getUrlRedireccio());
+        	}
         }
     }
     

@@ -283,6 +283,7 @@ public class DocumentResource extends NodeResource {
     @Transient private boolean pluginSummarizeActiu;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private DigitalitzacioPerfilDto digitalitzacioPerfil;
+    @Transient private String digitalitzacioProcesUrl;
     @Transient private MetaDocumentResource metaDocumentInfo;
     
     @Getter

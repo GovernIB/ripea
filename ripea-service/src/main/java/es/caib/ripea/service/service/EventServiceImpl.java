@@ -25,6 +25,7 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class EventServiceImpl implements EventService {
 	        log.debug("notifyAvisosActius a clients");
 	        eventPublisher.publishEvent(event);
     	} catch (Exception ex) {
-    		log.error("Erro al notifyAvisosActius a clients", ex);
+    		log.error("Error al notifyAvisosActius a clients", ex);
     	}
     }
 
@@ -75,7 +76,7 @@ public class EventServiceImpl implements EventService {
     		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacioUsuaris);
     		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
-    		log.error("Erro al notifyAnotacionsPendents a clients", ex);
+    		log.error("Error al notifyAnotacionsPendents a clients", ex);
     	}
     }
     
@@ -92,7 +93,7 @@ public class EventServiceImpl implements EventService {
     		TasquesPendentsEvent resultat = new TasquesPendentsEvent(tasquesUsuaris);
     		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
-    		log.error("Erro al notifyTasquesPendents a clients", ex);
+    		log.error("Error al notifyTasquesPendents a clients", ex);
     	}
     }
     
@@ -101,7 +102,7 @@ public class EventServiceImpl implements EventService {
     	try {
     		eventPublisher.publishEvent(fluxEvent);
     	} catch (Exception ex) {
-    		log.error("Erro al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
+    		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
     	}
     }
     
@@ -110,7 +111,16 @@ public class EventServiceImpl implements EventService {
     	try {
     		eventPublisher.publishEvent(firmaEvent);
     	} catch (Exception ex) {
-    		log.error("Erro al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
+    		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
+    	}
+    }
+    
+    @Override
+    public void notifyScanFinalitzat(ScanFinalitzatEvent scanEvent) {
+    	try {
+    		eventPublisher.publishEvent(scanEvent);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyScanFinalitzat a expedients suscrits", ex);
     	}
     }
     
