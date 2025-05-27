@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useSession } from './SessionStorageContext';
+import {useSessionList} from './SessionStorageContext';
 import {useUserSession} from "./Session.tsx";
 
 // Keys for session storage
@@ -9,30 +9,7 @@ const notificacionsKey = 'notificacions';
 const tasquesKey = 'tasques';
 const sseConnectedKey = 'user_connect';
 
-const useSseClientSession = () => {
-    const { value: container, save, remove } = useSession(sseClientKey);
-    const containerRef = useRef(container ?? []);
-
-    return {
-        container,
-        get: (key:string)=> container?.[key],
-        save: (key:string, newValue:any) => {
-            containerRef.current = {
-                ...containerRef.current,
-                [key]: newValue
-            };
-            save(containerRef.current)
-        },
-        remove: (key:string) => {
-            containerRef.current = {
-                ...containerRef.current,
-                [key]: undefined
-            };
-            save(containerRef.current)
-        },
-        removeAll: remove
-    }
-}
+const useSseClientSession = () => useSessionList(sseClientKey)
 
 /**
  * Hook per a utilitzar el client SSE

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import {useSession} from './SessionStorageContext';
+import {useSessionList} from './SessionStorageContext';
 
 // Keys for session storage
 const sseExpedientKey = 'sseExpedient';
@@ -7,30 +7,7 @@ const fluxCreateKey = 'flux_create';
 const firmaFinalitzadaKey = 'firma_finalitzada';
 const sseConnectedKey = 'exp_connect';
 
-const useSseExpedientSession = () => {
-    const { value: container, save, remove } = useSession(sseExpedientKey);
-    const containerRef = useRef(container ?? []);
-
-    return {
-        container,
-        get: (key:string)=> container?.[key],
-        save: (key:string, newValue:any) => {
-            containerRef.current = {
-                ...containerRef.current,
-                [key]: newValue
-            };
-            save(containerRef.current)
-        },
-        remove: (key:string) => {
-            containerRef.current = {
-                ...containerRef.current,
-                [key]: undefined
-            };
-            save(containerRef.current)
-        },
-        removeAll: remove
-    }
-}
+const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
 export const useFluxCreateSession = () => {
     const { get } = useSseExpedientSession();

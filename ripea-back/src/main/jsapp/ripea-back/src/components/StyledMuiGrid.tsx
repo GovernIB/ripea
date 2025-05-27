@@ -30,7 +30,8 @@ type StyledMuiGridProps = MuiDataGridProps & {
     toolbarCreateTitle?: string,
     toolbarMassiveActions?: MassiveActionProps[],
     onRowCountChange?: (count:number) => void,
-    rowProps?: any
+    rowProps?: any,
+    formInitOnChange?:boolean,
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -57,6 +58,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         onRowCountChange,
         onRowSelectionModelChange,
         rowProps,
+        formInitOnChange,
+        popupEditFormDialogComponentProps,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
@@ -190,6 +193,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             selectionActive={selectionActive || !!toolbarMassiveActions}
             checkboxSelection={selectionActive || !!toolbarMassiveActions}
             keepNonExistentRowsSelected={selectionActive || !!toolbarMassiveActions}
+
+            popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: formInitOnChange, ...popupEditFormDialogComponentProps }}
 
             toolbarHideRefresh
             toolbarHideCreate

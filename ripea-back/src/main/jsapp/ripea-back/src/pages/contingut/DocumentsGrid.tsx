@@ -197,10 +197,10 @@ const DocumentsGrid = (props:any) => {
                 staticSortModel={sortModel}
                 popupEditCreateActive
                 popupEditFormContent={<DocumentsGridForm/>}
-                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: true }}
+                formInitOnChange
                 formAdditionalData={{
                     expedient: {id: entity?.id},
-                    metaExpedient: {id: entity?.metaExpedient?.id},
+                    metaExpedient: entity?.metaExpedient,
                 }}
                 apiRef={dataGridApiRef}
                 rowAdditionalActions={actions}

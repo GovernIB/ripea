@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {createContext, useContext, useState, useEffect, useRef} from 'react';
 
 type SessionData = Record<string, any>;
 
@@ -79,3 +79,27 @@ export const useSession = (key:string) => {
         },
     };
 };
+export const useSessionList = (key:string) => {
+    const { value: container, save, remove } = useSession(key);
+    const containerRef = useRef(container ?? []);
+
+    return {
+        container,
+        get: (key:string)=> container?.[key],
+        save: (key:string, newValue:any) => {
+            containerRef.current = {
+                ...containerRef.current,
+                [key]: newValue
+            };
+            save(containerRef.current)
+        },
+        remove: (key:string) => {
+            containerRef.current = {
+                ...containerRef.current,
+                [key]: undefined
+            };
+            save(containerRef.current)
+        },
+        removeAll: remove
+    }
+}
