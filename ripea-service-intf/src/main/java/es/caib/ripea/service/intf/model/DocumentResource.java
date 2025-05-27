@@ -116,11 +116,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_RESUM_IA,
-                        formClass = DocumentResource.ResumIaFormAction.class),                
-				@ResourceConfigArtifact(
-						type = ResourceArtifactType.REPORT,
-						code = DocumentResource.ACTION_DESCARREGAR_MASSIU,
-						formClass = DocumentResource.MassiveAction.class),	                
+                        formClass = DocumentResource.ResumIaFormAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE,
@@ -128,7 +124,16 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE,
-						formClass = DocumentResource.UpdateTipusDocumentFormAction.class),				
+						formClass = DocumentResource.UpdateTipusDocumentFormAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = DocumentResource.ACTION_DESCARREGAR_MASSIU,
+                        formClass = DocumentResource.MassiveAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE,
+                        formClass = DocumentResource.DescarregarVersionFormAction.class,
+                        requiresId = true),
         })
 public class DocumentResource extends NodeResource {
 
@@ -151,6 +156,8 @@ public class DocumentResource extends NodeResource {
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
+
+    public static final String REPORT_DESCARREGAR_VERSIO_CODE = "DESCARREGAR_VERSIO";
 
 	@NotNull
 	private DocumentTipusEnumDto documentTipus = DocumentTipusEnumDto.DIGITAL;
@@ -462,6 +469,15 @@ public class DocumentResource extends NodeResource {
         private ResourceReference<ExpedientResource, Long> expedient;
     }
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class DescarregarVersionFormAction implements Serializable {
+    	@NotNull
+    	private String version;
+    }
+
     public DocumentDto toDocumentDto() {
         DocumentDto resultat = new DocumentDto();
         MetaDocumentDto metaNode = new MetaDocumentDto();
@@ -474,7 +490,8 @@ public class DocumentResource extends NodeResource {
         resultat.setData(Calendar.getInstance().getTime());
         resultat.setNtiOrigen(this.getNtiOrigen());
         resultat.setNtiEstadoElaboracion(this.getNtiEstadoElaboracion());
-        resultat.setNtiIdDocumentoOrigen(this.getNtiIdDocumentoOrigen());        resultat.setFitxerNom(this.fitxerNom);
+        resultat.setNtiIdDocumentoOrigen(this.getNtiIdDocumentoOrigen());
+        resultat.setFitxerNom(this.fitxerNom);
         resultat.setFitxerContingut(this.getFitxerContingut());
         resultat.setFitxerContentType(this.getFitxerContentType());
         resultat.setAmbFirma(this.isAmbFirma());

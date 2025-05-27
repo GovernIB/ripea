@@ -16,14 +16,17 @@ import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useFirmaNevegador from "../actions/FirmaNevegador.tsx";
 
-export const useActions = (refresh?: () => void) => {
+export const useActions = () => {
     const {temporalMessageShow} = useBaseAppContext();
-    const {artifactAction: apiAction, fieldDownload: apiDownload} = useResourceApiService('documentResource');
+    const {
+        artifactAction: apiAction,
+        artifactReport: apiReport,
+        fieldDownload: apiDownload,
+    } = useResourceApiService('documentResource');
 
     const downloadAdjunt = (id:any,fieldName:string) :void => {
         apiDownload(id,{fieldName})
             .then((result)=>{
-                refresh?.();
                 iniciaDescargaBlob(result);
                 temporalMessageShow(null, '', 'info');
             })
@@ -39,7 +42,17 @@ export const useActions = (refresh?: () => void) => {
                     .catch((error) => {
                         temporalMessageShow(null, error?.message, 'error');
                     });
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
+    const descarregarVersio = (id:any, version:string, fileType:any = 'PDF') => {
+        apiReport(id, {code: "DESCARREGAR_VERSIO", data: { version }, fileType})
+            .then((result)=>{
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -48,7 +61,8 @@ export const useActions = (refresh?: () => void) => {
 
     return {
         apiDownload: downloadAdjunt,
-        getLinkCSV: enllacCSV
+        getLinkCSV: enllacCSV,
+        descarregarVersio,
     }
 }
 
@@ -57,7 +71,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const { value: user } = useUserSession()
     const { value: entitat } = useEntitatSession()
 
-    const {apiDownload, getLinkCSV} = useActions(refresh)
+    const {apiDownload, getLinkCSV} = useActions()
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();

@@ -7,6 +7,7 @@ import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
+import {useActions} from "./ContingutActions.tsx";
 
 const Contenido = (props:any) => {
     const {entity} = props;
@@ -43,19 +44,20 @@ const Dada = (props:any) => {
 }
 
 const Versiones = (props:any) => {
-    const {versions, downloadable} = props;
+    const {entity} = props;
     const { t } = useTranslation();
+    const {descarregarVersio} = useActions()
 
     return <BasePage>
         {
-            versions?.map((version:any) =>
+            entity?.versions?.map((version:any) =>
                 <CardData key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
                     buttons={[
                         {
                             text: t('common.download'),
                             icon: 'download',
-                            onClick: ()=>{},
-                            hidden: !downloadable,
+                            onClick: ()=>{descarregarVersio(entity?.id,version?.id)},
+                            hidden: entity?.documentTipus == 'FISIC',
                         }
                     ]}
                 >
@@ -78,6 +80,8 @@ const useDocumentDetail = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
     const [numDades, setNumDades] = useState<number>(entity?.numDades);
+
+    const {apiDownload} = useActions()
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
@@ -108,7 +112,7 @@ const useDocumentDetail = () => {
         {
             value: "version",
             label: t('page.document.tabs.version'),
-            content: <Versiones versions={entity?.versions} downloadable={entity?.documentTipus != 'FISIC'}/>,
+            content: <Versiones entity={entity}/>,
             badge: entity?.versions?.length,
             hidden: !entity?.versions || entity?.versions?.length == 0,
         },
@@ -150,6 +154,7 @@ const useDocumentDetail = () => {
             buttonCallback={(value :any) :void => {
                 switch (value){
                     case 'download':
+                        apiDownload(entity?.id, 'adjunt')
                         break;
                     case 'descarregarImprimible':
                         break;

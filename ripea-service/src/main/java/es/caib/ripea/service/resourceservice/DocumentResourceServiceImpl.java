@@ -149,6 +149,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 //        register(DocumentResource.ACTION_FLUX_WEB_INI, new IniciarFluxFirmaWebActionExecutor());
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
 //        register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
+        register(DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE, new DescarregarVersionReportGenerator());
         //Dades externes
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
@@ -577,10 +578,37 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
             return resultat;
 		}
-
-
-
     }
+    private class DescarregarVersionReportGenerator implements ReportGenerator<DocumentResourceEntity, DocumentResource.DescarregarVersionFormAction, FitxerDto> {
+
+        @Override
+        public List<FitxerDto> generateData(String code, DocumentResourceEntity entity, DocumentResource.DescarregarVersionFormAction params) throws ReportGenerationException {
+            try {
+                List<FitxerDto> parametres = new ArrayList<FitxerDto>();
+                parametres.add(documentHelper.getFitxerAssociat(entity.getId(), params.getVersion()));
+                return parametres;
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/descarregarDocumentsMassiuZip", e);
+                throw new ReportGenerationException(ExpedientResource.class, entity.getId(), code, "S'ha produit un error al descarregar els documents seleccionats.");
+            }
+        }
+
+        @Override
+        public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+            for(FitxerDto fitxerDto : (List<FitxerDto>) data){
+                return new DownloadableFile(
+                        fitxerDto.getNom(),
+                        fitxerDto.getContentType(),
+                        fitxerDto.getContingut()
+                );
+            }
+            return null;
+        }
+
+        @Override
+        public void onChange(Serializable id, DocumentResource.DescarregarVersionFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource.DescarregarVersionFormAction target) {}
+    }
+
     private class NotificarDocumentsZipActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarDocumentsZipFormAction, DocumentResource> {
 
 		@Override
