@@ -76,6 +76,8 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
         return options.includes(value)
     }
 
+    const potMod = potModificar(entity)
+
     const actions = [
         {
             title: t('common.detail'),
@@ -87,7 +89,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: !potModificar(entity),
+            hidden: !potMod,
         },
         {
             title: t('page.tasca.acciones.tramitar'),
@@ -97,7 +99,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
                 window.location.href = (`${import.meta.env.VITE_BASE_URL}contingut/${row?.expedient?.id}?tascaId=${id}`)
             },
             disabled: disableResponsable,
-            hidden: (row:any)=> !potModificar(entity) || hideByEstat(row),
+            hidden: (row:any)=> !potMod || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.iniciar'),
@@ -105,7 +107,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'INICIADA'),
             disabled: disableResponsable,
-            hidden: (row: any) => !potModificar(entity) || row?.estat != 'PENDENT',
+            hidden: (row: any) => !potMod || row?.estat != 'PENDENT',
         },
         {
             title: t('page.tasca.acciones.rebutjar'),
@@ -113,7 +115,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: handleRebutjar,
             disabled: disableResponsable,
-            hidden: (row: any) => !potModificar(entity) || row?.estat != 'PENDENT',
+            hidden: (row: any) => !potMod || row?.estat != 'PENDENT',
         },
         {
             title: t('page.tasca.acciones.cancel'),
@@ -129,61 +131,61 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'FINALITZADA'),
             disabled: disableResponsable,
-            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
+            hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
+            hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.reassignar'),
             icon: "person",
             showInMenu: true,
             onClick: handleReassignar,
-            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
+            hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.delegar'),
             icon: "turn_right",
             showInMenu: true,
             onClick: handleDelegar,
-            hidden: (row: any) => !potModificar(entity) || row?.delegat != null || hideByEstat(row),
+            hidden: (row: any) => !potMod || row?.delegat != null || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.retomar'),
             icon: "close",
             showInMenu: true,
             onClick: handleRetomar,
-            hidden: (row: any) => !potModificar(entity) || row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any) => !potMod || row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => !potModificar(entity) || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any) => !potMod || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.upDataLimit'),
             icon: "info",
             showInMenu: true,
             onClick: handleCambiarDataLimit,
-            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
+            hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.upPrioritat'),
             icon: "schedule",
             showInMenu: true,
             onClick: handleCambiarPrioritat,
-            hidden: (row: any) => !potModificar(entity) || hideByEstat(row),
+            hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
             title: t('page.tasca.acciones.reobrir'),
             icon: "undo",
             showInMenu: true,
             onClick: handleReobrir,
-            hidden: (row: any) => !potModificar(entity) || row?.estat != 'FINALITZADA',
+            hidden: (row: any) => !potMod || row?.estat != 'FINALITZADA',
         },
     ];
 

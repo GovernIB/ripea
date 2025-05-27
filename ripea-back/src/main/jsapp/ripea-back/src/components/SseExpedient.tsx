@@ -2,16 +2,36 @@ import React, {useEffect, useRef} from 'react';
 import {useSession} from './SessionStorageContext';
 
 // Keys for session storage
+const sseExpedientKey = 'sseExpedient';
 const fluxCreateKey = 'flux_create';
 const firmaFinalitzadaKey = 'firma_finalitzada';
+const sseConnectedKey = 'exp_connect';
 
-export const useFluxCreateSessio = () => {
-    const {value} = useSession(fluxCreateKey);
-    return {value};
+const useSseExpedientSession = () => {
+    const { value: container, save, remove } = useSession(sseExpedientKey);
+    const containerRef = useRef(container ?? []);
+
+    return {
+        container,
+        get: (key:string)=> container?.[key],
+        save: (key:string, newValue:any) => {
+            containerRef.current = {
+                ...containerRef.current,
+                [key]: newValue
+            };
+            save(containerRef.current)
+        },
+        remove
+    }
 }
-export const useFirmaFinalitzadaSessio = () => {
-    const {value} = useSession(firmaFinalitzadaKey);
-    return {value};
+
+export const useFluxCreateSession = () => {
+    const { get } = useSseExpedientSession();
+    return { value: get(fluxCreateKey) };
+}
+export const useFirmaFinalitzadaSession = () => {
+    const { get } = useSseExpedientSession();
+    return { value: get(firmaFinalitzadaKey) };
 }
 
 /**
@@ -21,6 +41,19 @@ export const useFirmaFinalitzadaSessio = () => {
 export const SseExpedient: React.FC<any> = (props:any) => {
     const {id} = props
     const eventSourceRef = useRef<EventSource | null>(null);
+    const { save: saveSession, remove } = useSseExpedientSession();
+
+    const addEventListener = (eventSource: EventSource, key: string) => {
+        eventSource.addEventListener(key, (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                // console.log(`SSE '${key}' rebuts:`, data);
+                saveSession(key, data)
+            } catch (error) {
+                console.error(`Error processant SSE: ${key}`, error);
+            }
+        });
+    }
 
     useEffect(() => {
         // Funció per a connectar amb el servidor SSE
@@ -38,19 +71,21 @@ export const SseExpedient: React.FC<any> = (props:any) => {
             eventSourceRef.current = eventSource;
 
             // Gestionar l'esdeveniment de connexió
-            eventSource.addEventListener('connect', (event) => {
-                console.log('SSE connectat:', event.data);
-                // saveConnected(true);
+            eventSource.addEventListener(sseConnectedKey, () => {
+                // console.log('SSE connectat:', event.data);
+                saveSession(sseConnectedKey, true)
             });
 
-            // EventListener
+            // Gestionar l'esdeveniment de flux creat
             addEventListener(eventSource, fluxCreateKey)
+
+            // Gestionar l'esdeveniment de firma finalitzada
             addEventListener(eventSource, firmaFinalitzadaKey)
 
             // Gestionar errors
             eventSource.onerror = (error) => {
                 console.error('Error de connexió SSE:', error);
-                // saveConnected(false);
+                saveSession(sseConnectedKey, false);
 
                 // Tancar la connexió actual
                 eventSource.close();
@@ -66,31 +101,19 @@ export const SseExpedient: React.FC<any> = (props:any) => {
 
         // Netejar en desmuntar el component
         return () => {
-            console.log('Netejam o desmontam el component');
+            // console.log('Netejam o desmontam el component');
             if (eventSourceRef.current) {
-                console.log('Desconnectam SSE');
+                // console.log('Desconnectam SSE');
                 eventSourceRef.current.close();
                 eventSourceRef.current = null;
             }
-            // saveConnected(false);
+            remove()
+            saveSession(sseConnectedKey, false);
         };
     }, []);
 
     // Aquest component no renderitza res visible
     return null;
 };
-
-const addEventListener = (eventSource: EventSource, key: any) => {
-    eventSource.addEventListener(key, (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            console.log(`SSE '${key}' rebuts:`, data);
-            // const { save } = useSession(key);
-            // save(data)
-        } catch (error) {
-            console.error(`Error processant SSE: ${key}`, error);
-        }
-    });
-}
 
 export default SseExpedient;

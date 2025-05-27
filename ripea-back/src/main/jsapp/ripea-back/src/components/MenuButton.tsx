@@ -88,7 +88,7 @@ export const MenuActionButton = (props:MenuActionButtonProps) => {
     } = props;
 
     return <MenuButton {...other}>
-        {actions.map((action:any) =>
+        {actions.map((action:any, index:number) =>
                 // action?.showInMenu
                 !(typeof action.hidden === 'function' ? action.hidden(entity) : action.hidden)
                 && (!action?.linkTo && !action?.clickShowUpdateDialog)
@@ -96,7 +96,7 @@ export const MenuActionButton = (props:MenuActionButtonProps) => {
                     entity?.id
                         ? action?.onClick?.(entity?.id, entity)
                         : action?.onClick?.(entity)
-                } key={action.title} disabled={action?.disabled==true || action?.disabled?.(entity)}>
+                } key={`action-${index}`} disabled={action?.disabled==true || action?.disabled?.(entity)}>
                     {action.icon && <Icon>{action.icon}</Icon>}{action.title}
                 </MenuItem>
         )}

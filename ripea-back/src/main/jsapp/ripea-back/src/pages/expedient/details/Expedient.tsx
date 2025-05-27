@@ -4,7 +4,7 @@ import {
     GridPage,
     useResourceApiService,
 } from 'reactlib';
-import React, {useState, useEffect} from "react";
+import {useState, useEffect} from "react";
 import {Typography, Grid, Icon, IconButton, Link, Alert, Button} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -238,7 +238,7 @@ const Expedient = () => {
     ]
 
     return <GridPage>
-        {/*<SseExpedient id={id}/>*/}
+        <SseExpedient id={id}/>
 
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>

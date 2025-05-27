@@ -4,7 +4,7 @@ import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import {useFirmaFinalitzadaSessio} from "../../../components/SseExpedient.tsx";
+import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
 
 const FirmaNevegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -29,7 +29,7 @@ const FirmaNevegador = (props: any) => {
 export const useFirmaNevegador = () => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const {value: firma} = useFirmaFinalitzadaSessio();
+    const {value: firma} = useFirmaFinalitzadaSession();
 
     useEffect(() => {
         if (firma) {

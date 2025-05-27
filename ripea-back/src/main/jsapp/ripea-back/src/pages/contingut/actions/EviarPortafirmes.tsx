@@ -5,12 +5,12 @@ import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
-import {useFluxCreateSessio} from "../../../components/SseExpedient.tsx";
+import {useFluxCreateSession} from "../../../components/SseExpedient.tsx";
 
 const EviarPortafirmesForm = () => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
-    const {value: flux} = useFluxCreateSessio()
+    const {value: flux} = useFluxCreateSession()
 
     const [open, setOpen] = useState<boolean>(true);
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);

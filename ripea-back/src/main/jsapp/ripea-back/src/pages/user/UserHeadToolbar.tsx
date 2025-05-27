@@ -8,7 +8,7 @@ import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import Load from "../../components/Load.tsx";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
-import {useNotificacionsSessio, useTasquesSessio} from "../../components/SseClient.tsx";
+import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
 
 const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
@@ -285,7 +285,7 @@ const MenuSupAdmin = () => {
 }
 const MenuAdmin = (props:any) => {
     const {sessionScope} = props;
-    const { value: numNotif } = useNotificacionsSessio()
+    const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -342,7 +342,7 @@ const MenuAdmin = (props:any) => {
 }
 const MenuAdminOrgan = (props:any) => {
     const {sessionScope} = props;
-    const { value: numNotif } = useNotificacionsSessio()
+    const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -378,8 +378,8 @@ const MenuDissenyOrgan = () => {
 }
 const MenuUsuari = (props:any) => {
     const {sessionScope} = props;
-    const { value: numNotif } = useNotificacionsSessio()
-    const { value: numTasc } = useTasquesSessio()
+    const { value: numNotif } = useNotificacionsSession()
+    const { value: numTasc } = useTasquesSession()
     const { t } = useTranslation();
     const navigate = useNavigate();
 

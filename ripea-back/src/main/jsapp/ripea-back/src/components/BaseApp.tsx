@@ -24,7 +24,7 @@ import feder7 from '../assets/feder7.png';
 import una_manera from '../assets/una_manera.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import {Alert} from "@mui/material";
-import {useAlertesSessio} from "./SseClient.tsx";
+import {useAlertesSession} from "./SseClient.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -142,7 +142,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
-    const { value } = useAlertesSessio();
+    const { value } = useAlertesSession();
     return <MuiBaseApp
         code={code}
         headerTitle={title}
