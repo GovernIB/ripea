@@ -51,10 +51,13 @@ public class DigitalitzacioPluginMock extends RipeaAbstractPluginProperties impl
 	@Override
 	public DigitalitzacioTransaccioResposta iniciarProces(String codiPerfil, String idioma, UsuariDto funcionari, String returnUrl) throws SistemaExternException {
 		DigitalitzacioTransaccioResposta resposta = new DigitalitzacioTransaccioResposta();
-		resposta.setIdTransaccio(String.valueOf(System.currentTimeMillis()));
+		String idTransaccio = String.valueOf(System.currentTimeMillis());
+		resposta.setIdTransaccio(idTransaccio);
 		resposta.setReturnScannedFile(true);
 		resposta.setReturnSignedFile(false);
-		resposta.setUrlRedireccio("http://localhost:8080/ripeaback/modal/digitalitzacio/mock");
+		String[] partes = returnUrl.split("/");
+		String ultimaParte = partes[partes.length - 1];
+		resposta.setUrlRedireccio("http://localhost:8080/ripeaback/modal/digitalitzacio/mock?idExpedient="+ultimaParte+"&idTransaccio="+idTransaccio);
 		return resposta;
 	}
 

@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.helper.ExceptionHelper;
@@ -104,8 +105,12 @@ public class DigitalitzacioController extends BaseUserController {
 	
 	@RequestMapping(value = "/mock", method = RequestMethod.GET)
 	public String mock(
-			HttpServletRequest request) {
-
+			HttpServletRequest request,
+			@RequestParam(value = "idExpedient", required = false) Long idExpedient,
+			@RequestParam(value = "idTransaccio", required = false) Long idTransaccio,
+			Model model) {
+		model.addAttribute("idExpedient", idExpedient);
+		model.addAttribute("idTransaccio", idTransaccio);
 		return "mockDigitalitzacio";
 	}
 	
