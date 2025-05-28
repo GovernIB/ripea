@@ -69,7 +69,6 @@ export const useActions = () => {
 export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession()
-    const { value: entitat } = useEntitatSession()
 
     const {apiDownload, getLinkCSV} = useActions()
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
@@ -93,6 +92,9 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 
     const isFirmaActiva = (row:any) => {
         return isInOptions(row?.estat, 'REDACCIO', 'FIRMA_PARCIAL') && isDigitalOrImportat(row) && !isInOptions(row?.fitxerExtension, 'zip')
+    }
+    const isPermesModificarCustodiatsVar = (row:any) => {
+        return user?.sessionScope?.isPermesModificarCustodiats && isInOptions(row?.estat, 'CUSTODIAT', 'FIRMAT', 'FIRMA_PARCIAL', 'DEFINITIU')
     }
 
     const isInOptions = (value:string, ...options:string[]) => {
@@ -140,7 +142,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             clickShowUpdateDialog: true,
             disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
-            hidden: (row:any) => !potMod || !isDocument(row) || !(isInOptions(row?.estat, 'CUSTODIAT') && user?.sessionScope?.isPermesModificarCustodiats) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
+            hidden: (row:any) => !potMod || !isDocument(row) || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
             title: t('page.document.acciones.move'),
