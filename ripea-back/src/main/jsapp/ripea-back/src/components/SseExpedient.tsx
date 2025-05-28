@@ -3,19 +3,33 @@ import {useSessionList} from './SessionStorageContext';
 
 // Keys for session storage
 const sseExpedientKey = 'sseExpedient';
-const fluxCreateKey = 'flux_create';
+const fluxCreateKey = 'flux_creat';
 const firmaFinalitzadaKey = 'firma_finalitzada';
+const scanFinalitzatKey = 'scan_finalitzat';
 const sseConnectedKey = 'exp_connect';
 
 const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
 export const useFluxCreateSession = () => {
-    const { get } = useSseExpedientSession();
-    return { value: get(fluxCreateKey) };
+    const { get, remove } = useSseExpedientSession();
+	return {
+	    value: get(fluxCreateKey),
+	    remove: () => remove(fluxCreateKey),
+	};
 }
 export const useFirmaFinalitzadaSession = () => {
-    const { get } = useSseExpedientSession();
-    return { value: get(firmaFinalitzadaKey) };
+    const { get, remove } = useSseExpedientSession();
+    return {
+        value: get(firmaFinalitzadaKey),
+        remove: () => remove(firmaFinalitzadaKey),
+    };
+}
+export const useScanFinalitzatSession = () => {
+    const { get, remove } = useSseExpedientSession();
+    return {
+        value: get(scanFinalitzatKey),
+        remove: () => remove(scanFinalitzatKey),
+    };
 }
 
 /**
@@ -66,6 +80,9 @@ export const SseExpedient: React.FC<any> = (props:any) => {
             // Gestionar l'esdeveniment de firma finalitzada
             addEventListener(eventSource, firmaFinalitzadaKey)
 
+			// Gestionar l'esdeveniment de firma finalitzada
+			addEventListener(eventSource, scanFinalitzatKey)
+			
             // Gestionar errors
             eventSource.onerror = (error) => {
                 console.error('Error de connexió SSE:', error);

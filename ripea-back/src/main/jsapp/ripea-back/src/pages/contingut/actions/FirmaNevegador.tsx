@@ -27,10 +27,10 @@ const FirmaNevegador = (props: any) => {
     </FormActionDialog>
 }
 
-export const useFirmaNevegador = () => {
+export const useFirmaNevegador = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const {value: firma} = useFirmaFinalitzadaSession();
+    const {value: firma, remove: removeFirma} = useFirmaFinalitzadaSession();
 
     useEffect(() => {
         if (firma) {
@@ -40,6 +40,9 @@ export const useFirmaNevegador = () => {
                         : firma?.status == 'ERROR' ? 'error'
                             : 'info'
 
+            apiRef?.current?.close();
+            refresh?.()
+            removeFirma();
             temporalMessageShow(null, firma?.msg, severiry);
         }
     }, [firma]);
