@@ -10,10 +10,10 @@
 </head>	
 <body>
 Aquesta es una finestra ficticia que nomes hauria de aparéixer en entorns de desenvolupament.
-<c:if test="${idExpedient==null}">
+<c:if test="${idExpedient=='recuperarResultat'}">
 	<a href="<c:url value="/digitalitzacio/recuperarResultatMock/12345"/>" class="btn btn-default">Recuperar resultat del escaneig</a>
 </c:if>
-<c:if test="${idExpedient!=null}">
+<c:if test="${idExpedient!='recuperarResultat'}">
 	<a href="<c:url value="/modal/digitalitzacio/event/resultatScan/${idExpedient}/${idTransaccio}"/>" class="btn btn-default">Recuperar resultat del escaneig</a>
 </c:if>
 </body>

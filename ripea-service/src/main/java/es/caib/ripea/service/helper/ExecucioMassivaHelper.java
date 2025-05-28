@@ -31,6 +31,7 @@ import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
@@ -385,12 +386,29 @@ public class ExecucioMassivaHelper {
 				SecurityContextHolder.getContext().setAuthentication(orgAuthentication);
 				
 				if (exc == null) {
-					alertaHelper.crearAlerta(
-							messageHelper.getMessage(
-									"alertes.segon.pla.execucio.massiva",
-									new Object[] {execucioMassivaContingutId}),
-							null,
-							emc.getElementId());
+					Long contingutId = emc.getElementId();
+					if (ElementTipusEnumDto.INTERESSAT.equals(emc.getElementTipus())) {
+						InteressatEntity ie = interessatRepository.findById(emc.getElementId()).orElseGet(null);
+						if (ie!=null && ie.getExpedient()!=null) {
+							contingutId = ie.getExpedient().getId();
+						}
+					} else if (ElementTipusEnumDto.ANOTACIO.equals(emc.getElementTipus())) {
+						contingutId = null; //TODO com treurer el contingut a partir de una anotació
+					} else if (ElementTipusEnumDto.ANNEX.equals(emc.getElementTipus())) {
+						RegistreAnnexEntity ra = registreAnnexRepository.findById(emc.getElementId()).orElseGet(null);
+						if (ra!=null && ra.getDocument()!=null) {
+							contingutId = ra.getDocument().getId();
+						}
+					}
+
+					if (contingutId!=null) {
+						alertaHelper.crearAlerta(
+								messageHelper.getMessage(
+										"alertes.segon.pla.execucio.massiva",
+										new Object[] {execucioMassivaContingutId}),
+								null,
+								contingutId);
+					}
 				}
 				
 			} catch (Throwable e) {

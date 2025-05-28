@@ -107,8 +107,8 @@ public class DigitalitzacioController extends BaseUserController {
 	@RequestMapping(value = "/mock", method = RequestMethod.GET)
 	public String mock(
 			HttpServletRequest request,
-			@RequestParam(value = "idExpedient", required = false) Long idExpedient,
-			@RequestParam(value = "idTransaccio", required = false) Long idTransaccio,
+			@RequestParam(value = "idExpedient", required = false) String idExpedient,
+			@RequestParam(value = "idTransaccio", required = false) String idTransaccio,
 			Model model) {
 		model.addAttribute("idExpedient", idExpedient);
 		model.addAttribute("idTransaccio", idTransaccio);
