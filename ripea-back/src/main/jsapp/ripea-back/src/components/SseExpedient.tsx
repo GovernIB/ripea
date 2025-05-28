@@ -10,7 +10,7 @@ const sseConnectedKey = 'exp_connect';
 
 const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
-const tempSession = (key:string) => {
+const useTempSession = (key:string) => {
     const { get, remove } = useSseExpedientSession();
     const value = get(key)
 
@@ -26,9 +26,9 @@ const tempSession = (key:string) => {
     };
 }
 
-export const useFluxCreateSession = () => tempSession(fluxCreateKey);
-export const useFirmaFinalitzadaSession = () => tempSession(firmaFinalitzadaKey);
-export const useScanFinalitzatSession = () => tempSession(scanFinalitzatKey);
+export const useFluxCreateSession = () => useTempSession(fluxCreateKey);
+export const useFirmaFinalitzadaSession = () => useTempSession(firmaFinalitzadaKey);
+export const useScanFinalitzatSession = () => useTempSession(scanFinalitzatKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor

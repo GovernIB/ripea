@@ -25,6 +25,12 @@ const ScanerTabForm = () => {
         if (value) {
             console.log("scan", value)
             apiRef?.current?.setFieldValue("scaned", true)
+            apiRef?.current?.setFieldValue("adjunt", {
+                name: value?.nomDocument,
+                content: value?.contingut,
+                contentType: value?.mimeType,
+                // contentLength: ,
+            })
         }
     }, [value]);
 
