@@ -93,7 +93,9 @@ import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFo
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
+import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
 import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -157,9 +159,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
-        //Flux de firma, firma en navegador i document PINBAL (formularis modals)
+        //Flux de firma, firma en navegador, document PINBAL, viaFirma (formularis modals)
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
         register(DocumentResource.ACTION_NEW_DOC_PINBAL, new NouDocumentPinbalActionExecutor());
+        register(DocumentResource.ACTION_VIA_FIRMA, new ViaFirmaActionExecutor());
         register(DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE, new DescarregarVersionReportGenerator());
         //Dades externes
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
@@ -760,11 +763,34 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		}
     }
     
+    private class ViaFirmaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ViaFirmaForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ViaFirmaForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ViaFirmaForm target) {
+			if (fieldName==null) {
+				DocumentResourceEntity docRes = documentResourceRepository.findById(((Integer)id).longValue()).get();
+				target.setTitol(docRes.getNom());
+				target.setDescripcio("Firm de document "+docRes.getNom()+"["+docRes.getMetaDocument().getNom()+"]");
+				target.setDispositiusEnabled(configHelper.getAsBoolean(PropertyConfig.VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED));
+			} else if ("interessat".equals(fieldName)) {
+				InteressatResourceEntity intRes = interessatResourceRepository.findById((Long)fieldValue).get();
+				target.setSignantNom(intRes.getNomComplet());
+				target.setSignantNif(intRes.getDocumentNum());
+			}
+		}
+
+		@Override
+		public Serializable exec(String code, DocumentResourceEntity entity, ViaFirmaForm params) throws ActionExecutionException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+    }
+    
     private class NouDocumentPinbalActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NewDocPinbalForm, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, NewDocPinbalForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NewDocPinbalForm target) {
-			if (fieldName=="tipusDocument") {
+			if ("tipusDocument".equals(fieldName)) {
 				String codiServeiPinbal = metaDocumentResourceRepository.findById((Long)fieldValue).get().getPinbalServei().getCodi();
 				target.setCodiServeiPinbal(codiServeiPinbal);
 			}

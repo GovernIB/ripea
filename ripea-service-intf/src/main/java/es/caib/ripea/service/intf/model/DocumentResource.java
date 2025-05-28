@@ -86,6 +86,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_VIA_FIRMA,
+                        formClass = DocumentResource.ViaFirmaForm.class,
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_NEW_DOC_PINBAL,
                         formClass = DocumentResource.NewDocPinbalForm.class),            
                 @ResourceConfigArtifact(
@@ -145,6 +150,7 @@ public class DocumentResource extends NodeResource {
   //Flux de firma i firma en navegador
     public static final String ACTION_FIRMA_WEB_INI = "FIRMA_WEB_INI";
     public static final String ACTION_NEW_DOC_PINBAL = "NEW_DOC_PINBAL";
+    public static final String ACTION_VIA_FIRMA = "VIA_FIRMA";
 	//Accions massives desde la pipella de contingut
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
@@ -314,6 +320,36 @@ public class DocumentResource extends NodeResource {
     public static class IniciarFirmaSimple implements Serializable {
     	@NotNull
     	private String motiu;
+    }
+    
+    @Getter
+    @Setter
+    public static class ViaFirmaForm implements Serializable {
+    	@Size(max=256)
+    	private String titol;
+    	@Size(max=256)
+    	private String descripcio;
+    	
+//        @Transient
+//        @ResourceField(enumType = true, onChangeActive = true)
+//    	private String portafirmesEnviarFluxId;
+    	
+    	@NotEmpty
+    	private String codiUsuariViaFirma;
+    	private String codisUsuariViaFirma;
+    	private String dispositiuViaFirma;
+    	private ResourceReference<InteressatResource, Long> interessat;
+    	@NotEmpty
+    	private String signantNif;
+    	@NotEmpty
+    	private String signantNom;
+    	@Size(max=256)
+    	private String observacions;
+    	private Boolean firmaParcial;
+    	private Boolean validateCodeEnabled;
+    	private String validateCode;
+    	private Boolean rebreCorreu;
+    	private boolean isDispositiusEnabled = false;
     }
     
     @Getter
