@@ -37,7 +37,8 @@ const FormActionDialog = (props:FormActionDialogProp) => {
 
     const {
         formDialogComponent,
-        exec: actionExecutor
+        exec: actionExecutor,
+        close,
     } = useMuiActionReportLogic(
         resourceName,
         action,
@@ -59,7 +60,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
     }
 
     if (apiRef != null) {
-        apiRef.current = { show: exec };
+        apiRef.current = { show: exec, close };
     }
 
     return formDialogComponent;
@@ -81,7 +82,8 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
 
     const {
         formDialogComponent,
-        exec: reportExecutor
+        exec: reportExecutor,
+        close,
     } = useMuiActionReportLogic(
         resourceName,
         undefined,
@@ -103,7 +105,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
     }
 
     if (apiRef != null) {
-        apiRef.current = { show: exec };
+        apiRef.current = { show: exec, close };
     }
 
     return formDialogComponent;

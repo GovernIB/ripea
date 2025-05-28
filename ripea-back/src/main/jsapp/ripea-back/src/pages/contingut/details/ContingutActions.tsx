@@ -140,7 +140,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             clickShowUpdateDialog: true,
             disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
-            hidden: (row:any) => !potMod || !isDocument(row) || !(isInOptions(row?.estat, 'CUSTODIAT') && entitat?.isPermesModificarCustodiats) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
+            hidden: (row:any) => !potMod || !isDocument(row) || !(isInOptions(row?.estat, 'CUSTODIAT') && user?.sessionScope?.isPermesModificarCustodiats) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
             title: t('page.document.acciones.move'),
