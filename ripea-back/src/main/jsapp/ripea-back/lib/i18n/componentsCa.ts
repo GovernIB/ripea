@@ -102,9 +102,6 @@ const componentsCa = {
         validate: {
             error: 'Error de validació',
         },
-        submission: {
-            defaulterror: 'Error'
-        },
     },
     actionreport: {
         action: {
