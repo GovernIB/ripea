@@ -138,7 +138,7 @@ export const useActionReportLogic = (
         }
     });
     const dialogDisabled = formDialogContent == null;
-    const [formDialogShow, formDialogComponent] = useFormDialog(
+    const [formDialogShow, formDialogComponent, formDialogClose] = useFormDialog(
         resourceName,
         action ? 'ACTION' : (report ? 'REPORT' : undefined),
         action ? action : (report ? report : undefined),
@@ -209,8 +209,9 @@ export const useActionReportLogic = (
         initialized,
         apiLink,
         formDialogComponent,
-        exec
-    }
+        exec,
+        close: formDialogClose,
+    };
 }
 
 export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => {

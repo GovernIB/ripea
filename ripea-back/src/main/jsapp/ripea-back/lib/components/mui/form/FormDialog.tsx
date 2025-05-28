@@ -29,6 +29,7 @@ export type FormDialogShowArgs = {
     formComponentProps?: any;
 };
 export type FormDialogShowFn = (id: any, args?: FormDialogShowArgs) => Promise<any>;
+export type FormDialogCloseFn = () => void;
 export type UseFormDialogFn = (
     resourceName: string,
     resourceType?: ResourceType,
@@ -39,7 +40,7 @@ export type UseFormDialogFn = (
     defaultFormContent?: React.ReactNode,
     defaultDialogComponentProps?: any,
     defaultFormComponentProps?: any,
-    closeFn?: (reason?: string) => boolean) => [FormDialogShowFn, React.ReactElement];
+    closeFn?: (reason?: string) => boolean) => [FormDialogShowFn, React.ReactElement, FormDialogCloseFn];
 
 export const useFormDialog: UseFormDialogFn = (
     resourceName: string,
@@ -120,6 +121,7 @@ export const useFormDialog: UseFormDialogFn = (
             setOpen(false);
         }
     }
+    const close = () => setOpen(false);
     const dialogComponent = <FormDialog
         resourceName={resourceName}
         resourceType={resourceType}
@@ -138,7 +140,7 @@ export const useFormDialog: UseFormDialogFn = (
         noForm={submitReturnedContent != null}>
         {submitReturnedContent ?? formContent}
     </FormDialog>;
-    return [show, dialogComponent];
+    return [show, dialogComponent, close];
 }
 
 export const FormDialog: React.FC<FormDialogProps> = (props) => {

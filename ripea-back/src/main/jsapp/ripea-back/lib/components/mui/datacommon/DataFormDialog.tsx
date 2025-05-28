@@ -4,6 +4,7 @@ import { useFormDialog, FormDialogSubmitFn } from '../form/FormDialog';
 
 export type DataFormDialogApi = {
     show: (id?: any, additionalData?: any) => Promise<string>;
+    close: () => void;
 };
 
 export type DataFormDialogProps = React.PropsWithChildren & {
@@ -32,7 +33,7 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         children
     } = props;
     const { t } = useBaseAppContext();
-    const [formDialogShow, formDialogComponent] = useFormDialog(
+    const [formDialogShow, formDialogComponent, formDialogClose] = useFormDialog(
         resourceName,
         undefined,
         undefined,
@@ -47,8 +48,9 @@ export const DataFormDialog: React.FC<DataFormDialogProps> = (props) => {
         title: titleProp ?? ((id != null ? t('datacommon.update.title') : t('datacommon.create.title')) + ' ' + (resourceTitle ?? resourceName)),
         additionalData,
     });
+    const close = () => formDialogClose();
     if (apiRef != null) {
-        apiRef.current = { show };
+        apiRef.current = { show, close };
     }
     return <>
         {formDialogComponent}
