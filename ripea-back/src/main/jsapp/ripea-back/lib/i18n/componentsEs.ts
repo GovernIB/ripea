@@ -102,9 +102,6 @@ const componentsEs = {
         validate: {
             error: 'Error de validación',
         },
-        submission: {
-            defaulterror: 'Error'
-        },
     },
     actionreport: {
         action: {

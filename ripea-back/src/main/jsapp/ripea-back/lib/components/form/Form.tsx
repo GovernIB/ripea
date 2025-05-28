@@ -143,6 +143,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const location = useLocation();
     const additionalData = additionalDataProp ?? location.state?.additionalData;
     const calculatedId = (id?: any) => idFromExternalResetRef.current ?? id;
+    const isReady = !isLoading;
     const sendOnChangeRequest = React.useCallback((id: any, args: ResourceApiOnChangeArgs): Promise<any> => {
         if (resourceType == null) {
             return apiOnChange(id, args);
@@ -235,7 +236,7 @@ export const Form: React.FC<FormProps> = (props) => {
                 temporalMessageShow(
                     temporalMessageTitle ?? '',
                     error.message,
-                    t('form.submission.defaulterror'));
+                    'error');
                 reject?.(error);
             }
         }
@@ -419,9 +420,11 @@ export const Form: React.FC<FormProps> = (props) => {
     }, [id, fields]);
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
-        !isLoading && setModified(true);
-        onDataChange?.(data);
-    }, [data]);
+        if (isReady) {
+            setModified(true);
+            onDataChange?.(data);
+        }
+    }, [isReady, data]);
     apiRef.current = {
         getId,
         getData,
@@ -456,7 +459,7 @@ export const Form: React.FC<FormProps> = (props) => {
         resourceType,
         resourceTypeCode,
         isLoading,
-        isReady: !isLoading,
+        isReady,
         apiActions,
         isSaveActionPresent,
         isDeleteActionPresent,
@@ -472,7 +475,7 @@ export const Form: React.FC<FormProps> = (props) => {
         commonFieldComponentProps,
     }), [isLoading, apiActions, fields, fieldErrors, data, dataDispatchAction, commonFieldComponentProps]);
     return <ResourceApiFormContext.Provider value={context}>
-        {!isLoading ? children : null}
+        {isReady ? children : null}
     </ResourceApiFormContext.Provider>;
 }
 
