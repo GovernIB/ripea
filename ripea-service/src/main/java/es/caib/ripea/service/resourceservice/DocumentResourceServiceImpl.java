@@ -22,7 +22,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +40,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceR
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
@@ -51,6 +51,7 @@ import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -79,6 +80,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
@@ -110,6 +112,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
+    private final PinbalHelper pinbalHelper;
     private final EmailHelper emailHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
@@ -127,6 +130,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final InteressatResourceRepository interessatResourceRepository;
     private final ContingutRepository contingutRepository;
     private final DocumentRepository documentRepository;
+    private final EntitatRepository entitatRepository;
 
     @PostConstruct
     public void init() {
@@ -768,10 +772,24 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, NewDocPinbalForm params) throws ActionExecutionException {
-			// TODO Generar documento pinbal i añadirlo al expediente
+			//La entitat ja es comprova a pinbalHelper
+			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+			
+			PinbalConsultaDto consulta = new PinbalConsultaDto();
+			consulta.setInteressatId(params.getTitular().getId());
+			consulta.setFinalitat(params.getFinalitat());
+			consulta.setConsentiment(params.getConsentiment());
+			
+			//TODO: afegir la resta de parametres opcionals que depenen del servei
+			
+			pinbalHelper.pinbalNovaConsulta(
+					entitatEntity.getId(),
+					entity.getExpedient().getId(), //TODO: El pare pot ser una carpeta
+					entity.getMetaDocument().getId(),
+					consulta, 
+					configHelper.getRolActual());
 			return null;
 		}
-    	
     }
     
     private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, Serializable> {

@@ -35,10 +35,12 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEnti
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -57,6 +59,7 @@ import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -76,6 +79,7 @@ import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
+import es.caib.ripea.service.intf.model.ExpedientResource.NovaCarpetaForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
@@ -99,6 +103,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
 
+	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
 	private final OrganGestorRepository organGestorRepository;
 	
@@ -118,6 +123,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final MetaDocumentHelper metaDocumentHelper;
+    private final CarpetaHelper carpetaHelper;
 
     @PostConstruct
     public void init() {
@@ -151,6 +157,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
+        register(ExpedientResource.ACTION_NEW_CARPETA, new NovaCarpetaActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -326,7 +333,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
 		List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getMetaExpedient().getId());
 		resource.setAmbDocumentsPinbal(metaDocuments!=null && metaDocuments.size()>0);
-    }
+		resource.setCreacioCarpetesActiva(configHelper.getAsBoolean(PropertyConfig.CARPETES_CREACIO_ACTIVA));
+	}
 
     @Override
     public ExpedientResource create(ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
@@ -662,14 +670,49 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public void onChange(Serializable id, ExpedientResource.MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientResource.MassiveAction target) {}
     }
 
+    private class NovaCarpetaActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.NovaCarpetaForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, NovaCarpetaForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NovaCarpetaForm target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, NovaCarpetaForm params) throws ActionExecutionException {
+			try {
+				//La entitat ja es comprova a pinbalHelper
+				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+				carpetaHelper.create(
+						entitatEntity.getId(),
+						entity.getId(),
+						params.getNomCarpeta(),
+						false,
+						null,
+						false,
+						null, 
+						false, 
+						null, 
+						true);
+				return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/NovaCarpetaActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al crear la carpeta: "+e.getMessage(), e);
+			}
+		}
+    	
+    }
+    
     private class TancarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.TancarExpedientFormAction, Serializable> {
 		@Override
 		public void onChange(Serializable id, TancarExpedientFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, TancarExpedientFormAction target) {
 		}
 		@Override
 		public Serializable exec(String code, ExpedientResourceEntity entity, TancarExpedientFormAction params) throws ActionExecutionException {
-			expedientHelper.tancar(entity.getEntitat().getId(), entity.getId(), params.getMotiu(), params.getDocumentsPerFirmar().toArray(new Long[0]), false);
-			return null;
+			try {
+				expedientHelper.tancar(entity.getEntitat().getId(), entity.getId(), params.getMotiu(), params.getDocumentsPerFirmar().toArray(new Long[0]), false);
+				return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al tancar l'expedient: "+e.getMessage(), e);
+			}				
 		}
     }
 

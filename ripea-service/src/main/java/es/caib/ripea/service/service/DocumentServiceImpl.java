@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
-import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
@@ -32,22 +31,16 @@ import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
-import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
-import es.caib.ripea.persistence.entity.InteressatEntity;
-import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
-import es.caib.ripea.persistence.repository.ConsultaPinbalRepository;
 import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
-import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
@@ -76,13 +69,11 @@ import es.caib.ripea.service.helper.ViaFirmaHelper;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
-import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ContingutDto;
 import es.caib.ripea.service.intf.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
@@ -92,7 +83,6 @@ import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
@@ -125,11 +115,9 @@ import es.caib.ripea.service.intf.utils.Utils;
 public class DocumentServiceImpl implements DocumentService {
 
 	@Autowired private DocumentRepository documentRepository;
-	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;
 	@Autowired private DocumentViaFirmaRepository documentViaFirmaRepository;
 	@Autowired private DispositiuEnviamentRepository dispositiuEnviamentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentHelper documentHelper;
@@ -151,7 +139,6 @@ public class DocumentServiceImpl implements DocumentService {
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired private UsuariHelper usuariHelper;
-	@Autowired private EntitatRepository entitatRepository;
     @Autowired private EmailHelper emailHelper;
     @Autowired private ContingutLogHelper contingutLogHelper;
 
@@ -733,244 +720,7 @@ public class DocumentServiceImpl implements DocumentService {
 			Long metaDocumentId,
 			PinbalConsultaDto consulta, 
 			String rolActual) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
-		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				pareId,
-				false,
-				false,
-				false,
-				false, 
-				false, 
-				true, 
-				rolActual);
-		ExpedientEntity expedient = pare.getExpedientPare();
-		MetaDocumentEntity metaDocument = null;
-		if (metaDocumentId != null) {
-			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					pare.getEntitat(),
-					expedient.getMetaExpedient(),
-					metaDocumentId,
-					true,
-					true);
-		} else {
-			throw new ValidationException(
-					"<creacio>",
-					DocumentEntity.class,
-					"No es pot fer una petició PINBAL sense un meta-document associat");
-		}
-		if (!metaDocument.isPinbalActiu() || !metaDocument.getPinbalServei().isActiu()) {
-			throw new ValidationException(
-					"<creacio>",
-					DocumentEntity.class,
-					"No es pot fer una petició PINBAL sense un meta-document amb la integració PINBAL activa o el servei PINBAL actiu");
-		}
-		InteressatEntity interessat = interessatRepository.findByExpedientAndId(expedient, consulta.getInteressatId());
-		if (interessat == null) {
-			throw new NotFoundException(consulta.getInteressatId(), InteressatEntity.class);
-		} else if (interessat instanceof InteressatAdministracioEntity) {
-			throw new ValidationException(
-					"<creacio>",
-					DocumentEntity.class,
-					"S'ha especificat un interessat que no és una persona física o juridica");
-		}
-
-		ConsultaPinbalEntity.ConsultaPinbalEntityBuilder consultaPinbalBuilder = ConsultaPinbalEntity.builder();
-		try {
-			String idPeticion = null;
-			if ("SVDDGPCIWS02".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvddgpciws02(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment());
-			} else if ("SVDDGPVIWS02".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvddgpviws02(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment());
-			} else if ("SVDCCAACPASWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdccaacpasws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment(),
-						consulta.getComunitatAutonomaCodi(),
-						consulta.getProvinciaCodi());
-			} else if ("SVDSCDDWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdscddws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment(),
-						consulta.getComunitatAutonomaCodi(),
-						consulta.getProvinciaCodi(),
-						consulta.getDataConsulta(),
-						consulta.getDataNaixement(),
-						consulta.getConsentimentTipusDiscapacitat());
-			} else if ("SCDCPAJU".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioScdcpaju(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment(),
-						consulta.getProvinciaCodi(),
-						consulta.getMunicipiCodi());
-			} else if ("SVDSCTFNWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdsctfnws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDCCAACPCWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdccaacpcws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("Q2827003ATGSS001".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioQ2827003atgss001(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDDELSEXWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvddelsexws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SCDHPAJU".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioScdhpaju(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("NIVRENTI".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioNivrenti(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("ECOT103".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioEcot103(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDDGPRESIDENCIALEGALDOCWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvddgpresidencialegaldocws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDRRCCNACIMIENTOWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdrrccnacimientows01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDRRCCMATRIMONIOWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdrrccmatrimoniows01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDRRCCDEFUNCIONWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdrrccdefuncionws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDBECAWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = pinbalHelper.novaPeticioSvdbecaws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else {
-				throw new ValidationException(
-						"<creacio>",
-						DocumentEntity.class,
-						"S'ha especificat un servei PINBAL no suportat: " + metaDocument.getPinbalServei());
-			}
-			
-			FitxerDto justificant = pinbalHelper.getJustificante(idPeticion);
-			DocumentDto document = new DocumentDto();
-			document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-			
-			if (interessat instanceof InteressatPersonaFisicaEntity) {
-				InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
-				StringBuilder nomSencer = new StringBuilder(interessatPf.getNom());
-				if (interessatPf.getLlinatge1() != null) {
-					nomSencer.append(" ");
-					nomSencer.append(interessatPf.getLlinatge1().trim());
-				}
-				if (interessatPf.getLlinatge2() != null) {
-					nomSencer.append(" ");
-					nomSencer.append(interessatPf.getLlinatge2().trim());
-				}
-				document.setNom(idPeticion + " - " + nomSencer.toString());
-			} else {
-				document.setNom(idPeticion + " - " + interessat.getIdentificador());
-			}
-			
-			
-			document.setData(new Date());
-			document.setNtiOrgano(expedient.getNtiOrgano());
-			document.setNtiOrigen(NtiOrigenEnumDto.O1);
-			document.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
-			document.setNtiTipoDocumental("TD99");
-			document.setFitxerNom(justificant.getNom());
-			document.setFitxerContentType(justificant.getContentType());
-			document.setFitxerContingut(justificant.getContingut());
-			document.setFitxerTamany(justificant.getContingut() != null ? Long.valueOf(justificant.getContingut().length) : null);
-			document.setAmbFirma(true);
-			document.setFirmaSeparada(false);
-			document.setPinbalIdpeticion(idPeticion);
-
-			DocumentDto docum = documentHelper.crearDocument(
-					entitatId,
-					document,
-					pare,
-					true,
-					true);
-			
-			DocumentEntity doc = documentRepository.getOne(docum.getId());
-			
-			consultaPinbalBuilder
-			.entitat(entitatRepository.getOne(entitatId))
-			.servei(metaDocument.getPinbalServei().getCodi())
-			.estat(ConsultaPinbalEstatEnumDto.TRAMITADA)
-			.pinbalIdpeticion(idPeticion)
-			.expedient(expedient)
-			.metaExpedient(expedient.getMetaExpedient())
-			.document(doc);
-			
-			consultaPinbalRepository.save(consultaPinbalBuilder.build());
-			
-			return null;
-			
-		} catch (Exception e) {
-			
-			consultaPinbalBuilder
-			.entitat(entitatRepository.getOne(entitatId))
-			.servei(metaDocument.getPinbalServei().getCodi())
-			.estat(ConsultaPinbalEstatEnumDto.ERROR)
-			.error(Utils.abbreviate(Utils.getRootMsg(e), 4000))
-			.expedient(expedient)
-			.metaExpedient(expedient.getMetaExpedient());
-			
-			consultaPinbalRepository.save(consultaPinbalBuilder.build());
-			
-			return e;
-		}
+		return pinbalHelper.pinbalNovaConsulta(entitatId, pareId, metaDocumentId, consulta, rolActual);
 	}
 
 	@Transactional
