@@ -18,6 +18,7 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
@@ -280,6 +281,19 @@ public class MetaDocumentHelper {
     		logger.info("findMetaDocumentsDisponiblesPerCreacio time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		
 		return metaDocuments;
+	}
+	
+	public List<MetaDocumentEntity> findMetaDocumentsPinbalDisponiblesPerCreacio(Long metaExpedientId) {
+		List<MetaDocumentEntity> aux = findMetaDocumentsDisponiblesPerCreacio(null, null, metaExpedientRepository.findById(metaExpedientId).get(), false);
+		List<MetaDocumentEntity> resultat = new ArrayList<MetaDocumentEntity>();
+		if (aux!=null) {
+			for (MetaDocumentEntity metaDoc: aux) {
+				if (metaDoc.isLeftPerCreacio() && metaDoc.isPinbalActiu()) {
+					resultat.add(metaDoc);
+				}
+			}
+		}
+		return resultat;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentHelper.class);

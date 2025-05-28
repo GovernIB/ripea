@@ -317,6 +317,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean errorLastNotificacio;
     @Transient private boolean ambEnviamentsPendents;
     @Transient private boolean ambNotificacionsPendents;
+    @Transient private boolean ambDocumentsPinbal;
 
     @Getter
 	@Setter

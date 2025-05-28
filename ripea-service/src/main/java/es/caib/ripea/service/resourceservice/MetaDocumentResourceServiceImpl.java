@@ -63,6 +63,9 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	    				expedientEntity.getMetaExpedient(),
 	    				false);	
 	    		idsMetaDocsPermesos.add(documentEntity.getMetaDocument());
+	    	} else if (Stream.of(split[0]).anyMatch("PINBAL_DOC"::equals)) {
+	    		expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
+	    		idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity.getMetaExpedient().getId());
 	    	}
 	    	
 	    	Filter filtreTipusDocsPermesos = null;

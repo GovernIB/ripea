@@ -40,6 +40,7 @@ import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 import lombok.AllArgsConstructor;
@@ -83,16 +84,10 @@ import lombok.experimental.FieldNameConstants;
                         code = DocumentResource.ACTION_FIRMA_WEB_INI,
                         formClass = DocumentResource.IniciarFirmaSimple.class,
                         requiresId = true),
-//                @ResourceConfigArtifact(
-//                        type = ResourceArtifactType.ACTION,
-//                        code = DocumentResource.ACTION_FIRMA_WEB_FIN,
-//                        formClass = DocumentResource.FinalitzarFirmaSimple.class,
-//                        requiresId = true),
-//                @ResourceConfigArtifact(
-//                        type = ResourceArtifactType.ACTION,
-//                        code = DocumentResource.ACTION_FLUX_WEB_INI,
-//                        formClass = Serializable.class,
-//                        requiresId = true),             
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = DocumentResource.ACTION_NEW_DOC_PINBAL,
+                        formClass = DocumentResource.NewDocPinbalForm.class),            
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_MOURE_CODE,
@@ -149,13 +144,11 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_GET_CSV_LINK = "GET_CSV_LINK";
   //Flux de firma i firma en navegador
     public static final String ACTION_FIRMA_WEB_INI = "FIRMA_WEB_INI";
-//    public static final String ACTION_FIRMA_WEB_FIN = "FIRMA_WEB_FIN";
-//    public static final String ACTION_FLUX_WEB_INI  = "FLUX_WEB_INI";
+    public static final String ACTION_NEW_DOC_PINBAL = "NEW_DOC_PINBAL";
 	//Accions massives desde la pipella de contingut
 	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
-
     public static final String REPORT_DESCARREGAR_VERSIO_CODE = "DESCARREGAR_VERSIO";
 
 	@NotNull
@@ -323,12 +316,20 @@ public class DocumentResource extends NodeResource {
     	private String motiu;
     }
     
-//    @Getter
-//    @Setter
-//    public static class FinalitzarFirmaSimple implements Serializable {
-//    	@NotNull
-//    	private String transactionId;
-//    }
+    @Getter
+    @Setter
+    public static class NewDocPinbalForm implements Serializable {
+    	@NotNull 
+    	private ResourceReference<MetaDocumentResource, Long> tipusDocument;
+    	@NotNull
+    	private String finalitat;
+    	@NotNull
+    	private ResourceReference<InteressatResource, Long> titular;
+    	@NotNull
+    	private PinbalConsentimentEnumDto consentiment;
+    	@Transient
+    	private String codiServeiPinbal;
+    }
     
     @Getter
     @Setter

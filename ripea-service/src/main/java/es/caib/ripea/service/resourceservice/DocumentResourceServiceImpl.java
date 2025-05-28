@@ -86,6 +86,7 @@ import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
+import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
@@ -152,10 +153,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
-        //Flux de firma i firma en navegador
-//        register(DocumentResource.ACTION_FLUX_WEB_INI, new IniciarFluxFirmaWebActionExecutor());
+        //Flux de firma, firma en navegador i document PINBAL (formularis modals)
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
-//        register(DocumentResource.ACTION_FIRMA_WEB_FIN, new FinalitzarFirmaWebActionExecutor());
+        register(DocumentResource.ACTION_NEW_DOC_PINBAL, new NouDocumentPinbalActionExecutor());
         register(DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE, new DescarregarVersionReportGenerator());
         //Dades externes
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
@@ -754,6 +754,24 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al iniciar flux de firma: "+e.getMessage()); 
 			}
 		}
+    }
+    
+    private class NouDocumentPinbalActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NewDocPinbalForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, NewDocPinbalForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NewDocPinbalForm target) {
+			if (fieldName=="tipusDocument") {
+				String codiServeiPinbal = metaDocumentResourceRepository.findById((Long)fieldValue).get().getPinbalServei().getCodi();
+				target.setCodiServeiPinbal(codiServeiPinbal);
+			}
+		}
+
+		@Override
+		public Serializable exec(String code, DocumentResourceEntity entity, NewDocPinbalForm params) throws ActionExecutionException {
+			// TODO Generar documento pinbal i añadirlo al expediente
+			return null;
+		}
+    	
     }
     
     private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaSimple, Serializable> {
