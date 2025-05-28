@@ -83,7 +83,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
     const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
     const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEviarPortafirmes(refresh);
-    const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNevegador();
+    const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNevegador(refresh);
 
     const isDocument= (row:any) => row?.tipus=="DOCUMENT";
     const isDigitalOrImportat = (row:any) => {

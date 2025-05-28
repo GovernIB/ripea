@@ -14,8 +14,11 @@ export const useFluxCreateSession = () => {
     return { value: get(fluxCreateKey) };
 }
 export const useFirmaFinalitzadaSession = () => {
-    const { get } = useSseExpedientSession();
-    return { value: get(firmaFinalitzadaKey) };
+    const { get, remove } = useSseExpedientSession();
+    return {
+        value: get(firmaFinalitzadaKey),
+        remove: () => remove(firmaFinalitzadaKey),
+    };
 }
 
 /**
