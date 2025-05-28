@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
+import Iframe from "../../../components/Iframe.tsx";
 
 const FirmaNevegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -47,7 +48,7 @@ export const useFirmaNevegador = () => {
         apiRef.current?.show?.(id)
     }
     const formDialogResultProcessor = (result: any) => {
-        return <iframe src={result?.url} width={'100%'} height={'500px'}/>
+        return <Iframe src={result?.url}/>
     }
     const onError = (error: any): void => {
         temporalMessageShow(null, error.message, 'error');
