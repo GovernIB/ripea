@@ -1,7 +1,7 @@
 import {Divider} from "@mui/material";
 import {MuiDataGridApiRef, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {useEntitatSession, useUserSession} from "../../../components/Session.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import useDocumentDetail from "./DocumentDetail.tsx";
 import useHistoric from "../../Historic.tsx";
 import useInformacioArxiu from "../../InformacioArxiu.tsx";
