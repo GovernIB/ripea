@@ -71,6 +71,7 @@ const DataGrid = (props:any) => {
         autoHeight
         // height={162 + 52 * 4}
         toolbarHideCreate={ !potModificar(contingut) || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        rowHideUpdateButton={false}
         rowHideDeleteButton={false}
     />
 }

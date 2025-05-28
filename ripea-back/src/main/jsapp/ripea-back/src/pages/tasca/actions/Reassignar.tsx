@@ -7,7 +7,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const ReassignarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="responsableActual" required/>
+        <GridFormField xs={12} name="usuaris" multiple required/>
     </Grid>
 }
 

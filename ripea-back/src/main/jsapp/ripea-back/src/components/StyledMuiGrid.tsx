@@ -60,6 +60,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         rowProps,
         formInitOnChange,
         popupEditFormDialogComponentProps,
+        rowHideUpdateButton = true,
+        rowHideDeleteButton = true,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
@@ -201,8 +203,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             toolbarHideExport
             toolbarHideQuickFilter
             toolbarElementsWithPositions={toolbarElements}
-            rowHideUpdateButton
-            // rowHideDeleteButton
+            rowHideUpdateButton={rowHideUpdateButton}
+            rowHideDeleteButton={rowHideDeleteButton}
             readOnly={readOnly}
         />
     </>

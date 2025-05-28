@@ -50,18 +50,18 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 		boolean isSuper = "IPA_SUPER".equals(rolActual);
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
         Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-        
+
         Filter filtreResultat = null;
         
         if (isSuper) {
         	//No s'aplica ni el filtre per entitat, perque superusuari no treballa amb entitat seleccionada.
-        	filtreResultat = filtreBase;
+        	return currentSpringFilter;
         } else { 
         	
             Filter filtreEntitat = FilterBuilder.equal(
             		MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-            		entitatActualCodi != null?entitatActualCodi:"................................................................................");        	
-        	
+            		entitatActualCodi != null?entitatActualCodi:"................................................................................");
+
             filtreResultat = FilterBuilder.and(filtreBase, filtreEntitat);
             
             //Ja s'ha filtrat per entitat actual, al admin no se li aplica cap altre filtre
@@ -106,7 +106,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 		        filtreResultat = FilterBuilder.and(filtreResultat, filtreOrgansPermesos);
         	}
         }
-        
+
         return filtreResultat.generate();
     }
 }
