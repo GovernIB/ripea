@@ -15,6 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -143,8 +144,9 @@ public class DigitalitzacioController extends BaseUserController {
 		return "digitalitzacioIframeTancar";
 	}
 
-	@RequestMapping(value = "/event/resultatScan/{idExpedient}/{idTransaccio}", method = RequestMethod.GET)
-	public String recuperarResultatScanEvent(
+	@RequestMapping(value = "/event/resultatScan/{idExpedient}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
+	@ResponseBody
+	public ResponseEntity<String> recuperarResultatScanEvent(
 			HttpServletRequest request,
 			@PathVariable Long idExpedient,
 			@PathVariable String idTransaccio,
@@ -152,7 +154,7 @@ public class DigitalitzacioController extends BaseUserController {
 		DigitalitzacioResultatDto resposta = recuperaResultatEscaneig(idTransaccio, true, true);
 		ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
 		eventService.notifyScanFinalitzat(sfe);
-		return "";
+		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Escaneig finalitzat.");
 	}
 	
 	@RequestMapping(value = "/recuperarResultat/{idTransaccio}", method = RequestMethod.GET)
