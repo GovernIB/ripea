@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import {FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert} from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
@@ -14,16 +14,39 @@ import {MenuActionButton} from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
 import TabComponent from "../../components/TabComponent.tsx";
 import Iframe from "../../components/Iframe.tsx";
+import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
 
 const ScanerTabForm = () => {
-    const { data } = useFormContext();
+    const { data, apiRef } = useFormContext();
     const { t } = useTranslation();
+    const { value } = useScanFinalitzatSession();
+
+    useEffect(() => {
+        if (value) {
+            console.log("scan", value)
+            apiRef?.current?.setFieldValue("scaned", true)
+            apiRef?.current?.setFieldValue("adjunt", {
+                name: value?.nomDocument,
+                content: value?.contingut,
+                contentType: value?.mimeType,
+                // contentLength: ,
+            })
+        }
+    }, [value]);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="ntiIdDocumentoOrigen" componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}  required/>
-        <GridFormField xs={12} name="digitalitzacioPerfil" required/>
+        <Grid item xs={12} hidden={!data?.scaned}>
+            <Alert severity={"success"}>El proceso de escaneo se ha realizado con éxito.</Alert>
+        </Grid>
 
-        <Iframe src={data?.digitalitzacioProcesUrl}/>
+        <GridFormField xs={12} name="ntiIdDocumentoOrigen"
+                       componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
+                       required hidden={data?.scaned}/>
+        <GridFormField xs={12} name="digitalitzacioPerfil" required hidden={data?.scaned}/>
+
+        <Grid item xs={12} hidden={data?.scaned}>
+            <Iframe src={data?.digitalitzacioProcesUrl}/>
+        </Grid>
     </Grid>
 }
 const FileTabForm = () => {

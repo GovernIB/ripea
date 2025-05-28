@@ -10,27 +10,25 @@ const sseConnectedKey = 'exp_connect';
 
 const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
-export const useFluxCreateSession = () => {
+const useTempSession = (key:string) => {
     const { get, remove } = useSseExpedientSession();
-	return {
-	    value: get(fluxCreateKey),
-	    remove: () => remove(fluxCreateKey),
-	};
-}
-export const useFirmaFinalitzadaSession = () => {
-    const { get, remove } = useSseExpedientSession();
+    const value = get(key)
+
+    useEffect(() => {
+        if (value){
+            // remove(key)
+        }
+    }, [value]);
+
     return {
-        value: get(firmaFinalitzadaKey),
-        remove: () => remove(firmaFinalitzadaKey),
+        value: get(key),
+        remove: () => remove(key)
     };
 }
-export const useScanFinalitzatSession = () => {
-    const { get, remove } = useSseExpedientSession();
-    return {
-        value: get(scanFinalitzatKey),
-        remove: () => remove(scanFinalitzatKey),
-    };
-}
+
+export const useFluxCreateSession = () => useTempSession(fluxCreateKey);
+export const useFirmaFinalitzadaSession = () => useTempSession(firmaFinalitzadaKey);
+export const useScanFinalitzatSession = () => useTempSession(scanFinalitzatKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -40,6 +38,7 @@ export const SseExpedient: React.FC<any> = (props:any) => {
     const {id} = props
     const eventSourceRef = useRef<EventSource | null>(null);
     const { save: saveSession, removeAll } = useSseExpedientSession();
+    // saveSession("id", id)
 
     const addEventListener = (eventSource: EventSource, key: string) => {
         eventSource.addEventListener(key, (event) => {
