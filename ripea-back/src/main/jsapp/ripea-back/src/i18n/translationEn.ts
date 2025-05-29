@@ -369,6 +369,9 @@ const translationEn = {
                 flux: "There is a predefined signature flow. Creating a new signature flow will overwrite the selected one.",
                 summarize: "Generate title and description using artificial intelligence.\n(Requires a document to be attached beforehand)",
                 documentOrigenFormat: "Format: ES_<Body>_<AAAA>_<Specific_ID>",
+                dataBasic: "Basic data",
+                dataInteressat: "Interested party data",
+                dataOther: "Other data",
             },
             acciones: {
                 pinbal: "PINBAL consultation",

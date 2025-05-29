@@ -10,12 +10,13 @@ import {potModificar} from "../../expedient/details/Expedient.tsx";
 import useMoure, {useCopiar, useVincular} from "../actions/Moure.tsx";
 import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
-import useEviarPortafirmes from "../actions/EviarPortafirmes.tsx";
+import useEnviarPortafirmes from "../actions/EnviarPortafirmes.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useFirmaNevegador from "../actions/FirmaNevegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
+import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
 
 export const useActions = () => {
     const {temporalMessageShow} = useBaseAppContext();
@@ -85,8 +86,9 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleEnviarViaEmailShow, content: contentEnviarViaEmail} = useEnviarViaEmail(refresh);
     const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
     const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
-    const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEviarPortafirmes(refresh);
+    const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEnviarPortafirmes(refresh);
     const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNevegador(refresh);
+    const {handleShow: handleEnviarViaFirma, content: contentEnviarViaFirma} = useEnviarViaFirma(refresh)
 
     const isDocument= (row:any) => row?.tipus=="DOCUMENT";
     const isDigitalOrImportat = (row:any) => {
@@ -236,9 +238,9 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         },
         {
             title: t('page.document.acciones.viaFirma'),
-            icon: "edit_document",
+            icon: "mail",
             showInMenu: true,
-            // onClick: ,
+            onClick: handleEnviarViaFirma,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
             hidden: (row:any) => !potMod || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
@@ -313,6 +315,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {dialogSeguiment}
         {contentFirma}
         {contentDocPinbal}
+        {contentEnviarViaFirma}
     </>;
     return {
         createActions: createDocumentActions,

@@ -8,7 +8,7 @@ import * as builder from '../../../util/springFilterUtils.ts';
 import {useFluxCreateSession} from "../../../components/SseExpedient.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 
-const EviarPortafirmesForm = () => {
+const EnviarPortafirmesForm = () => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
     const {value: flux} = useFluxCreateSession()
@@ -86,7 +86,7 @@ const EviarPortafirmesForm = () => {
     </Grid>
 }
 
-const EviarPortafirmes = (props:any) => {
+const EnviarPortafirmes = (props:any) => {
     const { t } = useTranslation();
 
     return <FormActionDialog
@@ -96,11 +96,11 @@ const EviarPortafirmes = (props:any) => {
         initialOnChange
         {...props}
     >
-        <EviarPortafirmesForm/>
+        <EnviarPortafirmesForm/>
     </FormActionDialog>
 }
 
-const useEviarPortafirmes = (refresh?: () => void) => {
+const useEnviarPortafirmes = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -121,7 +121,7 @@ const useEviarPortafirmes = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <EviarPortafirmes apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <EnviarPortafirmes apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
     }
 }
-export default useEviarPortafirmes;
+export default useEnviarPortafirmes;

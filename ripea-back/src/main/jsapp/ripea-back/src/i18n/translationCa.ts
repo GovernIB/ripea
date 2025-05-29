@@ -369,6 +369,9 @@ const translationCa = {
                 flux: "Existeix un flux de firma predefinit. La creació d’un nou flux de firma implica sobreescriure el seleccionat.",
                 summarize: "Generar titol i descripció amb inteligència artificial.\n(Requereix haver adjuntat un document prèviament)",
                 documentOrigenFormat: "Format: ES_<Òrgan>_<AAAA>_<ID_específic>",
+                dataBasic: "Dades bàsiques",
+                dataInteressat: "Dades de l'interessat",
+                dataOther: "Altres dades",
             },
             acciones: {
                 pinbal: "Consulta PINBAL...",

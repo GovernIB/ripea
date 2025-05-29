@@ -309,7 +309,7 @@ public class DocumentResource extends NodeResource {
     	private String titol;
     	@Size(max=256)
     	private String descripcio;
-    	@NotEmpty
+    	@NotNull
         @Transient
         @ResourceField(enumType = true, onChangeActive = true)
     	private String codiUsuariViaFirma;
@@ -317,10 +317,11 @@ public class DocumentResource extends NodeResource {
     	private boolean isDispositiusEnabled = false;
     	@ResourceField(enumType = true)
     	private String viaFirmaDispositiuCodi;
+        @ResourceField(onChangeActive = true)
     	private ResourceReference<InteressatResource, Long> interessat;
-    	@NotEmpty
+    	@NotNull
     	private String signantNif;
-    	@NotEmpty
+    	@NotNull
     	private String signantNom;
     	@Size(max=256)
     	private String observacions;

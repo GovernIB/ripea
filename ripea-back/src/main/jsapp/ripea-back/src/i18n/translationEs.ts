@@ -369,6 +369,9 @@ const translationEs = {
                 flux: "Existe un flujo de firma predefinido. La creación de un nuevo flujo de firma implica sobrescribir el seleccionado.",
                 summarize: "Generar título y descripción con inteligencia artificial.\n(Requiere haber adjuntado un documento previamente)",
                 documentOrigenFormat: "Formato: ES_<Órgano>_<AAAA>_<ID_específico>",
+                dataBasic: "Datos básicos",
+                dataInteressat: "Datos interesado",
+                dataOther: "Otros datos",
             },
             acciones: {
                 pinbal: "Consulta PINBAL...",
