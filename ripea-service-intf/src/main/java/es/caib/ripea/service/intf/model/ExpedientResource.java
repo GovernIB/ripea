@@ -109,11 +109,6 @@ import lombok.experimental.FieldNameConstants;
                         formClass = ExpedientResource.MassiveAction.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
-                        type = ResourceArtifactType.REPORT,
-                        code = ExpedientResource.ACTION_NEW_CARPETA,
-                        formClass = ExpedientResource.NovaCarpetaForm.class,
-                        requiresId = true),                
-                @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
@@ -175,7 +170,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	public static final String ACTION_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
-	public static final String ACTION_NEW_CARPETA = "NEW_CARPETA";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
@@ -369,13 +363,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull
         private String motiu;
         private List<Long> documentsPerFirmar;
-    }
-    
-    @Getter
-    @Setter
-    public static class NovaCarpetaForm implements Serializable {
-        @NotNull
-        private String nomCarpeta;
     }
     
     public boolean estaRelacionatAmb(Long id) {

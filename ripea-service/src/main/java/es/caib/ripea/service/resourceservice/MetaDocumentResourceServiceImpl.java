@@ -70,7 +70,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
                     break;
                 case "PINBAL_DOC":
                     expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
-                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity.getMetaExpedient().getId());
+                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity);
                     break;
             }
 

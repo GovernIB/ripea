@@ -221,7 +221,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-    		//TODO: el padre no siempre es el expediente, puede ser una carpeta
     		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();
     		DocumentDto documentCreat = documentHelper.crearDocument(
     				entitatEntity.getId(),

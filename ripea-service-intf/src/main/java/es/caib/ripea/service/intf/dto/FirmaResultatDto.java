@@ -12,14 +12,12 @@ public class FirmaResultatDto {
 	private StatusEnumDto status;
 	private String msg;
 	private List<FirmaSignatureStatus> signatures = new ArrayList<>();
+	private boolean processada = false;
 	
-	public FirmaResultatDto(
-			StatusEnumDto status,
-			String msg) {
+	public FirmaResultatDto(StatusEnumDto status, String msg) {
 		this.status = status;
 		this.msg = msg;
 	}
-	
 	
 	public StatusEnumDto getStatus() {
 		return status;
@@ -31,13 +29,10 @@ public class FirmaResultatDto {
 	public void addSignature(FirmaSignatureStatus firmaSignatureStatus){
 		signatures.add(firmaSignatureStatus);
 	}
-
 	
 	@Getter
 	@Setter
 	public static class FirmaSignatureStatus {
-		
-		
 		public FirmaSignatureStatus(
 				String signID,
 				StatusEnumDto status,
@@ -46,8 +41,6 @@ public class FirmaResultatDto {
 			this.status = status;
 			this.msg = msg;
 		}
-		
-		
 		public FirmaSignatureStatus(
 				String signID,
 				StatusEnumDto status,
@@ -58,15 +51,10 @@ public class FirmaResultatDto {
 			this.fitxerFirmatNom = fitxerFirmatNom;
 			this.fitxerFirmatContingut = fitxerFirmatContingut;
 		}
-
-
 		private String signID;
 		private StatusEnumDto status;
 		private String msg;
 		private String fitxerFirmatNom; 
 		private byte[] fitxerFirmatContingut;
-		
-		
 	}
-
 }

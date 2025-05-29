@@ -30,11 +30,20 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 
     useEffect(() => {
         fetch('/build-info.json')
-            .then(response => response.json())
+            .then(response => {
+				if (response?.ok) {
+					return response.json()
+				}
+			})
             .then(data => {
-                setBuildTimestamp(data.buildTimestamp);
-                setScmRevision(data.scmRevision);
-            });
+				if (data) {
+                	setBuildTimestamp(data.buildTimestamp);
+                	setScmRevision(data.scmRevision);
+				}
+            })
+			.catch(error => {
+			        console.error('No se pudo cargar el archivo build-info.json:', error);
+			});
     }, []);
 
     const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor, backgroundImg) : {};

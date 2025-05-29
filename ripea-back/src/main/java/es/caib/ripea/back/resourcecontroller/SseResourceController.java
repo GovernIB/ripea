@@ -65,9 +65,9 @@ public class SseResourceController {
     public SseEmitter stream(@PathVariable String usuariCodi) {
         SseEmitter emitter = new SseEmitter(0L);
         clientsUsuaris.put(usuariCodi, emitter);
-        emitter.onCompletion(() -> clientsUsuaris.remove(usuariCodi)); // quan el client tanca o es desconnecta
-        emitter.onTimeout(() -> clientsUsuaris.remove(usuariCodi)); // també per si la connexió cau
-        emitter.onError((e) -> clientsUsuaris.remove(usuariCodi)); // per si hi ha error de xarxa
+        emitter.onCompletion(() ->	clientsUsuaris.remove(usuariCodi)); // quan el client tanca o es desconnecta
+        emitter.onTimeout(() ->		clientsUsuaris.remove(usuariCodi)); // també per si la connexió cau
+        emitter.onError((e) ->		clientsUsuaris.remove(usuariCodi)); // per si hi ha error de xarxa
         onSubscribeEmisorGlobal(usuariCodi, emitter);
         return emitter;
     }
@@ -112,9 +112,9 @@ public class SseResourceController {
         	emisorsExpedient.add(emitter);
         }
         clientsExpedient.put(expedientId, emisorsExpedient);
-        emitter.onCompletion(() -> clientsExpedient.remove(expedientId)); // quan el client tanca o es desconnecta
-        emitter.onTimeout(() -> clientsExpedient.remove(expedientId)); // també per si la connexió cau
-        emitter.onError((e) -> clientsExpedient.remove(expedientId));  // per si hi ha error de xarxa
+        emitter.onCompletion(() ->	clientsExpedient.get(expedientId).remove(emitter)); // quan el client tanca o es desconnecta
+        emitter.onTimeout(() -> 	clientsExpedient.get(expedientId).remove(emitter)); // també per si la connexió cau
+        emitter.onError((e) -> 		clientsExpedient.get(expedientId).remove(emitter)); // per si hi ha error de xarxa
         onSubscribeEmisorExpedient(expedientId, emitter);
         return emitter;
     }
@@ -207,20 +207,25 @@ public class SseResourceController {
     @EventListener
     public void handleEventFlux(CreacioFluxFinalitzatEvent fluxEvent) {
     	if (fluxEvent!=null && fluxEvent.getExpedientId()!=null) {
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+    		//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
 			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
 			while (iterator.hasNext()) {
 				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-	            try {
-	            	if (fluxEvent.getExpedientId().equals(expedientClient.getKey())) {
-	            		for(SseEmitter emisor: expedientClient.getValue()) {
-	            			emisor.send(SseEmitter.event().name(ExpedientEventType.FLUX_CREAT.getEventName()).data(fluxEvent.getFluxCreat()));
-	            		}
-	            	}
-	            } catch (IOException e) {
-	            	clientsExpedient.remove(expedientClient.getKey());
-	            }
+            	if (fluxEvent.getExpedientId().equals(expedientClient.getKey())) {
+            		Iterator<SseEmitter> iteratorEmisors = expedientClient.getValue().iterator();
+            		while (iteratorEmisors.hasNext()) {
+            			SseEmitter emisor = iteratorEmisors.next();
+            			try {
+            				emisor.send(SseEmitter.event().name(ExpedientEventType.FLUX_CREAT.getEventName()).data(fluxEvent.getFluxCreat()));
+        	            } catch (IOException e) {
+        	            	iteratorEmisors.remove(); //Eliminam el emisor de la llista de emisors del expedient
+        	            }
+            		}
+            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
+            		if (expedientClient.getValue()==null || expedientClient.getValue().size()==0) {
+            			clientsExpedient.remove(expedientClient.getKey());
+            		}
+            	}
 	        }
     	}
     }
@@ -229,20 +234,25 @@ public class SseResourceController {
     @EventListener
     public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
     	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+    		//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
 			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
 			while (iterator.hasNext()) {
 				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-	            try {
-	            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
-	            		for(SseEmitter emisor: expedientClient.getValue()) {
-	            			emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
-	            		}
-	            	}
-	            } catch (IOException e) {
-	            	clientsExpedient.remove(expedientClient.getKey());
-	            }
+            	if (firmaEvent.getExpedientId().equals(expedientClient.getKey())) {
+            		Iterator<SseEmitter> iteratorEmisors = expedientClient.getValue().iterator();
+            		while (iteratorEmisors.hasNext()) {
+            			SseEmitter emisor = iteratorEmisors.next();
+            			try {
+            				emisor.send(SseEmitter.event().name(ExpedientEventType.FIRMA_FINALITZADA.getEventName()).data(firmaEvent.getFirmaResultat()));
+        	            } catch (IOException e) {
+        	            	iteratorEmisors.remove(); //Eliminam el emisor de la llista de emisors del expedient
+        	            }
+            		}
+            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
+            		if (expedientClient.getValue()==null || expedientClient.getValue().size()==0) {
+            			clientsExpedient.remove(expedientClient.getKey());
+            		}
+            	}
 	        }
     	}
     }
@@ -251,20 +261,25 @@ public class SseResourceController {
     @EventListener
     public void handleEventScan(ScanFinalitzatEvent scanEvent) {
     	if (scanEvent!=null && scanEvent.getExpedientId()!=null) {
-			//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
+    		//Empram iterator per poder eliminar sense problemes elements del mapa mentre el recorrem
 			Iterator<Map.Entry<Long, List<SseEmitter>>> iterator = clientsExpedient.entrySet().iterator();
-			//Els avisos s'envien a tots els usuaris connectats
 			while (iterator.hasNext()) {
 				Map.Entry<Long, List<SseEmitter>> expedientClient = iterator.next();
-	            try {
-	            	if (scanEvent.getExpedientId().equals(expedientClient.getKey())) {
-	            		for(SseEmitter emisor: expedientClient.getValue()) {
-	            			emisor.send(SseEmitter.event().name(ExpedientEventType.SCAN_FINALITZAT.getEventName()).data(scanEvent.getResposta()));
-	            		}
-	            	}
-	            } catch (IOException e) {
-	            	clientsExpedient.remove(expedientClient.getKey());
-	            }
+            	if (scanEvent.getExpedientId().equals(expedientClient.getKey())) {
+            		Iterator<SseEmitter> iteratorEmisors = expedientClient.getValue().iterator();
+            		while (iteratorEmisors.hasNext()) {
+            			SseEmitter emisor = iteratorEmisors.next();
+            			try {
+            				emisor.send(SseEmitter.event().name(ExpedientEventType.SCAN_FINALITZAT.getEventName()).data(scanEvent.getResposta()));
+        	            } catch (IOException e) {
+        	            	iteratorEmisors.remove(); //Eliminam el emisor de la llista de emisors del expedient
+        	            }
+            		}
+            		//Si ja no queden emisors per l'expedient, eliminam l'entrada del mapa
+            		if (expedientClient.getValue()==null || expedientClient.getValue().size()==0) {
+            			clientsExpedient.remove(expedientClient.getKey());
+            		}
+            	}
 	        }
     	}
     }

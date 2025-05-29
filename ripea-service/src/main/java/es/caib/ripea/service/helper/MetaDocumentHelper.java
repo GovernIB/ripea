@@ -19,6 +19,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
@@ -34,6 +35,7 @@ public class MetaDocumentHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private CacheHelper cacheHelper;
 	
+	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
@@ -283,17 +285,21 @@ public class MetaDocumentHelper {
 		return metaDocuments;
 	}
 	
-	public List<MetaDocumentEntity> findMetaDocumentsPinbalDisponiblesPerCreacio(Long metaExpedientId) {
-		List<MetaDocumentEntity> aux = findMetaDocumentsDisponiblesPerCreacio(null, null, metaExpedientRepository.findById(metaExpedientId).get(), false);
+	public List<MetaDocumentEntity> findMetaDocumentsPinbalDisponiblesPerCreacio(ExpedientEntity expedientEntity) {
+		List<MetaDocumentEntity> aux = findMetaDocumentsDisponiblesPerCreacio(null, expedientEntity, null, false);
 		List<MetaDocumentEntity> resultat = new ArrayList<MetaDocumentEntity>();
 		if (aux!=null) {
 			for (MetaDocumentEntity metaDoc: aux) {
-				if (metaDoc.isLeftPerCreacio() && metaDoc.isPinbalActiu()) {
+				if (metaDoc.isPinbalActiu()) {
 					resultat.add(metaDoc);
 				}
 			}
 		}
 		return resultat;
+	}
+	
+	public List<MetaDocumentEntity> findMetaDocumentsPinbalDisponiblesPerCreacio(Long expedientId) {
+		return findMetaDocumentsPinbalDisponiblesPerCreacio(expedientRepository.findById(expedientId).get());
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentHelper.class);
