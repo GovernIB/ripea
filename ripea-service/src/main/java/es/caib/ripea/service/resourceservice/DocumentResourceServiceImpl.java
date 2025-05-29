@@ -100,7 +100,6 @@ import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -108,7 +107,6 @@ import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
-import es.caib.ripea.service.resourceservice.InteressatResourceServiceImpl.PaisFieldOptionsProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -817,8 +815,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				InteressatResourceEntity intRes = interessatResourceRepository.findById((Long)fieldValue).get();
 				target.setSignantNom(intRes.getNomComplet());
 				target.setSignantNif(intRes.getDocumentNum());
-			} else if (DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi.equals(fieldName)) {
-				
 			}
 		}
 
@@ -846,14 +842,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			}
 		}
     }
-    
+
     private class NouDocumentPinbalActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NewDocPinbalForm, Serializable> {
 
 		@Override
 		public void onChange(Serializable id, NewDocPinbalForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NewDocPinbalForm target) {
-			if ("tipusDocument".equals(fieldName)) {
-				String codiServeiPinbal = metaDocumentResourceRepository.findById((Long)fieldValue).get().getPinbalServei().getCodi();
-				target.setCodiServeiPinbal(codiServeiPinbal);
+			if (NewDocPinbalForm.Fields.tipusDocument.equals(fieldName) && fieldValue!=null) {
+                ResourceReference<MetaDocumentResource, Long> tipusDocument = (ResourceReference<MetaDocumentResource, Long>) fieldValue;
+
+				metaDocumentResourceRepository.findById(tipusDocument.getId())
+                        .ifPresent(metaDocumentResourceEntity -> {
+                            if (metaDocumentResourceEntity.getPinbalServei()!=null && metaDocumentResourceEntity.getPinbalServei().getCodi()!=null){
+                                target.setCodiServeiPinbal(metaDocumentResourceEntity.getPinbalServei().getCodi());
+                            } else {
+                                target.setCodiServeiPinbal(null);
+                                target.setTipusDocument(null);
+                            }
+                        });
 			}
 		}
 
@@ -867,16 +872,60 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				consulta.setInteressatId(params.getTitular().getId());
 				consulta.setFinalitat(params.getFinalitat());
 				consulta.setConsentiment(params.getConsentiment());
-				
-				//TODO: afegir la resta de parametres opcionals que depenen del servei
-				
+	            consulta.setComunitatAutonomaCodi(params.getComunitatAutonoma());
+	            consulta.setProvinciaCodi(params.getProvincia());
+	            consulta.setMunicipiCodi(params.getMunicipi());
+	            consulta.setDataConsulta(String.valueOf(params.getDataConsulta()));
+	            consulta.setDataNaixement(String.valueOf(params.getDataNaixement()));
+	            consulta.setConsentimentTipusDiscapacitat(params.getConsentimentTipusDiscapacitat());
+	            consulta.setNumeroTitol(params.getNumeroTitol());
+	            consulta.setCodiNacionalitat(params.getNacionalitat());
+	            consulta.setPaisNaixament(params.getPaisNaixament());
+	            consulta.setProvinciaNaixament(params.getProvinciaNaixament());
+	            consulta.setPoblacioNaixament(params.getPoblacioNaixament());
+	            consulta.setCodiPoblacioNaixament(params.getPoblacioNaixament());
+	            consulta.setSexe(params.getSexe());
+	            consulta.setNomPare(params.getNomPare());
+	            consulta.setNomMare(params.getNomMare());
+	            consulta.setTelefon(params.getTelefon());
+	            consulta.setEmail(params.getEmail());
+	            consulta.setNombreAnysHistoric(params.getNombreAnysHistoric());
+	            consulta.setExercici(params.getExercici());	
+	            consulta.setTipusPassaport(params.getTipusPassaport());
+	            consulta.setDataCaducidad(params.getDataCaducidad());
+	            consulta.setDataExpedicion(params.getDataExpedicion());
+	            consulta.setNumeroSoporte(params.getNumeroSoporte());	
+	            consulta.setRegistreCivil(params.getRegistreCivil());
+	            consulta.setTom(params.getTom());
+	            consulta.setPagina(params.getPagina());
+	            consulta.setAusenciaSegundoApellido(params.isAusenciaSegundoApellido());
+	            consulta.setCurs(params.getCurs());
+	
+	            if ("SVDRRCCDEFUNCIONWS01".equals(params.getCodiServeiPinbal())){
+	                consulta.setMunicipiRegistreSVDRRCCDEFUNCIONWS01(params.getMunicipiRegistre());
+	                consulta.setMunicipiNaixamentSVDRRCCDEFUNCIONWS01(params.getMunicipiNaixament());
+	            }
+	            if ("SVDRRCCMATRIMONIOWS01".equals(params.getCodiServeiPinbal())){
+	                consulta.setMunicipiRegistreSVDRRCCMATRIMONIOWS01(params.getMunicipiRegistre());
+	                consulta.setMunicipiNaixamentSVDRRCCMATRIMONIOWS01(params.getMunicipiNaixament());
+	            }
+	            if ("SVDRRCCNACIMIENTOWS01".equals(params.getCodiServeiPinbal())){
+	                consulta.setMunicipiRegistreSVDRRCCNACIMIENTOWS01(params.getMunicipiRegistre());
+	                consulta.setMunicipiNaixamentSVDRRCCNACIMIENTOWS01(params.getMunicipiNaixament());
+	            }
+	            if ("SVDDELSEXWS01".equals(params.getCodiServeiPinbal())){
+	                consulta.setMunicipiNaixamentSVDDELSEXWS01(params.getMunicipiNaixament());
+	            }
+	
 				pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
 						entity.getExpedient().getId(), //TODO: El pare pot ser una carpeta
 						entity.getMetaDocument().getId(),
 						consulta, 
 						configHelper.getRolActual());
+				
 				return null;
+				
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/NouDocumentPinbalActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al generar document PINBAL: "+e.getMessage());

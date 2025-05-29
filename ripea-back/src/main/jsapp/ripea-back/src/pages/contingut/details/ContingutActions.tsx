@@ -15,6 +15,7 @@ import useVisualitzar from "../actions/Visualitzar.tsx";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useFirmaNevegador from "../actions/FirmaNevegador.tsx";
+import useDocPinbal from "../actions/DocPinbal.tsx";
 
 export const useActions = () => {
     const {temporalMessageShow} = useBaseAppContext();
@@ -70,6 +71,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const { t } = useTranslation();
     const { value: user } = useUserSession()
 
+    const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
+
     const {apiDownload, getLinkCSV} = useActions()
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
@@ -112,8 +115,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {
             title: t('page.document.acciones.pinbal'),
             icon: "description",
-            // onClick: ,
-            disabled: true,
+            onClick: handleDocPinbal,
+            disabled: !entity?.ambDocumentsPinbal,
         },
         {
             title: "Carpeta...",
@@ -309,6 +312,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentEviarPortafirmes}
         {dialogSeguiment}
         {contentFirma}
+        {contentDocPinbal}
     </>;
     return {
         createActions: createDocumentActions,
