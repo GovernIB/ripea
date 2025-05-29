@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourceservice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
@@ -34,54 +35,66 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
+        List<String> namedQueriesList = Stream.of(namedQueries).collect(Collectors.toList());
+
     	/**
     	 * Current spring filter, per defecte: documents actius, de la entitat actual.
     	 */
-    	Filter filtreResultat = Filter.parse(currentSpringFilter);
-    	if (namedQueries!=null && namedQueries.length>0) {
-    		
-    		String[] split = namedQueries[0].split("#");
-    		
-    		//Metadocuments disponibles per creació
-    		List<MetaDocumentEntity> idsMetaDocsPermesos = null;
-    		ExpedientEntity expedientEntity = null;
-    				
-	    	if (Stream.of(split[0]).anyMatch("CREATE_NEW_DOC"::equals)) {
-	    		expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
-	    		idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
-	    				expedientEntity.getEntitat(),
-	    				expedientEntity,
-	    				expedientEntity.getMetaExpedient(),
-	    				false);	    		
-	    	} else if (Stream.of(split[0]).anyMatch("UPDATE_DOC"::equals)) {
-	    		DocumentEntity documentEntity = documentRepository.findById(Long.parseLong(split[1])).get();
-	    		expedientEntity = documentEntity.getExpedient();
-	    		idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
-	    				expedientEntity.getEntitat(),
-	    				expedientEntity,
-	    				expedientEntity.getMetaExpedient(),
-	    				false);	
-	    		idsMetaDocsPermesos.add(documentEntity.getMetaDocument());
-	    	} else if (Stream.of(split[0]).anyMatch("PINBAL_DOC"::equals)) {
-	    		expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
-	    		idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity.getMetaExpedient().getId());
-	    	}
-	    	
-	    	Filter filtreTipusDocsPermesos = null;
-	        List<String> grupsTipusDocs = Utils.getIdsEnGruposMil(getIdsFromEntitats(idsMetaDocsPermesos));
-	        if (grupsTipusDocs!=null) {
-		        for (String aux: grupsTipusDocs) {
-			        if (aux != null && !aux.isEmpty()) {
-			        	filtreTipusDocsPermesos = FilterBuilder.or(filtreTipusDocsPermesos, Filter.parse("id" + " IN (" + aux + ")"));
-			        }
-		        }
-	        }
+        Filter filtreResultat = null;
+        List<MetaDocumentEntity> idsMetaDocsPermesos = null;
 
-	    	filtreResultat = FilterBuilder.and(filtreResultat, filtreTipusDocsPermesos);
-    	}
-    	
-    	return filtreResultat.generate();
+        for (String namedQuery : namedQueriesList) {
+            String[] split = namedQuery.split("#");
+
+            //Metadocuments disponibles per creació
+            ExpedientEntity expedientEntity = null;
+
+            switch (split[0]) {
+                case "CREATE_NEW_DOC":
+                    expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
+                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
+                            expedientEntity.getEntitat(),
+                            expedientEntity,
+                            expedientEntity.getMetaExpedient(),
+                            false);
+                    break;
+                case "UPDATE_DOC":
+                    DocumentEntity documentEntity = documentRepository.findById(Long.parseLong(split[1])).get();
+                    expedientEntity = documentEntity.getExpedient();
+                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
+                            expedientEntity.getEntitat(),
+                            expedientEntity,
+                            expedientEntity.getMetaExpedient(),
+                            false);
+                    idsMetaDocsPermesos.add(documentEntity.getMetaDocument());
+                    break;
+                case "PINBAL_DOC":
+                    expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
+                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity.getMetaExpedient().getId());
+                    break;
+            }
+
+            Filter filtreTipusDocsPermesos = null;
+            List<String> grupsTipusDocs = Utils.getIdsEnGruposMil(getIdsFromEntitats(idsMetaDocsPermesos));
+            if (grupsTipusDocs!=null) {
+                for (String aux: grupsTipusDocs) {
+                    if (aux != null && !aux.isEmpty()) {
+                        filtreTipusDocsPermesos = FilterBuilder.or(filtreTipusDocsPermesos, Filter.parse("id" + " IN (" + aux + ")"));
+                    }
+                }
+            }
+
+            if (filtreTipusDocsPermesos!=null) {
+                filtreResultat = FilterBuilder.and(filtreResultat, filtreTipusDocsPermesos);
+            }
+        }
+
+        if (filtreResultat != null && !filtreResultat.isEmpty()) {
+            Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
+            return FilterBuilder.and(filtreBase, filtreResultat).generate();
+        }
+
+    	return currentSpringFilter;
     }
     
     private List<Long> getIdsFromEntitats(List<MetaDocumentEntity> metaDocsList) {
