@@ -17,6 +17,7 @@ import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useFirmaNevegador from "../actions/FirmaNevegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
+import useCrearCarpeta from "../actions/CrearCarpeta.tsx";
 
 export const useActions = () => {
     const {temporalMessageShow} = useBaseAppContext();
@@ -73,6 +74,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const { value: user } = useUserSession()
 
     const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
+    const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
 
     const {apiDownload, getLinkCSV} = useActions()
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
@@ -123,8 +125,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {
             title: "Carpeta...",
             icon: "folder",
-            // onClick: ,
-            disabled: true,
+            // onClick: handleCrearCarpeta,
+            disabled: !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
             title: t('page.document.acciones.import'),
@@ -316,6 +318,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentFirma}
         {contentDocPinbal}
         {contentEnviarViaFirma}
+        {contentCrearCarpeta}
     </>;
     return {
         createActions: createDocumentActions,

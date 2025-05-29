@@ -172,6 +172,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC)));
         response.put("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
         response.put("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false));
+        response.put("isCreacioCarpetesActiva", aplicacioService.propertyBooleanFindByKey(PropertyConfig.CARPETES_CREACIO_ACTIVA, false));
         return response;
     }
 }
