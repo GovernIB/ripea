@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +30,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
@@ -54,6 +56,7 @@ import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -85,6 +88,8 @@ import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
@@ -103,6 +108,7 @@ import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.CacheResourceHelper;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
+import es.caib.ripea.service.resourceservice.InteressatResourceServiceImpl.PaisFieldOptionsProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -125,6 +131,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final RolHelper rolHelper;
 	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	private final DocumentFirmaViaFirmaHelper firmaViaFirmaHelper;
+	private final UsuariHelper usuariHelper;
 
     private final UsuariResourceRepository usuariResourceRepository;
     private final DocumentResourceRepository documentResourceRepository;
@@ -167,6 +174,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         //Dades externes
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
+        register(DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi, new ViaFirmaDispositiuOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
     
@@ -191,6 +199,25 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			return resultat;
 		}
 	}
+    
+    public class ViaFirmaDispositiuOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			String[] requestParam = requestParameterMap.get(DocumentResource.ViaFirmaForm.Fields.codiUsuariViaFirma);
+			String vfUserCodi = requestParam!=null?requestParam[0]:"";
+			List<ViaFirmaDispositiuDto> dispos = pluginHelper.getDeviceUser(
+					vfUserCodi,
+					firmaViaFirmaHelper.getViaFirmaUsuariPassword(vfUserCodi));
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (dispos!=null) {
+				for (ViaFirmaDispositiuDto dsp: dispos) {
+					resultat.add(new FieldOption(dsp.getCodi(), dsp.getDescripcio()));
+				}
+			}
+			return resultat;
+		}
+    	
+    }
     
     @Override
     public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
@@ -765,6 +792,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     
     private class ViaFirmaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ViaFirmaForm, Serializable> {
 
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+        	List<FieldOption> resultat = new ArrayList<>();
+        	if (DocumentResource.ViaFirmaForm.Fields.codiUsuariViaFirma.equals(fieldName)) {
+        		Set<ViaFirmaUsuariEntity> vfUsuaris = usuariHelper.viaFirmaUsuarisUsuariActual();
+        		if (vfUsuaris!=null) {
+        			for (ViaFirmaUsuariEntity vfue: vfUsuaris) {
+        				resultat.add(new FieldOption(vfue.getCodi(), vfue.getDescripcio()));
+        			}
+        		}
+        	}
+        	return resultat;
+        }
+    	
 		@Override
 		public void onChange(Serializable id, ViaFirmaForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ViaFirmaForm target) {
 			if (fieldName==null) {
@@ -772,17 +813,37 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				target.setTitol(docRes.getNom());
 				target.setDescripcio("Firm de document "+docRes.getNom()+"["+docRes.getMetaDocument().getNom()+"]");
 				target.setDispositiusEnabled(configHelper.getAsBoolean(PropertyConfig.VIAFIRMA_PLUGIN_DISPOSITIUS_ENABLED));
-			} else if ("interessat".equals(fieldName)) {
+			} else if (DocumentResource.ViaFirmaForm.Fields.interessat.equals(fieldName)) {
 				InteressatResourceEntity intRes = interessatResourceRepository.findById((Long)fieldValue).get();
 				target.setSignantNom(intRes.getNomComplet());
 				target.setSignantNif(intRes.getDocumentNum());
+			} else if (DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi.equals(fieldName)) {
+				
 			}
 		}
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, ViaFirmaForm params) throws ActionExecutionException {
-			// TODO Auto-generated method stub
-			return null;
+			try {
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				ViaFirmaEnviarDto viaFirmaEnviarDto = new ViaFirmaEnviarDto();
+				viaFirmaEnviarDto.setTitol(params.getTitol());
+				viaFirmaEnviarDto.setDescripcio(params.getDescripcio());
+				viaFirmaEnviarDto.setCodiUsuariViaFirma(params.getCodiUsuariViaFirma());
+				viaFirmaEnviarDto.setViaFirmaDispositiuCodi(params.getViaFirmaDispositiuCodi());
+				viaFirmaEnviarDto.setSignantNif(params.getSignantNif());
+				viaFirmaEnviarDto.setSignantNom(params.getSignantNom());
+				viaFirmaEnviarDto.setObservacions(params.getObservacions());
+				viaFirmaEnviarDto.setFirmaParcial(params.getFirmaParcial());
+				viaFirmaEnviarDto.setValidateCodeEnabled(params.getValidateCodeEnabled());
+				viaFirmaEnviarDto.setValidateCode(params.getValidateCode());
+				viaFirmaEnviarDto.setRebreCorreu(params.getRebreCorreu());
+				firmaViaFirmaHelper.viaFirmaEnviar(entitatEntity.getId(), entity.getId(), viaFirmaEnviarDto);
+				return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/ViaFirmaActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al enviar a viaFirma: "+e.getMessage());
+			}
 		}
     }
     
@@ -798,23 +859,28 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, NewDocPinbalForm params) throws ActionExecutionException {
-			//La entitat ja es comprova a pinbalHelper
-			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-			
-			PinbalConsultaDto consulta = new PinbalConsultaDto();
-			consulta.setInteressatId(params.getTitular().getId());
-			consulta.setFinalitat(params.getFinalitat());
-			consulta.setConsentiment(params.getConsentiment());
-			
-			//TODO: afegir la resta de parametres opcionals que depenen del servei
-			
-			pinbalHelper.pinbalNovaConsulta(
-					entitatEntity.getId(),
-					entity.getExpedient().getId(), //TODO: El pare pot ser una carpeta
-					entity.getMetaDocument().getId(),
-					consulta, 
-					configHelper.getRolActual());
-			return null;
+			try {
+				//La entitat ja es comprova a pinbalHelper
+				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+				
+				PinbalConsultaDto consulta = new PinbalConsultaDto();
+				consulta.setInteressatId(params.getTitular().getId());
+				consulta.setFinalitat(params.getFinalitat());
+				consulta.setConsentiment(params.getConsentiment());
+				
+				//TODO: afegir la resta de parametres opcionals que depenen del servei
+				
+				pinbalHelper.pinbalNovaConsulta(
+						entitatEntity.getId(),
+						entity.getExpedient().getId(), //TODO: El pare pot ser una carpeta
+						entity.getMetaDocument().getId(),
+						consulta, 
+						configHelper.getRolActual());
+				return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/NouDocumentPinbalActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al generar document PINBAL: "+e.getMessage());
+			}				
 		}
     }
     

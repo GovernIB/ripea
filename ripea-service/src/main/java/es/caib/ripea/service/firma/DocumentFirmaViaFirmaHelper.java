@@ -9,11 +9,18 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.persistence.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
+import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.persistence.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.service.helper.AlertaHelper;
 import es.caib.ripea.service.helper.CacheHelper;
@@ -29,61 +36,128 @@ import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 
 @Component
 public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 
-	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private DocumentViaFirmaRepository documentViaFirmaRepository;
-	@Autowired
-	private AlertaHelper alertaHelper;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
+	@Autowired private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired private DispositiuEnviamentRepository dispositiuEnviamentRepository;	
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private ViaFirmaUsuariRepository viaFirmaUsuariRepository;
 	
-	@Autowired
-	private ContingutHelper contingutHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private AlertaHelper alertaHelper;
+	@Autowired private EmailHelper emailHelper;
+	@Autowired private OrganGestorHelper organGestorHelper;
+	@Autowired private ContingutHelper contingutHelper;
 
-	public void viaFirmaEnviar(DocumentViaFirmaEntity documentViaFirma) throws SistemaExternException {
-		DocumentEntity document = documentViaFirma.getDocument();
-		try {
-			String messageCode = pluginHelper.viaFirmaUpload(
-					document,
-					documentViaFirma);
-			documentViaFirma.updateEnviat(
-					new Date(),
-					messageCode);
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
-		} catch (Exception ex) {
-			Throwable rootCause = ExceptionUtils.getRootCause(ex);
-			if (rootCause == null) rootCause = ex;
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_VIAFIRMA,
-					rootCause.getMessage());
+	public void viaFirmaEnviar(Long entitatId, Long documentId, ViaFirmaEnviarDto viaFirmaEnviarDto) throws SistemaExternException {
+			
+		String contrasenyaUsuariViaFirma;
+		UsuariEntity usuari = usuariRepository.findByCodi(
+				SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		DocumentEntity document = documentHelper.comprovarDocument(
+				entitatId,
+				documentId,
+				false,
+				true,
+				false,
+				false, 
+				false, 
+				null);
+		if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"El document a enviar a viaFirma no és del tipus " + DocumentTipusEnumDto.DIGITAL);
+		}
+		if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"El document a enviar a viaFirma te alertes de validació");
+		}
+		if (DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) ||
+				DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
+			throw new ValidationException(
+					document.getId(),
+					DocumentEntity.class,
+					"No es poden enviar a viaFirma documents firmats o custodiats");
+		}
+		//Recuperar contrasenya usuari
+		for (ViaFirmaUsuariEntity viaFirmaDispositiuDto : usuari.getViaFirmaUsuaris()) {
+			if (viaFirmaDispositiuDto.getCodi().equals(viaFirmaEnviarDto.getCodiUsuariViaFirma())) {
+				contrasenyaUsuariViaFirma = viaFirmaDispositiuDto.getContrasenya();
+				viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
+			}
 		}
 		
-		documentViaFirmaRepository.save(documentViaFirma);
-		document.updateEstat(
-				DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
-		contingutLogHelper.log(
+		//Cridada desde formulari REACT, a on nomes carregam el codi del dispositiu
+		if (viaFirmaEnviarDto.getViaFirmaDispositiu() == null &&
+			viaFirmaEnviarDto.getViaFirmaDispositiuCodi() != null) {
+
+			List<ViaFirmaDispositiuDto> viaFirmaDispositiusDto = pluginHelper.getDeviceUser(
+					viaFirmaEnviarDto.getCodiUsuariViaFirma(), 
+					getViaFirmaUsuariPassword(viaFirmaEnviarDto.getCodiUsuariViaFirma()));
+			for (ViaFirmaDispositiuDto dispo: viaFirmaDispositiusDto) {
+				if (dispo.getCodi().equals(viaFirmaEnviarDto.getViaFirmaDispositiuCodi())) {
+					viaFirmaEnviarDto.setViaFirmaDispositiu(dispo);
+					break;
+				}
+			}
+		}
+		
+		DispositiuEnviamentEntity dispositiuEnviament = null;
+		if (viaFirmaEnviarDto.getViaFirmaDispositiu() != null) {
+			//Guardar dispositiu associat a l'enviament
+			dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
+					viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
+			
+			dispositiuEnviamentRepository.save(dispositiuEnviament);
+		}
+		
+		//Guardar document a enviar
+		DocumentViaFirmaEntity documentViaFirma = DocumentViaFirmaEntity.getBuilder(
+				DocumentEnviamentEstatEnumDto.PENDENT,
+				viaFirmaEnviarDto.getCodiUsuariViaFirma(),
+				viaFirmaEnviarDto.getContrasenyaUsuariViaFirma(),
+				viaFirmaEnviarDto.getTitol(),
+				viaFirmaEnviarDto.getDescripcio(),
+				dispositiuEnviament != null ? dispositiuEnviament.getCodi() : null,
+				viaFirmaEnviarDto.getSignantNif(),
+				viaFirmaEnviarDto.getSignantNom(),
+				viaFirmaEnviarDto.getObservacions(),
+				dispositiuEnviament,
+				document.getMetaDocument().isBiometricaLectura(),
+				document.getExpedient(),
 				document,
-				LogTipusEnumDto.VFIRMA_ENVIAMENT,
-				documentViaFirma.getMessageCode(),
-				documentViaFirma.getEstat().name(),
-				false,
-				false);
+				viaFirmaEnviarDto.isFirmaParcial(),
+				viaFirmaEnviarDto.isValidateCodeEnabled(),
+				viaFirmaEnviarDto.getValidateCode(),
+				viaFirmaEnviarDto.isRebreCorreu()).build();			
+		
+		viaFirmaEnviar(documentViaFirma);
 	}
 	
 	public Exception viaFirmaProcessar(
@@ -236,6 +310,36 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		return null;
 	}
 
+	private void viaFirmaEnviar(DocumentViaFirmaEntity documentViaFirma) {
+		DocumentEntity document = documentViaFirma.getDocument();
+		try {
+			String messageCode = pluginHelper.viaFirmaUpload(
+					document,
+					documentViaFirma);
+			documentViaFirma.updateEnviat(
+					new Date(),
+					messageCode);
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		} catch (Exception ex) {
+			Throwable rootCause = ExceptionUtils.getRootCause(ex);
+			if (rootCause == null) rootCause = ex;
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_VIAFIRMA,
+					rootCause.getMessage());
+		}
+		
+		documentViaFirmaRepository.save(documentViaFirma);
+		document.updateEstat(
+				DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
+		contingutLogHelper.log(
+				document,
+				LogTipusEnumDto.VFIRMA_ENVIAMENT,
+				documentViaFirma.getMessageCode(),
+				documentViaFirma.getEstat().name(),
+				false,
+				false);
+	}
+	
 	public void viaFirmaReintentar(DocumentViaFirmaEntity documentPortafirmes) {
 		contingutLogHelper.log(
 				documentPortafirmes.getDocument(),
@@ -290,6 +394,9 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		return viaFirmaProcessar(documentViaFirma);
 	}
 	
+	public String getViaFirmaUsuariPassword(String codiUsuari) {
+		return viaFirmaUsuariRepository.findById(codiUsuari).get().getContrasenya();
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentFirmaViaFirmaHelper.class);
 }

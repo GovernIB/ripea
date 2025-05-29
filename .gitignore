@@ -15,3 +15,4 @@ target/
 /jboss.profile
 /boot.profile
 /ripea-back/src/main/webapp/reactapp/
+/ripea-back/src/main/jsapp/ripea-back/public/build-info.json

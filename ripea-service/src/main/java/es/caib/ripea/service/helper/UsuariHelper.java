@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 
 @Component
@@ -183,6 +186,11 @@ public class UsuariHelper {
 		return configHelper.getConfig(PropertyConfig.IDIOMA_DEFECTE);
 	}
 
+	public Set<ViaFirmaUsuariEntity> viaFirmaUsuarisUsuariActual() {
+		UsuariEntity usuari = usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName());
+		return usuari.getViaFirmaUsuaris();
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(UsuariHelper.class);
 
 }

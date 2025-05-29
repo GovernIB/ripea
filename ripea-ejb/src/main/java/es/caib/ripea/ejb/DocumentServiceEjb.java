@@ -263,13 +263,11 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 	public void viaFirmaEnviar(
 			Long entitatId, 
 			Long documentId, 
-			ViaFirmaEnviarDto viaFirmaEnviarDto,
-			UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException {
+			ViaFirmaEnviarDto viaFirmaEnviarDto) throws NotFoundException, IllegalStateException, SistemaExternException {
 		delegateService.viaFirmaEnviar(
 				entitatId, 
 				documentId, 
-				viaFirmaEnviarDto, 
-				usuariActual);
+				viaFirmaEnviarDto);
 	}
 	
 	@Override

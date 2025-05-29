@@ -350,11 +350,7 @@ public interface DocumentService {
 	 *             Hi ha hagut algun error en la comunicació amb el portafirmes.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public void viaFirmaEnviar(
-			Long entitatId,
-			Long documentId,
-			ViaFirmaEnviarDto viaFirmaEnviarDto,
-			UsuariDto usuariActual) throws NotFoundException, IllegalStateException, SistemaExternException;
+	public void viaFirmaEnviar(Long entitatId, Long documentId, ViaFirmaEnviarDto viaFirmaEnviarDto) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Cancela l'enviament d'un document a firmar a ViaFirma.

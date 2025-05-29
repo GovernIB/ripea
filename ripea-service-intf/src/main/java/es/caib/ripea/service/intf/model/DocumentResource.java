@@ -324,20 +324,20 @@ public class DocumentResource extends NodeResource {
     
     @Getter
     @Setter
+    @FieldNameConstants
     public static class ViaFirmaForm implements Serializable {
     	@Size(max=256)
     	private String titol;
     	@Size(max=256)
     	private String descripcio;
-    	
-//        @Transient
-//        @ResourceField(enumType = true, onChangeActive = true)
-//    	private String portafirmesEnviarFluxId;
-    	
     	@NotEmpty
+        @Transient
+        @ResourceField(enumType = true, onChangeActive = true)
     	private String codiUsuariViaFirma;
-    	private String codisUsuariViaFirma;
-    	private String dispositiuViaFirma;
+    	@Transient 
+    	private boolean isDispositiusEnabled = false;
+    	@ResourceField(enumType = true)
+    	private String viaFirmaDispositiuCodi;
     	private ResourceReference<InteressatResource, Long> interessat;
     	@NotEmpty
     	private String signantNif;
@@ -349,7 +349,6 @@ public class DocumentResource extends NodeResource {
     	private Boolean validateCodeEnabled;
     	private String validateCode;
     	private Boolean rebreCorreu;
-    	private boolean isDispositiusEnabled = false;
     }
     
     @Getter

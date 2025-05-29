@@ -23,7 +23,6 @@ import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.persistence.entity.ContingutEntity;
-import es.caib.ripea.persistence.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
@@ -35,7 +34,6 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
-import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
@@ -75,7 +73,6 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -116,7 +113,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private DocumentViaFirmaRepository documentViaFirmaRepository;
-	@Autowired private DispositiuEnviamentRepository dispositiuEnviamentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ContingutHelper contingutHelper;
@@ -1151,99 +1147,14 @@ public class DocumentServiceImpl implements DocumentService {
 	public void viaFirmaEnviar(
 			Long entitatId, 
 			Long documentId, 
-			ViaFirmaEnviarDto viaFirmaEnviarDto,
-			UsuariDto usuariActual)
+			ViaFirmaEnviarDto viaFirmaEnviarDto)
 			throws NotFoundException, IllegalStateException, SistemaExternException {
-		logger.debug("Enviant document a viaFirma (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + documentId + ")");
-		String contrasenyaUsuariViaFirma;
+		logger.debug("Enviant document a viaFirma (entitatId=" + entitatId + ", id=" + documentId + ")");
 		try {
-			UsuariEntity usuari = usuariRepository.findByCodi(usuariActual.getCodi());
-			
-			DocumentEntity document = documentHelper.comprovarDocument(
-					entitatId,
-					documentId,
-					false,
-					true,
-					false,
-					false, 
-					false, 
-					null);
-			if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-				throw new ValidationException(
-						document.getId(),
-						DocumentEntity.class,
-						"El document a enviar a viaFirma no és del tipus " + DocumentTipusEnumDto.DIGITAL);
-			}
-			if (!cacheHelper.findErrorsValidacioPerNode(document).isEmpty()) {
-				throw new ValidationException(
-						document.getId(),
-						DocumentEntity.class,
-						"El document a enviar a viaFirma te alertes de validació");
-			}
-			if (DocumentEstatEnumDto.FIRMAT.equals(document.getEstat()) ||
-					DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat())) {
-				throw new ValidationException(
-						document.getId(),
-						DocumentEntity.class,
-						"No es poden enviar a viaFirma documents firmats o custodiats");
-			}
-			//Recuperar contrasenya usuari
-			for (ViaFirmaUsuariEntity viaFirmaDispositiuDto : usuari.getViaFirmaUsuaris()) {
-				if (viaFirmaDispositiuDto.getCodi().equals(viaFirmaEnviarDto.getCodiUsuariViaFirma())) {
-					contrasenyaUsuariViaFirma = viaFirmaDispositiuDto.getContrasenya();
-					viaFirmaEnviarDto.setContrasenyaUsuariViaFirma(contrasenyaUsuariViaFirma);
-				}
-			}
-			DispositiuEnviamentEntity dispositiuEnviament = null;
-			if (viaFirmaEnviarDto.getViaFirmaDispositiu() != null) {
-				//Guardar dispositiu associat a l'enviament
-				dispositiuEnviament = DispositiuEnviamentEntity.getBuilder(
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodi(), 
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiAplicacio(), 
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getDescripcio(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getLocal(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getEstat(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getToken(), 
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificador(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getTipus(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getEmailUsuari(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getCodiUsuari(),
-						viaFirmaEnviarDto.getViaFirmaDispositiu().getIdentificadorNacional()).build();
-				
-				dispositiuEnviamentRepository.save(dispositiuEnviament);
-			}
-			//Guardar document a enviar
-			DocumentViaFirmaEntity documentViaFirma = DocumentViaFirmaEntity.getBuilder(
-					DocumentEnviamentEstatEnumDto.PENDENT,
-					viaFirmaEnviarDto.getCodiUsuariViaFirma(),
-					viaFirmaEnviarDto.getContrasenyaUsuariViaFirma(),
-					viaFirmaEnviarDto.getTitol(),
-					viaFirmaEnviarDto.getDescripcio(),
-					dispositiuEnviament != null ? dispositiuEnviament.getCodi() : null,
-					viaFirmaEnviarDto.getSignantNif(),
-					viaFirmaEnviarDto.getSignantNom(),
-					viaFirmaEnviarDto.getObservacions(),
-					dispositiuEnviament,
-					document.getMetaDocument().isBiometricaLectura(),
-					document.getExpedient(),
-					document,
-					viaFirmaEnviarDto.isFirmaParcial(),
-					viaFirmaEnviarDto.isValidateCodeEnabled(),
-					viaFirmaEnviarDto.getValidateCode(),
-					viaFirmaEnviarDto.isRebreCorreu()).build();
-			
-			firmaViaFirmaHelper.viaFirmaEnviar(documentViaFirma);
-		
+			firmaViaFirmaHelper.viaFirmaEnviar(entitatId, documentId, viaFirmaEnviarDto);
 		} catch (Exception ex) {
-			logger.error(
-					"Error a l'hora d'enviar el document a viaFirma (" +
-					"documentId=" + documentId + ")",
-					ex);
-			throw new RuntimeException(
-					"Error a l'hora d'enviar el document a viaFirma: " + ex.getMessage(),
-					ex);
+			logger.error("Error a l'hora d'enviar el document a viaFirma (documentId=" + documentId + ")", ex);
+			throw new RuntimeException("Error a l'hora d'enviar el document a viaFirma: " + ex.getMessage(),ex);
 		}
 	}
 	

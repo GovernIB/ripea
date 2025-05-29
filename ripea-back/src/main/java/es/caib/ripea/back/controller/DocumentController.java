@@ -624,7 +624,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@Valid ViaFirmaEnviarCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelPortafirmes(request, documentId, model);
@@ -635,8 +634,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			documentService.viaFirmaEnviar(
 					entitatActual.getId(),
 					documentId,
-					ViaFirmaEnviarCommand.asDto(command),
-					usuariActual);
+					ViaFirmaEnviarCommand.asDto(command));
 		} catch (Exception ex) {
 			emplenarModelPortafirmes(
 					request,

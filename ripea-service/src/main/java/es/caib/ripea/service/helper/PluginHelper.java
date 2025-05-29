@@ -5366,10 +5366,7 @@ public class PluginHelper {
 		}
 	}
 
-	public List<ViaFirmaDispositiuDto> getDeviceUser(
-			String codiUsuari,
-			String contasenya) {
-
+	public List<ViaFirmaDispositiuDto> getDeviceUser(String codiUsuari, String contasenya) {
 		List<ViaFirmaDispositiuDto> viaFirmaDispositiusDto = new ArrayList<>();
 		try {
 			List<ViaFirmaDispositiu> viaFirmaDispositius = getViaFirmaPlugin().getDeviceUser(
@@ -5384,7 +5381,7 @@ public class PluginHelper {
 		}
 		return viaFirmaDispositiusDto;
 	}
-
+	
 	public String firmaSimpleWebStart(
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
