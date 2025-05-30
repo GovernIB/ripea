@@ -851,15 +851,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
             switch (fieldName) {
-                case DocumentResource.NewDocPinbalForm.Fields.provincia:
-                case DocumentResource.NewDocPinbalForm.Fields.provinciaNaixament:
+                case NewDocPinbalForm.Fields.provincia:
+                case NewDocPinbalForm.Fields.provinciaNaixament:
                     resultat.add(new FieldOption("07", "Illes Balears"));
                     break;
-                case DocumentResource.NewDocPinbalForm.Fields.comunitatAutonoma:
+                case NewDocPinbalForm.Fields.comunitatAutonoma:
                     resultat.add(new FieldOption("04", "Illes Balears"));
                     break;
-                case DocumentResource.NewDocPinbalForm.Fields.nacionalitat:
-                case DocumentResource.NewDocPinbalForm.Fields.paisNaixament:
+                case NewDocPinbalForm.Fields.nacionalitat:
+                case NewDocPinbalForm.Fields.paisNaixament:
                     List<PaisDto> paisos = cacheHelper.findPaisos();
                     if (paisos!=null) {
                         for (PaisDto dsp: paisos) {
@@ -867,7 +867,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         }
                     }
                     break;
-                case DocumentResource.NewDocPinbalForm.Fields.municipi:
+                case NewDocPinbalForm.Fields.municipi:
+                case NewDocPinbalForm.Fields.municipiNaixament:
+                case NewDocPinbalForm.Fields.municipiRegistre:
                     List<MunicipiDto> munis = cacheHelper.findMunicipisPerProvinciaPinbal("07");
                     if (munis!=null) {
                         for (MunicipiDto dsp: munis) {
@@ -889,12 +891,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                             .ifPresent(metaDocumentResourceEntity -> {
                                 if (metaDocumentResourceEntity.getPinbalServei() != null && metaDocumentResourceEntity.getPinbalServei().getCodi() != null) {
                                     target.setCodiServeiPinbal(metaDocumentResourceEntity.getPinbalServei().getCodi());
+                                    target.setFinalitat(metaDocumentResourceEntity.getPinbalFinalitat());
                                 } else {
                                     target.setTipusDocument(null);
                                 }
                             });
                 } else {
                     target.setCodiServeiPinbal(null);
+                    target.setFinalitat(null);
                 }
 			}
 		}
