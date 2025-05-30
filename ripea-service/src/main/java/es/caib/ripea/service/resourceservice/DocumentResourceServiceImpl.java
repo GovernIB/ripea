@@ -180,6 +180,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.NewDocPinbalForm.Fields.municipi, new MunicipiPinbalOptionsProvider());
         register(DocumentResource.NewDocPinbalForm.Fields.nacionalitat, new PaisPinbalOptionsProvider());
         register(DocumentResource.NewDocPinbalForm.Fields.paisNaixament, new PaisPinbalOptionsProvider());
+        register(DocumentResource.NewDocPinbalForm.Fields.comunitatAutonoma, new ComunitatPinbalOptionsProvider());
+        register(DocumentResource.NewDocPinbalForm.Fields.provincia, new ProvinciaPinbalOptionsProvider());
+        register(DocumentResource.NewDocPinbalForm.Fields.provinciaNaixament, new ProvinciaPinbalOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
     
@@ -247,6 +250,24 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					resultat.add(new FieldOption(dsp.getCodi(), dsp.getNom()));
 				}
 			}
+			return resultat;
+		}
+    }
+    
+    private class ComunitatPinbalOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			resultat.add(new FieldOption("04", "Illes Balears"));
+			return resultat;
+		}
+    }
+    
+    private class ProvinciaPinbalOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			resultat.add(new FieldOption("07", "Illes Balears"));
 			return resultat;
 		}
     }

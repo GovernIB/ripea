@@ -347,8 +347,10 @@ public class DocumentResource extends NodeResource {
     	@Transient
     	private String codiServeiPinbal;
 
-        private String comunitatAutonoma;
-        private String provincia;
+    	@ResourceField(enumType = true)
+        private String comunitatAutonoma = "04";
+    	@ResourceField(enumType = true)
+        private String provincia = "07";
         @ResourceField(enumType = true)
         private String municipi;
         private Date dataConsulta;
@@ -363,7 +365,8 @@ public class DocumentResource extends NodeResource {
         private String paisNaixament = "724";
         private boolean ausenciaSegundoApellido;
         private SexeEnumDto sexe;
-        private String provinciaNaixament;
+        @ResourceField(enumType = true)
+        private String provinciaNaixament = "07";
         private String poblacioNaixament;
         private String municipiNaixament;
         private String nomPare;
