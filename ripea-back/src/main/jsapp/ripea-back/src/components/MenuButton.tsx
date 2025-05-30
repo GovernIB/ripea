@@ -96,7 +96,7 @@ export const MenuActionButton = (props:MenuActionButtonProps) => {
                     entity?.id
                         ? action?.onClick?.(entity?.id, entity)
                         : action?.onClick?.(entity)
-                } key={`action-${index}`} disabled={action?.disabled==true || action?.disabled?.(entity)}>
+                } key={`action-${index}`} disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}>
                     {action.icon && <Icon>{action.icon}</Icon>}{action.title}
                 </MenuItem>
         )}
