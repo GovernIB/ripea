@@ -10,6 +10,7 @@ import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -269,4 +270,11 @@ public interface ExpedientInteressatService {
 
 	@PreAuthorize("isAuthenticated()")
 	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats);
+
+	@PreAuthorize("isAuthenticated()")
+	public List<InteressatDto> extreureInteressatsExcel(InputStream inputStream);
+
+	@PreAuthorize("isAuthenticated()")
+	public byte[] getModelDadesInteressatsExcel();
+	
 }

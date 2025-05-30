@@ -280,6 +280,9 @@ function descarregarDocumentExport() {
 			<a href="<c:url value="/expedient/${expedientId}/interessat/importar"/>" id="importInteressatBtn" class="btn btn-default" data-toggle="modal">
 				<span class="fa fa-download"></span>&nbsp;<spring:message code="contingut.boto.imp.interessat"/>
 			</a>
+			<a href="<c:url value="/expedient/getModelDadesInteressatsExcel"/>" class="btn btn-success" title="<spring:message code="contingut.importar.interessat.model"/>">
+				<span class="fa fa-file-excel-o"></span>
+			</a>
 			<a href="<c:url value="/expedient/${expedientId}/interessat/new"/>" id="addInteressatBtn" style="margin-left: 45px;" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="enableNotificar">
 				<span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/>
 			</a>

@@ -27,6 +27,7 @@
     <form:hidden path="accio" />
     
     <c:if test="${interessatImportCommand.accio=='INTERESSATS'}">
+    	<rip:inputSelect name="tipus" optionEnum="InteressatImportacioTipusDto" textKey="contingut.camp.importar.tipus"/>
    		<rip:inputFile name="fitxerInteressats" textKey="contingut.camp.importar.interessats" doNotShowErrors="1"/>
    	</c:if>
 

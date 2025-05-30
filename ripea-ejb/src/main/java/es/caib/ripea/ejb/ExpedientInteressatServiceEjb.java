@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.ejb;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -181,4 +182,17 @@ public class ExpedientInteressatServiceEjb extends AbstractServiceEjb<ExpedientI
 	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats) throws NotFoundException {
 		return delegateService.importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
 	}
+	
+	@Override
+	@RolesAllowed("**")
+	public List<InteressatDto> extreureInteressatsExcel(InputStream inputStream) {
+		return delegateService.extreureInteressatsExcel(inputStream);
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public byte[] getModelDadesInteressatsExcel() {
+		return delegateService.getModelDadesInteressatsExcel();
+	}
+	
 }

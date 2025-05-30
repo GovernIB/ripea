@@ -2,6 +2,7 @@ package es.caib.ripea.back.command;
 
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,10 +14,12 @@ public class InteressatImportCommand {
 
     private Long expedientId;
     private String accio = "INTERESSATS"; //INTERESSATS = Recupera interessats, SAVE = Importa els interessats
+    private InteressatImportacioTipusDto tipus;
     private MultipartFile fitxerInteressats;
     private List<InteressatPersonaFisicaDto> interessatsFisica = new ArrayList<InteressatPersonaFisicaDto>();
     private List<InteressatPersonaJuridicaDto> interessatsJuridi = new ArrayList<InteressatPersonaJuridicaDto>();
     private List<InteressatAdministracioDto> interessatsAdmini = new ArrayList<InteressatAdministracioDto>();
+    
     @SuppressWarnings("unused")
 	private boolean hasInteressats=false;
 
@@ -68,7 +71,15 @@ public class InteressatImportCommand {
         this.interessatsAdmini = interessatsAdmini;
     }
 
-    public boolean isHasInteressats() {
+    public InteressatImportacioTipusDto getTipus() {
+		return tipus;
+	}
+
+	public void setTipus(InteressatImportacioTipusDto tipus) {
+		this.tipus = tipus;
+	}
+
+	public boolean isHasInteressats() {
         return ((this.interessatsFisica!=null && this.interessatsFisica.size()>0) ||
                 (this.interessatsJuridi!=null && this.interessatsJuridi.size()>0) ||
                 (this.interessatsAdmini!=null && this.interessatsAdmini.size()>0));
