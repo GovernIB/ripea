@@ -12,13 +12,14 @@ const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
 const useTempSession = (key:string) => {
     const { get, remove } = useSseExpedientSession();
-    const value = get(key)
-
-    useEffect(() => {
-        if (value){
-            // remove(key)
-        }
-    }, [value]);
+    // const value = get(key)
+    //
+    // useEffect(() => {
+    //     if (value){
+    //         console.log("remove", key)
+    //         remove(key)
+    //     }
+    // }, [value]);
 
     return {
         value: get(key),

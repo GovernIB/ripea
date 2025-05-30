@@ -408,6 +408,8 @@ const translationCa = {
                 notificarMasiva: "Generar document per a notificar",
                 publicar: "Crear publicació",
                 changeType: "Cambiar tipus",
+                viaFirma: "Enviar document a ViaFirma",
+                import: "Importació de documents des del SGD",
             },
             dialog: {
                 generateZip: "S'ha generat un zip dels elements seleccionats",
@@ -423,7 +425,8 @@ const translationCa = {
                 firmaPendent: "Pendent de firmar",
                 firmaParcial: "Firmat parcialment",
                 errorPortafirmes: "Error a l'enviar al portafirmes",
-                funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB"
+                funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB",
+                folder: "En cas de no seleccionar una carpeta, s'importaran els documents directament a l'expedient.",
             },
             versio: {
                 title: "Versió",
