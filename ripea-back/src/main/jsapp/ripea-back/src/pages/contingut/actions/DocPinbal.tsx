@@ -26,8 +26,8 @@ const DocPinbalForm = () => {
         {data?.codiServeiPinbal == "SVDSCDDWS01" && <>
             <GridFormField xs={12} name="comunitatAutonoma"/>
             <GridFormField xs={12} name="provincia"/>
-            <GridFormField xs={12} name="dataConsulta"/>
-            <GridFormField xs={12} name="dataNaixement"/>
+            <GridFormField xs={12} name="dataConsulta" type={"date"}/>
+            <GridFormField xs={12} name="dataNaixement" type={"date"}/>
             <GridFormField xs={12} name="consentimentTipusDiscapacitat"/>
         </>}
         {data?.codiServeiPinbal == "SCDCPAJU" && <>
@@ -36,8 +36,8 @@ const DocPinbalForm = () => {
         </>}
         {data?.codiServeiPinbal == "SVDSCTFNWS01" && <>
             <GridFormField xs={12} name="comunitatAutonoma"/>
-            <GridFormField xs={12} name="dataConsulta"/>
-            <GridFormField xs={12} name="dataNaixement"/>
+            <GridFormField xs={12} name="dataConsulta" type={"date"}/>
+            <GridFormField xs={12} name="dataNaixement" type={"date"}/>
             <GridFormField xs={12} name="numeroTitol"/>
         </>}
         {data?.codiServeiPinbal == "SVDCCAACPCWS01" && <>
@@ -53,7 +53,7 @@ const DocPinbalForm = () => {
             <GridFormField xs={12} name="municipiNaixament"/>
             <GridFormField xs={12} name="nomPare"/>
             <GridFormField xs={12} name="nomMare"/>
-            <GridFormField xs={12} name="dataNaixement"/>
+            <GridFormField xs={12} name="dataNaixement" type={"date"}/>
             <GridFormField xs={12} name="telefon"/>
             <GridFormField xs={12} name="email"/>
         </>}
@@ -68,9 +68,9 @@ const DocPinbalForm = () => {
         {data?.codiServeiPinbal == "SVDDGPRESIDENCIALEGALDOCWS01" && <>
             <GridFormField xs={12} name="numeroSoporte"/>
             <GridFormField xs={12} name="tipusPassaport"/>
-            <GridFormField xs={12} name="dataCaducidad"/>
+            <GridFormField xs={12} name="dataCaducidad" type={"date"}/>
             <GridFormField xs={12} name="nacionalitat"/>
-            <GridFormField xs={12} name="dataExpedicion"/>
+            <GridFormField xs={12} name="dataExpedicion" type={"date"}/>
         </>}
         {data?.codiServeiPinbal == "SVDRRCCNACIMIENTOWS01" && <>
             {/* contingut.pinbal.form.legend.dadesRegistrals */}
@@ -95,11 +95,11 @@ const DocPinbalForm = () => {
             <GridFormField xs={12} name="pagina"/>
 
             {/* contingut.pinbal.form.legend.fetRegistral */}
-            <GridFormField xs={12} name="dataRegistre"/>
+            <GridFormField xs={12} name="dataRegistre" type={"date"}/>
             <GridFormField xs={12} name="municipiRegistre"/>
 
             {/* contingut.pinbal.form.legend.naixement */}
-            <GridFormField xs={12} name="dataNaixement"/>
+            <GridFormField xs={12} name="dataNaixement" type={"date"}/>
             <GridFormField xs={12} name="municipiNaixament"/>
 
             {/* contingut.pinbal.form.legend.dadesAdicionals */}

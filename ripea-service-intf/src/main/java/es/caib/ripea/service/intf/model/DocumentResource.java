@@ -367,7 +367,9 @@ public class DocumentResource extends NodeResource {
         private SexeEnumDto sexe;
         @ResourceField(enumType = true)
         private String provinciaNaixament = "07";
+        @ResourceField(enumType = true)
         private String poblacioNaixament;
+        @ResourceField(enumType = true)
         private String municipiNaixament;
         private String nomPare;
         private String nomMare;
@@ -382,6 +384,7 @@ public class DocumentResource extends NodeResource {
         private String tom;
         private String pagina;
         private Date dataRegistre;
+        @ResourceField(enumType = true)
         private String municipiRegistre;
 
         private Integer curs;
