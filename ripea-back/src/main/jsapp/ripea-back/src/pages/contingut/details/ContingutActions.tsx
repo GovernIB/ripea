@@ -14,7 +14,7 @@ import useEnviarPortafirmes from "../actions/EnviarPortafirmes.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
-import useFirmaNevegador from "../actions/FirmaNevegador.tsx";
+import useFirmaNavegador from "../actions/FirmaNavegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
 import useCrearCarpeta from "../actions/CrearCarpeta.tsx";
@@ -89,7 +89,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleNotificarShow, content: contentNotificar} = useNotificar(refresh);
     const {handleShow: handlePublicarShow, content: contentPublicar} = usePublicar(refresh);
     const {handleShow: handleEviarPortafirmesShow, content: contentEviarPortafirmes} = useEnviarPortafirmes(refresh);
-    const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNevegador(refresh);
+    const {handleShow: handleFirmaShow, content: contentFirma} = useFirmaNavegador(refresh);
     const {handleShow: handleEnviarViaFirma, content: contentEnviarViaFirma} = useEnviarViaFirma(refresh)
 
     const isDocument= (row:any) => row?.tipus=="DOCUMENT";

@@ -404,6 +404,7 @@ const translationCa = {
                 move: "Moure contingut",
                 copy: "Copiar contingut",
                 vincular: "Enllaçar contingut",
+				pinbal: "Nou document a partir de petició a PINBAL",
                 notificar: "Crear notificació document",
                 notificarMasiva: "Generar document per a notificar",
                 publicar: "Crear publicació",

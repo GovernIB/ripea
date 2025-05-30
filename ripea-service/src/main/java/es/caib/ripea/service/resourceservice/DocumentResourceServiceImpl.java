@@ -46,6 +46,7 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
+import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -83,6 +84,8 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
 import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
@@ -120,6 +123,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ConfigHelper configHelper;
     private final PinbalHelper pinbalHelper;
     private final EmailHelper emailHelper;
+    private final CacheHelper cacheHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -173,6 +177,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
         register(DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi, new ViaFirmaDispositiuOptionsProvider());
+        register(DocumentResource.NewDocPinbalForm.Fields.municipi, new MunicipiPinbalOptionsProvider());
+        register(DocumentResource.NewDocPinbalForm.Fields.nacionalitat, new PaisPinbalOptionsProvider());
+        register(DocumentResource.NewDocPinbalForm.Fields.paisNaixament, new PaisPinbalOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
     
@@ -214,7 +221,34 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			}
 			return resultat;
 		}
-    	
+    }
+    
+    public class MunicipiPinbalOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			List<MunicipiDto> munis = cacheHelper.findMunicipisPerProvinciaPinbal("07");
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (munis!=null) {
+				for (MunicipiDto dsp: munis) {
+					resultat.add(new FieldOption(dsp.getCodi(), dsp.getNom()));
+				}
+			}
+			return resultat;
+		}
+    }
+    
+    public class PaisPinbalOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			List<PaisDto> paisos = cacheHelper.findPaisos();
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (paisos!=null) {
+				for (PaisDto dsp: paisos) {
+					resultat.add(new FieldOption(dsp.getCodi(), dsp.getNom()));
+				}
+			}
+			return resultat;
+		}
     }
     
     @Override

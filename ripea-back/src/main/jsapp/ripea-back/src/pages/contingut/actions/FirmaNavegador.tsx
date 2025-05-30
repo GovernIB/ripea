@@ -7,13 +7,13 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 
-const FirmaNevegadorForm = () => {
+const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="motiu"/>
     </Grid>
 }
 
-const FirmaNevegador = (props: any) => {
+const FirmaNavegador = (props: any) => {
     const {} = useTranslation();
 
     return <FormActionDialog
@@ -23,11 +23,11 @@ const FirmaNevegador = (props: any) => {
         initialOnChange
         {...props}
     >
-        <FirmaNevegadorForm/>
+        <FirmaNavegadorForm/>
     </FormActionDialog>
 }
 
-export const useFirmaNevegador = (refresh?: () => void) => {
+export const useFirmaNavegador = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
     const { value: firma } = useFirmaFinalitzadaSession();
@@ -58,9 +58,9 @@ export const useFirmaNevegador = (refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <FirmaNevegador apiRef={apiRef}
+        content: <FirmaNavegador apiRef={apiRef}
                                  formDialogResultProcessor={formDialogResultProcessor}
                                  onError={onError}/>
     }
 }
-export default useFirmaNevegador;
+export default useFirmaNavegador;

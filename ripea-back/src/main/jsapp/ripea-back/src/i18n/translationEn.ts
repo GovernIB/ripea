@@ -404,6 +404,7 @@ const translationEn = {
                 move: "Move Content",
                 copy: "Copy Content",
                 vincular: "Link Content",
+				pinbal: "Create Document through PINBAL request",
                 notificar: "Create Document Notification",
                 notificarMasiva: "Generate document to notify",
                 publicar: "Create Publication",

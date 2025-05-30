@@ -349,6 +349,7 @@ public class DocumentResource extends NodeResource {
 
         private String comunitatAutonoma;
         private String provincia;
+        @ResourceField(enumType = true)
         private String municipi;
         private Date dataConsulta;
         private Date dataNaixement;
@@ -356,7 +357,9 @@ public class DocumentResource extends NodeResource {
         private Date dataExpedicion;
         private SiNoEnumDto consentimentTipusDiscapacitat;
         private String numeroTitol;
+        @ResourceField(enumType = true)
         private String nacionalitat = "724";
+        @ResourceField(enumType = true)
         private String paisNaixament = "724";
         private boolean ausenciaSegundoApellido;
         private SexeEnumDto sexe;

@@ -404,6 +404,7 @@ const translationEs = {
                 move: "Mover contenido",
                 copy: "Copiar contenido",
                 vincular: "Vincular contenido",
+				pinbal: "Nuevo documento a partir de petición PINBAL",
                 notificar: "Crear notificación documento",
                 notificarMasiva: "Generar documento para notificar",
                 publicar: "Crear publicación",

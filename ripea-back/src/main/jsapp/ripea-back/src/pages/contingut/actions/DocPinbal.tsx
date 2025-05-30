@@ -118,7 +118,7 @@ const DocPinbal = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"NEW_DOC_PINBAL"}
-        title={t('page.document.action.enviarEmail')}
+        title={t('page.document.action.pinbal')}
         {...props}
     >
         <DocPinbalForm/>

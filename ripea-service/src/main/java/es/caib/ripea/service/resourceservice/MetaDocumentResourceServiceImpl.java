@@ -11,13 +11,18 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.resourceservice.MetaDocumentResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -32,14 +37,24 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final ExpedientRepository expedientRepository;
 	private final DocumentRepository documentRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
+	private final EntityComprovarHelper entityComprovarHelper;
+	private final ConfigHelper configHelper;
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-        List<String> namedQueriesList = Stream.of(namedQueries).collect(Collectors.toList());
+    	
+    	List<String> namedQueriesList = Stream.of(namedQueries).collect(Collectors.toList());
 
-    	/**
-    	 * Current spring filter, per defecte: documents actius, de la entitat actual.
-    	 */
+        String entitatActualCodi = configHelper.getEntitatActualCodi();
+        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+    	
+        Filter filtreBase = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+//                ,FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", organActualCodi)
+        );
+
         Filter filtreResultat = null;
         List<MetaDocumentEntity> idsMetaDocsPermesos = null;
 
@@ -88,13 +103,8 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
                 filtreResultat = FilterBuilder.and(filtreResultat, filtreTipusDocsPermesos);
             }
         }
-
-        if (filtreResultat != null && !filtreResultat.isEmpty()) {
-            Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-            return FilterBuilder.and(filtreBase, filtreResultat).generate();
-        }
-
-    	return currentSpringFilter;
+        
+        return FilterBuilder.and(filtreBase, filtreResultat).generate();
     }
     
     private List<Long> getIdsFromEntitats(List<MetaDocumentEntity> metaDocsList) {
