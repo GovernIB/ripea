@@ -5,12 +5,14 @@ import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
+const sortModelTipusDocument:any = [{field: 'nom',sort: 'asc'}]
 const DocPinbalForm = () => {
     const {data} = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipusDocument"
-                       namedQueries={[`PINBAL_DOC#${data?.expedient?.id}`]}/>
+                       namedQueries={[`PINBAL_DOC#${data?.expedient?.id}`]}
+                       sortModel={sortModelTipusDocument}/>
         <GridFormField xs={12} name="titular"/>
         <GridFormField xs={12} name="consentiment" required/>
         <GridFormField xs={12} name="finalitat"/>

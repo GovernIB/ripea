@@ -409,6 +409,8 @@ const translationEn = {
                 notificarMasiva: "Generate document to notify",
                 publicar: "Create Publication",
                 changeType: "Change type",
+                viaFirma: "Send document to ViaFirma",
+                import: "Import of documents from the SGD",
             },
             dialog: {
                 generateZip: "A zip file has been generated with the selected items",
@@ -424,7 +426,8 @@ const translationEn = {
                 firmaPendent: "Pending signature",
                 firmaParcial: "Partially signed",
                 errorPortafirmes: "Error sending to portafirmas",
-                funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB"
+                funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
+                folder: "If no folder is selected, the documents will be imported directly into the case file.",
             },
             versio: {
                 title: "Version",

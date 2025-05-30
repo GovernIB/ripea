@@ -155,6 +155,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
         
+        register(ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE, new AmbDocumentsPinbalPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_INTERESSATS_CODE, new InteressatsPerspectiveApplicator());
@@ -327,9 +328,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
 		resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity));
 		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
-		List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getId());
-		resource.setAmbDocumentsPinbal(metaDocuments!=null && metaDocuments.size()>0);
-		resource.setCreacioCarpetesActiva(configHelper.getAsBoolean(PropertyConfig.CARPETES_CREACIO_ACTIVA));
 	}
 
     @Override
@@ -362,6 +360,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     		excepcioLogHelper.addExcepcio("/expedient/create", ex);
     		throw ex;
     	}
+    }
+
+    private class AmbDocumentsPinbalPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getId());
+            resource.setAmbDocumentsPinbal(metaDocuments!=null && !metaDocuments.isEmpty());
+        }
     }
 
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {

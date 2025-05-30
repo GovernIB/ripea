@@ -151,6 +151,7 @@ export const potModificar = (entity:any) :boolean => {
     return (isAgafatUsuariActual() && isUsuariActualWrite() || isAdminOAdminOrgan()) && !isTancat();
 }
 
+const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL']
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();
@@ -170,7 +171,7 @@ const Expedient = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id, {perspectives: ['COUNT', 'ESTAT', 'RELACIONAT']}).then((app) => setExpedient(app))
+            appGetOne(id, {perspectives}).then((app) => setExpedient(app))
         }
     },[apiIsReady])
 

@@ -36,7 +36,7 @@ const EnviarViaFirma = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"VIA_FIRMA"}
-        title={t('page.document.action.enviarEmail')}
+        title={t('page.document.action.viaFirma')}
         initialOnChange
         {...props}
     >

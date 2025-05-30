@@ -53,6 +53,9 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_AMB_PINBAL_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_INTERESSATS_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -189,7 +192,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_NOTIFICACIONS_CADUCADES = "NOTIFICACIONS_CADUCADES";
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
 	public static final String PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR = "DOCUMENTS_OBLIGATORIS_TANCAR";
-	
+	public static final String PERSPECTIVE_AMB_PINBAL_CODE = "AMB_PINBAL";
+
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 
 	@NotNull
@@ -385,7 +389,6 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	private String numeroRegistre;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
         private Date dataPresentacio;
-        @NotNull
     	private ResourceReference<CarpetaResource, Long> carpeta;
         private String novaCarpetaNom;
     }

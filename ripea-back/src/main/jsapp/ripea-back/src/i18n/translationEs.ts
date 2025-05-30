@@ -409,6 +409,8 @@ const translationEs = {
                 notificarMasiva: "Generar documento para notificar",
                 publicar: "Crear publicación",
                 changeType: "Cambiar tipo",
+                viaFirma: "Enviar documento a ViaFirma",
+                import: "Importación de documentos desde el SGD",
             },
             dialog: {
                 generateZip: "Se ha generado un zip de los elementos seleccionados",
@@ -425,6 +427,7 @@ const translationEs = {
                 firmaParcial: "Firmado parcialmente",
                 errorPortafirmes: "Error al enviar al portafirmas",
                 funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
+                folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
             },
             versio: {
                 title: "Versión",
