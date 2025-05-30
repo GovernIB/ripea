@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
@@ -22,6 +24,7 @@ import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -110,6 +113,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_IMPORT_DOCS,
+                        formClass = ExpedientResource.ImportarDocumentsForm.class,
+                        requiresId = true),                
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE,
                         formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
@@ -170,6 +178,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	public static final String ACTION_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
+	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
@@ -363,6 +372,22 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull
         private String motiu;
         private List<Long> documentsPerFirmar;
+    }
+    
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class ImportarDocumentsForm implements Serializable {
+    	@NotNull
+    	private TipusImportEnumDto tipusImportacio = TipusImportEnumDto.NUMERO_REGISTRE;
+    	private String codiEni;
+    	private String numeroRegistre;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
+        private Date dataPresentacio;
+        @NotNull
+    	private ResourceReference<CarpetaResource, Long> carpeta;
+        private String novaCarpetaNom;
     }
     
     public boolean estaRelacionatAmb(Long id) {

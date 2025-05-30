@@ -18,7 +18,6 @@ import es.caib.ripea.persistence.entity.ExpedientCarpetaArbreEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientCarpetaArbreRepository;
 import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
@@ -30,17 +29,13 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 @Component
 public class CarpetaHelper {
 
-	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private CarpetaRepository carpetaRepository;
 	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
-	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private ContingutHelper contingutHelper;
-	@Autowired private PluginHelper pluginHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private ExpedientCarpetaArbreRepository expedientCarpetaArbreRepository;
-	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private CacheHelper cacheHelper;
 	
 	public CarpetaDto create(

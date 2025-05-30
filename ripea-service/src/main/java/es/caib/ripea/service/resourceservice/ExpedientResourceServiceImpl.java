@@ -8,6 +8,7 @@ import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -67,6 +69,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -77,6 +80,7 @@ import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
+import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
@@ -84,6 +88,7 @@ import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
@@ -106,6 +111,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
     private final ConfigHelper configHelper;
+    private final CarpetaHelper carpetaHelper;
     private final ExpedientHelper expedientHelper;
     private final ContingutHelper contingutHelper;
     private final DocumentHelper documentHelper;
@@ -147,6 +153,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
+        register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_FOLLOWERS, new FollowersPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_COUNT, new CountPerspectiveApplicator());
@@ -828,6 +835,44 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats.");
 			}
     	}
+    }
+    
+    private class ImportarDocumentsArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarDocumentsForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ImportarDocumentsForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarDocumentsForm target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarDocumentsForm params) throws ActionExecutionException {
+			try {
+				String entitatActual = configHelper.getEntitatActualCodi();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+				Long destiId = entity.getId();
+				if (params.getCarpeta()==null) {
+					if (Utils.hasValue(params.getNovaCarpetaNom())) {
+						destiId = carpetaHelper.create(
+								entitatEntity.getId(),
+								entity.getId(),
+								params.getNovaCarpetaNom(),
+								false,
+								null,
+								false,
+								null, 
+								false, 
+								null, 
+								true).getId();
+					}
+				} else {
+					destiId = params.getCarpeta().getId();
+				}
+				ImportacioDto importacioDto = new ImportacioDto();
+				contingutHelper.importarDocuments(entitatEntity.getId(), destiId, importacioDto, new HashMap<String, String>(), new ArrayList<DocumentDto>());
+				return null;
+			} catch (Exception ex) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"ImportarDocumentsArxiuActionExecutor", ex);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, ex.getMessage());
+			}
+		}
     }
     
     private class SincronitzarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {

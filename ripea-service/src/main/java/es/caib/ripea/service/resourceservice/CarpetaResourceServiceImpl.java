@@ -4,6 +4,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.FilterBuilder;
+import com.turkraft.springfilter.parser.Filter;
+
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -14,6 +17,8 @@ import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.CarpetaResource;
+import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +33,19 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final CarpetaHelper carpetaHelper;
 	private final ConfigHelper configHelper;
+	
+    @Override
+    protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	String entitatActualCodi = configHelper.getEntitatActualCodi();
+        Filter filtreResultat = FilterBuilder.and(
+                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+                FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+//                ,FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", organActualCodi)
+        );
+        String resultat = filtreResultat.generate();
+        return resultat;
+    }
 	
     @Override
     public CarpetaResource create(CarpetaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
