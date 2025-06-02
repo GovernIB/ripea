@@ -297,7 +297,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
                 resource.setParentPath(parentPaths);
                 resource.setTreePath(parentPaths.stream()
-                        .map(ParentPath::getNom)
+                        .map(ParentPath::getId)
                         .collect(Collectors.toList()));
             }
         }
@@ -327,9 +327,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void setTreePath(ParentPath entity, List<ParentPath> path){
             Boolean notFound = true;
             int arrayIndex = 0;
-            List<String> result = new ArrayList<>();
+            List<Long> result = new ArrayList<>();
             while (notFound && path.size()>arrayIndex){
-                result.add(path.get(arrayIndex).getNom());
+                result.add(path.get(arrayIndex).getId());
                 notFound = !Objects.equals(entity.getId(), path.get(arrayIndex).getId());
                 arrayIndex++;
             }

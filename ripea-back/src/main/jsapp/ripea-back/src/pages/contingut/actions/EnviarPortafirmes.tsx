@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {Grid, Icon} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -11,23 +11,21 @@ import Iframe from "../../../components/Iframe.tsx";
 const EnviarPortafirmesForm = () => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
-    const {value: flux} = useFluxCreateSession()
+    const {onChange} = useFluxCreateSession()
 
     const [open, setOpen] = useState<boolean>(true);
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
 
-    useEffect(() => {
-        if(flux){
-            if(!flux?.error){
-                apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", {
-                    id: flux?.fluxId,
-                    description: flux?.nom +' - '+ flux?.descripcio
-                })
-                setOpen(true)
-                setOpenNewFlux(false)
-            }
+    onChange((flux) => {
+        if(!flux?.error){
+            apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", {
+                id: flux?.fluxId,
+                description: flux?.nom +' - '+ flux?.descripcio
+            })
+            setOpen(true)
+            setOpenNewFlux(false)
         }
-    }, [flux]);
+    });
 
     const filterResponsables = builder.neq('nif', null)
     const filterAnnexos = builder.and(

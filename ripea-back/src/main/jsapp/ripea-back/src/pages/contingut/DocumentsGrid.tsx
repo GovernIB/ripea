@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert} from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
@@ -15,24 +15,23 @@ import * as builder from '../../util/springFilterUtils.ts';
 import TabComponent from "../../components/TabComponent.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
+import {useSessionList} from "../../components/SessionStorageContext.tsx";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
     const { t } = useTranslation();
-    const { value } = useScanFinalitzatSession();
+    const { onChange } = useScanFinalitzatSession();
 
-    useEffect(() => {
-        if (value) {
-            console.log("scan", value)
-            apiRef?.current?.setFieldValue("scaned", true)
-            apiRef?.current?.setFieldValue("adjunt", {
-                name: value?.nomDocument,
-                content: value?.contingut,
-                contentType: value?.mimeType,
-                // contentLength: ,
-            })
-        }
-    }, [value]);
+    onChange((value) => {
+        console.log("scan", value)
+        apiRef?.current?.setFieldValue("scaned", true)
+        apiRef?.current?.setFieldValue("adjunt", {
+            name: value?.nomDocument,
+            content: value?.contingut,
+            contentType: value?.mimeType,
+            // contentLength: ,
+        })
+    });
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <Grid item xs={12} hidden={!data?.scaned}>
@@ -182,7 +181,7 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'createdBy',
@@ -194,9 +193,11 @@ const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
 
+    const { get: getFolderExpand } = useSessionList('folder_expand')
+
     const dataGridApiRef = useMuiDataGridApiRef()
     const [treeView, setTreeView] = useState<boolean>(true);
-    const [expand, setExpand] = useState<boolean>(true);
+    const [expand, setExpand] = useState<boolean>(false);
     const [vista, setVista] = useState<string>("carpeta");
 
     const refresh = () => {
@@ -231,6 +232,7 @@ const DocumentsGrid = (props:any) => {
 
                 groupingColDef={{
                     headerName: t('page.contingut.grid.nom'),
+                    flex: 1.5,
                     valueFormatter: (value:any, row:any) => {
                         return row?.id ?<ContingutIcon entity={row}/> :value;
                     },
@@ -267,7 +269,7 @@ const DocumentsGrid = (props:any) => {
                     }
                 }}
 
-                isGroupExpandedByDefault={() => expand}
+                isGroupExpandedByDefault={(row) => getFolderExpand(`${row?.id}`) || expand }
                 toolbarElementsWithPositions={[
                     {
                         position: 0,

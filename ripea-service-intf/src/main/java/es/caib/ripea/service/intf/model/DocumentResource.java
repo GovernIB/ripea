@@ -242,7 +242,7 @@ public class DocumentResource extends NodeResource {
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
 
     @Transient private List<ParentPath> parentPath;
-    @Transient public List<String> treePath;
+    @Transient public List<Long> treePath;
     @NotNull
     @Transient
     @ResourceField(onChangeActive = true)
@@ -274,7 +274,7 @@ public class DocumentResource extends NodeResource {
         private ContingutTipusEnumDto tipus;
         private String arxiuUuid;
 
-        public List<String> treePath;
+        public List<Long> treePath;
     }
 
     public String getFitxerExtension() {
