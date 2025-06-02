@@ -183,7 +183,7 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'createdBy',
@@ -195,9 +195,11 @@ const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
 
+    const { get: getFolderExpand } = useSessionList('folder_expand')
+
     const dataGridApiRef = useMuiDataGridApiRef()
     const [treeView, setTreeView] = useState<boolean>(true);
-    const [expand, setExpand] = useState<boolean>(true);
+    const [expand, setExpand] = useState<boolean>(false);
     const [vista, setVista] = useState<string>("carpeta");
 
     const refresh = () => {
@@ -232,6 +234,7 @@ const DocumentsGrid = (props:any) => {
 
                 groupingColDef={{
                     headerName: t('page.contingut.grid.nom'),
+                    flex: 1.5,
                     valueFormatter: (value:any, row:any) => {
                         return row?.id ?<ContingutIcon entity={row}/> :value;
                     },
@@ -268,7 +271,7 @@ const DocumentsGrid = (props:any) => {
                     }
                 }}
 
-                isGroupExpandedByDefault={() => expand}
+                isGroupExpandedByDefault={(row) => getFolderExpand(`${row?.id}`) || expand }
                 toolbarElementsWithPositions={[
                     {
                         position: 0,

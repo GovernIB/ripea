@@ -23,7 +23,7 @@ const useTempSession = (key:string) => {
     }, [value]);
 
     return {
-        value: get(key),
+        value,
         onChange: (callback: (newValue?:any) => void) => {
             onChangeRef.current = callback;
         },
