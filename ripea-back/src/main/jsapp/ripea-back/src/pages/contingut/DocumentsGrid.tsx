@@ -16,6 +16,7 @@ import TabComponent from "../../components/TabComponent.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
 import {useUserSession} from "../../components/Session.tsx";
+import {useSessionList} from "../../components/SessionStorageContext.tsx";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
@@ -24,6 +25,7 @@ const ScanerTabForm = () => {
     const { value: user } = useUserSession()
 
     onChange((value) => {
+        debugger;
         if (user?.codi==value?.usuari) {
             console.log("scan", value)
             apiRef?.current?.setFieldValue("scaned", true)

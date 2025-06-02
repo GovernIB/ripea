@@ -18,6 +18,7 @@ const EnviarPortafirmesForm = () => {
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
 
     onChange((flux) => {
+        debugger;
         if(!flux?.error && user?.codi==flux?.usuari) {
             apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", flux?.fluxId);
             setOpen(true);
