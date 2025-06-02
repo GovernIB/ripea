@@ -142,15 +142,15 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 			resposta.setUsuari(dataSplri[2]);
 			if (!resposta.isError()) {
-				FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
-				flux.setNom(resposta.getNom());
-				flux.setDescripcio(resposta.getDescripcio());
 				//El fluxId pot no arribar si s'esta creant un flux de un sol ús, ja que no es persisteix al portafib.
-				flux.setPortafirmesFluxId(resposta.getFluxId()!=null?resposta.getFluxId():transactionId);
 				if (resposta.getFluxId() != null) {
+					FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
+					flux.setNom(resposta.getNom());
+					flux.setDescripcio(resposta.getDescripcio());
 					EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 					fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
 				}
+				resposta.setFluxId(resposta.getFluxId()!=null?resposta.getFluxId():transactionId);
 				resultat = "El flux s'ha creat correctament. Podeu tancar la finestra.";
 			}
 			if (expedientId!=null) {
