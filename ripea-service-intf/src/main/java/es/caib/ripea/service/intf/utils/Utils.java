@@ -23,6 +23,9 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -584,4 +587,28 @@ public class Utils {
 			return null;
 		}
 	}
+	
+	public static String encripta(String data) {
+		try {
+	        SecretKeySpec secretKey = new SecretKeySpec("g8J@kLp!3#xYzWv9bQnM4dF5TjZ2Rc7p".getBytes(), "AES");
+	        Cipher cipher = Cipher.getInstance("AES");
+	        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+	        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+	        return java.util.Base64.getEncoder().encodeToString(encryptedBytes);
+		} catch (Exception ex) {
+			return data;
+		}
+    }
+	
+	public static String desencripta(String encryptedData) {
+		try {
+	        SecretKeySpec secretKey = new SecretKeySpec("g8J@kLp!3#xYzWv9bQnM4dF5TjZ2Rc7p".getBytes(), "AES");
+	        Cipher cipher = Cipher.getInstance("AES");
+	        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+	        byte[] decryptedBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedData));
+	        return new String(decryptedBytes);
+		} catch (Exception ex) {
+			return encryptedData;
+		}	        
+    }
 }

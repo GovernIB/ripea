@@ -1,9 +1,37 @@
 package es.caib.ripea.back.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.caib.ripea.back.command.DocumentNotificacionsCommand;
 import es.caib.ripea.back.command.InteressatCommand;
 import es.caib.ripea.back.command.InteressatCommand.Administracio;
@@ -17,26 +45,18 @@ import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.helper.ValidationHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.service.ConfigService;
 import es.caib.ripea.service.intf.service.DadesExternesService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import es.caib.ripea.service.intf.service.UnitatOrganitzativaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/expedient")
@@ -154,7 +174,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long expedientId,
 			@ModelAttribute InteressatImportCommand interessatImportCommand,
 			Model model) {
-
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -177,12 +197,38 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			return modalUrlTancar();
 		} else {
             try {
-				if (interessatImportCommand.getFitxerInteressats() == null || interessatImportCommand.getFitxerInteressats().getSize()==0) {
+            	List<InteressatDto> lista = null;
+            	InteressatImportacioTipusDto fitxerTipus = interessatImportCommand.getTipus();
+            	MultipartFile fitxer = interessatImportCommand.getFitxerInteressats();
+            	
+				if (fitxer == null || fitxer.getSize()==0) {
 					MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.file"));
 				} else {
-					List<InteressatDto> lista = objectMapper.readValue(
-							interessatImportCommand.getFitxerInteressats().getInputStream(),
-							new TypeReference<List<InteressatDto>>() {});
+					String fitxerNom = fitxer.getOriginalFilename();
+					
+					if (!esTipusFitxerValid(fitxerNom, fitxerTipus)) {
+						MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.tipus.error"));
+						return "interessatImportForm";
+					}
+					
+					if (fitxerTipus.equals(InteressatImportacioTipusDto.JSON)) {
+						lista = objectMapper.readValue(
+								interessatImportCommand.getFitxerInteressats().getInputStream(),
+								new TypeReference<List<InteressatDto>>() {});
+					} else if (fitxerTipus.equals(InteressatImportacioTipusDto.EXCEL)) {
+						lista = expedientInteressatService.extreureInteressatsExcel(fitxer.getInputStream());
+						
+						StringBuilder validacions = validarLlistaInteressats(
+								lista, 
+								entitatActual.getId(), 
+								expedientId);
+						
+						if (validacions.length() > 0) {
+					        MissatgesHelper.error(request, validacions.toString());
+					        return "interessatImportForm";
+					    }
+					}
+					
 					List<InteressatDto> listaActual = expedientInteressatService.findByExpedient(
 							getEntitatActualComprovantPermisos(request).getId(),
 							expedientId,
@@ -192,7 +238,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 					model.addAttribute(interessatImportCommand);
 					request.getSession().setAttribute("FITXER_IMPORT_INTERESSATS", lista);
 				}
-            } catch (IOException e) {
+            } catch (Exception e) {
 				MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.err"), e);
             }
 		}
@@ -200,6 +246,17 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		return "interessatImportForm";
 	}
 
+    @GetMapping(value = "/getModelDadesInteressatsExcel")
+    @ResponseBody
+    public void getModelDadesInteressatsExcel(HttpServletResponse response) throws IOException {
+        response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+        try {
+            writeFileToResponse("model_dades_interessats.xlsx", expedientInteressatService.getModelDadesInteressatsExcel(), response);
+        } catch (Exception ex) {
+            logger.debug("Error al obtenir la plantilla de el model de dades CSV de càrrega massiva", ex);
+        }
+    }
+    
 	@RequestMapping(value = "/{expedientId}/interessat/{interessatId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -684,6 +741,61 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 				provincia,
 				localitat,
 				"true".equals(arrel));
+	}
+
+
+	private StringBuilder validarLlistaInteressats(List<InteressatDto> lista, Long entitatId, Long expedientId) {
+		StringBuilder validacions = new StringBuilder();
+
+		for (InteressatDto interessatDto : lista) {
+			InteressatCommand interessatCommand = InteressatCommand.asCommand(interessatDto);
+			interessatCommand.setEntitatId(entitatId);
+			interessatCommand.setExpedientId(expedientId);
+			interessatCommand.setNotificacioAutoritzat(true);
+			interessatCommand.setIncapacitat(false);
+
+	        Set<ConstraintViolation<InteressatCommand>> violations = validarInteressat(interessatCommand);
+
+	        if (!violations.isEmpty()) {
+	            validacions.append("Fila ").append(interessatDto.getFila()).append(":<ul>");
+	            for (ConstraintViolation<InteressatCommand> v : violations) {
+	            	String camp = v.getPropertyPath().toString();
+	            	
+	            	if (! camp.isBlank())
+	            		validacions.append("<li>").append(camp).append(": ").append(v.getMessage()).append("</li>");
+	            	else
+	            		validacions.append("<li>").append(v.getMessage()).append("</li>");
+	            }
+	            validacions.append("</ul>");
+	        }
+		}
+		
+		return validacions;
+	}
+
+	private Set<ConstraintViolation<InteressatCommand>> validarInteressat(InteressatCommand command) {
+	    if (command.isPersonaFisica()) {
+	        return validator.validate(command, PersonaFisica.class);
+	    } else if (command.isPersonaJuridica()) {
+	        return validator.validate(command, PersonaJuridica.class);
+	    } else if (command.isAdministracio()) {
+	        return validator.validate(command, Administracio.class);
+	    }
+	    return Collections.emptySet();
+	}
+	
+	private boolean esTipusFitxerValid(String fileName, InteressatImportacioTipusDto tipus) {
+	    if (fileName == null) return false;
+
+	    Set<String> extensionsExcel = Set.of(".xlsx", ".xls", ".ods");
+	    Set<String> extensionsJson = Set.of(".json");
+
+	    if (tipus == InteressatImportacioTipusDto.EXCEL) {
+	        return extensionsExcel.stream().anyMatch(fileName::endsWith);
+	    } else if (tipus == InteressatImportacioTipusDto.JSON) {
+	        return extensionsJson.stream().anyMatch(fileName::endsWith);
+	    }
+	    return false;
 	}
 
 	private void ompleModel(HttpServletRequest request, Model model, String entitatActualCodi) {

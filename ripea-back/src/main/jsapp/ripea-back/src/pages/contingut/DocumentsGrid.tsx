@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert} from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
@@ -20,23 +20,20 @@ import {useUserSession} from "../../components/Session.tsx";
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
     const { t } = useTranslation();
-    const { value } = useScanFinalitzatSession();
+    const { onChange } = useScanFinalitzatSession();
     const { value: user } = useUserSession()
 
-    useEffect(() => {
-        if (value && !value.processada) {
-            if (user?.codi==value?.usuari) {
-                console.log("scan", value)
-                apiRef?.current?.setFieldValue("scaned", true)
-                apiRef?.current?.setFieldValue("adjunt", {
-                    name: value?.nomDocument,
-                    content: value?.contingut,
-                    contentType: value?.mimeType
-                });
-            }
-            value.processada = true;
+    onChange((value) => {
+        if (user?.codi==value?.usuari) {
+            console.log("scan", value)
+            apiRef?.current?.setFieldValue("scaned", true)
+            apiRef?.current?.setFieldValue("adjunt", {
+                name: value?.nomDocument,
+                content: value?.contingut,
+                contentType: value?.mimeType
+            });
         }
-    }, [value]);
+    });
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <Grid item xs={12} hidden={!data?.scaned}>

@@ -1,5 +1,6 @@
 package es.caib.ripea.service.service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +101,21 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			List<InteressatDto> interessats,
 			List<Long> seleccionats) {
 		return expedientInteressatHelper.importarInteressats(entitatId, expedientId, rolActual, interessats, seleccionats);
+	}
+	
+	@Override
+	public List<InteressatDto> extreureInteressatsExcel(InputStream excel) {
+		return expedientInteressatHelper.extreureInteressatsExcel(excel);
+	}
+	
+	@Override
+	public byte[] getModelDadesInteressatsExcel() {
+		try {
+			InputStream in = this.getClass().getResourceAsStream("/es/caib/ripea/core/templates/model_dades_interessats.xlsx");
+			return in.readAllBytes();
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 	
 	@Transactional

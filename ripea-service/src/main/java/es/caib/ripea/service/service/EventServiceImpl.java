@@ -100,7 +100,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
     	try {
-    		fluxEvent.getFluxCreat().setUsuari(SecurityContextHolder.getContext().getAuthentication().getName());
     		eventPublisher.publishEvent(fluxEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
@@ -110,7 +109,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
-    		firmaEvent.getFirmaResultat().setUsuari(SecurityContextHolder.getContext().getAuthentication().getName());
     		eventPublisher.publishEvent(firmaEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
@@ -120,7 +118,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public void notifyScanFinalitzat(ScanFinalitzatEvent scanEvent) {
     	try {
-    		scanEvent.getResposta().setUsuari(SecurityContextHolder.getContext().getAuthentication().getName());
     		eventPublisher.publishEvent(scanEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyScanFinalitzat a expedients suscrits", ex);

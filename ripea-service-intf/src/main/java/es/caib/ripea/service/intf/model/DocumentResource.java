@@ -363,7 +363,7 @@ public class DocumentResource extends NodeResource {
         private Date dataNaixement;
         private Date dataCaducidad;
         private Date dataExpedicion;
-        private SiNoEnumDto consentimentTipusDiscapacitat;
+        private SiNoEnumDto consentimentTipusDiscapacitat = SiNoEnumDto.SI;
         private String numeroTitol;
         @ResourceField(enumType = true)
         private String nacionalitat = "724";
@@ -373,7 +373,6 @@ public class DocumentResource extends NodeResource {
         private SexeEnumDto sexe;
         @ResourceField(enumType = true)
         private String provinciaNaixament = "07";
-        @ResourceField(enumType = true)
         private String poblacioNaixament;
         @ResourceField(enumType = true)
         private String municipiNaixament;

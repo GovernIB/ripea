@@ -44,6 +44,8 @@ public class BaseWebSecurityConfig {
 				new AntPathRequestMatcher("/img/**/*"),
 				new AntPathRequestMatcher("/js/**/*"),
 				new AntPathRequestMatcher("/webjars/**/*"),
+				new AntPathRequestMatcher("/modal/document/event/**/*"),
+				new AntPathRequestMatcher("/modal/digitalitzacio/event/**/*"),
 		};
 	}
 

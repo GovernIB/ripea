@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -61,6 +62,7 @@ import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -485,22 +487,30 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		return "redirect:" + urlRedirectToPortafib;
 	}
 
-	@RequestMapping(value = "/event/{documentId}/firmaSimpleWebEnd",  produces="text/plain")
+	@RequestMapping(value = "/event/{dades}/firmaSimpleWebEnd",  produces="text/plain")
 	@ResponseBody
 	public ResponseEntity<String> firmaSimpleWebEndAmbEvent(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable Long documentId,
+			@PathVariable String dades,
 			@RequestParam(value = "transactionID", required = true) String transactionID,
 			@RequestParam(value = "tascaId", required = false) Long tascaId) throws Exception {
 		
-		// Crear un usuario autenticado simulado. En portafib no se puede configurar una autenticación BASIC
-        User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+		// Autenticar un usuari simulat si és necessari
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || "anonymousUser".equals(auth.getName())) {
+	        User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        
+		String data = Utils.desencripta(dades);
+		String[] dataSplri = data.split("#");
+		Long expedientId = Long.parseLong(dataSplri[0]);
+		Long documentId = Long.parseLong(dataSplri[1]);
+        
 		//Comunicam a PF que la firma ha finalitzat
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
-		Long expedientId = null;
 		String resultat = null;
 		if (StatusEnumDto.OK.equals(firmaResultat.getStatus())) {
 			if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
@@ -511,12 +521,16 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 						firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(),
 						RolHelper.getRolActual(request),
 						tascaId);
+				if (!Utils.hasValue(firmaResultat.getMsg())) {
+					firmaResultat.setMsg("La firma ha finalitzat correctament.");
+				}
 				resultat = "La firma ha finalitzat correctament. Podeu tancar la finestra.";
 			}
 		}
 		if (resultat==null) {
 			resultat = "La firma no s'ha pogut finalitzar: "+firmaResultat.getMsg()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";
 		}
+		firmaResultat.setUsuari(dataSplri[2]);
 		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
 		eventService.notifyFirmaNavegadorFinalitzada(ffe);
 		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body(resultat);

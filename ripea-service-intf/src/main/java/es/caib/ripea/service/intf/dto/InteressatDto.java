@@ -52,6 +52,8 @@ public abstract class InteressatDto implements Serializable {
 	protected boolean exporta = true;
 	protected boolean exportaRepresentant= (representant!=null);
 	
+	private int fila;
+	
 	public Boolean getIncapacitat() {
 		return incapacitat;
 	}
@@ -181,6 +183,12 @@ public abstract class InteressatDto implements Serializable {
 	}
 	public void setExportaRepresentant(boolean exportaRepresentant) {
 		this.exportaRepresentant = exportaRepresentant;
+	}
+	public int getFila() {
+		return fila;
+	}
+	public void setFila(int fila) {
+		this.fila = fila;
 	}
 	public boolean isPersonaFisica() {
 		return this instanceof InteressatPersonaFisicaDto;

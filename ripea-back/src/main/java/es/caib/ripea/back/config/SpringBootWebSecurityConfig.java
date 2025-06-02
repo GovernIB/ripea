@@ -81,6 +81,7 @@ public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 				new AntPathRequestMatcher("/js/**/*"),
 				new AntPathRequestMatcher("/webjars/**/*"),
 				new AntPathRequestMatcher("/modal/document/event/**/*"),
+				new AntPathRequestMatcher("/modal/digitalitzacio/event/**/*"),
 		};
 	}
 

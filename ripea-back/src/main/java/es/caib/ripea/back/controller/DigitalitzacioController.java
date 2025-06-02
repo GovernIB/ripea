@@ -6,6 +6,7 @@ package es.caib.ripea.back.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +41,7 @@ import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.DigitalitzacioService;
 import es.caib.ripea.service.intf.service.EventService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Controlador per al manteniment de documents.
@@ -144,14 +151,25 @@ public class DigitalitzacioController extends BaseUserController {
 		return "digitalitzacioIframeTancar";
 	}
 
-	@RequestMapping(value = "/event/resultatScan/{idExpedient}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
+	@RequestMapping(value = "/event/resultatScan/{dades}/{idTransaccio}", method = RequestMethod.GET,  produces = "text/plain")
 	@ResponseBody
 	public ResponseEntity<String> recuperarResultatScanEvent(
 			HttpServletRequest request,
-			@PathVariable Long idExpedient,
+			@PathVariable String dades,
 			@PathVariable String idTransaccio,
 			Model model) {
+		// Autenticar un usuari simulat si és necessari
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || "anonymousUser".equals(auth.getName())) {
+	        User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+		String data = Utils.desencripta(dades);
+		String[] dataSplri = data.split("#");
+		Long idExpedient = Long.parseLong(dataSplri[0]);
 		DigitalitzacioResultatDto resposta = recuperaResultatEscaneig(idTransaccio, true, true);
+		resposta.setUsuari(dataSplri[2]);
 		ScanFinalitzatEvent sfe = new ScanFinalitzatEvent(idExpedient, resposta);
 		eventService.notifyScanFinalitzat(sfe);
 		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("Escaneig finalitzat.");

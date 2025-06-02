@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public class FirmaResultatDto {
 	
 	private StatusEnumDto status;
@@ -18,17 +19,6 @@ public class FirmaResultatDto {
 	public FirmaResultatDto(StatusEnumDto status, String msg) {
 		this.status = status;
 		this.msg = msg;
-	}
-	
-	public StatusEnumDto getStatus() {
-		return status;
-	}
-	public String getMsg() {
-		return msg;
-	}
-	
-	public void setUsuari(String usuari) {
-		this.usuari = usuari;
 	}
 	
 	public void addSignature(FirmaSignatureStatus firmaSignatureStatus){

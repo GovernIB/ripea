@@ -1,11 +1,18 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.InteressatRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.ValidationException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +20,26 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatAdministracioEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 
 @Component
 public class ExpedientInteressatHelper {
@@ -745,6 +767,140 @@ public class ExpedientInteressatHelper {
 			return "No s'ha seleccionat interessats per importar.";
 		}
 	}
+
+	@SuppressWarnings("deprecation") // POI 3.15
+	public List<InteressatDto> extreureInteressatsExcel(InputStream excel) {
+		List<InteressatDto> resultList = new ArrayList<>();
+
+		try (Workbook workbook = WorkbookFactory.create(excel)) {
+	        Sheet sheet = workbook.getSheetAt(0);
+	        if (sheet == null || sheet.getPhysicalNumberOfRows() <= 1) return resultList;
+
+	        for (int rowNum = 2; rowNum <= sheet.getLastRowNum(); rowNum++) {
+	            Row row = sheet.getRow(rowNum);
+	            if (row == null) continue;
+
+	            // Columna 0: tipus interessat
+	            Cell tipusCell = row.getCell(0);
+	            
+	            if (tipusCell == null || tipusCell.getCellType() != Cell.CELL_TYPE_STRING) continue;
+
+	            String tipusInteressat = tipusCell.getStringCellValue().trim();
+	            InteressatDto dto = crearInteressatDto(tipusInteressat);
+	            dto.setFila(row.getRowNum() + 1);
+	            
+	            // Columna 1: tipus document identificació
+	            Cell docTipusCell = row.getCell(1);
+	            if (docTipusCell != null && docTipusCell.getCellType() == Cell.CELL_TYPE_STRING) {
+	            	InteressatDocumentTipusEnumDto documentTipus = parseEnum(docTipusCell.getStringCellValue().trim(), InteressatDocumentTipusEnumDto.class);
+	                dto.setDocumentTipus(documentTipus);
+	            }
+
+	            // Columna 2 endavant
+	            for (int col = 2; col <= 18; col++) {
+	                Cell cell = row.getCell(col);
+	                if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) continue;
+
+	                String value = cell.getCellType() == Cell.CELL_TYPE_STRING
+	                        ? cell.getStringCellValue().trim()
+	                        : String.valueOf((int)cell.getNumericCellValue());
+
+	                switch (col) {
+	                    case 2:
+	                        dto.setDocumentNum(value);
+	                        break;
+	                    case 3:
+	                        cast(dto, InteressatPersonaFisicaDto.class).ifPresent(d -> d.setNom(value));
+	                        break;
+	                    case 4:
+	                        cast(dto, InteressatPersonaFisicaDto.class).ifPresent(d -> d.setLlinatge1(value));
+	                        break;
+	                    case 5:
+	                        cast(dto, InteressatPersonaFisicaDto.class).ifPresent(d -> d.setLlinatge2(value));
+	                        break;
+	                    case 6:
+	                        cast(dto, InteressatPersonaJuridicaDto.class).ifPresent(d -> d.setRaoSocial(value));
+	                        break;
+	                    case 7:
+	                        cast(dto, InteressatAdministracioDto.class).ifPresent(d -> d.setOrganCodi(value));
+	                        break;
+	                    case 8:
+	                        cast(dto, InteressatAdministracioDto.class).ifPresent(d -> d.setOrganNom(value));
+	                        break;
+	                    case 9:
+	                        cast(dto, InteressatAdministracioDto.class).ifPresent(d -> d.setAmbOficinaSir(Boolean.parseBoolean(value)));
+	                        break;
+	                    case 10:
+	                        dto.setPais(value);
+	                        break;
+	                    case 11:
+	                        dto.setProvincia(value);
+	                        break;
+	                    case 12:
+	                        dto.setMunicipi(value);
+	                        break;
+	                    case 13:
+	                        dto.setAdresa(value);
+	                        break;
+	                    case 14:
+	                        dto.setCodiPostal(value);
+	                        break;
+	                    case 15:
+	                        dto.setEmail(value);
+	                        break;
+	                    case 16:
+	                        dto.setTelefon(value);
+	                        break;
+	                    case 17:
+	                        dto.setObservacions(value);
+	                        break;
+	                    case 18:
+	                    	InteressatIdiomaEnumDto idioma = parseEnum(value, InteressatIdiomaEnumDto.class);
+	                        dto.setPreferenciaIdioma(idioma);
+	                        break;
+	                }
+	            }
+	            
+	            resultList.add(dto);
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("Hi ha hagut un error recuperant la informació dels interessats del excel", e);
+	    }
+
+	    return resultList;
+    }
+
+	private InteressatDto crearInteressatDto(String tipus) {
+        switch (tipus) {
+            case "PERSONA_FISICA":
+                InteressatPersonaFisicaDto fisica = new InteressatPersonaFisicaDto();
+                fisica.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
+                return fisica;
+            case "PERSONA_JURIDICA":
+                InteressatPersonaJuridicaDto juridica = new InteressatPersonaJuridicaDto();
+                juridica.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
+                return juridica;
+            case "ADMINISTRACIO":
+                InteressatAdministracioDto admin = new InteressatAdministracioDto();
+                admin.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+                return admin;
+            default:
+                throw new RuntimeException("Tipus interessat " + tipus + " no disponible");
+        }
+    }
+
+    private <T> Optional<T> cast(Object obj, Class<T> clazz) {
+        return clazz.isInstance(obj) ? Optional.of(clazz.cast(obj)) : Optional.empty();
+    }
+
+    private <E extends Enum<E>> E parseEnum(String value, Class<E> enumClass) {
+        try {
+            return Enum.valueOf(enumClass, value);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 	
 	private InteressatEntity getInteressatActualExpedientByDocNum(List<InteressatEntity> interessatsActualsExp, String docNum) {
 		if (interessatsActualsExp!=null) {
