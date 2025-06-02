@@ -397,6 +397,7 @@ const translationCa = {
                 publicar: "Publicar...",
                 descarregarImprimible: "Descarregar versió imprimible",
                 changeType: "Cambiar tipus",
+                definitive: "Convertir a definitiu",
             },
             action: {
                 enviarEmail: "Enviar document per email",
@@ -428,6 +429,7 @@ const translationCa = {
                 errorPortafirmes: "Error a l'enviar al portafirmes",
                 funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB",
                 folder: "En cas de no seleccionar una carpeta, s'importaran els documents directament a l'expedient.",
+                definitive: "Aquesta acció farà que els documents passin a formar part de l\'expedient definitivament i no es podran eliminar.",
             },
             versio: {
                 title: "Versió",

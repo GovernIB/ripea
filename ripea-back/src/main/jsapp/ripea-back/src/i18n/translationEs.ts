@@ -397,6 +397,7 @@ const translationEs = {
                 publicar: "Publicar...",
                 descarregarImprimible: "Descarregar versión imprimible",
                 changeType: "Cambiar tipo",
+                definitive: "Convertir a definitivo",
             },
             action: {
                 enviarEmail: "Enviar documento por email",
@@ -428,6 +429,7 @@ const translationEs = {
                 errorPortafirmes: "Error al enviar al portafirmas",
                 funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
+                definitive: "Esta acción hará que los documentos pasen a formar parte del expediente de forma definitiva y no se podrán eliminar.",
             },
             versio: {
                 title: "Versión",

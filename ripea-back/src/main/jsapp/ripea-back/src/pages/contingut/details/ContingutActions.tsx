@@ -20,7 +20,8 @@ import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
 import useCrearCarpeta from "../actions/CrearCarpeta.tsx";
 import useImportar from "../actions/Importar.tsx";
 
-export const useActions = () => {
+export const useActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
     const {
         artifactAction: apiAction,
@@ -63,10 +64,22 @@ export const useActions = () => {
             });
     }
 
+    const definitiu = (id:any) => {
+        apiAction(id, {code: 'CONVERTIR_DEFINITIU'})
+            .then(()=>{
+                refresh?.()
+                temporalMessageShow(null, t('page.document.alert.definitive'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
     return {
         apiDownload: downloadAdjunt,
         getLinkCSV: enllacCSV,
         descarregarVersio,
+        definitiu
     }
 }
 
@@ -78,7 +91,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
 
-    const {apiDownload, getLinkCSV} = useActions()
+    const {apiDownload, getLinkCSV, definitiu} = useActions()
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
@@ -283,6 +296,19 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             disabled: true,
         },
         {
+            title: "",
+            icon: "check_circle",
+            showInMenu: true,
+            onClick: definitiu,
+            hidden: (row:any) => !potMod || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
+        },
+        {
+            title: <Divider sx={{width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+            hidden: (row:any) => !potMod || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
+        },
+        {
             title: t('page.contingut.acciones.history'),
             icon: "list",
             showInMenu: true,
@@ -329,7 +355,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             ...documentActions,
             ...expedientActions
         ],
-        hiddenDelete: (row:any) => !potMod || !isDocument(row),
+        hiddenDelete: (row:any) => !potMod || !isDocument(row) || row?.estat == 'DEFINITIU',
         components
     }
 }

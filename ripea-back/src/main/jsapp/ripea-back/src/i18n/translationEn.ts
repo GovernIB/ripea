@@ -397,6 +397,7 @@ const translationEn = {
                 publicar: "Publish...",
                 descarregarImprimible: "Download printable version",
                 changeType: "Change type",
+                definitive: "Change to definitive",
             },
             action: {
                 enviarEmail: "Send Document via Email",
@@ -428,6 +429,7 @@ const translationEn = {
                 errorPortafirmes: "Error sending to portafirmas",
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
                 folder: "If no folder is selected, the documents will be imported directly into the case file.",
+                definitive: "This action will make the documents become a permanent part of the file and they cannot be deleted.",
             },
             versio: {
                 title: "Version",
