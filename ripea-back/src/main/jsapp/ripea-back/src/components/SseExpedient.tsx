@@ -12,18 +12,22 @@ const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
 const useTempSession = (key:string) => {
     const { get, remove } = useSseExpedientSession();
-    // const value = get(key)
-    //
-    // useEffect(() => {
-    //     if (value){
-    //         console.log("remove", key)
-    //         remove(key)
-    //     }
-    // }, [value]);
+    const onChangeRef = useRef<((newValue?:any) => void) | null>(null);
+    const value = get(key)
+
+    useEffect(() => {
+        if (value && !value.processada){
+            onChangeRef?.current?.(value);
+            value.processada = true;
+        }
+    }, [value]);
 
     return {
         value: get(key),
-        remove: () => remove(key)
+        onChange: (callback: (newValue?:any) => void) => {
+            onChangeRef.current = callback;
+        },
+        remove: () => remove(key),
     };
 }
 

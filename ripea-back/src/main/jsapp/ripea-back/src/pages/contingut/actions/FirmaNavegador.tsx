@@ -1,4 +1,4 @@
-import {useEffect, useRef} from "react";
+import {useRef} from "react";
 import {Grid} from "@mui/material";
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -30,21 +30,19 @@ const FirmaNavegador = (props: any) => {
 export const useFirmaNavegador = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const { value: firma } = useFirmaFinalitzadaSession();
+    const { onChange } = useFirmaFinalitzadaSession();
 
-    useEffect(() => {
-        if (firma) {
-            const severiry =
-                firma?.status == 'OK' ? 'success'
-                    : firma?.status == 'WARNING' ? 'warning'
-                        : firma?.status == 'ERROR' ? 'error'
-                            : 'info'
+    onChange((firma) => {
+        const severiry =
+            firma?.status == 'OK' ? 'success'
+                : firma?.status == 'WARNING' ? 'warning'
+                    : firma?.status == 'ERROR' ? 'error'
+                        : 'info'
 
-            apiRef?.current?.close();
-            refresh?.()
-            temporalMessageShow(null, firma?.msg, severiry);
-        }
-    }, [firma]);
+        apiRef?.current?.close?.();
+        refresh?.()
+        temporalMessageShow(null, firma?.msg, severiry);
+    })
 
     const handleShow = (id: any): void => {
         apiRef.current?.show?.(id)

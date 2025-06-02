@@ -8,7 +8,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 const sortModelTipusDocument:any = [{field: 'nom',sort: 'asc'}]
 const DocPinbalForm = () => {
     const {data} = useFormContext();
-    console.log("data", data)
+    // console.log("data", data)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipusDocument"
@@ -29,7 +29,7 @@ const DocPinbalForm = () => {
             <GridFormField xs={12} name="provincia" required/>
             <GridFormField xs={12} name="dataConsulta" type={"date"}/>
             <GridFormField xs={12} name="dataNaixement" type={"date"}/>
-            <GridFormField xs={12} name="consentimentTipusDiscapacitat"/>
+            <GridFormField xs={12} name="consentimentTipusDiscapacitat" required/>
         </>}
         {data?.codiServeiPinbal == "SCDCPAJU" && <>
             <GridFormField xs={12} name="provincia" required/>
@@ -97,11 +97,11 @@ const DocPinbalForm = () => {
 
             {/* contingut.pinbal.form.legend.fetRegistral */}
             <GridFormField xs={12} name="dataRegistre" type={"date"}/>
-            <GridFormField xs={12} name="municipiRegistre" required/>
+            <GridFormField xs={12} name="municipiRegistre"/>
 
             {/* contingut.pinbal.form.legend.naixement */}
             <GridFormField xs={12} name="dataNaixement" type={"date"}/>
-            <GridFormField xs={12} name="municipiNaixament" required/>
+            <GridFormField xs={12} name="municipiNaixament"/>
 
             {/* contingut.pinbal.form.legend.dadesAdicionals */}
             <GridFormField xs={12} name="ausenciaSegundoApellido"/>
