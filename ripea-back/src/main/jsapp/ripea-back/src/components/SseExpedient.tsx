@@ -12,14 +12,17 @@ const useSseExpedientSession = () => useSessionList(sseExpedientKey)
 
 const useTempSession = (key:string) => {
     const { get, remove } = useSseExpedientSession();
-    // const value = get(key)
-    //
-    // useEffect(() => {
-    //     if (value){
-    //         console.log("remove", key)
-    //         remove(key)
-    //     }
-    // }, [value]);
+    //const value = get(key)
+    
+    /*
+    useEffect(() => {
+        if (value && !value.processada){
+            //const newValue = { ...value, procesada: true };
+            //save(key, newValue); //Bucle infinito en useEffect de FirmaNavegador.tsx
+            //value.processada = true; //No es processa en el useEffect de FirmaNavegador.tsx
+        }
+    }, [value]);
+    */
 
     return {
         value: get(key),

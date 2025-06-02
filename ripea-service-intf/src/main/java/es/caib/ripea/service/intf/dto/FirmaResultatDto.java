@@ -12,7 +12,8 @@ public class FirmaResultatDto {
 	private StatusEnumDto status;
 	private String msg;
 	private List<FirmaSignatureStatus> signatures = new ArrayList<>();
-	private boolean processada = false;
+	private boolean processada = false; //Processada per el client SSE
+	private String usuari; //Usuari que ha iniciat el proces de firma
 	
 	public FirmaResultatDto(StatusEnumDto status, String msg) {
 		this.status = status;
@@ -24,6 +25,10 @@ public class FirmaResultatDto {
 	}
 	public String getMsg() {
 		return msg;
+	}
+	
+	public void setUsuari(String usuari) {
+		this.usuari = usuari;
 	}
 	
 	public void addSignature(FirmaSignatureStatus firmaSignatureStatus){

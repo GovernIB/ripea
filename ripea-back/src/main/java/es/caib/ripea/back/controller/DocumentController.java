@@ -485,7 +485,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		return "redirect:" + urlRedirectToPortafib;
 	}
 
-	@RequestMapping(value = "/event/{documentId}/firmaSimpleWebEnd",  produces = "text/plain")
+	@RequestMapping(value = "/event/{documentId}/firmaSimpleWebEnd",  produces="text/plain")
 	@ResponseBody
 	public ResponseEntity<String> firmaSimpleWebEndAmbEvent(
 			HttpServletRequest request,

@@ -15,22 +15,26 @@ import * as builder from '../../util/springFilterUtils.ts';
 import TabComponent from "../../components/TabComponent.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
+import {useUserSession} from "../../components/Session.tsx";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
     const { t } = useTranslation();
     const { value } = useScanFinalitzatSession();
+    const { value: user } = useUserSession()
 
     useEffect(() => {
-        if (value) {
-            console.log("scan", value)
-            apiRef?.current?.setFieldValue("scaned", true)
-            apiRef?.current?.setFieldValue("adjunt", {
-                name: value?.nomDocument,
-                content: value?.contingut,
-                contentType: value?.mimeType,
-                // contentLength: ,
-            })
+        if (value && !value.processada) {
+            if (user?.codi==value?.usuari) {
+                console.log("scan", value)
+                apiRef?.current?.setFieldValue("scaned", true)
+                apiRef?.current?.setFieldValue("adjunt", {
+                    name: value?.nomDocument,
+                    content: value?.contingut,
+                    contentType: value?.mimeType
+                });
+            }
+            value.processada = true;
         }
     }, [value]);
 

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -109,13 +110,14 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
-	@RequestMapping(value = "/portafirmes/flux/event/{expedientId}/{transactionId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/event/portafirmes/flux/{expedientId}/{transactionId}",  produces="text/plain")
 	@ResponseBody
-	public String transaccioEstat(
+	public ResponseEntity<String> transaccioEstat(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@PathVariable String transactionId,
 			Model model) {
+		String resultat = null;
 		try {
 			PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 			if (!resposta.isError() && resposta.getFluxId() != null) {
@@ -125,6 +127,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 				flux.setDescripcio(resposta.getDescripcio());
 				flux.setPortafirmesFluxId(resposta.getFluxId());
 				fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
+				resultat = "El flux s'ha creat correctament. Podeu tancar la finestra.";
 			}
 			if (expedientId!=null) {
 				CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
@@ -136,8 +139,9 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			resposta.setDescripcio("Error al recuperar i guardar el flux creat: "+transactionId+". "+ex.getMessage());
 			CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
 			eventService.notifyFluxFirmaFinalitzat(fluxEvent);
+			resultat = "El flux no s'ha pogut crear: "+ex.getMessage()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";
 		}
-		return "";
+		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body(resultat);
 	}
 	
 	@RequestMapping(value = "/portafirmes/flux/returnurl/{transactionId}", method = RequestMethod.GET)

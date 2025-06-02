@@ -74,6 +74,7 @@ import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
@@ -168,6 +169,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
+        register(DocumentResource.ACTION_CONVERTIR_DEFINITIU, new ConvertirDefinitiuActionExecutor());        
         //Flux de firma, firma en navegador, document PINBAL, viaFirma (formularis modals)
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
         register(DocumentResource.ACTION_NEW_DOC_PINBAL, new NouDocumentPinbalActionExecutor());
@@ -749,6 +751,30 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
     
+    private class ConvertirDefinitiuActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+						entitatEntity.getId(),
+						entity.getId(),
+						false,
+						true);
+				documentHelper.actualitzarEstat(document, DocumentEstatEnumDto.DEFINITIU);
+                return null;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/ConvertirDefinitiuActionExecutor", e);
+				return "";
+			}
+		}
+    	
+    }
+    
     private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, Serializable> {
 
 		@Override
@@ -780,7 +806,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public String exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
-				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/portafirmes/flux/event/"+entity.getExpedient().getId()+"/";
+				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+entity.getExpedient().getId()+"/";
 				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
 				return transaccioResponse.getUrlRedireccio();
 			} catch (Exception e) {
@@ -1279,7 +1305,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		} else {
         			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
 
-        			String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/document/portafirmes/flux/event/"+documentResourceEntity.getExpedient().getId()+"/";
+        			String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+documentResourceEntity.getExpedient().getId()+"/";
     				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
     				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());
         		}

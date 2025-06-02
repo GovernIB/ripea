@@ -6,26 +6,25 @@ import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
 import {useFluxCreateSession} from "../../../components/SseExpedient.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 
 const EnviarPortafirmesForm = () => {
     const { t } = useTranslation();
     const {data, apiRef} = useFormContext();
     const {value: flux} = useFluxCreateSession()
-
+    const { value: user } = useUserSession()
     const [open, setOpen] = useState<boolean>(true);
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
 
     useEffect(() => {
-        if(flux){
-            if(!flux?.error){
-                apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", {
-                    id: flux?.fluxId,
-                    description: flux?.nom +' - '+ flux?.descripcio
-                })
-                setOpen(true)
-                setOpenNewFlux(false)
+        if(flux && !flux.processada && !flux.error) {
+            if (user?.codi==flux?.usuari) {
+                apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", flux?.fluxId);
+                setOpen(true);
+                setOpenNewFlux(false);
             }
+            flux.processada = true;
         }
     }, [flux]);
 
