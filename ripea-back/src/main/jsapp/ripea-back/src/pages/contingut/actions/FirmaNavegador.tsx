@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import {useFirmaFinalitzadaSession} from "../../../components/SseExpedient.tsx";
+import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 
 const FirmaNavegadorForm = () => {
@@ -31,21 +32,24 @@ export const useFirmaNavegador = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
     const { onChange } = useFirmaFinalitzadaSession();
+    const { value: user } = useUserSession();
 
     onChange((firma) => {
-        const severiry =
-            firma?.status == 'OK' ? 'success'
-                : firma?.status == 'WARNING' ? 'warning'
-                    : firma?.status == 'ERROR' ? 'error'
-                        : 'info'
-
-        apiRef?.current?.close?.();
-        refresh?.()
-        temporalMessageShow(null, firma?.msg, severiry);
+        debugger;
+		if (user?.codi==firma?.usuari) {
+	        const severiry =
+	            firma?.status == 'OK' ? 'success'
+	                : firma?.status == 'WARNING' ? 'warning'
+	                    : firma?.status == 'ERROR' ? 'error'
+	                        : 'info';	
+	        apiRef?.current?.close?.();
+	        temporalMessageShow(null, firma?.msg, severiry);
+		}
+		refresh?.();
     })
 
     const handleShow = (id: any): void => {
-        apiRef.current?.show?.(id)
+        apiRef.current?.show?.(id);
     }
     const formDialogResultProcessor = (result: any) => {
         return <Iframe src={result?.url}/>

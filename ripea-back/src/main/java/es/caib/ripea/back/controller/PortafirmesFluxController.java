@@ -4,6 +4,7 @@
  */
 package es.caib.ripea.back.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +42,7 @@ import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.intf.service.PortafirmesFluxService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Controlador per definir fluxos de firma
@@ -109,22 +117,41 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		portafirmesFluxService.tancarTransaccio(idTransaccio);
 	}
 
-	@RequestMapping(value = "/portafirmes/flux/event/{expedientId}/{transactionId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/event/portafirmes/flux/{dades}/{transactionId}",  produces="text/plain")
 	@ResponseBody
-	public String transaccioEstat(
+	public ResponseEntity<String> transaccioEstat(
 			HttpServletRequest request,
-			@PathVariable Long expedientId,
+			@PathVariable String dades,
 			@PathVariable String transactionId,
 			Model model) {
+		String resultat = null;
+		String data = Utils.desencripta(dades);
+		String[] dataSplri = data.split("#");
+		Long expedientId = Long.parseLong(dataSplri[0]);
+		
 		try {
+
+			// Autenticar un usuari simulat si és necessari
+	        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	        if (auth == null || "anonymousUser".equals(auth.getName())) {
+		        User user = new User("$portafib_ripea", "portafib_ripea", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
+		        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+		        SecurityContextHolder.getContext().setAuthentication(authentication);
+	        }
+			
 			PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-			if (!resposta.isError() && resposta.getFluxId() != null) {
-				EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-				FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
-				flux.setNom(resposta.getNom());
-				flux.setDescripcio(resposta.getDescripcio());
-				flux.setPortafirmesFluxId(resposta.getFluxId());
-				fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
+			resposta.setUsuari(dataSplri[2]);
+			if (!resposta.isError()) {
+				//El fluxId pot no arribar si s'esta creant un flux de un sol ús, ja que no es persisteix al portafib.
+				if (resposta.getFluxId() != null) {
+					FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
+					flux.setNom(resposta.getNom());
+					flux.setDescripcio(resposta.getDescripcio());
+					EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+					fluxFirmaUsuariService.create(entitatActual.getId(), flux, null);
+				}
+				resposta.setFluxId(resposta.getFluxId()!=null?resposta.getFluxId():transactionId);
+				resultat = "El flux s'ha creat correctament. Podeu tancar la finestra.";
 			}
 			if (expedientId!=null) {
 				CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
@@ -133,11 +160,13 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		} catch (Exception ex) {
 			PortafirmesFluxRespostaDto resposta = new PortafirmesFluxRespostaDto();
 			resposta.setError(true);
+			resposta.setUsuari(dataSplri[2]);
 			resposta.setDescripcio("Error al recuperar i guardar el flux creat: "+transactionId+". "+ex.getMessage());
 			CreacioFluxFinalitzatEvent fluxEvent = new CreacioFluxFinalitzatEvent(expedientId, resposta);
 			eventService.notifyFluxFirmaFinalitzat(fluxEvent);
+			resultat = "El flux no s'ha pogut crear: "+ex.getMessage()+". Tancau la finestra i tornau-ho a provar passats uns minuts.";
 		}
-		return "";
+		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body(resultat);
 	}
 	
 	@RequestMapping(value = "/portafirmes/flux/returnurl/{transactionId}", method = RequestMethod.GET)

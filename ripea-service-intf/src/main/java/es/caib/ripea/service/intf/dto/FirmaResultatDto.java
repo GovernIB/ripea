@@ -7,23 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public class FirmaResultatDto {
 	
 	private StatusEnumDto status;
 	private String msg;
 	private List<FirmaSignatureStatus> signatures = new ArrayList<>();
-	private boolean processada = false;
+	private boolean processada = false; //Processada per el client SSE
+	private String usuari; //Usuari que ha iniciat el proces de firma
 	
 	public FirmaResultatDto(StatusEnumDto status, String msg) {
 		this.status = status;
 		this.msg = msg;
-	}
-	
-	public StatusEnumDto getStatus() {
-		return status;
-	}
-	public String getMsg() {
-		return msg;
 	}
 	
 	public void addSignature(FirmaSignatureStatus firmaSignatureStatus){

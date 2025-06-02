@@ -15,22 +15,26 @@ import * as builder from '../../util/springFilterUtils.ts';
 import TabComponent from "../../components/TabComponent.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
+import {useUserSession} from "../../components/Session.tsx";
 import {useSessionList} from "../../components/SessionStorageContext.tsx";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
     const { t } = useTranslation();
     const { onChange } = useScanFinalitzatSession();
+    const { value: user } = useUserSession()
 
     onChange((value) => {
-        console.log("scan", value)
-        apiRef?.current?.setFieldValue("scaned", true)
-        apiRef?.current?.setFieldValue("adjunt", {
-            name: value?.nomDocument,
-            content: value?.contingut,
-            contentType: value?.mimeType,
-            // contentLength: ,
-        })
+        debugger;
+        if (user?.codi==value?.usuari) {
+            console.log("scan", value)
+            apiRef?.current?.setFieldValue("scaned", true)
+            apiRef?.current?.setFieldValue("adjunt", {
+                name: value?.nomDocument,
+                content: value?.contingut,
+                contentType: value?.mimeType
+            });
+        }
     });
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
