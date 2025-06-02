@@ -193,7 +193,7 @@ const DocumentsGrid = (props:any) => {
     const {entity, onRowCountChange} = props;
     const { t } = useTranslation();
 
-    const { get: getFolderExpand } = useSessionList('folder_expand')
+    const { get: getFolderExpand, save: addFolderExpand } = useSessionList('folder_expand')
 
     const dataGridApiRef = useMuiDataGridApiRef()
     const [treeView, setTreeView] = useState<boolean>(true);
@@ -269,6 +269,7 @@ const DocumentsGrid = (props:any) => {
                     }
                 }}
 
+                rowExpansionChange={(params:any)=> addFolderExpand(`${params.id}`, params.childrenExpanded) }
                 isGroupExpandedByDefault={(row) => getFolderExpand(`${row?.id}`) || expand }
                 toolbarElementsWithPositions={[
                     {
