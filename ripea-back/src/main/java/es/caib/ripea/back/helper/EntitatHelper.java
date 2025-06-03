@@ -103,7 +103,7 @@ public class EntitatHelper {
 	
 	@SuppressWarnings("unchecked")
 	public static boolean isUsuariActualTeOrgans(HttpServletRequest request) {
-		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getAttribute(ORGANS_ACCESSIBLES);
+		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getSession().getAttribute(ORGANS_ACCESSIBLES);
 		if (organs != null && !organs.isEmpty()) {
 			return true;
 		} else {
@@ -121,7 +121,7 @@ public class EntitatHelper {
 
 	@SuppressWarnings("unchecked")
 	public static List<OrganGestorDto> findOrganGestorsAccessibles(HttpServletRequest request) {
-		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getAttribute(ORGANS_ACCESSIBLES);
+		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getSession().getAttribute(ORGANS_ACCESSIBLES);
 		if (organs != null && !organs.isEmpty()) {
 			return organs;
 		} else {
@@ -138,7 +138,7 @@ public class EntitatHelper {
 			} else {
 				organs = organGestorService.findOrganismesEntitatAmbPermisCache(entitatActual.getId());
 			}
-			request.setAttribute(ORGANS_ACCESSIBLES, organs);
+			request.getSession().setAttribute(ORGANS_ACCESSIBLES, organs);
 		}
 	}
 	
