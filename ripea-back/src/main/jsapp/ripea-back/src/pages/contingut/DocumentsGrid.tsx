@@ -25,7 +25,6 @@ const ScanerTabForm = () => {
     const { value: user } = useUserSession()
 
     onChange((value) => {
-        debugger;
         if (user?.codi==value?.usuari) {
             console.log("scan", value)
             apiRef?.current?.setFieldValue("scaned", true)
@@ -44,10 +43,10 @@ const ScanerTabForm = () => {
 
         <GridFormField xs={12} name="ntiIdDocumentoOrigen"
                        componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
-                       required hidden={data?.scaned}/>
-        <GridFormField xs={12} name="digitalitzacioPerfil" required hidden={data?.scaned}/>
+                       required/>
+        <GridFormField xs={12} name="digitalitzacioPerfil" required/>
 
-        <Grid item xs={12} hidden={data?.scaned}>
+        <Grid item xs={12}>
             <Iframe src={data?.digitalitzacioProcesUrl}/>
         </Grid>
     </Grid>

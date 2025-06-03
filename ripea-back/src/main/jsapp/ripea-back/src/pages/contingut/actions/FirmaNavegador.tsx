@@ -35,7 +35,6 @@ export const useFirmaNavegador = (refresh?: () => void) => {
     const { value: user } = useUserSession();
 
     onChange((firma) => {
-        debugger;
 		if (user?.codi==firma?.usuari) {
 	        const severiry =
 	            firma?.status == 'OK' ? 'success'

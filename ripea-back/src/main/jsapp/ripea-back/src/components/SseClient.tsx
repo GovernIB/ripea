@@ -111,7 +111,7 @@ export const SseClient: React.FC = () => {
       removeAll()
       saveSession(sseConnectedKey, false)
     };
-  }, []);
+  }, [user]);
 
   // Aquest component no renderitza res visible
   return null;

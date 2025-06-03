@@ -296,7 +296,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             disabled: true,
         },
         {
-            title: "",
+            title: t('page.document.acciones.definitive'),
             icon: "check_circle",
             showInMenu: true,
             onClick: definitiu,

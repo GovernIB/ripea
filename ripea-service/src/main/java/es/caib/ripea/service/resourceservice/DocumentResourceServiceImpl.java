@@ -1142,6 +1142,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     }
     private class EnviarPortafirmesActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarPortafirmesFormAction, DocumentResource> {
 
+        private Map<String, String> parseToMap(String input){
+            String[] tokens = input.split(",", -1); // split preservando vacíos
+
+            Map<String, String> map = new HashMap<>();
+            for (int i = 0; i < tokens.length - 1; i += 2) {
+                String key = tokens[i].trim();
+                String value = tokens[i + 1].trim();
+                map.put(key, value);
+            }
+
+            // Mostrar el resultado
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                System.out.println(entry.getKey() + " = " + entry.getValue());
+            }
+            return map;
+        }
+
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<>();
@@ -1149,6 +1166,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
                 EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), true, false, false, false, false);
                 List<PortafirmesFluxRespostaDto> fluxosDto = pluginHelper.portafirmesRecuperarPlantillesDisponibles(entitatEntity.getId(), false);
+
+                if (requestParameterMap.containsKey("additionalOption")){
+                    Map<String, String> additionalOption = parseToMap(requestParameterMap.get("additionalOption")[0]);
+                    if (additionalOption.containsKey("value")) {
+                        resultat.add(new FieldOption(additionalOption.get("value"), additionalOption.get("description")));
+                    }
+                }
 
                 if (fluxosDto != null) {
                     for (PortafirmesFluxRespostaDto flx : fluxosDto) {

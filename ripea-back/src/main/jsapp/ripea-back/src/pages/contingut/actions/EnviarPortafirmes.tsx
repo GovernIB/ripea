@@ -4,10 +4,10 @@ import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
-import * as builder from '../../../util/springFilterUtils.ts';
 import {useFluxCreateSession} from "../../../components/SseExpedient.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
+import * as builder from '../../../util/springFilterUtils.ts';
 
 const EnviarPortafirmesForm = () => {
     const { t } = useTranslation();
@@ -18,10 +18,10 @@ const EnviarPortafirmesForm = () => {
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
 
     onChange((flux) => {
-        debugger;
         if(!flux?.error && user?.codi==flux?.usuari) {
+            apiRef?.current?.setFieldValue("fluxCreat", flux);
             apiRef?.current?.setFieldValue("portafirmesEnviarFluxId", flux?.fluxId);
-            setOpen(true);
+            setOpen(false);
             setOpenNewFlux(false);
         }
     });
@@ -52,6 +52,10 @@ const EnviarPortafirmesForm = () => {
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
         <GridFormField xs={10} name="portafirmesEnviarFluxId"
                        componentProps={{title: t('page.document.detall.flux')}}
+                       requestParams={{additionalOption: {
+                           value: data?.fluxCreat?.fluxId,
+                           description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
+                       }}}
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
 
         <GridButton
@@ -69,6 +73,10 @@ const EnviarPortafirmesForm = () => {
         >
             <Icon sx={{m: 0}}>open_in_new</Icon>
         </GridButton>
+
+        {/*<Grid xs={12} hidden={!data?.portafirmesEnviarFluxDescription || data?.fluxCreatId!=data?.portafirmesEnviarFluxId}>*/}
+        {/*    <Alert severity={'info'}>Flujo "{data?.portafirmesEnviarFluxDescription}" creado correctamente</Alert>*/}
+        {/*</Grid>*/}
 
         <GridFormField xs={12} name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
         <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
