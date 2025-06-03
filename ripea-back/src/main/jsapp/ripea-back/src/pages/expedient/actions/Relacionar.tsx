@@ -95,7 +95,6 @@ const RelacionarForm= () => {
             perspectives={perspectives}
 
             selectionActive
-            // TODO: check seleccionados al inicio
             rowSelectionModel={selectionModel}
 
             onRowSelectionModelChange={(newSelection) => {

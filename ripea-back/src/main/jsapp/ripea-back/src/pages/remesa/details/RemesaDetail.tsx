@@ -27,7 +27,7 @@ const Dades = (props:any) => {
             <ContenidoData title={t('page.notificacio.detall.notificacioEstat')}>{entity?.notificacioEstat}</ContenidoData>
             <ContenidoData title={t('page.notificacio.detall.createdDate')}>{formatDate(entity?.createdDate)}</ContenidoData>
             <ContenidoData title={t('page.notificacio.detall.processatData')}
-                           hidden={!(entity.notificacioEstat=='FINALITZADA' || entity.notificacioEstat=='PROCESSADA')}>
+                           hidden={!(entity?.notificacioEstat=='FINALITZADA' || entity?.notificacioEstat=='PROCESSADA')}>
                 {formatDate(entity?.processatData)}</ContenidoData>
             <ContenidoData title={t('page.notificacio.detall.tipus')}>{entity?.tipus}</ContenidoData>
             <ContenidoData title={t('page.notificacio.detall.entregaPostal')}>{t(`enum.siNO.${entity?.entregaPostal}`)}</ContenidoData>

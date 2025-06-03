@@ -15,15 +15,18 @@ import useHistoric from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 
-export const iniciaDescargaBlob = (result: any) => {
-    const url = URL.createObjectURL(result.blob);
+export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
     link.href = url;
-    link.download = result.fileName;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link); // Limpieza
     URL.revokeObjectURL(url);
+}
+export const iniciaDescargaBlob = (result: any) => {
+    const url = URL.createObjectURL(result.blob);
+    iniciaDescarga(url, result.fileName)
 }
 export const iniciaDescargaJSON = (result: any) => {
     const data = result.blob;

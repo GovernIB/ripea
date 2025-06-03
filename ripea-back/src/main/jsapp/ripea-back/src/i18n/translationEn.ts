@@ -430,6 +430,7 @@ const translationEn = {
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
                 folder: "If no folder is selected, the documents will be imported directly into the case file.",
                 definitive: "This action will make the documents become a permanent part of the file and they cannot be deleted.",
+                scaned: "The scanning process was completed successfully.",
             },
             versio: {
                 title: "Version",

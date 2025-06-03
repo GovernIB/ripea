@@ -188,6 +188,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			//Camps transient per inicialitzar al carregar el formulari
 	        target.setPluginSummarizeActiu(Utils.hasValue(configHelper.getConfig(PropertyConfig.SUMMARIZE_PLUGIN_CLASS)));
 	        target.setFuncionariHabilitatDigitalib(rolHelper.doesCurrentUserHasRol("DIB_USER"));
+
+            if(previous.getAdjunt()!=null) {
+                new AdjuntOnchangeLogicProcessor().onChange(id, previous, DocumentResource.Fields.adjunt, previous.getAdjunt(), answers, previousFieldNames, target);
+            }
 		}
     }
     

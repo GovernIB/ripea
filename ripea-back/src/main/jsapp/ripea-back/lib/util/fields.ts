@@ -76,8 +76,7 @@ export const formattedFieldValue = (value: any, field?: any, config?: any): stri
     } else if (processedType === 'reference') {
         return value?.description;
     } else if (processedType === 'enum') {
-        const enumOption = field?.options?.inline?.find((o: any) => o.id === value);
-        return enumOption ? enumOption.description : value;
+        return field?.options?.[value] ?? value;
     } else if (processedType === 'checkbox' && (value != null || config?.booleanNullAsFalse)) {
         return value ? config?.booleanTextTrue ?? 'Si' : config?.booleanTextFalse ?? 'No';
     } else {
