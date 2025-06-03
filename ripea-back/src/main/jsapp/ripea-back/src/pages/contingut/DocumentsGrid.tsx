@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useDropzone } from 'react-dropzone'
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
 import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
-import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService, toBase64 } from 'reactlib';
+import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
 import { useContingutActions } from "./details/ContingutActions.tsx";
@@ -18,6 +17,7 @@ import Iframe from "../../components/Iframe.tsx";
 import { useScanFinalitzatSession } from "../../components/SseExpedient.tsx";
 import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
+import DropZone from "../../components/DropZone.tsx";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
@@ -27,7 +27,6 @@ const ScanerTabForm = () => {
 
     onChange((value) => {
         if (user?.codi == value?.usuari) {
-            console.log("scan", value)
             apiRef?.current?.setFieldValue("scaned", true)
             apiRef?.current?.setFieldValue("adjunt", {
                 name: value?.nomDocument,
@@ -39,7 +38,7 @@ const ScanerTabForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <Grid item xs={12} hidden={!data?.scaned}>
-            <Alert severity={"success"}>El proceso de escaneo se ha realizado con éxito.</Alert>
+            <Alert severity={"success"}>{t('page.document.alert.scaned')}</Alert>
         </Grid>
 
         <GridFormField xs={12} name="ntiIdDocumentoOrigen"
@@ -94,7 +93,7 @@ const DocumentsGridForm = () => {
         {
             value: "scaner",
             label: t('page.document.tabs.scaner'),
-            content: data?.funcionariHabilitatDigitalib
+            content: !data?.funcionariHabilitatDigitalib
                 ? <ScanerTabForm />
                 : <Alert severity={"warning"} sx={{ width: '100%' }}>{t('page.document.alert.funcionariHabilitatDigitalib')}</Alert>,
         }
@@ -210,32 +209,13 @@ const DocumentsGrid = (props: any) => {
     const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, dataGridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
-    const onDrop = React.useCallback((acceptedFiles: any) => {
-        const droppedFile = acceptedFiles[0];
-        toBase64(droppedFile).then(base64 => {
-            const adjunt = {
-                name: droppedFile.name,
-                content: base64,
-                contentType: droppedFile.type,
-                contentLength: droppedFile.size,
-            };
-            dataGridApiRef?.current?.showCreateDialog?.(null, { adjunt })
-        });
+    const onDrop = React.useCallback((adjunt: any) => {
+        dataGridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ noClick: true, onDrop })
-    const dragDropStyle = { border: '2px dashed ' + (isDragActive ? 'orange' : 'transparent') };
 
     return <GridPage>
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                ...dragDropStyle
-            }}
-            {...getRootProps()}>
-            <Load value={entity}>
-                <input {...getInputProps()} />
+        <Load value={entity}>
+            <DropZone onDrop={onDrop}>
                 <StyledMuiGrid
                     resourceName="documentResource"
                     popupEditFormDialogResourceTitle={t('page.document.title')}
@@ -336,9 +316,8 @@ const DocumentsGrid = (props: any) => {
                 />
                 {components}
                 {massiveComponents}
-            </Load>
-
-        </div>
+            </DropZone>
+        </Load>
     </GridPage>
 }
 

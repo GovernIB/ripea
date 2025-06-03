@@ -73,24 +73,28 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         }
     };
 
+    const buttons = [
+         {
+            value: 'cancel',
+            text: 'Cancelar el envío',
+            icon: 'delete',
+            hidden: !(entity?.estat == 'ENVIAT' && potModificar)
+        },
+        {
+            value: 'close',
+            text: t('common.close'),
+            icon: 'close'
+        },
+    ]
+        .filter((button:any)=>!button?.hidden)
+
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={'Detalles de la firma'}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
-            buttons={[
-                (entity?.estat == 'ENVIAT' && potModificar) && {
-                    value: 'cancel',
-                    text: 'Cancelar el envío',
-                    icon: 'delete',
-                },
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    icon: 'close'
-                },
-            ]}
+            buttons={buttons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

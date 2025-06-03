@@ -10,7 +10,6 @@ public class PortafirmesFluxRespostaDto implements Serializable {
 	private boolean error;
 	private PortafirmesFluxEstatDto estat;
 	private boolean isUsuariActual;
-	private boolean processada = false; //Processada per el client SSE
 	private String usuari; //Usuari que ha iniciat el proces de firma
 	
 	public String getNom() {
@@ -44,12 +43,6 @@ public class PortafirmesFluxRespostaDto implements Serializable {
 		this.estat = estat;
 	}
 
-	public boolean isProcessada() {
-		return processada;
-	}
-	public void setProcessada(boolean processada) {
-		this.processada = processada;
-	}
 	public boolean isUsuariActual() {
 		return isUsuariActual;
 	}
