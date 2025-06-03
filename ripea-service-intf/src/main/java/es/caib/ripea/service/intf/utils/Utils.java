@@ -594,7 +594,7 @@ public class Utils {
 	        Cipher cipher = Cipher.getInstance("AES");
 	        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 	        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-	        return java.util.Base64.getEncoder().encodeToString(encryptedBytes);
+	        return java.util.Base64.getEncoder().encodeToString(encryptedBytes).replace("/", "_");
 		} catch (Exception ex) {
 			return data;
 		}
@@ -605,7 +605,7 @@ public class Utils {
 	        SecretKeySpec secretKey = new SecretKeySpec("g8J@kLp!3#xYzWv9bQnM4dF5TjZ2Rc7p".getBytes(), "AES");
 	        Cipher cipher = Cipher.getInstance("AES");
 	        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-	        byte[] decryptedBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedData));
+	        byte[] decryptedBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedData.replace("_", "/")));
 	        return new String(decryptedBytes);
 		} catch (Exception ex) {
 			return encryptedData;

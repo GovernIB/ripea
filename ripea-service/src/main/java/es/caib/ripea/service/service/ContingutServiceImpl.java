@@ -49,6 +49,7 @@ import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
@@ -139,6 +140,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired private ContingutsOrfesHelper contingutRepositoryHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private DominiService dominiService;
 	@Autowired private ConfigHelper configHelper;
 
@@ -955,20 +957,10 @@ public class ContingutServiceImpl implements ContingutService {
 			Long entitatId,
 			Long contingutId) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutId));
-		logger.debug("Obtenint informació de l'arxiu pel contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ")");
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
-				entitatId,
-				contingutId,
-				true,
-				false);
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				true, false);
+		logger.debug("Obtenint informació de l'arxiu pel contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
+		//Comprovar contingut ja comprova també entitat
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(entitatId, contingutId, true, false);
+		EntitatEntity entitat = entitatRepository.findById(entitatId).get();
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();

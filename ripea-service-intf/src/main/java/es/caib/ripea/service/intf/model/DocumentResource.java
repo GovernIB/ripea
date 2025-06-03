@@ -445,11 +445,11 @@ public class DocumentResource extends NodeResource {
         private ServeiTipusEnumDto serveiTipus = ServeiTipusEnumDto.NORMAL;
 //        @Field(type = Field.TYPE_TEXTAREA)
         private String descripcio;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone="Europe/Madrid")
         private Date dataProgramada;
         @NotNull
         @ResourceField(onChangeActive = true)
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", timezone="Europe/Madrid")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone="Europe/Madrid")
         private Date dataCaducitat;
         @NotNull
         @ResourceField(onChangeActive = true)
@@ -497,6 +497,7 @@ public class DocumentResource extends NodeResource {
         @Transient private String portafirmesFluxUrl;
         @Transient private String urlInicioFlujoFirma;
         @Transient private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
+        @Transient private PortafirmesFluxRespostaDto fluxCreat;
     }
     
     @Getter

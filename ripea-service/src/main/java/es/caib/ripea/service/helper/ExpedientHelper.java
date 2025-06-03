@@ -1755,22 +1755,12 @@ public class ExpedientHelper {
 			boolean exportar,
 			String format) throws IOException {
 		
-		EntitatEntity entitatActual = null;
-
-		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
-			entitatActual = entitatRepository.findById(entitatActualId).get(); //Cridada desde execucio massiva
-		} else {
-			entitatActual = entityComprovarHelper.comprovarEntitat(entitatActualId, false, false, false, true, false);
-		}
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatActualId, false, false, false, true, false);
 		
 		//Comprovar permis de lectura per els expedients
 		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
 		for (Long expedientId : expedientIds) {
-			ExpedientEntity expedient = null;
-			if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
-				expedient = expedientRepository.findById(expedientId).get();
-			} else {
-				expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
 						expedientId,
 						false,
 						true,
@@ -1778,7 +1768,6 @@ public class ExpedientHelper {
 						false,
 						false,
 						null);
-			}
 			expedients.add(expedient);
 		}
 		
@@ -2698,12 +2687,7 @@ public class ExpedientHelper {
 	}
 
 	public FitxerDto exportacio(Long entitatId, Collection<Long> expedientIds, String format) throws IOException {
-		EntitatEntity entitat = null;
-		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
-			entitat = entitatRepository.findById(entitatId).get(); //Cridada desde execucio massiva
-		} else {
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-		}
+		EntitatEntity entitat =  entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
 		List<Long> ids = new ArrayList<>(expedientIds != null ? expedientIds : new ArrayList<Long>());
 		List<ExpedientEntity> expedients = expedientRepositoryCommnand.findByEntitatAndIdInOrderByIdAsc(entitat, ids);
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(expedientIds);
@@ -2728,17 +2712,13 @@ public class ExpedientHelper {
 		List<String[]> files = new ArrayList<String[]>();
 		int dadesIndex = 0;
 		for (ExpedientEntity expedient : expedients) {
-			
-			if(!"SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
-				entityComprovarHelper.comprovarMetaExpedient(
-						entitat,
-						expedient.getMetaExpedient().getId(),
-						true,
-						false,
-						false,
-						false, false, null, null);
-			}
-			
+			entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					expedient.getMetaExpedient().getId(),
+					true,
+					false,
+					false,
+					false, false, null, null);
 			String[] fila = new String[numColumnes];
 			fila[0] = expedient.getNumero();
 			fila[1] = expedient.getNom();

@@ -143,10 +143,18 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisUsuariOrAdmin, 
 			boolean comprovarPermisUsuariOrAdminOrOrgan, 
 			boolean comprovarPermisAdminOrOrgan) throws NotFoundException {
+		
 		EntitatEntity entitat = entitatRepository.findById(entitatId).orElse(null);
+		
 		if (entitat == null) {
 			throw new NotFoundException(entitatId, EntitatEntity.class);
 		}
+		
+		//Per processos en segon pla, aquest usuari no té permisos ACL sobre objectes
+		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+			return entitat;
+		}
+		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisUsuari) {
 			boolean esLectorEntitat = auth != null && permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
@@ -440,6 +448,12 @@ public class EntityComprovarHelper {
 			boolean checkPerMassiuAdmin, 
 			String rolActual, 
 			Long organId) {
+		
+		//Per processos en segon pla, aquest usuari no té permisos ACL sobre objectes
+		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+			return metaExpedientRepository.findById(metaExpedientId).get();
+		}
+		
 		MetaExpedientEntity metaExpedient = comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);
@@ -877,6 +891,12 @@ public class EntityComprovarHelper {
 		if (expedient.getEsborrat() != 0) {
 			throw new NotFoundException(expedientId, ExpedientEntity.class);
 		}
+		
+		//Per processos en segon pla, aquest usuari no té permisos ACL sobre objectes
+		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+			return expedient;
+		}
+		
 		comprovarEntitat(expedient.getEntitat().getId(), false, false, false, true, false);
 
 		if (comprovarAgafatPerUsuariActual && !RolHelper.isAdminEntitat(rolActual) && !RolHelper.isAdminOrgan(rolActual)) {

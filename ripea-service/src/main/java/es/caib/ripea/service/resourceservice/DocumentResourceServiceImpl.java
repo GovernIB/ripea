@@ -1054,9 +1054,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarFormAction target) {
             if (fieldName==null){
                 target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
-            }
-
-            if (fieldName!=null) {
+               	target.setDuracio(configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA, 10));
+            } else {
                 switch (fieldName) {
                     case DocumentResource.NotificarFormAction.Fields.duracio:
                         if (fieldValue != null) {
@@ -1231,6 +1230,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		}
         	}
         	
+        	//Enviam com a parametre transactionID si s'ha creat un flux temporal, sino enviam el fluxId
 			firmaPortafirmesHelper.portafirmesEnviar(
 					entitatId,
 					document,
@@ -1242,7 +1242,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					params.getPortafirmesSequenciaTipus(),
 					params.getPortafirmesFluxTipus(),
 					annexosIds.toArray(new Long[0]),
-					null,
+					params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null,
 					params.isAvisFirmaParcial(),
 					params.isFirmaParcial());
         	

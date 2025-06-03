@@ -1215,16 +1215,9 @@ public class ContingutHelper {
 			Long contingutId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite) {
-		ContingutEntity contingut = comprovarContingutDinsExpedientAccessible(
-				entitatId,
-				contingutId,
-				comprovarPermisRead,
-				comprovarPermisWrite);
+		ContingutEntity contingut = comprovarContingutDinsExpedientAccessible(entitatId, contingutId, comprovarPermisRead, comprovarPermisWrite);
 		if (!(contingut instanceof NodeEntity)) {
-			throw new ValidationException(
-					contingut.getId(),
-					ContingutEntity.class,
-					"El contingut no és un node");
+			throw new ValidationException(contingut.getId(), ContingutEntity.class, "El contingut no és un node");
 		}
 		return (NodeEntity)contingut;
 	}
@@ -1234,32 +1227,12 @@ public class ContingutHelper {
 			Long contingutId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite) {
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				true, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				contingutId);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
 		// Comprova el permís de lectura de l'expedient superior
-		getExpedientSuperior(
-				contingut,
-				true,
-				false,
-				false,
-				null);
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			
-			entityComprovarHelper.comprovarExpedient(
-					contingut.getId(),
-					false,
-					comprovarPermisRead,
-					comprovarPermisWrite,
-					false,
-					false,
-					null);
-
+		getExpedientSuperior(contingut, true, false, false, null);
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {				
+			entityComprovarHelper.comprovarExpedient(contingut.getId(), false, comprovarPermisRead, comprovarPermisWrite, false, false, null);
 		}
 		return contingut;
 	}
