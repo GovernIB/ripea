@@ -1,15 +1,14 @@
 package es.caib.ripea.service.intf.model;
 
+import java.util.Date;
+
+import org.springframework.data.annotation.Transient;
+
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +16,6 @@ import java.util.List;
 @ResourceConfig(quickFilterFields = { "identificador" }, descriptionField = "destiCodiINom")
 public class RegistreResource extends BaseAuditableResource<Long> {
 
-//    private Long id;
     private String aplicacioCodi;
     private String aplicacioVersio;
     private String assumpteCodiCodi;
@@ -52,13 +50,10 @@ public class RegistreResource extends BaseAuditableResource<Long> {
     private String usuariNom;
     private String destiCodi;
     private String destiDescripcio;
-
-//    private List<RegistreInteressatDto> interessats;
-//    private List<RegistreAnnexDto> annexos;
     private String justificantArxiuUuid;
-
-//    private RegistreJustificantDto justificant;
-
+    
+    @Transient private RegistreAnnexResource justificant;
+    
     public String getDestiCodiINom() {
         return destiCodi + " - " + destiDescripcio;
     }
