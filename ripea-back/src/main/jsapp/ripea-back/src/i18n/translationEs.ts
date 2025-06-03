@@ -430,6 +430,7 @@ const translationEs = {
                 funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
                 definitive: "Esta acción hará que los documentos pasen a formar parte del expediente de forma definitiva y no se podrán eliminar.",
+                scaned: "El proceso de escaneo se ha realizado con éxito.",
             },
             versio: {
                 title: "Versión",

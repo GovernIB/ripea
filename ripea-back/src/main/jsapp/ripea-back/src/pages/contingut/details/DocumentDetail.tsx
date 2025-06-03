@@ -120,31 +120,21 @@ const useDocumentDetail = () => {
         },
     ]
 
-    let buttons :any[] = []
-
-    if (entity?.documentTipus != 'FISIC') {
-        buttons = [
-            ...buttons,
-            {
-                value: 'download',
-                text: t('common.download'),
-                icon: 'download',
-                // hidden: contingut.documentTipus == 'FISIC'
-            },
-        ]
-    }
-
-    if (entity?.estat == 'CUSTODIAT') {
-        buttons = [
-            ...buttons,
-            {
-                value: 'descarregarImprimible',
-                text: t('page.document.acciones.descarregarImprimible'),
-                icon: 'download',
-                // hidden: contingut.estat != 'CUSTODIAT'
-            },
-        ]
-    }
+    let buttons :any[] = [
+        {
+            value: 'download',
+            text: t('common.download'),
+            icon: 'download',
+            hidden: entity?.documentTipus == 'FISIC'
+        },
+        {
+            value: 'descarregarImprimible',
+            text: t('page.document.acciones.descarregarImprimible'),
+            icon: 'download',
+            hidden: entity?.estat == 'CUSTODIAT'
+        },
+    ]
+        .filter((button:any)=>!button?.hidden)
 
     const dialog =
         <MuiDialog

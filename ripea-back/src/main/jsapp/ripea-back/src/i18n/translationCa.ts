@@ -430,6 +430,7 @@ const translationCa = {
                 funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB",
                 folder: "En cas de no seleccionar una carpeta, s'importaran els documents directament a l'expedient.",
                 definitive: "Aquesta acció farà que els documents passin a formar part de l\'expedient definitivament i no es podran eliminar.",
+                scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
             },
             versio: {
                 title: "Versió",
