@@ -199,8 +199,7 @@ const UserHeadToolbar = (props:any) => {
 
                 {(isRolActualSupAdmin || isRolActualAdmin || isRolActualOrganAdmin) &&
                     <MenuItem onClick={()=>{
-                        /* TODO: revisar */
-                        const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf';
+                        const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/02_ripea_manual_administradors.pdf';
                         const link = document.createElement('a');
                         link.href = url;
                         link.download = '02_ripea_manual_administradors.pdf';
@@ -215,8 +214,7 @@ const UserHeadToolbar = (props:any) => {
 
                 <MenuItem
                     onClick={()=>{
-                        /* TODO: revisar */
-                        const url = 'https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf';
+                        const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/01_ripea_manual_usuari.pdf';
                         const link = document.createElement('a');
                         link.href = url;
                         link.download = '01_ripea_manual_usuari.pdf';
