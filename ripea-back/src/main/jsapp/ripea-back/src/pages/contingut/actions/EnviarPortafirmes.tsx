@@ -59,7 +59,10 @@ const EnviarPortafirmesForm = () => {
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
 
         <GridButton
-            xs={1} onClick={()=>setOpen(!open)}
+            xs={1} onClick={()=>{
+                setOpenNewFlux(false)
+                setOpen(!open)
+            }}
             hidden={data?.portafirmesFluxTipus!='PORTAFIB'}
         >
             <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
@@ -67,16 +70,12 @@ const EnviarPortafirmesForm = () => {
         <GridButton
             xs={1} onClick={()=>{
                 setOpen(false)
-                setOpenNewFlux(true)
+                setOpenNewFlux(!openNewFlux)
             }}
             hidden={data?.portafirmesFluxTipus!='PORTAFIB'}
         >
             <Icon sx={{m: 0}}>open_in_new</Icon>
         </GridButton>
-
-        {/*<Grid xs={12} hidden={!data?.portafirmesEnviarFluxDescription || data?.fluxCreatId!=data?.portafirmesEnviarFluxId}>*/}
-        {/*    <Alert severity={'info'}>Flujo "{data?.portafirmesEnviarFluxDescription}" creado correctamente</Alert>*/}
-        {/*</Grid>*/}
 
         <GridFormField xs={12} name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
         <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>

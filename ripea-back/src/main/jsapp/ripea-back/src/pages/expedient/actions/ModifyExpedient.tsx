@@ -10,6 +10,7 @@ export const ModifyExpedient = (props: { apiRef:any }) => {
     return <MuiFormDialog
         resourceName={"expedientResource"}
         title={t('common.update')+' '+t('page.expedient.title')}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
         apiRef={apiRef}
     >
         <ExpedientGridForm/>

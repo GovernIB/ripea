@@ -21,6 +21,7 @@ export const CambiarPrioritat = (props: { apiRef:any }) => {
     return <MuiFormDialog
         resourceName={"expedientResource"}
         title={t('page.expedient.action.changePrioritat')}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
         apiRef={apiRef}
     >
         <CambiarPrioritatForm/>

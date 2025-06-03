@@ -35,8 +35,10 @@ export const FollowersDialog = (props:any) => {
 		setOpen(true);
     }
 
-	const handleClose = () => {
-        setOpen(false);
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setOpen(false);
+        }
     };
 	
     return <>

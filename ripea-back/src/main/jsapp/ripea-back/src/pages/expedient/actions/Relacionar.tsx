@@ -115,6 +115,7 @@ const Relacionar = (props:any) => {
     return <MuiFormDialog
         resourceName={'expedientResource'}
         title={t('page.expedient.action.relacio')}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
         {...props}
     >
         <RelacionarForm/>

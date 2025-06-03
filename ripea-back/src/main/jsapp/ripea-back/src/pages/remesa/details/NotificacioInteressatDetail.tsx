@@ -88,8 +88,11 @@ const useNotificacioInteressatDetail = () => {
         setOpen(true);
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setEntity(undefined);
+            setOpen(false);
+        }
     };
 
     const tabs = [

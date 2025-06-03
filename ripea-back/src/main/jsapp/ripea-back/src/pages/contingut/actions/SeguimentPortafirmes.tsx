@@ -66,10 +66,12 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
             setOpen(true)
         }
     }
-    const handleClose = () => {
-        setEntity(undefined)
-        setOpen(false)
-    }
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setEntity(undefined);
+            setOpen(false);
+        }
+    };
 
     const dialog =
         <MuiDialog

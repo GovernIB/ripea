@@ -117,8 +117,10 @@ const useExecucioMassiva = () => {
         setOpen(true);
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setOpen(false);
+        }
     };
 
     const actions: any = [
@@ -291,8 +293,11 @@ const useExecucioMassivaContingut = () => {
         setOpen(true);
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setEntityId(undefined);
+            setOpen(false);
+        }
     };
 
     const dialog =

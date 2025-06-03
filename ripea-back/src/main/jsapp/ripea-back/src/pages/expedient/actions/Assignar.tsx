@@ -17,6 +17,7 @@ export const Assignar = (props: { apiRef:any }) => {
     return <MuiFormDialog
         resourceName={"expedientResource"}
         title={t('page.expedient.action.assignar')}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
         apiRef={apiRef}
     >
         <AssignarForm/>

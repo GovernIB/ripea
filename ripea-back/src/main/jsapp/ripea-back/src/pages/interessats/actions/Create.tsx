@@ -5,6 +5,7 @@ import {useRef} from "react";
 const CreateForm = (props:any) => {
     return <MuiFormDialog
         resourceName={"interessatResource"}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
         {...props}
     >
         <InteressatsGridForm/>

@@ -52,6 +52,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         formDialogResultProcessor,
         onSuccess,
         onError,
+        (reason?: string) => reason !== 'backdropClick'
     )
 
     const exec = (id: any, formAdditionalData?: any) :void => {
@@ -97,6 +98,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         formDialogResultProcessor,
         onSuccess,
         onError,
+        (reason?: string) => reason !== 'backdropClick'
     )
 
     const exec = (id: any, formAdditionalData?: any) :void => {

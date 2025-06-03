@@ -12,6 +12,7 @@ const CrearCarpetaForm = () => {
 const CrearCarpeta = (props:any) => {
     return <MuiFormDialog
         resourceName={"carpetaResource"}
+        onClose={(reason?: string) => reason !== 'backdropClick'}
         {...props}
     >
         <CrearCarpetaForm/>
