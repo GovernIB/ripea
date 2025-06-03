@@ -197,10 +197,12 @@ export const useDataCommonEditable = (
     const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
     const isPopupEditCreate = popupEditActive || popupEditCreateActive;
     const isPopupEditUpdate = popupEditActive || popupEditUpdateActive;
-    const showCreateDialog: DataCommonShowCreateDialogFn = (row?: any) => {
-        dataDialogPopupApiRef.current?.show(
-            undefined,
-            (typeof formAdditionalData === 'function') ? formAdditionalData(row, 'create') : formAdditionalData).
+    const showCreateDialog: DataCommonShowCreateDialogFn = (row?: any, additionalData?: any) => {
+        const processedAdditionalData = {
+            ...((typeof formAdditionalData === 'function') ? formAdditionalData(row, 'create') : formAdditionalData),
+            ...additionalData
+        }
+        dataDialogPopupApiRef.current?.show(undefined, processedAdditionalData).
             then(() => {
                 refresh?.();
             }).
@@ -208,10 +210,12 @@ export const useDataCommonEditable = (
                 // Feim un catch buit perquè no aparegui a la consola el missatge: Uncaught (in promise)
             });
     }
-    const showUpdateDialog: DataCommonShowUpdateDialogFn = (id: any, row?: any) => {
-        dataDialogPopupApiRef.current?.show(
-            id,
-            (typeof formAdditionalData === 'function') ? formAdditionalData(row, 'update') : formAdditionalData).
+    const showUpdateDialog: DataCommonShowUpdateDialogFn = (id: any, row?: any, additionalData?: any) => {
+        const processedAdditionalData = {
+            ...((typeof formAdditionalData === 'function') ? formAdditionalData(row, 'create') : formAdditionalData),
+            ...additionalData
+        }
+        dataDialogPopupApiRef.current?.show(id, processedAdditionalData).
             then(() => {
                 refresh?.();
             }).

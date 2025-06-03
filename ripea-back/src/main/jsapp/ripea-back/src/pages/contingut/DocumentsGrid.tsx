@@ -1,22 +1,23 @@
-import {useState} from "react";
-import {FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert} from "@mui/material";
-import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
-import {GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService} from 'reactlib';
-import {useTranslation} from "react-i18next";
+import React, { useState } from "react";
+import { useDropzone } from 'react-dropzone'
+import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
+import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
+import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService, toBase64 } from 'reactlib';
+import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
-import {useContingutActions} from "./details/ContingutActions.tsx";
+import { useContingutActions } from "./details/ContingutActions.tsx";
 import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
-import GridFormField, {GridButton} from "../../components/GridFormField.tsx";
-import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
+import GridFormField, { GridButton } from "../../components/GridFormField.tsx";
+import StyledMuiGrid, { ToolbarButton } from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
-import {potModificar} from "../expedient/details/Expedient.tsx";
-import {MenuActionButton} from "../../components/MenuButton.tsx";
+import { potModificar } from "../expedient/details/Expedient.tsx";
+import { MenuActionButton } from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
 import TabComponent from "../../components/TabComponent.tsx";
 import Iframe from "../../components/Iframe.tsx";
-import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
-import {useUserSession} from "../../components/Session.tsx";
-import {useSessionList} from "../../components/SessionStorageContext.tsx";
+import { useScanFinalitzatSession } from "../../components/SseExpedient.tsx";
+import { useUserSession } from "../../components/Session.tsx";
+import { useSessionList } from "../../components/SessionStorageContext.tsx";
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
@@ -25,7 +26,7 @@ const ScanerTabForm = () => {
     const { value: user } = useUserSession()
 
     onChange((value) => {
-        if (user?.codi==value?.usuari) {
+        if (user?.codi == value?.usuari) {
             console.log("scan", value)
             apiRef?.current?.setFieldValue("scaned", true)
             apiRef?.current?.setFieldValue("adjunt", {
@@ -42,12 +43,12 @@ const ScanerTabForm = () => {
         </Grid>
 
         <GridFormField xs={12} name="ntiIdDocumentoOrigen"
-                       componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
-                       required/>
-        <GridFormField xs={12} name="digitalitzacioPerfil" required/>
+            componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
+            required />
+        <GridFormField xs={12} name="digitalitzacioPerfil" required />
 
         <Grid item xs={12}>
-            <Iframe src={data?.digitalitzacioProcesUrl}/>
+            <Iframe src={data?.digitalitzacioProcesUrl} />
         </Grid>
     </Grid>
 }
@@ -55,22 +56,22 @@ const FileTabForm = () => {
     const { data } = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="adjunt" type={"file"} required/>
-        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus=="FIRMA_ADJUNTA"}/>
-        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled/>
-        <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus!="FIRMA_SEPARADA"} required/>
+        <GridFormField xs={12} name="adjunt" type={"file"} required />
+        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus == "FIRMA_ADJUNTA"} />
+        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled />
+        <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required />
     </Grid>
 }
 
 const DocumentsGridForm = () => {
     const { t } = useTranslation();
     const { data, apiRef } = useFormContext();
-    const {artifactAction: apiAction} = useResourceApiService('documentResource');
+    const { artifactAction: apiAction } = useResourceApiService('documentResource');
 
     const actualizarDatos = () => {
         if (data?.adjunt && data.pluginSummarizeActiu) {
-            apiAction(undefined, {code :"RESUM_IA", data:{ adjunt: data?.adjunt }})
-                .then((result)=>{
+            apiAction(undefined, { code: "RESUM_IA", data: { adjunt: data?.adjunt } })
+                .then((result) => {
                     if (result) {
                         apiRef?.current?.setFieldValue("nom", result.titol)
                         apiRef?.current?.setFieldValue("descripcio", result.resum)
@@ -79,7 +80,7 @@ const DocumentsGridForm = () => {
         }
     };
 
-    const metaDocumentFilter :string = builder.and(
+    const metaDocumentFilter: string = builder.and(
         builder.eq("metaExpedient.id", data?.metaExpedient?.id),
         builder.eq("actiu", true),
     );
@@ -88,36 +89,36 @@ const DocumentsGridForm = () => {
         {
             value: "file",
             label: t('page.document.tabs.file'),
-            content: <FileTabForm/>,
+            content: <FileTabForm />,
         },
         {
             value: "scaner",
             label: t('page.document.tabs.scaner'),
             content: data?.funcionariHabilitatDigitalib
-                ?<ScanerTabForm/>
-                :<Alert severity={"warning"} sx={{width: '100%'}}>{t('page.document.alert.funcionariHabilitatDigitalib')}</Alert>,
+                ? <ScanerTabForm />
+                : <Alert severity={"warning"} sx={{ width: '100%' }}>{t('page.document.alert.funcionariHabilitatDigitalib')}</Alert>,
         }
     ];
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaDocument"
-                       namedQueries={
-                           apiRef?.current?.getId()
-                               ?[`UPDATE_DOC#${apiRef?.current?.getId()}`]
-                               :[`CREATE_NEW_DOC#${data?.expedient?.id}`]
-                       }
-                       filter={metaDocumentFilter}/>
-        <GridFormField xs={data.pluginSummarizeActiu ?11 :12} name="nom"/>
+            namedQueries={
+                apiRef?.current?.getId()
+                    ? [`UPDATE_DOC#${apiRef?.current?.getId()}`]
+                    : [`CREATE_NEW_DOC#${data?.expedient?.id}`]
+            }
+            filter={metaDocumentFilter} />
+        <GridFormField xs={data.pluginSummarizeActiu ? 11 : 12} name="nom" />
         <GridButton xs={1} title={t('page.document.detall.summarize')}
-                    onClick={actualizarDatos}
-                    disabled={!data?.adjunt}
-                    hidden={!data.pluginSummarizeActiu}>
+            onClick={actualizarDatos}
+            disabled={!data?.adjunt}
+            hidden={!data.pluginSummarizeActiu}>
             <Icon>assistant</Icon>IA
         </GridButton>
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
-        <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required/>
-        <GridFormField xs={12} name="ntiOrigen" required/>
-        <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
+        <GridFormField xs={12} name="descripcio" type={"textarea"} />
+        <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required />
+        <GridFormField xs={12} name="ntiOrigen" required />
+        <GridFormField xs={12} name="ntiEstadoElaboracion" required />
 
         <Grid item xs={12}>
             <TabComponent
@@ -128,25 +129,25 @@ const DocumentsGridForm = () => {
     </Grid>
 }
 
-const ExpandButton = (props:{value:any, onChange:(value:any) => void, hidden: boolean}) => {
-    const {value, onChange, hidden} = props;
+const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
+    const { value, onChange, hidden } = props;
     const { t } = useTranslation();
 
-    if (hidden){
+    if (hidden) {
         return <></>
     }
 
     return <ToolbarButton
-        startIcon={<Icon>{value ?'arrow_right' :'arrow_drop_down'}</Icon>}
-        onClick={()=>onChange(!value)}
+        startIcon={<Icon>{value ? 'arrow_right' : 'arrow_drop_down'}</Icon>}
+        onClick={() => onChange(!value)}
         color={'none'}
     >
         {value ? t("common.contract") : t("common.expand")}
     </ToolbarButton>
 }
 
-const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) => {
-    const {value, onChange} = props;
+const TreeViewSelector = (props: { value: any, onChange: (value: any) => void }) => {
+    const { value, onChange } = props;
     const { t } = useTranslation();
 
     return <Grid item xs={3} sx={{ ml: 1 }}>
@@ -166,7 +167,7 @@ const TreeViewSelector = (props:{value: any, onChange: (value: any) => void }) =
     </Grid>
 }
 
-const sortModel:any = [{field: 'id', sort: 'desc'}]
+const sortModel: any = [{ field: 'id', sort: 'desc' }]
 const perspectives = ["PATH"]
 const columns = [
     // {
@@ -192,8 +193,8 @@ const columns = [
     },
 ];
 
-const DocumentsGrid = (props:any) => {
-    const {entity, onRowCountChange} = props;
+const DocumentsGrid = (props: any) => {
+    const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
 
     const { get: getFolderExpand, save: addFolderExpand } = useSessionList('folder_expand')
@@ -206,112 +207,138 @@ const DocumentsGrid = (props:any) => {
     const refresh = () => {
         dataGridApiRef?.current?.refresh?.();
     }
-    const {createActions, actions, hiddenDelete, components} = useContingutActions(entity, dataGridApiRef, refresh);
-    const {actions: massiveActions, components: massiveComponents} = useContingutMassiveActions(entity, refresh);
+    const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, dataGridApiRef, refresh);
+    const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
+
+    const onDrop = React.useCallback((acceptedFiles: any) => {
+        const droppedFile = acceptedFiles[0];
+        toBase64(droppedFile).then(base64 => {
+            const adjunt = {
+                name: droppedFile.name,
+                content: base64,
+                contentType: droppedFile.type,
+                contentLength: droppedFile.size,
+            };
+            dataGridApiRef?.current?.showCreateDialog?.(null, { adjunt })
+        });
+    }, [])
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ noClick: true, onDrop })
+    const dragDropStyle = { border: '2px dashed ' + (isDragActive ? 'orange' : 'transparent') };
 
     return <GridPage>
-        <Load value={entity}>
-            <StyledMuiGrid
-                resourceName="documentResource"
-                popupEditFormDialogResourceTitle={t('page.document.title')}
-                columns={columns}
-                paginationActive
-                filter={builder.and(
-                    builder.eq('expedient.id', entity?.id),
-                    builder.eq('esborrat', 0),
-                )}
-                perspectives={perspectives}
-                staticSortModel={sortModel}
-                popupEditCreateActive
-                popupEditFormContent={<DocumentsGridForm/>}
-                formInitOnChange
-                formAdditionalData={{
-                    expedient: {id: entity?.id},
-                    metaExpedient: entity?.metaExpedient,
-                }}
-                apiRef={dataGridApiRef}
-                rowAdditionalActions={actions}
-                onRowCountChange={onRowCountChange}
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                ...dragDropStyle
+            }}
+            {...getRootProps()}>
+            <Load value={entity}>
+                <input {...getInputProps()} />
+                <StyledMuiGrid
+                    resourceName="documentResource"
+                    popupEditFormDialogResourceTitle={t('page.document.title')}
+                    columns={columns}
+                    paginationActive
+                    filter={builder.and(
+                        builder.eq('expedient.id', entity?.id),
+                        builder.eq('esborrat', 0),
+                    )}
+                    perspectives={perspectives}
+                    staticSortModel={sortModel}
+                    popupEditCreateActive
+                    popupEditFormContent={<DocumentsGridForm />}
+                    formInitOnChange
+                    formAdditionalData={{
+                        expedient: { id: entity?.id },
+                        metaExpedient: entity?.metaExpedient,
+                    }}
+                    apiRef={dataGridApiRef}
+                    rowAdditionalActions={actions}
+                    onRowCountChange={onRowCountChange}
 
-                groupingColDef={{
-                    headerName: t('page.contingut.grid.nom'),
-                    flex: 1.5,
-                    valueFormatter: (value:any, row:any) => {
-                        return row?.id ?<ContingutIcon entity={row}/> :value;
-                    },
-                    renderCell: (params: any) => {
-                        return treeView
-                            ?<GridTreeDataGroupingCell {...params}/>
-                            :params.formattedValue
-                    },
-                }}
-                treeData
-                treeDataAdditionalRows={(_rows:any) => {
-                    const additionalRows :any[] = [];
+                    groupingColDef={{
+                        headerName: t('page.contingut.grid.nom'),
+                        flex: 1.5,
+                        valueFormatter: (value: any, row: any) => {
+                            return row?.id ? <ContingutIcon entity={row} /> : value;
+                        },
+                        renderCell: (params: any) => {
+                            return treeView
+                                ? <GridTreeDataGroupingCell {...params} />
+                                : params.formattedValue
+                        },
+                    }}
+                    treeData
+                    treeDataAdditionalRows={(_rows: any) => {
+                        const additionalRows: any[] = [];
 
-                    if(_rows!=null && vista == "carpeta") {
-                        for (const row of _rows) {
-                            const aditionalRow = row.parentPath
-                                ?.filter((a: any) => a.id != row.id
-                                    && !additionalRows.map((b)=>b.id).includes(a.id)
-                                    && !additionalRows.map((b)=>b.nom).includes(a.nom))
-                            aditionalRow && additionalRows.push(...aditionalRow);
+                        if (_rows != null && vista == "carpeta") {
+                            for (const row of _rows) {
+                                const aditionalRow = row.parentPath
+                                    ?.filter((a: any) => a.id != row.id
+                                        && !additionalRows.map((b) => b.id).includes(a.id)
+                                        && !additionalRows.map((b) => b.nom).includes(a.nom))
+                                aditionalRow && additionalRows.push(...aditionalRow);
+                            }
+                            setTreeView(additionalRows?.length > 0)
+                        } else {
+                            setTreeView(true)
                         }
-                        setTreeView(additionalRows?.length > 0)
-                    }else {
-                        setTreeView(true)
-                    }
-                    // console.log('>>> additionalRows', additionalRows)
-                    return additionalRows;
-                }}
-                getTreeDataPath={(row:any) :string[] => {
-                    switch (vista) {
-                        case "estat": return [`${row.estat}`, `${row.nom}`];
-                        case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
-                        default: return row.treePath;
-                    }
-                }}
+                        // console.log('>>> additionalRows', additionalRows)
+                        return additionalRows;
+                    }}
+                    getTreeDataPath={(row: any): string[] => {
+                        switch (vista) {
+                            case "estat": return [`${row.estat}`, `${row.nom}`];
+                            case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
+                            default: return row.treePath;
+                        }
+                    }}
 
-                rowExpansionChange={(params:any)=> addFolderExpand(`${params.id}`, params.childrenExpanded) }
-                isGroupExpandedByDefault={(row) => getFolderExpand(`${row?.id}`) || expand }
-                toolbarElementsWithPositions={[
-                    {
-                        position: 0,
-                        element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView}/>,
-                    },
-                    {
-                        position: 1,
-                        element: <TreeViewSelector value={vista} onChange={(value:any) => {
-                            setVista(value);
-                            refresh();
-                        }} />,
-                    },
-                    {
-                        position: 3,
-                        element: <MenuActionButton
-                            id={'createDocument'}
-                            hidden={!potModificar(entity)}
-                            buttonLabel={t('page.contingut.acciones.create')}
-                            buttonProps={{
-                                startIcon: <Icon>add</Icon>,
-                                variant: "outlined",
-                                sx: {borderRadius: '4px',  minWidth: '20px', minHeight: '32px', py: 0}
-                            }}
-                            actions={createActions}
-                        />,
-                    }
-                ]}
+                    rowExpansionChange={(params: any) => addFolderExpand(`${params.id}`, params.childrenExpanded)}
+                    isGroupExpandedByDefault={(row) => getFolderExpand(`${row?.id}`) || expand}
+                    toolbarElementsWithPositions={[
+                        {
+                            position: 0,
+                            element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView} />,
+                        },
+                        {
+                            position: 1,
+                            element: <TreeViewSelector value={vista} onChange={(value: any) => {
+                                setVista(value);
+                                refresh();
+                            }} />,
+                        },
+                        {
+                            position: 3,
+                            element: <MenuActionButton
+                                id={'createDocument'}
+                                hidden={!potModificar(entity)}
+                                buttonLabel={t('page.contingut.acciones.create')}
+                                buttonProps={{
+                                    startIcon: <Icon>add</Icon>,
+                                    variant: "outlined",
+                                    sx: { borderRadius: '4px', minWidth: '20px', minHeight: '32px', py: 0 }
+                                }}
+                                actions={createActions}
+                            />,
+                        }
+                    ]}
 
-                toolbarMassiveActions={massiveActions}
-                isRowSelectable={(data:any)=> data?.row?.tipus=="DOCUMENT"}
-                toolbarHideCreate
-                rowHideDeleteButton={hiddenDelete}
+                    toolbarMassiveActions={massiveActions}
+                    isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
+                    toolbarHideCreate
+                    rowHideDeleteButton={hiddenDelete}
 
-                popupEditFormComponentProps={{ initOnChangeRequest: true }}
-            />
-            {components}
-            {massiveComponents}
-        </Load>
+                    popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                />
+                {components}
+                {massiveComponents}
+            </Load>
+
+        </div>
     </GridPage>
 }
 

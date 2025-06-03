@@ -50,7 +50,6 @@ export const FormFieldFile: React.FC<FormFieldFileProps> = (props) => {
                     content: base64,
                     contentType: currentFile.type,
                     contentLength: currentFile.size,
-    
                 };
                 onChange(fileValue);
                 setFileName(currentFile?.name);
