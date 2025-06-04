@@ -28,7 +28,7 @@ export const useActions = (refresh?: () => void) => {
         return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
             .then((result) => {
                 iniciaDescargaJSON(result);
-                temporalMessageShow(null, '', 'info');
+                temporalMessageShow(null, t('page.interessat.action.exportar.ok'), 'info');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');

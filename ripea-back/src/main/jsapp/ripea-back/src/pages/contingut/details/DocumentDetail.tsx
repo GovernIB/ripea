@@ -129,7 +129,7 @@ const useDocumentDetail = () => {
         },
         {
             value: 'descarregarImprimible',
-            text: t('page.document.acciones.descarregarImprimible'),
+            text: t('page.document.action.descarregarImprimible.label'),
             icon: 'download',
             hidden: entity?.estat == 'CUSTODIAT'
         },
@@ -149,6 +149,7 @@ const useDocumentDetail = () => {
                         apiDownload(entity?.id, 'adjunt')
                         break;
                     case 'descarregarImprimible':
+                        /* TODO: action */
                         break;
                 }
                 handleClose();

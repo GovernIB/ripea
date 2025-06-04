@@ -37,7 +37,7 @@ const Importar = (props:any) => {
     return <FormActionDialog
         resourceName={"expedientResource"}
         action={"IMPORT_DOCS"}
-        title={t('page.document.action.import')}
+        title={t('page.document.action.import.title')}
         {...props}
     >
         <ImportarForm/>
@@ -45,6 +45,7 @@ const Importar = (props:any) => {
 }
 
 const useImportar = (entity:any, refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -55,7 +56,7 @@ const useImportar = (entity:any, refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.import.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

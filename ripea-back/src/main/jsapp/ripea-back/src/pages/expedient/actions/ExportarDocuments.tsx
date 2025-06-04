@@ -1,6 +1,6 @@
 import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
-import {useRef, useState} from "react";
+import {useRef} from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 import {useTranslation} from "react-i18next";
@@ -19,7 +19,7 @@ const ExportarDocuments = (props:any) => {
     return <FormReportDialog
         resourceName={"expedientResource"}
         report={"EXPORT_DOC"}
-        title={t('page.expedient.action.exportZIP')}
+        title={t('page.expedient.action.exportZIP.title')}
         {...props}
     >
         <ExportarDocumentsForm/>
@@ -27,21 +27,19 @@ const ExportarDocuments = (props:any) => {
 }
 
 const useExportarDocuments = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
-    const [message, setMessage] = useState<any>('');
 
     const handleShow = (id:any) :void => {
-        setMessage('individual')
         apiRef.current?.show?.(undefined, {ids: [id], massivo: false})
     }
     const handleMassiveShow = (ids:any[]) :void => {
-        setMessage('maassiu')
         apiRef.current?.show?.(undefined, {ids: ids, massivo: true})
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, message, 'success');
+        temporalMessageShow(null, t('page.expedient.action.exportZIP.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

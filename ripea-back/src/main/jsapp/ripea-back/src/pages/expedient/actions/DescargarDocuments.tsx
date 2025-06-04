@@ -4,6 +4,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {useTranslation} from "react-i18next";
 
 const sortModel:any = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
@@ -79,11 +80,13 @@ const DescargarDocumentsForm = () => {
 }
 
 const DescargarDocuments = (props:any) => {
+    const {t} = useTranslation();
+
     return <FormReportDialog
         resourceName={"expedientResource"}
         report={"EXPORT_SELECTED_DOCS"}
         reportFileType={'ZIP'}
-        title={''}
+        title={t('page.expedient.action.download.title')}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
         {...props}
     >
@@ -92,6 +95,7 @@ const DescargarDocuments = (props:any) => {
 }
 
 const useDescargarDocuments = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -100,7 +104,7 @@ const useDescargarDocuments = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.expedient.action.download.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

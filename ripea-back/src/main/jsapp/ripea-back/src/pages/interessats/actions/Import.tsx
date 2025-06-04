@@ -79,7 +79,7 @@ const Import = (props:any) => {
     return <FormActionDialog
         resourceName={"interessatResource"}
         action={"IMPORTAR"}
-        title={t('page.interessat.action.importar')}
+        title={t('page.interessat.action.importar.title')}
         {...props}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'md'}}
     >
@@ -87,6 +87,7 @@ const Import = (props:any) => {
     </FormActionDialog>
 }
 const useImport = (entity:any, refresh?: () => void) => {
+    const {t} = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -100,7 +101,7 @@ const useImport = (entity:any, refresh?: () => void) => {
     }
     const onSuccess = (): void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.interessat.action.importar.ok'), 'success');
     }
     const onError = (error: any): void => {
         temporalMessageShow(null, error?.message, 'error');

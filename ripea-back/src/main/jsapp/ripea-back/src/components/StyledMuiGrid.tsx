@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
 import {GridEventListener, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
@@ -110,13 +110,11 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             refresh()
         }
     }, [user]);
-    useEffect(() => {
-        const handleEvent: GridEventListener<'rowExpansionChange'> = (params, event, detail) => {
-            rowExpansionChange?.(params, event, detail)
-        };
-        const unsubscribe = datagridApiRef?.current?.subscribeEvent?.('rowExpansionChange', handleEvent);
-        return () => {unsubscribe?.()};
-    }, []);
+    React.useEffect(() => {
+        if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0 && rowExpansionChange) {
+            datagridApiRef.current.subscribeEvent('rowExpansionChange', rowExpansionChange);
+        }
+    }, [datagridApiRef.current]);
 
     // Custom row styling with colored bar
     const getRowClassName = (params: any) :string =>

@@ -71,7 +71,7 @@ const translationCa = {
         },
         contingut: {
             grid: {
-                nom: 'Nom',
+                nom: "Nom",
             },
             detalle: {
                 numero: "Número",
@@ -113,12 +113,18 @@ const translationCa = {
                 origen: "Origen",
                 desti: "Destí",
             },
-            acciones: {
-                create: "Crear contingut",
-                history: "Històric d'accions",
-            },
             action: {
-                history: "Històric d'accions de l'element",
+                create: {
+                    label: "Crear contingut",
+                },
+                history: {
+                    label: "Històric d'accions",
+                    title: "Històric d'accions de l'element",
+                },
+                infoArxiu: {
+                    title: "Informació obtinguda de l'arxiu",
+                    label: "Informació de l'arxiu",
+                },
             },
             history: {
                 create: "Creació",
@@ -139,6 +145,7 @@ const translationCa = {
                 registre: "Informació registre",
                 interessats: "Interessats",
                 annexos: "Annexos",
+                justificant: "Justificant",
             },
             detall: {
                 title: "Detalls de l'anotació de registre",
@@ -149,6 +156,12 @@ const translationCa = {
                 acceptedDate: "Data d'acceptació",
                 usuariActualitzacio: "Usuari",
             },
+            action: {
+                justificant: {
+                    label: "Descarregar justificant",
+                    ok: "",
+                }
+            }
         },
         tasca: {
             title: "Tasca",
@@ -167,30 +180,62 @@ const translationCa = {
                 estat: "Estat",
                 prioritat: "Prioritat",
             },
-            acciones: {
-                new: "Nova Tasca",
-                tramitar: "Tramitar",
-                iniciar: "Iniciar",
-                rebutjar: "Rebutjar",
-                cancel: "Cancel·lar",
-                finalitzar: "Finalitzar",
-                reassignar: "Reassignar",
-                delegar: "Delegar",
-                retomar: "Reprendre",
-                upDataLimit: "Modificar data límit...",
-                upPrioritat: "Canviar prioritat...",
-                reobrir: "Reobrir",
-            },
             action: {
-                retomar: "Reprendre tasca",
-                reobrir: "Reobrir tasca",
-                rebutjar: "Rebutjar tasca",
-                reassignar: "Reassignar tasca",
-                delegar: "Delegar tasca",
-                changePrioritat: "Modificar prioritat de la tasca",
-                changeDataLimit: "Canviar data límit",
-                cancelar: "Esteu segur que voleu cancel·lar aquesta tasca?",
-            },
+                new: {
+                    label: "Nova tasca",
+                },
+                tramitar: {
+                    label: "Tramitar",
+                },
+                iniciar: {
+                    label: "Iniciar",
+                    ok: "La tasca s'ha iniciat correctament",
+                },
+                rebutjar: {
+                    label: "Rebutjar",
+                    title: "Rebutjar tasca",
+                    ok: "La tasca s'ha rebutjat correctament",
+                },
+                cancel: {
+                    label: "Cancel·lar",
+                    title: "Segur que voleu cancel·lar aquesta tasca?",
+                    ok: "La tasca s'ha cancel·lat correctament",
+                },
+                finalitzar: {
+                    label: "Finalitzar",
+                    ok: "La tasca s'ha finalitzat correctament",
+                },
+                reassignar: {
+                    label: "Reassignar",
+                    title: "Reassignar tasca",
+                    ok: "La tasca s'ha reassignat correctament",
+                },
+                delegar: {
+                    label: "Delegar",
+                    title: "Delegar tasca",
+                    ok: "La tasca s'ha delegat correctament",
+                },
+                retomar: {
+                    label: "Reprendre",
+                    title: "Reprendre tasca",
+                    ok: "La tasca s'ha reprès correctament",
+                },
+                changeDataLimit: {
+                    label: "Modificar data límit...",
+                    title: "Canviar data límit",
+                    ok: "La tasca s'ha modificat correctament",
+                },
+                changePrioritat: {
+                    label: "Canviar prioritat...",
+                    title: "Modificar prioritat de la tasca",
+                    ok: "La tasca s'ha modificat correctament",
+                },
+                reobrir: {
+                    label: "Reobrir",
+                    title: "Reobrir tasca",
+                    ok: "La tasca s'ha reobert correctament",
+                },
+            }
         },
         interessat: {
             title: "Interessat",
@@ -215,7 +260,15 @@ const translationCa = {
                 deleteRep: "Esborrar Representant",
             },
             action: {
-                importar: "Importar interessats",
+                importar: {
+                    label: "Importar...",
+                    title: "Importar interessats",
+                    ok: "Interessats importats correctament",
+                },
+                exportar: {
+                    label: "Exportar...",
+                    ok: "Interessats exportats correctament",
+                },
             },
             grid: {
                 title: "Interessatd del fitxer",
@@ -241,41 +294,118 @@ const translationCa = {
                 agafatPer: "Agafat per",
                 avisos: "Avisos",
             },
-            acciones: {
-                nou: "Nou expedient",
-                detall: "Gestionar",
-                follow: "Seguir",
-                unfollow: "Deixar de seguir",
-                assignar: "Assignar",
-                agafar: "Agafar",
-                retornar: "Retornar",
-                lliberar: "Alliberar",
-				eliminar: "Eliminar",
-                upPrioritat: "Canviar prioritat...",
-                upEstat: "Canviar estat...",
-                relacio: "Relacionar...",
-                close: "Tancar...",
-                open: "Reobrir",
-                download: "Descarregar documents...",
-                exportFullCalcul: "Exportar full de càlcul",
-                exportZIP: "Exportar índex ZIP",
-                exportPDF: "Exportar índex PDF",
-                exportCSV: "Exportar índex CSV",
-                exportEXCEL: "Exporta índex EXCEL",
-                exportPDF_ENI: "Índex PDF i exportació ENI",
-                exportENI: "Exportació ENI",
-                exportINSIDE: "Exportació INSIDE",
-                export: "Exportar eld documents...",
-                infoArxiu: "Informació arxiu",
-                sincronitzar: "Sincronitzar estat amb arxiu",
-            },
             action: {
-                close: "Tancar expedient",
-                changePrioritat: "Modificar prioritat de l'expedient",
-                changeEstat: "Modificar estat de l'expedient",
-                assignar: "Assignar expedient a usuari",
-                exportZIP: "Exportar documents a ZIP",
-                relacio: "Relacionar expedients",
+                new: {
+                    label: "Nou expedient",
+                    ok: "L'expedient '{{expedient}}' s'ha creat correctament.",
+                },
+                update: {
+                    label: "Modificar...",
+                    title: "Modificar Expedient",
+                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                },
+                detall: {
+                    label: "Gestionar",
+                },
+                agafar: {
+                    label: "Agafar",
+                    ok: "L'expedient '{{expedient}}' ha estat agafat per l'usuari '{{user}}'",
+                },
+                follow: {
+                    label: "Seguir",
+                    ok: "L'usuari '{{user}}' ha començat a seguir l'expedient '{{expedient}}'.",
+                },
+                unfollow: {
+                    label: "Deixar de seguir",
+                    ok: "L'usuari '{{user}}' ha deixat de seguir l'expedient '{{expedient}}'.",
+                },
+                retornar: {
+                    label: "Retornar",
+                    ok: "L'expedient '{{expedient}}' ha estat retornat a l'usuari '{{user}}'",
+                },
+                lliberar: {
+                    label: "Alliberar",
+                    ok: "L'expedient '{{expedient}}' ha estat alliberat",
+                },
+                eliminar: {
+                    label: "Eliminar",
+                    ok: "L'expedient '{{expedient}}' ha estat esborrat correctament",
+                },
+                close: {
+                    label: "Tancar...",
+                    title: "Tancar expedient",
+                    ok: "L'expedient '{{expedient}}' ha estat tancat correctament",
+                },
+                open: {
+                    label: "Reobrir",
+                    ok: "L'expedient '{{expedient}}' ha estat reobert correctament",
+                },
+                download: {
+                    label: "Descarregar documents...",
+                    ok: "",
+                },
+                exportFullCalcul: {
+                    label: "Exportar full de càlcul",
+                    ok: "",
+                },
+                exportZIP: {
+                    label: "Exportar índex ZIP",
+                    title: "Exportar documents a ZIP",
+                    ok: "",
+                },
+                exportPDF: {
+                    label: "Exportar índex PDF",
+                    ok: "",
+                },
+                exportCSV: {
+                    label: "Exportar índex CSV",
+                    ok: "",
+                },
+                exportEXCEL: {
+                    label: "Exportar índex EXCEL",
+                    ok: "",
+                },
+                exportPDF_ENI: {
+                    label: "Índex PDF i exportació ENI",
+                    ok: "",
+                },
+                exportENI: {
+                    label: "Exportació ENI",
+                    ok: "",
+                },
+                exportINSIDE: {
+                    label: "Exportació INSIDE",
+                    ok: "",
+                },
+                export: {
+                    label: "Exportar els documents...",
+                    ok: "",
+                },
+                sincronitzar: {
+                    label: "Sincronitzar estat amb arxiu",
+                    ok: "",
+                },
+
+                changePrioritat: {
+                    label: "Canviar prioritat...",
+                    title: "Modificar prioritat de l'expedient",
+                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                },
+                changeEstat: {
+                    label: "Canviar estat...",
+                    title: "Modificar estat de l'expedient",
+                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                },
+                assignar: {
+                    label: "Assignar",
+                    title: "Assignar expedient a usuari",
+                    ok: "L'expedient '{{expedient}}' s'ha assignat correctament.",
+                },
+                relacio: {
+                    label: "Relacionar...",
+                    title: "Relacionar expedient",
+                    ok: "Les relacions de l'expedient '{{expedient}}' han canviat correctament.",
+                },
             },
             alert: {
                 owner: "Cal reservar l'expedient per poder modificar-lo",
@@ -293,15 +423,14 @@ const translationCa = {
                 seguidors: "Seguidors del expedient",
             },
 			results: {
-                checkDelete: 'Esteu segur que voleu esborrar aquest element?',
-                checkRelacio: 'Esteu segur que voleu esborrar aquesta relació?',
+                checkDelete: "Esteu segur que voleu esborrar aquest element?",
+                checkRelacio: "Esteu segur que voleu esborrar aquesta relació?",
                 actionOk: "L'acció s'ha executat correctament.",
 				actionBackgroundOk: "L'acción s'ha preparat per la seva execució en segon plà. Pot consultar l'estat del procés des del llistat de execucions massives.",
 			}
         },
         arxiu: {
             detall: {
-                title: "Informació obtinguda de l'arxiu",
                 arxiuUuid: "Identificador de l'arxiu",
                 fitxerNom: "Nom del fitxer",
                 serie: "Sèrie documental",
@@ -373,48 +502,120 @@ const translationCa = {
                 dataInteressat: "Dades de l'interessat",
                 dataOther: "Altres dades",
             },
-            acciones: {
-                pinbal: "Consulta PINBAL...",
-                import: "Importar documents...",
-                detall: "Detalls",
-                move: "Moure...",
-                copy: "Copiar...",
-                vincular: "Enllaçar...",
-                imprimible: "Versió imprimible",
-                original: "Descarregar original",
-                firma: "Descarregar signatura",
-                view: "Visualitzar",
-                csv: "Copiar enllaç CSV",
-                portafirmes: "Enviar a portafirmes...",
-                firmar: "Firma des del navegador...",
-                viaFirma: "Enviar viaFirma...",
-                mail: "Enviar via email...",
-                seguiment: "Seguiment portafirmes",
-                infoArxiu: "Informació arxiu",
-                export: "Exportació ENI...",
-                notificar: "Notificar o comunicar...",
-                comunicar: "Comunicar...",
-                publicar: "Publicar...",
-                descarregarImprimible: "Descarregar versió imprimible",
-                changeType: "Cambiar tipus",
-                definitive: "Convertir a definitiu",
-            },
             action: {
-                enviarEmail: "Enviar document per email",
-                enviarPortafirmes: "Enviar document a portafirmes",
-                move: "Moure contingut",
-                copy: "Copiar contingut",
-                vincular: "Enllaçar contingut",
-				pinbal: "Nou document a partir de petició a PINBAL",
-                notificar: "Crear notificació document",
-                notificarMasiva: "Generar document per a notificar",
-                publicar: "Crear publicació",
-                changeType: "Cambiar tipus",
-                viaFirma: "Enviar document a ViaFirma",
-                import: "Importació de documents des del SGD",
-            },
-            dialog: {
-                generateZip: "S'ha generat un zip dels elements seleccionats",
+                crearCarpets: {
+                    label: "Carpeta...",
+                    title: "Crear nova carpeta",
+                    ok: "Carpeta '{{carpeta}}' creada correctament",
+                },
+                pinbal: {
+                    label: "Consulta PINBAL...",
+                    title: "Nova consulta PINBAL",
+                    ok: "Document PINBAL '{{document}}' creat correctament",
+                },
+                import: {
+                    label: "Importar documents...",
+                    title: "Importació de documents des del SGD",
+                    ok: "Documents importats correctament",
+                },
+                detall: {
+                    label: "Detalls",
+                },
+                move: {
+                    label: "Moure...",
+                    title: "Moure contingut",
+                    ok: "Document '{{document}}' mogut correctament",
+                },
+                copy: {
+                    label: "Copiar...",
+                    title: "Copiar contingut",
+                    ok: "Document '{{document}}' copiat correctament",
+                },
+                vincular: {
+                    label: "Vincular...",
+                    title: "Vincular contingut",
+                    ok: "Document '{{document}}' vinculat correctament",
+                },
+                imprimible: {
+                    label: "Versió imprimible",
+                    ok: "",
+                },
+                original: {
+                    label: "Descarregar original",
+                    ok: "",
+                },
+                firma: {
+                    label: "Descarregar signatura",
+                    title: "Signar des del navegador",
+                    ok: "Document signat correctament",
+                },
+                view: {
+                    label: "Visualitzar",
+                    title: "",
+                },
+                csv: {
+                    label: "Copiar enllaç CSV",
+                    ok: "Enllaç CSV copiat correctament",
+                },
+                portafirmes: {
+                    label: "Enviar a portafirmes...",
+                    title: "Enviar document a portafirmes",
+                    ok: "Document '{{document}}' enviat a portafirmes",
+                },
+                firmar: {
+                    label: "Signatura des del navegador...",
+                },
+                viaFirma: {
+                    label: "Enviar viaFirma...",
+                    title: "Enviar document a ViaFirma",
+                    ok: "Document '{{document}}' enviat a viaFirma",
+                },
+                mail: {
+                    label: "Enviar via email...",
+                    title: "Enviar document per email",
+                    ok: "Document '{{document}}' enviat via email",
+                },
+                seguiment: {
+                    label: "Seguiment portafirmes",
+                    title: "Detalls de la signatura",
+                    ok: "La signatura ha estat cancel·lada correctament",
+                },
+                export: {
+                    label: "Exportació ENI...",
+                    ok: "",
+                },
+                notificar: {
+                    label: "Notificar o comunicar...",
+                    title: "Crear notificació document",
+                    ok: "Notificació creada correctament",
+                },
+                notificarMasiva: {
+                    label: "Notificar o comunicar...",
+                    title: "Generar document per notificar",
+                    ok: "S'ha generat un zip dels elements seleccionats",
+                },
+                comunicar: {
+                    label: "Comunicar...",
+                },
+                publicar: {
+                    label: "Publicar...",
+                    title: "Crear publicació",
+                    ok: "Publicació creada correctament",
+                },
+                descarregarImprimible: {
+                    label: "Descarregar versió imprimible",
+                    ok: "",
+                },
+                changeType: {
+                    label: "Canviar tipus...",
+                    title: "Canviar tipus",
+                    ok: "Document '{{document}}' modificat correctament",
+                },
+                definitive: {
+                    label: "Convertir a definitiu",
+                    description: "Aquesta acció farà que els documents passin a formar part de l'expedient de forma definitiva i no es podran eliminar.",
+                    ok: "Document '{{document}}' canviat a definitiu",
+                },
             },
             alert: {
                 import: "Document importat",
@@ -429,7 +630,6 @@ const translationCa = {
                 errorPortafirmes: "Error a l'enviar al portafirmes",
                 funcionariHabilitatDigitalib: "Cal ser un funcionari habilitat a DIGITALIB",
                 folder: "En cas de no seleccionar una carpeta, s'importaran els documents directament a l'expedient.",
-                definitive: "Aquesta acció farà que els documents passin a formar part de l\'expedient definitivament i no es podran eliminar.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
             },
             versio: {
@@ -491,6 +691,7 @@ const translationCa = {
                 title: "Detalls de la notificació",
                 notificacioDades: "Dades de la notificació",
                 notificacioDocument: "Document de la notificació",
+                error: "S'han produït errors en enviar la notificació",
 
                 emisor: "Emissor",
                 assumpte: "Concepte",
@@ -504,11 +705,25 @@ const translationCa = {
                 serveiTipusEnum: "Tipus de servei",
                 notificacioIdentificador: "Identificador",
             },
-            acciones: {
-                actualitzarEstat: "Actualitzar estat",
-                notificacioInteressat: "Enviaments",
-                justificant: "Justificant d’enviament",
-                documentEnviat: "Document enviat",
+            action: {
+                actualitzarEstat: {
+                    label: "Actualitzar estat",
+                    ok: "L'estat ha estat actualitzat",
+                },
+                notificacioInteressat: {
+                    label: "Enviaments",
+                    title: "Enviaments",
+                    ok: "",
+                },
+                justificant: {
+                    label: "Justificant d'enviament",
+                    ok: "",
+                },
+                documentEnviat: {
+                    label: "Document enviat",
+                    title: "",
+                    ok: "",
+                },
             },
         },
         notificacioInteressat: {
@@ -532,13 +747,20 @@ const translationCa = {
                 classificacio: "DEH procediment",
                 enviamentDatatEstat: "Estat",
             },
-            acciones: {
-                ampliarPlac: "Amplia el termini",
-                downloadDoc: "Descarregar document",
-                certificat: "Certificació",
-            },
             action: {
-                ampliarPlac: "Ampliació del termini dels enviaments de la remesa",
+                ampliarPlac: {
+                    label: "Ampliar termini",
+                    title: "Ampliació del termini dels enviaments de la remesa",
+                    ok: "El termini ha estat ampliat",
+                },
+                downloadDoc: {
+                    label: "Descarregar document",
+                    ok: "",
+                },
+                certificat: {
+                    label: "Certificació",
+                    ok: "",
+                },
             },
         },
         publicacio: {

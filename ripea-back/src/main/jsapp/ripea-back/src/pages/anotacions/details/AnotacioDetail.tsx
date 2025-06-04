@@ -9,6 +9,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
+import {useActions} from "./AnotacioActions.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -211,10 +212,20 @@ const Annexos = (props:any) => {
 }
 
 const Justificant = (props:any) => {
-    const { entity } = props;
+    const { id, entity } = props;
     const { t } = useTranslation();
 
-    return <CardData title={<><Icon hidden>description</Icon>{entity?.titol}</>}>
+    const {downloadJustificant} = useActions()
+
+    return <CardData title={<><Icon hidden>description</Icon>{entity?.titol}</>}
+         buttons={[
+             {
+                 text: t('page.anotacio.action.justificant.label'),
+                 icon: 'download',
+                 onClick: ()=>downloadJustificant(id),
+             }
+         ]}
+    >
         <ContenidoData title={"Fecha de captura (ENI)"}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
         <ContenidoData title={"Origen (ENI)"}>{entity?.ntiOrigen}</ContenidoData>
         <ContenidoData title={"Tipo documental (ENI)"}>{entity?.ntiTipoDocumental}</ContenidoData>
@@ -278,7 +289,7 @@ const useAnotacioDetail = () => {
         {
             value: "justificant",
             label: t('page.anotacio.tabs.justificant'),
-            content: <Justificant entity={entity?.registreInfo?.justificant}/>,
+            content: <Justificant id={entity?.id} entity={entity?.registreInfo?.justificant}/>,
             hidden: !user?.sessionScope?.isIncorporacioJustificantActiva,
         },
     ]

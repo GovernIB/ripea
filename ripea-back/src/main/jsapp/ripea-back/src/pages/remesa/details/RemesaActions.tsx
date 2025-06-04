@@ -8,12 +8,13 @@ import useRemesaDetail from "./RemesaDetail.tsx";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
 const useActions = (refresh?: () => void) => {
-    const {temporalMessageShow} = useBaseAppContext();
+    const { t } = useTranslation();
 
     const {
         artifactAction: apiAction,
         artifactReport: apiReport,
     } = useResourceApiService('documentNotificacioResource');
+    const {temporalMessageShow} = useBaseAppContext();
 
     const action = (id:any, code:any, mssg:any) => {
         apiAction(id, {code})
@@ -36,8 +37,8 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    const actualitzarEstat = (id: any) => action(id, 'ACTUALITZAR_ESTAT', '');
-    const justificant = (id: any) => report(id, 'DESCARREGAR_JUSTIFICANT', '', 'ZIP');
+    const actualitzarEstat = (id: any) => action(id, 'ACTUALITZAR_ESTAT', t('page.notificacio.action.actualitzarEstat.ok'));
+    const justificant = (id: any) => report(id, 'DESCARREGAR_JUSTIFICANT', t('page.notificacio.action.justificant.ok'), 'ZIP');
 
     return {
         actualitzarEstat,
@@ -68,20 +69,20 @@ const useRemesaActions = (refresh?: () => void) => {
             hidden: (row:any) => row.tipus != 'MANUAL',
         },
         {
-            title: t('page.notificacio.acciones.actualitzarEstat'),
+            title: t('page.notificacio.action.actualitzarEstat.label'),
             icon: "sync",
             showInMenu: true,
             onClick: actualitzarEstat,
             hidden: (row:any) => row.estat == 'PROCESSADA',
         },
         {
-            title: t('page.notificacio.acciones.notificacioInteressat'),
+            title: t('page.notificacio.action.notificacioInteressat.label'),
             icon: "send",
             showInMenu: true,
             onClick: handleNotificacioOpen,
         },
         {
-            title: t('page.notificacio.acciones.justificant'),
+            title: t('page.notificacio.action.justificant.label'),
             icon: "download",
             showInMenu: true,
             onClick: justificant,

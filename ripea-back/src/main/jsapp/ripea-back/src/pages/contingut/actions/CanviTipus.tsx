@@ -26,7 +26,7 @@ const CanviTipus = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"MASSIVE_CANVI_TIPUS"}
-        title={t('page.document.action.changeType')}
+        title={t('page.document.action.changeType.title')}
         {...props}
     >
         <CanviTipusForm/>
@@ -34,6 +34,7 @@ const CanviTipus = (props:any) => {
 }
 
 const useCanviTipus = (entity:any, refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -44,9 +45,9 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
             metaExpedient: entity?.metaExpedient,
         })
     }
-    const onSuccess = () :void => {
+    const onSuccess = (result:any) :void => {
         refresh?.();
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.changeType.ok', {document: result?.nom}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error?.message, 'error');

@@ -71,7 +71,7 @@ const translationEn = {
         },
         contingut: {
             grid: {
-                nom: 'Name',
+                nom: "Name",
             },
             detalle: {
                 numero: "Number",
@@ -113,12 +113,18 @@ const translationEn = {
                 origen: "Origin",
                 desti: "Destination",
             },
-            acciones: {
-                create: "Create content",
-                history: "Action history",
-            },
             action: {
-                history: "Element action history",
+                create: {
+                    label: "Create content",
+                },
+                history: {
+                    label: "Action history",
+                    title: "Element action history",
+                },
+                infoArxiu: {
+                    title: "Information obtained from the file",
+                    label: "File information",
+                },
             },
             history: {
                 create: "Creation",
@@ -139,6 +145,7 @@ const translationEn = {
                 registre: "Registry Information",
                 interessats: "Interested Parties",
                 annexos: "Annexes",
+                justificant: "Receipt",
             },
             detall: {
                 title: "Registration Annotation Details",
@@ -149,6 +156,12 @@ const translationEn = {
                 acceptedDate: "Acceptance Date",
                 usuariActualitzacio: "User",
             },
+            action: {
+                justificant: {
+                    label: "Download receipt",
+                    ok: "",
+                }
+            }
         },
         tasca: {
             title: "Task",
@@ -167,30 +180,62 @@ const translationEn = {
                 estat: "Status",
                 prioritat: "Priority",
             },
-            acciones: {
-                new: "New Task",
-                tramitar: "Process",
-                iniciar: "Start",
-                rebutjar: "Reject",
-                cancel: "Cancel",
-                finalitzar: "Finish",
-                reassignar: "Reassign",
-                delegar: "Delegate",
-                retomar: "Resume",
-                upDataLimit: "Modify Deadline...",
-                upPrioritat: "Change Priority...",
-                reobrir: "Reopen",
-            },
             action: {
-                retomar: "Resume Task",
-                reobrir: "Reopen Task",
-                rebutjar: "Reject Task",
-                reassignar: "Reassign Task",
-                delegar: "Delegate Task",
-                changePrioritat: "Modify Task Priority",
-                changeDataLimit: "Change Deadline",
-                cancelar: "Are you sure you want to cancel this task?",
-            },
+                new: {
+                    label: "New Task",
+                },
+                tramitar: {
+                    label: "Process",
+                },
+                iniciar: {
+                    label: "Start",
+                    ok: "The task has been started successfully",
+                },
+                rebutjar: {
+                    label: "Reject",
+                    title: "Reject task",
+                    ok: "The task has been rejected successfully",
+                },
+                cancel: {
+                    label: "Cancel",
+                    title: "Are you sure you want to cancel this task?",
+                    ok: "The task has been cancelled successfully",
+                },
+                finalitzar: {
+                    label: "Finish",
+                    ok: "The task has been completed successfully",
+                },
+                reassignar: {
+                    label: "Reassign",
+                    title: "Reassign task",
+                    ok: "The task has been reassigned successfully",
+                },
+                delegar: {
+                    label: "Delegate",
+                    title: "Delegate task",
+                    ok: "The task has been delegated successfully",
+                },
+                retomar: {
+                    label: "Resume",
+                    title: "Resume task",
+                    ok: "The task has been resumed successfully",
+                },
+                changeDataLimit: {
+                    label: "Change deadline...",
+                    title: "Change deadline",
+                    ok: "The task has been updated successfully",
+                },
+                changePrioritat: {
+                    label: "Change priority...",
+                    title: "Change task priority",
+                    ok: "The task has been updated successfully",
+                },
+                reobrir: {
+                    label: "Reopen",
+                    title: "Reopen task",
+                    ok: "The task has been reopened successfully",
+                },
+            }
         },
         interessat: {
             title: "Interested Party",
@@ -215,7 +260,15 @@ const translationEn = {
                 deleteRep: "Delete Representative",
             },
             action: {
-                importar: "Import stakeholders",
+                importar: {
+                    label: "Import...",
+                    title: "Import interested parties",
+                    ok: "Interested parties imported successfully",
+                },
+                exportar: {
+                    label: "Export...",
+                    ok: "Interested parties exported successfully",
+                },
             },
             grid: {
                 title: "Stakeholders from the file",
@@ -241,41 +294,118 @@ const translationEn = {
                 agafatPer: "Taken by",
                 avisos: "Warnings",
             },
-            acciones: {
-                nou: "New expedient",
-                detall: "Manage",
-                follow: "Follow",
-                unfollow: "Unfollow",
-                assignar: "Assign",
-                agafar: "Take",
-                retornar: "Return",
-                lliberar: "Release",
-				eliminar: "Delete",
-                upPrioritat: "Change Priority...",
-                upEstat: "Change Status...",
-                relacio: "Relate...",
-                close: "Close...",
-                open: "Reopen",
-                download: "Download Documents...",
-                exportFullCalcul: "Export spreadsheet",
-                exportZIP: "Export ZIP Index",
-                exportPDF: "Export PDF Index",
-                exportCSV: "Export CSV Index",
-                exportEXCEL: "Export EXCEL index",
-                exportPDF_ENI: "PDF index and ENI export",
-                exportENI: "ENI export",
-                exportINSIDE: "INSIDE export",
-                export: "Export documents...",
-                infoArxiu: "Archive Information",
-                sincronitzar: "Synchronize Status with Archive",
-            },
             action: {
-                close: "Close expedient",
-                changePrioritat: "Modify Expedient Priority",
-                changeEstat: "Modify Expedient Status",
-                assignar: "Assign Expedient to User",
-                exportZIP: "Export documents to ZIP",
-                relacio: "Relate case file",
+                new: {
+                    label: "New expedient",
+                    ok: "The expedient '{{expedient}}' has been created successfully.",
+                },
+                update: {
+                    label: "Modify...",
+                    title: "Modify Expedient",
+                    ok: "The expedient '{{expedient}}' has been modified successfully.",
+                },
+                detall: {
+                    label: "Manage",
+                },
+                agafar: {
+                    label: "Take",
+                    ok: "The expedient '{{expedient}}' has been taken by the user '{{user}}'.",
+                },
+                follow: {
+                    label: "Follow",
+                    ok: "The user '{{user}}' has started following the expedient '{{expedient}}'.",
+                },
+                unfollow: {
+                    label: "Unfollow",
+                    ok: "The user '{{user}}' has stopped following the expedient '{{expedient}}'.",
+                },
+                retornar: {
+                    label: "Return",
+                    ok: "The expedient '{{expedient}}' has been returned to the user '{{user}}'.",
+                },
+                lliberar: {
+                    label: "Release",
+                    ok: "The expedient '{{expedient}}' has been released.",
+                },
+                eliminar: {
+                    label: "Delete",
+                    ok: "The expedient '{{expedient}}' has been deleted successfully.",
+                },
+                close: {
+                    label: "Close...",
+                    title: "Close expedient",
+                    ok: "The expedient '{{expedient}}' has been closed successfully.",
+                },
+                open: {
+                    label: "Reopen",
+                    ok: "The expedient '{{expedient}}' has been reopened successfully.",
+                },
+                download: {
+                    label: "Download documents...",
+                    ok: "",
+                },
+                exportFullCalcul: {
+                    label: "Export spreadsheet",
+                    ok: "",
+                },
+                exportZIP: {
+                    label: "Export ZIP index",
+                    title: "Export documents to ZIP",
+                    ok: "",
+                },
+                exportPDF: {
+                    label: "Export PDF index",
+                    ok: "",
+                },
+                exportCSV: {
+                    label: "Export CSV index",
+                    ok: "",
+                },
+                exportEXCEL: {
+                    label: "Export EXCEL index",
+                    ok: "",
+                },
+                exportPDF_ENI: {
+                    label: "PDF index and ENI export",
+                    ok: "",
+                },
+                exportENI: {
+                    label: "ENI export",
+                    ok: "",
+                },
+                exportINSIDE: {
+                    label: "INSIDE export",
+                    ok: "",
+                },
+                export: {
+                    label: "Export documents...",
+                    ok: "",
+                },
+                sincronitzar: {
+                    label: "Synchronize status with file",
+                    ok: "",
+                },
+
+                changePrioritat: {
+                    label: "Change priority...",
+                    title: "Modify expedient priority",
+                    ok: "The expedient '{{expedient}}' has been modified successfully.",
+                },
+                changeEstat: {
+                    label: "Change status...",
+                    title: "Modify expedient status",
+                    ok: "The expedient '{{expedient}}' has been modified successfully.",
+                },
+                assignar: {
+                    label: "Assign",
+                    title: "Assign expedient to user",
+                    ok: "The expedient '{{expedient}}' has been assigned successfully.",
+                },
+                relacio: {
+                    label: "Relate...",
+                    title: "Relate expedient",
+                    ok: "The relations of the expedient '{{expedient}}' have changed successfully.",
+                },
             },
             alert: {
                 owner: "It is necessary to reserve the file to be able to modify it",
@@ -293,15 +423,14 @@ const translationEn = {
                 seguidors: "Expedient followers",
             },
 			results: {
-                checkDelete: 'Are you sure you want to delete this item?',
-                checkRelacio: 'Are you sure you want to delete this relationship?',
+                checkDelete: "Are you sure you want to delete this item?",
+                checkRelacio: "Are you sure you want to delete this relationship?",
                 actionOk: "Action executed.",
 				actionBackgroundOk: "Action is executing on background.",
 			}
         },
         arxiu: {
             detall: {
-                title: "Information obtained from the file",
                 arxiuUuid: "File identifier",
                 fitxerNom: "File name",
                 serie: "Documentary series",
@@ -373,48 +502,120 @@ const translationEn = {
                 dataInteressat: "Interested party data",
                 dataOther: "Other data",
             },
-            acciones: {
-                pinbal: "PINBAL consultation",
-                import: "Import documents",
-                detall: "Details",
-                move: "Move...",
-                copy: "Copy...",
-                vincular: "Link...",
-                imprimible: "Printable version",
-                original: "Download original",
-                firma: "Download signature",
-                view: "View",
-                csv: "Copy CSV link",
-                portafirmes: "Send to Signature Portal...",
-                firmar: "Sign from Browser...",
-                viaFirma: "Send viaFirma...",
-                mail: "Send via Email...",
-                seguiment: "Signature tracking",
-                infoArxiu: "Archive Information",
-                export: "ENI Export...",
-                notificar: "Notify or Communicate...",
-                comunicar: "Communicate...",
-                publicar: "Publish...",
-                descarregarImprimible: "Download printable version",
-                changeType: "Change type",
-                definitive: "Change to definitive",
-            },
             action: {
-                enviarEmail: "Send Document via Email",
-                enviarPortafirmes: "Send document to signature folder",
-                move: "Move Content",
-                copy: "Copy Content",
-                vincular: "Link Content",
-				pinbal: "Create Document through PINBAL request",
-                notificar: "Create Document Notification",
-                notificarMasiva: "Generate document to notify",
-                publicar: "Create Publication",
-                changeType: "Change type",
-                viaFirma: "Send document to ViaFirma",
-                import: "Import of documents from the SGD",
-            },
-            dialog: {
-                generateZip: "A zip file has been generated with the selected items",
+                crearCarpets: {
+                    label: "Folder...",
+                    title: "Create new folder",
+                    ok: "Folder '{{carpeta}}' created successfully",
+                },
+                pinbal: {
+                    label: "PINBAL query...",
+                    title: "New PINBAL query",
+                    ok: "PINBAL document '{{document}}' created successfully",
+                },
+                import: {
+                    label: "Import documents...",
+                    title: "Import documents from SGD",
+                    ok: "Documents imported successfully",
+                },
+                detall: {
+                    label: "Details",
+                },
+                move: {
+                    label: "Move...",
+                    title: "Move content",
+                    ok: "Document '{{document}}' moved successfully",
+                },
+                copy: {
+                    label: "Copy...",
+                    title: "Copy content",
+                    ok: "Document '{{document}}' copied successfully",
+                },
+                vincular: {
+                    label: "Link...",
+                    title: "Link content",
+                    ok: "Document '{{document}}' linked successfully",
+                },
+                imprimible: {
+                    label: "Printable version",
+                    ok: "",
+                },
+                original: {
+                    label: "Download original",
+                    ok: "",
+                },
+                firma: {
+                    label: "Download signature",
+                    title: "Sign from browser",
+                    ok: "Document signed successfully",
+                },
+                view: {
+                    label: "View",
+                    title: "",
+                },
+                csv: {
+                    label: "Copy CSV link",
+                    ok: "CSV link copied successfully",
+                },
+                portafirmes: {
+                    label: "Send to signature inbox...",
+                    title: "Send document to signature inbox",
+                    ok: "Document '{{document}}' sent to signature inbox",
+                },
+                firmar: {
+                    label: "Sign from browser...",
+                },
+                viaFirma: {
+                    label: "Send viaFirma...",
+                    title: "Send document to ViaFirma",
+                    ok: "Document '{{document}}' sent via viaFirma",
+                },
+                mail: {
+                    label: "Send via email...",
+                    title: "Send document via email",
+                    ok: "Document '{{document}}' sent via email",
+                },
+                seguiment: {
+                    label: "Signature inbox tracking",
+                    title: "Signature details",
+                    ok: "The signature has been cancelled successfully",
+                },
+                export: {
+                    label: "ENI export...",
+                    ok: "",
+                },
+                notificar: {
+                    label: "Notify or communicate...",
+                    title: "Create document notification",
+                    ok: "Notification created successfully",
+                },
+                notificarMasiva: {
+                    label: "Notify or communicate...",
+                    title: "Generate document to notify",
+                    ok: "A zip of the selected items has been generated",
+                },
+                comunicar: {
+                    label: "Communicate...",
+                },
+                publicar: {
+                    label: "Publish...",
+                    title: "Create publication",
+                    ok: "Publication created successfully",
+                },
+                descarregarImprimible: {
+                    label: "Download printable version",
+                    ok: "",
+                },
+                changeType: {
+                    label: "Change type...",
+                    title: "Change type",
+                    ok: "Document '{{document}}' modified successfully",
+                },
+                definitive: {
+                    label: "Convert to definitive",
+                    description: "This action will make the documents permanently part of the file and they cannot be deleted.",
+                    ok: "Document '{{document}}' changed to definitive",
+                },
             },
             alert: {
                 import: "Document imported",
@@ -429,7 +630,6 @@ const translationEn = {
                 errorPortafirmes: "Error sending to portafirmas",
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
                 folder: "If no folder is selected, the documents will be imported directly into the case file.",
-                definitive: "This action will make the documents become a permanent part of the file and they cannot be deleted.",
                 scaned: "The scanning process was completed successfully.",
             },
             versio: {
@@ -491,6 +691,7 @@ const translationEn = {
                 title: "Notification details",
                 notificacioDades: "Notification data",
                 notificacioDocument: "Notification document",
+                error: "Errors occurred while sending the notification",
 
                 emisor: "Sender",
                 assumpte: "Subject",
@@ -504,11 +705,25 @@ const translationEn = {
                 serveiTipusEnum: "Service type",
                 notificacioIdentificador: "Identifier",
             },
-            acciones: {
-                actualitzarEstat: "Update status",
-                notificacioInteressat: "Shipments",
-                justificant: "Shipping receipt",
-                documentEnviat: "Sent document",
+            action: {
+                actualitzarEstat: {
+                    label: "Update status",
+                    ok: "The status has been updated",
+                },
+                notificacioInteressat: {
+                    label: "Shipments",
+                    title: "Shipments",
+                    ok: "",
+                },
+                justificant: {
+                    label: "Proof of shipment",
+                    ok: "",
+                },
+                documentEnviat: {
+                    label: "Document sent",
+                    title: "",
+                    ok: "",
+                },
             },
         },
         notificacioInteressat: {
@@ -532,13 +747,20 @@ const translationEn = {
                 classificacio: "DEH procedure",
                 enviamentDatatEstat: "Status",
             },
-            acciones: {
-                ampliarPlac: "Extend deadline",
-                downloadDoc: "Download document",
-                certificat: "Certification",
-            },
             action: {
-                ampliarPlac: "Extension of the shipping batch deadlines",
+                ampliarPlac: {
+                    label: "Extend deadline",
+                    title: "Extension of the deadline for the batch shipments",
+                    ok: "The deadline has been extended",
+                },
+                downloadDoc: {
+                    label: "Download document",
+                    ok: "",
+                },
+                certificat: {
+                    label: "Certification",
+                    ok: "",
+                },
             },
         },
         publicacio: {

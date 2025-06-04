@@ -199,7 +199,6 @@ const DocumentsGrid = (props: any) => {
     const { get: getFolderExpand, save: addFolderExpand } = useSessionList('folder_expand')
 
     const gridApiRef = useMuiDataGridApiRef();
-    const datagridApiRef = useGridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(false);
     const [vista, setVista] = useState<string>("carpeta");
@@ -213,14 +212,6 @@ const DocumentsGrid = (props: any) => {
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
-
-    React.useEffect(() => {
-        if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0) {
-            datagridApiRef.current.subscribeEvent('rowExpansionChange', (p1, p2, p3) => {
-                console.log('>>> rowExpansionChange', p1.id, p1.childrenExpanded, p1, p2, p3)
-            });
-        }
-    }, [datagridApiRef.current]);
 
     return <GridPage>
         <Load value={entity}>
@@ -244,7 +235,6 @@ const DocumentsGrid = (props: any) => {
                         metaExpedient: entity?.metaExpedient,
                     }}
                     apiRef={gridApiRef}
-                    datagridApiRef={datagridApiRef}
                     rowAdditionalActions={actions}
                     onRowCountChange={onRowCountChange}
 

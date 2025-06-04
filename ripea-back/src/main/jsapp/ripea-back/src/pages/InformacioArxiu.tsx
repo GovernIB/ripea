@@ -162,7 +162,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.arxiu.detall.title')}
+            title={t('page.contingut.action.infoArxiu.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={[
                 {

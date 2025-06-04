@@ -18,7 +18,7 @@ const CambiarDataLimit = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        title={t('page.tasca.action.changeDataLimit')}
+        title={t('page.tasca.action.changeDataLimit.title')}
         action={'CHANGE_DATALIMIT'}
         {...props}
     >
@@ -27,6 +27,7 @@ const CambiarDataLimit = (props:any) => {
 }
 
 const useCambiarDataLimit = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -37,7 +38,7 @@ const useCambiarDataLimit = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.changeDataLimit.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

@@ -18,7 +18,7 @@ const Reobrir = (props:any) => {
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
         action={"REABRIR"}
-        title={t('page.tasca.action.reobrir')}
+        title={t('page.tasca.action.reobrir.title')}
         {...props}
     >
         <ReobrirForm/>
@@ -26,6 +26,7 @@ const Reobrir = (props:any) => {
 }
 
 const useReobrir = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -34,7 +35,7 @@ const useReobrir = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.reobrir.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

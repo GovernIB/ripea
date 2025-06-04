@@ -45,7 +45,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         apiAction(id, {code: 'CANCEL_FIRMA'})
             .then(()=>{
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.document.action.seguiment.ok'), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -92,7 +92,7 @@ const useSeguimentPortafirmes = (potModificar:boolean, refresh?: () => void) => 
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={'Detalles de la firma'}
+            title={t('page.document.action.seguiment.title')}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={buttons}
             buttonCallback={(value :any) :void=>{

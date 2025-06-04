@@ -16,7 +16,7 @@ const Reassignar = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        title={t('page.tasca.action.reassignar')}
+        title={t('page.tasca.action.reassignar.title')}
         action={'REASSIGNAR'}
         {...props}
     >
@@ -25,6 +25,7 @@ const Reassignar = (props:any) => {
 }
 
 const useReassignar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -33,7 +34,7 @@ const useReassignar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.reassignar.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

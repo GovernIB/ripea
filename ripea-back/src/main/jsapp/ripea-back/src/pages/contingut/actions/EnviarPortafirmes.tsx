@@ -96,7 +96,7 @@ const EnviarPortafirmes = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}
-        title={t('page.document.action.enviarPortafirmes')}
+        title={t('page.document.action.enviarPortafirmes.title')}
         initialOnChange
         {...props}
     >
@@ -105,6 +105,7 @@ const EnviarPortafirmes = (props:any) => {
 }
 
 const useEnviarPortafirmes = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -115,9 +116,9 @@ const useEnviarPortafirmes = (refresh?: () => void) => {
             metaDocument: row?.metaDocument,
         })
     }
-    const onSuccess = () :void => {
+    const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.enviarPortafirmes.ok', {document: result?.nom}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

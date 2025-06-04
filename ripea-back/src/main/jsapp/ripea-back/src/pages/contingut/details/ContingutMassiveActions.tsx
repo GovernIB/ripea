@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import useMoure from "../actions/Moure.tsx";
+import {useMoure} from "../actions/Moure.tsx";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useNotificarMassive from "../actions/NotificarMassive.tsx";
 import useCanviTipus from "../actions/CanviTipus.tsx";
@@ -32,6 +32,8 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
 
     const {download} = useMassiveActions(refresh)
     const {handleMassiveShow: handleMoure, content: contentMoure} = useMoure(refresh)
+    // const {handleMassiveShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
+    // const {handleMassiveShow: handleVincular, content: contentVincular} = useVincular(refresh)
     const {handleMassiveShow: handleNotificar, content: contentNotificar} = useNotificarMassive(entity, refresh)
     const {handleMassiveShow: handleCanviTipus, content: contentCanviTipus} = useCanviTipus(entity, refresh)
 
@@ -42,19 +44,19 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
             onClick: download,
         },
         {
-            title: t('page.document.acciones.notificar'),
+            title: t('page.document.action.notificarMasiva.title'),
             icon: "mail",
             onClick: handleNotificar,
             hidden: !potModificar(entity),
         },
         {
-            title: t('page.document.acciones.move'),
+            title: t('page.document.action.move.title'),
             icon: "open_with",
             onClick: (ids:any[])=>handleMoure(ids, entity),
             hidden: !potModificar(entity),
         },
         {
-            title: t('page.document.acciones.changeType'),
+            title: t('page.document.action.changeType.title'),
             icon: "edit",
             onClick: handleCanviTipus,
             hidden: !potModificar(entity),

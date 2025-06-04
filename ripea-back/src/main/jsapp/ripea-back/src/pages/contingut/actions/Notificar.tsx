@@ -140,7 +140,7 @@ const Notificar = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"NOTIFICAR"}
-        title={(data:any)=> `${t('page.document.action.notificar')}: ${data.nom}`}
+        title={t('page.document.action.notificar.title')}
         formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
         {...props}
         initialOnChange
@@ -150,6 +150,7 @@ const Notificar = (props:any) => {
 }
 
 const useNotificar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -161,7 +162,7 @@ const useNotificar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.notificar.ok'), 'success');
         window.location.reload();
     }
     const onError = (error:any) :void => {

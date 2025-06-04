@@ -20,7 +20,7 @@ export const CambiarPrioritat = (props: { apiRef:any }) => {
 
     return <MuiFormDialog
         resourceName={"expedientResource"}
-        title={t('page.expedient.action.changePrioritat')}
+        title={t('page.expedient.action.changePrioritat.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
         apiRef={apiRef}
     >
@@ -29,14 +29,15 @@ export const CambiarPrioritat = (props: { apiRef:any }) => {
 }
 
 const useCambiarPrioritat = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
+    const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id)
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.expedient.action.changePrioritat.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');

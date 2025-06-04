@@ -31,8 +31,7 @@ const Moure = (props:any) => {
     </FormActionDialog>
 }
 
-export const useMoure = (refresh?: () => void) => {
-    const { t } = useTranslation();
+const useAction = (code:string, title:string, onSuccess?: (result:any) => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -44,9 +43,23 @@ export const useMoure = (refresh?: () => void) => {
             contingut: row?.nom,
             expedient: row?.expedient,
             carpeta: carpeta,
-            action: 'MOURE',
+            action: code,
         })
     }
+
+    const onError = (error:any) :void => {
+        temporalMessageShow(null, error.message, 'error');
+    }
+
+    return {
+        handleShow,
+        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess} onError={onError}/>
+    }
+}
+const useMassiveAction = (code:string, title:string, onSuccess?: () => void) => {
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
     const handleMassiveShow = (ids:any[], entity:any) :void => {
         apiRef.current?.show?.(undefined, {
             ids: ids,
@@ -55,109 +68,109 @@ export const useMoure = (refresh?: () => void) => {
                 id: entity?.id,
                 description: entity?.nom,
             },
-            action: 'MOURE',
+            action: code,
         })
-    }
-    const onSuccess = () :void => {
-        refresh?.()
-        temporalMessageShow(null, '', 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');
     }
 
     return {
+        handleMassiveShow,
+        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess} onError={onError}/>
+    }
+}
+
+export const useMoure = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const {handleShow, content} = useAction(
+        'MOURE',
+        t('page.document.action.move.title'),
+        (result:any) :void => {
+            refresh?.()
+            temporalMessageShow(null, t('page.document.action.move.ok', {document: result?.nom}), 'success');
+        }
+    )
+
+    const {handleMassiveShow, content: massiveContent} = useMassiveAction(
+        'MOURE',
+        t('page.document.action.move.title'),
+        () :void => {
+            refresh?.()
+            temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'success');
+        }
+    )
+
+    return {
         handleShow,
         handleMassiveShow,
-        content: <Moure apiRef={apiRef} title={t('page.document.action.move')} onSuccess={onSuccess} onError={onError}/>
+        content: <>
+            {content}
+            {massiveContent}
+        </>
     }
 }
 export const useCopiar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any, row:any) :void => {
-        const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
-        apiRef.current?.show?.(undefined, {
-            ids: [id],
-            massivo: false,
-            contingut: row?.nom,
-            expedient: row?.expedient,
-            carpeta: carpeta,
-            action: 'COPIAR',
-        })
-    }
-    const handleMassiveShow = (ids:any[], entity:any) :void => {
-        apiRef.current?.show?.(undefined, {
-            ids: ids,
-            massivo: true,
-            expedient: {
-                id: entity?.id,
-                description: entity?.nom,
-            },
-            action: 'COPIAR',
-        })
-    }
-    const onSuccess = () :void => {
-        refresh?.()
-        temporalMessageShow(null, '', 'success');
-    }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
+    const {handleShow, content} = useAction(
+        'COPIAR',
+        t('page.document.action.copy.title'),
+        (result:any) :void => {
+            refresh?.()
+            temporalMessageShow(null, t('page.document.action.copy.ok', {document: result?.nom}), 'success');
+        }
+    )
+
+    const {handleMassiveShow, content: massiveContent} = useMassiveAction(
+        'COPIAR',
+        t('page.document.action.copy.title'),
+        () :void => {
+            refresh?.()
+            temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'success');
+        }
+    )
 
     return {
         handleShow,
         handleMassiveShow,
-        content: <Moure apiRef={apiRef}
-                        title={t('page.document.action.copy')}
-                        onSuccess={onSuccess}
-                        onError={onError}/>
+        content: <>
+            {content}
+            {massiveContent}
+        </>
     }
 }
 export const useVincular = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any, row:any) :void => {
-        const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
-        apiRef.current?.show?.(undefined, {
-            ids: [id],
-            massivo: false,
-            contingut: row?.nom,
-            expedient: row?.expedient,
-            carpeta: carpeta,
-            action: 'VINCULAR',
-        })
-    }
-    const handleMassiveShow = (ids:any[], entity:any) :void => {
-        apiRef.current?.show?.(undefined, {
-            ids: ids,
-            massivo: true,
-            expedient: {
-                id: entity?.id,
-                description: entity?.nom,
-            },
-            action: 'VINCULAR',
-        })
-    }
-    const onSuccess = () :void => {
-        refresh?.()
-        temporalMessageShow(null, '', 'success');
-    }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
+    const {handleShow, content} = useAction(
+        'VINCULAR',
+        t('page.document.action.vincular.title'),
+        (result:any) :void => {
+            refresh?.()
+            temporalMessageShow(null, t('page.document.action.vincular.ok', {document: result?.nom}), 'success');
+        }
+    )
+
+    const {handleMassiveShow, content: massiveContent} = useMassiveAction(
+        'VINCULAR',
+        t('page.document.action.vincular.title'),
+        () :void => {
+            refresh?.()
+            temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'success');
+        }
+    )
 
     return {
         handleShow,
         handleMassiveShow,
-        content: <Moure apiRef={apiRef}
-                        title={t('page.document.action.vincular')}
-                        onSuccess={onSuccess}
-                        onError={onError}/>
+        content: <>
+            {content}
+            {massiveContent}
+        </>
     }
 }
-export default useMoure;

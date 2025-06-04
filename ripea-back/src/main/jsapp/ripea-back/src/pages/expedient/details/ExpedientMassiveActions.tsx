@@ -86,27 +86,27 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 
     const actions = [
         {
-            title: t('page.expedient.acciones.agafar'),
+            title: t('page.expedient.action.agafar.title'),
             icon: "lock",
             onClick: agafar,
         },
         {
-            title: t('page.expedient.acciones.lliberar'),
+            title: t('page.expedient.action.lliberar.title'),
             icon: "lock_open",
 			onClick: alliberar,
         },
 		{
-		    title: t('page.expedient.acciones.retornar'),
+		    title: t('page.expedient.action.retornar.title'),
 		    icon: "undo",
 			onClick: retornar,
 		},		
         {
-            title: t('page.expedient.acciones.follow'),
+            title: t('page.expedient.action.follow.title'),
             icon: "person_add_alt1",
             onClick: follow,
         },
         {
-            title: t('page.expedient.acciones.unfollow'),
+            title: t('page.expedient.action.unfollow.title'),
             icon: "person_remove",
             onClick: unfollow,
         },
@@ -116,44 +116,44 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 			onClick: esborrar,
         },
         {
-            title: t('page.expedient.acciones.exportFullCalcul'),
+            title: t('page.expedient.action.exportFullCalcul.title'),
             icon: "download",
 			onClick: exportExcel
         },
         {
-            title: t('page.expedient.acciones.exportCSV'),
+            title: t('page.expedient.action.exportCSV.title'),
             icon: "download",
 			onClick: exportCsv
         },
         {
-            title: t('page.expedient.acciones.exportZIP'),
+            title: t('page.expedient.action.exportZIP.title'),
             icon: "download",
 			onClick: exportIndexZip
         },
         {
-            title: t('page.expedient.acciones.exportPDF'),
+            title: t('page.expedient.action.exportPDF.title'),
             icon: "download",
 			onClick: exportIndexPdf,
         },
 		{
-            title: t('page.expedient.acciones.exportEXCEL'),
+            title: t('page.expedient.action.exportEXCEL.title'),
 		    icon: "download",
 			onClick: exportIndexXls,
             hidden: !(user?.sessionScope?.isExportacioExcelActiva),
 		},
         {
-            title: t('page.expedient.acciones.exportENI'),
+            title: t('page.expedient.action.exportENI.title'),
             icon: "download",
 			onClick: exportEni
         },
 		{
-            title: t('page.expedient.acciones.exportINSIDE'),
+            title: t('page.expedient.action.exportINSIDE.title'),
 		    icon: "download",
 			onClick: exportInside,
 			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
-            title: t('page.expedient.acciones.export'),
+            title: t('page.expedient.action.export.title'),
             icon: "description",
             onClick: handleExportDoc,
         },

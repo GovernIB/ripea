@@ -22,7 +22,7 @@ const Publicar = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"PUBLICAR"}
-        title={t('page.document.action.publicar')}
+        title={t('page.document.action.publicar.title')}
         {...props}
     >
         <PublicarForm/>
@@ -30,6 +30,7 @@ const Publicar = (props:any) => {
 }
 
 const usePublicar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -38,7 +39,7 @@ const usePublicar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.publicar.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

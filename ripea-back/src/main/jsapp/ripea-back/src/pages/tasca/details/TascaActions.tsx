@@ -24,11 +24,11 @@ const useActions = (refresh?: () => void) => {
         artifactAction: apiAction
     } = useResourceApiService('expedientTascaResource');
 
-    const changeEstat = (id:any, estat:string) => {
+    const changeEstat = (id:any, estat:string, mssg?:string) => {
         apiAction(id,{code:'CHANGE_ESTAT', data:{estat}})
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, mssg ?? '', 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -43,7 +43,7 @@ const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    changeEstat(id, 'CANCELLADA')
+                    changeEstat(id, 'CANCELLADA', t('page.tasca.action.cancel.ok'))
                 }
             });
     }
@@ -92,7 +92,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: !potMod,
         },
         {
-            title: t('page.tasca.acciones.tramitar'),
+            title: t('page.tasca.action.tramitar.label'),
             icon: "folder",
             showInMenu: true,
             onClick: (id:any, row:any) => {
@@ -102,15 +102,15 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row:any)=> !potMod || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.iniciar'),
+            title: t('page.tasca.action.iniciar.label'),
             icon: "play_arrow",
             showInMenu: true,
-            onClick: (id: any)=> changeEstat(id,'INICIADA'),
+            onClick: (id: any)=> changeEstat(id,'INICIADA', t('page.tasca.action.iniciar.ok')),
             disabled: disableResponsable,
             hidden: (row: any) => !potMod || row?.estat != 'PENDENT',
         },
         {
-            title: t('page.tasca.acciones.rebutjar'),
+            title: t('page.tasca.action.rebutjar.label'),
             icon: "reply",
             showInMenu: true,
             onClick: handleRebutjar,
@@ -118,7 +118,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row: any) => !potMod || row?.estat != 'PENDENT',
         },
         {
-            title: t('page.tasca.acciones.cancel'),
+            title: t('page.tasca.action.cancel.label'),
             icon: "close",
             showInMenu: true,
             onClick: cancelar,
@@ -126,10 +126,10 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: hideByEstat,
         },
         {
-            title: t('page.tasca.acciones.finalitzar'),
+            title: t('page.tasca.action.finalitzar.label'),
             icon: "check",
             showInMenu: true,
-            onClick: (id: any)=> changeEstat(id,'FINALITZADA'),
+            onClick: (id: any)=> changeEstat(id,'FINALITZADA', t('page.tasca.action.finalitzar.ok')),
             disabled: disableResponsable,
             hidden: (row: any) => !potMod || hideByEstat(row),
         },
@@ -140,21 +140,21 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.reassignar'),
+            title: t('page.tasca.action.reassignar.label'),
             icon: "person",
             showInMenu: true,
             onClick: handleReassignar,
             hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.delegar'),
+            title: t('page.tasca.action.delegar.label'),
             icon: "turn_right",
             showInMenu: true,
             onClick: handleDelegar,
             hidden: (row: any) => !potMod || row?.delegat != null || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.retomar'),
+            title: t('page.tasca.action.retomar.label'),
             icon: "close",
             showInMenu: true,
             onClick: handleRetomar,
@@ -167,21 +167,21 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row: any) => !potMod || row?.usuariActualDelegat || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.upDataLimit'),
+            title: t('page.tasca.action.changeDataLimit.label'),
             icon: "info",
             showInMenu: true,
             onClick: handleCambiarDataLimit,
             hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.upPrioritat'),
+            title: t('page.tasca.action.changePrioritat.label'),
             icon: "schedule",
             showInMenu: true,
             onClick: handleCambiarPrioritat,
             hidden: (row: any) => !potMod || hideByEstat(row),
         },
         {
-            title: t('page.tasca.acciones.reobrir'),
+            title: t('page.tasca.action.reobrir.label'),
             icon: "undo",
             showInMenu: true,
             onClick: handleReobrir,

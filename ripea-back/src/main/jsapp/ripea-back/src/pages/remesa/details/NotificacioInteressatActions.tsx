@@ -5,11 +5,12 @@ import useAmpliarPlac from "../actions/AmpliarPlac.tsx";
 import useNotificacioInteressatDetail from "./NotificacioInteressatDetail.tsx";
 
 const useActions = (refresh?: () => void) => {
-    const {temporalMessageShow} = useBaseAppContext();
+    const { t } = useTranslation();
 
     const {
         artifactReport: apiReport,
     } = useResourceApiService('documentEnviamentInteressatResource');
+    const {temporalMessageShow} = useBaseAppContext();
 
     const report = (id:any, code:any, mssg:any, fileType:any) => {
         apiReport(id, {code, fileType})
@@ -22,7 +23,7 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    const certificat = (id:any) => report(id, 'DESCARREGAR_CERTIFICAT', '', 'ZIP')
+    const certificat = (id:any) => report(id, 'DESCARREGAR_CERTIFICAT', t('page.notificacioInteressat.action.certificat.ok'), 'ZIP')
 
     return {
         certificat
@@ -44,14 +45,14 @@ const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
             onClick: handleOpen,
         },
         {
-            title: t('page.notificacioInteressat.acciones.ampliarPlac'),
+            title: t('page.notificacioInteressat.action.ampliarPlac.label'),
             icon: "edit_calendar",
             showInMenu: true,
             onClick: handleShow,
             hidden: (row:any) => row?.finalitzat || entity?.notificacioEstat == 'PROCESSADA',
         },
         {
-            title: t('page.notificacioInteressat.acciones.certificat'),
+            title: t('page.notificacioInteressat.action.certificat.label'),
             icon: "download",
             showInMenu: true,
             onClick: certificat,

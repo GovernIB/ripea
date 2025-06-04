@@ -108,7 +108,7 @@ const ExpedientAlert = (props:any) => {
                    action={
                        <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id)} color={"inherit"}>
                            <Icon>lock</Icon>
-                           <Typography variant={"subtitle2"}>{t('page.expedient.acciones.agafar')}</Typography>
+                           <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
                        </IconButton>
                    }
             >{t('page.expedient.alert.owner')}</Alert>
@@ -251,7 +251,7 @@ const Expedient = () => {
                         {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
 
                         {expedient?.agafatPer?.id == user?.codi &&
-                            <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id)} title={t('page.expedient.acciones.lliberar')}>
+                            <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id)} title={t('page.expedient.action.lliberar.label')}>
                                 <Icon>lock_open</Icon>
                             </IconButton>
                         }

@@ -17,7 +17,7 @@ const Rebutjar = (props:any) => {
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
         action={"REBUTJAR"}
-        title={t('page.tasca.action.rebutjar')}
+        title={t('page.tasca.action.rebutjar.title')}
         {...props}
     >
         <RebutjarForm/>
@@ -25,6 +25,7 @@ const Rebutjar = (props:any) => {
 }
 
 const useRebutjar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -33,7 +34,7 @@ const useRebutjar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.rebutjar.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

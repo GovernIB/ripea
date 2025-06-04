@@ -18,7 +18,7 @@ const EnviarViaEmail = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_VIA_EMAIL"}
-        title={t('page.document.action.enviarEmail')}
+        title={t('page.document.action.enviarEmail.title')}
         {...props}
     >
         <EnviarViaEmailForm/>
@@ -26,15 +26,16 @@ const EnviarViaEmail = (props:any) => {
 }
 
 const useEnviarViaEmail = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(id)
     }
-    const onSuccess = () :void => {
+    const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.enviarEmail.ok', {document: result?.nom}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

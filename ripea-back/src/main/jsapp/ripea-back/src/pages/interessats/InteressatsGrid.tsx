@@ -113,14 +113,14 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     element: <ToolbarButton icon={'upload'}
                                             onClick={()=>exportar(selectedRows, entity)}
                                             disabled={selectedRows?.length==0}
-                    >{t('common.export')}...</ToolbarButton>
+                    >{t('page.interessat.action.exportar.label')}</ToolbarButton>
                 },
                 {
                     position: 0,
                     element: <ToolbarButton icon={'download'}
                                             onClick={()=>handleImport()}
                                             hidden={!potModificar(entity)}
-                    >{t('common.import')}...</ToolbarButton>
+                    >{t('page.interessat.action.importar.label')}</ToolbarButton>
                 },
             ]}
         />

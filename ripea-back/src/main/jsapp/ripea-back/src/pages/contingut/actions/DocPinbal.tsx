@@ -121,7 +121,7 @@ const DocPinbal = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"NEW_DOC_PINBAL"}
-        title={t('page.document.action.pinbal')}
+        title={t('page.document.action.pinbal.title')}
         {...props}
     >
         <DocPinbalForm/>
@@ -129,6 +129,7 @@ const DocPinbal = (props:any) => {
 }
 
 const useDocPinbal = (entity:any,refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -137,9 +138,9 @@ const useDocPinbal = (entity:any,refresh?: () => void) => {
             expedient: {id: entity?.id}
         })
     }
-    const onSuccess = () :void => {
+    const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.pinbal.ok', {document: result?.nom}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

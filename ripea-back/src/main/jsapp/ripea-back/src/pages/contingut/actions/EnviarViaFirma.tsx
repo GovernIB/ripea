@@ -36,7 +36,7 @@ const EnviarViaFirma = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"VIA_FIRMA"}
-        title={t('page.document.action.viaFirma')}
+        title={t('page.document.action.viaFirma.title')}
         initialOnChange
         {...props}
     >
@@ -45,15 +45,16 @@ const EnviarViaFirma = (props:any) => {
 }
 
 const useEnviarViaFirma = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(id)
     }
-    const onSuccess = () :void => {
+    const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.document.action.viaFirma.ok', {document: result?.nom}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

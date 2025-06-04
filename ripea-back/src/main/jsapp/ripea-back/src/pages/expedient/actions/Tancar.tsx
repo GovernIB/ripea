@@ -109,22 +109,23 @@ const Tancar = (props: any) => {
     return <FormActionDialog
         resourceName={"expedientResource"}
         action={"TANCAR"}
-        title={t('page.expedient.action.close')}
+        title={t('page.expedient.action.close.title')}
         {...props}
     >
         <TancarForm/>
     </FormActionDialog>
 }
 const useTancar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id: any): void => {
         apiRef.current?.show?.(id)
     }
-    const onSuccess = (): void => {
+    const onSuccess = (result): void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.expedient.action.close.title', {expedient: result?.nom}), 'success');
     }
     const onError = (error: any): void => {
         temporalMessageShow(null, error?.message, 'error');

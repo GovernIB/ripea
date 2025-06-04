@@ -15,11 +15,11 @@ const FirmaNavegadorForm = () => {
 }
 
 const FirmaNavegador = (props: any) => {
-    const {} = useTranslation();
+    const { t } = useTranslation();
 
     return <FormActionDialog
         resourceName={"documentResource"}
-        title={'Firmar desde el navegador'}
+        title={t('page.document.action.firmar.title')}
         action={"FIRMA_WEB_INI"}
         initialOnChange
         {...props}

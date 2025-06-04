@@ -38,7 +38,7 @@ const useVisualitzar = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={''}
+            title={t('page.document.action.view.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
             buttons={[
                 {

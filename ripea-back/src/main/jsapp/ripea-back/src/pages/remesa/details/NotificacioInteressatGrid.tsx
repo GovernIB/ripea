@@ -49,7 +49,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
     const dialog =
         <MuiDialog
             open={open}
-            title={t('page.notificacio.acciones.notificacioInteressat')}
+            title={t('page.notificacio.action.notificacioInteressat.title')}
             closeCallback={handleClose}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
             buttons={[

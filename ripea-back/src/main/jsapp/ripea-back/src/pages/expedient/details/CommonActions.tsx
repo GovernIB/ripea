@@ -44,6 +44,8 @@ export const iniciaDescargaJSON = (result: any) => {
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
+    const { value: user } = useUserSession();
+
     const {
         patch: apiPatch,
         artifactAction: apiAction,
@@ -64,7 +66,7 @@ export const useActions = (refresh?: () => void) => {
 			});		
     }
 	
-	const massiveReport = (id:any, code:string, msg:string, fileType:any) => {
+	const report = (id:any, code:string, msg:string, fileType:any) => {
 	    return apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
@@ -75,7 +77,7 @@ export const useActions = (refresh?: () => void) => {
 			});		
 	}
 
-    const reobrir= (id: any): void => {
+    const reobrir= (id:any): void => {
         messageDialogShow(
             '',
             '',
@@ -87,27 +89,27 @@ export const useActions = (refresh?: () => void) => {
                 }
             });
     }
-    const follow= (id: any): void => { action(id, 'FOLLOW', t('page.expedient.results.actionOk')); }
-    const unfollow= (id: any): void => { action(id, 'UNFOLLOW', t('page.expedient.results.actionOk')); }
-    const agafar= (id: any): void => { action(id, 'AGAFAR', t('page.expedient.results.actionOk')); }
-    const retornar= (id: any) :void => { action(id, 'RETORNAR', t('page.expedient.results.actionOk')); }
-	const alliberar= (id: any) :void => { action(id, 'ALLIBERAR', t('page.expedient.results.actionOk')); }
-    const syncArxiu= (id: any): void => {
+    const follow= (id:any, row:any): void => { action(id, 'FOLLOW', t('page.expedient.action.follow.ok', {user: user?.nom, expedient: row?.nom})); }
+    const unfollow= (id:any, row:any): void => { action(id, 'UNFOLLOW', t('page.expedient.action.unfollow.ok', {user: user?.nom, expedient: row?.nom})); }
+    const agafar= (id:any, row:any): void => { action(id, 'AGAFAR', t('page.expedient.action.agafar.ok', {user: user?.nom, expedient: row?.nom})); }
+    const retornar= (id:any, row:any) :void => { action(id, 'RETORNAR', t('page.expedient.action.retornar.ok', {user: user?.nom, expedient: row?.nom})); }
+	const alliberar= (id:any, row:any) :void => { action(id, 'ALLIBERAR', t('page.expedient.action.lliberar.ok', {expedient: row?.nom})); }
+    const syncArxiu= (id:any): void => {
         apiAction(undefined, {code: 'SYNC_ARXIU', data:{ ids: [id], massivo: false }})
             .then((result) => {
                 const success = result.filter((r:any)=>r?.codi=='OK')
-                // const info = result.filter((r:any)=>r?.codi=='INFO')
+                const info = result.filter((r:any)=>r?.codi=='INFO')
                 const error = result.filter((r:any)=>r?.codi=='ERROR')
 
                 success?.length>0 && temporalMessageShow(null, success.map((r:any)=><p>{r?.valor}</p>), 'success');
-                // info?.length>0 && temporalMessageShow(null, info.map((r:any)=><p>{r?.valor}</p>), 'info');
+                info?.length>0 && temporalMessageShow(null, info.map((r:any)=><p>{r?.valor}</p>), 'info');
                 error?.length>0 && temporalMessageShow(null, error.map((r:any)=><p>{r?.valor}</p>), 'error');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
     }
-	const eliminar= (id: any) :void => {
+	const eliminar= (id:any, row:any) :void => {
         messageDialogShow(
             '',
             t('page.expedient.result.checkDelete'),
@@ -115,21 +117,21 @@ export const useActions = (refresh?: () => void) => {
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    action(id, 'ESBORRAR', t('page.expedient.results.actionOk'));
+                    action(id, 'ESBORRAR', t('page.expedient.action.eliminar.ok', {expedient: row?.nom}));
                 }
             });
     }
 	
-	const exportIndexPdf= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
-	const exportIndexXls= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
-	const exportPdfEni= (id: any): void => { massiveReport(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
-	const exportEni= (id: any): void => { massiveReport(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
-	const exportInside= (id: any): void => { massiveReport(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportIndexPdf= (id:any): void => { report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
+	const exportIndexXls= (id:any): void => { report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
+	const exportPdfEni= (id:any): void => { report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportEni= (id:any): void => { report(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportInside= (id:any): void => { report(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
 
     const eliminarRelacio = (id:any, row:any, relacioId:any) => {
         messageDialogShow(
             '',
-            t('page.expedient.result.checkRelacio'),
+            t('page.expedient.result.checkRelacio', {expedient: row?.nom}),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -140,7 +142,7 @@ export const useActions = (refresh?: () => void) => {
                     apiPatch(id,{data: {relacionatsPer, relacionatsAmb} })
                         .then(() => {
                             refresh?.()
-                            temporalMessageShow(null, '', 'success');
+                            temporalMessageShow(null, t('page.expedient.action.relacio.ok'), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');
@@ -216,27 +218,27 @@ export const useCommonActions = (refresh?: () => void) => {
 
     const actions = [
         {
-            title: t('page.expedient.acciones.detall'),
+            title: t('page.expedient.action.detall.label'),
             icon: "folder",
             linkTo: "/contingut/{{id}}",
             showInMenu: true,
         },
         {
-            title: t('common.update')+'...',
+            title: t('page.expedient.action.update.label'),
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
             hidden: isTancat,
         },
         {
-            title: t('page.expedient.acciones.follow'),
+            title: t('page.expedient.action.follow.label'),
             icon: "person_add",
             showInMenu: true,
             onClick: follow,
             hidden: (row:any) => row?.seguidor || !isUsuariActualWrite(row),// si el usuario actual es seguidor
         },
         {
-            title: t('page.expedient.acciones.unfollow'),
+            title: t('page.expedient.action.unfollow.label'),
             icon: "person_remove",
             showInMenu: true,
             onClick: unfollow,
@@ -248,7 +250,7 @@ export const useCommonActions = (refresh?: () => void) => {
             disabled: true,
         },
         {
-            title: t('page.expedient.acciones.assignar'),
+            title: t('page.expedient.action.assignar.label'),
             icon: "person",
             showInMenu: true,
             onClick: hanldeAssignar,
@@ -261,49 +263,49 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !isAdminOAdminOrgan(row),
         },
         {
-            title: t('page.expedient.acciones.agafar'),
+            title: t('page.expedient.action.agafar.label'),
             icon: "lock",
             showInMenu: true,
             onClick: agafar,
             hidden: isAgafatUsuariActual
         },
         {
-            title: t('page.expedient.acciones.retornar'),
+            title: t('page.expedient.action.retornar.label'),
             icon: "undo",
             showInMenu: true,
             onClick: retornar,
             hidden: (row:any) => !isAgafatUsuariActual(row) || row?.agafatPer?.id == row?.createdBy,
         },
         {
-            title: t('page.expedient.acciones.lliberar'),
+            title: t('page.expedient.action.lliberar.label'),
             icon: "lock_open",
             showInMenu: true,
             onClick: alliberar,
             hidden: (row:any) => !row?.agafatPer,
         },
         {
-            title: t('page.expedient.acciones.upPrioritat'),
+            title: t('page.expedient.action.upPrioritat.label'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarPrioridad,
             hidden: (row:any) => !potModificar(row),
         },
         {
-            title: t('page.expedient.acciones.upEstat'),
+            title: t('page.expedient.action.upEstat.label'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarEstado,
             hidden: (row:any) => isTancat(row) || !potModificar(row),
         },
         {
-            title: t('page.expedient.acciones.relacio'),
+            title: t('page.expedient.action.relacio.label'),
             icon: "link",
             showInMenu: true,
             onClick: hanldeRelacionar,
             hidden: (row:any) => !potModificar(row),
         },
         {
-            title: t('page.expedient.acciones.close'),
+            title: t('page.expedient.action.close.label'),
             icon: "check",
             showInMenu: true,
             onClick: handleTancar,
@@ -311,7 +313,7 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !potModificar(row) || isTancat(row),
         },
         {
-            title: t('page.expedient.acciones.open'),
+            title: t('page.expedient.action.open.label'),
             icon: "undo",
             showInMenu: true,
             onClick: reobrir,
@@ -323,34 +325,34 @@ export const useCommonActions = (refresh?: () => void) => {
             disabled: true,
         },
         {
-            title: t('page.contingut.acciones.history'),
+            title: t('page.contingut.action.history.label'),
             icon: "list",
             showInMenu: true,
             onClick: handelHistoricOpen,
         },
         {
-            title: t('page.expedient.acciones.download'),
+            title: t('page.expedient.action.download.label'),
             icon: "download",
             showInMenu: true,
             onClick: handleDescargarDocuments,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.acciones.exportPDF'),
+            title: t('page.expedient.action.exportPDF.label'),
             icon: "format_list_numbered",
             showInMenu: true,
 			onClick: exportIndexPdf,
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.acciones.exportEXCEL'),
+            title: t('page.expedient.action.exportEXCEL.label'),
             icon: "lists",
             showInMenu: true,
 			onClick: exportIndexXls,
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioExcelActiva),
         },
         {
-            title: t('page.expedient.acciones.exportPDF_ENI'),
+            title: t('page.expedient.action.exportPDF_ENI.label'),
             icon: "format_list_numbered",
             showInMenu: true,
 			onClick: exportPdfEni,
@@ -358,7 +360,7 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.acciones.exportENI'),
+            title: t('page.expedient.action.exportENI.label'),
             icon: "folder_code",
             showInMenu: true,
 			onClick: exportEni,
@@ -366,7 +368,7 @@ export const useCommonActions = (refresh?: () => void) => {
 			hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.acciones.exportINSIDE'),
+            title: t('page.expedient.action.exportINSIDE.label'),
             icon: "folder_zip",
             showInMenu: true,
 			onClick: exportInside,
@@ -374,7 +376,7 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !(row?.conteDocuments && user?.sessionScope?.isExportacioInsideActiva),
         },
         {
-            title: t('page.expedient.acciones.export'),
+            title: t('page.expedient.action.export.label'),
             icon: "description",
             showInMenu: true,
 			onClick: handleExportDoc,
@@ -382,20 +384,20 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.acciones.infoArxiu'),
+            title: t('page.expedient.action.infoArxiu.label'),
             icon: "info",
             showInMenu: true,
             onClick: handleArxiuOpen,
             disabled: (row:any) => !row?.arxiuUuid,
         },
         {
-            title: t('page.expedient.acciones.sincronitzar'),
+            title: t('page.expedient.action.sincronitzar.label'),
             icon: "autorenew",
             showInMenu: true,
             onClick: syncArxiu,
         },
 		{
-		    title: t('page.expedient.acciones.eliminar'),
+		    title: t('page.expedient.action.eliminar.label'),
 		    icon: "delete",
 		    showInMenu: true,
 		    onClick: eliminar,

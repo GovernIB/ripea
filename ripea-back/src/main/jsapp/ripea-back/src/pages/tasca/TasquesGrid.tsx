@@ -117,7 +117,7 @@ const TasquesGrid = (props: any) => {
             sortModel={sortModel}
             onRowCountChange={onRowCountChange}
             popupEditCreateActive
-			toolbarCreateTitle={t('page.tasca.acciones.new')}
+			toolbarCreateTitle={t('page.tasca.action.new.label')}
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
                 expedient: {id: entity?.id},

@@ -20,7 +20,7 @@ export const CambiarEstat = (props: { apiRef:any }) => {
 
     return <MuiFormDialog
         resourceName={"expedientResource"}
-        title={t('page.expedient.action.changeEstat')}
+        title={t('page.expedient.action.changeEstat.title')}
         apiRef={apiRef}
         onClose={(reason?: string) => reason !== 'backdropClick'}
     >
@@ -29,14 +29,15 @@ export const CambiarEstat = (props: { apiRef:any }) => {
 }
 
 const useCambiarEstat = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
+    const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id)
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.expedient.action.changeEstat.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');

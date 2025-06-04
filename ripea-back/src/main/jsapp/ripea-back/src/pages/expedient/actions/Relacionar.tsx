@@ -114,7 +114,7 @@ const Relacionar = (props:any) => {
 
     return <MuiFormDialog
         resourceName={'expedientResource'}
-        title={t('page.expedient.action.relacio')}
+        title={t('page.expedient.action.relacio.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
         {...props}
     >
@@ -123,6 +123,7 @@ const Relacionar = (props:any) => {
 }
 
 const useRelacionar= (refresh?: () => void) => {
+    const { t } = useTranslation();
     const formApiRef = useRef<MuiFormDialogApi>()
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -130,7 +131,7 @@ const useRelacionar= (refresh?: () => void) => {
         formApiRef.current?.show?.(id,{ relacionatsAmb: row?.relacionatsAmb })
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error:any) :void => {
                 if (error) {

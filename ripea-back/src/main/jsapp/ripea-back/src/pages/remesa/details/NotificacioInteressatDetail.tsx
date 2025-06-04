@@ -65,8 +65,9 @@ const Notific = (props:any) => {
         <CardData title={t('page.notificacioInteressat.detall.certificacio')} hidden={!entity?.enviamentCertificacioData}
               buttons={[
                   {
-                      text: t('page.notificacioInteressat.acciones.downloadDoc'),
+                      text: t('page.notificacioInteressat.action.downloadDoc.label'),
                       icon: 'download',
+                      /* TODO: action */
                       onClick: ()=>{},
                   },
               ]}

@@ -24,7 +24,7 @@ const NotificarMassive = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"MASSIVE_NOTIFICAR_ZIP"}
-        title={t('page.document.action.notificarMasiva')}
+        title={t('page.document.action.notificarMasiva.title')}
         {...props}
     >
         <NotificarMassiveForm/>
@@ -51,7 +51,7 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
     }
     const onSuccess = (result?: any) :void => {
         if (result?.id) {
-            temporalMessageShow(null, t('page.document.dialog.generateZip'), 'success');
+            temporalMessageShow(null, t('page.document.action.notificarMasiva.ok'), 'success');
             handleNotificar(result?.id, result)
         }else {
             onError({message: ''})

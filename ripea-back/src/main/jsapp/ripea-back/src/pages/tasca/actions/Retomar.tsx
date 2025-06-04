@@ -17,7 +17,7 @@ const Retomar = (props:any) => {
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
         action={"RETOMAR"}
-        title={t('page.tasca.action.retomar')}
+        title={t('page.tasca.action.retomar.title')}
         {...props}
     >
         <RetomarForm/>
@@ -25,6 +25,7 @@ const Retomar = (props:any) => {
 }
 
 const useRetomar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -33,7 +34,7 @@ const useRetomar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.retomar.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

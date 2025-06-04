@@ -18,7 +18,7 @@ const CambiarPrioritat = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        title={t('page.tasca.action.changePrioritat')}
+        title={t('page.tasca.action.changePrioritat.title')}
         action={'CHANGE_PRIORITAT'}
         {...props}
     >
@@ -27,6 +27,7 @@ const CambiarPrioritat = (props:any) => {
 }
 
 const useCambiarPrioritat = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -38,7 +39,7 @@ const useCambiarPrioritat = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.changePrioritat.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

@@ -18,7 +18,7 @@ const AmpliarPlac = (props:any) => {
     return <FormActionDialog
         resourceName={"documentEnviamentInteressatResource"}
         action={"AMPLIAR_PLAC"}
-        title={t('page.notificacioInteressat.action.ampliarPlac')}
+        title={t('page.notificacioInteressat.action.ampliarPlac.title')}
         {...props}
     >
         <AmpliarPlacForm/>
@@ -26,6 +26,7 @@ const AmpliarPlac = (props:any) => {
 }
 
 const useAmpliarPlac = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -34,7 +35,7 @@ const useAmpliarPlac = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.notificacioInteressat.action.ampliarPlac.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

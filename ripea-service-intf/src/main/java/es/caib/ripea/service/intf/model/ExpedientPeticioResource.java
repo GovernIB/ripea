@@ -41,7 +41,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
-    public static final String REPORT_DOWNLOAD_JUSTIFICANT = "REPORT_DOWNLOAD_JUSTIFICANT";
+    public static final String REPORT_DOWNLOAD_JUSTIFICANT = "DOWNLOAD_JUSTIFICANT";
 
 //    private Long id;
     private String identificador;

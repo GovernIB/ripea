@@ -17,7 +17,7 @@ const Delegar = (props:any) => {
 
     return <FormActionDialog
         resourceName={"expedientTascaResource"}
-        title={t('page.tasca.action.delegar')}
+        title={t('page.tasca.action.delegar.title')}
         action={'DELEGAR'}
         {...props}
     >
@@ -26,6 +26,7 @@ const Delegar = (props:any) => {
 }
 
 const useDelegar = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -34,7 +35,7 @@ const useDelegar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, '', 'success');
+        temporalMessageShow(null, t('page.tasca.action.delegar.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

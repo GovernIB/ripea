@@ -14,8 +14,9 @@ const Dades = (props:any) => {
         <CardData title={t('page.notificacio.detall.notificacioDades')}
               buttons={[
                   {
-                      text: t('page.notificacio.acciones.justificant'),
+                      text: t('page.notificacio.action.justificant.label'),
                       icon: 'download',
+                      /* TODO: action */
                       onClick: ()=>{},
                       hidden: entity?.notificacioEstat == 'PENDENT',
                   },
@@ -35,8 +36,9 @@ const Dades = (props:any) => {
         <CardData title={t('page.notificacio.detall.notificacioDocument')}
                   buttons={[
                       {
-                          text: t('page.notificacio.acciones.documentEnviat'),
+                          text: t('page.notificacio.action.documentEnviat.label'),
                           icon: 'download',
+                          /* TODO: action */
                           onClick: ()=>{},
                           flex: 2,
                       },
@@ -85,8 +87,7 @@ const useRemesaDetail = () => {
             }}
         >
             {entity?.error &&
-                <AlertExpand severity={"error"} label={"Se han producido errores enviando la notificación"}>
-                    {entity?.errorDescripcio}</AlertExpand>
+                <AlertExpand severity={"error"} label={t('page.notificacio.detall.error')}>{entity?.errorDescripcio}</AlertExpand>
             }
             <Dades entity={entity}/>
         </MuiDialog>
