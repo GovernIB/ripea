@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
-import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
+import { GridTreeDataGroupingCell, useGridApiRef } from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -198,20 +198,29 @@ const DocumentsGrid = (props: any) => {
 
     const { get: getFolderExpand, save: addFolderExpand } = useSessionList('folder_expand')
 
-    const dataGridApiRef = useMuiDataGridApiRef()
+    const gridApiRef = useMuiDataGridApiRef();
+    const datagridApiRef = useGridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(false);
     const [vista, setVista] = useState<string>("carpeta");
 
     const refresh = () => {
-        dataGridApiRef?.current?.refresh?.();
+        gridApiRef?.current?.refresh?.();
     }
-    const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, dataGridApiRef, refresh);
+    const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
     const onDrop = React.useCallback((adjunt: any) => {
-        dataGridApiRef?.current?.showCreateDialog?.(null, { adjunt })
+        gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
+
+    React.useEffect(() => {
+        if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0) {
+            datagridApiRef.current.subscribeEvent('rowExpansionChange', (p1, p2, p3) => {
+                console.log('>>> rowExpansionChange', p1.id, p1.childrenExpanded, p1, p2, p3)
+            });
+        }
+    }, [datagridApiRef.current]);
 
     return <GridPage>
         <Load value={entity}>
@@ -234,7 +243,8 @@ const DocumentsGrid = (props: any) => {
                         expedient: { id: entity?.id },
                         metaExpedient: entity?.metaExpedient,
                     }}
-                    apiRef={dataGridApiRef}
+                    apiRef={gridApiRef}
+                    datagridApiRef={datagridApiRef}
                     rowAdditionalActions={actions}
                     onRowCountChange={onRowCountChange}
 
