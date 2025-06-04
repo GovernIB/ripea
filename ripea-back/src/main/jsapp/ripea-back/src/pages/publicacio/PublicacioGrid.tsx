@@ -78,7 +78,7 @@ const PublicacioGrid = (props:any) => {
             popupEditFormContent={<PublicacioGridForm/>}
             columns={columns}
             rowAdditionalActions={actions}
-            paginationActive
+            // paginationActive
             filter={builder.and(
                 builder.eq('expedient.id', id)
             )}

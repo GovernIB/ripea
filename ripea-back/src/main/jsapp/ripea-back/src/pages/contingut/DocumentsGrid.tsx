@@ -229,7 +229,7 @@ const DocumentsGrid = (props: any) => {
                     resourceName="documentResource"
                     popupEditFormDialogResourceTitle={t('page.document.title')}
                     columns={columns}
-                    paginationActive
+                    // paginationActive
                     filter={builder.and(
                         builder.eq('expedient.id', entity?.id),
                         builder.eq('esborrat', 0),

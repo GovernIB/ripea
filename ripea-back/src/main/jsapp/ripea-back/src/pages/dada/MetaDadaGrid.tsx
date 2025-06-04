@@ -46,7 +46,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             perspectives={perspectives}
             apiRef={apiRef}
             rowAdditionalActions={actions}
-            paginationActive
+            // paginationActive
             disableColumnSorting
             readOnly
             onRowsChange={(rows:any)=> {
