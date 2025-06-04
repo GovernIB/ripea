@@ -1,2 +1,4 @@
 Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE,CONFIGURABLE_ORGAN,ORGAN_CODI,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,ENTITAT_CODI,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) 
 values ('es.caib.ripea.encription.key',null,'Clau per encriptar i dessencriptar parametres de les URLS (firma, escaneig, flux firma).','GENERAL','10','1','TEXT',null,null,'0',null,'0','0',null,'0','0');
+
+--Afegir la propietat es.caib.ripea.encription.key=g8J@kLp!3#xYzWv9bQnM4dF5TjZ2Rc7p al system.properties (pot ser qualsevol clau de 32 caracters)
