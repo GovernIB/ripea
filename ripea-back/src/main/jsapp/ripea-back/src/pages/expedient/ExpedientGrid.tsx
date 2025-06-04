@@ -28,7 +28,7 @@ export const ExpedientGridForm = () => {
         <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor"
-            /*TODO: filter={'organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre'}*/
+            /*TODO: namedQueries={['organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre']}*/
                        disabled={!!data?.id || data?.disableOrganGestor}
                        readOnly={!!data?.id || data?.disableOrganGestor}/>
         <GridFormField xs={12} name="sequencia" disabled/>

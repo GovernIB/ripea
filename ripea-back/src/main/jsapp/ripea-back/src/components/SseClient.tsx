@@ -54,63 +54,65 @@ export const SseClient: React.FC = () => {
   }
 
   useEffect(() => {
-    // Funció per a connectar amb el servidor SSE
-    const connectToSSE = () => {
-      // Tancar la connexió anterior si existeix
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
+      if(user && user?.codi) {
+          // Funció per a connectar amb el servidor SSE
+          const connectToSSE = () => {
+              // Tancar la connexió anterior si existeix
+              if (eventSourceRef.current) {
+                  eventSourceRef.current.close();
+              }
+
+              // Crear una nova connexió
+              const apiUrl = import.meta.env.VITE_API_URL || '/api/';
+              const sseUrl = `${apiUrl}sse/subscribe/user/${user?.codi}`;
+
+              const eventSource = new EventSource(sseUrl, {withCredentials: true});
+              eventSourceRef.current = eventSource;
+
+              // Gestionar l'esdeveniment de connexió
+              eventSource.addEventListener(sseConnectedKey, (event) => {
+                  console.log('SSE connectat:', event.data);
+                  saveSession(sseConnectedKey, true)
+              });
+
+              // Gestionar l'esdeveniment d'alerta
+              addEventListener(eventSource, avisosKey)
+
+              // Gestionar l'esdeveniment de notificació
+              addEventListener(eventSource, notificacionsKey)
+
+              // Gestionar l'esdeveniment de tasques
+              addEventListener(eventSource, tasquesKey)
+
+              // Gestionar errors
+              eventSource.onerror = (error) => {
+                  console.error('Error de connexió SSE:', error);
+                  saveSession(sseConnectedKey, false)
+
+                  // Tancar la connexió actual
+                  eventSource.close();
+                  eventSourceRef.current = null;
+
+                  // Intentar reconnectar després d'un temps
+                  setTimeout(connectToSSE, 5000);
+              };
+          };
+
+          // Iniciar la connexió
+          connectToSSE();
+
+          // Netejar en desmuntar el component
+          return () => {
+              console.log('Netejam o desmontam el component');
+              if (eventSourceRef.current) {
+                  console.log('Desconnectam SSE');
+                  eventSourceRef.current.close();
+                  eventSourceRef.current = null;
+              }
+              removeAll()
+              saveSession(sseConnectedKey, false)
+          };
       }
-
-      // Crear una nova connexió
-      const apiUrl = import.meta.env.VITE_API_URL || '/api/';
-      const sseUrl = `${apiUrl}sse/subscribe/user/${user?.codi}`;
-
-      const eventSource = new EventSource(sseUrl, { withCredentials: true });
-      eventSourceRef.current = eventSource;
-
-      // Gestionar l'esdeveniment de connexió
-      eventSource.addEventListener(sseConnectedKey, (event) => {
-        console.log('SSE connectat:', event.data);
-        saveSession(sseConnectedKey, true)
-      });
-
-        // Gestionar l'esdeveniment d'alerta
-        addEventListener(eventSource, avisosKey)
-
-        // Gestionar l'esdeveniment de notificació
-        addEventListener(eventSource, notificacionsKey)
-
-        // Gestionar l'esdeveniment de tasques
-        addEventListener(eventSource, tasquesKey)
-
-        // Gestionar errors
-        eventSource.onerror = (error) => {
-            console.error('Error de connexió SSE:', error);
-            saveSession(sseConnectedKey, false)
-
-            // Tancar la connexió actual
-            eventSource.close();
-            eventSourceRef.current = null;
-
-            // Intentar reconnectar després d'un temps
-            setTimeout(connectToSSE, 5000);
-        };
-    };
-
-    // Iniciar la connexió
-    connectToSSE();
-
-    // Netejar en desmuntar el component
-    return () => {
-      console.log('Netejam o desmontam el component');
-      if (eventSourceRef.current) {
-        console.log('Desconnectam SSE');
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-      removeAll()
-      saveSession(sseConnectedKey, false)
-    };
   }, [user]);
 
   // Aquest component no renderitza res visible

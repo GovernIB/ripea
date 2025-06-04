@@ -9,6 +9,7 @@ import {useTranslation} from "react-i18next";
 import Load from "../../components/Load.tsx";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
+import {iniciaDescarga} from "../expedient/details/CommonActions.tsx";
 
 const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
@@ -200,30 +201,14 @@ const UserHeadToolbar = (props:any) => {
                 {(isRolActualSupAdmin || isRolActualAdmin || isRolActualOrganAdmin) &&
                     <MenuItem onClick={()=>{
                         const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/02_ripea_manual_administradors.pdf';
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = '02_ripea_manual_administradors.pdf';
-                        document.body.appendChild(link);
-                        link.click();
-
-                        // Limpieza
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
+                        iniciaDescarga(url, '02_ripea_manual_administradors.pdf')
                     }}
                 ><Icon>download</Icon>{t('page.user.options.manualAdmin')}</MenuItem>}
 
                 <MenuItem
                     onClick={()=>{
                         const url = 'https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/01_ripea_manual_usuari.pdf';
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = '01_ripea_manual_usuari.pdf';
-                        document.body.appendChild(link);
-                        link.click();
-
-                        // Limpieza
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
+                        iniciaDescarga(url, '01_ripea_manual_usuari.pdf')
                     }}
                 ><Icon>download</Icon>{t('page.user.options.manual')}</MenuItem>
 

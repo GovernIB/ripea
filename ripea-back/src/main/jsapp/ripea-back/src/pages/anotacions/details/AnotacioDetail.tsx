@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
@@ -8,6 +8,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -16,7 +17,6 @@ const Resum = (props:any) => {
 
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
-
             <ContenidoData title={t('page.registre.detall.identificador')} xs={6}>{registre?.identificador}</ContenidoData>
             <ContenidoData title={t('page.registre.detall.data')} xs={6}>{formatDate(registre?.data)}</ContenidoData>
             <ContenidoData title={t('page.registre.detall.oficina')}>{registre?.oficinaDescripcio} ({registre?.oficinaCodi})</ContenidoData>
@@ -210,8 +210,27 @@ const Annexos = (props:any) => {
     />
 }
 
+const Justificant = (props:any) => {
+    const { entity } = props;
+    const { t } = useTranslation();
+
+    return <CardData title={<><Icon hidden>description</Icon>{entity?.titol}</>}>
+        <ContenidoData title={"Fecha de captura (ENI)"}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
+        <ContenidoData title={"Origen (ENI)"}>{entity?.ntiOrigen}</ContenidoData>
+        <ContenidoData title={"Tipo documental (ENI)"}>{entity?.ntiTipoDocumental}</ContenidoData>
+        <ContenidoData title={"Identificador"}>{entity?.uuid}</ContenidoData>
+        <ContenidoData title={"Fichero"}>{entity?.titol}</ContenidoData>
+
+        <CardData title={<>{entity?.validacioFirmaCorrecte && <Icon>verified</Icon>}{t('page.arxiu.firma.title')}</>}>
+            <ContenidoData title={"Tipo firma"}>{entity?.firmaTipus}</ContenidoData>
+            <ContenidoData title={"Perfil firma"}>{entity?.firmaPerfil}</ContenidoData>
+        </CardData>
+    </CardData>
+}
+
 const useAnotacioDetail = () => {
     const { t } = useTranslation();
+    const { value: user } = useUserSession();
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -255,6 +274,12 @@ const useAnotacioDetail = () => {
             label: t('page.anotacio.tabs.annexos'),
             content: <Annexos entity={entity?.registreInfo} onRowCountChange={setNumAnnexos}/>,
             badge: numAnnexos,
+        },
+        {
+            value: "justificant",
+            label: t('page.anotacio.tabs.justificant'),
+            content: <Justificant entity={entity?.registreInfo?.justificant}/>,
+            hidden: !user?.sessionScope?.isIncorporacioJustificantActiva,
         },
     ]
 

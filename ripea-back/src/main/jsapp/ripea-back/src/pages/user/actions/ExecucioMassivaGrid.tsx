@@ -261,7 +261,7 @@ const columnsContingut = [
 ]
 const sortModelContingut: any = [{field: 'ordre', sort: 'asc'}];
 
-const estatColor = {
+const estatColor :any = {
     'ESTAT_FINALITZAT': 'green',
     'ESTAT_ERROR': 'red',
     'ESTAT_PENDENT': 'orange',

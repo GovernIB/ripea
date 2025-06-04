@@ -15,7 +15,7 @@ const DadaForm = () => {
     </Grid>
 }
 
-const tipusValor = {
+const tipusValor :any = {
     // TODO: revisar tipado
     TEXT: 'text',
     DATA: 'date',
@@ -46,6 +46,7 @@ const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
 const DataGrid = (props:any) => {
     const { entity, contingut, refresh } = props
     const [numDades, setNumDades] = useState<number>(0);
+    const potMod = potModificar(contingut);
 
     return <StyledMuiGrid
         resourceName={"dadaResource"}
@@ -70,9 +71,9 @@ const DataGrid = (props:any) => {
         }}
         autoHeight
         // height={162 + 52 * 4}
-        toolbarHideCreate={ !potModificar(contingut) || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
-        rowHideUpdateButton={false}
-        rowHideDeleteButton={false}
+        toolbarHideCreate={ !potMod || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        rowHideUpdateButton={!potMod}
+        rowHideDeleteButton={!potMod}
     />
 }
 const useDataGrid = (contingut:any, refresh?:() => void) => {
