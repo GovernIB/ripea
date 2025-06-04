@@ -104,7 +104,7 @@ const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
 }
 
 const useFieldOptions = (
-    anyValuePresent: boolean,
+    open: boolean,
     inputValue: string | undefined,
     optionsRequest: (q: string) => AdvancedSearchOptionsRequestType) => {
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -113,8 +113,8 @@ const useFieldOptions = (
     const [error, setError] = React.useState<any>();
     const debouncedInputValue = useDebounce(inputValue);
     React.useEffect(() => {
-        const q = debouncedInputValue?.length ? debouncedInputValue : null;
-        if (!anyValuePresent) {
+        if (open) {
+            const q = debouncedInputValue?.length ? debouncedInputValue : null;
             setLoading(true);
             const or = optionsRequest(q);
             const optionsRequestPromise = Array.isArray(or) ? or[0] : or;
@@ -131,7 +131,7 @@ const useFieldOptions = (
                 });
             return () => optionsRequestCancel?.();
         }
-    }, [anyValuePresent, optionsRequest, debouncedInputValue]);
+    }, [open, optionsRequest, debouncedInputValue]);
     return { loading, options, page, error };
 }
 
@@ -216,7 +216,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         page: optionsPage,
         error: optionsError,
     } = useFieldOptions(
-        !isEmptyValue && !multiple,
+        open,
         optionsQuickFilter,
         optionsRequest);
     const handleOnChange = (_event: Event, value: any, reason: AutocompleteChangeReason): void => {
@@ -290,9 +290,14 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             value={valueMultipleAdapted}
             readOnly={readOnly}
             inputValue={inputValue}
-            open={open}
             options={options}
             multiple={multiple}
+            open={open}
+            onOpen={() => setOpen(true)}
+            onClose={(event: Event, reason) => {
+                reason === 'escape' && handleOnInputChange(event, value?.description ?? '');
+                setOpen(false);
+            }}
             onChange={handleOnChange}
             onInputChange={handleOnInputChange}
             getOptionLabel={(option: any) => option?.description}
@@ -334,11 +339,6 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 return options;
             }}
             getOptionDisabled={(option) => option.disabled}
-            onOpen={() => setOpen(true)}
-            onClose={(event: Event, reason) => {
-                reason === 'escape' && handleOnInputChange(event, value?.description ?? '');
-                setOpen(false);
-            }}
             fullWidth
             {...componentProps}
             renderInput={(params) => <TextField
@@ -385,7 +385,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             closeText={t('form.field.reference.close')}
             clearText={t('form.field.reference.clear')}
             loadingText={t('form.field.reference.loading')}
-            noOptionsText={t('form.field.reference.noOptions')}
+            noOptionsText={optionsLoading ? t('form.field.reference.loading') : t('form.field.reference.noOptions')}
         />
     </>;
 }
