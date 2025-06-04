@@ -165,7 +165,7 @@ public class DigitalitzacioController extends BaseUserController {
 	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-		String data = Utils.desencripta(dades);
+		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
 		Long idExpedient = Long.parseLong(dataSplri[0]);
 		DigitalitzacioResultatDto resposta = recuperaResultatEscaneig(idTransaccio, true, true);

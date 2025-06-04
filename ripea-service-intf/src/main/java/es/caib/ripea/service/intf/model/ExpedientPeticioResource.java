@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
@@ -28,13 +29,19 @@ import lombok.Setter;
                         code = ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
-                        code = ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE),             
+                        code = ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT,
+                        formClass = Serializable.class,
+                        requiresId = true),          
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
+    public static final String REPORT_DOWNLOAD_JUSTIFICANT = "REPORT_DOWNLOAD_JUSTIFICANT";
 
 //    private Long id;
     private String identificador;

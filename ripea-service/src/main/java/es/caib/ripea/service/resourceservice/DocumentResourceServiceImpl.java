@@ -451,7 +451,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             if (fieldValue != null) {
             	UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
     			String dadesURL = previous.getExpedient().getId()+"#"+previous.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
-				String paramSecure = Utils.encripta(dadesURL);
+				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
             	String urlReturn = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/digitalitzacio/event/resultatScan/"+paramSecure+"/";
         		DigitalitzacioTransaccioRespostaDto respostaDto = pluginHelper.digitalitzacioIniciarProces(
         				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca",
@@ -1001,7 +1001,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaSimple params) throws ActionExecutionException {
 			try {
     			String dadesURL = entity.getExpedient().getId()+"#"+entity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
-				String paramSecure = Utils.encripta(dadesURL);
+				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
 				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/" + paramSecure + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				FitxerDto fitxerDto = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), entity.getId());
@@ -1284,7 +1284,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		} else {
         			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
         			String dadesURL = documentResourceEntity.getExpedient().getId()+"#"+documentResourceEntity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
-    				String paramSecure = Utils.encripta(dadesURL);
+    				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
     				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/portafirmes/flux/"+paramSecure+"/";
     				PortafirmesIniciFluxRespostaDto transaccioResponse = pluginHelper.portafirmesIniciarFluxDeFirma(false, urlReturnToRipea);
     				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());

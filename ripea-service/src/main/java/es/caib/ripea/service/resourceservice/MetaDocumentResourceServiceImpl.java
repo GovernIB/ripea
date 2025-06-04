@@ -11,7 +11,6 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
@@ -19,7 +18,6 @@ import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -37,7 +35,6 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final ExpedientRepository expedientRepository;
 	private final DocumentRepository documentRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
-	private final EntityComprovarHelper entityComprovarHelper;
 	private final ConfigHelper configHelper;
 	
     @Override
@@ -46,7 +43,6 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     	List<String> namedQueriesList = Stream.of(namedQueries).collect(Collectors.toList());
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
-        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
     	
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,

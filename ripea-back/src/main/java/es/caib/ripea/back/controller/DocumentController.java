@@ -504,7 +504,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         
-		String data = Utils.desencripta(dades);
+		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
 		Long expedientId = Long.parseLong(dataSplri[0]);
 		Long documentId = Long.parseLong(dataSplri[1]);

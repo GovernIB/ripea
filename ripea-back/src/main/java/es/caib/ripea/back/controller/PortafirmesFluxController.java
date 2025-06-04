@@ -125,7 +125,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			@PathVariable String transactionId,
 			Model model) {
 		String resultat = null;
-		String data = Utils.desencripta(dades);
+		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
 		Long expedientId = Long.parseLong(dataSplri[0]);
 		

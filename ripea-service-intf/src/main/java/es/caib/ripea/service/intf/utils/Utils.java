@@ -588,9 +588,9 @@ public class Utils {
 		}
 	}
 	
-	public static String encripta(String data) {
+	public static String encripta(String data, String key) {
 		try {
-	        SecretKeySpec secretKey = new SecretKeySpec("g8J@kLp!3#xYzWv9bQnM4dF5TjZ2Rc7p".getBytes(), "AES");
+	        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
 	        Cipher cipher = Cipher.getInstance("AES");
 	        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 	        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
@@ -600,9 +600,9 @@ public class Utils {
 		}
     }
 	
-	public static String desencripta(String encryptedData) {
+	public static String desencripta(String encryptedData, String key) {
 		try {
-	        SecretKeySpec secretKey = new SecretKeySpec("g8J@kLp!3#xYzWv9bQnM4dF5TjZ2Rc7p".getBytes(), "AES");
+	        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
 	        Cipher cipher = Cipher.getInstance("AES");
 	        cipher.init(Cipher.DECRYPT_MODE, secretKey);
 	        byte[] decryptedBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedData.replace("_", "/")));
@@ -611,4 +611,20 @@ public class Utils {
 			return encryptedData;
 		}	        
     }
+	
+	public static Map<String, String> namedQueriesToMap(String[] namedQueries) {
+    	Map<String, String> mapaNamedQueries = new HashMap<String, String>();
+    	if (namedQueries!=null && namedQueries.length>0) {
+	        for (String namedQuery : namedQueries) {
+	            String[] split = namedQuery.split("#");
+	            int i = split.length;
+	            if (i==1) {
+	            	mapaNamedQueries.put(split[0], null);
+	            } else if (i==2) {
+	            	mapaNamedQueries.put(split[0], split[1]);
+	            }
+	        }
+    	}
+        return mapaNamedQueries;
+	}
 }
