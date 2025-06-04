@@ -101,8 +101,9 @@ const RelacionarForm= () => {
                 setSelectedRows([...newSelection]);
             }}
 
-            height={162 + 52 * 4}
-            paginationActive
+            // height={162 + 52 * 4}
+            // paginationActive
+            autoHeight
             readOnly
         />
     </Load>

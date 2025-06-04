@@ -324,8 +324,9 @@ const useExecucioMassivaContingut = () => {
                 apiRef={gridApiRef}
                 sortModel={sortModelContingut}
                 columns={columnsContingut}
-                paginationActive
-                height={162 + 52 * 4}
+                // paginationActive
+                // height={162 + 52 * 4}
+                autoHeight
                 readOnly
 
                 rowProps={(row: any) => {

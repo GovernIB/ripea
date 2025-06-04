@@ -126,7 +126,7 @@ const RemesaGrid = (props:any) => {
             // perspectives={['']}
             columns={columns}
             rowAdditionalActions={actions}
-            paginationActive
+            // paginationActive
             apiRef={apiRef}
             onRowCountChange={onRowCountChange}
             disableColumnSorting

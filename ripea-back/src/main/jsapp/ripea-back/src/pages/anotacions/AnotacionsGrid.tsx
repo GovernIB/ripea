@@ -46,7 +46,7 @@ const AnotacionsGrid = (props:any) => {
             perspectives={perspectives}
             columns={columns}
             rowAdditionalActions={actions}
-            paginationActive
+            // paginationActive
             disableColumnSorting
             readOnly
         />

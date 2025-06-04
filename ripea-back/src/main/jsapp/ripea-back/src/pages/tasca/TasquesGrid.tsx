@@ -111,7 +111,7 @@ const TasquesGrid = (props: any) => {
             resourceName="expedientTascaResource"
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={additionalColumns}
-            paginationActive
+            // paginationActive
             filter={builder.and(builder.eq('expedient.id', entity?.id))}
             perspectives={perspectives}
             sortModel={sortModel}
