@@ -59,9 +59,10 @@ export const useFormDialog: UseFormDialogFn = (
     const [title, setTitle] = React.useState<string | null>();
     const [id, setId] = React.useState<any>();
     const [additionalData, setAdditionalData] = React.useState<any>();
-    const [initOnChangeRequest, setInitOnChangeRequest] = React.useState<boolean>(defaultFormComponentProps?.initOnChangeRequest);
     const [dialogComponentProps, setDialogComponentProps] = React.useState<any>(defaultDialogComponentProps);
-    const [formComponentProps, setFormComponentProps] = React.useState<any>(defaultFormComponentProps);
+    const {initOnChangeRequestProp, ...otherFormComponentProps} = defaultFormComponentProps ?? {};
+    const [initOnChangeRequest, setInitOnChangeRequest] = React.useState<boolean>(initOnChangeRequestProp);
+    const [formComponentProps, setFormComponentProps] = React.useState<any>(otherFormComponentProps);
     const [resolveFn, setResolveFn] = React.useState<(value?: any) => void>();
     const [rejectFn, setRejectFn] = React.useState<(value: any) => void>();
     const [formContent, setFormContent] = React.useState<React.ReactNode | undefined>(defaultFormContent);
