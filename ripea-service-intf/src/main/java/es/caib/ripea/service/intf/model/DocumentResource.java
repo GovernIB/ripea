@@ -296,6 +296,7 @@ public class DocumentResource extends NodeResource {
     @Getter
     @Setter
     public static class EnviarViaEmailFormAction implements Serializable {
+    	private VersioDocumentEnum versioDocument = VersioDocumentEnum.IMPRIMIBLE;
         private String email;
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
     }

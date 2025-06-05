@@ -558,7 +558,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         .map(ResourceReference::getId)
                         .collect(Collectors.toList());
 
-                emailHelper.enviarDocument(entity.getId(), emails, desinataris, VersioDocumentEnum.IMPRIMIBLE);
+                emailHelper.enviarDocument(entity.getId(), emails, desinataris, params.getVersioDocument());
             }
 
             return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

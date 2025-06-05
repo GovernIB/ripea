@@ -7,7 +7,8 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const EnviarViaEmailForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="email" type={"text"}/>
+		<GridFormField xs={12} name="versioDocument"/>
+	    <GridFormField xs={12} name="email" type={"text"}/>
         <GridFormField xs={12} name="responsables" multiple/>
     </Grid>
 }
