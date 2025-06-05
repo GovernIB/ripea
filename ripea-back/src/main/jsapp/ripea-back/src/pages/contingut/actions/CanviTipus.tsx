@@ -45,9 +45,9 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
             metaExpedient: entity?.metaExpedient,
         })
     }
-    const onSuccess = (result:any) :void => {
+    const onSuccess = () :void => {
         refresh?.();
-        temporalMessageShow(null, t('page.document.action.changeType.ok', {document: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.document.action.changeType.ok'), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error?.message, 'error');

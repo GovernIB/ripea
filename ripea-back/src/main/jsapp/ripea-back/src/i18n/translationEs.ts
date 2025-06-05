@@ -607,7 +607,7 @@ const translationEs = {
                 changeType: {
                     label: "Cambiar tipo...",
                     title: "Cambiar tipo",
-                    ok: "Documento '{{document}}' modificado correctamente",
+                    ok: "Los documentod se han modificado correctamente",
                 },
                 definitive: {
                     label: "Convertir a definitivo",
