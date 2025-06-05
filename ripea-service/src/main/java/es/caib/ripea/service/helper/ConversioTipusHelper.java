@@ -967,6 +967,11 @@ public class ConversioTipusHelper {
 	        .byDefault()
 	        .register();
       
+	      mapperFactory.classMap(DocumentPortafirmesEntity.class, DocumentPortafirmesDto.class) 
+	      	.exclude("annexos")
+	        .byDefault()
+	        .register();
+	      
 	      //if not excluded with the new version of orika 1.4.6 it gives: ma.glasnost.orika.MappingException: Encountered mapping of primitive to object (or vise-versa); sourceType=boolean, destinationType=ExpedientEntity
 	      mapperFactory.classMap(DocumentEntity.class, DocumentDto.class) 
 	      	.exclude("esborrat")
@@ -976,11 +981,6 @@ public class ConversioTipusHelper {
 	      	.exclude("carpeta")
 	      	.exclude("escriptori")
 	      	.exclude("registre")
-	        .byDefault()
-	        .register();
-	      
-	      mapperFactory.classMap(DocumentPortafirmesEntity.class, DocumentPortafirmesDto.class) 
-	      	.exclude("annexos")
 	        .byDefault()
 	        .register();
 	      

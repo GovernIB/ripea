@@ -5,7 +5,19 @@ package es.caib.ripea.plugin.caib.conversio;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
+import org.apache.poi.xwpf.usermodel.IBodyElement;
+import org.apache.poi.xwpf.usermodel.IRunElement;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFFooter;
+import org.apache.poi.xwpf.usermodel.XWPFHeader;
+import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.jopendocument.dom.ODPackage;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Element;
@@ -121,7 +133,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 					documentKind).to(
 					ConverterTypeTo.PDF);
 			
-			/*byte[] contingut;
+			byte[] contingut;
 			// xdocreport gives error when trying to convert docx/odt which has hyperlink in header/footer to pdf
 			// that's why hyperlinks needs to be removed
 			// error is: java.lang.RuntimeException: Not all annotations could be added to the document (the document doesn't have enough pages). at com.lowagie.text.pdf.PdfDocument.close(Unknown Source)
@@ -129,9 +141,9 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 				contingut = removeLinksHeaderFooterDocx(arxiu.getArxiuContingut());
 			} else {
 				contingut = removeLinksHeaderFooterOdt(arxiu.getArxiuContingut());
-			}*/
+			}
 			
-			ByteArrayInputStream bais = new ByteArrayInputStream(arxiu.getArxiuContingut());
+			ByteArrayInputStream bais = new ByteArrayInputStream(contingut);
 			baosConversio = new ByteArrayOutputStream();
 			IConverter converter = ConverterRegistry.getRegistry().getConverter(options);
 			converter.convert(bais, baosConversio, options);
@@ -165,7 +177,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 		return convertit;
 	}
 
-/*
+
 	private byte[] removeLinksHeaderFooterOdt(byte[] contingut) {
 		try {
 
@@ -190,14 +202,18 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 															if (e5.getName().equals("p")) {
 																for (Object o6 : e5.getChildren()) {
 																	org.jdom.Element e6 = ((org.jdom.Element) o6);
-																	e6.getName();
+																	if ("a".equalsIgnoreCase(e6.getName())) {
+																		String value = e6.getValue();
+																		e6.setName("span");
+																		e6.setText(value);
+																	}
 																}
-																org.jdom.Element element = e5.getChild("a", Namespace.getNamespace("text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0"));
-																if (element != null) {
-																	String value = element.getValue();
-																	element.setName("span");
-																	element.setText(value);
-																}
+//																org.jdom.Element element = e5.getChild("a"); //Namespace.get("text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0")
+//																if (element != null) {e5.getChildren()
+//																	String value = element.getValue();
+//																	element.setName("span");
+//																	element.setText(value);
+//																}
 															}
 														}
 													}
@@ -245,11 +261,40 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 	}
 
 	private void removeLinksDocx(List<IBodyElement> bodyElements) throws Exception {
+		
 		for (IBodyElement bodyElement : bodyElements) {
+			
 			if (bodyElement instanceof XWPFParagraph) {
+				
 				XWPFParagraph paragraph = (XWPFParagraph) bodyElement;
 				
-				
+	            List<XWPFRun> runsToRemove = new ArrayList<>();
+	            List<String> runTexts = new ArrayList<>();
+	            List<Integer> runFontSizes = new ArrayList<>();
+
+	            // Recorre los runs y almacena aquellos que sean hipervínculos
+	            for (IRunElement runElement : paragraph.getIRuns()) {
+	                if (runElement instanceof XWPFHyperlinkRun) {
+	                    XWPFHyperlinkRun hyperlinkRun = (XWPFHyperlinkRun) runElement;
+	                    runsToRemove.add(hyperlinkRun);
+	                    runTexts.add(hyperlinkRun.getText(0));
+	                    runFontSizes.add(hyperlinkRun.getFontSize());
+	                }
+	            }
+
+	            // Elimina los runs que son hipervínculos
+	            for (XWPFRun run : runsToRemove) {
+	                paragraph.removeRun(paragraph.getIRuns().indexOf(run));
+	            }
+
+	            // Reinsertar el texto sin el enlace
+	            for (int i = 0; i < runTexts.size(); i++) {
+	                XWPFRun newRun = paragraph.createRun();
+	                newRun.setText(runTexts.get(i));
+	                newRun.setColor("0000EE");
+	                newRun.setFontSize(runFontSizes.get(i));
+	            }
+/*
 				//removes hyperlink created with keyword HYPERLINK
 				int runToRemove = -1;
 				int i = 0;
@@ -258,7 +303,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 						XWPFRun run = (XWPFRun) runElement;
 						CTR cTR = run.getCTR();
 						boolean containsHyperlink = false;
-						for (CTText ctText : cTR.getInstrTextList()) {
+						for (CTText ctText : cTR.getInstrTextArray()) {
 							if (ctText.getStringValue().contains("HYPERLINK")) {
 								containsHyperlink = true;
 							}
@@ -272,8 +317,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 				if (runToRemove != -1) {
 					paragraph.removeRun(runToRemove);
 				}
-				
-				
+
 				//removes hyperlink created with tag <w:hyperlink>
 				int j = 0;
 				int runRemoved = -1;
@@ -296,10 +340,10 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 					xWPFRun.setColor("0000EE");
 					xWPFRun.setFontSize(runRemovedFontSize);
 				}
+				*/
 			}
 		}
 	}
-*/
 	
 	private void estamparBarcodePdf417(
 			PdfContentByte contentByte,

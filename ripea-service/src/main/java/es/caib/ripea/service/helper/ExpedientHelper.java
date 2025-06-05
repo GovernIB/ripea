@@ -1896,6 +1896,7 @@ public class ExpedientHelper {
 			
 			List<Long> aux = new ArrayList<Long>();
 			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
+				if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
 				for (Long metaExpId: idsMetaExpedientsPermesos) {
 					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).get();
 					if(mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {

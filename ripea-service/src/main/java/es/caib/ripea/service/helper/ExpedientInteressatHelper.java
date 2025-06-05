@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -783,7 +784,7 @@ public class ExpedientInteressatHelper {
 	            // Columna 0: tipus interessat
 	            Cell tipusCell = row.getCell(0);
 	            
-	            if (tipusCell == null || tipusCell.getCellType() != Cell.CELL_TYPE_STRING) continue;
+	            if (tipusCell == null || tipusCell.getCellType() != CellType.STRING) continue;
 
 	            String tipusInteressat = tipusCell.getStringCellValue().trim();
 	            InteressatDto dto = crearInteressatDto(tipusInteressat);
@@ -791,7 +792,7 @@ public class ExpedientInteressatHelper {
 	            
 	            // Columna 1: tipus document identificació
 	            Cell docTipusCell = row.getCell(1);
-	            if (docTipusCell != null && docTipusCell.getCellType() == Cell.CELL_TYPE_STRING) {
+	            if (docTipusCell != null && docTipusCell.getCellType() == CellType.STRING) {
 	            	InteressatDocumentTipusEnumDto documentTipus = parseEnum(docTipusCell.getStringCellValue().trim(), InteressatDocumentTipusEnumDto.class);
 	                dto.setDocumentTipus(documentTipus);
 	            }
@@ -799,9 +800,9 @@ public class ExpedientInteressatHelper {
 	            // Columna 2 endavant
 	            for (int col = 2; col <= 18; col++) {
 	                Cell cell = row.getCell(col);
-	                if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) continue;
+	                if (cell == null || cell.getCellType() == CellType.BLANK) continue;
 
-	                String value = cell.getCellType() == Cell.CELL_TYPE_STRING
+	                String value = cell.getCellType() == CellType.STRING
 	                        ? cell.getStringCellValue().trim()
 	                        : String.valueOf((int)cell.getNumericCellValue());
 

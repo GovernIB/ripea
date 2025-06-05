@@ -95,6 +95,7 @@ import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
@@ -557,7 +558,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         .map(ResourceReference::getId)
                         .collect(Collectors.toList());
 
-                emailHelper.enviarDocument(entity.getId(), emails, desinataris);
+                emailHelper.enviarDocument(entity.getId(), emails, desinataris, VersioDocumentEnum.IMPRIMIBLE);
             }
 
             return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

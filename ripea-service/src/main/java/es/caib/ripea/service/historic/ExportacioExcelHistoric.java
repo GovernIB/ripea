@@ -3,8 +3,8 @@ package es.caib.ripea.service.historic;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +23,10 @@ public class ExportacioExcelHistoric {
 
 		bold = wb.createFont();
 		bold.setBold(true);
-		bold.setColor(HSSFColor.WHITE.index);
+		bold.setColor(IndexedColors.WHITE.getIndex());
 
 		greyFont = wb.createFont();
-		greyFont.setColor(HSSFColor.GREY_25_PERCENT.index);
+		greyFont.setColor(IndexedColors.GREY_25_PERCENT.getIndex());
 		greyFont.setCharSet(HSSFFont.ANSI_CHARSET);
 		format = wb.createDataFormat();
 

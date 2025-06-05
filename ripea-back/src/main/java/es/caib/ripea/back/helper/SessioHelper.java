@@ -60,7 +60,7 @@ public class SessioHelper {
 					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, RolHelper.getRolActual(request));
 				}
 				if (RolHelper.isRolActualDissenyadorOrgan(request)) {
-					resultat = "/ripea/metaExpedient";
+					resultat = "/ripeaback/metaExpedient";
 				}
 			}
 			if (usuariActual == null) {

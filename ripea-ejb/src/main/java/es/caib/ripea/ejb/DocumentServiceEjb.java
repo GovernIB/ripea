@@ -37,6 +37,7 @@ import es.caib.ripea.service.intf.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
@@ -645,7 +646,7 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
 
     @Override
     @RolesAllowed("**")
-    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
-        delegateService.enviarDocument(documentId, emails, desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris, VersioDocumentEnum versioDocument){
+        delegateService.enviarDocument(documentId, emails, desinataris, versioDocument);
     }
 }
