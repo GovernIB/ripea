@@ -1,7 +1,9 @@
 package es.caib.ripea.service.resourceservice;
 
 import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DadaResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.model.DadaResource;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaResource, Long, DadaResourceEntity> implements DadaResourceService {
 
     private final DadaResourceRepository dadaResourceRepository;
+    private final MetaDadaResourceRepository metaDadaResourceRepository;
 
     @Override
     protected void beforeCreateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
@@ -38,12 +41,20 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
     }
 
     private void beforeSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        entity.setValor(String.valueOf(resource.getValor()));
+        MetaDadaResourceEntity metaDadaResourceEntity = metaDadaResourceRepository.findById(resource.getMetaDada().getId()).get();
+
+        String value = resource.getValueByFieldName(metaDadaResourceEntity.getTipus());
+        entity.setValor(value);
     }
 
     @Override
     protected void afterDelete(DadaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
         updateOrder(entity, null);
+    }
+
+    @Override
+    protected void afterConversion(DadaResourceEntity entity, DadaResource resource) {
+        resource.setValueByFieldName(entity.getMetaDada().getTipus(), entity.getValor());
     }
 
     private void updateOrder(DadaResourceEntity entity, Integer position) {

@@ -751,6 +751,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		throw new ActionExecutionException(getResourceClass(), null, code, "No s'ha indicat cap element per realitzar l'acció.");
         	}
 
+            if (!params.isMassivo() && params.getIds().size() == 1){
+                DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(params.getIds().get(0)).get();
+                if (documentResourceEntity != null) {
+                    return objectMappingHelper.newInstanceMap(documentResourceEntity, DocumentResource.class);
+                }
+            }
+
             return null;
         }
 
@@ -773,7 +780,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						false,
 						true);
 				documentHelper.actualitzarEstat(document, DocumentEstatEnumDto.DEFINITIU);
-                return null;
+                return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/ConvertirDefinitiuActionExecutor", e);
 				return "";
@@ -850,7 +857,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				viaFirmaEnviarDto.setValidateCode(params.getValidateCode());
 				viaFirmaEnviarDto.setRebreCorreu(params.getRebreCorreu());
 				firmaViaFirmaHelper.viaFirmaEnviar(entitatEntity.getId(), entity.getId(), viaFirmaEnviarDto);
-				return null;
+				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/ViaFirmaActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al enviar a viaFirma: "+e.getMessage());
@@ -973,13 +980,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	
 				pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
-						entity.getExpedient().getId(), //TODO: El pare pot ser una carpeta
+                        params.getExpedient().getId(), //TODO: El pare pot ser una carpeta
 						entity.getMetaDocument().getId(),
 						consulta, 
 						configHelper.getRolActual());
 				
-				return null;
-				
+				return params;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/NouDocumentPinbalActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al generar document PINBAL: "+e.getMessage());

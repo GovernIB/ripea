@@ -39,8 +39,8 @@ export const useActions = (refresh?: () => void) => {
         getOne(row?.representant?.id)
             .then((representant) => {
                 messageDialogShow(
-                    t('page.interessat.dialog.deleteRepTitle'),
-                    t('page.interessat.dialog.deleteRepMessage'),
+                    t('page.interessat.action.deleteRep.check'),
+                    t('page.interessat.dialog.deleteRep.description'),
                     confirmDialogButtons,
                     confirmDialogComponentProps)
                     .then((value: any) => {
@@ -49,10 +49,10 @@ export const useActions = (refresh?: () => void) => {
                                 apiDelete(representant?.id)
                                     .then(() => {
                                         refresh?.();
-                                        temporalMessageShow(null, 'Elemento borrado', 'success');
+                                        temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
                                     })
                                     .catch((error) => {
-                                        temporalMessageShow('Error', error.message, 'error');
+                                        temporalMessageShow(null, error.message, 'error');
                                     });
                             } else {
                                 apiPatch(id, {
@@ -60,7 +60,7 @@ export const useActions = (refresh?: () => void) => {
                                 })
                                     .then(() => {
                                         refresh?.();
-                                        temporalMessageShow(null, 'Elemento borrado', 'success');
+                                        temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
                                     })
                             }
                         }
@@ -69,8 +69,8 @@ export const useActions = (refresh?: () => void) => {
     }
     const deleteInteressat = (id: any, row: any) => {
         messageDialogShow(
-            t('page.interessat.dialog.deleteTitle'),
-            t('page.interessat.dialog.deleteMessage'),
+            t('page.interessat.action.delete.check'),
+            t('page.interessat.dialog.delete.description'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -81,16 +81,16 @@ export const useActions = (refresh?: () => void) => {
                         })
                             .then(() => {
                                 refresh?.();
-                                temporalMessageShow(null, 'Elemento borrado', 'success');
+                                temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
                             })
                     } else {
                         apiDelete(id)
                             .then(() => {
                                 refresh?.();
-                                temporalMessageShow(null, 'Elemento borrado', 'success');
+                                temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
                             })
                             .catch((error) => {
-                                temporalMessageShow('Error', error.message, 'error');
+                                temporalMessageShow(null, error.message, 'error');
                             });
                     }
                 }
@@ -129,7 +129,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             hidden: () => !potModificar,
         },
         {
-            title: t('page.interessat.actions.delete'),
+            title: t('page.interessat.action.delete.label'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteInteressat,
@@ -142,21 +142,21 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             hidden: () => !potModificar,
         },
         {
-            title: t('page.interessat.actions.createRep'),
+            title: t('page.interessat.action.createRep.label'),
             icon: "add",
             showInMenu: true,
             onClick: createRepresentent,
             hidden: (row: any) => row?.representant || !potModificar,
         },
         {
-            title: t('page.interessat.actions.updateRep'),
+            title: t('page.interessat.action.updateRep.label'),
             icon: "edit",
             showInMenu: true,
             onClick: updateRepresentent,
             hidden: (row: any) => !row?.representant || !potModificar,
         },
         {
-            title: t('page.interessat.actions.deleteRep'),
+            title: t('page.interessat.action.deleteRep.label'),
             icon: "delete",
             showInMenu: true,
             onClick: deleteRepresentent,

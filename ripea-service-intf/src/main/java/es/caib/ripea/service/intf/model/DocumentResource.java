@@ -342,6 +342,9 @@ public class DocumentResource extends NodeResource {
     @Setter
     @FieldNameConstants
     public static class NewDocPinbalForm implements Serializable {
+        @NotNull
+        private ResourceReference<ExpedientResource, Long> expedient;
+
     	@NotNull
         @ResourceField(onChangeActive = true)
     	private ResourceReference<MetaDocumentResource, Long> tipusDocument;
