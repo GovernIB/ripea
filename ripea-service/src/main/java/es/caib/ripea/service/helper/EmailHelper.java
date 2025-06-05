@@ -53,6 +53,7 @@ import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -1153,7 +1154,7 @@ public class EmailHelper {
 
 	}
 
-    public void enviarDocument(Long adjuntId, List<String> emails, List<String> desinataris) {
+    public void enviarDocument(Long adjuntId, List<String> emails, List<String> desinataris, VersioDocumentEnum versioDocument) {
     	List<String> destinatarisNoAgrupats = new ArrayList<>(emails);
         List<String> destinatarisAgrupats = new ArrayList<>();
 
@@ -1181,7 +1182,8 @@ public class EmailHelper {
                 subject,
                 text,
                 EventTipusEnumDto.ENVIAR_FICHERO,
-                adjuntId);
+                document,
+                versioDocument);
     }
 
     private void sendOrSaveEmail(
@@ -1196,6 +1198,7 @@ public class EmailHelper {
                 subject,
                 text,
                 eventTipus,
+                null,
                 null);
     }
 
@@ -1205,7 +1208,8 @@ public class EmailHelper {
 			String subject,
 			String text,
 			EventTipusEnumDto eventTipus,
-            Long adjuntId) {
+			DocumentEntity document,
+            VersioDocumentEnum versioDocument) {
 
 		// remove duplicats
 		destinatarisNoAgrupats = new ArrayList<>(new HashSet<>(destinatarisNoAgrupats));
@@ -1235,8 +1239,13 @@ public class EmailHelper {
                 helper.setSubject(subject);
                 helper.setText(text);
 
-                if (adjuntId != null) {
-                    FitxerDto fitxer = documentHelper.getFitxerAssociat(adjuntId, null);
+                if (document != null) {
+                	FitxerDto fitxer = null;
+                	if (versioDocument==null || VersioDocumentEnum.IMPRIMIBLE.equals(versioDocument)) {
+                		fitxer = pluginHelper.arxiuDocumentVersioImprimible(document);
+                	} else {
+                		fitxer = documentHelper.getFitxerAssociat(document, null);
+                	}
                     if (fitxer != null) {
                         helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
                     }
@@ -1255,8 +1264,7 @@ public class EmailHelper {
 						subject,
 						text,
 						eventTipus,
-                        adjuntId)
-						.build();
+                        document!=null?document.getId():null).build();
 				emailPendentEnviarRepository.save(enitity);
 			}
 		}

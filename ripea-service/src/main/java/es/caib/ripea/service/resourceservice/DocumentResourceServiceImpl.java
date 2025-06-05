@@ -59,6 +59,7 @@ import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
@@ -450,7 +451,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         .map(ResourceReference::getId)
                         .collect(Collectors.toList());
 
-                emailHelper.enviarDocument(entity.getId(), emails, desinataris);
+                emailHelper.enviarDocument(entity.getId(), emails, desinataris, VersioDocumentEnum.IMPRIMIBLE);
             }
 
             return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

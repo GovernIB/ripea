@@ -113,6 +113,7 @@ import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
@@ -411,8 +412,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional
     @Override
-    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris){
-        emailHelper.enviarDocument(documentId, emails, desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris, VersioDocumentEnum versioDocument){
+        emailHelper.enviarDocument(documentId, emails, desinataris, versioDocument);
         DocumentEntity document= documentRepository.findById(documentId).orElse(null);
         if (document!=null) {
 	        contingutLogHelper.log(

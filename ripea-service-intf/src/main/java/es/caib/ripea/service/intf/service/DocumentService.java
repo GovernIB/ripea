@@ -745,5 +745,5 @@ public interface DocumentService {
 			Long tascaId) throws IOException;
 
     @PreAuthorize("isAuthenticated()")
-    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris);
+    public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris, VersioDocumentEnum versioDocument);
 }

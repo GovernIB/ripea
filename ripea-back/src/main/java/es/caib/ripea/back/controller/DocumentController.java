@@ -48,6 +48,7 @@ import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaUsuariDto;
 import es.caib.ripea.service.intf.exception.ResponsableNoValidPortafirmesException;
@@ -685,6 +686,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
             Model model) {
 
         EnviarDocumentCommand command = new EnviarDocumentCommand();
+        command.setVersioDocument(VersioDocumentEnum.IMPRIMIBLE);
         model.addAttribute(command);
         return "enviarDocumentEmail";
     }
@@ -698,7 +700,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
         List<String> emails = new ArrayList<>(Arrays.asList(command.getEmail().split(",")));
         emails.removeAll(Arrays.asList("", null));
         if (emails.size()>0 || command.getResponsablesCodi().size()>0) {
-        	documentService.enviarDocument(documentId, emails, command.getResponsablesCodi());
+        	documentService.enviarDocument(documentId, emails, command.getResponsablesCodi(), command.getVersioDocument());
         }
         MissatgesHelper.success(
                 request,

@@ -19,12 +19,10 @@
 </head>
 <body>
 <form:form action="" method="post" cssClass="form-horizontal" modelAttribute="enviarDocumentCommand">
-
-	<rip:inputText name="email" textKey="contingut.interessat.info.email"/>
-
     <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
     <c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-    
+    <rip:inputSelect name="versioDocument" optionEnum="VersioDocumentEnum" emptyOption="false" textKey="contingut.document.form.enviar.versio"></rip:inputSelect>
+	<rip:inputText name="email" textKey="contingut.interessat.info.email"/>
     <rip:inputSuggest
             name="responsablesCodi"
             urlConsultaInicial="${urlConsultaInicial}"
@@ -35,7 +33,6 @@
             required="true"
             multiple="true"/>
     <div class="row" style="margin-bottom: 60px;"></div>
-
     <div id="modal-botons">
         <button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.enviar"/></button>
         <a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
