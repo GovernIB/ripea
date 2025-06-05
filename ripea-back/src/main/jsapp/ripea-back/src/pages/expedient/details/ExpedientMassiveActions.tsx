@@ -1,5 +1,5 @@
 import {useBaseAppContext, useResourceApiService} from "reactlib";
-import useExportarDocuments from "../actions/ExportarDocuments.tsx";
+import {useExportarDocumentsMassive} from "../actions/ExportarDocuments.tsx";
 import { useTranslation } from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 
@@ -82,7 +82,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 			exportInside
     } = useMassiveActions(refresh);
 
-    const {handleMassiveShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
+    const {handleMassiveShow: handleExportDoc, content: contentExportDoc} = useExportarDocumentsMassive(refresh);
 
     const actions = [
         {
@@ -153,7 +153,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
-            title: t('page.expedient.action.export.title'),
+            title: t('page.expedient.action.exportZIP.title'),
             icon: "description",
             onClick: handleExportDoc,
         },

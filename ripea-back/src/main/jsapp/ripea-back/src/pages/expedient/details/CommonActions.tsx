@@ -10,7 +10,7 @@ import useRelacionar from "../actions/Relacionar.tsx";
 import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
-import useExportarDocuments from "../actions/ExportarDocuments.tsx";
+import {useExportarDocuments} from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
@@ -122,11 +122,11 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 	
-	const exportIndexPdf= (id:any): void => { report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionBackgroundOk'), 'PDF');}
-	const exportIndexXls= (id:any): void => { report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionBackgroundOk'), 'XLSX');}
-	const exportPdfEni= (id:any): void => { report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
-	const exportEni= (id:any): void => { report(id, 'EXPORT_ENI', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
-	const exportInside= (id:any): void => { report(id, 'EXPORT_INSIDE', t('page.expedient.results.actionBackgroundOk'), 'ZIP');}
+	const exportIndexPdf= (id:any): void => { report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionOk'), 'PDF');}
+	const exportIndexXls= (id:any): void => { report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionOk'), 'XLSX');}
+	const exportPdfEni= (id:any): void => { report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionOk'), 'ZIP');}
+	const exportEni= (id:any): void => { report(id, 'EXPORT_ENI', t('page.expedient.results.actionOk'), 'ZIP');}
+	const exportInside= (id:any): void => { report(id, 'EXPORT_INSIDE', t('page.expedient.results.actionOk'), 'ZIP');}
 
     const eliminarRelacio = (id:any, row:any, relacioId:any) => {
         messageDialogShow(
@@ -284,14 +284,14 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !row?.agafatPer,
         },
         {
-            title: t('page.expedient.action.upPrioritat.label'),
+            title: t('page.expedient.action.changePrioritat.label'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarPrioridad,
             hidden: (row:any) => !potModificar(row),
         },
         {
-            title: t('page.expedient.action.upEstat.label'),
+            title: t('page.expedient.action.changeEstat.label'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarEstado,
@@ -384,7 +384,7 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !row?.conteDocuments,
         },
         {
-            title: t('page.expedient.action.infoArxiu.label'),
+            title: t('page.contingut.action.infoArxiu.label'),
             icon: "info",
             showInMenu: true,
             onClick: handleArxiuOpen,

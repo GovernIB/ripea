@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
-import { GridTreeDataGroupingCell, useGridApiRef } from "@mui/x-data-grid-pro";
+import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -296,7 +296,7 @@ const DocumentsGrid = (props: any) => {
                             element: <MenuActionButton
                                 id={'createDocument'}
                                 hidden={!potModificar(entity)}
-                                buttonLabel={t('page.contingut.acciones.create')}
+                                buttonLabel={t('page.contingut.action.create.label')}
                                 buttonProps={{
                                     startIcon: <Icon>add</Icon>,
                                     variant: "outlined",

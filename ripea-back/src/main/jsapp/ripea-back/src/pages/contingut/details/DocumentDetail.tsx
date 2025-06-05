@@ -56,7 +56,7 @@ const Versiones = (props:any) => {
                         {
                             text: t('common.download'),
                             icon: 'download',
-                            onClick: ()=>{descarregarVersio(entity?.id,version?.id)},
+                            onClick: ()=>{descarregarVersio(entity?.id, version?.id)},
                             hidden: entity?.documentTipus == 'FISIC',
                         }
                     ]}
@@ -149,7 +149,7 @@ const useDocumentDetail = () => {
                         apiDownload(entity?.id, 'adjunt')
                         break;
                     case 'descarregarImprimible':
-                        /* TODO: action */
+                        apiDownload(entity?.id, 'imprimible', t('page.document.action.imprimible.ok'))
                         break;
                 }
                 handleClose();

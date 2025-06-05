@@ -15,7 +15,6 @@ import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import useMassiveActions from "./details/ExpedientMassiveActions.tsx";
-import * as builder from "../../util/springFilterUtils.ts";
 
 const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px'}
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
@@ -25,16 +24,11 @@ const tancatStyle = {backgroundColor: 'grey', color: 'white', ...labelStyle}
 export const ExpedientGridForm = () => {
     const {data} = useFormContext();
 
-    const organGestorFilter: string = builder.and(
-        // builder.eq("metaExpedient.id", data?.metaExpedient?.id),
-    );
-
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="metaExpedient" hidden={!!data?.id}/>
         <GridFormField xs={12} name="nom"/>
         <GridFormField xs={12} name="organGestor"
-                       filter={organGestorFilter}
-            /*TODO: namedQueries={['organGestorService.findPermesosByEntitatAndExpedientTipusIdAndFiltre']}*/
+                       namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}
                        disabled={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}
                        readOnly={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}/>
         <GridFormField xs={12} name="sequencia" disabled/>

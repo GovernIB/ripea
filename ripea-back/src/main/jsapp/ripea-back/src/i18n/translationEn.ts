@@ -159,7 +159,7 @@ const translationEn = {
             action: {
                 justificant: {
                     label: "Download receipt",
-                    ok: "",
+                    ok: "The receipt has been downloaded successfully",
                 }
             }
         },
@@ -342,48 +342,50 @@ const translationEn = {
                 },
                 download: {
                     label: "Download documents...",
-                    ok: "",
+                    title: "Document selection",
+                    ok: "The documents have been downloaded successfully",
                 },
                 exportFullCalcul: {
                     label: "Export spreadsheet",
-                    ok: "",
+                    ok: "The spreadsheet has been downloaded successfully",
                 },
                 exportZIP: {
                     label: "Export ZIP index",
                     title: "Export documents to ZIP",
-                    ok: "",
+                    ok: "The ZIP document has been downloaded successfully",
                 },
                 exportPDF: {
                     label: "Export PDF index",
-                    ok: "",
+                    ok: "The PDF document has been downloaded successfully",
                 },
                 exportCSV: {
                     label: "Export CSV index",
-                    ok: "",
+                    ok: "The CSV index has been downloaded successfully",
                 },
                 exportEXCEL: {
                     label: "Export EXCEL index",
-                    ok: "",
+                    ok: "The EXCEL index has been downloaded successfully",
                 },
                 exportPDF_ENI: {
                     label: "PDF index and ENI export",
-                    ok: "",
+                    ok: "The document has been downloaded successfully",
                 },
                 exportENI: {
                     label: "ENI export",
-                    ok: "",
+                    ok: "The ENI document has been downloaded successfully",
                 },
                 exportINSIDE: {
                     label: "INSIDE export",
-                    ok: "",
+                    ok: "The INSIDE document has been downloaded successfully",
                 },
                 export: {
                     label: "Export documents...",
-                    ok: "",
+                    title: "Export documents",
+                    ok: "The documents have been downloaded successfully",
                 },
                 sincronitzar: {
                     label: "Synchronize status with file",
-                    ok: "",
+                    ok: "The archive status has been synchronized",
                 },
 
                 changePrioritat: {
@@ -538,11 +540,11 @@ const translationEn = {
                 },
                 imprimible: {
                     label: "Printable version",
-                    ok: "",
+                    ok: "The printable version has been downloaded successfully",
                 },
                 original: {
                     label: "Download original",
-                    ok: "",
+                    ok: "The original document has been downloaded successfully",
                 },
                 firma: {
                     label: "Download signature",
@@ -580,10 +582,6 @@ const translationEn = {
                     title: "Signature details",
                     ok: "The signature has been cancelled successfully",
                 },
-                export: {
-                    label: "ENI export...",
-                    ok: "",
-                },
                 notificar: {
                     label: "Notify or communicate...",
                     title: "Create document notification",
@@ -604,7 +602,7 @@ const translationEn = {
                 },
                 descarregarImprimible: {
                     label: "Download printable version",
-                    ok: "",
+                    ok: "The printable version has been downloaded successfully",
                 },
                 changeType: {
                     label: "Change type...",
@@ -755,11 +753,11 @@ const translationEn = {
                 },
                 downloadDoc: {
                     label: "Download document",
-                    ok: "",
+                    ok: "The document has been downloaded successfully",
                 },
                 certificat: {
                     label: "Certification",
-                    ok: "",
+                    ok: "The certificate has been downloaded successfully",
                 },
             },
         },

@@ -7,7 +7,7 @@ import useNotificacioInteressatGrid from "./NotificacioInteressatGrid.tsx";
 import useRemesaDetail from "./RemesaDetail.tsx";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {

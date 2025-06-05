@@ -63,7 +63,7 @@ export const useActions = (refresh?: () => void) => {
         apiReport(id, {code: "DESCARREGAR_VERSIO", data: { version }, fileType})
             .then((result)=>{
                 iniciaDescargaBlob(result);
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.expedient.results.actionOk'), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -220,7 +220,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('common.download'),
             icon: "download",
             showInMenu: true,
-			onClick: (id:any) => apiDownload(id, 'adjunt'),
+			onClick: (id:any) => apiDownload(id, 'adjunt', t('page.expedient.results.actionOk')),
             hidden: (row:any) => !isDigitalOrImportat(row),
         },
         {

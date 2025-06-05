@@ -5,10 +5,13 @@ import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import AlertExpand from "../../../components/AlertExpand.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import {useActions} from "./RemesaActions.tsx";
 
 const Dades = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
+
+    const {justificant} = useActions()
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
         <CardData title={t('page.notificacio.detall.notificacioDades')}
@@ -16,8 +19,7 @@ const Dades = (props:any) => {
                   {
                       text: t('page.notificacio.action.justificant.label'),
                       icon: 'download',
-                      /* TODO: action */
-                      onClick: ()=>{},
+                      onClick: ()=>{justificant(entity?.id)},
                       hidden: entity?.notificacioEstat == 'PENDENT',
                   },
               ]}

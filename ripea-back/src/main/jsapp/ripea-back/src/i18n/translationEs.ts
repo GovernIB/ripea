@@ -159,7 +159,7 @@ const translationEs = {
             action: {
                 justificant: {
                     label: "Descargar justificante",
-                    ok: "",
+                    ok: "El justificante se ha descargado correctamente",
                 }
             }
         },
@@ -342,48 +342,50 @@ const translationEs = {
                 },
                 download: {
                     label: "Descargar documentos...",
-                    ok: "",
+                    title: "Selección documentos",
+                    ok: "Los documentos se han descargado correctamente",
                 },
                 exportFullCalcul: {
                     label: "Exportar hoja de cálculo",
-                    ok: "",
+                    ok: "La hoja de cálculo se ha descargado correctamente",
                 },
                 exportZIP: {
                     label: "Exportar indice ZIP",
                     title: "Exportar documentos a ZIP",
-                    ok: "",
+                    ok: "El documento ZIP se ha descargado correctamente",
                 },
                 exportPDF: {
                     label: "Exportar indice PDF",
-                    ok: "",
+                    ok: "El documento PDF se ha descargado correctamente",
                 },
                 exportCSV: {
                     label: "Exportar indice CSV",
-                    ok: "",
+                    ok: "El indice CSV se ha descargado correctamente",
                 },
                 exportEXCEL: {
                     label: "Exportar índice EXCEL",
-                    ok: "",
+                    ok: "El índice EXCEL se ha descargado correctamente",
                 },
                 exportPDF_ENI: {
                     label: "Indice PDF y exportación ENI",
-                    ok: "",
+                    ok: "El documento se ha descargado correctamente",
                 },
                 exportENI: {
                     label: "Exportación ENI",
-                    ok: "",
+                    ok: "El documento ENI se ha descargado correctamente",
                 },
                 exportINSIDE: {
                     label: "Exportación INSIDE",
-                    ok: "",
+                    ok: "El documento INSIDE se ha descargado correctamente",
                 },
                 export: {
                     label: "Exportar los documentos...",
-                    ok: "",
+                    title: "Exportar documentos",
+                    ok: "Los documentos se han descargado correctamente",
                 },
                 sincronitzar: {
                     label: "Sincronizar estado con archivo",
-                    ok: "",
+                    ok: "El estado del archivo ha sido sincronizado",
                 },
 
                 changePrioritat: {
@@ -538,11 +540,11 @@ const translationEs = {
                 },
                 imprimible: {
                     label: "Versión imprimible",
-                    ok: "",
+                    ok: "La versión imprimible se ha descargado correctamente",
                 },
                 original: {
                     label: "Descargar original",
-                    ok: "",
+                    ok: "El documenmto original se ha descargado correctamente",
                 },
                 firma: {
                     label: "Descargar firma",
@@ -580,10 +582,6 @@ const translationEs = {
                     title: "Detalles de la firma",
                     ok: "La firma ha sido cancelada correctamente",
                 },
-                export: {
-                    label: "Exportación ENI...",
-                    ok: "",
-                },
                 notificar: {
                     label: "Notificar o comunicar...",
                     title: "Crear notificación documento",
@@ -604,7 +602,7 @@ const translationEs = {
                 },
                 descarregarImprimible: {
                     label: "Descarregar versión imprimible",
-                    ok: "",
+                    ok: "La versión imprimible se ha descargado correctamente",
                 },
                 changeType: {
                     label: "Cambiar tipo...",
@@ -755,11 +753,11 @@ const translationEs = {
                 },
                 downloadDoc: {
                     label: "Descargar documento",
-                    ok: "",
+                    ok: "El documento se ha descargado correctamente",
                 },
                 certificat: {
                     label: "Certificación",
-                    ok: "",
+                    ok: "El certificado se ha descargado correctamente",
                 },
             },
         },

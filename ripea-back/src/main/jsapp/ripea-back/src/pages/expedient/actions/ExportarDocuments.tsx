@@ -14,19 +14,16 @@ const ExportarDocumentsForm = () => {
 }
 
 const ExportarDocuments = (props:any) => {
-    const { t } = useTranslation();
-
     return <FormReportDialog
         resourceName={"expedientResource"}
         report={"EXPORT_DOC"}
-        title={t('page.expedient.action.exportZIP.title')}
         {...props}
     >
         <ExportarDocumentsForm/>
     </FormReportDialog>
 }
 
-const useExportarDocuments = (refresh?: () => void) => {
+export const useExportarDocuments = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
@@ -34,6 +31,27 @@ const useExportarDocuments = (refresh?: () => void) => {
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(undefined, {ids: [id], massivo: false})
     }
+    const onSuccess = () :void => {
+        refresh?.()
+        temporalMessageShow(null, t('page.expedient.action.export.ok'), 'success');
+    }
+    const onError = (error:any) :void => {
+        temporalMessageShow(null, error.message, 'error');
+    }
+
+    return {
+        handleShow,
+        content: <ExportarDocuments title={t('page.expedient.action.export.title')}
+                                    apiRef={apiRef}
+                                    onSuccess={onSuccess}
+                                    onError={onError}/>
+    }
+}
+export const useExportarDocumentsMassive = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
     const handleMassiveShow = (ids:any[]) :void => {
         apiRef.current?.show?.(undefined, {ids: ids, massivo: true})
     }
@@ -46,9 +64,10 @@ const useExportarDocuments = (refresh?: () => void) => {
     }
 
     return {
-        handleShow,
         handleMassiveShow,
-        content: <ExportarDocuments apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <ExportarDocuments title={t('page.expedient.action.exportZIP.title')}
+                                    apiRef={apiRef}
+                                    onSuccess={onSuccess}
+                                    onError={onError}/>
     }
 }
-export default useExportarDocuments;

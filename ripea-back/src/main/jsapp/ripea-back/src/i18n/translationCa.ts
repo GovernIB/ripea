@@ -159,7 +159,7 @@ const translationCa = {
             action: {
                 justificant: {
                     label: "Descarregar justificant",
-                    ok: "",
+                    ok: "El justificant s'ha descarregat correctament",
                 }
             }
         },
@@ -342,48 +342,50 @@ const translationCa = {
                 },
                 download: {
                     label: "Descarregar documents...",
-                    ok: "",
+                    title: "Selecció de documents",
+                    ok: "Els documents s'han descarregat correctament",
                 },
                 exportFullCalcul: {
                     label: "Exportar full de càlcul",
-                    ok: "",
+                    ok: "El full de càlcul s'ha descarregat correctament",
                 },
                 exportZIP: {
                     label: "Exportar índex ZIP",
                     title: "Exportar documents a ZIP",
-                    ok: "",
+                    ok: "El document ZIP s'ha descarregat correctament",
                 },
                 exportPDF: {
                     label: "Exportar índex PDF",
-                    ok: "",
+                    ok: "El document PDF s'ha descarregat correctament",
                 },
                 exportCSV: {
                     label: "Exportar índex CSV",
-                    ok: "",
+                    ok: "L'índex CSV s'ha descarregat correctament",
                 },
                 exportEXCEL: {
                     label: "Exportar índex EXCEL",
-                    ok: "",
+                    ok: "L'índex EXCEL s'ha descarregat correctament",
                 },
                 exportPDF_ENI: {
                     label: "Índex PDF i exportació ENI",
-                    ok: "",
+                    ok: "El document s'ha descarregat correctament",
                 },
                 exportENI: {
                     label: "Exportació ENI",
-                    ok: "",
+                    ok: "El document ENI s'ha descarregat correctament",
                 },
                 exportINSIDE: {
                     label: "Exportació INSIDE",
-                    ok: "",
+                    ok: "El document INSIDE s'ha descarregat correctament",
                 },
                 export: {
                     label: "Exportar els documents...",
-                    ok: "",
+                    title: "Exportar documents",
+                    ok: "Els documents s'han descarregat correctament",
                 },
                 sincronitzar: {
                     label: "Sincronitzar estat amb arxiu",
-                    ok: "",
+                    ok: "L'estat de l'arxiu s'ha sincronitzat",
                 },
 
                 changePrioritat: {
@@ -538,11 +540,11 @@ const translationCa = {
                 },
                 imprimible: {
                     label: "Versió imprimible",
-                    ok: "",
+                    ok: "La versió imprimible s'ha descarregat correctament",
                 },
                 original: {
                     label: "Descarregar original",
-                    ok: "",
+                    ok: "El document original s'ha descarregat correctament",
                 },
                 firma: {
                     label: "Descarregar signatura",
@@ -580,10 +582,6 @@ const translationCa = {
                     title: "Detalls de la signatura",
                     ok: "La signatura ha estat cancel·lada correctament",
                 },
-                export: {
-                    label: "Exportació ENI...",
-                    ok: "",
-                },
                 notificar: {
                     label: "Notificar o comunicar...",
                     title: "Crear notificació document",
@@ -604,7 +602,7 @@ const translationCa = {
                 },
                 descarregarImprimible: {
                     label: "Descarregar versió imprimible",
-                    ok: "",
+                    ok: "La versió imprimible s'ha descarregat correctament",
                 },
                 changeType: {
                     label: "Canviar tipus...",
@@ -755,11 +753,11 @@ const translationCa = {
                 },
                 downloadDoc: {
                     label: "Descarregar document",
-                    ok: "",
+                    ok: "El document s'ha descarregat correctament",
                 },
                 certificat: {
                     label: "Certificació",
-                    ok: "",
+                    ok: "El certificat s'ha descarregat correctament",
                 },
             },
         },
