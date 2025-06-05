@@ -1,14 +1,25 @@
 package es.caib.ripea.service.historic;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricMetriquesEnumDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
-
-import java.io.IOException;
-import java.util.*;
 
 public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric {
 
@@ -75,18 +86,17 @@ public class ExportacioExcelOrganGestorHistoric extends ExportacioExcelHistoric 
 		return bytes;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void createOrgansGestorsHeader(Collection<OrganGestorDto> organsGestors, HSSFSheet sheet, HistoricTipusEnumDto tipusAgrupament) {
 		HSSFFont bold;
 		HSSFCellStyle headerStyle;
 
 		bold = wb.createFont();
 		bold.setBold(true);
-		bold.setColor(HSSFColor.WHITE.index);
+		bold.setColor(IndexedColors.WHITE.getIndex());
 
 		headerStyle = wb.createCellStyle();
-		headerStyle.setFillPattern(HSSFCellStyle.FINE_DOTS);
-		headerStyle.setFillBackgroundColor(HSSFColor.GREY_80_PERCENT.index);
+		headerStyle.setFillPattern(FillPatternType.FINE_DOTS);
+		headerStyle.setFillBackgroundColor(IndexedColors.GREY_80_PERCENT.getIndex());
 		headerStyle.setFont(bold);
 		int rowNum = 0;
 		int colNum = 0;
