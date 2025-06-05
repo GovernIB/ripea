@@ -27,7 +27,12 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             field: 'dades',
             flex: 0.75,
             valueGetter: (value: any) => dadesFilter(entity, value),
-            valueFormatter: (value: any) => value?.map((dada: any) => dada?.valor).join(", \n"),
+            valueFormatter: (value: any, row:any) => {
+                if (row?.tipus?.toLowerCase() == 'DOMINI') {
+                    return value?.map((dada: any) => dada?.domini?.description).join(", \n")
+                }
+                return value?.map((dada: any) => dada?.valor).join(", \n")
+            },
         }
     ]
 

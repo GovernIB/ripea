@@ -252,22 +252,39 @@ const translationEn = {
                 direccioPostal: "Postal address",
                 entregaDehObligat: "DEH required?",
             },
-            actions: {
-                new: "New Interested Party",
-                delete: "Delete Interested Party",
-                createRep: "Add Representative",
-                updateRep: "Modify Representative",
-                deleteRep: "Delete Representative",
-            },
             action: {
+                new: {
+                    label: "New Stakeholder",
+                    ok: "Item created",
+                },
+                delete: {
+                    label: "Delete Stakeholder",
+                    check: "Are you sure you want to proceed with this action?",
+                    description: "Once deleted, it cannot be recovered",
+                    ok: "Item deleted",
+                },
+                createRep: {
+                    label: "Add Representative",
+                    ok: "Item created",
+                },
+                updateRep: {
+                    label: "Edit Representative",
+                    ok: "Item updated",
+                },
+                deleteRep: {
+                    label: "Delete Representative",
+                    check: "Are you sure you want to proceed with this action?",
+                    description: "Once deleted, it cannot be recovered",
+                    ok: "Item deleted",
+                },
                 importar: {
                     label: "Import...",
-                    title: "Import interested parties",
-                    ok: "Interested parties imported successfully",
+                    title: "Import stakeholders",
+                    ok: "Stakeholders imported successfully",
                 },
                 exportar: {
                     label: "Export...",
-                    ok: "Interested parties exported successfully",
+                    ok: "Stakeholders exported successfully",
                 },
             },
             grid: {
@@ -277,12 +294,6 @@ const translationEn = {
             alert: {
                 incapacitat: "If the holder has a disability, a recipient must be specified.",
             },
-            dialog: {
-                deleteTitle: "Delete Interested Party",
-                deleteMessage: "Are you sure you want to proceed with this action?",
-                deleteRepTitle: "Delete Representative",
-                deleteRepMessage: "Are you sure you want to proceed with this action?",
-            }
         },
         expedient: {
             title: "Expedient",
@@ -513,7 +524,7 @@ const translationEn = {
                 pinbal: {
                     label: "PINBAL query...",
                     title: "New PINBAL query",
-                    ok: "PINBAL document '{{document}}' created successfully",
+                    ok: "The document has been created from the pinbal query '{{codiServeiPinbal}}'"
                 },
                 import: {
                     label: "Import documents...",

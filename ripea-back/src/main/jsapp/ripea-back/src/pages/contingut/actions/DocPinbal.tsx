@@ -133,14 +133,14 @@ const useDocPinbal = (entity:any,refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id,{
+    const handleShow = () :void => {
+        apiRef.current?.show?.(undefined,{
             expedient: {id: entity?.id}
         })
     }
     const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.document.action.pinbal.ok', {document: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.document.action.pinbal.ok', {codiServeiPinbal: result?.codiServeiPinbal}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

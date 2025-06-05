@@ -252,14 +252,31 @@ const translationCa = {
                 direccioPostal: "Adreça postal",
                 entregaDehObligat: "DEH obligat?",
             },
-            actions: {
-                new: "Nou Interessat",
-                delete: "Esborrar Interessat",
-                createRep: "Afegir Representant",
-                updateRep: "Modificar Representant",
-                deleteRep: "Esborrar Representant",
-            },
             action: {
+                new: {
+                    label: "Nou Interessat",
+                    ok: "Element creat",
+                },
+                delete: {
+                    label: "Esborrar Interessat",
+                    check: "Estàs segur que vols continuar amb aquesta acció?",
+                    description: "Un cop esborrat no es podrà recuperar",
+                    ok: "Element esborrat",
+                },
+                createRep: {
+                    label: "Afegir Representant",
+                    ok: "Element creat",
+                },
+                updateRep: {
+                    label: "Modificar Representant",
+                    ok: "Element modificat",
+                },
+                deleteRep: {
+                    label: "Esborrar Representant",
+                    check: "Estàs segur que vols continuar amb aquesta acció?",
+                    description: "Un cop esborrat no es podrà recuperar",
+                    ok: "Element esborrat",
+                },
                 importar: {
                     label: "Importar...",
                     title: "Importar interessats",
@@ -277,12 +294,6 @@ const translationCa = {
             alert: {
                 incapacitat: "En cas de titular amb discapacitat es obligatori indicar un destinatari.",
             },
-            dialog: {
-                deleteTitle: "Esborrar interessat",
-                deleteMessage: "Està segur que vol continuar amb aquesta acció?",
-                deleteRepTitle: "Esborrar Representant",
-                deleteRepMessage: "Està segur que vol continuar amb aquesta acció?",
-            }
         },
         expedient: {
             title: "Expedient",
@@ -513,7 +524,7 @@ const translationCa = {
                 pinbal: {
                     label: "Consulta PINBAL...",
                     title: "Nova consulta PINBAL",
-                    ok: "Document PINBAL '{{document}}' creat correctament",
+                    ok: "S'ha creat el document a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
                 import: {
                     label: "Importar documents...",

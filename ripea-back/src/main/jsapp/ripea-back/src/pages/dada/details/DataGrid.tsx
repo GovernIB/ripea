@@ -11,23 +11,14 @@ const DadaForm = () => {
     const { data }  = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="valor" type={data.tipusValor} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DATA'} type={"date"} required/>
+        <GridFormField xs={12} name={'importe'} hidden={data.tipusValor != 'IMPORT'} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'TEXT'} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'SENCER'} decimalScale={0} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'FLOTANT'} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'BOOLEA'} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required/>
     </Grid>
-}
-
-const tipusValor :any = {
-    // TODO: revisar tipado
-    TEXT: 'text',
-    DATA: 'date',
-    IMPORT: 'number',
-    SENCER: 'number',
-    FLOTANT: 'number',
-    BOOLEA: 'checkbox',
-    DOMINI: null,
-}
-
-export const getDataFieldType = (tipus:string) => {
-    return tipusValor[tipus] ?? 'text'
 }
 
 const columns = [
@@ -45,11 +36,14 @@ const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
 
 const DataGrid = (props:any) => {
     const { entity, contingut, refresh } = props
+    const { t } = useTranslation();
+
     const [numDades, setNumDades] = useState<number>(0);
     const potMod = potModificar(contingut);
 
     return <StyledMuiGrid
         resourceName={"dadaResource"}
+        popupEditFormDialogResourceTitle={t('page.dada.title')}
         filter={
             builder.and(
                 builder.eq('metaDada.id', entity?.id),
@@ -63,7 +57,7 @@ const DataGrid = (props:any) => {
         formAdditionalData={{
             metaDada:{id: entity?.id},
             node:{id: contingut?.id},
-            tipusValor: getDataFieldType(entity?.tipus),
+            tipusValor: entity?.tipus,
         }}
         onRowCountChange={(count:number)=>{
             setNumDades?.(count)

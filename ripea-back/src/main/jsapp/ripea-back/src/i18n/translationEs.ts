@@ -252,14 +252,31 @@ const translationEs = {
                 direccioPostal: "Dirección postal",
                 entregaDehObligat: "DEH obligada?",
             },
-            actions: {
-                new: "Nuevo Interesado",
-                delete: "Borrar Interesado",
-                createRep: "Añadir Representante",
-                updateRep: "Modificar Representante",
-                deleteRep: "Borrar Representante",
-            },
             action: {
+                new: {
+                    label: "Nuevo Interesado",
+                    ok: "Elemento creado",
+                },
+                delete: {
+                    label: "Borrar Interesado",
+                    check: "Esta seguro de que quiere seguir con esta acción?",
+                    description: "Una vez borrado no se prodra recuperar",
+                    ok: "Elemento borrado",
+                },
+                createRep: {
+                    label: "Añadir Representante",
+                    ok: "Elemento creado",
+                },
+                updateRep: {
+                    label: "Modificar Representante",
+                    ok: "Elemento modificado",
+                },
+                deleteRep: {
+                    label: "Borrar Representante",
+                    check: "Esta seguro de que quiere seguir con esta acción?",
+                    description: "Una vez borrado no se prodra recuperar",
+                    ok: "Elemento borrado",
+                },
                 importar: {
                     label: "Importar...",
                     title: "Importar interesados",
@@ -277,12 +294,6 @@ const translationEs = {
             alert: {
                 incapacitat: "En caso de titular con incapacidad es obligatorio indicar un destinatario.",
             },
-            dialog: {
-                deleteTitle: "Borrar interesado",
-                deleteMessage: "Esta seguro de que quiere seguir con esta acción?",
-                deleteRepTitle: "Borrar Representante",
-                deleteRepMessage: "Esta seguro de que quiere seguir con esta acción?",
-            }
         },
         expedient: {
             title: "Expediente",
@@ -513,7 +524,7 @@ const translationEs = {
                 pinbal: {
                     label: "Consulta PINBAL...",
                     title: "Nueva consulta PINBAL",
-                    ok: "Documento PINBAL '{{document}}' creado correctamente",
+                    ok: "Se ha creado el documento a partir de la consulta pinbal '{{codiServeiPinbal}}'",
                 },
                 import: {
                     label: "Importar documentos...",
