@@ -47,7 +47,8 @@ const ImportForm = () => {
     }, [selectedRows]);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-
+	
+		<GridFormField xs={12} name="tipusImportacio"/>
         <GridFormField xs={12} name="fitxerJsonInteressats" type={"file"} required/>
 
         <Load value={data?.interessatsFitxer} noEffect>

@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,6 +42,7 @@ import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.PaisDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
@@ -250,14 +252,21 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
             try {
-                if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    List<InteressatDto> lista = objectMapper.readValue(
-                            ((FileReference)fieldValue).getContent(),
-                            new TypeReference<List<InteressatDto>>() {});
-                    target.setInteressatsFitxer(lista);
-                }
+            	if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
+	                if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
+	                    ObjectMapper objectMapper = new ObjectMapper();
+	                    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	                    List<InteressatDto> lista = objectMapper.readValue(
+	                            ((FileReference)fieldValue).getContent(),
+	                            new TypeReference<List<InteressatDto>>() {});
+	                    target.setInteressatsFitxer(lista);
+	                }
+            	} else {
+            		List<InteressatDto> interessatsExcel = expedientInteressatHelper.extreureInteressatsExcel(
+            				new ByteArrayInputStream(((FileReference)fieldValue).getContent()));
+            		//TODO comprovar que en Jamal hagi pogut mourer la funcio de validacio al helper.
+            		target.setInteressatsFitxer(interessatsExcel);
+            	}
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor.onChange", e);
             }

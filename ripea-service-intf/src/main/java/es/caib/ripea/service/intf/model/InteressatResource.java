@@ -22,6 +22,7 @@ import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
@@ -137,6 +138,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Setter
     @FieldNameConstants
     public static class ImportarInteressatsFormAction implements Serializable {
+    	private InteressatImportacioTipusDto tipusImportacio = InteressatImportacioTipusDto.JSON;
         @NotNull
         @ResourceField(onChangeActive = true)
         private FileReference fitxerJsonInteressats;

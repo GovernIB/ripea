@@ -154,7 +154,11 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE,
-						formClass = ExpedientResource.MassiveAction.class),			
+						formClass = ExpedientResource.MassiveAction.class),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = ExpedientResource.ACTION_PLANTILLA_EXCEL_INTERESSATS,
+						formClass = Serializable.class),					
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 
@@ -182,6 +186,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
+	public static final String ACTION_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";

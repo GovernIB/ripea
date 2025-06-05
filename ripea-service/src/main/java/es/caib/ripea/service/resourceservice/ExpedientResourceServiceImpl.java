@@ -59,7 +59,6 @@ import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.CodiValorDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -140,6 +139,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ENI, new ExportIndexEniGenerator());
         register(ExpedientResource.ACTION_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
         register(ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
+        register(ExpedientResource.ACTION_PLANTILLA_EXCEL_INTERESSATS, 	new PlantillaExcelInteressatsReportGenerator());
         //Genera un Zip de los documentos seleccionados para un expediente concreto
         register(ExpedientResource.ACTION_EXPORT_SELECTED_DOCS, new ExportSelectedDocsGenerator());
         
@@ -1200,6 +1200,31 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+    }
+    
+    private class PlantillaExcelInteressatsReportGenerator implements ReportGenerator<ExpedientResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+			try {
+				DownloadableFile resultat = new DownloadableFile(
+	        			"model_dades_interessats.xlsx",
+	        			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	        			this.getClass().getResourceAsStream("/es/caib/ripea/core/templates/model_dades_interessats.xlsx").readAllBytes());
+				return resultat;
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/PlantillaExcelInteressatsReportGenerator", e);
+				throw new ReportGenerationException(ExpedientResource.class, 0, code, "S'ha produit un error al descarregar la plantilla excel de importació de interessats.");
+			}
+		}
+		
+		@Override
+		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, Serializable params) throws ReportGenerationException {
+			return null;
+		}
     }
 
     private class ExportIdexInsideGenerator implements ReportGenerator<ExpedientResourceEntity, ExpedientResource.MassiveAction, Serializable> {
