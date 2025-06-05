@@ -8,6 +8,7 @@ import { useFormFieldCommon } from './FormFieldText';
 
 type FormFieldNumberProps = FormFieldCustomProps & {
     allowNegative?: boolean;
+    decimalScale?: number;
     decimalSeparator?: boolean | string;
     thousandSeparator?: boolean | string;
     valueIsNumericString?: boolean;
@@ -67,6 +68,7 @@ export const FormFieldNumber: React.FC<FormFieldNumberProps> = (props) => {
         onChange,
         componentProps,
         allowNegative,
+        decimalScale,
         decimalSeparator,
         thousandSeparator,
         valueIsNumericString,
@@ -89,6 +91,7 @@ export const FormFieldNumber: React.FC<FormFieldNumberProps> = (props) => {
         max: field?.max,
         step: field?.step,
         allowNegative,
+        decimalScale,
         decimalSeparator,
         thousandSeparator,
         valueIsNumericString,
