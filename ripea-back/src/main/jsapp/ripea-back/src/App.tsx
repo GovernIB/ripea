@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
 import { BaseApp } from './components/BaseApp';
-import logo from './assets/logo.png';
-import govern_logo from './assets/govern-logo.png';
+import logo from './assets/Drassana_RIP_DRA_COL.svg';
+import goib_logo from './assets/goib_logo.svg';
 import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
 
@@ -18,19 +18,19 @@ export const App: React.FC = () => {
 
     return <BaseApp
         code="cmd"
-        logo={entitatLogo ?? govern_logo}
-        style={{ height: '110px' }}
+        logo={entitatLogo ?? goib_logo}
+        // style={{ height: '110px' }}
         logoStyle={{
-            '& img': { height: '80px' },
+            '& img': { height: '38px' },
             pl: 2,
             pr: 4,
             mr: 4,
-            borderRight: `1px solid ${ entitat?.capsaleraColorLletra ?? '#fff' }`
+            borderRight: `2px solid ${ entitat?.capsaleraColorLletra ?? '#000' }`
         }}
-        title={<img src={logo} title={'RIPEA v' + version} alt={'RIPEA v' + version} />}
+        title={<img src={logo} title={'RIPEA v' + version} style={{ height: '80px' }} alt={'RIPEA v' + version} />}
         version={version}
         availableLanguages={['ca', 'es']}
-        appbarBackgroundColor={backgroundColor ?? "#ff9523"}>
+        appbarBackgroundColor={backgroundColor ?? "#FFFFFF"}>
         <AppRoutes />
     </BaseApp>;
 }

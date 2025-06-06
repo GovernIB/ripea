@@ -27,44 +27,40 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 
     const [buildTimestamp, setBuildTimestamp] = useState<string | null>(null);
     const [scmRevision, setScmRevision] = useState<string | null>(null);
+    const [comandaVersion, setComandaVersion] = useState<string>(version ?? '');
 
     useEffect(() => {
         fetch('/build-info.json')
-            .then(response => {
-				if (response?.ok) {
-					return response.json()
-				}
-			})
+            .then(response => response.json())
             .then(data => {
-				if (data) {
-                	setBuildTimestamp(data.buildTimestamp);
-                	setScmRevision(data.scmRevision);
-				}
-            })
-			.catch(error => {
-			        console.error('No se pudo cargar el archivo build-info.json:', error);
-			});
+                setBuildTimestamp(data.buildTimestamp);
+                setScmRevision(data.scmRevision);
+                data.comandaVersion && setComandaVersion(data.comandaVersion);
+            });
     }, []);
 
     const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor, backgroundImg) : {};
     return <footer>
-        <Toolbar style={{ ...style, ...backgroundStyle }} sx={{minHeight: '44px !important'}}>
+        <Toolbar style={{ ...style, ...backgroundStyle }} sx={{minHeight: '36px !important', lineHeight: '0.5em'}}>
             <Typography
                 variant="caption"
                 component="div"
-                title={title + (version ? ' v' + version : '')}
+                title={title + (comandaVersion ? ' v' + comandaVersion : '')}
                 sx={{
                     flexGrow: 1,
                     alignSelf: 'flex-start',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    mt: 1,
+                    color: '#F6F6F6',
                 }}>
-                {(title ? title : '') + (version ? ' v' + version : '')}
-                <span id="versioData" style={{ color: 'rgba(0,0,0,0)' }}>
+                {(title ? title : '') + (comandaVersion ? ' v' + comandaVersion : '')}
+                <span id="versioData" style={{ color: backgroundColor, marginLeft: '16px' }}>
                     ({buildTimestamp} | Revisió: {scmRevision})
                 </span>
             </Typography>
             {logos && logos.map((logo) =>
-                <Box sx={{ mr: 2, pt: 0, pr: 2, cursor: 'pointer', ...logoStyle }} key={logo}>
+                <Box sx={{ mr: 0, pt: 0, pr: 0, height: '36px', cursor: 'pointer', ...logoStyle }} key={logo}>
                     <img src={logo} alt="foot_logo" style={{maxHeight: '36px'}}/>
                 </Box>)
             }

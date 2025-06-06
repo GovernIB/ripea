@@ -7,6 +7,7 @@ import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const useMassiveActions = (refresh?: () => void) => {
+    const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
     const {artifactReport: apiReport} = useResourceApiService('documentResource');
 
@@ -22,7 +23,7 @@ const useMassiveActions = (refresh?: () => void) => {
             });
     }
 
-    const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', '', 'ZIP'); }
+    const download = (ids: any[]): void => { massiveReport(ids, 'DESCARREGAR_MASSIU', t('page.expedient.results.actionOk'), 'ZIP'); }
 
     return {download}
 }
