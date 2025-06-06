@@ -19,10 +19,9 @@ import {
     useResourceApiContext,
 } from 'reactlib';
 import Footer from './Footer';
-import uenegroma from '../assets/uenegroma.png';
-import feder7 from '../assets/feder7.png';
-import una_manera from '../assets/una_manera.png';
+import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
+import UserMenu from "./UserMenu.tsx";
 import {Alert} from "@mui/material";
 import {useAlertesSession} from "./SseClient.tsx";
 
@@ -109,6 +108,21 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     </LocalizationProvider>;
 }
 
+const generateFooter = (version?:string) => {
+    return (
+        <>
+            <div style={{ height: '36px', width: '100%' }} />
+            <Footer
+                title="RIPEA"
+                version={version}
+                logos={[drassana]}
+                backgroundColor="#5F5D5D"
+                style={{ position: 'fixed', height: '36px', bottom: 0, width: '100%' }}
+            />
+        </>
+    );
+};
+
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
@@ -153,13 +167,14 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
         headerAdditionalComponents={[<UserHeadToolbar/>]}
-        headerAdditionalAuthComponents={availableLanguages?.length ? [
-            <AuthLanguageSelector
-                key="sel_lang"
-                languages={availableLanguages}
-                sx={{ mr: 2 }} />
-        ] : undefined}
-        footer={<Footer title="RIPEA" version={version} logos={[uenegroma,feder7,una_manera]}/>}
+        // headerAdditionalAuthComponents={availableLanguages?.length ? [
+        //     <AuthLanguageSelector
+        //         key="sel_lang"
+        //         languages={availableLanguages}
+        //         sx={{ mr: 2 }} />,
+        // ] : undefined}
+        headerAdditionalAuthComponents={<UserMenu/>}
+        footer={generateFooter(version)}
         persistentSession
         persistentLanguage
         i18nUseTranslation={useTranslation}

@@ -146,7 +146,7 @@ const useDocumentDetail = () => {
             buttonCallback={(value :any) :void => {
                 switch (value){
                     case 'download':
-                        apiDownload(entity?.id, 'adjunt')
+                        apiDownload(entity?.id, 'adjunt', t('page.expedient.results.actionOk'))
                         break;
                     case 'descarregarImprimible':
                         apiDownload(entity?.id, 'imprimible', t('page.document.action.imprimible.ok'))

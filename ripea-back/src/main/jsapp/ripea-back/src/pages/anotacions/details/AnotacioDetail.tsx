@@ -191,7 +191,7 @@ const Annexos = (props:any) => {
             title: t('common.download'),
             icon: "download",
             showInMenu: true,
-            onClick: (id:any, row:any) => apiDownload(row?.document?.id,'adjunt'),
+            onClick: (id:any, row:any) => apiDownload(row?.document?.id,'adjunt', t('page.expedient.results.actionOk')),
             hidden: (row:any) => !row?.document?.id,
         },
     ]

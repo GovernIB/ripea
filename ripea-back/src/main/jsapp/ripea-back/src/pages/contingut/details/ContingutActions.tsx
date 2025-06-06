@@ -32,11 +32,11 @@ export const useActions = (refresh?: () => void) => {
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
-    const downloadAdjunt = (id:any,fieldName:string, mssg?:string) :void => {
+    const downloadAdjunt = (id:any, fieldName:string, mssg:string) :void => {
         apiDownload(id,{fieldName})
             .then((result)=>{
                 iniciaDescargaBlob(result);
-                temporalMessageShow(null, mssg ?? '', 'info');
+                temporalMessageShow(null, mssg, 'info');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
