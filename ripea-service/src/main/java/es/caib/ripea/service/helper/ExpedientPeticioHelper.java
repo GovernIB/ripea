@@ -29,6 +29,7 @@ import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
@@ -66,7 +67,7 @@ public class ExpedientPeticioHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private PluginHelper pluginHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
-    @Autowired private EventService eventService;
+    @Autowired private GrupRepository grupRepository;    
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
@@ -412,10 +413,50 @@ public class ExpedientPeticioHelper {
 			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ);
 			permisosPerAnotacionsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 		}
-
-
 		return permisosPerAnotacionsDto;
+	}
+
+	public void rebutjar(Long expedientPeticioId, String observacions) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.REBUTJAT);
+		expedientPeticioEntity.setDataActualitzacio(new Date());
+		expedientPeticioEntity.setUsuariActualitzacio(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
+		expedientPeticioEntity.setObservacions(observacions);
+
+		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
+		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
+		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
+
+		try {
+			pluginHelper.canviEstatAnotacio(anotacioRegistreId,
+					Estat.REBUTJADA,
+					observacions);
+			expedientPeticioEntity.setEstatCanviatDistribucio(true);
+		} catch (Exception e) {
+			expedientPeticioEntity.setEstatCanviatDistribucio(false);
+		}
+		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
+		if (entitatAnotacio != null) {
+			cacheHelper.evictAllCountAnotacionsPendents();
+		}
+	}
+	
+	public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		
+		if (procedimentId != null) {
+			MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(procedimentId);
+			expedientPeticioEntity.updateMetaExpedient(metaExpedient);
+		} else {
+			expedientPeticioEntity.updateMetaExpedient(null);
+		}
+		
+		if (grupId != null) {
+			GrupEntity grup = grupRepository.getOne(grupId);
+			expedientPeticioEntity.setGrup(grup);
+		} else {
+			expedientPeticioEntity.setGrup(null);
+		}
 	}
 	
 	public boolean getPropertyGuardarContingutAnnexosDistribucio() {

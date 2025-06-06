@@ -151,12 +151,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void setRolUsuariActual(String rolActual) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Actualitzant rol de usuari actual");
-		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
-		usuari.updateRolActual(rolActual);
-		cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
-		eventService.notifyAnotacionsPendents(List.of(auth.getName()));
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Actualitzant rol de usuari actual");
+			UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+			usuari.updateRolActual(rolActual);
+			cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
+			eventService.notifyAnotacionsPendents(List.of(auth.getName()));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.out.println(ex.getMessage());
+		}
 	}
 	
 	@Transactional

@@ -552,6 +552,20 @@ public class Utils {
     	return null;
     }
     
+    public static List<String> getCodisEnGruposMil(List<String> codis) {
+    	int maxSize = 1000;
+    	if (codis!=null && codis.size()>0) {
+    		List<String> result = new ArrayList<>();
+    		for (int i = 0; i < codis.size(); i += maxSize) {
+                List<String> subList = codis.subList(i, Math.min(i + maxSize, codis.size()));
+                String concatenated = subList.stream().map(String::valueOf).collect(Collectors.joining(","));
+                result.add(concatenated);
+            }
+    		return result;
+    	}
+    	return null;
+    }
+    
 	public static String getCodiNom(InteressatTipusEnum tipus, String documentNum, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
 		String resultat = null;
         switch (tipus) {

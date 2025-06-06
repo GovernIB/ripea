@@ -9,10 +9,12 @@ import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(quickFilterFields = { "identificador" }, descriptionField = "destiCodiINom")
 public class RegistreResource extends BaseAuditableResource<Long> {
 

@@ -96,4 +96,22 @@ public class PermisosPerAnotacions {
 		}
 		return Utils.getNullIfEmpty(list.get(index));
 	}
+	
+    public List<String> getIdsProcedimentsGruposMil() {
+    	List<Long> procedimentsIds = new ArrayList<Long>();
+    	if (this.procedimentsPermesos!=null) {
+    		for (MetaExpedientEntity mee: this.procedimentsPermesos) {
+    			procedimentsIds.add(mee.getId());
+    		}
+    	}
+    	return Utils.getIdsEnGruposMil(procedimentsIds);
+    }
+    
+    public List<String> getIdsGrupsGruposMil() {
+    	return Utils.getIdsEnGruposMil(this.idsGrupsPermesos);
+    }
+    
+    public List<String> getIdsOrganGestorsGruposMil() {
+    	return Utils.getCodisEnGruposMil(this.adminOrganCodisOrganAmbDescendents);
+    }
 }

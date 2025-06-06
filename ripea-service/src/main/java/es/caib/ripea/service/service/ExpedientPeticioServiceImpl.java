@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 
-import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Firma;
@@ -33,7 +31,6 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
-import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
@@ -42,11 +39,9 @@ import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.persistence.repository.RegistreRepository;
-import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -82,7 +77,6 @@ import es.caib.ripea.service.intf.dto.RegistreDto;
 import es.caib.ripea.service.intf.dto.RegistreJustificantDto;
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
-import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -109,9 +103,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
-	@Autowired private UsuariRepository usuariRepository;
-	@Autowired private GrupRepository grupRepository;
-	@Autowired private EventService eventService;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -431,35 +422,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional
 	@Override
-	public void rebutjar(Long expedientPeticioId,
-			String observacions) {
-		log.debug("Reutjant el expedient peticio " +
-				"expedientPeticioId=" +
-				expedientPeticioId +
-				")");
-
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.REBUTJAT);
-		expedientPeticioEntity.setDataActualitzacio(new Date());
-		expedientPeticioEntity.setUsuariActualitzacio(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
-		expedientPeticioEntity.setObservacions(observacions);
-
-		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
-		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
-		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
-
-		try {
-			pluginHelper.canviEstatAnotacio(anotacioRegistreId,
-					Estat.REBUTJADA,
-					observacions);
-			expedientPeticioEntity.setEstatCanviatDistribucio(true);
-		} catch (Exception e) {
-			expedientPeticioEntity.setEstatCanviatDistribucio(false);
-		}
-		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
-		if (entitatAnotacio != null) {
-			cacheHelper.evictAllCountAnotacionsPendents();
-		}
+	public void rebutjar(Long expedientPeticioId, String observacions) {
+		log.debug("Reutjant el expedient peticio expedientPeticioId=" + expedientPeticioId +")");
+		expedientPeticioHelper.rebutjar(expedientPeticioId, observacions);
 	}
 	
 	@Transactional(readOnly = true)
@@ -559,34 +524,15 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional
 	@Override
 	public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
-
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		
-		if (procedimentId != null) {
-			MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(procedimentId);
-			expedientPeticioEntity.updateMetaExpedient(metaExpedient);
-		} else {
-			expedientPeticioEntity.updateMetaExpedient(null);
-		}
-		
-		if (grupId != null) {
-			GrupEntity grup = grupRepository.getOne(grupId);
-			expedientPeticioEntity.setGrup(grup);
-		} else {
-			expedientPeticioEntity.setGrup(null);
-		}
-	
+		log.debug("canviarProcediment (expedientPeticioId=" + expedientPeticioId + ", procediment="+ procedimentId +", grup="+ grupId +")");
+		expedientPeticioHelper.canviarProcediment(expedientPeticioId, procedimentId, grupId);
 	}
-	
-	
 	
 	@Transactional
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {
-		log.debug("Consultant el expedient peticio " +
-				"expedientPeticioId=" +
-				expedientPeticioId +
-				")");
+		
+		log.debug("Consultant el expedient peticio expedientPeticioId=" + expedientPeticioId + ")");
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		

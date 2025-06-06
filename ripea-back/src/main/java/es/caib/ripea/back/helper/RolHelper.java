@@ -38,12 +38,19 @@ public class RolHelper {
 			
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
 
+			try {
+			
 			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 				aplicacioService.setRolUsuariActual(canviRol);
 			} else if (request.isUserInRole(canviRol)) {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 				aplicacioService.setRolUsuariActual(canviRol);
+			}
+			
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				System.out.println(ex.getMessage());
 			}
 			
 			AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);

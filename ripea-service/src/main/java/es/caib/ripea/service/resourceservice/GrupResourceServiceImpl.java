@@ -4,12 +4,14 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.OrganGestorCacheHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.intf.dto.OrganismeDto;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.GrupResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
@@ -44,9 +47,47 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
 	private final PermisosHelper permisosHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final OrganGestorCacheHelper organGestorCacheHelper;
+	private final MetaExpedientRepository metaExpedientRepository;
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
+    	
+        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+    	if (mapaNamedQueries.size()>0) {
+    		if (mapaNamedQueries.containsKey("BY_PROCEDIMENT")) {
+    			Long procedimentId = Long.parseLong(mapaNamedQueries.get("BY_PROCEDIMENT"));
+    			Filter filtreGrupsProcediment = null;
+    			if (procedimentId>0) {
+	    			List<GrupEntity> grupsProcs = metaExpedientRepository.findById(procedimentId).get().getGrups();
+	    			List<Long> grupsIds = new ArrayList<Long>();
+	    			if (grupsProcs!=null) {
+						for (GrupEntity ge: grupsProcs) {
+							grupsIds.add(ge.getId());
+						}
+	    			}
+	    			if (grupsIds.size()>0) {
+	    				List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
+	    				
+	    		        if (grupsOrgansProcedimentIn!=null) {
+	    			        for (String aux: grupsOrgansProcedimentIn) {
+	    				        if (aux != null && !aux.isEmpty()) {
+	    				        	filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
+	    				        }
+	    			        }
+	    		        }
+	    			} else {
+	    				return FilterBuilder.equal("id", 0).generate();
+	    				// ----------------> return sense resultats
+	    			}
+    			} else {
+    				return FilterBuilder.equal("id", 0).generate();
+    				// ----------------> return sense resultats
+    			}
+    			
+				return filtreGrupsProcediment.generate();
+				// ----------------> return amb resultats
+    		}
+    	}
     	
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();

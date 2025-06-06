@@ -3,6 +3,8 @@ package es.caib.ripea.service.intf.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -16,10 +18,12 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 @ResourceConfig(
         quickFilterFields = { "identificador" },
         descriptionField = "identificador",
@@ -34,7 +38,17 @@ import lombok.Setter;
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT,
                         formClass = Serializable.class,
-                        requiresId = true),          
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO,
+                        formClass = ExpedientPeticioResource.RebutjarAnotacioForm.class,
+                        requiresId = true),   
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
+                        formClass = Serializable.class,
+                        requiresId = true),                 
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
@@ -42,6 +56,8 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
     public static final String REPORT_DOWNLOAD_JUSTIFICANT = "DOWNLOAD_JUSTIFICANT";
+    public static final String ACTION_REBUTJAR_ANOTACIO = "REBUTJAR_ANOTACIO";
+    public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
 
 //    private Long id;
     private String identificador;
@@ -58,7 +74,17 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     private ResourceReference<GrupResource, Long> grup;
     private ResourceReference<ExpedientResource, Long> expedient;
+    
+    private boolean pendentCanviEstatDistribucio;
+    private int reintentsCanviEstatDistribucio;
 
     @Transient private RegistreResource registreInfo;
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
+    
+    @Getter
+    @Setter
+    public static class RebutjarAnotacioForm implements Serializable {
+    	@NotNull
+    	private String motiu;
+    }
 }
