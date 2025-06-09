@@ -1,5 +1,5 @@
 import {FormControl, Icon, ListItemIcon, MenuItem, Select} from "@mui/material";
-import {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useNavigate} from "react-router-dom";
@@ -7,6 +7,10 @@ import {iniciaDescarga} from "../expedient/details/CommonActions.tsx";
 import usePerfil from "./detail/Perfil.tsx";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
+import MenuButton from "../../components/MenuButton.tsx";
+import {TextAvatar, useBaseAppContext} from "reactlib";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Load from "../../components/Load.tsx";
 
 const MenuSelect = (props:any) => {
     const {icon, value, onChange, color = "white", children, ...other} = props
@@ -46,8 +50,17 @@ const MenuSelect = (props:any) => {
         </FormControl>
     </MenuItem>
 }
+const UserAvatar: React.FC = (props: any) => {
+    const { value: user } = useUserSession();
 
-const UserMenu = (props:any) => {
+    if (user?.nom) {
+        return <TextAvatar text={user?.nom} />;
+    } else {
+        return <Icon {...props}>account_circle</Icon>;
+    }
+}
+
+export const UserMenu = (props:any) => {
     const {color = "#000"} = props;
     const { t } = useTranslation();
 
@@ -167,4 +180,42 @@ const UserMenu = (props:any) => {
         }
     </>
 }
-export default UserMenu;
+const UserMenuButton = () => {
+    const { t } = useBaseAppContext();
+    const { value: user, remove: signOut } = useUserSession();
+
+    return <Load value={user} noEffect>
+        <MenuButton id={user?.codi}
+           buttonProps={{ endIcon: undefined, sx: {m: '0 !important'} }}
+           buttonLabel={<UserAvatar/>}
+        >
+            <MenuItem disableRipple
+                      sx={{
+                          "&.MuiButtonBase-root:hover": {
+                              bgcolor: "transparent",
+                              cursor: "default"
+                          }
+                      }}>
+                <ListItemAvatar>
+                    <UserAvatar />
+                </ListItemAvatar>
+                <ListItemText
+                    primary={user?.nom}
+                    secondary={user?.codi} />
+            </MenuItem>
+
+            <Divider/>
+            <UserMenu/>
+            <Divider/>
+
+            <MenuItem onClick={() => {signOut?.()}}>
+                <ListItemIcon>
+                    <Icon fontSize="small">logout</Icon>
+                </ListItemIcon>
+                <ListItemText>{t('app.auth.logout')}</ListItemText>
+            </MenuItem>
+        </MenuButton>
+    </Load>
+}
+
+export default UserMenuButton;

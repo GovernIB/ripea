@@ -21,7 +21,7 @@ import {
 import Footer from './Footer';
 import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
-import UserMenu from "../pages/user/UserMenu.tsx";
+import UserMenuButton, {UserMenu} from "../pages/user/UserMenu.tsx";
 import {Alert} from "@mui/material";
 import {useAlertesSession} from "./SseClient.tsx";
 
@@ -166,7 +166,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarStyle={style}
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
-        headerAdditionalComponents={[<UserHeadToolbar/>]}
+        headerAdditionalComponents={[<UserHeadToolbar/>, <UserMenuButton/>]}
         // headerAdditionalAuthComponents={availableLanguages?.length ? [
         //     <AuthLanguageSelector
         //         key="sel_lang"

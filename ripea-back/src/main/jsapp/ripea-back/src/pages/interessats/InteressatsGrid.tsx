@@ -132,7 +132,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             variant={'contained'}
                                             title={t('page.expedient.action.excelInteressats.title')}
                                             onClick={()=>excelInteressats(entity?.id)}
-                                            hidden={!potModificar(entity) || num==0}
+                                            hidden={!potModificar(entity) || !num || num==0}
                     />,
                 },
             ]}

@@ -55,7 +55,7 @@ const Accions = (props:any) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             // paginationActive
-            // height={162 + 52 * 4}
+            height={162 + 52 * 4}
             toolbarHide
             readOnly
         />
@@ -162,7 +162,7 @@ const Moviment = (props:any) => {
             columns={columnsMoviment}
             onRowCountChange={onRowCountChange}
             // paginationActive
-            // height={162 + 52 * 4}
+            height={162 + 52 * 4}
             toolbarHide
             readOnly
         />
@@ -231,7 +231,7 @@ const useHistoric = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.contingut.action.history')}
+            title={t('page.contingut.action.history.label')}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {
