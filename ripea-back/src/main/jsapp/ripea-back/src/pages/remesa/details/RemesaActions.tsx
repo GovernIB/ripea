@@ -39,10 +39,12 @@ export const useActions = (refresh?: () => void) => {
 
     const actualitzarEstat = (id: any) => action(id, 'ACTUALITZAR_ESTAT', t('page.notificacio.action.actualitzarEstat.ok'));
     const justificant = (id: any) => report(id, 'DESCARREGAR_JUSTIFICANT', t('page.notificacio.action.justificant.ok'), 'ZIP');
+    const descarregarDocumentEnviat = (id: any) => report(id, 'DESCARREGAR_DOC_ENVIAT', t('page.notificacio.action.documentEnviat.ok'), 'ZIP');
 
     return {
         actualitzarEstat,
         justificant,
+        descarregarDocumentEnviat,
     }
 }
 

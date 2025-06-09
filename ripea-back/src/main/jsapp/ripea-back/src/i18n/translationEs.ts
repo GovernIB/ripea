@@ -740,8 +740,7 @@ const translationEs = {
                 },
                 documentEnviat: {
                     label: "Documento enviado",
-                    title: "",
-                    ok: "",
+                    ok: "Se ha descargado el documento enviado",
                 },
             },
         },
@@ -771,10 +770,6 @@ const translationEs = {
                     label: "Ampliar plazo",
                     title: "Ampliación del plazo de los envíos de la remesa",
                     ok: "El plazo ha sido ampliado",
-                },
-                downloadDoc: {
-                    label: "Descargar documento",
-                    ok: "El documento se ha descargado correctamente",
                 },
                 certificat: {
                     label: "Certificación",

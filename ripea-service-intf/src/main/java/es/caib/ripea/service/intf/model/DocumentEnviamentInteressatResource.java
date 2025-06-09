@@ -38,7 +38,7 @@ import lombok.Setter;
                         requiresId = true),
     			@ResourceConfigArtifact(
     					type = ResourceArtifactType.REPORT,
-    					code = DocumentEnviamentInteressatResource.ACTION_DESCARREGAR_CERTIFICAT,
+    					code = DocumentEnviamentInteressatResource.REPORT_DESCARREGAR_CERTIFICAT,
     					formClass = DocumentEnviamentInteressatResource.MassiveAction.class),                
         }
 )
@@ -46,7 +46,7 @@ public class DocumentEnviamentInteressatResource extends BaseAuditableResource<L
 
     public static final String PERSPECTIVE_DETAIL_CODE = "DETAIL";
     public static final String ACTION_AMPLIAR_PLAC_CODE = "AMPLIAR_PLAC";
-    public static final String ACTION_DESCARREGAR_CERTIFICAT	= "DESCARREGAR_CERTIFICAT";
+    public static final String REPORT_DESCARREGAR_CERTIFICAT = "DESCARREGAR_CERTIFICAT";
 
     private String enviamentReferencia;
     private String enviamentDatatEstat;

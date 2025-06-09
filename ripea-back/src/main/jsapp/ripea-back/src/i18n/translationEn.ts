@@ -740,8 +740,7 @@ const translationEn = {
                 },
                 documentEnviat: {
                     label: "Document sent",
-                    title: "",
-                    ok: "",
+                    ok: "The sent document has been downloaded",
                 },
             },
         },
@@ -771,10 +770,6 @@ const translationEn = {
                     label: "Extend deadline",
                     title: "Extension of the deadline for the batch shipments",
                     ok: "The deadline has been extended",
-                },
-                downloadDoc: {
-                    label: "Download document",
-                    ok: "The document has been downloaded successfully",
                 },
                 certificat: {
                     label: "Certification",

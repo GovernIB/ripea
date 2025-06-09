@@ -51,7 +51,7 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
     public void init() {
         register(DocumentEnviamentInteressatResource.PERSPECTIVE_DETAIL_CODE, new DetailPerspectiveApplicator());
         register(DocumentEnviamentInteressatResource.ACTION_AMPLIAR_PLAC_CODE, new AmpliarPlacActionExecutor());
-        register(DocumentEnviamentInteressatResource.ACTION_DESCARREGAR_CERTIFICAT, new CertificatReportGenerator());
+        register(DocumentEnviamentInteressatResource.REPORT_DESCARREGAR_CERTIFICAT, new CertificatReportGenerator());
     }
 
     private class DetailPerspectiveApplicator implements PerspectiveApplicator<DocumentEnviamentInteressatResourceEntity, DocumentEnviamentInteressatResource> {
