@@ -392,16 +392,12 @@ public class ExpedientPeticioHelper {
 		return exception;
 	}
 	
-	public PermisosPerAnotacions findPermisosPerAnotacions(
-			Long entitatId,
-			String rolActual, 
-			Long organActualId) {
-		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();
-		
+	public PermisosPerAnotacions findPermisosPerAnotacions(Long entitatId, String rolActual, Long organActualId) {
+		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();		
 		if (rolActual.equals("IPA_ADMIN")) {
 			// in this case all annotations of entitat are permitted, it is not equal to annotations belonging to any procediment of entitat because some of the annotations might not have procediment assigned
 			// so this is wrong -> permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
-		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+		} else if (organActualId!=null && (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY"))) {
 			EntitatEntity entitat = entitatRepository.getOne(entitatId);
 			OrganGestorEntity organGestor = organGestorRepository.getOne(organActualId);
 			permisosPerAnotacionsDto.setAdminOrganHasPermisAdminComu(organGestorHelper.hasPermisAdminComu(organActualId));
@@ -412,10 +408,7 @@ public class ExpedientPeticioHelper {
 			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ);
 			permisosPerAnotacionsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 		}
-
-
 		return permisosPerAnotacionsDto;
-		
 	}
 	
 	public boolean getPropertyGuardarContingutAnnexosDistribucio() {

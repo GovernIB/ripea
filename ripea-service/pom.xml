@@ -211,6 +211,13 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- The package org.w3c.dom is accessible from more than one module: <unnamed>, java.xml	DominiHelper.java -->
+		 			<groupId>org.jopendocument</groupId>
+		 			<artifactId>jOpenDocument</artifactId>
+				</exclusion>
+			</exclusions>			
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
