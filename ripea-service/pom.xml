@@ -170,10 +170,6 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
 		</dependency>
-		<!--dependency>
-			<groupId>org.jopendocument</groupId>
-			<artifactId>jOpenDocument</artifactId>
-		</dependency-->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
@@ -182,16 +178,6 @@
 			<groupId>com.github.spullara.mustache.java</groupId>
 			<artifactId>compiler</artifactId>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.viafirma</groupId>-->
-<!--			<artifactId>documents-sdk-java</artifactId>-->
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<artifactId>jersey-client</artifactId>-->
-<!--					<groupId>com.sun.jersey</groupId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

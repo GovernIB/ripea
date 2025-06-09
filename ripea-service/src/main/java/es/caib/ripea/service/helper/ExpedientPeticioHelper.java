@@ -43,7 +43,6 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -393,12 +392,8 @@ public class ExpedientPeticioHelper {
 		return exception;
 	}
 	
-	public PermisosPerAnotacions findPermisosPerAnotacions(
-			Long entitatId,
-			String rolActual, 
-			Long organActualId) {
-		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();
-		
+	public PermisosPerAnotacions findPermisosPerAnotacions(Long entitatId, String rolActual, Long organActualId) {
+		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();		
 		if (rolActual.equals("IPA_ADMIN")) {
 			// in this case all annotations of entitat are permitted, it is not equal to annotations belonging to any procediment of entitat because some of the annotations might not have procediment assigned
 			// so this is wrong -> permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
