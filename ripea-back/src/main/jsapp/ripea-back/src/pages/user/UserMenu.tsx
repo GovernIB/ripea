@@ -1,7 +1,7 @@
 import {FormControl, Icon, ListItemIcon, MenuItem, Select} from "@mui/material";
 import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
+import {useUserSession} from "../../components/Session.tsx";
 import {useNavigate} from "react-router-dom";
 import {iniciaDescarga} from "../expedient/details/CommonActions.tsx";
 import usePerfil from "./detail/Perfil.tsx";
@@ -13,7 +13,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Load from "../../components/Load.tsx";
 
 const MenuSelect = (props:any) => {
-    const {icon, value, onChange, color = "white", children, ...other} = props
+    const {icon, value, onChange, color = "#000", children, ...other} = props
     const [open, setOpen] = useState<boolean>(false)
 
     return <MenuItem onClick={()=>setOpen(prev=>!prev)}>
@@ -60,13 +60,12 @@ const UserAvatar: React.FC = (props: any) => {
     }
 }
 
-export const UserMenu = (props:any) => {
-    const {color = "#000"} = props;
+export const UserMenu = () => {
     const { t } = useTranslation();
-
-    const { value: entitat } = useEntitatSession()
     const navigate = useNavigate();
-    const textColor = entitat?.capsaleraColorLletra ?? color;
+
+    // const { value: entitat } = useEntitatSession()
+    // const textColor = entitat?.capsaleraColorLletra ?? '#000';
 
     const { value: user, permisos, save: apiSave } = useUserSession();
     const isRolActualSupAdmin = user?.rolActual == 'IPA_SUPER';
@@ -141,7 +140,6 @@ export const UserMenu = (props:any) => {
             value={entitatId}
             onChange={setEntitatId}
             icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
-            color={textColor}
             hidden={isRolActualSupAdmin}
         >
             {
@@ -155,7 +153,6 @@ export const UserMenu = (props:any) => {
             value={rol}
             onChange={setRol}
             icon={<Icon fontSize={"inherit"}>badge</Icon>}
-            color={textColor}
         >
             {
                 user?.rols?.map((rol:any) =>
@@ -169,7 +166,6 @@ export const UserMenu = (props:any) => {
                 value={organId}
                 onChange={setOrganId}
                 icon={<Icon fontSize={"inherit"}>apartment</Icon>}
-                color={textColor}
             >
                 {
                     permisos?.organs?.map((rol:any) =>
@@ -208,6 +204,7 @@ const UserMenuButton = () => {
             <UserMenu/>
             <Divider/>
 
+            {/* TODO: borrar sessión de back */}
             <MenuItem onClick={() => {signOut?.()}}>
                 <ListItemIcon>
                     <Icon fontSize="small">logout</Icon>

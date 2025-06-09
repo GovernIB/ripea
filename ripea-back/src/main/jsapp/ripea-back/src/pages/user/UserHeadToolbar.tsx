@@ -6,7 +6,6 @@ import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
 import {MenuEntry} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
-import UserMenuButton from "./UserMenu.tsx";
 
 const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
