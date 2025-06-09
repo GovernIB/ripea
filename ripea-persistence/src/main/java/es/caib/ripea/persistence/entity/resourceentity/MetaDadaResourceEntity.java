@@ -1,6 +1,7 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "metadada")
@@ -52,4 +55,10 @@ public class MetaDadaResourceEntity extends BaseAuditableEntity<MetaDadaResource
 
     @Version
     private long version = 0;
+
+    @OneToMany(
+            mappedBy = "metaDada",
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    protected Set<DadaResourceEntity> dades = new HashSet<DadaResourceEntity>();
 }

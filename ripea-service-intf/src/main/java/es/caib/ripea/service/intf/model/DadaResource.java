@@ -44,6 +44,7 @@ public class DadaResource extends BaseAuditableResource<Long> {
     @Transient private boolean boolea;
     @ResourceField(enumType = true)
     @Transient private String domini;
+    @Transient private String dominiDescription;
 
     public String getValueByFieldName(MetaDadaTipusEnumDto fieldName) {
         switch (fieldName) {
@@ -60,37 +61,37 @@ public class DadaResource extends BaseAuditableResource<Long> {
                 return String.valueOf(this.flotant);
             case BOOLEA:
                 return String.valueOf(this.boolea);
-//            case DOMINI:
-//                return this.domini.getId().toString();
+            case DOMINI:
+                return this.domini;
         }
         return null;
     }
-    public void setValueByFieldName(MetaDadaTipusEnumDto fieldName, String value) {
+    public void setValueByFieldName(MetaDadaTipusEnumDto fieldName) {
         switch (fieldName) {
             case TEXT:
-                this.text = String.valueOf(value);
+                this.text = String.valueOf(this.valor);
                 break;
             case DATA:
                 try {
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                    this.data = formatter.parse(value);
+                    this.data = formatter.parse(this.valor);
                 }catch (ParseException e) {}
                 break;
             case IMPORT:
-                this.importe = Float.parseFloat(value);
+                this.importe = Float.parseFloat(this.valor);
                 break;
             case SENCER:
-                this.sencer = Integer.valueOf(value);
+                this.sencer = Integer.valueOf(this.valor);
                 break;
             case FLOTANT:
-                this.flotant = Float.parseFloat(value);
+                this.flotant = Float.parseFloat(this.valor);
                 break;
             case BOOLEA:
-                this.boolea = Boolean.parseBoolean(value);
+                this.boolea = Boolean.parseBoolean(this.valor);
                 break;
-//            case DOMINI:
-//                this.DOMINI = ResourceReference.<?, Long>toResourceReference(Long.valueOf(value));
-//                break;
+            case DOMINI:
+                this.domini = this.valor;
+                break;
         }
     }
 

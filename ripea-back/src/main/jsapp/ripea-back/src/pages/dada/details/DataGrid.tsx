@@ -17,7 +17,8 @@ const DadaForm = () => {
         <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'SENCER'} decimalScale={0} required/>
         <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'FLOTANT'} required/>
         <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'BOOLEA'} required/>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required/>
+        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required
+                       requestParams={{metaDada: data?.metaDada?.codi}}/>
     </Grid>
 }
 
@@ -29,6 +30,7 @@ const columns = [
     {
         field: 'valor',
         flex: 0.75,
+        valueFormatter: (value:any, row:any)=> row?.dominiDescription || value,
     }
 ]
 
@@ -55,7 +57,7 @@ const DataGrid = (props:any) => {
         popupEditCreateActive
         popupEditFormContent={<DadaForm/>}
         formAdditionalData={{
-            metaDada:{id: entity?.id},
+            metaDada: entity,
             node:{id: contingut?.id},
             tipusValor: entity?.tipus,
         }}
@@ -64,6 +66,7 @@ const DataGrid = (props:any) => {
             refresh?.()
         }}
         autoHeight
+        formInitOnChange
         toolbarHideCreate={ !potMod || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
         rowHideUpdateButton={!potMod}
         rowHideDeleteButton={!potMod}

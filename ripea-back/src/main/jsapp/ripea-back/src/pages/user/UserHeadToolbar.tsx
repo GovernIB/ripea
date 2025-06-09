@@ -7,6 +7,13 @@ import {useNotificacionsSession, useTasquesSession} from "../../components/SseCl
 import {MenuEntry} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
 
+const icons = {
+    expedient: 'folder_open',
+    anotacio: 'attach_email',
+    tasca: 'pending_actions',
+    consulta: 'search',
+}
+
 const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
 }
@@ -66,7 +73,7 @@ const useMenuSupAdmin = () => {
         {
             id: 'expedient',
             title: t('page.user.menu.expedient'),
-            // icon: '',
+            icon: icons.expedient,
             to: '/expedient',
         },
         {
@@ -149,13 +156,13 @@ const useMenuAdmin = () => {
         {
             id: 'expedient',
             title: t('page.user.menu.expedient'),
-            // icon: '',
+            icon: icons.expedient,
             to: '/expedient',
         },
         {
             id: 'anotacions',
             title: <MenuBadge badgeContent={numNotif}>{t('page.user.menu.anotacions')}</MenuBadge>,
-            // icon: '',
+            icon: icons.anotacio,
             onClick: () => toProgramaAntic('expedientPeticio'),
         },
         {
@@ -228,7 +235,7 @@ const useMenuAdmin = () => {
         {
             id: 'consultar',
             title: t('page.user.menu.consultar'),
-            // icon: '',
+            icon: icons.consulta,
             children: [
                 {
                     id: 'continguts',
@@ -305,13 +312,13 @@ const useMenuAdminOrgan = () => {
         {
             id: 'expedient',
             title: t('page.user.menu.expedient'),
-            // icon: '',
+            icon: icons.expedient,
             to: '/expedient',
         },
         {
             id: 'anotacions',
             title: <MenuBadge badgeContent={numNotif}>{t('page.user.menu.anotacions')}</MenuBadge>,
-            // icon: '',
+            icon: icons.anotacio,
             onClick: () => toProgramaAntic('expedientPeticio'),
         },
         {
@@ -379,19 +386,19 @@ const useMenuUsuari = () => {
         {
             id: 'expedient',
             title: t('page.user.menu.expedient'),
-            // icon: '',
+            icon: icons.expedient,
             to: '/expedient',
         },
         {
             id: 'anotacions',
             title: <MenuBadge badgeContent={numNotif}>{t('page.user.menu.anotacions')}</MenuBadge>,
-            // icon: '',
+            icon: icons.anotacio,
             onClick: () => toProgramaAntic('expedientPeticio'),
         },
         {
             id: 'tasca',
             title: <MenuBadge badgeContent={numTasc}>{t('page.user.menu.tasca')}</MenuBadge>,
-            // icon: '',
+            icon: icons.tasca,
             onClick: () => toProgramaAntic('usuariTasca'),
         },
         {
@@ -404,7 +411,7 @@ const useMenuUsuari = () => {
         {
             id: 'consultar',
             title: t('page.user.menu.consultar'),
-            // icon: '',
+            icon: icons.consulta,
             hidden: !(user?.sessionScope?.teAccesEstadistiques || user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu),
             children: [
                 {
@@ -452,7 +459,7 @@ const useAccionesMassivas = () => {
         {
             id: 'massive',
             title: t('page.user.massive.title'),
-            // icon: '',
+            icon: 'list_alt',
             children: [
                 {
                     id: 'portafirmes',

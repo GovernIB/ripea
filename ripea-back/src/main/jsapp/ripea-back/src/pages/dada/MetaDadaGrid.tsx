@@ -4,7 +4,7 @@ import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 
 const dadesFilter = (entity:any, dades:any[]) :any[] => {
-    return dades.filter((dada)=>dada?.node?.id == entity?.id)
+    return dades?.filter((dada)=>dada?.node?.id == entity?.id)
 }
 
 const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
@@ -28,8 +28,8 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             flex: 0.75,
             valueGetter: (value: any) => dadesFilter(entity, value),
             valueFormatter: (value: any, row:any) => {
-                if (row?.tipus?.toLowerCase() == 'DOMINI') {
-                    return value?.map((dada: any) => dada?.domini?.description).join(", \n")
+                if (row?.tipus == 'DOMINI') {
+                    return value?.map((dada: any) => dada?.dominiDescription).join(", \n")
                 }
                 return value?.map((dada: any) => dada?.valor).join(", \n")
             },
@@ -56,7 +56,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             readOnly
             onRowsChange={(rows:any)=> {
                 const array:any[] = []
-                rows.forEach((row:any) => array.push(...row.dades))
+                rows.forEach((row:any) => array.push(...(row?.dades || [])))
                 onRowCountChange?.(dadesFilter(entity, array).length)
             }}
         />
