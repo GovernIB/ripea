@@ -55,6 +55,8 @@ const Notific = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
 
+    const {certificat} = useActions();
+
     return <BasePage>
         <Typography hidden={entity?.notificacioInfo?.notificacioEstat != 'PENDENT'}>{t('page.notificacioInteressat.detall.noEnviat')}</Typography>
 
@@ -65,10 +67,9 @@ const Notific = (props:any) => {
         <CardData title={t('page.notificacioInteressat.detall.certificacio')} hidden={!entity?.enviamentCertificacioData}
               buttons={[
                   {
-                      text: t('page.notificacioInteressat.action.downloadDoc.label'),
+                      text: t('page.notificacioInteressat.action.certificat.label'),
                       icon: 'download',
-                      /* TODO: action */
-                      onClick: ()=>{},
+                      onClick: ()=>{certificat(entity?.id)},
                   },
               ]}
         >

@@ -11,7 +11,7 @@ const Dades = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
 
-    const {justificant} = useActions()
+    const {justificant, descarregarDocumentEnviat} = useActions()
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
         <CardData title={t('page.notificacio.detall.notificacioDades')}
@@ -40,8 +40,7 @@ const Dades = (props:any) => {
                       {
                           text: t('page.notificacio.action.documentEnviat.label'),
                           icon: 'download',
-                          /* TODO: action */
-                          onClick: ()=>{},
+                          onClick: ()=>{descarregarDocumentEnviat(entity?.id)},
                           flex: 2,
                       },
                   ]}

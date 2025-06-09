@@ -740,8 +740,7 @@ const translationCa = {
                 },
                 documentEnviat: {
                     label: "Document enviat",
-                    title: "",
-                    ok: "",
+                    ok: "S'ha descarregat el document enviat",
                 },
             },
         },
@@ -771,10 +770,6 @@ const translationCa = {
                     label: "Ampliar termini",
                     title: "Ampliació del termini dels enviaments de la remesa",
                     ok: "El termini ha estat ampliat",
-                },
-                downloadDoc: {
-                    label: "Descarregar document",
-                    ok: "El document s'ha descarregat correctament",
                 },
                 certificat: {
                     label: "Certificació",
