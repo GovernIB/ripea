@@ -21,7 +21,7 @@ import {
 import Footer from './Footer';
 import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
-import UserMenu from "./UserMenu.tsx";
+import UserMenu from "../pages/user/UserMenu.tsx";
 import {Alert} from "@mui/material";
 import {useAlertesSession} from "./SseClient.tsx";
 

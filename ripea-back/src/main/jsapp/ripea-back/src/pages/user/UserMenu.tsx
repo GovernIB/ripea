@@ -1,10 +1,10 @@
 import {FormControl, Icon, ListItemIcon, MenuItem, Select} from "@mui/material";
 import {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {useEntitatSession, useUserSession} from "./Session.tsx";
+import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useNavigate} from "react-router-dom";
-import {iniciaDescarga} from "../pages/expedient/details/CommonActions.tsx";
-import usePerfil from "../pages/user/detail/Perfil.tsx";
+import {iniciaDescarga} from "../expedient/details/CommonActions.tsx";
+import usePerfil from "./detail/Perfil.tsx";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 
@@ -98,14 +98,6 @@ const UserMenu = (props:any) => {
             navigate('/expedient')
         }
     }, [rol]);
-
-
-    // <MenuItem onClick={() => signOut?.()}>
-    //     <ListItemIcon>
-    //         <Icon fontSize="small">logout</Icon>
-    //     </ListItemIcon>
-    //     <ListItemText>{t('app.auth.logout')}</ListItemText>
-    // </MenuItem>
 
     return <>
         <MenuItem onClick={handleOpen}>
