@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -41,7 +42,8 @@ public class DadaResource extends BaseAuditableResource<Long> {
     @Transient private Integer sencer;
     @Transient private Float flotant;
     @Transient private boolean boolea;
-//    @Transient private ResourceReference<?, Long> domini;
+    @ResourceField(enumType = true)
+    @Transient private String domini;
 
     public String getValueByFieldName(MetaDadaTipusEnumDto fieldName) {
         switch (fieldName) {

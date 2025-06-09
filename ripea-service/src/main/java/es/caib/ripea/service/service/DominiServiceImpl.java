@@ -171,49 +171,9 @@ public class DominiServiceImpl implements DominiService {
 	
 	@Transactional
 	@Override
-	public ResultatDominiDto getResultDomini(
-			Long entitatId,
-			DominiDto domini,
-			String filter,
-			int page,
-			int resultCount) throws NotFoundException, DominiException {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false, false, false);
-		ResultatDominiDto resultat = new ResultatDominiDto();
-		if (domini == null) {
-			return resultat;
-		}
-		JdbcTemplate jdbcTemplate = null;
-		Properties conProps = dominiHelper.getProperties(domini);
-		
-		if (conProps != null && !conProps.isEmpty()) {
-			DataSource dataSource = dominiHelper.createDominiConnexio(
-					entitat.getCodi(),
-					conProps);
-			jdbcTemplate = dominiHelper.setDataSource(dataSource);
-		}
-		int start = (((page - 1) * resultCount != 0 && filter.isEmpty()) ? ((page - 1) * resultCount + 1) : (page - 1) * resultCount);
-		int addToEnd = (page - 1) * resultCount;
-		int end = resultCount + addToEnd;
-		try {
-			resultat = cacheHelper.findDominisByConsutla(
-				jdbcTemplate,
-				domini.getConsulta(),
-				filter,
-				start,
-				end);
-		} catch (Exception ex) {
-			logger.error(
-					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
-					ex);
-			throw new RuntimeException(
-					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
-					ex);
-		}
-		return resultat;
+	public ResultatDominiDto getResultDomini(Long entitatId, DominiDto domini, String filter, int page, int resultCount) 
+	throws NotFoundException, DominiException {
+		return dominiHelper.getResultDomini(entitatId, domini, filter, page, resultCount);
 	}
 	
 	public ResultatConsultaDto getSelectedDomini(

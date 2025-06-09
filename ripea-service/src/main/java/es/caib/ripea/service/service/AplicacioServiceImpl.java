@@ -68,7 +68,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntitatRepository entitatRepository;
-    @Autowired private EventService eventService;
+    
 
 	@Override
 	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
@@ -157,7 +157,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 			UsuariEntity usuari = usuariRepository.getOne(auth.getName());
 			usuari.updateRolActual(rolActual);
 			cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
-			eventService.notifyAnotacionsPendents(List.of(auth.getName()));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.out.println(ex.getMessage());
@@ -338,7 +337,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void evictCountAnotacionsPendents(String usuariCodi) {
 		logger.debug("Evict count anotacions per usuari");
-		cacheHelper.evictCountAnotacionsPendents(usuariCodi);
+		cacheHelper.evictCountAnotacionsPendents( usuariCodi);
 	}
 
 	@Override

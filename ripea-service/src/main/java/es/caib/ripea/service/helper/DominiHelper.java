@@ -29,6 +29,7 @@ import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.repository.DominiRepository;
 import es.caib.ripea.service.intf.dto.DominiDto;
+import es.caib.ripea.service.intf.dto.ResultatDominiDto;
 import es.caib.ripea.service.intf.exception.CipherException;
 import es.caib.ripea.service.intf.exception.DominiException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -40,7 +41,63 @@ public class DominiHelper {
 	@Autowired private DominiRepository dominiRepository;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private CacheHelper cacheHelper;
 
+	public ResultatDominiDto getResultDomini(
+			Long entitatId,
+			String metaDadaCodi,
+			String filter,
+			int page,
+			int resultCount) throws NotFoundException, DominiException {
+		DominiEntity dominiE = dominiRepository.findByCodiAndEntitatId(metaDadaCodi, entitatId);
+		return getResultDomini(entitatId, conversioTipusHelper.convertir(dominiE, DominiDto.class), filter, page, resultCount);
+	}
+	
+	public ResultatDominiDto getResultDomini(
+			Long entitatId,
+			DominiDto domini,
+			String filter,
+			int page,
+			int resultCount) throws NotFoundException, DominiException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, false, false);
+		ResultatDominiDto resultat = new ResultatDominiDto();
+		if (domini == null) {
+			return resultat;
+		}
+		JdbcTemplate jdbcTemplate = null;
+		Properties conProps = getProperties(domini);
+		
+		if (conProps != null && !conProps.isEmpty()) {
+			DataSource dataSource = createDominiConnexio(
+					entitat.getCodi(),
+					conProps);
+			jdbcTemplate = setDataSource(dataSource);
+		}
+		int start = (((page - 1) * resultCount != 0 && filter.isEmpty()) ? ((page - 1) * resultCount + 1) : (page - 1) * resultCount);
+		int addToEnd = (page - 1) * resultCount;
+		int end = resultCount + addToEnd;
+		try {
+			resultat = cacheHelper.findDominisByConsutla(
+				jdbcTemplate,
+				domini.getConsulta(),
+				filter,
+				start,
+				end);
+		} catch (Exception ex) {
+			logger.error(
+					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
+					ex);
+			throw new RuntimeException(
+					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
+					ex);
+		}
+		return resultat;
+	}
+	
 	public DominiDto create(
 			Long entitatId,
 			DominiDto domini, 

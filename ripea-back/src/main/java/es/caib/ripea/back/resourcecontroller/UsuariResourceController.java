@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,7 @@ import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -72,6 +74,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final EntitatService entitatService;
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
+    private final EventService eventService;
 
     @Hidden
     @GetMapping("/actual/securityInfo")
@@ -135,8 +138,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
             EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
             EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
             EntitatHelper.findEntitatsAccessibles(request, entitatService);
-
-            RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService);
+            RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService, eventService);
             RolHelper.setRolActualFromDb(request, aplicacioService);
         }
 

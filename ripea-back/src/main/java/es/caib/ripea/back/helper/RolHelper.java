@@ -5,9 +5,11 @@ package es.caib.ripea.back.helper;
 
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -30,23 +32,36 @@ public class RolHelper {
 	private static final String REQUEST_PARAMETER_CANVI_ROL  = "canviRol";
 	public  static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
-	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService, OrganGestorService organGestorService) {
-        processarCanviRols(request, request.getParameter(REQUEST_PARAMETER_CANVI_ROL), aplicacioService, organGestorService);
+	public static void processarCanviRols(
+			HttpServletRequest request,
+			AplicacioService aplicacioService,
+			OrganGestorService organGestorService,
+			EventService eventService) {
+        processarCanviRols(request, request.getParameter(REQUEST_PARAMETER_CANVI_ROL), aplicacioService, organGestorService, eventService);
     }
-	public static void processarCanviRols(HttpServletRequest request, String canviRol, AplicacioService aplicacioService, OrganGestorService organGestorService) {
+	public static void processarCanviRols(
+			HttpServletRequest request,
+			String canviRol,
+			AplicacioService aplicacioService,
+			OrganGestorService organGestorService,
+			EventService eventService) {
+		
 		if (canviRol != null && canviRol.length() > 0) {
 			
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
 
 			try {
 			
-			if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
-				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
-				aplicacioService.setRolUsuariActual(canviRol);
-			} else if (request.isUserInRole(canviRol)) {
-				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
-				aplicacioService.setRolUsuariActual(canviRol);
-			}
+				if (ROLE_ADMIN_ORGAN.equals(canviRol) && isUsuariActualTeOrgans(request)) {
+					request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
+					aplicacioService.setRolUsuariActual(canviRol);
+				} else if (request.isUserInRole(canviRol)) {
+					request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
+					aplicacioService.setRolUsuariActual(canviRol);
+				}
+				
+				if (eventService!=null)
+					eventService.notifyAnotacionsPendents(List.of(SecurityContextHolder.getContext().getAuthentication().getName()));
 			
 			} catch (Exception ex) {
 				ex.printStackTrace();

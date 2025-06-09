@@ -28,6 +28,7 @@ public interface DominiRepository extends JpaRepository<DominiEntity, Long> {
 			Pageable pageable);
 	DominiEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
+	DominiEntity findByCodiAndEntitatId(String codi, Long entitatId);
 	
 	List<DominiEntity> findByEntitatAndCodiInOrderByIdAsc(
 			EntitatEntity entitat,
