@@ -26,16 +26,12 @@ public interface DominiRepository extends JpaRepository<DominiEntity, Long> {
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Pageable pageable);
+	
 	DominiEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
 	DominiEntity findByCodiAndEntitatId(String codi, Long entitatId);
 	
-	List<DominiEntity> findByEntitatAndCodiInOrderByIdAsc(
-			EntitatEntity entitat,
-			List<String> dominiCodis);
-	
-	
-	List<DominiEntity> findByEntitatAndCodi(
-			EntitatEntity entitat,
-			String dominiCodi);
+	List<DominiEntity> findByEntitatAndCodiInOrderByIdAsc(EntitatEntity entitat, List<String> dominiCodis);
+		
+	List<DominiEntity> findByEntitatAndCodi(EntitatEntity entitat, String dominiCodi);
 }

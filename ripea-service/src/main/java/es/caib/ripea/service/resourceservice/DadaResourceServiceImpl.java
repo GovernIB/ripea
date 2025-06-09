@@ -90,15 +90,15 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
             resultat.add(new FieldOption("NO_APLICA", "No aplica"));
             try {
                 EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-                List<ResultatConsultaDto> fluxosDto = dominiHelper.getResultDomini(
+                List<ResultatConsultaDto> dominiValors = dominiHelper.getResultDomini(
                         entitatEntity.getId(),
                         requestParameterMap.get(DadaResource.Fields.metaDada)[0],
                         "",
                         1,
                         Integer.MAX_VALUE).getResultat();
 
-                if (fluxosDto!=null) {
-                    for (ResultatConsultaDto flx: fluxosDto) {
+                if (dominiValors!=null) {
+                    for (ResultatConsultaDto flx: dominiValors) {
                         resultat.add(new FieldOption(flx.getId(), flx.getText()));
                     }
                 }
