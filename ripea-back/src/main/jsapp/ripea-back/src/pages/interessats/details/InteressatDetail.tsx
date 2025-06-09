@@ -53,6 +53,7 @@ const useInteressatDetail = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
+            title={t('page.interessat.action.detail.title')}
             componentProps={{fullWidth: true, maxWidth: 'sm'}}
             buttons={[
                 {

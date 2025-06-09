@@ -120,6 +120,7 @@ const translationEs = {
                 history: {
                     label: "Histórico de acciones",
                     title: "Histórico de acciones del elemento",
+                    detail: "Detalle de la acción",
                 },
                 infoArxiu: {
                     title: "Información obtenida del archivo",
@@ -253,6 +254,9 @@ const translationEs = {
                 entregaDehObligat: "DEH obligada?",
             },
             action: {
+                detail: {
+                    title: "Detalle del interesado",
+                },
                 new: {
                     label: "Nuevo Interesado",
                     ok: "Elemento creado",
@@ -657,6 +661,7 @@ const translationEs = {
         },
         metaDada: {
             title: "Tipo de dato",
+            detail: "Editar valores de la metadata",
         },
         registre: {
             grid: {
@@ -853,10 +858,13 @@ const translationEs = {
                 anexos: "Adjuntar anexos pendientes de anotaciones aceptadas",
                 anotacio: "Actualizar estado de las anotaciones en Distribución",
                 prioritat: "Cambiar prioridad de expedientes",
-                masives: "Consultar acciones masivas",
             },
             action: {
-                masives: "Ejecuciones masivas de {{name}}",
+                massives: {
+                    label: "Consultar acciones masivas",
+                    title: "Ejecuciones masivas de {{name}}",
+                    detail: "Detalle de la acción masiva",
+                },
             },
             perfil: {
                 title: "Mi perfil",

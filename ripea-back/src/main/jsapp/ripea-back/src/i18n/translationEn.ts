@@ -120,6 +120,7 @@ const translationEn = {
                 history: {
                     label: "Action history",
                     title: "Element action history",
+                    detail: "Action details",
                 },
                 infoArxiu: {
                     title: "Information obtained from the file",
@@ -253,6 +254,9 @@ const translationEn = {
                 entregaDehObligat: "DEH required?",
             },
             action: {
+                detail: {
+                    title: "Details of the interested party",
+                },
                 new: {
                     label: "New Stakeholder",
                     ok: "Item created",
@@ -657,6 +661,7 @@ const translationEn = {
         },
         metaDada: {
             title: "Data Type",
+            detail: "Edit metadata values",
         },
         registre: {
             grid: {
@@ -853,10 +858,13 @@ const translationEn = {
                 anexos: "Attach pending annexes from accepted annotations",
                 anotacio: "Update annotation status in Distribution",
                 prioritat: "Change case priority",
-                masives: "View massive actions"
             },
             action: {
-                masives: "{{name}} mass executions",
+                masives: {
+                    label: "View massive actions",
+                    title: "{{name}} mass executions",
+                    detail: "Detail of the mass action",
+                },
             },
             perfil: {
                 title: "My profile",

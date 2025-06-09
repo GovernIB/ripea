@@ -161,7 +161,7 @@ const useExecucioMassiva = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
-            title={t('page.user.action.masives', {name: user?.nom})}
+            title={t('page.user.action.massives.title', {name: user?.nom})}
             componentProps={{fullWidth: true, maxWidth: 'xl'}}
             buttons={[
                 {
@@ -304,6 +304,7 @@ const useExecucioMassivaContingut = () => {
         <MuiDialog
             open={open}
             closeCallback={handleClose}
+            title={t('page.user.action.massives.detail')}
             componentProps={{fullWidth: true, maxWidth: 'lg'}}
             buttons={[
                 {

@@ -120,6 +120,7 @@ const translationCa = {
                 history: {
                     label: "Històric d'accions",
                     title: "Històric d'accions de l'element",
+                    detail: "Detall de l'acció",
                 },
                 infoArxiu: {
                     title: "Informació obtinguda de l'arxiu",
@@ -253,6 +254,9 @@ const translationCa = {
                 entregaDehObligat: "DEH obligat?",
             },
             action: {
+                detail: {
+                    title: "Detall de l'interessat",
+                },
                 new: {
                     label: "Nou Interessat",
                     ok: "Element creat",
@@ -657,6 +661,7 @@ const translationCa = {
         },
         metaDada: {
             title: "Tipus de dada",
+            detail: "Editar valors de la metadada",
         },
         registre: {
             grid: {
@@ -853,10 +858,13 @@ const translationCa = {
                 anexos: "Adjuntar annexos pendents d'anotacions acceptades",
                 anotacio: "Actualitzar estat de les anotacions a Distribució",
                 prioritat: "Canviar prioritat dels expedients",
-                masives: "Consultar accions massives"
             },
             action: {
-                masives: "Execucions massives de {{name}}",
+                massives: {
+                    label: "Consultar accions massives",
+                    title: "Execucions massives de {{name}}",
+                    detail: "Detall de l'acció massiva",
+                },
             },
             perfil: {
                 title: "El meu perfil",

@@ -83,6 +83,7 @@ const useAccioDialog = () => {
     const dialog =
     <MuiDialog
         open={open}
+        title={t('page.contingut.action.history.detail')}
         closeCallback={handleClose}
         componentProps={{ fullWidth: true, maxWidth: 'md'}}
         buttons={[

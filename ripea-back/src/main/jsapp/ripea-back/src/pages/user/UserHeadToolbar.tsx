@@ -529,7 +529,7 @@ const useAccionesMassivas = () => {
                 },
                 {
                     id: 'masives',
-                    title: t('page.user.massive.masives'),
+                    title: t('page.user.action.massives.label'),
                     // icon: '',
                     onClick: handleOpen,
                 },
