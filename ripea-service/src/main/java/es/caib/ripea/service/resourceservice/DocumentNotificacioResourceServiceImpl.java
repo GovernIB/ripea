@@ -30,6 +30,7 @@ import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
@@ -58,7 +59,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     public void init() {
         register(DocumentNotificacioResource.ACTION_ACTUALITZAR_ESTAT_CODE, new ActualitzarEstatActionExecutor());
         register(DocumentNotificacioResource.ACTION_DESCARREGAR_JUSTIFICANT, new JustificantReportGenerator());
-//        register(DocumentNotificacioResource.ACTION_ELIMINAR, new EliminarNotificacioActionExecutor());
+        register(DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT, new DescarregarDocEnviatReportGenerator());
     }
 
     @Override
@@ -106,27 +107,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         @Override
         public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
     }
-    
-    /*
-    private class EliminarNotificacioActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, Serializable, DocumentNotificacioResource> {
 
-		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
-
-		@Override
-		public DocumentNotificacioResource exec(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ActionExecutionException {
-            try {
-            	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-            	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(entitatEntity.getId(), entity.getDocument().getId(), false, true);
-            	documentNotificacioHelper.delete(entity.getId(), document);
-            	return null;
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/EliminarNotificacioActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al eliminar la notificació.");
-            }
-		}
-    }
-    */
     private class JustificantReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, DocumentNotificacioResource.MassiveAction, Serializable> {
 
 		@Override
@@ -140,12 +121,12 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 			DocumentNotificacioResource.MassiveAction params = (DocumentNotificacioResource.MassiveAction)data.get(1);
 			
 			if (params.isMassivo()) {
-				throw new ReportGenerationException(DocumentNotificacioResource.class, notificacioId, code, "La generació de justificants massiu per notificacions no esta implementat.");
+				throw new ReportGenerationException(getResourceClass(), notificacioId, code, "La generació de justificants massiu per notificacions no esta implementat.");
 			} else {
 				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(notificacioId).get();
 				RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioResourceEntity.getNotificacioIdentificador());
 				if (resposta.isError()) {
-					throw new ReportGenerationException(DocumentNotificacioResource.class, notificacioId, code, "La descarrega del justificant de la notificacio ha fallat: "+resposta.getErrorDescripcio());
+					throw new ReportGenerationException(getResourceClass(), notificacioId, code, "La descarrega del justificant de la notificacio ha fallat: "+resposta.getErrorDescripcio());
 				} else {
 	            	resultat = new DownloadableFile(
 	            			"justificantEnviament_"+notificacioId+".pdf",
@@ -164,4 +145,45 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 			return parametres;
 		}
     }
+
+    private class DescarregarDocEnviatReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public List<Serializable> generateData(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ReportGenerationException {
+			List<Serializable> parametres = new ArrayList<Serializable>();
+			parametres.add(entity!=null?entity.getDocument().getId():0l);
+			return parametres;
+		}
+		
+		@Override
+		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
+			Long documentId = data.get(0)!=null?(Long)data.get(0):null;
+			try {
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+	        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+	        			entitatEntity.getId(),
+	        			documentId,
+						true,
+						false);
+
+	        	FitxerDto fitxerDto = documentHelper.getFitxerAssociat(document, null);
+				
+            	return new DownloadableFile(
+            			fitxerDto.getNom(),
+            			fitxerDto.getContentType(),
+            			fitxerDto.getContingut());
+			} catch (Exception ex) {
+				excepcioLogHelper.addExcepcio("/documentEnviament/"+documentId+"/DescarregarDocEnviatReportGenerator", ex);
+				throw new ReportGenerationException(
+						getResourceClass(), 
+						documentId,
+						code,
+						"La descarrega del document enviat de la notificacio ha fallat: "+ex.getMessage());
+			}
+		}
+    }
+
 }

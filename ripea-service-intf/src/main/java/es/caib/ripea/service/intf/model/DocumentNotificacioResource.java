@@ -35,7 +35,12 @@ import javax.validation.constraints.NotNull;
 			@ResourceConfigArtifact(
 					type = ResourceArtifactType.REPORT,
 					code = DocumentNotificacioResource.ACTION_DESCARREGAR_JUSTIFICANT,
-					formClass = DocumentNotificacioResource.MassiveAction.class),				
+					formClass = DocumentNotificacioResource.MassiveAction.class),
+            @ResourceConfigArtifact(
+                    type = ResourceArtifactType.REPORT,
+                    code = DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT,
+                    formClass = Serializable.class,
+                    requiresId = true),
         }
 )
 public class DocumentNotificacioResource extends DocumentEnviamentResource {
@@ -44,6 +49,7 @@ public class DocumentNotificacioResource extends DocumentEnviamentResource {
 	
 	public static final String ACTION_ACTUALITZAR_ESTAT_CODE	= "ACTUALITZAR_ESTAT";
     public static final String ACTION_DESCARREGAR_JUSTIFICANT	= "DESCARREGAR_JUSTIFICANT";
+    public static final String ACTION_DESCARREGAR_DOC_ENVIAT	= "DESCARREGAR_DOC_ENVIAT";
     public static final String ACTION_ELIMINAR					= "DELETE_NOTIFICACIO";
 
     private DocumentNotificacioTipusEnumDto tipus;
