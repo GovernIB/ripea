@@ -10,7 +10,7 @@ import theme from './theme';
 import App from './App.tsx'
 import {
     envVar,
-    KeycloakAuthProvider as AuthProvider,
+    // KeycloakAuthProvider as AuthProvider,
     ResourceApiProvider
 } from 'reactlib';
 import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
@@ -30,11 +30,11 @@ export const envVars = {
     VITE_AUTH_KEYCLOAK_CLIENTID: import.meta.env.VITE_AUTH_KEYCLOAK_CLIENTID,
 }
 
-const getAuthConfig = () => ({
-    url: envVar('VITE_AUTH_KEYCLOAK_URL', envVars),
-    realm: envVar('VITE_AUTH_KEYCLOAK_REALM', envVars),
-    clientId: envVar('VITE_AUTH_KEYCLOAK_CLIENTID', envVars),
-});
+// const getAuthConfig = () => ({
+//     url: envVar('VITE_AUTH_KEYCLOAK_URL', envVars),
+//     realm: envVar('VITE_AUTH_KEYCLOAK_REALM', envVars),
+//     clientId: envVar('VITE_AUTH_KEYCLOAK_CLIENTID', envVars),
+// });
 
 const getEnvApiUrl = () => {
     const envApiPublicUrl = envVar('VITE_API_PUBLIC_URL', envVars);
@@ -54,7 +54,7 @@ const getEnvApiUrl = () => {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>
+        {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
         <SessionStorageProvider>
             <SseProvider>
                 <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
@@ -67,6 +67,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </ResourceApiProvider>
             </SseProvider>
         </SessionStorageProvider>
-        </AuthProvider>
+        {/*</AuthProvider>*/}
     </React.StrictMode>,
 );

@@ -165,7 +165,7 @@ const useMenuAdmin = () => {
             children: [
                 {
                     id: 'procediments',
-                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
+                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')}>
                         {t('page.user.menu.procediments')}
                     </MenuBadge>,
                     // icon: '',
@@ -321,7 +321,7 @@ const useMenuAdminOrgan = () => {
             children: [
                 {
                     id: 'procediments',
-                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
+                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')}>
                         {t('page.user.menu.procediments')}
                     </MenuBadge>,
                     // icon: '',

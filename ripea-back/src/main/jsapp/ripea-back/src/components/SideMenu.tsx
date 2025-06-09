@@ -142,7 +142,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
         py: 0,
         pl: 3,
         pr: !shrink ? 1 : 3,
-        '& :before': (level ?? 0) > 0 && !shrink ? {
+        '> :before': (level ?? 0) > 0 && !shrink ? {
             content: '""',
             display: 'block',
             position: 'absolute',
