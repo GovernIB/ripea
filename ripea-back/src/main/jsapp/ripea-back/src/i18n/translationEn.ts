@@ -349,6 +349,7 @@ const translationEn = {
                 },
                 open: {
                     label: "Reopen",
+                    description: "Do you want to reopen the case?",
                     ok: "The expedient '{{expedient}}' has been reopened successfully.",
                 },
                 download: {
@@ -419,6 +420,10 @@ const translationEn = {
                     title: "Relate expedient",
                     ok: "The relations of the expedient '{{expedient}}' have changed successfully.",
                 },
+                excelInteressats: {
+                    title: "Export interested parties to EXCEL",
+                    ok: "The interested parties have been successfully exported"
+                }
             },
             alert: {
                 owner: "It is necessary to reserve the file to be able to modify it",

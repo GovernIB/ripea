@@ -11,6 +11,7 @@ import useInteressatActions, {useActions} from "./details/InteressatActions.tsx"
 import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
 import {potModificar} from "../expedient/details/Expedient.tsx";
+import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
 
 export const InteressatsGridForm = () => {
     const {data} = useFormContext()
@@ -59,11 +60,12 @@ const columns = [
 
 interface DetailGridProps {
     entity: any,
+    num: number,
     onRowCountChange?: (number: number) => void,
 }
 
 const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
-    const {entity, onRowCountChange} = props
+    const {entity, num, onRowCountChange} = props
     const { t } = useTranslation();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
@@ -75,6 +77,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
 
     const {actions, components} = useInteressatActions(entity, refresh)
     const {exportar} = useActions(refresh);
+    const {excelInteressats} = useExpedientActions(refresh);
     const {handleShow: handleImport, content: contentImport} = useImport(entity, refresh);
 
     return <GridPage>
@@ -121,6 +124,16 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             onClick={()=>handleImport()}
                                             hidden={!potModificar(entity)}
                     >{t('page.interessat.action.importar.label')}</ToolbarButton>
+                },
+                {
+                    position: 0,
+                    element: <ToolbarButton icon={'description'}
+                                            color={'success'}
+                                            variant={'contained'}
+                                            title={t('page.expedient.action.excelInteressats.title')}
+                                            onClick={()=>excelInteressats(entity?.id)}
+                                            hidden={!potModificar(entity) || num==0}
+                    />,
                 },
             ]}
         />
