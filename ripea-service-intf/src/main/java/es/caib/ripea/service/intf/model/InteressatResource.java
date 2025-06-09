@@ -138,6 +138,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Setter
     @FieldNameConstants
     public static class ImportarInteressatsFormAction implements Serializable {
+        @NotNull
     	private InteressatImportacioTipusDto tipusImportacio = InteressatImportacioTipusDto.JSON;
         @NotNull
         @ResourceField(onChangeActive = true)

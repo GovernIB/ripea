@@ -77,15 +77,15 @@ export const useActions = (refresh?: () => void) => {
 			});		
 	}
 
-    const reobrir= (id:any): void => {
+    const reobrir= (id:any, row:any): void => {
         messageDialogShow(
             '',
-            '',
+            t('page.expedient.action.open.description'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
                 if (value) {
-                    action(id, 'REOBRIR', t('page.expedient.results.actionOk'));
+                    action(id, 'REOBRIR', t('page.expedient.action.open.ok', {expedient: row?.nom}));
                 }
             });
     }
@@ -121,8 +121,19 @@ export const useActions = (refresh?: () => void) => {
                 }
             });
     }
-	
-	const exportIndexPdf= (id:any): void => { report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionOk'), 'PDF');}
+
+    const excelInteressats= (id:any): void => {
+        apiReport(id, {code: 'PLANTILLA_EXCEL_INTERESSATS', fileType: 'XLSX'})
+            .then((result) => {
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, t('page.expedient.action.excelInteressats.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    const exportIndexPdf= (id:any): void => { report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionOk'), 'PDF');}
 	const exportIndexXls= (id:any): void => { report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionOk'), 'XLSX');}
 	const exportPdfEni= (id:any): void => { report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionOk'), 'ZIP');}
 	const exportEni= (id:any): void => { report(id, 'EXPORT_ENI', t('page.expedient.results.actionOk'), 'ZIP');}
@@ -165,7 +176,8 @@ export const useActions = (refresh?: () => void) => {
         exportEni,
         exportInside,
         syncArxiu,
-        eliminarRelacio
+        eliminarRelacio,
+        excelInteressats,
     }
 }
 

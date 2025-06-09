@@ -349,6 +349,7 @@ const translationCa = {
                 },
                 open: {
                     label: "Reobrir",
+                    description: "Voleu reobrir l'expedient?",
                     ok: "L'expedient '{{expedient}}' ha estat reobert correctament",
                 },
                 download: {
@@ -419,6 +420,10 @@ const translationCa = {
                     title: "Relacionar expedient",
                     ok: "Les relacions de l'expedient '{{expedient}}' han canviat correctament.",
                 },
+                excelInteressats: {
+                    title: "Exportar interessats a EXCEL",
+                    ok: "Els interessats s'han exportat correctament"
+                }
             },
             alert: {
                 owner: "Cal reservar l'expedient per poder modificar-lo",

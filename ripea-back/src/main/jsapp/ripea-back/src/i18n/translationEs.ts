@@ -349,6 +349,7 @@ const translationEs = {
                 },
                 open: {
                     label: "Reabrir",
+                    description: "¿Desea reabrir el epediente?",
                     ok: "El expediente '{{expedient}}' ha sido reabierto correctamente",
                 },
                 download: {
@@ -419,6 +420,10 @@ const translationEs = {
                     title: "Relacionar expediente",
                     ok: "Las relaciones del expediente '{{expedient}}' han cambiado correctamente.",
                 },
+                excelInteressats: {
+                    title: "Exportar interesados a EXCEL",
+                    ok: "Los interesados se han exportado correctamente",
+                }
             },
             alert: {
                 owner: "Es necesario reservar el expediente para poder modificarlo",

@@ -1,11 +1,11 @@
-import React from "react";
+import React, {ReactElement} from "react";
 import {Button, Icon, Menu, MenuItem} from "@mui/material";
 
 type MenuButtonProps = {
     id: string;
     hidden?: boolean;
     children?: any;
-    buttonLabel?: string;
+    buttonLabel?: string | ReactElement;
     buttonProps?: any;
     menuProps?: any;
     arrowDown?: string;

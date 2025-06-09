@@ -158,7 +158,7 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_PLANTILLA_EXCEL_INTERESSATS,
-						formClass = Serializable.class),					
+                        requiresId = true),
 		})
 public class ExpedientResource extends NodeResource implements Serializable {
 

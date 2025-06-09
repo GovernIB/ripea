@@ -7,7 +7,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const EnviarViaEmailForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-		<GridFormField xs={12} name="versioDocument"/>
+		<GridFormField xs={12} name="versioDocument" required/>
 	    <GridFormField xs={12} name="email" type={"text"}/>
         <GridFormField xs={12} name="responsables" multiple/>
     </Grid>
@@ -19,7 +19,7 @@ const EnviarViaEmail = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_VIA_EMAIL"}
-        title={t('page.document.action.enviarEmail.title')}
+        title={t('page.document.action.mail.title')}
         {...props}
     >
         <EnviarViaEmailForm/>
@@ -36,7 +36,7 @@ const useEnviarViaEmail = (refresh?: () => void) => {
     }
     const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.document.action.enviarEmail.ok', {document: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.document.action.mail.ok', {document: result?.nom}), 'success');
     }
     const onError = (error:any) :void => {
         temporalMessageShow(null, error.message, 'error');

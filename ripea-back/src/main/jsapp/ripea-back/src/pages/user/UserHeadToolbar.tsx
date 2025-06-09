@@ -6,6 +6,8 @@ import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
 import {MenuEntry} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
+import MenuButton from "../../components/MenuButton.tsx";
+import UserMenu from "./UserMenu.tsx";
 
 const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
@@ -55,6 +57,13 @@ const UserHeadToolbar = () => {
         <Grid item xs={12} display={'flex'} alignContent={'center'} justifyContent={'end'}>
             {...generateAppMenu(menuEntries)}
             {...contents}
+
+            {/* TODO: revisar implementación temporal */}
+            <MenuButton id={"temp"}
+                        arrowUp={'account_circle'}
+                        arrowDown={'account_circle'}>
+                <UserMenu/>
+            </MenuButton>
         </Grid>
     </Grid>
 }
@@ -165,7 +174,7 @@ const useMenuAdmin = () => {
             children: [
                 {
                     id: 'procediments',
-                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
+                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')}>
                         {t('page.user.menu.procediments')}
                     </MenuBadge>,
                     // icon: '',
@@ -321,7 +330,7 @@ const useMenuAdminOrgan = () => {
             children: [
                 {
                     id: 'procediments',
-                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')} sx={{pl: 0}}>
+                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')}>
                         {t('page.user.menu.procediments')}
                     </MenuBadge>,
                     // icon: '',
