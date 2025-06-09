@@ -39,7 +39,7 @@ const MenuButton = (props:MenuButtonProps) => {
     return(<>
         <Button
             id={`menu-button-${id}`}
-            aria-controls={open ? 'demo-customized-menu' : undefined}
+            aria-controls={'demo-customized-menu'}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
