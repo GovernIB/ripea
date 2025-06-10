@@ -290,20 +290,20 @@ function setCheckboxTrue($checkbox) {
 										<div class="controls">
 											<c:choose>
 												<c:when test="${metaDada.tipus == 'SENCER'}">
-													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
+													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="." data-a-sep="" data-m-dec="0" class="form-control text-right${multipleClass}"></form:input>
 												</c:when>
 												<c:when test="${metaDada.tipus == 'FLOTANT'}">
-													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
+													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="." data-a-sep="" data-m-dec="10" data-a-pad="false" class="form-control text-right${multipleClass}"></form:input>
 												</c:when>
 												<c:when test="${metaDada.tipus == 'IMPORT'}">
-													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="," data-a-sep="." data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
+													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="autonumeric" data-a-dec="." data-a-sep="" data-m-dec="2" class="form-control text-right${multipleClass}"></form:input>
 												</c:when>
 												<c:when test="${metaDada.tipus == 'DATA'}">
-													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" data-a-dec="," data-a-sep="." data-m-dec="2" cssClass="form-control text-right${multipleClass}"></form:input>
+													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="datepicker" data-idioma="${requestLocale}" cssClass="form-control text-right${multipleClass}"></form:input>
 												</c:when>
 												<c:when test="${metaDada.tipus == 'BOOLEA'}">
 												<label>
-													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="checkbox" data-a-dec="," data-a-sep="." data-m-dec="2" class="${multipleClass}"></form:input>
+													<form:input path="${metaDada.codi}" id="${metaDada.codi}" data-toggle="checkbox" class="${multipleClass}"></form:input>
 												</label>
 												</c:when>
 												<c:when test="${metaDada.tipus == 'DOMINI'}">

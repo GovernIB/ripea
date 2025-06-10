@@ -59,7 +59,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
     }
 
     private void beforeSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
-        String value = resource.getValueByFieldName(entity.getMetaDada().getTipus());
+        String value = resource.getDataValorByTipus();
         entity.setValor(value);
     }
 
@@ -70,8 +70,8 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
 
     @Override
     protected void afterConversion(DadaResourceEntity entity, DadaResource resource) {
-        resource.setValueByFieldName(entity.getMetaDada().getTipus());
-
+        resource.setTipus(entity.getMetaDada().getTipus());
+        resource.setDataValorByTipus();
         if (resource.getDomini() != null) {
             Map<String,String[]> requestParameterMap = new HashMap<>();
             requestParameterMap.put(DadaResource.Fields.metaDada, new String[] { entity.getMetaDada().getCodi() });

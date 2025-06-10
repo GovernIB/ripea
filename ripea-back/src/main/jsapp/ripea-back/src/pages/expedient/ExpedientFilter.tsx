@@ -24,9 +24,6 @@ const ExpedientFilterForm = () => {
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="nom"/>
         <GridFormField xs={3} name="estat"/>
-        <GridFormField xs={3} name="estatAdditional" filter={filtErestatAdditional}
-                       disabled={!data?.metaExpedient || data?.estat == 'TANCAT'}
-                       readOnly={!data?.metaExpedient || data?.estat == 'TANCAT'}/>
         <GridFormField xs={3} name="interessat"/>
         <GridFormField xs={3} name="organGestor"/>
         <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
@@ -50,8 +47,6 @@ const springFilterBuilder = (data: any, user: any): string => {
     filterStr += builder.and(
         builder.like("numero", data.numero),
         builder.like("nom", data.nom),
-        data.estat && builder.equals("estat", `'TANCAT'`, (data.estat === 'TANCAT')),
-        data.estat != 'TANCAT' && builder.eq("estatAdditional.id", data.estatAdditional?.id),
         builder.exists(
             builder.or(
                 builder.like("interessats.documentNum", data.interessat),

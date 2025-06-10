@@ -16,6 +16,8 @@ public interface ExpedientEstatRepository extends JpaRepository<ExpedientEstatEn
 	
 	List<ExpedientEstatEntity> findByMetaExpedientOrderByOrdreAsc(MetaExpedientEntity metaExpedient);
 	
+	List<ExpedientEstatEntity> findByMetaExpedientIdOrderByOrdreAsc(Long metaExpedientId);
+	
 	ExpedientEstatEntity findByMetaExpedientAndOrdre(MetaExpedientEntity metaExpedient, int ordre);
 	
 	ExpedientEstatEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedient, String codi);

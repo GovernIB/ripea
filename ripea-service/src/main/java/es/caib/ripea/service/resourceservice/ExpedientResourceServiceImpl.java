@@ -29,6 +29,7 @@ import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.ExpedientEstatEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
@@ -36,9 +37,11 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEnti
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.base.service.BaseMutableResourceService.FieldOptionsProvider;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -57,6 +60,7 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
@@ -71,6 +75,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
@@ -91,6 +96,7 @@ import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.ExpedientResourceHelper;
+import es.caib.ripea.service.resourceservice.DocumentResourceServiceImpl.ViaFirmaDispositiuOptionsProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,6 +107,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 	private final ExpedientRepository expedientRepository;
 	private final OrganGestorRepository organGestorRepository;
+	private final ExpedientEstatRepository expedientEstatRepository;
 	
     private final UsuariResourceRepository usuariResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
@@ -168,7 +175,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
+        register(ExpedientResource.ExpedientFilterForm.Fields.estat, new EstatsExpedientOptionsProvider());
         //register(null, new InitialOnChangeExpedientResourceLogicProcessor());
+    }
+    
+    public class EstatsExpedientOptionsProvider implements FieldOptionsProvider {
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			String[] requestParam = requestParameterMap.get("metaExpedientId");
+			String vfUserCodi = requestParam!=null?requestParam[0]:"";
+			List<ExpedientEstatEntity> estatsProcediment = expedientEstatRepository.findByMetaExpedientIdOrderByOrdreAsc(Long.parseLong(vfUserCodi));
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			resultat.add(new FieldOption("0", "Obert"));
+			if (estatsProcediment!=null) {
+				for (ExpedientEstatEntity dsp: estatsProcediment) {
+					resultat.add(new FieldOption(dsp.getId().toString(), dsp.getNom()));
+				}
+			}
+			resultat.add(new FieldOption("-1", "Tancat"));
+			return resultat;
+		}
     }
     
     @Override

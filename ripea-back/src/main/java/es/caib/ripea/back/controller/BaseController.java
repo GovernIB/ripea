@@ -531,7 +531,7 @@ public class BaseController implements MessageSourceAware {
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"),true));
-	    binder.registerCustomEditor(Long[].class, new StringArrayPropertyEditor(null));
+	    binder.registerCustomEditor(Long[].class, new StringArrayPropertyEditor(","));
 	    binder.registerCustomEditor(LocalDateTime.class, new CustomDateTimeEditor("dd/MM/yyyy HH:mm:ss"));
 		binder.registerCustomEditor(Date[].class, new CustomDatesEditor());
 		binder.registerCustomEditor(BigDecimal.class, new CustomNumberEditor(BigDecimal.class, NumberFormat.getInstance(new Locale("es","ES")), true));

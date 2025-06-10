@@ -346,8 +346,10 @@ public class ExpedientResource extends NodeResource implements Serializable {
 		private static final long serialVersionUID = 647178646210565833L;
 		private String numero;
         private String nom;
-        private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
-        private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+//        private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
+//        private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+        @ResourceField(enumType = true)
+        private String estat;
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
