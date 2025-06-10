@@ -1,4 +1,5 @@
-import {Grid, Button, Link} from "@mui/material";
+import React from "react";
+import {Grid, Button} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
 import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
@@ -6,6 +7,10 @@ import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
 import {MenuEntry} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
+import {
+    Link as RouterLink,
+    LinkProps as RouterLinkProps,
+} from 'react-router-dom';
 
 export const icons = {
     expedient: 'folder_open',
@@ -18,6 +23,10 @@ const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
 }
 
+const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
+    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+});
+
 const generateMenuItems = (appMenuEntries: any[]) => {
     const { value: entitat } = useEntitatSession();
 
@@ -28,7 +37,7 @@ const generateMenuItems = (appMenuEntries: any[]) => {
                 key={entry.id}
                 style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0 }}
                 component={Link}
-                href={entry.to} // Navegació amb React Router
+                to={entry.to} // Navegació amb React Router
                 onClick={entry?.onClick}
             >
                 {entry.title}
