@@ -1,22 +1,47 @@
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import * as builder from '../../util/springFilterUtils';
 import {useDadaActions} from "./details/DadaActions.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
+import {useEffect, useState} from "react";
 
-const dadesFilter = (entity:any, dades:any[]) :any[] => {
-    return dades?.filter((dada)=>dada?.node?.id == entity?.id)
+const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
+    return dades?.filter((dada)=>dada?.metaDada?.id == metaDada?.id)
 }
 
 const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
-const perspectives = ['DADES']
 
 const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) => void) }) => {
     const apiRef = useMuiDataGridApiRef()
     const { entity, onRowCountChange } = props
 
+    const {
+        isReady,
+        find: apiFindAll
+    } = useResourceApiService('dadaResource');
+    const [dades, setDades] = useState<any[]>([]);
+
+    const findByExpedient = (id:any) => {
+        if (id) {
+            const filter = builder.eq('node.id', id)
+            console.log("filter", filter)
+            apiFindAll({unpaged: true, filter})
+                .then((result) => {
+                    console.log("result", result)
+                    setDades(result?.rows)
+                })
+        }
+    }
+
     const refresh = () => {
         apiRef.current.refresh();
+        findByExpedient(entity?.id)
     }
+
+    useEffect(() => {
+        if (isReady) {
+            findByExpedient(entity?.id)
+        }
+    }, [isReady]);
 
     const columns = [
         {
@@ -26,7 +51,7 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
         {
             field: 'dades',
             flex: 0.75,
-            valueGetter: (value: any) => dadesFilter(entity, value),
+            valueGetter: (value: any, row:any) => dadesFilter(row, dades),
             valueFormatter: (value: any, row:any) => {
                 if (row?.tipus == 'DOMINI') {
                     return value?.map((dada: any) => dada?.dominiDescription).join(", \n")
@@ -48,17 +73,12 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
                 )
             }
             staticSortModel={sortModel}
-            perspectives={perspectives}
             apiRef={apiRef}
             rowAdditionalActions={actions}
             // paginationActive
             disableColumnSorting
             readOnly
-            onRowsChange={(rows:any)=> {
-                const array:any[] = []
-                rows.forEach((row:any) => array.push(...(row?.dades || [])))
-                onRowCountChange?.(dadesFilter(entity, array).length)
-            }}
+            onRowsChange={()=> onRowCountChange?.(dades?.length)}
         />
         {components}
     </GridPage>
