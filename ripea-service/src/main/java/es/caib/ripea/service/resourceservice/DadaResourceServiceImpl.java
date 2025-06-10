@@ -70,7 +70,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
 
     @Override
     protected void afterConversion(DadaResourceEntity entity, DadaResource resource) {
-        resource.setTipus(entity.getMetaDada().getTipus());
+        resource.setTipusValor(entity.getMetaDada().getTipus());
         resource.setDataValorByTipus();
         if (resource.getDomini() != null) {
             Map<String,String[]> requestParameterMap = new HashMap<>();

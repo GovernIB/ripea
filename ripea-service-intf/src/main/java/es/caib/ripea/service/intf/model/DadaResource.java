@@ -48,11 +48,11 @@ public class DadaResource extends BaseAuditableResource<Long> {
     @ResourceField(enumType = true)
     @Transient private String domini;
     @Transient private String dominiDescription;
-    @Transient private MetaDadaTipusEnumDto tipus;
+    @Transient private MetaDadaTipusEnumDto tipusValor;
 
     public String getDataValorByTipus() {
-    	if (this.tipus!=null) {
-	        switch (this.tipus) {
+    	if (this.tipusValor !=null) {
+	        switch (this.tipusValor) {
 	            case TEXT:
 	                return this.text;
 	            case DATA:
@@ -74,8 +74,8 @@ public class DadaResource extends BaseAuditableResource<Long> {
     }
     
     public String getNullFieldNamebyTipus() {
-    	if (this.tipus!=null) {
-	        switch (this.tipus) {
+    	if (this.tipusValor !=null) {
+	        switch (this.tipusValor) {
 	            case TEXT:
 	                return Utils.hasValue(this.text)?null:"text";
 	            case DATA:
@@ -96,8 +96,8 @@ public class DadaResource extends BaseAuditableResource<Long> {
     }
     
     public void setDataValorByTipus() {
-    	if (this.tipus!=null) {
-	    	switch (this.tipus) {
+    	if (this.tipusValor !=null) {
+	    	switch (this.tipusValor) {
 	            case TEXT:
 	                this.text = this.valor;
 	                break;
