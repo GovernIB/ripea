@@ -659,7 +659,7 @@ const translationCa = {
         dada: {
             title: "valor per al dada '{{metaDada}}'",
             grid: {
-                valor: "Valor",
+                valor: "Valor de la dada",
             },
         },
         metaDada: {

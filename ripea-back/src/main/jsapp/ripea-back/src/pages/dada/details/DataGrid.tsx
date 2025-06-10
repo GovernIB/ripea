@@ -8,16 +8,17 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const DadaForm = () => {
+    const { t } = useTranslation()
     const { data }  = useFormContext();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DATA'} type={"date"} required/>
-        <GridFormField xs={12} name={'importe'} hidden={data.tipusValor != 'IMPORT'} required/>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'TEXT'} required/>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'SENCER'} decimalScale={0} required/>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'FLOTANT'} required/>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'BOOLEA'} required/>
-        <GridFormField xs={12} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DATA'} type={"date"} required/>
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={'importe'} hidden={data.tipusValor != 'IMPORT'} required/>
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'TEXT'} required/>
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'SENCER'} decimalScale={0} required/>
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'FLOTANT'} required/>
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'BOOLEA'} required/>
+        <GridFormField xs={12} label={t('page.dada.grid.valor')} name={data.tipusValor?.toLowerCase()} hidden={data.tipusValor != 'DOMINI'} required
                        requestParams={{metaDada: data?.metaDada?.codi}}/>
     </Grid>
 }

@@ -659,7 +659,7 @@ const translationEs = {
         dada: {
             title: "valor para el dato '{{metaDada}}'",
             grid: {
-                valor: "Valor",
+                valor: "Valor del dato",
             },
         },
         metaDada: {
