@@ -45,7 +45,7 @@ const DataGrid = (props:any) => {
 
     return <StyledMuiGrid
         resourceName={"dadaResource"}
-        popupEditFormDialogResourceTitle={t('page.dada.title')}
+        popupEditFormDialogResourceTitle={t('page.dada.title', {metaDada: entity?.nom})}
         filter={
             builder.and(
                 builder.eq('metaDada.id', entity?.id),
@@ -61,6 +61,7 @@ const DataGrid = (props:any) => {
             node:{id: contingut?.id},
             tipusValor: entity?.tipus,
         }}
+        popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'xs' }}
         onRowCountChange={(count:number)=>{
             setNumDades?.(count)
             refresh?.()
@@ -93,9 +94,9 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
     const content =
         <MuiDialog
             open={open}
-            title={t('page.metaDada.detail')}
+            title={t('page.metaDada.detail', {metaDada: entity?.nom})}
             closeCallback={handleClose}
-            componentProps={{ fullWidth: true, maxWidth: 'md' }}
+            componentProps={{ fullWidth: true, maxWidth: 'sm' }}
             buttons={[
                 {
                     value: 'close',

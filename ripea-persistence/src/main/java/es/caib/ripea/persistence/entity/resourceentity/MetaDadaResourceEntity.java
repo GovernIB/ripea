@@ -1,8 +1,6 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
@@ -60,5 +58,6 @@ public class MetaDadaResourceEntity extends BaseAuditableEntity<MetaDadaResource
             mappedBy = "metaDada",
             fetch = FetchType.LAZY,
             orphanRemoval = true)
+    @OrderBy("ordre ASC")
     protected Set<DadaResourceEntity> dades = new HashSet<DadaResourceEntity>();
 }

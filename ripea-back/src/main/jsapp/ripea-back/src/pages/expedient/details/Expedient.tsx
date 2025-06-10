@@ -25,6 +25,7 @@ import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio from "./ErrorValidacio.tsx";
 import SseExpedient from "../../../components/SseExpedient.tsx";
+import {icons} from "../../user/UserHeadToolbar.tsx";
 
 const Contenido = (props :any) => {
     const { title, children } = props;
@@ -55,7 +56,7 @@ const ExpedientsRelacionats = (props:any) => {
         {
             relacionats?.map((relacionat:any) =>
                 <Typography key={relacionat?.id} variant={"caption"} display={"flex"} alignItems={"center"}>
-                    <Icon fontSize={"inherit"}>folder</Icon>
+                    <Icon fontSize={"inherit"}>{icons.expedient}</Icon>
                     <Link href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
                     <IconButton onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}><Icon>delete</Icon></IconButton>
                 </Typography>
@@ -106,7 +107,7 @@ const ExpedientAlert = (props:any) => {
         {expedient?.agafatPer?.id != user?.codi &&
             <Alert severity="info"
                    action={
-                       <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id)} color={"inherit"}>
+                       <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id, expedient)} color={"inherit"}>
                            <Icon>lock</Icon>
                            <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
                        </IconButton>
@@ -244,14 +245,14 @@ const Expedient = () => {
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
                 <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                    <Icon>folder</Icon>{expedient?.nom}</Typography>
+                    <Icon>{icons.expedient}</Icon>{expedient?.nom}</Typography>
                 </Grid>
                 <Grid item xs={4} display={'flex'} justifyContent={'end'}>
                     <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
                         {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
 
                         {expedient?.agafatPer?.id == user?.codi &&
-                            <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id)} title={t('page.expedient.action.lliberar.label')}>
+                            <IconButton aria-label="lock_open" color={"inherit"} onClick={()=>alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
                                 <Icon>lock_open</Icon>
                             </IconButton>
                         }

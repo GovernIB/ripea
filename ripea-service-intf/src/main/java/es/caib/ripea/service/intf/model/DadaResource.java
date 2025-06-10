@@ -99,7 +99,7 @@ public class DadaResource extends BaseAuditableResource<Long> {
     	if (this.tipus!=null) {
 	    	switch (this.tipus) {
 	            case TEXT:
-	                this.text = String.valueOf(this.valor);
+	                this.text = this.valor;
 	                break;
 	            case DATA:
 	                try {
