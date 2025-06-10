@@ -13,7 +13,7 @@ export interface AppMenuProps {
 
 export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
   const [open, setOpen] = React.useState(false);
-    const { value: entitat } = useEntitatSession()
+  const { value: entitat } = useEntitatSession()
 
   const toggleMenu = () => {
     setOpen(!open);
@@ -25,7 +25,7 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
         aria-label="open menu"
         onClick={toggleMenu}
         edge="start"
-        sx={{ mr: 2 }}
+        // sx={{ mr: 2 }}
         style={{ color: entitat?.capsaleraColorLletra ?? '#000' }}
       >
         <Icon sx={{ fontSize: '24px'}} fontSize={'medium'}>{menuIcon}</Icon>

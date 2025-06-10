@@ -69,7 +69,7 @@ public class DadaResource extends BaseAuditableResource<Long> {
     public void setValueByFieldName(MetaDadaTipusEnumDto fieldName) {
         switch (fieldName) {
             case TEXT:
-                this.text = String.valueOf(this.valor);
+                this.text = this.valor;
                 break;
             case DATA:
                 try {

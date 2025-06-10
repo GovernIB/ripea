@@ -1,13 +1,13 @@
-import {Grid} from "@mui/material";
+import {Grid, Button, Link} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
-import {useUserSession} from "../../components/Session.tsx";
+import {useEntitatSession, useUserSession} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import useExecucioMassiva from "./actions/ExecucioMassivaGrid.tsx";
 import {useNotificacionsSession, useTasquesSession} from "../../components/SseClient.tsx";
 import {MenuEntry} from "reactlib";
 import AppMenu from "../../components/AppMenu.tsx";
 
-const icons = {
+export const icons = {
     expedient: 'folder_open',
     anotacio: 'attach_email',
     tasca: 'pending_actions',
@@ -18,12 +18,33 @@ const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
 }
 
+const generateMenuItems = (appMenuEntries: any[]) => {
+    const { value: entitat } = useEntitatSession();
+
+    return appMenuEntries?.length
+        ? appMenuEntries.map((entry) => (
+            <Button
+                className="appMenuItem"
+                key={entry.id}
+                style={{ color: entitat?.capsaleraColorLletra ?? '#000', marginLeft: 0 }}
+                component={Link}
+                href={entry.to} // Navegació amb React Router
+                onClick={entry?.onClick}
+            >
+                {entry.title}
+            </Button>
+        ))
+        : [];
+}
 const generateAppMenu = (menuEntries: MenuEntry[] | undefined) => {
     return menuEntries?.length
         ? [<AppMenu key="app_menu" menuEntries={menuEntries} />]
         : [];
 }
 
+const AppMenuBadge = (props:any) => {
+    return <StyledBadge textcolor={'white'} badgecolor={'primary'} {...props}/>
+}
 const MenuBadge = (props:any) => {
     return <StyledBadge sx={{pl: 0}} textcolor={'primary'} badgecolor={'white'} {...props}/>
 }
@@ -37,6 +58,7 @@ const UserHeadToolbar = () => {
     const isRolActualRevisor = user?.rolActual == 'IPA_REVISIO';
     const isRolActualUser = user?.rolActual == 'tothom';
 
+    const appMenuEntries:any[] =[]
     const menuEntries:any[] =[]
     const contents:any[] = []
 
@@ -51,17 +73,27 @@ const UserHeadToolbar = () => {
     ];
 
     menus.forEach(({ condition, hook }) => {
-        const { entries, content } = hook();
+        const { appEntries, entries, content } = hook();
         if (condition) {
+            appMenuEntries.push(...appEntries);
             menuEntries.push(...entries);
             contents.push(content);
         }
     });
 
-    return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} justifyContent={'space-between'}>
-        <Grid item xs={12} display={'flex'} alignContent={'center'} justifyContent={'end'}>
-            {...generateAppMenu(menuEntries)}
-            {...contents}
+    appMenuEntries.forEach((entrie)=>{
+        entrie.title = <AppMenuBadge badgeContent={entrie?.badge} title={entrie?.hover}>{entrie.title}</AppMenuBadge>
+    })
+
+    menuEntries.forEach((entrie)=>{
+        entrie.title = <MenuBadge badgeContent={entrie?.badge} title={entrie?.hover}>{entrie.title}</MenuBadge>
+    })
+
+    return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
+        <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries)} {/* Menu */}</Grid>
+        <Grid item xs={1} display={"flex"} justifyContent={"center"}>
+            {...generateAppMenu(menuEntries)} {/* Side Menu */}
+            {...contents} {/* Additional content */}
         </Grid>
     </Grid>
 }
@@ -69,6 +101,26 @@ const UserHeadToolbar = () => {
 const useMenuSupAdmin = () => {
     const { t } = useTranslation();
 
+    const appEntries:any[] = [
+        {
+            id: 'expedient',
+            title: t('page.user.menu.expedient'),
+            icon: icons.expedient,
+            to: '/expedient',
+        },
+        {
+            id: 'integracions',
+            title: t('page.user.menu.integracions'),
+            // icon: '',
+            onClick: () => toProgramaAntic('integracio'),
+        },
+        {
+            id: 'excepcions',
+            title: t('page.user.menu.excepcions'),
+            // icon: '',
+            onClick: () => toProgramaAntic('excepcio'),
+        },
+    ];
     const entries = [
         {
             id: 'expedient',
@@ -143,6 +195,7 @@ const useMenuSupAdmin = () => {
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
@@ -152,6 +205,29 @@ const useMenuAdmin = () => {
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
 
+    const appEntries:any[] = [
+        {
+            id: 'expedient',
+            title: t('page.user.menu.expedient'),
+            icon: icons.expedient,
+            to: '/expedient',
+        },
+        {
+            id: 'anotacions',
+            title: t('page.user.menu.anotacions'),
+            badge: numNotif,
+            icon: icons.anotacio,
+            onClick: () => toProgramaAntic('expedientPeticio'),
+        },
+        {
+            id: 'procediments',
+            title: t('page.user.menu.procediments'),
+            badge: user?.sessionScope?.organsNoSincronitzats,
+            hover: t('page.user.menu.procedimentsTitle'),
+            // icon: '',
+            onClick: () => toProgramaAntic('metaExpedient'),
+        },
+    ];
     const entries = [
         {
             id: 'expedient',
@@ -161,7 +237,8 @@ const useMenuAdmin = () => {
         },
         {
             id: 'anotacions',
-            title: <MenuBadge badgeContent={numNotif}>{t('page.user.menu.anotacions')}</MenuBadge>,
+            title: t('page.user.menu.anotacions'),
+            badge: numNotif,
             icon: icons.anotacio,
             onClick: () => toProgramaAntic('expedientPeticio'),
         },
@@ -172,9 +249,9 @@ const useMenuAdmin = () => {
             children: [
                 {
                     id: 'procediments',
-                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')}>
-                        {t('page.user.menu.procediments')}
-                    </MenuBadge>,
+                    title: t('page.user.menu.procediments'),
+                    barge: user?.sessionScope?.organsNoSincronitzats,
+                    hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
                     onClick: () => toProgramaAntic('metaExpedient'),
                 },
@@ -299,6 +376,7 @@ const useMenuAdmin = () => {
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
@@ -308,6 +386,29 @@ const useMenuAdminOrgan = () => {
     const { value: numNotif } = useNotificacionsSession()
     const { t } = useTranslation();
 
+    const appEntries:any[] = [
+        {
+            id: 'expedient',
+            title: t('page.user.menu.expedient'),
+            icon: icons.expedient,
+            to: '/expedient',
+        },
+        {
+            id: 'anotacions',
+            title: t('page.user.menu.anotacions'),
+            badge: numNotif,
+            icon: icons.anotacio,
+            onClick: () => toProgramaAntic('expedientPeticio'),
+        },
+        {
+            id: 'procediments',
+            title: t('page.user.menu.procediments'),
+            badge: user?.sessionScope?.organsNoSincronitzats,
+            hover: t('page.user.menu.procedimentsTitle'),
+            // icon: '',
+            onClick: () => toProgramaAntic('metaExpedient'),
+        },
+    ];
     const entries = [
         {
             id: 'expedient',
@@ -317,7 +418,8 @@ const useMenuAdminOrgan = () => {
         },
         {
             id: 'anotacions',
-            title: <MenuBadge badgeContent={numNotif}>{t('page.user.menu.anotacions')}</MenuBadge>,
+            title: t('page.user.menu.anotacions'),
+            badge: numNotif,
             icon: icons.anotacio,
             onClick: () => toProgramaAntic('expedientPeticio'),
         },
@@ -328,9 +430,9 @@ const useMenuAdminOrgan = () => {
             children: [
                 {
                     id: 'procediments',
-                    title: <MenuBadge badgeContent={user?.sessionScope?.organsNoSincronitzats} title={t('page.user.menu.procedimentsTitle')}>
-                        {t('page.user.menu.procediments')}
-                    </MenuBadge>,
+                    title: t('page.user.menu.procediments'),
+                    badge: user?.sessionScope?.organsNoSincronitzats,
+                    hover: t('page.user.menu.procedimentsTitle'),
                     // icon: '',
                     onClick: () => toProgramaAntic('metaExpedient'),
                 },
@@ -347,6 +449,7 @@ const useMenuAdminOrgan = () => {
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
@@ -354,6 +457,7 @@ const useMenuAdminOrgan = () => {
 const useMenuDissenyOrgan = () => {
     const { t } = useTranslation();
 
+    const appEntries:any[] = [];
     const entries = [
         {
             id: 'procediments',
@@ -372,6 +476,7 @@ const useMenuDissenyOrgan = () => {
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
@@ -382,6 +487,28 @@ const useMenuUsuari = () => {
     const { value: numTasc } = useTasquesSession()
     const { t } = useTranslation();
 
+    const appEntries:any[] = [
+        {
+            id: 'expedient',
+            title: t('page.user.menu.expedient'),
+            icon: icons.expedient,
+            to: '/expedient',
+        },
+        {
+            id: 'anotacions',
+            title: t('page.user.menu.anotacions'),
+            badge: numNotif,
+            icon: icons.anotacio,
+            onClick: () => toProgramaAntic('expedientPeticio'),
+        },
+        {
+            id: 'tasca',
+            title: t('page.user.menu.tasca'),
+            badge: numTasc,
+            icon: icons.tasca,
+            onClick: () => toProgramaAntic('usuariTasca'),
+        },
+    ];
     const entries = [
         {
             id: 'expedient',
@@ -391,13 +518,15 @@ const useMenuUsuari = () => {
         },
         {
             id: 'anotacions',
-            title: <MenuBadge badgeContent={numNotif}>{t('page.user.menu.anotacions')}</MenuBadge>,
+            title: t('page.user.menu.anotacions'),
+            badge: numNotif,
             icon: icons.anotacio,
             onClick: () => toProgramaAntic('expedientPeticio'),
         },
         {
             id: 'tasca',
-            title: <MenuBadge badgeContent={numTasc}>{t('page.user.menu.tasca')}</MenuBadge>,
+            title: t('page.user.menu.tasca'),
+            badge: numTasc,
             icon: icons.tasca,
             onClick: () => toProgramaAntic('usuariTasca'),
         },
@@ -438,11 +567,11 @@ const useMenuUsuari = () => {
             ],
         },
     ]
-
     const content = <>
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
@@ -455,6 +584,7 @@ const useAccionesMassivas = () => {
 
     const {handleOpen, dialog} = useExecucioMassiva();
 
+    const appEntries:any[] = [];
     const entries = [
         {
             id: 'massive',
@@ -541,6 +671,7 @@ const useAccionesMassivas = () => {
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
@@ -548,6 +679,7 @@ const useAccionesMassivas = () => {
 const useMenuRevisor = () => {
     const { t } = useTranslation();
 
+    const appEntries:any[] = [];
     const entries = [
         {
             id: 'revisar',
@@ -560,6 +692,7 @@ const useMenuRevisor = () => {
     </>
 
     return {
+        appEntries,
         entries,
         content,
     }
