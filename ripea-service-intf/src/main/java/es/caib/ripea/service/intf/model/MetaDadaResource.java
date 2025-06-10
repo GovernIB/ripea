@@ -23,16 +23,9 @@ import java.util.List;
 @NoArgsConstructor
 @ResourceConfig(
         quickFilterFields = { "codi", "nom" },
-        descriptionField = "nom",
-        artifacts = {
-                @ResourceConfigArtifact(
-                        type = ResourceArtifactType.PERSPECTIVE,
-                        code = MetaDadaResource.PERSPECTIVE_DADES),
-        }
+        descriptionField = "nom"
 )
 public class MetaDadaResource extends BaseAuditableResource<Long> {
-
-    public static final String PERSPECTIVE_DADES = "DADES";
 
     private String codi;
     private String nom;
