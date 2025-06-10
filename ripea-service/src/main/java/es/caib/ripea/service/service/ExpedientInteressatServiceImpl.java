@@ -104,8 +104,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	}
 	
 	@Override
-	public List<InteressatDto> extreureInteressatsExcel(InputStream excel) {
-		return expedientInteressatHelper.extreureInteressatsExcel(excel);
+	public List<InteressatDto> extreureInteressatsExcel(InputStream excel, Long expedientId) {
+		return expedientInteressatHelper.extreureInteressatsExcel(excel, expedientId);
 	}
 	
 	@Override

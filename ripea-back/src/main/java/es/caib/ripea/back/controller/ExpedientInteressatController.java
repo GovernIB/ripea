@@ -4,13 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +51,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.exception.InteressatNotValidException;
 import es.caib.ripea.service.intf.service.ConfigService;
 import es.caib.ripea.service.intf.service.DadesExternesService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
@@ -174,7 +173,6 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long expedientId,
 			@ModelAttribute InteressatImportCommand interessatImportCommand,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -216,17 +214,18 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 								interessatImportCommand.getFitxerInteressats().getInputStream(),
 								new TypeReference<List<InteressatDto>>() {});
 					} else if (fitxerTipus.equals(InteressatImportacioTipusDto.EXCEL)) {
-						lista = expedientInteressatService.extreureInteressatsExcel(fitxer.getInputStream());
-						
-						StringBuilder validacions = validarLlistaInteressats(
-								lista, 
-								entitatActual.getId(), 
-								expedientId);
-						
-						if (validacions.length() > 0) {
-					        MissatgesHelper.error(request, validacions.toString());
-					        return "interessatImportForm";
-					    }
+						try {
+							lista = expedientInteressatService.extreureInteressatsExcel(
+									fitxer.getInputStream(), 
+									expedientId);
+						} catch (Exception e) {
+							if (e instanceof InteressatNotValidException) {
+								MissatgesHelper.error(request,  e.getMessage());
+					        	return "interessatImportForm";
+							}
+							
+							throw e;	
+						}
 					}
 					
 					List<InteressatDto> listaActual = expedientInteressatService.findByExpedient(
@@ -744,45 +743,45 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 	}
 
 
-	private StringBuilder validarLlistaInteressats(List<InteressatDto> lista, Long entitatId, Long expedientId) {
-		StringBuilder validacions = new StringBuilder();
-
-		for (InteressatDto interessatDto : lista) {
-			InteressatCommand interessatCommand = InteressatCommand.asCommand(interessatDto);
-			interessatCommand.setEntitatId(entitatId);
-			interessatCommand.setExpedientId(expedientId);
-			interessatCommand.setNotificacioAutoritzat(true);
-			interessatCommand.setIncapacitat(false);
-
-	        Set<ConstraintViolation<InteressatCommand>> violations = validarInteressat(interessatCommand);
-
-	        if (!violations.isEmpty()) {
-	            validacions.append("Fila ").append(interessatDto.getFila()).append(":<ul>");
-	            for (ConstraintViolation<InteressatCommand> v : violations) {
-	            	String camp = v.getPropertyPath().toString();
-	            	
-	            	if (! camp.isBlank())
-	            		validacions.append("<li>").append(camp).append(": ").append(v.getMessage()).append("</li>");
-	            	else
-	            		validacions.append("<li>").append(v.getMessage()).append("</li>");
-	            }
-	            validacions.append("</ul>");
-	        }
-		}
-		
-		return validacions;
-	}
-
-	private Set<ConstraintViolation<InteressatCommand>> validarInteressat(InteressatCommand command) {
-	    if (command.isPersonaFisica()) {
-	        return validator.validate(command, PersonaFisica.class);
-	    } else if (command.isPersonaJuridica()) {
-	        return validator.validate(command, PersonaJuridica.class);
-	    } else if (command.isAdministracio()) {
-	        return validator.validate(command, Administracio.class);
-	    }
-	    return Collections.emptySet();
-	}
+//	private StringBuilder validarLlistaInteressats(List<InteressatDto> lista, Long entitatId, Long expedientId) {
+//		StringBuilder validacions = new StringBuilder();
+//
+//		for (InteressatDto interessatDto : lista) {
+//			InteressatCommand interessatCommand = InteressatCommand.asCommand(interessatDto);
+//			interessatCommand.setEntitatId(entitatId);
+//			interessatCommand.setExpedientId(expedientId);
+//			interessatCommand.setNotificacioAutoritzat(true);
+//			interessatCommand.setIncapacitat(false);
+//
+//	        Set<ConstraintViolation<InteressatCommand>> violations = validarInteressat(interessatCommand);
+//
+//	        if (!violations.isEmpty()) {
+//	            validacions.append("Fila ").append(interessatDto.getFila()).append(":<ul>");
+//	            for (ConstraintViolation<InteressatCommand> v : violations) {
+//	            	String camp = v.getPropertyPath().toString();
+//	            	
+//	            	if (! camp.isBlank())
+//	            		validacions.append("<li>").append(camp).append(": ").append(v.getMessage()).append("</li>");
+//	            	else
+//	            		validacions.append("<li>").append(v.getMessage()).append("</li>");
+//	            }
+//	            validacions.append("</ul>");
+//	        }
+//		}
+//		
+//		return validacions;
+//	}
+//
+//	private Set<ConstraintViolation<InteressatCommand>> validarInteressat(InteressatCommand command) {
+//	    if (command.isPersonaFisica()) {
+//	        return validator.validate(command, PersonaFisica.class);
+//	    } else if (command.isPersonaJuridica()) {
+//	        return validator.validate(command, PersonaJuridica.class);
+//	    } else if (command.isAdministracio()) {
+//	        return validator.validate(command, Administracio.class);
+//	    }
+//	    return Collections.emptySet();
+//	}
 	
 	private boolean esTipusFitxerValid(String fileName, InteressatImportacioTipusDto tipus) {
 	    if (fileName == null) return false;

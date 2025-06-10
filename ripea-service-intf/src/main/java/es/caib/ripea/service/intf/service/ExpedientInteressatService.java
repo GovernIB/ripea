@@ -272,7 +272,7 @@ public interface ExpedientInteressatService {
 	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats, List<Long> seleccionats);
 
 	@PreAuthorize("isAuthenticated()")
-	public List<InteressatDto> extreureInteressatsExcel(InputStream inputStream);
+	public List<InteressatDto> extreureInteressatsExcel(InputStream inputStream, Long expedientId);
 
 	@PreAuthorize("isAuthenticated()")
 	public byte[] getModelDadesInteressatsExcel();

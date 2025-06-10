@@ -2,11 +2,17 @@ package es.caib.ripea.service.helper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.groups.Default;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -28,6 +34,8 @@ import es.caib.ripea.persistence.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.persistence.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.service.intf.base.model.Resource;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
@@ -39,8 +47,10 @@ import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.exception.InteressatNotValidException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.model.InteressatResource;
 
 @Component
 public class ExpedientInteressatHelper {
@@ -55,7 +65,8 @@ public class ExpedientInteressatHelper {
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private CacheHelper cacheHelper;
-
+	@Autowired(required = true) private javax.validation.Validator validator;
+	
 	@Transactional
 	public InteressatEntity create(
 			Long expedientId,
@@ -770,12 +781,12 @@ public class ExpedientInteressatHelper {
 	}
 
 	@SuppressWarnings("deprecation") // POI 3.15
-	public List<InteressatDto> extreureInteressatsExcel(InputStream excel) {
-		List<InteressatDto> resultList = new ArrayList<>();
+	public List<InteressatDto> extreureInteressatsExcel(InputStream excel, Long expedientId) {
+		List<InteressatDto> interessatsExcel = new ArrayList<>();
 
 		try (Workbook workbook = WorkbookFactory.create(excel)) {
 	        Sheet sheet = workbook.getSheetAt(0);
-	        if (sheet == null || sheet.getPhysicalNumberOfRows() <= 1) return resultList;
+	        if (sheet == null || sheet.getPhysicalNumberOfRows() <= 1) return interessatsExcel;
 
 	        for (int rowNum = 2; rowNum <= sheet.getLastRowNum(); rowNum++) {
 	            Row row = sheet.getRow(rowNum);
@@ -862,16 +873,71 @@ public class ExpedientInteressatHelper {
 	                }
 	            }
 	            
-	            resultList.add(dto);
+	            interessatsExcel.add(dto);
 	        }
 
 	    } catch (Exception e) {
 	        throw new RuntimeException("Hi ha hagut un error recuperant la informació dels interessats del excel", e);
 	    }
 
-	    return resultList;
+		validarLlistaInteressats(interessatsExcel, expedientId);
+		
+	    return interessatsExcel;
     }
+	
+	private StringBuilder validarLlistaInteressats(List<InteressatDto> interessatsExcel, Long expedientId) {
+		StringBuilder validacions = new StringBuilder();
+		Set<String> camposIgnoradosTemp = new HashSet<String>();
+		
+		for (InteressatDto interessatDto : interessatsExcel) {
+			InteressatResource interessatResource = null;
+			
+			if (interessatDto.isPersonaFisica()) {
+				interessatResource = conversioTipusHelper.convertir((InteressatPersonaFisicaDto)interessatDto, InteressatResource.class);
+				camposIgnoradosTemp = Set.of("raoSocial", "organCodi", "organNom"); // Ignorar camps persona jurídica i adm
+			} else if (interessatDto.isPersonaJuridica()) {
+				interessatResource = conversioTipusHelper.convertir((InteressatPersonaJuridicaDto)interessatDto, InteressatResource.class);
+				camposIgnoradosTemp = Set.of("nom", "llinatge1", "organCodi", "organNom"); // Ignorar camps persona física i adm
+			} else {
+				interessatResource = conversioTipusHelper.convertir((InteressatAdministracioDto)interessatDto, InteressatResource.class);
+				camposIgnoradosTemp = Set.of( "nom", "llinatge1", "raoSocial"); // Ignorar camps persona física i jurídica
+			}
+			
+			interessatResource.setNotificacioAutoritzat(true);
+			interessatResource.setIncapacitat(false);
+			interessatResource.setExpedient(ResourceReference.toResourceReference(expedientId));
+			
+			Set<ConstraintViolation<InteressatResource>> violations = validarInteressat(interessatResource);
 
+			Set<String> camposIgnorados = Collections.unmodifiableSet(camposIgnoradosTemp);
+			
+			violations = violations.stream()
+				    .filter(v -> !camposIgnorados.contains(v.getPropertyPath().toString()))
+				    .collect(Collectors.toSet());
+			
+	        if (!violations.isEmpty()) {
+	            validacions.append("Fila ").append(interessatDto.getFila()).append(":<ul>");
+	            for (ConstraintViolation<InteressatResource> v : violations) {
+	            	String camp = v.getPropertyPath().toString();
+	            	
+	            	if (! camp.isBlank())
+	            		validacions.append("<li>").append(camp).append(": ").append(v.getMessage()).append("</li>");
+	            	else
+	            		validacions.append("<li>").append(v.getMessage()).append("</li>");
+	            }
+	            validacions.append("</ul>");
+	            
+	            throw new InteressatNotValidException(validacions.toString());
+	        }
+		}
+		
+		return validacions;
+	}
+
+	private Set<ConstraintViolation<InteressatResource>> validarInteressat(InteressatResource resource) {
+		return validator.validate(resource, Default.class, Resource.OnCreate.class);
+	}
+	
 	private InteressatDto crearInteressatDto(String tipus) {
         switch (tipus) {
             case "PERSONA_FISICA":

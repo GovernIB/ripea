@@ -79,6 +79,7 @@ import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
@@ -107,6 +108,8 @@ import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.service.intf.model.ExpedientResource;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.utils.Utils;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
@@ -966,6 +969,45 @@ public class ConversioTipusHelper {
 	        })
 	        .byDefault()
 	        .register();
+	      
+	      mapperFactory.classMap(InteressatPersonaFisicaDto.class, InteressatResource.class)
+	        .customize(new CustomMapper<InteressatPersonaFisicaDto, InteressatResource>() {
+	            @Override
+	            public void mapAtoB(InteressatPersonaFisicaDto source, InteressatResource target, MappingContext mappingContext) {
+	            	InteressatPersonaFisicaDto interessat = (InteressatPersonaFisicaDto) source;
+            		target.setTipus(InteressatTipusEnum.InteressatPersonaFisicaEntity);
+            		target.setNom(interessat.getNom());
+            		target.setLlinatge1(interessat.getLlinatge1());
+            		target.setLlinatge2(interessat.getLlinatge2());            
+	            }
+	        })
+	        .byDefault()
+	        .register();
+	      
+	      mapperFactory.classMap(InteressatPersonaJuridicaDto.class, InteressatResource.class)
+	        .customize(new CustomMapper<InteressatPersonaJuridicaDto, InteressatResource>() {
+	            @Override
+	            public void mapAtoB(InteressatPersonaJuridicaDto source, InteressatResource target, MappingContext mappingContext) {
+	            	InteressatPersonaJuridicaDto interessat = (InteressatPersonaJuridicaDto) source;
+	            	target.setTipus(InteressatTipusEnum.InteressatPersonaJuridicaEntity);
+	            	target.setRaoSocial(interessat.getRaoSocial());          
+	            }
+	        })
+	        .byDefault()
+	        .register();
+	      
+	      mapperFactory.classMap(InteressatAdministracioDto.class, InteressatResource.class)
+	        .customize(new CustomMapper<InteressatAdministracioDto, InteressatResource>() {
+	            @Override
+	            public void mapAtoB(InteressatAdministracioDto source, InteressatResource target, MappingContext mappingContext) {
+	            	InteressatAdministracioDto interessat = (InteressatAdministracioDto) source;
+	            	target.setTipus(InteressatTipusEnum.InteressatPersonaFisicaEntity);
+	            	target.setOrganCodi(interessat.getOrganCodi());
+          			target.setOrganNom(interessat.getOrganNom());
+          		}
+	        })
+	        .byDefault()
+	        .register();
       
 	      mapperFactory.classMap(DocumentPortafirmesEntity.class, DocumentPortafirmesDto.class) 
 	      	.exclude("annexos")
@@ -1005,6 +1047,11 @@ public class ConversioTipusHelper {
 	      	.exclude("registre")
 	      	.exclude("peticions")
 	      	.exclude("tasques")
+	        .byDefault()
+	        .register();
+	      
+	      mapperFactory.classMap(InteressatDto.class, InteressatResource.class) 
+	      	.exclude("tipus")
 	        .byDefault()
 	        .register();
 	      
