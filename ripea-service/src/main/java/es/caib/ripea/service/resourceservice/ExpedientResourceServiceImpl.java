@@ -175,26 +175,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
         register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
-        register(ExpedientResource.ExpedientFilterForm.Fields.estat, new EstatsExpedientOptionsProvider());
         //register(null, new InitialOnChangeExpedientResourceLogicProcessor());
-    }
-    
-    public class EstatsExpedientOptionsProvider implements FieldOptionsProvider {
-		@Override
-		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
-			String[] requestParam = requestParameterMap.get("metaExpedientId");
-			String vfUserCodi = requestParam!=null?requestParam[0]:"";
-			List<ExpedientEstatEntity> estatsProcediment = expedientEstatRepository.findByMetaExpedientIdOrderByOrdreAsc(Long.parseLong(vfUserCodi));
-			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			resultat.add(new FieldOption("0", "Obert"));
-			if (estatsProcediment!=null) {
-				for (ExpedientEstatEntity dsp: estatsProcediment) {
-					resultat.add(new FieldOption(dsp.getId().toString(), dsp.getNom()));
-				}
-			}
-			resultat.add(new FieldOption("-1", "Tancat"));
-			return resultat;
-		}
     }
     
     @Override
@@ -1381,7 +1362,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
     
-    private static class FilterOnchangeLogicProcessor implements FilterProcessor<ExpedientFilterForm> {
+    private class FilterOnchangeLogicProcessor implements FilterProcessor<ExpedientFilterForm> {
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            if(ExpedientResource.ExpedientFilterForm.Fields.estat.equals(fieldName)) {
+                resultat.add(new FieldOption("0", "Obert"));
+                resultat.add(new FieldOption("-1", "Tancat"));
+
+                if (requestParameterMap.containsKey("metaExpedientId") && requestParameterMap.get("metaExpedientId").length>0){
+                    Long metaExpedientId = Long.valueOf(requestParameterMap.get("metaExpedientId")[0]);
+                    List<ExpedientEstatEntity> estatsProcediment = expedientEstatRepository.findByMetaExpedientIdOrderByOrdreAsc(metaExpedientId);
+
+                    for (ExpedientEstatEntity dsp : estatsProcediment) {
+                        resultat.add(new FieldOption(dsp.getId().toString(), dsp.getNom()));
+                    }
+                }
+            }
+            return resultat;
+        }
 
         @Override
         public void onChange(Serializable id, ExpedientFilterForm previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientFilterForm target) {
