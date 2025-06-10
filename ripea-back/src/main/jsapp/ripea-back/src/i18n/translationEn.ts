@@ -657,11 +657,14 @@ const translationEn = {
             },
         },
         dada: {
-            title: "Data"
+            title: "value for the data '{{metaDada}}'",
+            grid: {
+                valor: "Value",
+            },
         },
         metaDada: {
-            title: "Data Type",
-            detail: "Edit metadata values",
+            title: "Data type",
+            detail: "Values of the data '{{metaDada}}'",
         },
         registre: {
             grid: {

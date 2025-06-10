@@ -1,13 +1,14 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import org.springframework.stereotype.Service;
 
-import es.caib.ripea.persistence.entity.DominiEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDadaResourceEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -48,32 +49,33 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
         @Override
         public void applySingle(String code, MetaDadaResourceEntity metaDadaEntity, MetaDadaResource resource) throws PerspectiveApplicationException {
         	List<DadaResource> dadaResourceList = metaDadaEntity.getDades().stream()
-            .map(dadaResource->objectMappingHelper.newInstanceMap(dadaResource, DadaResource.class))
-            .collect(Collectors.toList());
-        	
-        	if (dadaResourceList!=null && MetaDadaTipusEnumDto.DOMINI.equals(metaDadaEntity.getTipus())) {
+                    .map(dadaResource->objectMappingHelper.newInstanceMap(dadaResource, DadaResource.class))
+                    .collect(Collectors.toList());
+
+        	if (!dadaResourceList.isEmpty() && MetaDadaTipusEnumDto.DOMINI.equals(metaDadaEntity.getTipus())) {
         		//Carregar la descripció del valor del domini
         		EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-        		DominiEntity dominiEntity = dominiHelper.findByEntitatAndCodi(entitatEntity, metaDadaEntity.getCodi());
-        		for (DadaResource dr: dadaResourceList) {        			
+        		for (DadaResource dr: dadaResourceList) {
                     List<ResultatConsultaDto> dominiValors = dominiHelper.getResultDomini(
                             entitatEntity.getId(),
                             metaDadaEntity.getCodi(),
                             "",
                             1,
                             Integer.MAX_VALUE).getResultat();
-                    if (dominiValors!=null) {
-                    	for (ResultatConsultaDto valorOptionDomini: dominiValors) {
-                    		if (valorOptionDomini.getId().equals(dr.getValor())) {
-                    			dr.setDomini(dominiEntity.getDescripcio());
-                    			dr.setDominiDescription(valorOptionDomini.getText());
-                    			break;
-                    		}
-                    	}
+
+                    ResultatConsultaDto resultatConsultaDto = new ResultatConsultaDto();
+                    resultatConsultaDto.setId("NO_APLICA");
+                    resultatConsultaDto.setText("No aplica");
+                    dominiValors.add(resultatConsultaDto);
+                    for (ResultatConsultaDto valorOptionDomini : dominiValors) {
+                        if (valorOptionDomini.getId().equals(dr.getValor())) {
+                            dr.setDominiDescription(valorOptionDomini.getText());
+                            break;
+                        }
                     }
-        		}
+                }
         	}
-        	
+
             resource.setDades(dadaResourceList);
         }
     }

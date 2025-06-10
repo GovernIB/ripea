@@ -136,18 +136,20 @@ export const UserMenu = () => {
 
         <Divider/>
 
-        <MenuSelect
-            value={entitatId}
-            onChange={setEntitatId}
-            icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
-            hidden={isRolActualSupAdmin}
-        >
-            {
-                entitats?.map((entitat: any) =>
-                    <MenuItem key={entitat?.entitatCodi} value={entitat?.entitatId}><ListItemText>{entitat?.entitatNom}</ListItemText></MenuItem>
-                )
-            }
-        </MenuSelect>
+        { !isRolActualSupAdmin &&
+            <MenuSelect
+                value={entitatId}
+                onChange={setEntitatId}
+                icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
+                hidden={isRolActualSupAdmin}
+            >
+                {
+                    entitats?.map((entitat: any) =>
+                        <MenuItem key={entitat?.entitatCodi} value={entitat?.entitatId}><ListItemText>{entitat?.entitatNom}</ListItemText></MenuItem>
+                    )
+                }
+            </MenuSelect>
+        }
 
         <MenuSelect
             value={rol}
@@ -204,7 +206,7 @@ const UserMenuButton = () => {
             <UserMenu/>
             <Divider/>
 
-            {/* TODO: borrar sessión de back */}
+            {/* TODO: revisar borrar sessión */}
             <MenuItem onClick={() => {signOut?.()}}>
                 <ListItemIcon>
                     <Icon fontSize="small">logout</Icon>

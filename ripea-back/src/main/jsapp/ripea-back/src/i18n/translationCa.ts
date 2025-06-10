@@ -657,11 +657,14 @@ const translationCa = {
             },
         },
         dada: {
-            title: "Dada"
+            title: "valor per al dada '{{metaDada}}'",
+            grid: {
+                valor: "Valor",
+            },
         },
         metaDada: {
             title: "Tipus de dada",
-            detail: "Editar valors de la metadada",
+            detail: "Valors de la dada '{{metaDada}}'",
         },
         registre: {
             grid: {

@@ -311,7 +311,7 @@ const translationEs = {
             },
             action: {
                 new: {
-                    label: "New expedient",
+                    label: "Nuevo expedient",
                     ok: "El expediente '{{expedient}}' se ha creado correctamente.",
                 },
                 update: {
@@ -657,11 +657,14 @@ const translationEs = {
             },
         },
         dada: {
-            title: "Dato"
+            title: "valor para el dato '{{metaDada}}'",
+            grid: {
+                valor: "Valor",
+            },
         },
         metaDada: {
             title: "Tipo de dato",
-            detail: "Editar valores de la metadata",
+            detail: "Valores del dato '{{metaDada}}'",
         },
         registre: {
             grid: {
