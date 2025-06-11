@@ -11,12 +11,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ca';
 import 'dayjs/locale/es';
-import AuthLanguageSelector from './AuthLanguageSelector';
 import {
     MuiBaseApp,
     MenuEntry,
     useBaseAppContext,
     useResourceApiContext,
+    useResourceApiService,
 } from 'reactlib';
 import Footer from './Footer';
 import drassana from '../assets/drassana.png';
@@ -24,6 +24,7 @@ import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import UserMenuButton, {UserMenu} from "../pages/user/UserMenu.tsx";
 import {Alert} from "@mui/material";
 import {useAlertesSession} from "./SseClient.tsx";
+import {useUserSession} from "./Session";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -42,7 +43,6 @@ export type BaseAppProps = React.PropsWithChildren & {
     title?: string | React.ReactElement;
     title_logo?: string;
     version: string;
-    availableLanguages?: string[];
     menuEntries?: MenuEntryWithResource[];
     appbarBackgroundColor?: string;
     appbarBackgroundImg?: string;
@@ -89,6 +89,32 @@ const useLocationPath = () => {
     return location.pathname;
 }
 
+const useI18n = () => {
+    const { value: currentUser } = useUserSession();
+    const { isReady: apiIsReady, getOne: apiGetOne } = useResourceApiService('usuariResource');
+    const [currentUserLanguage, setCurrentUserLanguage] = React.useState<string>();
+    React.useEffect(() => {
+        if (currentUser != null && apiIsReady) {
+            apiGetOne(currentUser?.codi).then((data: any) => {
+                setCurrentUserLanguage(data.idioma ?? null);
+            });
+        }
+    }, [currentUser, apiIsReady]);
+    const i18nHandleLanguageChange = (language?: string) => {
+        i18n.changeLanguage(language);
+    }
+    const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
+        i18n.addResourceBundle(language, namespace, bundle);
+    }
+    return {
+        i18nUseTranslation: useTranslation,
+        i18nCurrentLanguage: currentUserLanguage ?? i18n.language,
+        i18nHandleLanguageChange,
+        i18nAddResourceBundleCallback,
+        i18nInitialized: currentUserLanguage !== undefined
+    }
+}
+
 const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     const { currentLanguage } = useBaseAppContext();
     const adapterLocale = React.useMemo(() => {
@@ -131,7 +157,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         logoStyle,
         title,
         version,
-        availableLanguages,
         menuEntries,
         appbarBackgroundColor,
         appbarBackgroundImg,
@@ -140,12 +165,13 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
-    const i18nHandleLanguageChange = (language?: string) => {
-        i18n.changeLanguage(language);
-    }
-    const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
-        i18n.addResourceBundle(language, namespace, bundle);
-    }
+    const {
+        i18nUseTranslation,
+        i18nCurrentLanguage,
+        i18nHandleLanguageChange,
+        i18nAddResourceBundleCallback,
+        i18nInitialized,
+    } = useI18n();
     const anyHistoryEntryExist = () => location.key !== 'default';
     const goBack = (fallback?: string) => {
         if (anyHistoryEntryExist()) {
@@ -167,18 +193,12 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         headerAppbarBackgroundColor={appbarBackgroundColor}
         headerAppbarBackgroundImg={appbarBackgroundImg}
         headerAdditionalComponents={[<UserHeadToolbar/>, <UserMenuButton/>]}
-        // headerAdditionalAuthComponents={availableLanguages?.length ? [
-        //     <AuthLanguageSelector
-        //         key="sel_lang"
-        //         languages={availableLanguages}
-        //         sx={{ mr: 2 }} />,
-        // ] : undefined}
         headerAdditionalAuthComponents={<UserMenu/>}
         footer={generateFooter(version)}
         persistentSession
         persistentLanguage
-        i18nUseTranslation={useTranslation}
-        i18nCurrentLanguage={i18n.language}
+        i18nUseTranslation={i18nUseTranslation}
+        i18nCurrentLanguage={i18nCurrentLanguage}
         i18nHandleLanguageChange={i18nHandleLanguageChange}
         i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
         routerGoBack={goBack}
@@ -197,7 +217,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                     ))
                 }
             </div>
-            {children}
+            {i18nInitialized && children}
         </CustomLocalizationProvider>
     </MuiBaseApp>;
 }

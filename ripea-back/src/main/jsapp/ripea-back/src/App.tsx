@@ -8,14 +8,12 @@ import {useEntitatSession} from "./components/Session.tsx";
 export const App: React.FC = () => {
     const version = '1.0.1';
     const { value: entitat } = useEntitatSession()
-
     const entitatLogo = useMemo(()=>{
         return entitat?.logoImgBytes ?`data:image/png;base64,${entitat?.logoImgBytes}` :null;
     }, [entitat]);
     const backgroundColor = useMemo(()=>{
         return entitat?.capsaleraColorFons
     }, [entitat]);
-
     return <BaseApp
         code="cmd"
         logo={entitatLogo ?? goib_logo}
@@ -29,7 +27,6 @@ export const App: React.FC = () => {
         }}
         title={<img src={logo} title={'RIPEA v' + version} style={{ height: '80px' }} alt={'RIPEA v' + version} />}
         version={version}
-        availableLanguages={['ca', 'es']}
         appbarBackgroundColor={backgroundColor ?? "#FFFFFF"}>
         <AppRoutes />
     </BaseApp>;

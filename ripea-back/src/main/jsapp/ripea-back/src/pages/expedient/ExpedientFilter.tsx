@@ -1,5 +1,5 @@
 import {Grid} from "@mui/material";
-import {useFormContext,} from 'reactlib';
+import {useFormContext} from 'reactlib';
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
@@ -92,14 +92,14 @@ const springFilterBuilder = (data: any, user: any): string => {
 const ExpedientFilter = (props: any) => {
     const {onSpringFilterChange} = props;
     const {value: user} = useUserSession();
-
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
         componentProps={{ style: {minHeight: '206px' } }}
         springFilterBuilder={(data: any)=>springFilterBuilder(data, user)}
         onSpringFilterChange={onSpringFilterChange}
-    >
+        filterOnFieldEnterKeyPressed
+        >
         <ExpedientFilterForm/>
     </StyledMuiFilter>
 }
