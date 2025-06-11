@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Typography, Icon, Grid, CardContent, Card} from "@mui/material";
+import {Typography, Icon, Grid} from "@mui/material";
 import {
     GridPage,
     useFormContext,
@@ -15,6 +15,8 @@ import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import useMassiveActions from "./details/ExpedientMassiveActions.tsx";
+import {CardPage} from "../../components/CardData.tsx";
+import Load from "../../components/Load.tsx";
 
 const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px'}
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
@@ -160,6 +162,7 @@ const ExpedientGrid = () => {
     const {t} = useTranslation();
     const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
+    const [load, setLoad] = useState<boolean>(false);
     const apiRef = useMuiDataGridApiRef();
 
     const refresh = () => {
@@ -216,58 +219,48 @@ const ExpedientGrid = () => {
     ];
 
     return <GridPage>
-        <Card sx={{
-            border: '1px solid #e3e3e3',
-            borderRadius: '4px',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
-        }}>
-            <CardContent sx={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e3e3e3'}}>
-                <Typography variant="h5">{t('page.expedient.filter.title')}</Typography>
-            </CardContent>
+        <CardPage title={t('page.expedient.filter.title')}>
+            <ExpedientFilter onSpringFilterChange={(value:any)=>{
+                setSpringFilter(value)
+                setLoad(true)
+            }}/>
 
-            <CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+            <Load value={load} noEffect>
+            <StyledMuiGrid
+                resourceName="expedientResource"
+                popupEditFormDialogResourceTitle={t('page.expedient.title')}
+                columns={columnsAddition}
+                filter={springFilter}
+                sortModel={sortModel}
+                perspectives={perspectives}
+                apiRef={apiRef}
+                popupEditCreateActive
+                popupEditFormContent={<ExpedientGridForm/>}
+                onRowDoubleClick={(row: any) => navigate(`/contingut/${row?.id}`)}
+                rowAdditionalActions={actions}
+                paginationActive
+                rowHideDeleteButton
+                selectionActive
+                toolbarCreateTitle={t('page.expedient.action.new.label')}
+                toolbarMassiveActions={massiveActions}
 
-                <Grid item xs={12}>
-                    <ExpedientFilter onSpringFilterChange={setSpringFilter}/>
-                </Grid>
+                rowProps={(row: any) => {
+                    const color = row?.estatAdditionalInfo?.color;
+                    return color
+                        ? {
+                            'box-shadow': `${color} -6px 0px 0px`,
+                            'border-left': `6px solid ${color}`,
+                        }
+                        : {
+                            'padding-left': '6px'
+                        }
+                }}
+            />
+            </Load>
 
-                <StyledMuiGrid
-                    resourceName="expedientResource"
-                    popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                    columns={columnsAddition}
-                    filter={springFilter}
-                    sortModel={sortModel}
-                    perspectives={perspectives}
-                    apiRef={apiRef}
-                    popupEditCreateActive
-                    popupEditFormContent={<ExpedientGridForm/>}
-                    onRowDoubleClick={(row: any) => navigate(`/contingut/${row?.id}`)}
-                    rowAdditionalActions={actions}
-                    paginationActive
-                    rowHideDeleteButton
-                    selectionActive
-                    toolbarCreateTitle={t('page.expedient.action.new.label')}
-                    toolbarMassiveActions={massiveActions}
-
-                    rowProps={(row: any) => {
-                        const color = row?.estatAdditionalInfo?.color;
-                        return color
-                            ? {
-                                'box-shadow': `${color} -6px 0px 0px`,
-                                'border-left': `6px solid ${color}`,
-                            }
-                            : {
-                                'padding-left': '6px'
-                            }
-                    }}
-                />
-
-                {components}
-                {massiveComponents}
-            </CardContent>
-        </Card>
+            {components}
+            {massiveComponents}
+        </CardPage>
     </GridPage>
 }
 

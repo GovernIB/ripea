@@ -5,9 +5,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.model.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +42,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
-import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.RebutjarAnotacioForm;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.RegistreAnnexResource;
-import es.caib.ripea.service.intf.model.RegistreResource;
 import es.caib.ripea.service.intf.registre.RegistreAnnexFirmaTipusEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiEstadoElaboracionEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
@@ -189,6 +188,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         @Override
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
             resource.setRegistreInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class));
+
+            resource.getRegistreInfo().setInteressats(
+                    entity.getRegistre().getInteressats().stream()
+                            .map(interessat -> {
+                                RegistreInteressatResource interessatResource = objectMappingHelper.newInstanceMap(interessat, RegistreInteressatResource.class);
+                                return ResourceReference.<RegistreInteressatResource, Long>toResourceReference(interessatResource.getId(), interessatResource.getCodiNom());
+                            })
+                            .collect(Collectors.toList())
+            );
+
             if (resource.getRegistreInfo().getJustificantArxiuUuid()!=null && Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.INCORPORAR_JUSTIFICANT))) {
             	RegistreAnnexResource justificant = new RegistreAnnexResource();
             	Document documentDetalls = pluginHelper.arxiuDocumentConsultar(

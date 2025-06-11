@@ -101,12 +101,12 @@ public class RegistreResourceEntity extends BaseAuditableEntity<RegistreResource
 
 
 
-//    @OneToMany(
-//            mappedBy = "registre",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true)
-//    private List<RegistreInteressatEntity> interessats = new ArrayList<RegistreInteressatEntity>();
-//
+    @OneToMany(
+            mappedBy = "registre",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<RegistreInteressatResourceEntity> interessats = new ArrayList<RegistreInteressatResourceEntity>();
+
 //    @OneToMany(
 //            mappedBy = "registre",
 //            cascade = CascadeType.ALL,

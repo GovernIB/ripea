@@ -140,6 +140,9 @@ const translationEs = {
             },
         },
         anotacio: {
+            filter: {
+                title: "Buscador de anotaciones de registro"
+            },
             tabs: {
                 resum: "Resumen",
                 estat: "Estado",
@@ -161,7 +164,25 @@ const translationEs = {
                 justificant: {
                     label: "Descargar justificante",
                     ok: "El justificante se ha descargado correctamente",
-                }
+                },
+                acceptar: {
+                    label: "Aceptar",
+                    title: "Aceptar expediente",
+                    ok: "La anotación se ha aceptado correctamente",
+                },
+                rebutjar: {
+                    label: "Rechazar",
+                    title: "Rechazar expediente",
+                    ok: "La anotación se ha rechazado correctamente",
+                },
+                canviProcediment: {
+                    label: "Cambiar procedimiento",
+                    title: "Cambiar procedimiento",
+                },
+                canviEstatDistribucio: {
+                    label: "Cambiar estado a distribución",
+                    ok: "El estado ha cambiado correctamente",
+                },
             }
         },
         tasca: {
@@ -671,7 +692,9 @@ const translationEs = {
                 extracte: "Extracto",
                 origenRegistreNumero: "Numero registro",
                 data: "Fecha registro",
+                dataRecepcio: "Fecha de recepción",
                 destiDescripcio: "Destino",
+                interessats: "Interesados",
             },
             detall: {
                 tipus: "Tipo",

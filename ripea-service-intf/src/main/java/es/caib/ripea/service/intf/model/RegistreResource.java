@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
 import java.util.Date;
+import java.util.List;
 
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -53,6 +55,8 @@ public class RegistreResource extends BaseAuditableResource<Long> {
     private String destiCodi;
     private String destiDescripcio;
     private String justificantArxiuUuid;
+
+    private List<ResourceReference<RegistreInteressatResource, Long>> interessats;
     
     @Transient private RegistreAnnexResource justificant;
     

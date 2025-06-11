@@ -11,7 +11,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import TasquesGrid from "../../tasca/TasquesGrid.tsx";
-import AnotacionsGrid from "../../anotacions/AnotacionsGrid.tsx";
+import AnotacionsExpedientGrid from "../../anotacioExpedient/AnotacionsExpedientGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import {StyledEstat, StyledPrioritat} from "../ExpedientGrid.tsx";
@@ -226,7 +226,7 @@ const Expedient = () => {
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
-            content: <AnotacionsGrid id={id} onRowCountChange={setNumAnotacions}/>,
+            content: <AnotacionsExpedientGrid id={id} onRowCountChange={setNumAnotacions}/>,
             badge: numAnotacions ?? expedient?.numAnotacions,
             hidden: !isExperientOrCarpeta(expedient) || !expedient?.numAnotacions,
         },

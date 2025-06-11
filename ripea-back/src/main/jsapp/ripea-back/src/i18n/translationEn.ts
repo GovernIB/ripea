@@ -140,6 +140,9 @@ const translationEn = {
             },
         },
         anotacio: {
+            filter: {
+                title: "Registry entry search"
+            },
             tabs: {
                 resum: "Summary",
                 estat: "Status",
@@ -161,7 +164,25 @@ const translationEn = {
                 justificant: {
                     label: "Download receipt",
                     ok: "The receipt has been downloaded successfully",
-                }
+                },
+                acceptar: {
+                    label: "Accept",
+                    title: "Accept case file",
+                    ok: "The annotation has been accepted successfully",
+                },
+                rebutjar: {
+                    label: "Reject",
+                    title: "Reject case file",
+                    ok: "The annotation has been rejected successfully",
+                },
+                canviProcediment: {
+                    label: "Change procedure",
+                    title: "Change procedure",
+                },
+                canviEstatDistribucio: {
+                    label: "Change status to distribution",
+                    ok: "The status has been changed successfully",
+                },
             }
         },
         tasca: {
@@ -668,10 +689,12 @@ const translationEn = {
         },
         registre: {
             grid: {
-                extracte: "Extract",
-                origenRegistreNumero: "Registration Number",
-                data: "Registration Date",
+                extracte: "Summary",
+                origenRegistreNumero: "Registry number",
+                data: "Registration date",
+                dataRecepcio: "Reception date",
                 destiDescripcio: "Destination",
+                interessats: "Interested parties",
             },
             detall: {
                 tipus: "Type",
