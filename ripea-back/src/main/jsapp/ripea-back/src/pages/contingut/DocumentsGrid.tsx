@@ -258,8 +258,7 @@ const DocumentsGrid = (props: any) => {
                             for (const row of _rows) {
                                 const aditionalRow = row.parentPath
                                     ?.filter((a: any) => a.id != row.id
-                                        && !additionalRows.map((b) => b.id).includes(a.id)
-                                        && !additionalRows.map((b) => b.nom).includes(a.nom))
+                                        && !additionalRows.map((b) => b.id).includes(a.id))
                                 aditionalRow && additionalRows.push(...aditionalRow);
                             }
                             setTreeView(additionalRows?.length > 0)

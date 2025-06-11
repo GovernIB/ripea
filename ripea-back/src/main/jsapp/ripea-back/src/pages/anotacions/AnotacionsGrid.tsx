@@ -3,7 +3,6 @@ import {useTranslation} from "react-i18next";
 import useAnotacioActions from "./details/AnotacioActions.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
-import * as builder from "../../util/springFilterUtils.ts";
 import {CardPage} from "../../components/CardData.tsx";
 import AnotacioFilter from "./AnotacioFilter.tsx";
 import Load from "../../components/Load.tsx";
@@ -11,7 +10,7 @@ import {useState} from "react";
 import {Grid} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 
-const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
+const sortModel:any = [{field: 'registre.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
 const namedQueries = ['LLISTAT_ANOTACIONS'];
 
@@ -63,7 +62,7 @@ const AnotacionsGrid = () => {
             field: 'registreInfo.interessats',
             headerName: t('page.registre.grid.interessats'),
             flex: 0.5,
-            valueFormatter: (value: any) => value.map(i=>i?.description).join(", \n")
+            valueFormatter: (value: any) => value.map((i:any)=>i?.description).join(", \n")
         },
         {
             field: 'grup',

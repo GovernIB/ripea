@@ -5,7 +5,7 @@ import {formatDate} from "../../util/dateUtils.ts";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import * as builder from "../../util/springFilterUtils.ts";
 
-const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
+const sortModel:any = [{field: 'registre.data', sort: 'desc'}];
 const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
 
 const AnotacionsExpedientGrid = (props:any) => {
