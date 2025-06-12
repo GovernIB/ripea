@@ -309,7 +309,7 @@ public class EmailHelper {
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
-		OrganGestorEntity organ = organGestorRepository.findByCodi(registre.getDestiCodi());
+		OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), registre.getDestiCodi());
 
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();

@@ -35,7 +35,7 @@ public class ContingutResourceHelper {
             // ##################### EXPEDIENT ##################################
             Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(
                     (ExpedientEntity)contingut);
-            return getArxiuExpedientDetall(arxiuExpedient);
+            return getArxiuExpedientDetall(entitatId, arxiuExpedient);
         } else if (contingut instanceof DocumentEntity) {
             // ##################### DOCUMENT ##################################
             Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
@@ -57,7 +57,7 @@ public class ContingutResourceHelper {
         }
     }
 
-    public ArxiuDetallDto getArxiuExpedientDetall(Expedient arxiuExpedient){
+    public ArxiuDetallDto getArxiuExpedientDetall(Long entitatId, Expedient arxiuExpedient){
         ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
 
         arxiuDetall.setFills(getArxiuContinguts(arxiuExpedient.getContinguts()));
@@ -83,7 +83,7 @@ public class ContingutResourceHelper {
                 }
             }
             arxiuDetall.setEniInteressats(metadades.getInteressats());
-            arxiuDetall.setEniOrgans(getOrgansAmbNoms(metadades.getOrgans()));
+            arxiuDetall.setEniOrgans(getOrgansAmbNoms(entitatId, metadades.getOrgans()));
             arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
         }
         return arxiuDetall;
@@ -141,7 +141,7 @@ public class ContingutResourceHelper {
                 }
             }
 
-            arxiuDetall.setEniOrgans(getOrgansAmbNoms(metadades.getOrgans()));
+            arxiuDetall.setEniOrgans(getOrgansAmbNoms(entitatId, metadades.getOrgans()));
             if (metadades.getFormat() != null) {
                 arxiuDetall.setEniFormat(metadades.getFormat().toString());
             }
@@ -303,11 +303,11 @@ public class ContingutResourceHelper {
         }
         return detallFills;
     }
-    private List<String> getOrgansAmbNoms(List<String> organsCodis) {
+    private List<String> getOrgansAmbNoms(Long entitatId, List<String> organsCodis) {
         List<String> organsCodisNoms = new ArrayList<>();
         if (Utils.isNotEmpty(organsCodis)) {
             for (String organCodi : organsCodis) {
-                OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
+                OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitatId, organCodi);
                 if (organ != null) {
                     organsCodisNoms.add(organ.getCodiINom());
                 } else {

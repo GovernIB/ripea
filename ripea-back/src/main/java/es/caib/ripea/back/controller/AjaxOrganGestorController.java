@@ -107,8 +107,7 @@ public class AjaxOrganGestorController extends BaseAdminController{
 					text,
 					directOrganPermisRequired);
 		} else if(RolHelper.isRolActualSuperusuari(request)) {
-			organGestorsList = organGestorService.findAll(
-					text);
+			organGestorsList = organGestorService.findAll(entitatActual.getId(), text);
 		}
 		
 		if (text == null) {

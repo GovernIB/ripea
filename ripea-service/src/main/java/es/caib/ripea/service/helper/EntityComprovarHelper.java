@@ -86,6 +86,14 @@ public class EntityComprovarHelper {
 	@Autowired private ConfigHelper configHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
 
+	public EntitatEntity comprovarEntitat(String entitatCodi) throws NotFoundException {
+		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
+		if (entitat == null) {
+			throw new NotFoundException(entitatCodi, EntitatEntity.class);
+		}
+		return comprovarEntitat(entitat.getId(),false,false,false,false,false);
+	}
+    
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,
 			boolean comprovarPermisUsuari,
@@ -281,7 +289,7 @@ public class EntityComprovarHelper {
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIdPermesos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.READ);
 //		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIdPermesos);
-		organCodis.addAll(organGestorRepository.findCodisByIdList(organIdPermesos));
+		organCodis.addAll(organGestorRepository.findCodisByIdList(entitat.getId(), organIdPermesos));
 
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ);

@@ -36,11 +36,6 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenci
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.base.service.BaseMutableResourceService.ActionExecutor;
-import es.caib.ripea.service.base.service.BaseReadonlyResourceService.FilterProcessor;
-import es.caib.ripea.service.base.service.BaseReadonlyResourceService.OnChangeLogicProcessor;
-import es.caib.ripea.service.base.service.BaseReadonlyResourceService.PerspectiveApplicator;
-import es.caib.ripea.service.base.service.BaseReadonlyResourceService.ReportGenerator;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
@@ -50,9 +45,9 @@ import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
@@ -70,14 +65,14 @@ import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.InteressatResource;
-import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
 import es.caib.ripea.service.intf.model.ExpedientResource.MassiveAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
+import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -163,7 +158,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
         //throw new PermissionDeniedException
         EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
-        OrganGestorEntity ogEntity	= organGestorRepository.findByCodi(organActualCodi);
+        OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
         
 		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
 				entitatEntity.getId(),
@@ -394,7 +389,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(
                     entity.getId(), entity.getNom(), entity.getMetaExpedient().getNom(), entity.getArxiuUuid());
-            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuExpedientDetall(arxiuExpedient);
+            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi());
+            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuExpedientDetall(entitatEntity.getId(), arxiuExpedient);
 //            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDetall(entity.getEntitat().getId(), entity.getId());
             resource.setArxiu(arxiu);
         }

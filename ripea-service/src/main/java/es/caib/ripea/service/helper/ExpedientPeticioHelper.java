@@ -221,7 +221,7 @@ public class ExpedientPeticioHelper {
 		}
 		expedientPeticioEntity.updateMetaExpedient(metaExpedientEntity);
 		
-		calcularGrup(expedientPeticioEntity);
+		calcularGrup(entitat, expedientPeticioEntity);
 		
 		ExpedientEntity expedientEntity = null;
 		if (metaExpedientEntity != null) {
@@ -282,7 +282,7 @@ public class ExpedientPeticioHelper {
 				ExpedientPeticioEstatEnumDto.PENDENT);
 	}
 	
-	private void calcularGrup(ExpedientPeticioEntity expedientPeticioEntity) {
+	private void calcularGrup(EntitatEntity entitat, ExpedientPeticioEntity expedientPeticioEntity) {
 		
 		if (cacheHelper.mostrarLogsGrups())
 			logger.info("calcularGrupAlRecibirAnotacio start (expedientPeticio=" + expedientPeticioEntity.getId() + " - " + expedientPeticioEntity.getIdentificador());
@@ -304,7 +304,7 @@ public class ExpedientPeticioHelper {
 				if (cacheHelper.mostrarLogsGrups())
 					logger.info("grupsNotEmpty");
 				
-				OrganGestorEntity org = organGestorRepository.findByCodi(expedientPeticioEntity.getRegistre().getDestiCodi());
+				OrganGestorEntity org = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), expedientPeticioEntity.getRegistre().getDestiCodi());
 				
 				while (grup == null && org != null) {
 					
