@@ -185,8 +185,8 @@ public class ExpedientInteressatServiceEjb extends AbstractServiceEjb<ExpedientI
 	
 	@Override
 	@RolesAllowed("**")
-	public List<InteressatDto> extreureInteressatsExcel(InputStream inputStream) {
-		return delegateService.extreureInteressatsExcel(inputStream);
+	public List<InteressatDto> extreureInteressatsExcel(InputStream inputStream, Long expedientId) {
+		return delegateService.extreureInteressatsExcel(inputStream, expedientId);
 	}
 	
 	@Override

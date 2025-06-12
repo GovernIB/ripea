@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import NotFoundPage from './pages/NotFound';
 import Expedient from './pages/expedient/details/Expedient.tsx';
 import ExpedientGrid from './pages/expedient/ExpedientGrid';
+import AnotacionsGrid from "./pages/anotacions/AnotacionsGrid.tsx";
 
 const AppRoutes: React.FC = () => {
     return <Routes>
@@ -11,6 +12,7 @@ const AppRoutes: React.FC = () => {
             {/*<Route path=":id" element={<Expedient />} />*/}
         </Route>
         <Route path="contingut/:id" element={<Expedient />} />
+        <Route path="expedientPeticio" element={<AnotacionsGrid />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;
 }

@@ -23,35 +23,26 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
-			"where (og.entitat = :entitat)" +
+			"where (og.entitat.id = :entitatId)" +
 			" and (og.id in (select distinct pare.id from OrganGestorEntity))")
-	public List<OrganGestorEntity> findByEntitatAndHasPare(
-			@Param("entitat") EntitatEntity entitat);
-
+	public List<OrganGestorEntity> findByEntitatAndHasPare(@Param("entitatId") Long entitatId);
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
-			"where (og.entitat = :entitat)" +
+			"where (og.entitat.id = :entitatId)" +
 			" and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
 	public List<OrganGestorEntity> findByEntitatAndFiltre(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre);
-
-
-	@Query(	"from " +
-			"    OrganGestorEntity og " +
-			"where (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
-	public List<OrganGestorEntity> findByFiltre(
+			@Param("entitatId") Long entitatId,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
-			"where " +
-			"     og in (:canditats) " +
+			"where (og.entitat.id = :entitatId)" +
+			" and og in (:canditats) " +
 			" and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
 	public List<OrganGestorEntity> findByCanditatsAndFiltre(
+			@Param("entitatId") Long entitatId,
 			@Param("canditats")List<OrganGestorEntity> canditats,
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
@@ -97,62 +88,46 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") OrganEstatEnumDto estat);
 
-	@Query("from " +
-			"    OrganGestorEntity og " +
-			" where " +
-			"    (og.entitat = :entitat) " + 
+	@Query("from OrganGestorEntity og " +
+			" where og.entitat = :entitat " + 
 			"and og.id in (:ids)")
 	public List<OrganGestorEntity> findByEntitatAndIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("ids") List<Long> ids);
 
-	@Query("from " +
-			"    OrganGestorEntity og " +
-			" where " +
-			"    (og.entitat = :entitat) " +
+	@Query("from OrganGestorEntity og " +
+			" where og.entitat = :entitat " +
 			"and og.codi in (:codis)")
 	public List<OrganGestorEntity> findByEntitatAndCodis(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("codis") List<String> codis);
 
-
 	@Query(	"select og.codi " +
-			"from " +
-			"    OrganGestorEntity og " +
-			" where " +
-			"    og.entitat = :entitat " + 
+			"from OrganGestorEntity og " +
+			" where og.entitat = :entitat " + 
 			"and og.estat = es.caib.ripea.service.intf.dto.OrganEstatEnumDto.V " +
 			"and og.id in (:ids)")
 	public List<String> findCodisByEntitatAndVigentIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("ids") List<Long> ids);
-	
 
 	@Query(	"select distinct og.codi " +
-			"from " +
-			"    OrganGestorEntity og " +
-			"where" +
-			"    og.id in (:ids)")
-	public List<String> findCodisByIdList(@Param("ids") List<Long> ids);
-
+			"from OrganGestorEntity og " +
+			"where og.entitat.id = :entitatId" +
+			" and og.id in (:ids)")
+	public List<String> findCodisByIdList(@Param("entitatId")Long entitatId, @Param("ids") List<Long> ids);
 	
-	@Query(	"select " +
-			"    meog " + 
-			"from " +
-			"    MetaExpedientOrganGestorEntity meog " +
-			"where " +
-			"    meog.metaExpedient.id = :metaExpedientId")
-	List<MetaExpedientOrganGestorEntity> findMetaExpedientOrganGestorsByMetaExpedientId(
-			@Param("metaExpedientId") Long metaExpedientId);
+	@Query(	"select meog " + 
+			"from MetaExpedientOrganGestorEntity meog " +
+			"where meog.metaExpedient.id = :metaExpedientId")
+	List<MetaExpedientOrganGestorEntity> findMetaExpedientOrganGestorsByMetaExpedientId(@Param("metaExpedientId") Long metaExpedientId);
 
 	public List<OrganGestorEntity> findByEntitatIdAndEstat(Long entitatId, OrganEstatEnumDto estat);
 
-	public OrganGestorEntity findByCodi(String codi);
+	public OrganGestorEntity findByEntitatIdAndCodi(Long entitatId, String codi);
 
-	@Query(	"from " +
-			"    OrganGestorEntity og " +
-			"where " +
-			"    og.entitat = :entitat " +
+	@Query(	"from OrganGestorEntity og " +
+			"where og.entitat = :entitat " +
 			"and og.estat != es.caib.ripea.service.intf.dto.OrganEstatEnumDto.V ")
-    List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
+	public List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
 }

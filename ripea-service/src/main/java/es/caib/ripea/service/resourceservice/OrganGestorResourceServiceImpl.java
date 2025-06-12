@@ -126,7 +126,7 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
 			        	//Organs sobre els quals té permisos de amdinistrador o disseny
 			        	List<OrganGestorEntity> organsGestorsAdminDisseny = entityComprovarHelper.findAccessiblesUsuariActualRolAdminOrDisseny(
 			        			entitat.getId(),
-			        			organGestorRepository.findByCodi(organActualCodi).getId(),
+			        			organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi).getId(),
 			        			null);
 						for (OrganGestorEntity ogCodi: organsGestorsAdminDisseny) {
 							organsIds.add(ogCodi.getId());

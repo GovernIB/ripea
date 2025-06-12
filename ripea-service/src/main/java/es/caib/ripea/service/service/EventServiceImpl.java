@@ -129,7 +129,11 @@ public class EventServiceImpl implements EventService {
 		try {
 			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
 			if (entitatEntity!=null) {
-				OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(usuariCodi);
+				
+				OrganGestorEntity organGestorEntity = null;
+				if (configHelper.getOrganActualCodi()!=null)
+					organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+				
 				return cacheHelper.countAnotacionsPendents(
 						entitatEntity,
 						configHelper.getRolActual(),

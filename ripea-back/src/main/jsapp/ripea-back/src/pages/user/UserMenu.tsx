@@ -141,7 +141,6 @@ export const UserMenu = () => {
                 value={entitatId}
                 onChange={setEntitatId}
                 icon={<Icon fontSize={"inherit"}>account_balance</Icon>}
-                hidden={isRolActualSupAdmin}
             >
                 {
                     entitats?.map((entitat: any) =>

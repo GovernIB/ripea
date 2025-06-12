@@ -336,7 +336,7 @@ public class CacheHelper {
 		if (organs == null || organs.isEmpty()) {
 			return organigrama;
 		}
-		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitat.getUnitatArrel());
+		OrganGestorEntity arrel = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), entitat.getUnitatArrel());
 		if (arrel == null) {
 			return organigrama;
 		}

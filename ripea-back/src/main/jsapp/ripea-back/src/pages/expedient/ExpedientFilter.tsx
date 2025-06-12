@@ -95,7 +95,6 @@ const ExpedientFilter = (props: any) => {
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        componentProps={{ style: {minHeight: '206px' } }}
         springFilterBuilder={(data: any)=>springFilterBuilder(data, user)}
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed

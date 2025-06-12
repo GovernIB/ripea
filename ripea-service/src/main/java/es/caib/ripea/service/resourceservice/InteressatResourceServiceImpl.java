@@ -263,8 +263,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	                }
             	} else {
             		List<InteressatDto> interessatsExcel = expedientInteressatHelper.extreureInteressatsExcel(
-            				new ByteArrayInputStream(((FileReference)fieldValue).getContent()));
-            		//TODO comprovar que en Jamal hagi pogut mourer la funcio de validacio al helper.
+            				new ByteArrayInputStream(((FileReference)fieldValue).getContent()),
+            				previous.getExpedient().getId());
             		target.setInteressatsFitxer(interessatsExcel);
             	}
             } catch (Exception e) {

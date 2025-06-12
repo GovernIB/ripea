@@ -269,13 +269,10 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
-			Long entitatId,
-			OrganGestorFiltreDto filtre);
+	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(Long entitatId, OrganGestorFiltreDto filtre);
 
 	@PreAuthorize("isAuthenticated()")
-	public List<OrganGestorDto> findAll(
-			String filter);
+	public List<OrganGestorDto> findAll(Long entitatId, String filter);
 
 	@PreAuthorize("isAuthenticated()")
 	public String getOrganCodiFromContingutId(

@@ -992,7 +992,7 @@ public class ContingutServiceImpl implements ContingutService {
 					}
 				}
 				arxiuDetall.setEniInteressats(metadades.getInteressats());
-				arxiuDetall.setEniOrgans(getOrgansAmbNoms(metadades.getOrgans()));
+				arxiuDetall.setEniOrgans(getOrgansAmbNoms(entitatId, metadades.getOrgans()));
 				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());		
 			}
 			
@@ -1048,7 +1048,7 @@ public class ContingutServiceImpl implements ContingutService {
 					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
 				}
 
-				arxiuDetall.setEniOrgans(getOrgansAmbNoms(metadades.getOrgans()));
+				arxiuDetall.setEniOrgans(getOrgansAmbNoms(entitatId, metadades.getOrgans()));
 				if (metadades.getFormat() != null) {
 					arxiuDetall.setEniFormat(metadades.getFormat().toString());
 				}
@@ -1847,11 +1847,11 @@ public class ContingutServiceImpl implements ContingutService {
 	    return idsDomini.toString();
 	}
 	
-	private List<String> getOrgansAmbNoms(List<String> organsCodis) {
+	private List<String> getOrgansAmbNoms(Long entitatId, List<String> organsCodis) {
 		List<String> organsCodisNoms = new ArrayList<>();
 		if (Utils.isNotEmpty(organsCodis)) {
 			for (String organCodi : organsCodis) {
-				OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
+				OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitatId, organCodi);
 				if (organ != null) {
 					organsCodisNoms.add(organ.getCodiINom());
 				} else {

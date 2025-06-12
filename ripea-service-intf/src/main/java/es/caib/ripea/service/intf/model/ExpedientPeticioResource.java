@@ -29,6 +29,10 @@ import lombok.experimental.FieldNameConstants;
         descriptionField = "identificador",
         artifacts = {
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = ExpedientPeticioResource.FILTER_CODE,
+                        formClass = ExpedientPeticioResource.FilterForm.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE),
                 @ResourceConfigArtifact(
@@ -37,7 +41,6 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT,
-                        formClass = Serializable.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -47,11 +50,12 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
-                        formClass = Serializable.class,
                         requiresId = true),                 
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
+
+    public static final String FILTER_CODE = "ANOTACIO_FILTER";
 
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
@@ -80,6 +84,21 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
 
     @Transient private RegistreResource registreInfo;
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class FilterForm implements Serializable {
+        private String numRegistre;
+        private String extracte;
+        private String destinacio;
+        private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+        private Date dataRecepcioInicial;
+        private Date dataRecepcioFinal;
+        private ExpedientPeticioEstatViewEnumDto estat = ExpedientPeticioEstatViewEnumDto.PENDENT;
+        private String interessat;
+    }
     
     @Getter
     @Setter

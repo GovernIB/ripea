@@ -140,6 +140,9 @@ const translationCa = {
             },
         },
         anotacio: {
+            filter: {
+                title: "Cercador d'anotacions de registre"
+            },
             tabs: {
                 resum: "Resum",
                 estat: "Estat",
@@ -161,7 +164,25 @@ const translationCa = {
                 justificant: {
                     label: "Descarregar justificant",
                     ok: "El justificant s'ha descarregat correctament",
-                }
+                },
+                acceptar: {
+                    label: "Acceptar",
+                    title: "Acceptar expedient",
+                    ok: "L'anotació s'ha acceptat correctament",
+                },
+                rebutjar: {
+                    label: "Rebutjar",
+                    title: "Rebutjar expedient",
+                    ok: "L'anotació s'ha rebutjat correctament",
+                },
+                canviProcediment: {
+                    label: "Canviar procediment",
+                    title: "Canviar procediment",
+                },
+                canviEstatDistribucio: {
+                    label: "Canviar estat a distribució",
+                    ok: "L'estat ha canviat correctament",
+                },
             }
         },
         tasca: {
@@ -671,7 +692,9 @@ const translationCa = {
                 extracte: "Extracte",
                 origenRegistreNumero: "Número de registre",
                 data: "Data de registre",
+                dataRecepcio: "Data de recepció",
                 destiDescripcio: "Destinació",
+                interessats: "Interessats",
             },
             detall: {
                 tipus: "Tipus",
