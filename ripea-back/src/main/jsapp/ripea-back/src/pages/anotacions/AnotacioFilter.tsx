@@ -49,6 +49,7 @@ const AnotacioFilter = (props: any) => {
         code={"ANOTACIO_FILTER"}
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
+		filterOnFieldEnterKeyPressed
     >
         <AnotacioFilterForm/>
     </StyledMuiFilter>

@@ -57,6 +57,7 @@ public class RegistreResource extends BaseAuditableResource<Long> {
     private String justificantArxiuUuid;
 
     private List<ResourceReference<RegistreInteressatResource, Long>> interessats;
+    private List<ResourceReference<RegistreAnnexResource, Long>> annexos;
     
     @Transient private RegistreAnnexResource justificant;
     

@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.model.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +24,7 @@ import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
 import es.caib.ripea.service.helper.PermisosPerAnotacions;
@@ -38,11 +37,19 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
+import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.RebutjarAnotacioForm;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.RegistreAnnexResource;
+import es.caib.ripea.service.intf.model.RegistreInteressatResource;
+import es.caib.ripea.service.intf.model.RegistreResource;
 import es.caib.ripea.service.intf.registre.RegistreAnnexFirmaTipusEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiEstadoElaboracionEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
@@ -58,6 +65,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
 	private final ConfigHelper configHelper;
 	private final PluginHelper pluginHelper;
+	private final EventHelper eventHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ExpedientPeticioHelper expedientPeticioHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
@@ -70,6 +78,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE, new EstatViewPerspectiveApplicator());
         register(ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT, new DescarregarJustificantReportGenerator());
         register(ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO, new RebutjarAnotacioActionExecutor());
+        register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());        
         register(ExpedientPeticioResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
     }
@@ -80,16 +89,13 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
         
-        currentSpringFilter = null;
-        String[] namedQueriesFake = {"LLISTAT_ANOTACIONS"};
-        
 		Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreEntitat = FilterBuilder.equal(
         		ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.entitatCodi, 
         		entitat!=null?entitat.getUnitatArrel():"................................................................................");
         
         Filter filtrePermesos = null;
-        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueriesFake);
+        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
     			
@@ -98,8 +104,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     			
     			boolean isAdmin 		= "IPA_ADMIN".equals(rolActual);
     			boolean isAdminOrgan 	= "IPA_ORGAN_ADMIN".equals(rolActual);
-    			boolean isDissenyOrgan 	= "IPA_DISSENY".equals(rolActual);
-    			boolean isSuper 		= "IPA_SUPER".equals(rolActual);
+//    			boolean isDissenyOrgan 	= "IPA_DISSENY".equals(rolActual);
+//    			boolean isSuper 		= "IPA_SUPER".equals(rolActual);
 
     			//Admin no aplica filtres de permisos
     			if (!isAdmin) {
@@ -268,6 +274,27 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
     }
     
+    private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, ExpedientPeticioResource.AcceptarAnotacioForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, AcceptarAnotacioForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, AcceptarAnotacioForm target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, AcceptarAnotacioForm params) throws ActionExecutionException {
+			try {
+				if (ExpedientPeticioAccioEnumDto.CREAR.equals(params.getAccio())) {
+					//TODO: ExpedientServiceImpl.create
+				} else {
+					//TODO: ExpedientServiceImpl.incorporar
+				}
+				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/AcceptarAnotacioActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al acceptar la anotació: "+e.getMessage());
+			}
+		}
+    }
+    
     private class RebutjarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, ExpedientPeticioResource.RebutjarAnotacioForm, Serializable> {
 
 		@Override
@@ -277,6 +304,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, RebutjarAnotacioForm params) throws ActionExecutionException {
 			try {
 				expedientPeticioHelper.rebutjar(entity.getId(), params.getMotiu());
+				try {
+					eventHelper.notifyAnotacionsPendents(entity.getId());
+				} catch (Exception ex) {}
 				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/RebutjarAnotacioActionExecutor", e);

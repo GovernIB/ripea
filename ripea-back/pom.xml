@@ -446,6 +446,7 @@
 								</goals>
 								<configuration>
 									<outputDirectory>src/main/webapp/reactapp</outputDirectory>
+									<overwrite>true</overwrite>
 									<resources>
 										<resource>
 											<directory>${frontend.app.path}/dist</directory>

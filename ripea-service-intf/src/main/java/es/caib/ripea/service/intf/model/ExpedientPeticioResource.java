@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
@@ -15,6 +16,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,7 +48,12 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO,
                         formClass = ExpedientPeticioResource.RebutjarAnotacioForm.class,
-                        requiresId = true),   
+                        requiresId = true),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO,
+                        formClass = ExpedientPeticioResource.AcceptarAnotacioForm.class,
+                        requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO,
@@ -61,6 +68,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
     public static final String REPORT_DOWNLOAD_JUSTIFICANT = "DOWNLOAD_JUSTIFICANT";
     public static final String ACTION_REBUTJAR_ANOTACIO = "REBUTJAR_ANOTACIO";
+    public static final String ACTION_ACCEPTAR_ANOTACIO = "ACCEPTAR_ANOTACIO";
     public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
 
 //    private Long id;
@@ -98,6 +106,29 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Date dataRecepcioFinal;
         private ExpedientPeticioEstatViewEnumDto estat = ExpedientPeticioEstatViewEnumDto.PENDENT;
         private String interessat;
+    }
+    
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class AcceptarAnotacioForm implements Serializable {
+    	
+    	private ExpedientPeticioAccioEnumDto accio = ExpedientPeticioAccioEnumDto.CREAR;
+    	
+    	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+    	private ResourceReference<ExpedientResource, Long> expedient;
+    	private String newExpedientTitol;
+    	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
+    	private String prioritatMotiu;
+    	private int any;
+    	private Long sequencia;
+    	private boolean associarInteressats = true;
+    	private boolean agafarExpedient = true;
+    	private Long organGestorId;
+    	
+    	private List<ResourceReference<RegistreInteressatResource, Long>> interessats;
+    	private List<ResourceReference<RegistreAnnexResource, Long>> annexos;
     }
     
     @Getter
