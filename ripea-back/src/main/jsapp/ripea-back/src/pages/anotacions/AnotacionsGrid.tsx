@@ -86,7 +86,7 @@ const AnotacionsGrid = () => {
 
     return <GridPage>
 
-        <CardPage>
+        <CardPage title={t('page.anotacio.filter.title')}>
             <AnotacioFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)
                 setLoad(true)

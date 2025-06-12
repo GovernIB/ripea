@@ -226,7 +226,7 @@ const useMenuAdmin = () => {
             title: t('page.user.menu.anotacions'),
             badge: numNotif,
             icon: icons.anotacio,
-            onClick: () => toProgramaAntic('expedientPeticio'),
+            to: '/expedientPeticio',
         },
         {
             id: 'procediments',
@@ -249,7 +249,7 @@ const useMenuAdmin = () => {
             title: t('page.user.menu.anotacions'),
             badge: numNotif,
             icon: icons.anotacio,
-            onClick: () => toProgramaAntic('expedientPeticio'),
+            to: '/expedientPeticio',
         },
         {
             id: 'config',
@@ -407,7 +407,7 @@ const useMenuAdminOrgan = () => {
             title: t('page.user.menu.anotacions'),
             badge: numNotif,
             icon: icons.anotacio,
-            onClick: () => toProgramaAntic('expedientPeticio'),
+            to: '/expedientPeticio',
         },
         {
             id: 'procediments',
@@ -430,7 +430,7 @@ const useMenuAdminOrgan = () => {
             title: t('page.user.menu.anotacions'),
             badge: numNotif,
             icon: icons.anotacio,
-            onClick: () => toProgramaAntic('expedientPeticio'),
+            to: '/expedientPeticio',
         },
         {
             id: 'config',
@@ -508,7 +508,7 @@ const useMenuUsuari = () => {
             title: t('page.user.menu.anotacions'),
             badge: numNotif,
             icon: icons.anotacio,
-            onClick: () => toProgramaAntic('expedientPeticio'),
+            to: '/expedientPeticio',
         },
         {
             id: 'tasca',
@@ -530,7 +530,7 @@ const useMenuUsuari = () => {
             title: t('page.user.menu.anotacions'),
             badge: numNotif,
             icon: icons.anotacio,
-            onClick: () => toProgramaAntic('expedientPeticio'),
+            to: '/expedientPeticio',
         },
         {
             id: 'tasca',

@@ -95,7 +95,7 @@ const useAnotacioActions = (refresh?: () => void) => {
         },
         {
             title: t('page.anotacio.action.canviEstatDistribucio.label'),
-            icon: "edit",
+            icon: "turn_right",
             showInMenu: true,
             onClick: canviEstatDistribucio,
             hidden: (row:any) => !row?.pendentCanviEstatDistribucio || !isRolActualAdmin,
