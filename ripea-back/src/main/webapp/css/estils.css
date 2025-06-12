@@ -8,9 +8,11 @@
 }
 
 .navbar-app {
-    background-color: #ff9523;
-    height: 110px;
-    color: white;
+    background-color: white;
+    height: 89px;
+    color: black;
+    --Paper-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--Paper-shadow);
 }
 
 .navbar-app .container {
@@ -40,14 +42,14 @@
 }
 
 #govern-logo {
-    border-right: 1px solid #FFFFFF;
+    border-right: 2px solid black;
     display: block;
     padding: 0px 24px 0px 12px;
 }
 
 #app-logo {
     display: block;
-    padding: 0 0 0 12px;
+    padding: 0px 24px 0px 12px;
 }
 
 .container-main, .container-foot {

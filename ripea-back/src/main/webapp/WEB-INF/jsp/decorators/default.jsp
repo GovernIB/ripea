@@ -270,12 +270,12 @@ body {
 								<img src="<c:url value="/entitat/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
 							</c:when>
 							<c:otherwise>
-								<img src="<c:url value="/img/govern-logo.png"/>"  height="65" alt="Govern de les Illes Balears" />
+								<img src="<c:url value="/img/goib_logo.svg"/>"  height="65" alt="Govern de les Illes Balears" />
 							</c:otherwise>
 						</c:choose>
 					</div>
 					<div id="app-logo" class="pull-left">
-						<img src="<c:url value="/img/logo.png"/>" alt="RIPEA" />
+						<img src="<c:url value="/img/Drassana_RIP_DRA_COL.svg"/>" height="65" alt="RIPEA" />
 					</div>
 				</div>
 			</div>
