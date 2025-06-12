@@ -1,5 +1,21 @@
 package es.caib.ripea.service.helper;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
@@ -39,28 +55,11 @@ import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.dto.GrupDto;
-import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class EntityComprovarHelper {
@@ -93,6 +92,14 @@ public class EntityComprovarHelper {
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
     @Autowired private MetaExpedientHelper metaExpedientHelper;
 
+	public EntitatEntity comprovarEntitat(String entitatCodi) throws NotFoundException {
+		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
+		if (entitat == null) {
+			throw new NotFoundException(entitatCodi, EntitatEntity.class);
+		}
+		return comprovarEntitat(entitat.getId(),false,false,false,false,false);
+	}
+    
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,
 			boolean comprovarPermisUsuari,
@@ -255,6 +262,7 @@ public class EntityComprovarHelper {
 		for (List<OrganGestorEntity> list : sublists) {
 			filtrats.addAll(
 					organGestorRepository.findByCanditatsAndFiltre(
+							entitatId,
 							list,
 							filter == null || filter.isEmpty(),
 							filter != null ? filter : ""));
@@ -281,7 +289,7 @@ public class EntityComprovarHelper {
 		if (metaExpedientIdPermesos != null && !metaExpedientIdPermesos.isEmpty() && !directOrganPermisRequired) {
 
 			filtrats = organGestorRepository.findByEntitatAndFiltre(
-					entitat,
+					entitat.getId(),
 					filter == null || filter.isEmpty(),
 					filter != null ? filter : "");
 		} else {
@@ -297,6 +305,7 @@ public class EntityComprovarHelper {
 				for (List<OrganGestorEntity> sublist : sublists) {
 					filtrats.addAll(
 							organGestorRepository.findByCanditatsAndFiltre(
+									entitat.getId(),
 									sublist,
 									filter == null || filter.isEmpty(),
 									filter != null ? filter : ""));
@@ -312,7 +321,7 @@ public class EntityComprovarHelper {
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIdPermesos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, ExtendedPermission.READ);
 //		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIdPermesos);
-		organCodis.addAll(organGestorRepository.findCodisByIdList(organIdPermesos));
+		organCodis.addAll(organGestorRepository.findCodisByIdList(entitat.getId(), organIdPermesos));
 
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIdPermesos = permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ);

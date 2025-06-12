@@ -319,7 +319,7 @@ public class EmailHelper {
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
-		OrganGestorEntity organ = organGestorRepository.findByCodi(registre.getDestiCodi());
+		OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), registre.getDestiCodi());
 		
 		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 
@@ -485,7 +485,7 @@ public class EmailHelper {
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
-		OrganGestorEntity organ = organGestorRepository.findByCodi(registre.getDestiCodi());
+		OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), registre.getDestiCodi());
 		
 		List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio = dadesUsuarisAfectatsAnotacio(expedientPeticioId);
 

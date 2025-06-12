@@ -242,9 +242,8 @@ public class OrganGestorServiceEjb extends AbstractServiceEjb<OrganGestorService
 
 	@Override
 	@RolesAllowed("**")
-	public List<OrganGestorDto> findAll(
-			String filter) {
-		return delegateService.findAll(filter);
+	public List<OrganGestorDto> findAll(Long entitatId, String filter) {
+		return delegateService.findAll(entitatId, filter);
 	}
 
 	@Override

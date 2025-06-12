@@ -554,7 +554,7 @@ public class GrupServiceImpl implements GrupService {
 			if (cacheHelper.mostrarLogsGrups())
 				logger.info("exPet=" + exPet.getId() + ", " + exPet.getIdentificador());
 
-			OrganGestorEntity org = organGestorRepository.findByCodi(exPet.getRegistre().getDestiCodi());
+			OrganGestorEntity org = organGestorRepository.findByEntitatIdAndCodi(metaExpedient.getEntitat().getId(), exPet.getRegistre().getDestiCodi());
 
 			while (grup == null && org != null) {
 				

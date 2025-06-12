@@ -591,11 +591,10 @@ public class OrganGestorHelper {
 	public void organsDescarregarNomCatala() {
     	List<EntitatEntity> entitats = entitatRepository.findAll();
     	for (EntitatEntity entitat : entitats) {
-    		
     		ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
     		List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getUnitatArrel(), null, null);
     		for (UnitatOrganitzativa unitatOrganitzativa : unitatsWs) {
-    			OrganGestorEntity organ = organGestorRepository.findByCodi(unitatOrganitzativa.getCodi());
+    			OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), unitatOrganitzativa.getCodi());
 				if (organ != null && Utils.isNotEmpty(unitatOrganitzativa.getDenominacioCooficial())) {
 					organ.updateNomCatala(unitatOrganitzativa.getDenominacioCooficial());
 				} 

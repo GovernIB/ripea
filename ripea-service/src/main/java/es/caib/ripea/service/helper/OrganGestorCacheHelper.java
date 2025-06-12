@@ -1,8 +1,13 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.service.intf.dto.OrganismeDto;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -10,7 +15,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.service.intf.dto.OrganismeDto;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -18,9 +26,9 @@ import java.util.*;
 public class OrganGestorCacheHelper {
 
     @Autowired private CacheHelper cacheHelper;
-    @Autowired
-    OrganGestorCacheHelper self;
+    @Autowired OrganGestorCacheHelper self;
     @Autowired private OrganGestorRepository organGestorRepository;
+    @Autowired private EntityComprovarHelper entityComprovarHelper;
 
     @Cacheable(value = "codisOrgansFills", key="#codiEntitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisOrgansFills(String codiEntitat, String codiDir3Organ) {
@@ -51,8 +59,9 @@ public class OrganGestorCacheHelper {
         List<Long> resultat = new ArrayList<Long>();
         List<String> organs = getCodisOrgansFills(codiEntitat, codiDir3Organ);
         if (organs!=null) {
+        	EntitatEntity ee = entityComprovarHelper.comprovarEntitat(codiEntitat);
             for (String organ: organs) {
-                resultat.add(organGestorRepository.findByCodi(organ).getId());
+                resultat.add(organGestorRepository.findByEntitatIdAndCodi(ee.getId(), organ).getId());
             }
         }
         return resultat;

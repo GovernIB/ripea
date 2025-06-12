@@ -33,6 +33,7 @@ public class ConfigHelper {
     @Autowired private ConfigGroupRepository configGroupRepository;
     @Autowired private OrganGestorRepository organGestorRepository;
     @Autowired private Environment springEnvironment;
+    @Autowired private EntityComprovarHelper entityComprovarHelper;
 
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
     private static ThreadLocal<String> organCodi = new ThreadLocal<>();
@@ -90,7 +91,8 @@ public class ConfigHelper {
 
         Map<String, Map<String, String>> propietatsPerOrgan = new HashMap<>();
         List<ConfigEntity> configuracionsPerOrgan = configRepository.findByEntitatCodiAndConfigurableOrganActiuTrueAndOrganCodiIsNotNull(entitatCodi);
-
+        EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatCodi);
+        
         for (ConfigEntity config : configuracionsPerOrgan) {
             String subKey = getSubKey(config);
             if (subKey == null) {
@@ -113,7 +115,13 @@ public class ConfigHelper {
             String prefix = ConfigDto.prefix + "." + entitatCodi + ".";
             String valor = getValue(config);
             propertiesMap.put(config.getOrganCodi(), valor);
-            propertiesMap.putAll(getValorsPerFills(config.getOrganCodi(), prefix, subKey, valor, config.isConfigurableOrgansDescendents(), isPassword ? false : mostrarLogs));
+            propertiesMap.putAll(getValorsPerFills(
+            		entitatEntity.getId(),
+            		config.getOrganCodi(),
+            		prefix,
+            		subKey,
+            		valor,
+            		config.isConfigurableOrgansDescendents(), isPassword ? false : mostrarLogs));
             if (mostrarLogs) {
                 if (isPassword) {
                     log.info("[CFG] Propietat de tipus password. No es mostren els valors.");
@@ -129,12 +137,12 @@ public class ConfigHelper {
 
     }
 
-    private Map<String, String> getValorsPerFills(String organCodi, String prefix, String sufix, String valor, boolean aplicaDescencents, boolean mostrarLogs) {
+    private Map<String, String> getValorsPerFills(Long entitatId, String organCodi, String prefix, String sufix, String valor, boolean aplicaDescencents, boolean mostrarLogs) {
         if (mostrarLogs) {
             log.info("[CFG-Fill] Inicialitzant propietat per organ [Organ: " + organCodi + ", Prop: " + sufix + ", Valor: " + valor + ", Descendents: " + aplicaDescencents + "].");
         }
         Map<String, String> propertiesMap = new HashMap<>();
-        OrganGestorEntity organGestor = organGestorRepository.findByCodi(organCodi);
+        OrganGestorEntity organGestor = organGestorRepository.findByEntitatIdAndCodi(entitatId, organCodi);
 
         if (aplicaDescencents) {
             for (OrganGestorEntity fill : organGestor.getFills()) {
@@ -150,10 +158,10 @@ public class ConfigHelper {
                             log.info("[CFG-Fill] Valor: " + valor);
                         }
                     }
-                    propertiesMap.putAll(getValorsPerFills(fill.getCodi(), prefix, sufix, valor, aplicaDescencents, mostrarLogs));
+                    propertiesMap.putAll(getValorsPerFills(entitatId, fill.getCodi(), prefix, sufix, valor, aplicaDescencents, mostrarLogs));
                 } else {
                     propertiesMap.put(fill.getCodi(), valor);
-                    propertiesMap.putAll(getValorsPerFills(fill.getCodi(), prefix, sufix, valor, aplicaDescencents, mostrarLogs));
+                    propertiesMap.putAll(getValorsPerFills(entitatId, fill.getCodi(), prefix, sufix, valor, aplicaDescencents, mostrarLogs));
                 }
             }
         }

@@ -214,7 +214,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				false, 
 				false);
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
-				entitat,
+				entitat.getId(),
 				filter == null || filter.isEmpty(),
 				filter);
 		return conversioTipusHelper.convertirList(
@@ -224,10 +224,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<OrganGestorDto> findAll(
-			String filter) {
-
-		List<OrganGestorEntity> organs = organGestorRepository.findByFiltre(
+	public List<OrganGestorDto> findAll(Long entitatId, String filter) {
+		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
+				entitatId,
 				filter == null || filter.isEmpty(),
 				filter != null ? filter : "");
 		return conversioTipusHelper.convertirList(
@@ -550,7 +549,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// El camp lastHistoricosUnitats hauria d'apuntar a la darrera unitat a la que ha fet la trasició. Necessitem trobar la darrera unitat de forma recursiva, perquè és possible que hi hagi canvis acumulats:
 			// Si la darrera sincronització de la unitat A canvia a B, i després a C, des del servei web tindrés la unitat A apuntant a B (A -> B) i la unitat B apuntant a C (B -> C)
 			// El que volem és afegir un punter directe des de la unitat A a la unitat C (A -> C)
-			vigentObsolete.setLastHistoricosUnitats(getLastHistoricos(vigentObsolete, unitatsWS));
+			vigentObsolete.setLastHistoricosUnitats(getLastHistoricos(entitat,vigentObsolete, unitatsWS));
 		}
 		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = new ArrayList<>();
@@ -584,7 +583,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			UnitatOrganitzativaDto unitatOrganitzativaDto = conversioTipusHelper.convertir(
 					vigent,
 					UnitatOrganitzativaDto.class);
-			OrganGestorEntity org = organGestorRepository.findByCodi(unitatOrganitzativaDto.getCodi());
+			OrganGestorEntity org = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), unitatOrganitzativaDto.getCodi());
 			unitatOrganitzativaDto.setOldDenominacio(org.getNom());
 			unitatsVigentsWithChangedAttributesDto.add(unitatOrganitzativaDto);
 			
@@ -654,11 +653,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	// Retorna la/les unitat/s a la que un organ obsolet ha fet la transició
 	// Inici de mètode recursiu
 	private List<UnitatOrganitzativa> getLastHistoricos(
+			EntitatEntity entitat,
 			UnitatOrganitzativa unitat,
 			List<UnitatOrganitzativa> unitatsFromWebService){
 
 		List<UnitatOrganitzativa> lastHistorcos = new ArrayList<>();
 		getLastHistoricosRecursive(
+				entitat,
 				unitat,
 				unitatsFromWebService,
 				lastHistorcos);
@@ -666,6 +667,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	private void getLastHistoricosRecursive(
+			EntitatEntity entitat,
 			UnitatOrganitzativa unitat,
 			List<UnitatOrganitzativa> unitatsFromWebService,
 			List<UnitatOrganitzativa> lastHistorics) {
@@ -679,7 +681,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				UnitatOrganitzativa unitatFromCodi = getUnitatFromCodi(historicCodi, unitatsFromWebService);
 				if (unitatFromCodi == null) {
 					// Looks for historico in database
-					OrganGestorEntity entity = organGestorRepository.findByCodi(historicCodi);
+					OrganGestorEntity entity = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), historicCodi);
 					if (entity != null) {
 						UnitatOrganitzativa uo = conversioTipusHelper.convertir(entity, UnitatOrganitzativa.class);
 						lastHistorics.add(uo);
@@ -700,6 +702,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					logger.info("Detected organ division with transitioning to itself : " + historicCodi + ". Probably caused by error in DIR3");
 				} else {
 					getLastHistoricosRecursive(
+							entitat,
 							unitatFromCodi,
 							unitatsFromWebService,
 							lastHistorics);
@@ -1061,7 +1064,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				if (metaExpedient.getOrganGestor() == null) {
 					List<Long> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(OrganGestorEntity.class, ExtendedPermission.COMU, permis);
 					if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
-						organCodis.addAll(organGestorRepository.findCodisByIdList(organProcedimentsComunsIds));
+						organCodis.addAll(organGestorRepository.findCodisByIdList(entitat.getId(), organProcedimentsComunsIds));
 					}
 				}
 				organsGestors = organGestorHelper.findDescendents(entitat.getCodi(), new ArrayList<>(organCodis), filtre);
@@ -1147,19 +1150,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
-
 	@Override
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		List<OrganGestorEntity> organsSuperiorEntities = new ArrayList<OrganGestorEntity>();
-		organsSuperiorEntities = organGestorRepository.findByEntitatAndHasPare(entitat);
+		organsSuperiorEntities = organGestorRepository.findByEntitatAndHasPare(entitatId);
 		List<OrganGestorDto> organsSuperior = new ArrayList<OrganGestorDto>();
-		
 		for (OrganGestorEntity organ : organsSuperiorEntities) {
 			organsSuperior.add(conversioTipusHelper.convertir(organ, OrganGestorDto.class));
 		}
-		
 		return organsSuperior;
 	}
 

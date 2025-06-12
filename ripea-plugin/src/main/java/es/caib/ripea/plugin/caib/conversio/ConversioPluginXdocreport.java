@@ -1,11 +1,7 @@
-/**
- * 
- */
 package es.caib.ripea.plugin.caib.conversio;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,7 +13,11 @@ import org.apache.poi.xwpf.usermodel.XWPFHeader;
 import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.xmlbeans.XmlCursor;
+import org.jdom.Namespace;
 import org.jopendocument.dom.ODPackage;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Element;
@@ -101,13 +101,11 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 
 
 
-	private boolean isExtensioPdf(
-			ConversioArxiu arxiu) {
+	private boolean isExtensioPdf(ConversioArxiu arxiu) {
 		return "pdf".equalsIgnoreCase(arxiu.getArxiuExtensio());
 	}
 
-	private DocumentKind getDocumentKind(
-			ConversioArxiu arxiu) throws SistemaExternException {
+	private DocumentKind getDocumentKind(ConversioArxiu arxiu) throws SistemaExternException {
 		String extensio = arxiu.getArxiuExtensio();
 		if ("odt".equalsIgnoreCase(extensio)) {
 			return DocumentKind.ODT;
@@ -119,24 +117,20 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 		}
 	}
 
-
-	private ConversioArxiu convertirIEstampar(
-			ConversioArxiu arxiu,
-			String url) throws Exception {
+	private ConversioArxiu convertirIEstampar(ConversioArxiu arxiu, String url) throws Exception {
+		
 		ConversioArxiu convertit = new ConversioArxiu();
 		ByteArrayOutputStream baosConversio = null;
+		
 		if (!isExtensioPdf(arxiu)) {
 			
 			DocumentKind documentKind = getDocumentKind(arxiu);
 			
-			Options options = Options.getFrom(
-					documentKind).to(
-					ConverterTypeTo.PDF);
+			Options options = Options.getFrom(documentKind).to(ConverterTypeTo.PDF);
 			
 			byte[] contingut;
 			// xdocreport gives error when trying to convert docx/odt which has hyperlink in header/footer to pdf
-			// that's why hyperlinks needs to be removed
-			// error is: java.lang.RuntimeException: Not all annotations could be added to the document (the document doesn't have enough pages). at com.lowagie.text.pdf.PdfDocument.close(Unknown Source)
+			// Not all annotations could be added to the document (the document doesn't have enough pages)
 			if (documentKind == DocumentKind.DOCX) {
 				contingut = removeLinksHeaderFooterDocx(arxiu.getArxiuContingut());
 			} else {
@@ -148,6 +142,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 			IConverter converter = ConverterRegistry.getRegistry().getConverter(options);
 			converter.convert(bais, baosConversio, options);
 		}
+		
 		if (url != null) {
 			PdfReader pdfReader;
 			if (baosConversio != null)
@@ -176,8 +171,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 				getNomArxiuConvertitPdf(arxiu.getArxiuNom()));
 		return convertit;
 	}
-
-
+	  
 	private byte[] removeLinksHeaderFooterOdt(byte[] contingut) {
 		try {
 
@@ -202,18 +196,14 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 															if (e5.getName().equals("p")) {
 																for (Object o6 : e5.getChildren()) {
 																	org.jdom.Element e6 = ((org.jdom.Element) o6);
-																	if ("a".equalsIgnoreCase(e6.getName())) {
-																		String value = e6.getValue();
-																		e6.setName("span");
-																		e6.setText(value);
-																	}
+																	e6.getName();
 																}
-//																org.jdom.Element element = e5.getChild("a"); //Namespace.get("text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0")
-//																if (element != null) {e5.getChildren()
-//																	String value = element.getValue();
-//																	element.setName("span");
-//																	element.setText(value);
-//																}
+																org.jdom.Element element = e5.getChild("a", Namespace.getNamespace("text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0"));
+																if (element != null) {
+																	String value = element.getValue();
+																	element.setName("span");
+																	element.setText(value);
+																}
 															}
 														}
 													}
@@ -261,40 +251,11 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 	}
 
 	private void removeLinksDocx(List<IBodyElement> bodyElements) throws Exception {
-		
 		for (IBodyElement bodyElement : bodyElements) {
-			
 			if (bodyElement instanceof XWPFParagraph) {
-				
 				XWPFParagraph paragraph = (XWPFParagraph) bodyElement;
 				
-	            List<XWPFRun> runsToRemove = new ArrayList<>();
-	            List<String> runTexts = new ArrayList<>();
-	            List<Integer> runFontSizes = new ArrayList<>();
-
-	            // Recorre los runs y almacena aquellos que sean hipervínculos
-	            for (IRunElement runElement : paragraph.getIRuns()) {
-	                if (runElement instanceof XWPFHyperlinkRun) {
-	                    XWPFHyperlinkRun hyperlinkRun = (XWPFHyperlinkRun) runElement;
-	                    runsToRemove.add(hyperlinkRun);
-	                    runTexts.add(hyperlinkRun.getText(0));
-	                    runFontSizes.add(hyperlinkRun.getFontSize());
-	                }
-	            }
-
-	            // Elimina los runs que son hipervínculos
-	            for (XWPFRun run : runsToRemove) {
-	                paragraph.removeRun(paragraph.getIRuns().indexOf(run));
-	            }
-
-	            // Reinsertar el texto sin el enlace
-	            for (int i = 0; i < runTexts.size(); i++) {
-	                XWPFRun newRun = paragraph.createRun();
-	                newRun.setText(runTexts.get(i));
-	                newRun.setColor("0000EE");
-	                newRun.setFontSize(runFontSizes.get(i));
-	            }
-/*
+				
 				//removes hyperlink created with keyword HYPERLINK
 				int runToRemove = -1;
 				int i = 0;
@@ -303,7 +264,7 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 						XWPFRun run = (XWPFRun) runElement;
 						CTR cTR = run.getCTR();
 						boolean containsHyperlink = false;
-						for (CTText ctText : cTR.getInstrTextArray()) {
+						for (CTText ctText : cTR.getInstrTextList()) {
 							if (ctText.getStringValue().contains("HYPERLINK")) {
 								containsHyperlink = true;
 							}
@@ -317,7 +278,8 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 				if (runToRemove != -1) {
 					paragraph.removeRun(runToRemove);
 				}
-
+				
+				
 				//removes hyperlink created with tag <w:hyperlink>
 				int j = 0;
 				int runRemoved = -1;
@@ -340,7 +302,6 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 					xWPFRun.setColor("0000EE");
 					xWPFRun.setFontSize(runRemovedFontSize);
 				}
-				*/
 			}
 		}
 	}
@@ -429,7 +390,8 @@ public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties imp
 			}
 		}
 	}
-	
 	@Override
-	public String getEndpointURL() { return null; }
+	public String getEndpointURL() {
+		return getProperty("plugin.conversio.endpointName"); 
+	}
 }

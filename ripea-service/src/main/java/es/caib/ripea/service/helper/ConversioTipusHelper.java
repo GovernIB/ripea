@@ -135,6 +135,7 @@ public class ConversioTipusHelper {
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ConfigHelper configHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
 
 	public ConversioTipusHelper() {
 		
@@ -883,7 +884,8 @@ public class ConversioTipusHelper {
 					@Override
 					public OrganConfigDto convert(ConfigEntity source, Type<? extends OrganConfigDto>destinationClass, MappingContext mappingContext) {
 						OrganConfigDto target = new OrganConfigDto();
-						OrganGestorEntity organGestor = organGestorRepository.findByCodi(source.getOrganCodi());
+						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(source.getEntitatCodi());
+						OrganGestorEntity organGestor = organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), source.getOrganCodi());
 						target.setOrganGestorId(organGestor.getId());
 						target.setOrganGestorCodiNom(organGestor.getCodi() + " - " + organGestor.getNom() + " (" + organGestor.getEntitat().getCodi() + ")");
 						
