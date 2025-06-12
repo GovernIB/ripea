@@ -104,7 +104,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     			//Admin no aplica filtres de permisos
     			if (!isAdmin) {
     			
-	    			OrganGestorEntity ogEntity	= organGestorRepository.findByCodi(organActualCodi);        
+	    			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
 					PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 							entitat.getId(),
 							rolActual,
