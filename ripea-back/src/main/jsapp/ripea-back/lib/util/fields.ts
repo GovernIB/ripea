@@ -21,7 +21,11 @@ export const processType = (field?: any, forcedType?: any) => {
     if (processedType != null) {
         if (processedType === 'search') {
             const dataSourceHref = field?.dataSource?.href;
-            return dataSourceHref?.includes('options{?quickFilter,') ? 'reference' : 'enum';
+            return dataSourceHref?.includes('options{?quickFilter,')
+                ? 'reference'
+                : dataSourceHref == null || dataSourceHref?.includes('enum')
+                    ? 'enum'
+                    : 'reference';
         } else {
             return processedType;
         }
