@@ -18,7 +18,7 @@ import java.util.Set;
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
-	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
+
 	public OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 	
 	@Query(	"from " +

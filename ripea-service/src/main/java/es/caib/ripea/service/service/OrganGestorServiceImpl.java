@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -733,6 +731,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		// Sempre afegirem el nom com a subordre, si no hi ha cap ordre dona error
+		Utils.addSortDefault(paginacioParams, "nom");
 		Page<OrganGestorEntity> organs = organGestorRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),

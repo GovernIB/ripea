@@ -1,6 +1,8 @@
 package es.caib.ripea.service.intf.utils;
 
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -530,5 +532,20 @@ public class Utils {
 		}
 		
 		return resultat;
+	}
+	
+	public static void addSortDefault(PaginacioParamsDto paginacioParams, String camp) {
+		boolean isOrderedByNom = false;
+		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
+			for(PaginacioParamsDto.OrdreDto ordre : paginacioParams.getOrdres()) {
+				if (camp.equals(ordre.getCamp())) {
+					isOrderedByNom = true;
+					break;
+				}
+			}
+		}
+		if (!isOrderedByNom) {
+			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto(camp, PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+		}
 	}
 }
