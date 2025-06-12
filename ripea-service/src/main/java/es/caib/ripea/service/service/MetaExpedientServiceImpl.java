@@ -96,6 +96,8 @@ import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
@@ -1069,8 +1071,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
 		ordenacioMap.put("lastModifiedBy.codiAndNom", new String[] {"lastModifiedBy.nom"});
 		
-		// Sempre afegirem el nom com a subordre
-		addNomSort(paginacioParams);
+		// Sempre afegirem el nom com a subordre, si no hi ha cap ordre dona error
+		Utils.addSortDefault(paginacioParams, "nom");
 		
 		return paginacioHelper.toPaginaDto(
 				metaExpedientRepository.findByEntitat(
@@ -1100,21 +1102,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				});
 	}
 
-	private void addNomSort(PaginacioParamsDto paginacioParams) {
-		boolean isOrderedByNom = false;
-		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
-			for(PaginacioParamsDto.OrdreDto ordre : paginacioParams.getOrdres()) {
-				if ("nom".equals(ordre.getCamp())) {
-					isOrderedByNom = true;
-					break;
-				}
-			}
-		}
-		if (!isOrderedByNom) {
-			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
-		}
-	}
-
 	private Page<MetaExpedientEntity> findByOrganGestorEntity(
 			Long entitatId,
 			Long organGestorId,
@@ -1127,8 +1114,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitatId,
 				organGestorId,
 				hasPermisAdmComu);
+
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("organGestor.codiINom", new String[] {"organGestor.codi", "organGestor.nom"});
+		
+		// Sempre afegirem el nom com a subordre, si no hi ha cap ordre dona error
+		Utils.addSortDefault(paginacioParams, "nom");
+		
 		return metaExpedientRepository.findByOrganGestor(
 			entitat,
 			filtre.getCodi() == null || filtre.getCodi().isEmpty(),

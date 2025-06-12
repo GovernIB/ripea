@@ -65,6 +65,7 @@ import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Service
@@ -730,6 +731,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		// Sempre afegirem el nom com a subordre, si no hi ha cap ordre dona error
+		Utils.addSortDefault(paginacioParams, "nom");
 		Page<OrganGestorEntity> organs = organGestorRepository.findAmbFiltrePaginat(
 				entitat,
 				filtre.getCodi() == null || filtre.getCodi().isEmpty(),

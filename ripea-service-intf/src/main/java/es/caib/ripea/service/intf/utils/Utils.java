@@ -34,6 +34,7 @@ import org.springframework.security.crypto.codec.Base64;
 
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 
 public class Utils {
 	
@@ -640,5 +641,20 @@ public class Utils {
 	        }
     	}
         return mapaNamedQueries;
+	}
+	
+	public static void addSortDefault(PaginacioParamsDto paginacioParams, String camp) {
+		boolean isOrderedByNom = false;
+		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
+			for(PaginacioParamsDto.OrdreDto ordre : paginacioParams.getOrdres()) {
+				if (camp.equals(ordre.getCamp())) {
+					isOrderedByNom = true;
+					break;
+				}
+			}
+		}
+		if (!isOrderedByNom) {
+			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto(camp, PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+		}
 	}
 }
