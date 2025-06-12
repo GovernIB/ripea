@@ -215,7 +215,7 @@ const DocumentsGrid = (props: any) => {
 
     return <GridPage>
         <Load value={entity}>
-            <DropZone onDrop={onDrop}>
+            <DropZone onDrop={onDrop} disabled={!potModificar(entity)}>
                 <StyledMuiGrid
                     resourceName="documentResource"
                     popupEditFormDialogResourceTitle={t('page.document.title')}

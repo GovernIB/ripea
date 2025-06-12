@@ -57,7 +57,7 @@ const useTascaDetail = () => {
                 <ContenidoData title={t('page.tasca.detall.duracio')}>{entity?.duracio}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.dataLimit')}>{formatDate(entity?.dataLimit, "DD/MM/Y")}</ContenidoData>
                 <ContenidoData title={t('page.tasca.detall.estat')}>{entity?.estat}</ContenidoData>
-                <ContenidoData title={t('page.tasca.detall.prioritat')}><StyledPrioritat entity={entity}/></ContenidoData>
+                <ContenidoData title={t('page.tasca.detall.prioritat')}><StyledPrioritat entity={entity}>{t(`enum.prioritat.${entity?.prioritat}`)}</StyledPrioritat></ContenidoData>
             </Grid>
         </MuiDialog>
 

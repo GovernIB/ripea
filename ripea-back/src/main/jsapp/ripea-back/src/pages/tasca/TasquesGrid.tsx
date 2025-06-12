@@ -76,7 +76,7 @@ const columns = [
     {
         field: 'prioritat',
         flex: 0.5,
-        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
+        renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
     },
 ];
 

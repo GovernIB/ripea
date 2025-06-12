@@ -454,6 +454,7 @@ const translationCa = {
                 owner: "Cal reservar l'expedient per poder modificar-lo",
                 alert: "Aquest expedient té alertes pendents de llegir",
                 validation: "Aquest expedient té errors de validació",
+                esborranys: "Existen documentos en estado borrador (B) que deben pasarse a definitivos o eliminarse del expediente si se quiere cerrar el expediente.\nEsta acción hará que los documentos pasen a formar parte del expediente definitivamente y no se podrán eliminar.",
                 borradors: "Aquest expedient conté esborranys que s'eliminaran en tancar-lo. A continuació teniu l'opció de marcar els esborranys perquè siguin signats amb signatura de servidor abans del tancament de l'expedient i així evitar-ne l'eliminació. Si els documents contenen alguna signatura invàlida, aquestes s'eliminaran i es tornarà a signar el document al servidor.",
                 notificacio: "Aquest expedient conté notificacions caducades no finalitzades. S'intentarà actualitzar-ne l'estat. Si arriba nova informació de les notificacions pendents, es desarà el certificat a l'Helium, però no a l'Arxiu digital.",
                 documents: "Aquest expedient conté documents d'annexos d'anotacions amb errors. S'intentaran reprocessar en tancar-lo i, en cas que no sigui possible moure'ls, se'n desarà una còpia a l'Arxiu digital sense les signatures originals (tant el document original com la còpia es podran continuar consultant des de la pestanya de contingut de l'expedient).",
@@ -594,7 +595,7 @@ const translationCa = {
                 },
                 view: {
                     label: "Visualitzar",
-                    title: "",
+                    title: "Visualitzar",
                 },
                 csv: {
                     label: "Copiar enllaç CSV",

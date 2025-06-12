@@ -76,8 +76,8 @@ const ExpedientInfo = (props:any) => {
             <Contenido title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</Contenido>
             <Contenido title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</Contenido>
             <Contenido title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
-            <Contenido title={t('page.contingut.detalle.estat')}><StyledEstat entity={expedient}/></Contenido>
-            <Contenido title={t('page.contingut.detalle.prioritat')}><StyledPrioritat entity={expedient}/></Contenido>
+            <Contenido title={t('page.contingut.detalle.estat')}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></Contenido>
+            <Contenido title={t('page.contingut.detalle.prioritat')}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></Contenido>
             <Contenido title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</Contenido>
 
             <ExpedientsRelacionats entity={expedient}/>
@@ -113,6 +113,9 @@ const ExpedientAlert = (props:any) => {
                        </IconButton>
                    }
             >{t('page.expedient.alert.owner')}</Alert>
+        }
+        { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
+            <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
         }
         { expedient?.numAlert!=0 && count!=0 &&
             <Alert severity="error" color="warning"

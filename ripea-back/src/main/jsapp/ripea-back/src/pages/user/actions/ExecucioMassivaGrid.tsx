@@ -220,7 +220,7 @@ const useExecucioMassiva = () => {
 }
 
 const StyledEstat = (props:any) => {
-    const {entity} = props;
+    const {entity, children} = props;
 
     const estat = entity?.estat
 
@@ -230,7 +230,7 @@ const StyledEstat = (props:any) => {
         {estat == 'ESTAT_PENDENT' && <Icon color={"warning"}>schedule</Icon>}
         {estat == 'ESTAT_CANCELAT' && <Icon color={"disabled"}>check_circle</Icon>}
 
-        {estat}
+        {children}
     </>
 }
 
@@ -246,7 +246,7 @@ const columnsContingut = [
     {
         field: 'estat',
         flex: 0.5,
-        renderCell: (params: any) => <StyledEstat entity={params.row}/>,
+        renderCell: (params: any) => <StyledEstat entity={params.row}>{params.formattedValue}</StyledEstat>,
     },
     // {
     //     field: 'dataInici',

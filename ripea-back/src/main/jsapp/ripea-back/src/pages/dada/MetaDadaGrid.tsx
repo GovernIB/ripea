@@ -23,14 +23,16 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
     const findByExpedient = (id:any) => {
         if (id) {
             const filter = builder.eq('node.id', id)
-            console.log("filter", filter)
             apiFindAll({unpaged: true, filter})
-                .then((result) => {
-                    console.log("result", result)
-                    setDades(result?.rows)
-                })
+                .then((result) => setDades(result?.rows))
         }
     }
+
+    useEffect(() => {
+        if(dades){
+            onRowCountChange?.(dades?.length)
+        }
+    }, [dades]);
 
     const refresh = () => {
         apiRef.current.refresh();
@@ -78,7 +80,6 @@ const MetaDadaGrid = (props: { entity:any, onRowCountChange?: ((value:number) =>
             // paginationActive
             disableColumnSorting
             readOnly
-            onRowsChange={()=> onRowCountChange?.(dades?.length)}
         />
         {components}
     </GridPage>

@@ -112,7 +112,7 @@ export const useActions = (refresh?: () => void) => {
 	const eliminar= (id:any, row:any) :void => {
         messageDialogShow(
             '',
-            t('page.expedient.result.checkDelete'),
+            t('page.expedient.results.checkDelete'),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {
@@ -413,7 +413,7 @@ export const useCommonActions = (refresh?: () => void) => {
 		    icon: "delete",
 		    showInMenu: true,
 		    onClick: eliminar,
-		    hidden: (row:any) => !potModificar(row),
+		    hidden: (row:any) => !potModificar(row) && row.conteDocumentsDefinitius,
 		},	
     ]
         .map(({ hidden, ...rest }) => ({

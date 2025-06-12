@@ -16,7 +16,7 @@ const EstatMessage = (props:any) => {
     </Typography>
 }
 const StyledEstat = (props:any) => {
-    const { entity } = props;
+    const { entity, children } = props;
 
     const error = '#ef5350';
     const success = '#4caf50';
@@ -26,7 +26,7 @@ const StyledEstat = (props:any) => {
     switch (entity?.notificacioEstat) {
         case 'PENDENT':
             return <>
-                <EstatMessage icon={"schedule"} color={warning}>{entity?.notificacioEstat}</EstatMessage>
+                <EstatMessage icon={"schedule"} color={warning}>{children}</EstatMessage>
                 { entity?.error &&
                     <EstatMessage icon={"warning"} color={error}>Error procesando la notificación dentro Notib</EstatMessage>
                 }
@@ -36,16 +36,16 @@ const StyledEstat = (props:any) => {
         case 'PROCESSADA':
         case 'ENVIADA_AMB_ERRORS':
             if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={error}>{entity?.notificacioEstat}</EstatMessage>
+                return <EstatMessage icon={"warning"} color={error}>{children}</EstatMessage>
             } else {
-                return <EstatMessage icon={"check"} color={success}>{entity?.notificacioEstat}</EstatMessage>
+                return <EstatMessage icon={"check"} color={success}>{children}</EstatMessage>
             }
         case 'ENVIADA':
         case 'FINALITZADA_AMB_ERRORS':
             if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={error}>{entity?.notificacioEstat}</EstatMessage>
+                return <EstatMessage icon={"warning"} color={error}>{children}</EstatMessage>
             } else {
-                return <EstatMessage icon={"mail"} color={info}>{entity?.notificacioEstat}</EstatMessage>
+                return <EstatMessage icon={"mail"} color={info}>{children}</EstatMessage>
             }
     }
 
@@ -102,7 +102,7 @@ const columns = [
     {
         field: 'notificacioEstat',
         flex: 0.5,
-        renderCell: (params:any) => <StyledEstat entity={params?.row}/>
+        renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>
     },
 ]
 

@@ -41,8 +41,7 @@ export const ExpedientGridForm = () => {
 }
 
 export const StyledEstat = (props: any) => {
-    const {entity: expedient, icon} = props;
-    const {t} = useTranslation();
+    const {entity: expedient, icon, children} = props;
 
     const additionalStyle = {backgroundColor: expedient?.estatAdditionalInfo?.color, ...labelStyle}
 
@@ -56,13 +55,12 @@ export const StyledEstat = (props: any) => {
 
     return <Typography variant="caption" sx={{...commonStyle, ...style}}>
         {icon && <Icon fontSize={"inherit"}>{icona}</Icon>}
-        {expedient?.estatAdditionalInfo?.nom ?? t(`enum.estat.${expedient?.estat}`)}
+        {expedient?.estatAdditionalInfo?.nom ?? children}
     </Typography>
 }
 
 export const StyledPrioritat = (props: any) => {
-    const {entity: expedient} = props;
-    const {t} = useTranslation();
+    const {entity: expedient, children} = props;
 
     let style: any = {};
 
@@ -81,9 +79,7 @@ export const StyledPrioritat = (props: any) => {
             break;
     }
 
-    return <Typography variant="caption" sx={{...commonStyle, ...labelStyle, ...style}}>
-        {t(`enum.prioritat.${expedient?.prioritat}`)}
-    </Typography>
+    return <Typography variant="caption" sx={{...commonStyle, ...labelStyle, ...style}}>{children}</Typography>
 }
 
 const beforeAvis = [
@@ -109,12 +105,12 @@ const afterAvis = [
     {
         field: 'estat',
         flex: 0.75,
-        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}/>
+        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>
     },
     {
         field: 'prioritat',
         flex: 0.5,
-        renderCell: (params: any) => <StyledPrioritat entity={params?.row}/>
+        renderCell: (params: any) => <StyledPrioritat entity={params?.row}>{params.formattedValue}</StyledPrioritat>
     },
     {
         field: 'agafatPer',

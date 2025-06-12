@@ -301,6 +301,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private int numComentaris;
     @Transient private int numSeguidors;
     @Transient private int numContingut;
+    @Transient private boolean hasEsborranys;
     @Transient private int numDades;
     @Transient private int numMetaDades;
     @Transient private int numInteressats;

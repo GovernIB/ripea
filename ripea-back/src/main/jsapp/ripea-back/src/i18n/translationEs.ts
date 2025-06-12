@@ -454,6 +454,7 @@ const translationEs = {
                 owner: "Es necesario reservar el expediente para poder modificarlo",
                 alert: "Este expediente tiene alertas pendientes de leer",
                 validation: "Este expediente tiene errores de validación",
+                esborranys: "Existen documentos en estado borrador (B) que deben pasarse a definitivos o eliminarse del expediente si se quiere cerrar el expediente.\nEsta acción hará que los documentos pasen a formar parte del expediente definitivamente y no se podrán eliminar.",
                 borradors: "Este expediente contiene borradores que serán eliminados al cerrarlo. A continuación tiene la possibilidad de marcar los borradores para que sean firmados con firma de servidor antes del cierre del expediente y así se evitará su eliminación. Si los documentos contienen alguna firma inválida, éstas serán eliminadas, y se volverá a firmar el documento en servidor.",
                 notificacio: "Este expediente contiene notificaciones caducadas no finalizadas. Se intentará actualitzar su estado. Si llega nueva información de las notificaciones pendientes, se guardará el certificado en Helium, pero no en el Archivo digital.",
                 documents: "Este expediente contiene documentos de anexos de anotaciones con errores. Se intentarán reprocesar al cerrar, y en caso de que no sea posible moverlos, se guardará una copia de éstos en el Archivo digital sin las firmas originales (tanto el documento original como la copia, se podrán seguir consultando desde la pestaña de contenido del expediente).",
@@ -594,7 +595,7 @@ const translationEs = {
                 },
                 view: {
                     label: "Visualizar",
-                    title: "",
+                    title: "Visualizar",
                 },
                 csv: {
                     label: "Copiar enlace CSV",

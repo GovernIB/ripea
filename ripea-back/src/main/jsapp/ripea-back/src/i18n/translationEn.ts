@@ -454,6 +454,7 @@ const translationEn = {
                 owner: "It is necessary to reserve the file to be able to modify it",
                 alert: "This file has unread pending alerts",
                 validation: "This file has validation errors",
+                esborranys: "There are documents in draft status (B) that must either be finalized or removed from the case file before it can be closed.\nThis action will make the documents a permanent part of the case file and they will no longer be deletable.",
                 borradors: "This file contains drafts that will be deleted when closing it. You have the option to mark the drafts to be signed with server signature before closing the file to avoid their deletion. If the documents contain any invalid signatures, they will be removed and the document will be re-signed on the server.",
                 notificacio: "This file contains expired notifications that are not finalized. An attempt will be made to update their status. If new information about pending notifications arrives, the certificate will be saved in Helium but not in the Digital Archive.",
                 documents: "This file contains annotation annex documents with errors. An attempt will be made to reprocess them upon closing, and if it is not possible to move them, a copy will be saved in the Digital Archive without the original signatures (both the original document and the copy will still be accessible from the file’s content tab).",
@@ -594,7 +595,7 @@ const translationEn = {
                 },
                 view: {
                     label: "View",
-                    title: "",
+                    title: "View",
                 },
                 csv: {
                     label: "Copy CSV link",
