@@ -80,7 +80,96 @@
 				$('table').dataTable().api().state.clear();
 			});
 			$('table').data("page-length", ${dadesUsuariActual.numElementsPagina});
+			
+			$('.circular-avatar').each(function (index) {
+				this.style.backgroundColor=stringToColor('${dadesUsuariActual.nom}');
+				this.innerHTML=obtenerIniciales('${dadesUsuariActual.nom}');
+			});
+
+			$("a.capMenuDesplegable").click(function() {
+				let flecha = $(this).prev("span");
+				let menu = $(this).next(".ul_capMenuDesplegable")[0];
+			    if (menu.style.display === "block") {
+			        menu.style.display = "none";
+			        flecha.removeClass("fa-caret-down");
+			        flecha.addClass("fa-caret-right");
+			    } else {
+			        menu.style.display = "block";
+			        flecha.removeClass("fa-caret-right");
+			        flecha.addClass("fa-caret-down");
+			    }
+			});
 		});
+		
+		function mostrarMenuUsuari(event) {
+			debugger;
+		    let popup = document.getElementById("popupMenuUsuari");
+		    if (popup.style.display === "none") {
+			    // Obtener coordenadas del clic
+			    let x = event.clientX; // Posición horizontal del clic
+			    let y = event.clientY; // Posición vertical del clic
+	
+			    // Posicionar el div 200px a la izquierda y hacia abajo
+			    popup.style.left = (x-250) + "px";
+			    popup.style.top = "70px"; // Ajusta este valor según necesites
+			    popup.style.display = "block"; // Mostrar el div
+		    } else {
+		    	popup.style.display = "none";
+			}
+		}
+		
+		document.addEventListener("click", function(event) {
+			if (event.srcElement.className!="circular-avatar") {
+			    let popup = document.getElementById("popupMenuUsuari");
+			    // Verificar si el clic NO fue dentro del popup
+			    if (!popup.contains(event.target)) {
+			        popup.style.display = "none"; // Ocultar el div
+			    }
+			}
+		});
+		
+		function stringToColor(str) {
+		    let hash = 0;
+		    for (let i = 0; i < str.length; i++) {
+		        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+		    }
+		    let color = '#';
+		    for (let i = 0; i < 3; i++) {
+		        let value = (hash >> (i * 8)) & 0xff;
+		        let hex = value.toString(16);
+		        // Asegurar que siempre tenga 2 caracteres (añadir '0' si es necesario)
+		        if (hex.length === 1) {
+		            hex = '0' + hex;
+		        }
+		        color += hex;
+		    }
+		    return color;
+		}
+		
+		function obtenerIniciales(nombre) {
+		    let palabras = nombre.trim().split(/\s+/); // Divide por espacios
+		    let iniciales = '';
+		    if (palabras.length > 1) {
+		        // Tomar la primera letra de cada palabra, con un máximo de 2 palabras
+		        iniciales = palabras.slice(0, 2).map(palabra => palabra.charAt(0)).join('');
+		    } else {
+		        // Si hay una sola palabra, tomar las dos primeras letras
+		        iniciales = palabras[0].substring(0, 2);
+		    }
+		    return iniciales.toUpperCase();
+		}
+		
+		function toggleMenuPrincipal() {
+		    let menu = document.getElementById("menuPrincipal");
+		    let overlay = document.getElementById("overlayMenu");
+		    if (menu.style.display === "block") {
+		        menu.style.display = "none";
+		        overlay.style.display = "none";
+		    } else {
+		        menu.style.display = "block";
+		        overlay.style.display = "block";
+		    }
+		}
 		
 	</script>
 	<decorator:head />
@@ -88,7 +177,7 @@
 body {
 	background-image:url(<c:url value="/img/background-pattern.png"/>);
 	color:#666666;
-	padding-top: 120px;
+	padding-top: 100px;
 }
 .select2-container--bootstrap .select2-results__option { min-height: 30px; }
 <%-- If capsaleraColorFons is defined for entitat use it, if not look if there is capsaleraColorFons defined for application and use it, if not default color is used 	--%>
@@ -126,339 +215,201 @@ body {
 </style>
 </head>
 <body>
-	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
-		<div class="container container-caib">
-		
-			<div class="nav navbar-nav navbar-right" style="width:100%;">
-				<ul class="list-inline pull-right" style="margin-bottom: 0px;">
-				
-					<%------------------------ ENTITATS ------------------------%>
+	<div id="popupMenuUsuari" class="popupMenuUsuari">
+		<div style="display: flex;">
+			<div class="circular-avatar"></div>
+			<div>
+				<c:choose>
+					<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom} ${dadesUsuariActual.codi}</c:when>
+					<c:otherwise>${pageContext.request.userPrincipal.name}</c:otherwise>
+				</c:choose>
+			</div>
+		</div>
+		<div>Perfil i manuals</div>
+		<div>Selectors</div>
+		<div>Tancar sessio</div>
+	</div>
+	<div id="overlayMenu" class="overlayMenu" onclick="toggleMenuPrincipal()"></div>
+	<div id="menuPrincipal" class="menuPrincipal">
+		<div class="menuPrincipalCapcalera">
+			<div style="width: 20%;padding-left: 11px;"><img src="<c:url value="/img/goib_escut_logo.png"/>" height="40"/></div>
+			<div style="width: 70%;padding-top: 8px;">Menú</div>
+			<div style="width: 10%; cursor:pointer;font-weight:lighter;padding-top:5px;" onclick="toggleMenuPrincipal();"><span class="fa fa-times"></span></div>
+		</div>
+		<div class="menuPrincipalCos">
+			<c:choose>
+				<c:when test="${isRolActualSuperusuari}">
 					
-					<c:if test="${not isRolActualSuperusuari and hiHaEntitats}">
-						<li class="dropdown">
-							<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
-						<span class="fa fa-institution"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
-							<c:if test="${hiHaMesEntitats}"></a></c:if>
-							<c:if test="${hiHaMesEntitats}">
-								<ul class="dropdown-menu">
-									<c:forEach var="entitat" items="${sessionEntitats}" varStatus="status">
-										<c:if test="${entitat.id != entitatActual.id}">
-											<c:url var="urlCanviEntitat" value="/index">
-												<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
-											</c:url>
-											<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
-										</c:if>
-									</c:forEach>
-								</ul>
-							</c:if>
-						</li>
-					</c:if>
-					
-					<%------------------------ ROLS ------------------------%>
-					
-					<li class="dropdown">
-						<c:choose>
-							<c:when test="${fn:length(rolsUsuariActual) > 1}">
-								<a href="#" data-toggle="dropdown">
-									<span class="fa fa-id-card-o"></span>
-									<spring:message code="decorator.menu.rol.${rolActual}"/>
-									<span class="caret caret-white"></span>
-								</a>
-								<ul class="dropdown-menu">
-									<c:forEach var="rol" items="${rolsUsuariActual}">
-										<c:if test="${rol != rolActual}">
-											<li>
-												<c:url var="canviRolUrl" value="/index">
-													<c:param name="${requestParameterCanviRol}" value="${rol}"/>
-												</c:url>
-												<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
-											</li>
-										</c:if>
-									</c:forEach>
-								</ul>
-							</c:when>
-							<c:otherwise>
-								<c:if test="${not empty rolActual}"><span class="fa fa-id-card-o"></span>&nbsp;<spring:message code="decorator.menu.rol.${rolActual}"/></c:if>
-							</c:otherwise>
-						</c:choose>
-					</li>
-					
-					<%------------------------ ORGANS ------------------------%>
-					
-					<c:if test="${isRolActualAdministradorOrgan or isRolActualDissenyadorOrgan}">
-						<c:if test="${!hiHaOrgansGestors}">
-							<li class="dropdown">
-								<span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="decorator.menu.organgestor.cap"/>
-							</li>
-						</c:if>
-						<c:if test="${hiHaOrgansGestors}">
-							<li class="dropdown">
-								<c:if test="${hiHaMesOrgansGestors}"><a href="#" data-toggle="dropdown"></c:if>
-								<c:if test="${null != organGestorActual}">
-									<span class="fa fa-cubes"></span> ${organGestorActual.nom} <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-								</c:if>
-								<c:if test="${null == organGestorActual}">
-									<span class="fa fa-cubes"></span> <spring:message code="decorator.menu.organgestor.tots"/> <c:if test="${hiHaMesOrgansGestors}"><b class="caret caret-white"></b></c:if>
-								</c:if>
-								<c:if test="${hiHaMesOrgansGestors}"></a></c:if>
-								<c:if test="${hiHaMesOrgansGestors}">
-									<ul class="dropdown-menu">
-									<c:if test="${null != organGestorActual}">
-										<c:url var="urlCanviOrganGestor" value="/index">
-											<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
-										</c:url>
-									</c:if>
-										<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
-											<c:if test="${og.id != organGestorActual.id}">
-												<c:url var="urlCanviOrganGestor" value="/index">
-													<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
-												</c:url>
-												<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
-											</c:if>
-										</c:forEach>
-									</ul>
-								</c:if>
-							</li>
-						</c:if>
-					</c:if>
-					
-					<%------------------------ USER ------------------------%>
-					
-					<li class="dropdown">
-						<a href="#" data-toggle="dropdown">
-							<span class="fa fa-user"></span>
-							<c:choose>
-								<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom}</c:when>
-								<c:otherwise>${pageContext.request.userPrincipal.name}</c:otherwise>
-							</c:choose>
-							<span class="caret caret-white"></span>
-						</a>
+					<%---- Entitats ----%>
+					<a href="<c:url value="/entitat"/>" ><spring:message code="decorator.menu.entitats"/></a>
+					<div class="btn-group">
+						<a data-toggle="dropdown" class="dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></a>
 						<ul class="dropdown-menu">
+							<%---- Integracions ----%>
+							<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
+							<%---- Excepcions ----%>
+							<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>				
+							<li><a href="<c:url value="/monitor"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.monitor"/></a></li>											
+						</ul>
+					</div>
+					<div class="btn-group">
+						<a data-toggle="dropdown" class="dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
+							<li><a href="<c:url value="/pinbalServei"/>"><spring:message code="decorator.menu.pinbal.servei"/></a></li>
+							<li><a href="<c:url value="/scheduled"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.reinici.scheduler"/> ...</a></li>
+							<li><a href="<c:url value="/plugin"/>" data-toggle="modal"><spring:message code="decorator.menu.reinici.plugin"/> ...</a></li>
+						</ul>
+					</div>
+					
+					<a href="<c:url value="/avis"/>"><spring:message code="decorator.menu.avisos"/></a>
+				</c:when>
+				<c:when test="${isRolActualAdministrador}">
+					<%---- Expedients ----%>
+					<ul>
+					<li><span class="fa fa-folder-o"></span><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>							
+					<%---- Annotacions pendents ----%>
+					<li><span class="fa fa-envelope"></span><a href="<c:url value="/expedientPeticio"></c:url>"><spring:message code="decorator.menu.expedientPeticions"/><span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a></li>
+					<li style="display: inline-table;width: 100%;">
+						<span class="fa fa-caret-right"></span>
+						<a href="#" class="capMenuDesplegable"><spring:message code="decorator.menu.configurar"/></a>
+						<ul class="ul_capMenuDesplegable" style="display:none;">
+							<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
+							<c:if test="${sessionScope['SessionHelper.isDocumentsGeneralsEnabled']!=null  && sessionScope['SessionHelper.isDocumentsGeneralsEnabled']}">
+								<li><a href="<c:url value="/metaDocument"/>"><spring:message code="decorator.menu.metadocuments"/></a></li>
+							</c:if>
+							<c:if test="${sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null  && sessionScope['SessionHelper.isTipusDocumentsEnabled']}">
+								<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
+							</c:if>
+							<c:if test="${sessionScope['SessionHelper.isDominisEnabled']!=null  && sessionScope['SessionHelper.isDominisEnabled']}">
+								<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
+							</c:if>								
+							<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
+							<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
+							<c:if test="${isUrlsInstruccioActiu}">
+								<li><a href="<c:url value="/urlInstruccio"/>"><spring:message code="decorator.menu.urlinstruccio"/></a></li>
+							</c:if>
+							<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
+						</ul>
+					</li>
+					<li style="display: inline-table;width: 100%;">
+						<span class="fa fa-caret-right"></span>
+						<a href="#" class="capMenuDesplegable"><spring:message code="decorator.menu.consultar"/></a>
+						<ul class="ul_capMenuDesplegable" style="display:none;">
+							<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
 							<li>
-								<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="false" data-width="1200px" data-refresh-pagina="true">
-									<spring:message code="decorator.menu.configuracio.user"/>
+								<a href="<c:url value="/historic"/>" data-maximized="true">
+									<spring:message code="decorator.menu.accions.estadistiques"/>
 								</a>
 							</li>
-							<li>
-								<c:if test="${isRolActualSuperusuari or isRolActualAdministrador or isRolActualAdministradorOrgan}">
-									<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf" rel="noopener noreferrer" target="_blank">
-										<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualAdministradors"/>
+							<c:if test="${isRevisioActiva}">
+								<li>
+									<a href="<c:url value="/metaExpedientRevisio"/>">
+											<spring:message code="decorator.menu.revisioProcediments"/>
 									</a>
-								</c:if>
-								<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf" rel="noopener noreferrer" target="_blank">
-									<span class="fa fa-download"></span> <spring:message code="decorator.menu.manualUsuari"/>
+								</li>	
+							</c:if>	
+							<li>
+								<a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true">
+									<spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/>
 								</a>
 							</li>
 							<li>
-								<a href="<c:url value="/usuari/logout"/>">
-									<i class="fa fa-power-off"></i> <spring:message code="decorator.menu.accions.desconectar"/>
+								<a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true">
+									<spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/>
 								</a>
 							</li>
+							<li>
+								<a href="<c:url value="/seguimentPinbal"/>" data-maximized="true">
+									<spring:message code="decorator.menu.seguiment.consultesPinbal"/>
+								</a>
+							</li>								
+							<li>
+								<a href="<c:url value="/seguimentTasques"/>" data-maximized="true">
+									<spring:message code="decorator.menu.seguiment.assignacioTasques"/>
+								</a>
+							</li>		
+							<li>
+								<a href="<c:url value="/seguimentExpedientsPendents"/>" data-maximized="true">
+									<spring:message code="decorator.menu.seguiment.expedientsPendents"/>
+								</a>
+							</li>															
+							<li>
+								<a href="<c:url value="/expedientPeticioComunicades"></c:url>">
+									<spring:message code="decorator.menu.anotacionsComunicades"/>
+								</a>
+							</li>	
 						</ul>
 					</li>
 				</ul>
-				<div class="clearfix"></div>
-			</div>
+				</c:when>
+				<c:when test="${isRolActualAdministradorOrgan}">
+					<ul>
+					<li><span class="fa fa-folder-o"></span><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
+					<li>
+						<span class="fa fa-envelope"></span>
+						<a href="<c:url value="/expedientPeticio"></c:url>">
+						<spring:message code="decorator.menu.expedientPeticions"/>
+						<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
+					</a></li>
+					<li style="display: inline-table;width: 100%;">
+						<span class="fa fa-caret-right"></span>
+						<a href="#" class="capMenuDesplegable"><spring:message code="decorator.menu.configurar"/></a>
+						<ul class="ul_capMenuDesplegable" style="display:none;">
+							<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
+							<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
+						</ul>
+					</li>
+					</ul>
+				</c:when>
+				<c:when test="${isRolActualDissenyadorOrgan}">
+				<ul>
+					<li><a href="<c:url value="/metaExpedient"></c:url>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
+					<li><a href="<c:url value="/grup"></c:url>"><spring:message code="decorator.menu.grups"/></a></li>
+				</ul>
+				</c:when>
+				<c:when test="${isRolActualUsuari}">
+				<ul>
+					<li>
+						<span class="fa fa-folder-o">
+						</span><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a>
+					</li>
+					<li>
+						<span class="fa fa-envelope"></span>
+						<a href="<c:url value="/expedientPeticio"></c:url>"><spring:message code="decorator.menu.expedientPeticions"/> <span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a>
+					</li>
+					<li>
+						<span class="fa fa-pencil-square-o"></span>
+						<a href="<c:url value="/usuariTasca"></c:url>"><spring:message code="decorator.menu.tasques"/> <span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span></a>
+					</li>
+					<c:if test="${isCreacioFluxUsuariActiu}">
+						<li><a href="<c:url value="/fluxusuari"></c:url>"><spring:message code="decorator.menu.fluxosusuari"/></a></li>
+					</c:if>
+					<c:if test="${teAccesEstadistiques or isMostrarSeguimentEnviamentsUsuariActiu}">
+						<li style="display: inline-table;width: 100%;">
+							<span class="fa fa-caret-right"></span>
+							<a href="#" class="capMenuDesplegable"><spring:message code="decorator.menu.consultar"/></a>
+							<ul class="ul_capMenuDesplegable" style="display:none;">
+								<c:if test="${teAccesEstadistiques}">
+									<li><a href="<c:url value="/historic"/>" data-maximized="true"><spring:message code="decorator.menu.accions.estadistiques"/></a></li>
+								</c:if>
+								<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
+									<li><a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/></a></li>
+									<li><a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/></a></li>
+								</c:if>
+							</ul>
+						</li>
+					</c:if>
+				</ul>
+				</c:when>
+			</c:choose>
+			<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">
+				<ul>
+					<li style="display: inline-table;width: 100%;">
+						<span class="fa fa-caret-right"></span>
+						<a href="#" class="capMenuDesplegable"><spring:message code="massiu.portafirmes"/></a>
+						<ul class="ul_capMenuDesplegable" style="display:none;">
 
-			<div class="navbar-header">
-				<div class="navbar-collapse collapse">
-				<div class="navbar-brand" style="margin-top: -20px; padding: 0;">
-					<div id="govern-logo" class="pull-left">
-						<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
-						<c:choose>
-							<c:when test="${not isRolActualSuperusuari && (sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0)}">
-								<img src="<c:url value="/entitat/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
-							</c:when>
-							<c:otherwise>
-								<img src="<c:url value="/img/goib_logo.svg"/>"  height="65" alt="Govern de les Illes Balears" />
-							</c:otherwise>
-						</c:choose>
-					</div>
-					<div id="app-logo" class="pull-left">
-						<img src="<c:url value="/img/Drassana_RIP_DRA_COL.svg"/>" height="65" alt="RIPEA" />
-					</div>
-				</div>
-			</div>
-			</div>
-	
-			<%------------------------ MENU BUTTONS ------------------------%>
-			<div class="btn-group navbar-btn navbar-right" style="margin-top: 25px;">
-				<c:choose>
-					<c:when test="${isRolActualSuperusuari}">
-						
-						<%---- Entitats ----%>
-						<a href="<c:url value="/entitat"/>" class="btn btn-primary"><spring:message code="decorator.menu.entitats"/></a>
-						<div class="btn-group">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
-							<ul class="dropdown-menu">
-								<%---- Integracions ----%>
-								<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
-								<%---- Excepcions ----%>
-								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>				
-								<li><a href="<c:url value="/monitor"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.monitor"/></a></li>											
-							</ul>
-						</div>
-						<div class="btn-group">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
-								<li><a href="<c:url value="/pinbalServei"/>"><spring:message code="decorator.menu.pinbal.servei"/></a></li>
-								<li><a href="<c:url value="/scheduled"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.reinici.scheduler"/> ...</a></li>
-								<li><a href="<c:url value="/plugin"/>" data-toggle="modal"><spring:message code="decorator.menu.reinici.plugin"/> ...</a></li>
-							</ul>
-						</div>
-						
-						<a href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>
-					</c:when>
-					<c:when test="${isRolActualAdministrador}">
-						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>								
-						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"></c:url>" class="btn btn-primary">
-							<spring:message code="decorator.menu.expedientPeticions"/>
-							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
-						</a>
-						<div class="btn-group">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
-								<c:if test="${sessionScope['SessionHelper.isDocumentsGeneralsEnabled']!=null  && sessionScope['SessionHelper.isDocumentsGeneralsEnabled']}">
-									<li><a href="<c:url value="/metaDocument"/>"><spring:message code="decorator.menu.metadocuments"/></a></li>
-								</c:if>
-								<li class="divider"></li>
-								<c:if test="${sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null  && sessionScope['SessionHelper.isTipusDocumentsEnabled']}">
-									<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
-								</c:if>
-								<c:if test="${sessionScope['SessionHelper.isDominisEnabled']!=null  && sessionScope['SessionHelper.isDominisEnabled']}">
-									<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
-								</c:if>								
-								<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-								<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
-								<c:if test="${isUrlsInstruccioActiu}">
-									<li><a href="<c:url value="/urlInstruccio"/>"><spring:message code="decorator.menu.urlinstruccio"/></a></li>
-								</c:if>
-								<li class="divider"></li>
-								<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
-<%-- 										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li> --%>
-							</ul>
-						</div>
-						<div class="btn-group">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/contingutAdmin"/>"><spring:message code="decorator.menu.continguts"/></a></li>
-								<%--<li>
-									<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
-										<spring:message code="decorator.menu.accions.massives.admin"/>
-									</a>
-								</li>--%>
-								<li>
-									<a href="<c:url value="/historic"/>" data-maximized="true">
-										<spring:message code="decorator.menu.accions.estadistiques"/>
-									</a>
-								</li>
-								<%---- Revisió d'expedients ----%>
-								<c:if test="${isRevisioActiva}">
-									<li>
-										<a href="<c:url value="/metaExpedientRevisio"/>">
-												<spring:message code="decorator.menu.revisioProcediments"/>
-										</a>
-									</li>	
-								</c:if>	
-								<li>
-									<a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true">
-										<spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/>
-									</a>
-								</li>
-								<li>
-									<a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true">
-										<spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/>
-									</a>
-								</li>
-								<li>
-									<a href="<c:url value="/seguimentPinbal"/>" data-maximized="true">
-										<spring:message code="decorator.menu.seguiment.consultesPinbal"/>
-									</a>
-								</li>								
-								<li>
-									<a href="<c:url value="/seguimentTasques"/>" data-maximized="true">
-										<spring:message code="decorator.menu.seguiment.assignacioTasques"/>
-									</a>
-								</li>		
-								<li>
-									<a href="<c:url value="/seguimentExpedientsPendents"/>" data-maximized="true">
-										<spring:message code="decorator.menu.seguiment.expedientsPendents"/>
-									</a>
-								</li>															
-								
-								<%---- Annotacions comunicadas ----%>
-								<li>
-									<a href="<c:url value="/expedientPeticioComunicades"></c:url>">
-										<spring:message code="decorator.menu.anotacionsComunicades"/>
-									</a>
-								</li>	
-								
-																
-							</ul>
-						</div>
-					</c:when>
-					<c:when test="${isRolActualAdministradorOrgan}">
-						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
-						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
-							<spring:message code="decorator.menu.expedientPeticions"/>
-							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
-						</a>
-						<div class="btn-group">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
-							<ul class="dropdown-menu">
-								 <%---- Procediments ----%>
-								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
-								<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-							</ul>
-						</div>
-					</c:when>
-					<c:when test="${isRolActualDissenyadorOrgan}">
-						<a href="<c:url value="/metaExpedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.metaexpedients"/></a>
-						<a href="<c:url value="/grup"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.grups"/></a>
-					</c:when>
-					<c:when test="${isRolActualUsuari}">
-						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
-						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedientPeticions"/> <span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a>
-						<%---- Tasques ----%>
-						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.tasques"/> <span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span></a>
-						<%-- Fluxos --%>
-						<c:if test="${isCreacioFluxUsuariActiu}">
-							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.fluxosusuari"/></a>
-						</c:if>
-						<%-- Consulta --%>
-						<c:if test="${teAccesEstadistiques or isMostrarSeguimentEnviamentsUsuariActiu}">
-							<div class="btn-group">
-								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
-								<ul class="dropdown-menu">
-									<%---- Estadístiques ----%>
-									<c:if test="${teAccesEstadistiques}">
-										<li><a href="<c:url value="/historic"/>" data-maximized="true"><spring:message code="decorator.menu.accions.estadistiques"/></a></li>
-									</c:if>
-									<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
-										<%-- Consulta enviaments --%>
-										<li><a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/></a></li>
-										<li><a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/></a></li>
-									</c:if>
-								</ul>
-							</div>
-						</c:if>
-					</c:when>
-				</c:choose>
-				<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">
-					<%---- Acció massiva ----%>	
-					<div class="btn-group">
-						<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	  						 <spring:message code="massiu.portafirmes"/> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
 							<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
 							<li><a href="<c:url value="/massiu/firmasimpleweb"/>"><spring:message code="massiu.firmasimpleweb"/></a></li>
 							<c:if test="${isConvertirDefinitiuActiu}">
@@ -475,20 +426,100 @@ body {
 								<li><a href="<c:url value="/massiu/expedientPeticioCanviEstatDistribucio"/>"><spring:message code="massiu.anotacions.pendents.canvi.estat"/></a></li>
 							</c:if>
 							<li><a href="<c:url value="/massiu/canviPrioritats"/>"><spring:message code="expedient.massiu.prioritat.modificar.titol"/></a></li>
-							<li class="divider"></li>
 							<li><a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
 									<spring:message code="decorator.menu.accions.massives.user"/>
-							</a></li>												
+							</a>
+							</li>												
+						</ul>
+					</li>
+				</ul>
+			</c:if>
+			<c:if test="${isRolActualRevisor}">
+				<ul><li><a href="<c:url value="/metaExpedientRevisio"/>"><spring:message code="decorator.menu.revisioProcediments"/></a></li></ul>
+			</c:if>
+		</div>
+	</div>
+	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
+		<div class="container container-caib">
+
+			<div class="navbar-header" style="width: 25%;">
+				<div class="navbar-collapse collapse">
+					<div class="navbar-brand" style="padding: 0px !important;width: 100%;">
+						<div id="govern-logo" class="pull-left">
+							<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
+							<c:choose>
+								<c:when test="${not isRolActualSuperusuari && (sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0)}">
+									<img src="<c:url value="/entitat/getEntitatLogo"/>"  height="60" alt="Govern de les Illes Balears" />
+								</c:when>
+								<c:otherwise>
+									<img src="<c:url value="/img/goib_logo.svg"/>"  height="60" alt="Govern de les Illes Balears" />
+								</c:otherwise>
+							</c:choose>
+						</div>
+						<div id="app-logo" class="pull-left">
+							<img src="<c:url value="/img/Drassana_RIP_DRA_COL.svg"/>" height="80" alt="RIPEA" />
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<div class="navbar-header" style="width: 70%;">
+				<div class="navbar-collapse collapse">
+					<div class="navbar-brand" style="padding: 0px !important; width: 100%;">
+						<ul class="navbar-brand-ul pull-right">
+							<c:choose>
+								<c:when test="${isRolActualSuperusuari}">
+									<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
+									<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
+									<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
+								</c:when>
+								<c:when test="${isRolActualAdministrador or isRolActualAdministradorOrgan}">
+									<li><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
+									<li>
+										<a href="<c:url value="/expedientPeticio"></c:url>">
+											<spring:message code="decorator.menu.expedientPeticions"/>
+											<span id="anotacio-pendent-count" class="badge small" style="background-color: #337ab6;">${countAnotacionsPendents}</span>
+										</a>
+									</li>
+									<li>
+										<a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a>
+									</li>
+								</c:when>
+								<c:when test="${isRolActualUsuari}">
+									<li><a href="<c:url value="/expedient"></c:url>"><spring:message code="decorator.menu.expedients"/></a></li>
+									<li>
+										<a href="<c:url value="/expedientPeticio"></c:url>">
+											<spring:message code="decorator.menu.expedientPeticions"/>
+											<span id="anotacio-pendent-count" class="badge small" style="background-color: #337ab6;">${countAnotacionsPendents}</span>
+										</a>
+									</li>
+									<li>
+										<a href="<c:url value="/usuariTasca"></c:url>">
+											<spring:message code="decorator.menu.tasques"/>
+											<span id="tasca-pendent-count" class="badge small" style="background-color: #337ab6;">${countTasquesPendent}</span>
+										</a>
+									</li>								
+								</c:when>
+							</c:choose>
+							<li>&nbsp;</li>
+							<li>
+								<div class="llista-menu-desplegable" onclick="toggleMenuPrincipal()">
+									<span class="fa fa-bars"></span>
+								</div>
+							</li>
 						</ul>
 					</div>
-				</c:if>
-				<c:if test="${isRolActualRevisor}">
-					<%---- Revisió d'expedients ----%>
-					<a href="<c:url value="/metaExpedientRevisio"/>"class="btn btn-primary">
-							<spring:message code="decorator.menu.revisioProcediments"/>
-					</a>
-				</c:if>
+				</div>
 			</div>
+
+			<div class="navbar-header" style="width: 5%;">
+				<div class="navbar-collapse collapse">
+					<div class="navbar-brand" style="padding: 0px !important; width: 100%;">
+						<div class="circular-avatar" onclick="mostrarMenuUsuari(event)"></div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 
