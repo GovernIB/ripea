@@ -41,13 +41,10 @@ const useCambiarPrioritat = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.tasca.action.changePrioritat.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <CambiarPrioritat apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <CambiarPrioritat apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useCambiarPrioritat;

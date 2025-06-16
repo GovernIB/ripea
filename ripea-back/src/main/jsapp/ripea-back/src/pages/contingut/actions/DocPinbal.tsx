@@ -142,13 +142,10 @@ const useDocPinbal = (entity:any,refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.document.action.pinbal.ok', {codiServeiPinbal: result?.codiServeiPinbal}), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <DocPinbal apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <DocPinbal apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useDocPinbal;

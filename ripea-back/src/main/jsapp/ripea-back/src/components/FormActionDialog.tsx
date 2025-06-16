@@ -1,5 +1,5 @@
 import React, {MutableRefObject} from "react";
-import {useMuiActionReportLogic} from "reactlib";
+import {useBaseAppContext, useMuiActionReportLogic} from "reactlib";
 
 type CommonProps = {
     title?: string | ((data:any) => string),
@@ -22,6 +22,7 @@ type FormReportDialogProp = CommonProps & {
 }
 
 const FormActionDialog = (props:FormActionDialogProp) => {
+    const {temporalMessageShow} = useBaseAppContext();
     const {
         title,
         resourceName,
@@ -31,8 +32,8 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         children,
         apiRef,
         formDialogResultProcessor,
-        onSuccess,
-        onError,
+        onSuccess = () => temporalMessageShow(null, '', 'success'),
+        onError = (error:any) => error?.message && temporalMessageShow(null, error.message, 'error'),
     } = props;
 
     const {
@@ -67,6 +68,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
     return formDialogComponent;
 }
 export const FormReportDialog = (props:FormReportDialogProp) => {
+    const {temporalMessageShow} = useBaseAppContext();
     const {
         title,
         resourceName,
@@ -77,8 +79,8 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         children,
         apiRef,
         formDialogResultProcessor,
-        onSuccess,
-        onError,
+        onSuccess = () => temporalMessageShow(null, '', 'info'),
+        onError = (error:any) => error?.message && temporalMessageShow(null, error.message, 'error'),
     } = props;
 
     const {

@@ -38,13 +38,10 @@ const useEnviarViaEmail = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.document.action.mail.ok', {document: result?.nom}), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <EnviarViaEmail apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <EnviarViaEmail apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useEnviarViaEmail;

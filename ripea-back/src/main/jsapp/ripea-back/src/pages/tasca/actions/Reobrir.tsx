@@ -37,13 +37,10 @@ const useReobrir = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.tasca.action.reobrir.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Reobrir apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Reobrir apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useReobrir;

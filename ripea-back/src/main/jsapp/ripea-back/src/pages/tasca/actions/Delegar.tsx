@@ -7,8 +7,8 @@ import GridFormField from "../../../components/GridFormField.tsx";
 
 const DelegarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="delegat" required/>
-        <GridFormField xs={12} name="comentari"/>
+        <GridFormField xs={12} name="usuari" required/>
+        <GridFormField xs={12} name="motiu" type={"textarea"}/>
     </Grid>
 }
 
@@ -37,13 +37,10 @@ const useDelegar = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.tasca.action.delegar.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Delegar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Delegar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useDelegar;

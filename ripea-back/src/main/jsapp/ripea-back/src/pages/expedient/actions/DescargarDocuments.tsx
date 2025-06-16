@@ -5,15 +5,16 @@ import ContingutIcon from "../../contingut/details/ContingutIcon.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useTranslation} from "react-i18next";
+import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 
 const sortModel:any = [{field: 'id', sort: 'desc'}]
 const perspectives = ["PATH"]
 const columns = [
-    {
-        field: 'nom',
-        flex: 0.5,
-        renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
-    },
+    // {
+    //     field: 'nom',
+    //     flex: 0.5,
+    //     renderCell: (params: any) => <ContingutIcon entity={params?.row}/>
+    // },
     {
         field: 'descripcio',
         flex: 0.5,
@@ -33,8 +34,10 @@ const columns = [
 ];
 
 const DescargarDocumentsForm = () => {
+    const { t } = useTranslation();
     const {apiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
+    const [treeView, setTreeView] = useState<boolean>(true);
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("ids", selectedRows)
@@ -49,6 +52,20 @@ const DescargarDocumentsForm = () => {
         )}
         perspectives={perspectives}
         staticSortModel={sortModel}
+
+        groupingColDef={{
+            headerName: t('page.contingut.grid.nom'),
+            flex: 1,
+            valueFormatter: (value: any, row: any) => {
+                return row?.id ? <ContingutIcon entity={row} /> : value;
+            },
+            renderCell: (params: any) => {
+                return treeView
+                    ? <GridTreeDataGroupingCell {...params} />
+                    : params.formattedValue
+            },
+        }}
+
         treeData={true}
         treeDataAdditionalRows={(_rows:any) => {
             const additionalRows :any[] = [];
@@ -60,6 +77,7 @@ const DescargarDocumentsForm = () => {
                             && !additionalRows.map((b) => b.nom).includes(a.nom))
                     aditionalRow && additionalRows.push(...aditionalRow);
                 }
+                setTreeView(additionalRows?.length > 0)
             }
             // console.log('>>> additionalRows', additionalRows)
             return additionalRows;
@@ -67,7 +85,7 @@ const DescargarDocumentsForm = () => {
         getTreeDataPath={(row:any) :string[] => row.treePath }
 
         isGroupExpandedByDefault={()=>true}
-        isRowSelectable={(data:any)=> data?.row?.id}
+        isRowSelectable={(data: any) => data?.row?.tipus == "DOCUMENT"}
         readOnly
 
         onRowSelectionModelChange={(newSelection) => {
@@ -106,13 +124,10 @@ const useDescargarDocuments = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.expedient.action.download.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <DescargarDocuments apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <DescargarDocuments apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useDescargarDocuments;

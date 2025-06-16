@@ -165,13 +165,10 @@ const useNotificar = (refresh?: () => void) => {
         temporalMessageShow(null, t('page.document.action.notificar.ok'), 'success');
         window.location.reload();
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Notificar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Notificar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useNotificar;

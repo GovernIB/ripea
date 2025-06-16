@@ -36,13 +36,10 @@ const useReassignar = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.tasca.action.reassignar.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Reassignar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Reassignar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useReassignar;

@@ -37,13 +37,10 @@ const useAmpliarPlac = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.notificacioInteressat.action.ampliarPlac.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <AmpliarPlac apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <AmpliarPlac apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useAmpliarPlac;

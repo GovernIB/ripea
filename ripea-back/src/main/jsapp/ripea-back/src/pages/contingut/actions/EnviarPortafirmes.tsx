@@ -120,13 +120,10 @@ const useEnviarPortafirmes = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.document.action.enviarPortafirmes.ok', {document: result?.nom}), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <EnviarPortafirmes apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <EnviarPortafirmes apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useEnviarPortafirmes;

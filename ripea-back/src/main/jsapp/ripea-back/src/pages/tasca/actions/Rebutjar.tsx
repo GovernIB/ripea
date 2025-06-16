@@ -36,13 +36,10 @@ const useRebutjar = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.tasca.action.rebutjar.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Rebutjar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Rebutjar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useRebutjar;

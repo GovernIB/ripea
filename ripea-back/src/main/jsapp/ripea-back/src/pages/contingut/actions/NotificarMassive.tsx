@@ -54,17 +54,14 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
             temporalMessageShow(null, t('page.document.action.notificarMasiva.ok'), 'success');
             handleNotificar(result?.id, result)
         }else {
-            onError({message: ''})
+            temporalMessageShow(null, '', 'error')
         }
-    }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error?.message, 'error');
     }
 
     return {
         handleMassiveShow,
         content: <>
-            <NotificarMassive apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+            <NotificarMassive apiRef={apiRef} onSuccess={onSuccess}/>
             {content}
         </>
     }

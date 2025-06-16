@@ -49,13 +49,10 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
         refresh?.();
         temporalMessageShow(null, t('page.document.action.changeType.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error?.message, 'error');
-    }
 
     return {
         handleMassiveShow,
-        content: <CanviTipus apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <CanviTipus apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useCanviTipus;

@@ -50,13 +50,9 @@ const useAction = (code:string, title:string, onSuccess?: (result:any) => void) 
         })
     }
 
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
-
     return {
         handleShow,
-        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess} onError={onError}/>
+        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess}/>
     }
 }
 const useMassiveAction = (code:string, title:string, onSuccess?: () => void) => {
@@ -74,13 +70,10 @@ const useMassiveAction = (code:string, title:string, onSuccess?: () => void) => 
             action: code,
         })
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleMassiveShow,
-        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess} onError={onError}/>
+        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess}/>
     }
 }
 

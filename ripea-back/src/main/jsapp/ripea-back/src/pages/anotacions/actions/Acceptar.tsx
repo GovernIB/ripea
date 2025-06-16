@@ -200,13 +200,10 @@ const useAcceptar = (refresh?: () => void) => {
         refresh?.();
         temporalMessageShow(null, t('page.anotacio.acceptar.rebutjar.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error?.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Acceptar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Acceptar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useAcceptar;

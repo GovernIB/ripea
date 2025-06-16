@@ -127,13 +127,10 @@ const useTancar = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.expedient.action.close.title', {expedient: result?.nom}), 'success');
     }
-    const onError = (error: any): void => {
-        temporalMessageShow(null, error?.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Tancar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Tancar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useTancar;

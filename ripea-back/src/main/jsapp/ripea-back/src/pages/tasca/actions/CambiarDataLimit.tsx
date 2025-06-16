@@ -40,13 +40,10 @@ const useCambiarDataLimit = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.tasca.action.changeDataLimit.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <CambiarDataLimit apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <CambiarDataLimit apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useCambiarDataLimit;

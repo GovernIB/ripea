@@ -35,16 +35,12 @@ export const useExportarDocuments = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.expedient.action.export.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
         content: <ExportarDocuments title={t('page.expedient.action.export.title')}
                                     apiRef={apiRef}
-                                    onSuccess={onSuccess}
-                                    onError={onError}/>
+                                    onSuccess={onSuccess}/>
     }
 }
 export const useExportarDocumentsMassive = (refresh?: () => void) => {
@@ -57,17 +53,14 @@ export const useExportarDocumentsMassive = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.exportZIP.ok'), 'success');
-    }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
+        // temporalMessageShow(null, t('page.expedient.action.exportZIP.ok'), 'success');
+        temporalMessageShow(null, t('page.expedient.results.actionBackgroundOk'), 'info');
     }
 
     return {
         handleMassiveShow,
         content: <ExportarDocuments title={t('page.expedient.action.exportZIP.title')}
                                     apiRef={apiRef}
-                                    onSuccess={onSuccess}
-                                    onError={onError}/>
+                                    onSuccess={onSuccess}/>
     }
 }

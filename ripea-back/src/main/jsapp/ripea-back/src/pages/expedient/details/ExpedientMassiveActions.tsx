@@ -2,6 +2,7 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useExportarDocumentsMassive} from "../actions/ExportarDocuments.tsx";
 import { useTranslation } from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
+import {Divider} from "@mui/material";
 
 export const useMassiveActions = (refresh?: () => void)=> {
 	
@@ -10,7 +11,7 @@ export const useMassiveActions = (refresh?: () => void)=> {
     const {artifactAction: apiAction, artifactReport: apiReport} = useResourceApiService('expedientResource');
 
     const massiveAction = (ids:any[], code:string, msg:string) => {
-        return apiAction(undefined, {code :code, data:{ ids: ids, massivo: true }})
+        apiAction(undefined, {code :code, data:{ ids: ids, massivo: true }})
 			.then(() => {
                 refresh?.()
                 temporalMessageShow(null, msg, 'info');
@@ -21,7 +22,7 @@ export const useMassiveActions = (refresh?: () => void)=> {
     }
 	
 	const massiveReport = (ids:any[], code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code :code, data:{ ids: ids, massivo: true }, fileType})
+	    apiReport(undefined, {code :code, data:{ ids: ids, massivo: true }, fileType})
 			.then(() => {
 			    refresh?.()
 			    temporalMessageShow(null, msg, 'info');
@@ -86,27 +87,27 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 
     const actions = [
         {
-            title: t('page.expedient.action.agafar.title'),
+            title: t('page.expedient.action.agafar.label'),
             icon: "lock",
             onClick: agafar,
         },
         {
-            title: t('page.expedient.action.lliberar.title'),
+            title: t('page.expedient.action.lliberar.label'),
             icon: "lock_open",
 			onClick: alliberar,
         },
 		{
-		    title: t('page.expedient.action.retornar.title'),
+		    title: t('page.expedient.action.retornar.label'),
 		    icon: "undo",
 			onClick: retornar,
 		},		
         {
-            title: t('page.expedient.action.follow.title'),
+            title: t('page.expedient.action.follow.label'),
             icon: "person_add_alt1",
             onClick: follow,
         },
         {
-            title: t('page.expedient.action.unfollow.title'),
+            title: t('page.expedient.action.unfollow.label'),
             icon: "person_remove",
             onClick: unfollow,
         },
@@ -116,44 +117,49 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
 			onClick: esborrar,
         },
         {
-            title: t('page.expedient.action.exportFullCalcul.title'),
+            title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
+            showInMenu: true,
+            disabled: true,
+        },
+        {
+            title: t('page.expedient.action.exportFullCalcul.label'),
             icon: "download",
 			onClick: exportExcel
         },
         {
-            title: t('page.expedient.action.exportCSV.title'),
+            title: t('page.expedient.action.exportCSV.label'),
             icon: "download",
 			onClick: exportCsv
         },
         {
-            title: t('page.expedient.action.exportZIP.title'),
+            title: t('page.expedient.action.exportZIP.label'),
             icon: "download",
 			onClick: exportIndexZip
         },
         {
-            title: t('page.expedient.action.exportPDF.title'),
+            title: t('page.expedient.action.exportPDF.label'),
             icon: "download",
 			onClick: exportIndexPdf,
         },
 		{
-            title: t('page.expedient.action.exportEXCEL.title'),
+            title: t('page.expedient.action.exportEXCEL.label'),
 		    icon: "download",
 			onClick: exportIndexXls,
             hidden: !(user?.sessionScope?.isExportacioExcelActiva),
 		},
         {
-            title: t('page.expedient.action.exportENI.title'),
+            title: t('page.expedient.action.exportENI.label'),
             icon: "download",
 			onClick: exportEni
         },
 		{
-            title: t('page.expedient.action.exportINSIDE.title'),
+            title: t('page.expedient.action.exportINSIDE.label'),
 		    icon: "download",
 			onClick: exportInside,
 			hidden: !(user?.sessionScope?.isExportacioInsideActiva),
 		},
         {
-            title: t('page.expedient.action.exportZIP.title'),
+            title: t('page.expedient.action.exportZIP.label'),
             icon: "description",
             onClick: handleExportDoc,
         },

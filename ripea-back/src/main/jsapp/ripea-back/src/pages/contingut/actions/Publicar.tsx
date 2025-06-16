@@ -41,13 +41,10 @@ const usePublicar = (refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.document.action.publicar.ok'), 'success');
     }
-    const onError = (error:any) :void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Publicar apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Publicar apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default usePublicar;

@@ -53,15 +53,10 @@ export const useFirmaNavegador = (refresh?: () => void) => {
     const formDialogResultProcessor = (result: any) => {
         return <Iframe src={result?.url}/>
     }
-    const onError = (error: any): void => {
-        temporalMessageShow(null, error.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <FirmaNavegador apiRef={apiRef}
-                                 formDialogResultProcessor={formDialogResultProcessor}
-                                 onError={onError}/>
+        content: <FirmaNavegador apiRef={apiRef} formDialogResultProcessor={formDialogResultProcessor}/>
     }
 }
 export default useFirmaNavegador;

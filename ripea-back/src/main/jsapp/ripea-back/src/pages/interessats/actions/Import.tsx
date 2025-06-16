@@ -104,13 +104,10 @@ const useImport = (entity:any, refresh?: () => void) => {
         refresh?.()
         temporalMessageShow(null, t('page.interessat.action.importar.ok'), 'success');
     }
-    const onError = (error: any): void => {
-        temporalMessageShow(null, error?.message, 'error');
-    }
 
     return {
         handleShow,
-        content: <Import apiRef={apiRef} onSuccess={onSuccess} onError={onError}/>
+        content: <Import apiRef={apiRef} onSuccess={onSuccess}/>
     }
 }
 export default useImport;
