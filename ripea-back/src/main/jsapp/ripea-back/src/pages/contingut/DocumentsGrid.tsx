@@ -285,17 +285,20 @@ const DocumentsGrid = (props: any) => {
                         }
                     }}
 
-                    rowExpansionChange={(params: any) => addFolderExpand(params.id, params.childrenExpanded)}
-                    isGroupExpandedByDefault={(row) => {
-                        if (typeof row?.id === "number") {
-                            const value = getFolderExpand(`${row?.id}`)
-                            if (value === undefined) {
-                                addFolderExpand(`${row?.id}`, expand)
-                                return expand
-                            }
-                            return value
+                    rowExpansionChange={(params: any) => {
+                        if (typeof params?.id === "number") {
+                            addFolderExpand(params.id, params.childrenExpanded)
                         }
-                        return false
+                    }}
+                    isGroupExpandedByDefault={(params) => {
+                        if (typeof params?.id === "number") {
+                            const value = getFolderExpand(`${params?.id}`)
+                            if (value !== undefined) {
+                                return value
+                            }
+                            addFolderExpand(`${params?.id}`, expand)
+                        }
+                        return expand
                     }}
                     toolbarElementsWithPositions={[
                         {
