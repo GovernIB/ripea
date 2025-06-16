@@ -19,7 +19,7 @@ export const App: React.FC = () => {
         logo={entitatLogo ?? goib_logo}
         // style={{ height: '110px' }}
         logoStyle={{
-            '& img': { height: '38px' },
+            '& img': { height: '60px' },
             pl: 2,
             pr: 4,
             mr: 4,

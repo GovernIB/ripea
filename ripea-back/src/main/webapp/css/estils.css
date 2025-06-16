@@ -7,10 +7,176 @@
     min-width: 1000px;
 }
 
-.navbar-app {
-    background-color: #ff9523;
-    height: 110px;
+.popupMenuUsuari {
+	position: absolute;
+    display: none; /* Oculto por defecto */
+    background-color: white;
+/*     border: 1px solid; */
+    z-index: 1050;
+    width: fit-content;
+	min-height: 295px;
+    padding: 0px;
+}
+
+.popupMenuUsuari a {
+	color: rgb(0, 0, 0, 0.60);
+	font-size: medium;
+}
+
+.menuUsuariNom {
+	font-size: 1.3em;
+    padding: 10px 0px 0px 15px;
+    color: black;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    margin: 0px;
+}
+
+.menuPrincipal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 19%;
+    height: 100vh; /* Toda la altura de la pantalla */
+    background-color: #004b99;
     color: white;
+    display: none; /* Oculto por defecto */
+    z-index: 1050;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.menuPrincipalCapcalera {
+	display: flex;
+	width: 100%;
+	font-size: 1.4em;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(8,67,133,1);
+    height: 55px;
+    padding: 10px 20px 20px 20px;
+}
+
+.menuPrincipalCos {
+	padding-top: 10px;
+}
+
+.menuPrincipalCos ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.menuPrincipalCos li {
+	height: 45px;
+    padding-top: 10px;
+    cursor: pointer;
+    padding-left: 45px;
+}
+
+.menuPrincipalCos li:hover {
+	background-color: rgba(8,67,133,1);
+}
+
+.menuPrincipalCos li a {
+	color: white;
+	font-weight: bold;
+	padding-left: 30px;
+}
+
+.menuPrincipalCos li a:hover {
+	text-decoration: none;
+}
+
+.ul_capMenuDesplegable li a {
+	color: white;
+	padding-left: 30px;	
+	font-weight: normal;
+	border-left: 1px solid white;
+	display: inline-block;
+}
+
+.ul_capMenuDesplegable li a:hover {
+	text-decoration: none;
+}
+
+.overlayMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 81%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    z-index: 1050;
+}
+
+.navbar-header {
+	padding-top: 10px;
+}
+
+.navbar-header span {
+	
+}
+
+.menuPrincipalCos span.badge {
+	position: relative;
+    top: -10px;
+    background-color: cornflowerblue;
+}
+
+.navbar-header span.badge {
+	position: relative;
+    top: -10px;
+    background-color: cornflowerblue;
+}
+
+.navbar-brand-ul {
+    display: flex; /* Alinea los elementos en fila */
+    list-style: none; /* Elimina los discos */
+    padding: 0; /* Elimina espacio adicional */
+    margin: 0;
+    font-size: 0.8em;
+    padding-top: 15px;
+}
+
+.navbar-brand-ul li {
+    padding: 10px;
+}
+
+.navbar-brand-ul li :hover{
+	background-color: #f7fafc;
+}	
+
+.navbar-brand-ul a {
+    text-decoration: none; /* Opcional: Elimina subrayado de los enlaces */
+    color: #000; /* Color de los enlaces */
+}
+
+.llista-menu-desplegable {
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.circular-avatar {
+    width: 40px; /* Ajusta el tamaño según necesites */
+    height: 40px;
+    border-radius: 50%; /* Hace que el div sea completamente redondo */
+    overflow: hidden; /* Asegura que el contenido no se desborde */
+    display: flex; /* Centra el contenido si es necesario */
+    align-items: center;
+    justify-content: center;
+    background-color: #ccc; /* Color de fondo opcional */
+    float: right;
+    margin-top: 13px;
+    cursor: pointer;
+    color: white;
+}
+
+.navbar-app {
+    background-color: white;
+    height: 89px;
+    color: black;
+    --Paper-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--Paper-shadow);
 }
 
 .navbar-app .container {
@@ -40,19 +206,33 @@
 }
 
 #govern-logo {
-    border-right: 1px solid #FFFFFF;
+    border-right: 2px solid black;
     display: block;
-    padding: 0px 24px 0px 12px;
+    padding: 7px 24px 0px 24px;
 }
 
 #app-logo {
     display: block;
-    padding: 0 0 0 12px;
+    padding: 0px 24px 0px 24px;
 }
 
-.container-main, .container-foot {
+.container-main {
     padding-right: 0;
     padding-left: 0;
+}
+
+.container-foot {
+	position: fixed;
+    bottom: 0;
+	padding-right: 0;
+    padding-left: 0;
+	background: #5f5d5d;
+    color: white;
+    font-size: medium;
+}
+
+.app-version {
+	padding-top: 8px;
 }
 
 .container-main .panel-heading h2 {
