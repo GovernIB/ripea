@@ -99,22 +99,57 @@
 			        flecha.addClass("fa-caret-down");
 			    }
 			});
+			
+			$("a.userMenuDesplegable").click(function() {
+				$(".ul_userMenuDesplegable").hide();
+				let menu = $(this).next(".ul_userMenuDesplegable")[0];
+			    if (menu.style.display === "block") {
+			        menu.style.display = "none";
+			    } else {
+				    let x = event.clientX; // Posición horizontal del clic
+				    let y = event.clientY; // Posición vertical del clic
+				    let scrollVertical = window.scrollY || document.documentElement.scrollTop;
+				    // Posicionar el div 200px a la izquierda y hacia abajo
+				    menu.style.left = "0px";
+				    menu.style.display = "block"; // Mostrar el div
+				    let alturaNecessaria = calcularAlturaDiv(menu);
+				    menu.style.top = (scrollVertical+y-alturaNecessaria-10) + "px"; // Ajusta este valor según necesites
+// 				    menu.style.height = alturaNecessaria+"px";
+// 			        menu.style.display = "block";
+			    }
+			});
+			
+			$(".menuPrincipalCos a[href]:not([href='#'])").click(function() {
+			    let menu = document.getElementById("popupMenuUsuari");
+				if (!menu.contains(event.target)) {
+					toggleMenuPrincipal();
+				}
+			});
+			
+			$(".ul_userMenuDesplegable").mouseout(function() { $(this.hide()); });
 		});
 		
 		function mostrarMenuUsuari(event) {
-			debugger;
 		    let popup = document.getElementById("popupMenuUsuari");
-		    if (popup.style.display === "none") {
+		    if (popup.style.display === "block") {
+		    	popup.style.display = "none";
+		    	document.body.style.overflow = "auto";
+		    	$(".ul_userMenuDesplegable").hide();
+		    } else {
+				//No permitir scroll mientras el menu esta abierto
+				document.body.style.overflow = "hidden";
 			    // Obtener coordenadas del clic
 			    let x = event.clientX; // Posición horizontal del clic
 			    let y = event.clientY; // Posición vertical del clic
-	
-			    // Posicionar el div 200px a la izquierda y hacia abajo
-			    popup.style.left = (x-250) + "px";
-			    popup.style.top = "70px"; // Ajusta este valor según necesites
+			    
 			    popup.style.display = "block"; // Mostrar el div
-		    } else {
-		    	popup.style.display = "none";
+			    
+			    let scrollVertical = window.scrollY || document.documentElement.scrollTop;
+			    let ampladaMenuUsuari = popup.offsetWidth;
+			    popup.style.left = (x-ampladaMenuUsuari) + "px";
+			    popup.style.top = (scrollVertical+70)+"px"; // Ajusta este valor según necesites			    
+			    let alturaNecessaria = calcularAlturaDiv(popup);
+			    popup.style.height = alturaNecessaria+"px";
 			}
 		}
 		
@@ -123,7 +158,9 @@
 			    let popup = document.getElementById("popupMenuUsuari");
 			    // Verificar si el clic NO fue dentro del popup
 			    if (!popup.contains(event.target)) {
-			        popup.style.display = "none"; // Ocultar el div
+		    		popup.style.display = "none";
+		    		document.body.style.overflow = "auto";
+		    		$(".ul_userMenuDesplegable").hide();
 			    }
 			}
 		});
@@ -171,6 +208,25 @@
 		    }
 		}
 		
+		function calcularAlturaDiv(div) {
+		    if (!div) return 0; // Verifica que el div existe
+
+		    let estiloPadre = window.getComputedStyle(div);
+		    let paddingSuperior = parseFloat(estiloPadre.paddingTop);
+		    let paddingInferior = parseFloat(estiloPadre.paddingBottom);
+
+		    // Obtener la altura total de los hijos
+		    let alturaTotal = paddingSuperior + paddingInferior; // Suma los paddings del padre
+		    Array.from(div.children).forEach(elemento => {
+		        let estilo = window.getComputedStyle(elemento);
+		        alturaTotal += elemento.offsetHeight 
+		                      + parseFloat(estilo.marginTop) 
+		                      + parseFloat(estilo.marginBottom);
+		    });
+
+		    return alturaTotal;
+		}
+		
 	</script>
 	<decorator:head />
 <style>
@@ -216,18 +272,159 @@ body {
 </head>
 <body>
 	<div id="popupMenuUsuari" class="popupMenuUsuari">
-		<div style="display: flex;">
-			<div class="circular-avatar"></div>
+		<div style="display: flex;padding: 10px;border-bottom: 1px solid lightgrey;">
+			<div class="circular-avatar" style="font-size: large;padding-top: 2px;"></div>
 			<div>
+				<p class="menuUsuariNom">
 				<c:choose>
-					<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom} ${dadesUsuariActual.codi}</c:when>
+					<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom}</c:when>
 					<c:otherwise>${pageContext.request.userPrincipal.name}</c:otherwise>
 				</c:choose>
+				</p>
+				<p style="margin: 0px;padding: 0px 0px 0px 15px;">
+					${dadesUsuariActual.codi}
+				</p>
 			</div>
 		</div>
-		<div>Perfil i manuals</div>
-		<div>Selectors</div>
-		<div>Tancar sessio</div>
+		<div style="padding: 10px;border-bottom: 1px solid lightgrey;">
+			<p>
+				<a href="<c:url value="/usuari/configuracio"/>" onclick="mostrarMenuUsuari(event);" data-toggle="modal" data-maximized="false" data-width="1200px" data-refresh-pagina="true">
+					<span class="fa fa-user" style="padding: 0px 15px 0px 5px;"></span><spring:message code="decorator.menu.configuracio.user"/>
+				</a>
+			</p>
+			<c:if test="${isRolActualSuperusuari or isRolActualAdministrador or isRolActualAdministradorOrgan}">
+				<p>
+				<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf" rel="noopener noreferrer" target="_blank">
+					<span class="fa fa-download" style="padding: 0px 15px 0px 5px;"></span><spring:message code="decorator.menu.manualAdministradors"/>
+				</a>
+				</p>
+			</c:if>
+			<p>
+				<a href="https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf" rel="noopener noreferrer" target="_blank">
+					<span class="fa fa-download" style="padding: 0px 15px 0px 5px;"></span><spring:message code="decorator.menu.manualUsuari"/>
+				</a>			
+			</p>
+		</div>
+		<div style="padding: 10px;border-bottom: 1px solid lightgrey;">
+				<%------------------------ ENTITATS ------------------------%>
+				<c:if test="${not isRolActualSuperusuari and hiHaEntitats}">
+					<div style="padding-bottom: 10px;">
+					<c:choose>
+						<c:when test="${hiHaMesEntitats}">
+							<a class="userMenuDesplegable" href="#">
+								<span class="fa fa-institution" style="padding: 0px 15px 0px 5px;"></span>${entitatActual.nom}<b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu ul_userMenuDesplegable">
+								<c:forEach var="entitat" items="${sessionEntitats}" varStatus="status">
+									<c:if test="${entitat.id != entitatActual.id}">
+										<c:url var="urlCanviEntitat" value="/index">
+											<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
+										</c:url>
+										<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
+									</c:if>
+								</c:forEach>
+							</ul>
+						</c:when>
+						<c:otherwise>
+							<a href="#">
+								<span class="fa fa-institution" style="padding: 0px 15px 0px 5px;"></span>${entitatActual.nom}
+							</a>
+						</c:otherwise>
+					</c:choose>
+					</div>
+				</c:if>
+				
+				<%------------------------ ROLS ------------------------%>
+				<div style="padding-bottom: 10px;">
+					<c:choose>
+						<c:when test="${fn:length(rolsUsuariActual) > 1}">
+							<a class="userMenuDesplegable" href="#" data-toggle="dropdown">
+								<span class="fa fa-id-card-o" style="padding: 0px 15px 0px 5px;"></span>
+								<spring:message code="decorator.menu.rol.${rolActual}"/>
+								<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu ul_userMenuDesplegable">
+								<c:forEach var="rol" items="${rolsUsuariActual}">
+									<c:if test="${rol != rolActual}">
+										<li>
+											<c:url var="canviRolUrl" value="/index">
+												<c:param name="${requestParameterCanviRol}" value="${rol}"/>
+											</c:url>
+											<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
+										</li>
+									</c:if>
+								</c:forEach>
+							</ul>
+						</c:when>
+						<c:otherwise>
+							<c:if test="${not empty rolActual}">
+								<a href="#">
+									<span class="fa fa-id-card-o" style="padding: 0px 15px 0px 5px;"></span>
+									<spring:message code="decorator.menu.rol.${rolActual}"/>
+								</a>
+							</c:if>
+						</c:otherwise>
+					</c:choose>
+				</div>
+				<%------------------------ ORGANS ------------------------%>
+				
+				<c:if test="${isRolActualAdministradorOrgan or isRolActualDissenyadorOrgan}">
+					<div>
+					<c:if test="${!hiHaOrgansGestors}">
+						<a class="userMenuDesplegable" href="#" data-toggle="dropdown">
+							<span class="fa fa-exclamation-triangle" style="padding: 0px 15px 0px 5px;"></span>
+							<spring:message code="decorator.menu.organgestor.cap"/>
+						</a>
+					</c:if>
+					
+					<c:if test="${hiHaOrgansGestors}">					
+						<c:choose>
+							<c:when test="${hiHaMesOrgansGestors}">
+								<a class="userMenuDesplegable" href="#" data-toggle="dropdown">
+								<c:if test="${null != organGestorActual}">
+									<span class="fa fa-cubes" style="padding: 0px 15px 0px 5px;"></span> ${organGestorActual.nom} <b class="caret"></b>
+								</c:if>
+								<c:if test="${null == organGestorActual}">
+									<span class="fa fa-cubes" style="padding: 0px 15px 0px 5px;"></span> <spring:message code="decorator.menu.organgestor.tots"/> <b class="caret"></b>
+								</c:if>
+								</a>
+								<ul class="dropdown-menu ul_userMenuDesplegable">
+								<c:if test="${null != organGestorActual}">
+									<c:url var="urlCanviOrganGestor" value="/index">
+										<c:param name="${requestParameterCanviOrganGestor}" value="-1"/>
+									</c:url>
+								</c:if>
+									<c:forEach var="og" items="${sessionOrgansGestors}" varStatus="status">
+										<c:if test="${og.id != organGestorActual.id}">
+											<c:url var="urlCanviOrganGestor" value="/index">
+												<c:param name="${requestParameterCanviOrganGestor}" value="${og.id}"/>
+											</c:url>
+											<li><a href="${urlCanviOrganGestor}">${og.nom}</a></li>
+										</c:if>
+									</c:forEach>
+								</ul>								
+							</c:when>
+							<c:otherwise>
+								<a href="#" data-toggle="dropdown">
+									<c:if test="${null != organGestorActual}">
+										<span class="fa fa-cubes" style="padding: 0px 15px 0px 5px;"></span> ${organGestorActual.nom}
+									</c:if>
+									<c:if test="${null == organGestorActual}">
+										<span class="fa fa-cubes" style="padding: 0px 15px 0px 5px;"></span> <spring:message code="decorator.menu.organgestor.tots"/>
+									</c:if>
+								</a>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
+					</div>
+				</c:if>
+			</ul>
+		</div>
+		<div style="padding: 10px;">
+			<a href="<c:url value="/usuari/logout"/>">
+				<span class="fa fa-sign-out" style="padding: 0px 15px 0px 5px;"></span><spring:message code="decorator.menu.accions.desconectar"/>
+			</a>
+		</div>
 	</div>
 	<div id="overlayMenu" class="overlayMenu" onclick="toggleMenuPrincipal()"></div>
 	<div id="menuPrincipal" class="menuPrincipal">
@@ -243,7 +440,7 @@ body {
 					<%---- Entitats ----%>
 					<a href="<c:url value="/entitat"/>" ><spring:message code="decorator.menu.entitats"/></a>
 					<div class="btn-group">
-						<a data-toggle="dropdown" class="dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></a>
+						<a data-toggle="dropdown" class="dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret"></span></a>
 						<ul class="dropdown-menu">
 							<%---- Integracions ----%>
 							<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
@@ -379,7 +576,7 @@ body {
 						<a href="<c:url value="/expedientPeticio"></c:url>"><spring:message code="decorator.menu.expedientPeticions"/> <span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a>
 					</li>
 					<li>
-						<span class="fa fa-pencil-square-o"></span>
+						<span class="fa fa-calendar-check-o"></span>
 						<a href="<c:url value="/usuariTasca"></c:url>"><spring:message code="decorator.menu.tasques"/> <span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span></a>
 					</li>
 					<c:if test="${isCreacioFluxUsuariActiu}">
@@ -558,14 +755,9 @@ body {
 		</div>
 	</div>
     <div class="container container-foot container-caib">
-    	<div class="pull-left app-version"><p>RIPEA <rip:versio/></p></div>
+    	<div class="pull-left app-version"><strong>RIPEA <rip:versio/></strong></div>
         <div class="pull-right govern-footer">
-        	<p>
-	        	<img src="<c:url value="/img/uenegroma.png"/>"	     hspace="5" height="50" alt="<spring:message code='decorator.logo.ue'/>" />
-	        	<img src="<c:url value="/img/feder7.png"/>" 	     hspace="5" height="35" alt="<spring:message code='decorator.logo.feder'/>" />
-	        	<img src="<c:url value="/img/una_manera.png"/>" 	 hspace="5" height="30" alt="<spring:message code='decorator.logo.manera'/>" />
-	        	<%--img src="<c:url value="/img/govern-logo-neg.png"/>" hspace="5" height="30" alt="<spring:message code='decorator.logo.govern'/>" /--%>
-        	</p>
+        	<img src="<c:url value="/img/drassana.png"/>" hspace="5" height="36"/>
         </div>
     </div>
 </body>

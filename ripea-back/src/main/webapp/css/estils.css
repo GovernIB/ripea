@@ -11,11 +11,24 @@
 	position: absolute;
     display: none; /* Oculto por defecto */
     background-color: white;
-    padding: 10px;
-    border: 1px solid;
+/*     border: 1px solid; */
     z-index: 1050;
-    width: 250px;
-    height: 450px;
+    width: fit-content;
+	min-height: 295px;
+    padding: 0px;
+}
+
+.popupMenuUsuari a {
+	color: rgb(0, 0, 0, 0.60);
+	font-size: medium;
+}
+
+.menuUsuariNom {
+	font-size: 1.3em;
+    padding: 10px 0px 0px 15px;
+    color: black;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    margin: 0px;
 }
 
 .menuPrincipal {
@@ -203,9 +216,23 @@
     padding: 0px 24px 0px 24px;
 }
 
-.container-main, .container-foot {
+.container-main {
     padding-right: 0;
     padding-left: 0;
+}
+
+.container-foot {
+	position: fixed;
+    bottom: 0;
+	padding-right: 0;
+    padding-left: 0;
+	background: #5f5d5d;
+    color: white;
+    font-size: medium;
+}
+
+.app-version {
+	padding-top: 8px;
 }
 
 .container-main .panel-heading h2 {

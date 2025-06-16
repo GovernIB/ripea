@@ -14,8 +14,8 @@ import {
 
 export const icons = {
     expedient: 'folder_open',
-    anotacio: 'attach_email',
-    tasca: 'pending_actions',
+    anotacio: 'email',
+    tasca: 'event_avaliable',
     consulta: 'search',
 }
 
