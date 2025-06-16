@@ -123,7 +123,7 @@ const useTancar = (refresh?: () => void) => {
     const handleShow = (id: any): void => {
         apiRef.current?.show?.(id)
     }
-    const onSuccess = (result): void => {
+    const onSuccess = (result: any): void => {
         refresh?.()
         temporalMessageShow(null, t('page.expedient.action.close.title', {expedient: result?.nom}), 'success');
     }

@@ -81,25 +81,21 @@ export const useSession = (key:string) => {
 };
 export const useSessionList = (key:string) => {
     const { value: container, save, remove } = useSession(key);
-    const containerRef = useRef(container ?? []);
+    const containerRef = useRef<any[]>(container ?? []);
+
+    const listSave = (key:string, newValue:any) => {
+        containerRef.current = {
+            ...containerRef.current,
+            [key]: newValue
+        };
+        save(containerRef.current)
+    }
 
     return {
         container,
         get: (key:string)=> container?.[key],
-        save: (key:string, newValue:any) => {
-            containerRef.current = {
-                ...containerRef.current,
-                [key]: newValue
-            };
-            save(containerRef.current)
-        },
-        remove: (key:string) => {
-            containerRef.current = {
-                ...containerRef.current,
-                [key]: undefined
-            };
-            save(containerRef.current)
-        },
+        save: listSave,
+        remove: (key:string) => listSave(key, undefined),
         removeAll: remove
     }
 }

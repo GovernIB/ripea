@@ -135,7 +135,7 @@ const Interessats = (props:any) => {
     const { entity, onRowCountChange } = props;
 
     return <StyledMuiGrid
-        resourceName="registreInteressatResource"
+        resourceName={'registreInteressatResource'}
         columns={interessatsColumns}
         filter={`registre.id:${entity?.id}`}
         staticSortModel={interessatsSortModel}

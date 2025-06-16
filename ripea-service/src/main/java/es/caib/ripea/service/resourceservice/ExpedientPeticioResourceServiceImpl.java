@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -276,7 +277,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     
     private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, ExpedientPeticioResource.AcceptarAnotacioForm, Serializable> {
 
-		@Override
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> reslult = new ArrayList<>();
+            if (ExpedientPeticioResource.AcceptarAnotacioForm.Fields.tipusDocument.equals(fieldName)){
+                reslult.add(new FieldOption("test", "Prueba"));
+            }
+            return reslult;
+        }
+
+        @Override
 		public void onChange(Serializable id, AcceptarAnotacioForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, AcceptarAnotacioForm target) {}
 
 		@Override

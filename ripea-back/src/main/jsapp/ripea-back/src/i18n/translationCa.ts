@@ -114,6 +114,10 @@ const translationCa = {
                 desti: "Destí",
             },
             action: {
+                guardarArxiu: {
+                    label: "Desar a l'arxiu",
+                    ok: "Element desat a l'arxiu",
+                },
                 create: {
                     label: "Crear contingut",
                 },
@@ -166,12 +170,12 @@ const translationCa = {
                     ok: "El justificant s'ha descarregat correctament",
                 },
                 acceptar: {
-                    label: "Acceptar",
+                    label: "Acceptar...",
                     title: "Acceptar expedient",
                     ok: "L'anotació s'ha acceptat correctament",
                 },
                 rebutjar: {
-                    label: "Rebutjar",
+                    label: "Rebutjar...",
                     title: "Rebutjar expedient",
                     ok: "L'anotació s'ha rebutjat correctament",
                 },

@@ -29,7 +29,10 @@ const useCrearCarpeta = (entity:any, refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = () => {
-        apiRef.current?.show(undefined, { expedientRelacionat: {id: entity?.id} })
+        apiRef.current?.show(undefined, {
+            expedient: {id: entity?.id},
+            expedientRelacionat: {id: entity?.id},
+        })
             .then((result:any) => {
                 refresh?.()
                 temporalMessageShow(null, t('page.document.action.crearCarpets.ok', {carpeta: result?.nom}), 'success');

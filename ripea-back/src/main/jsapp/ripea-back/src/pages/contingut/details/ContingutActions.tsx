@@ -168,6 +168,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 
     const documentActions = [
         {
+            title: t('page.contingut.action.guardarArxiu.label'),
+            icon: 'autorenew',
+            showInMenu: true,
+            // onClick: ,
+            disabled: !entity?.arxiuUuid,
+            hidden: (row:any) => row?.arxiuUuid,
+        },
+        {
             title: t('page.document.action.detall.label'),
             icon: "folder",
             showInMenu: true,

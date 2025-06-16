@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Box, Grid} from "@mui/material";
-import {BasePage, GridPage, useResourceApiService, MuiDialog} from "reactlib";
+import {BasePage, GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
@@ -76,6 +76,7 @@ const useDocumentDetail = () => {
         isReady: apiIsReady,
         getOne: apiGetOne,
     } = useResourceApiService('documentResource');
+    const {temporalMessageShow} = useBaseAppContext();
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -87,6 +88,10 @@ const useDocumentDetail = () => {
         if(apiIsReady && id){
             apiGetOne(id, {perspectives: ['VERSIONS', 'COUNT']})
                 .then((app) => setEntity(app))
+                .catch((error) => {
+                    handleClose()
+                    temporalMessageShow(null, error?.message, 'error');
+                });
         }
         setOpen(true);
     }

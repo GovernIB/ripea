@@ -15,7 +15,7 @@ import org.springframework.data.annotation.Transient;
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "nom" }, descriptionField = "observacions")
+@ResourceConfig(quickFilterFields = { "nom" }, descriptionField = "codiNom")
 public class RegistreInteressatResource extends BaseAuditableResource<Long> {
 
     private String adresa;

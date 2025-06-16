@@ -114,6 +114,10 @@ const translationEn = {
                 desti: "Destination",
             },
             action: {
+                guardarArxiu: {
+                    label: "Save to archive",
+                    ok: "Item saved to archive",
+                },
                 create: {
                     label: "Create content",
                 },
@@ -166,12 +170,12 @@ const translationEn = {
                     ok: "The receipt has been downloaded successfully",
                 },
                 acceptar: {
-                    label: "Accept",
+                    label: "Accept...",
                     title: "Accept case file",
                     ok: "The annotation has been accepted successfully",
                 },
                 rebutjar: {
-                    label: "Reject",
+                    label: "Reject...",
                     title: "Reject case file",
                     ok: "The annotation has been rejected successfully",
                 },

@@ -115,6 +115,14 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
 
     const actions = [
         {
+            title: t('page.contingut.action.guardarArxiu.label'),
+            icon: 'autorenew',
+            showInMenu: true,
+            // onClick: ,
+            disabled: !entity?.arxiuPropagat,
+            hidden: (row:any) => row?.arxiuPropagat && row?.representantInfo?.arxiuPropagat,
+        },
+        {
             title: t('common.detail'),
             icon: "info",
             showInMenu: true,

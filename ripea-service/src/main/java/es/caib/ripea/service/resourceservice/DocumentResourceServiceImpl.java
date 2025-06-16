@@ -745,7 +745,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    			}
     			} catch (Exception e) {
     				excepcioLogHelper.addExcepcio("/expedient/MoureActionExecutor", e);
-    				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al mourer o copiar els documents seleccionats.");
+    				throw new ReportGenerationException(DocumentResource.class, null, code, e.getMessage());
     			}	    			
         	} else {
         		throw new ActionExecutionException(getResourceClass(), null, code, "No s'ha indicat cap element per realitzar l'acció.");

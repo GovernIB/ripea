@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
 import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -196,11 +196,12 @@ const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
 
-    const { get: getFolderExpand, save: addFolderExpand } = useSessionList('folder_expand')
+    const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
 
     const gridApiRef = useMuiDataGridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(false);
+    const isFirstRender = useRef(true);
     const [vista, setVista] = useState<string>("carpeta");
 
     const refresh = () => {
@@ -212,6 +213,14 @@ const DocumentsGrid = (props: any) => {
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        removeAll()
+    }, [expand]);
 
     return <GridPage>
         <Load value={entity}>
@@ -276,8 +285,18 @@ const DocumentsGrid = (props: any) => {
                         }
                     }}
 
-                    rowExpansionChange={(params: any) => addFolderExpand(`${params.id}`, params.childrenExpanded)}
-                    isGroupExpandedByDefault={(row) => getFolderExpand(`${row?.id}`) || expand}
+                    rowExpansionChange={(params: any) => addFolderExpand(params.id, params.childrenExpanded)}
+                    isGroupExpandedByDefault={(row) => {
+                        if (typeof row?.id === "number") {
+                            const value = getFolderExpand(`${row?.id}`)
+                            if (value === undefined) {
+                                addFolderExpand(`${row?.id}`, expand)
+                                return expand
+                            }
+                            return value
+                        }
+                        return false
+                    }}
                     toolbarElementsWithPositions={[
                         {
                             position: 0,

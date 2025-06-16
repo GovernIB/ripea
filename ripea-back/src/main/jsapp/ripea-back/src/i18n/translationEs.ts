@@ -114,6 +114,10 @@ const translationEs = {
                 desti: "Destino",
             },
             action: {
+                guardarArxiu: {
+                    label: "Guardar en archivo",
+                    ok: "Elemento guardado en archivo",
+                },
                 create: {
                     label: "Crear contenido",
                 },
@@ -166,12 +170,12 @@ const translationEs = {
                     ok: "El justificante se ha descargado correctamente",
                 },
                 acceptar: {
-                    label: "Aceptar",
+                    label: "Aceptar...",
                     title: "Aceptar expediente",
                     ok: "La anotación se ha aceptado correctamente",
                 },
                 rebutjar: {
-                    label: "Rechazar",
+                    label: "Rechazar...",
                     title: "Rechazar expediente",
                     ok: "La anotación se ha rechazado correctamente",
                 },

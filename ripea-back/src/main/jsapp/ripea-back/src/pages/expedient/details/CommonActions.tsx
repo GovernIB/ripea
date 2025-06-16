@@ -332,6 +332,13 @@ export const useCommonActions = (refresh?: () => void) => {
             hidden: (row:any) => !isTancat(row) || !user?.sessionScope?.isReobrirPermes || !( !user?.sessionScope?.isTancamentLogicActiu || row?.tancatData),
         },
         {
+            title: t('page.expedient.action.eliminar.label'),
+            icon: "delete",
+            showInMenu: true,
+            onClick: eliminar,
+            hidden: (row:any) => !potModificar(row) || row.conteDocumentsDefinitius,
+        },
+        {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
@@ -408,13 +415,6 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: syncArxiu,
         },
-		{
-		    title: t('page.expedient.action.eliminar.label'),
-		    icon: "delete",
-		    showInMenu: true,
-		    onClick: eliminar,
-		    hidden: (row:any) => !potModificar(row) && row.conteDocumentsDefinitius,
-		},	
     ]
         .map(({ hidden, ...rest }) => ({
             ...rest,

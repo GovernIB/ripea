@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Button, Icon, Tooltip} from "@mui/material";
-import {GridEventListener, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
+import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";

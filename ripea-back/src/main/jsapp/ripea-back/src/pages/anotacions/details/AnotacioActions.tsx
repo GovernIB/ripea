@@ -6,6 +6,7 @@ import useRebutjar from "../actions/Rebutjar.tsx";
 import {useNavigate} from "react-router-dom";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
+import useAcceptar from "../actions/Acceptar.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -55,7 +56,8 @@ const useAnotacioActions = (refresh?: () => void) => {
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
 
     const { canviEstatDistribucio } = useActions(refresh)
-    const {handleShow, content} = useRebutjar(refresh)
+    const {handleShow: handleRebutjar, content: contentRebutjar} = useRebutjar(refresh)
+    const {handleShow: handleAcceptar, content: contentAcceptar} = useAcceptar(refresh)
     const {handleOpen, dialog} = useAnotacioDetail();
 
     const actions = [
@@ -69,14 +71,14 @@ const useAnotacioActions = (refresh?: () => void) => {
             title: t('page.anotacio.action.acceptar.label'),
             icon: "check_circle",
             showInMenu: true,
-            // onClick: ,
+            onClick: handleAcceptar,
             hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio,
         },
         {
             title: t('page.anotacio.action.rebutjar.label'),
             icon: "close",
             showInMenu: true,
-            onClick: handleShow,
+            onClick: handleRebutjar,
             hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio,
         },
         {
@@ -104,7 +106,8 @@ const useAnotacioActions = (refresh?: () => void) => {
 
     const components = <>
         {dialog}
-        {content}
+        {contentRebutjar}
+        {contentAcceptar}
     </>;
 
     return {

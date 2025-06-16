@@ -3,9 +3,11 @@ package es.caib.ripea.service.intf.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -113,9 +115,9 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     @NoArgsConstructor
     @FieldNameConstants
     public static class AcceptarAnotacioForm implements Serializable {
-    	
+        @NotNull
     	private ExpedientPeticioAccioEnumDto accio = ExpedientPeticioAccioEnumDto.CREAR;
-    	
+        @NotNull
     	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     	private ResourceReference<ExpedientResource, Long> expedient;
     	private String newExpedientTitol;
@@ -125,10 +127,12 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private Long sequencia;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;
-    	private Long organGestorId;
+    	private ResourceReference<OrganGestorResource, Long> organGestor;
     	
-    	private List<ResourceReference<RegistreInteressatResource, Long>> interessats;
-    	private List<ResourceReference<RegistreAnnexResource, Long>> annexos;
+    	private List<Long> interessats;
+        private Map<Long, String> annexos;
+        @Transient @ResourceField(enumType = true)
+        private String tipusDocument;
     }
     
     @Getter
