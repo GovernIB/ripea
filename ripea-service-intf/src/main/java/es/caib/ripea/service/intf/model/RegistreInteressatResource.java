@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.registre.RegistreInteressatDocumentTipusEnum;
@@ -15,8 +17,18 @@ import org.springframework.data.annotation.Transient;
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "nom" }, descriptionField = "codiNom")
+@ResourceConfig(
+        quickFilterFields = { "nom" },
+        descriptionField = "codiNom",
+        artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = RegistreInteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
+        }
+)
 public class RegistreInteressatResource extends BaseAuditableResource<Long> {
+
+    public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
 
     private String adresa;
     private String canal;
@@ -39,6 +51,7 @@ public class RegistreInteressatResource extends BaseAuditableResource<Long> {
     private RegistreInteressatTipusEnum tipus;
     private String organCodi;
 
+    @Transient private RegistreInteressatResource representantInfo;
     private ResourceReference<RegistreInteressatResource, Long> representant;
     private ResourceReference<RegistreResource, Long> registre;
 

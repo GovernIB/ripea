@@ -10,6 +10,7 @@ import {useActions as useDocumentActions} from "../../contingut/details/Contingu
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./AnotacioActions.tsx";
+import useRegistreInteressatDetail from "./RegistreInteressatDetail.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -130,21 +131,40 @@ const interessatsColumns = [
     },
 ];
 
+const interessatsPerspectives:any[] = ['REPRESENTANT']
 const interessatsSortModel:any = [{field: 'id', sort: 'asc'}];
 const Interessats = (props:any) => {
     const { entity, onRowCountChange } = props;
+    const { t } = useTranslation()
 
-    return <StyledMuiGrid
-        resourceName={'registreInteressatResource'}
-        columns={interessatsColumns}
-        filter={`registre.id:${entity?.id}`}
-        staticSortModel={interessatsSortModel}
-        toolbarHide
-        disableColumnSorting
-        readOnly
-        autoHeight
-        onRowCountChange={onRowCountChange}
-    />
+    const {handleOpen, dialog} = useRegistreInteressatDetail();
+
+    const actions = [
+        {
+            title: t('common.detail'),
+            icon: "info",
+            showInMenu: true,
+            onClick: handleOpen,
+            hidden: (row:any) => row?.tipus == "ADMINISTRACIO"
+        },
+    ]
+
+    return <>
+        <StyledMuiGrid
+            resourceName={'registreInteressatResource'}
+            columns={interessatsColumns}
+            filter={`registre.id:${entity?.id}`}
+            perspectives={interessatsPerspectives}
+            staticSortModel={interessatsSortModel}
+            rowAdditionalActions={actions}
+            toolbarHide
+            disableColumnSorting
+            readOnly
+            autoHeight
+            onRowCountChange={onRowCountChange}
+        />
+        {dialog}
+    </>
 }
 
 const annexosColumns = [
