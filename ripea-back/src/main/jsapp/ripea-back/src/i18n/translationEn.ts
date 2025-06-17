@@ -551,11 +551,6 @@ const translationEn = {
                 dataOther: "Other data",
             },
             action: {
-                crearCarpets: {
-                    label: "Folder...",
-                    title: "Create new folder",
-                    ok: "Folder '{{carpeta}}' created successfully",
-                },
                 pinbal: {
                     label: "PINBAL query...",
                     title: "New PINBAL query",
@@ -681,6 +676,19 @@ const translationEn = {
                 data: "Date",
                 arxiuUuid: "File UUID",
             },
+        },
+        carpeta: {
+            title: 'Folder',
+            action: {
+                new: {
+                    label: "Folder...",
+                    ok: "Folder '{{carpeta}}' created successfully",
+                },
+                update: {
+                    label: "Edit...",
+                    ok: "Folder '{{carpeta}}' updated successfully",
+                }
+            }
         },
         dada: {
             title: "value for the data '{{metaDada}}'",

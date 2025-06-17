@@ -551,11 +551,6 @@ const translationCa = {
                 dataOther: "Altres dades",
             },
             action: {
-                crearCarpets: {
-                    label: "Carpeta...",
-                    title: "Crear nova carpeta",
-                    ok: "Carpeta '{{carpeta}}' creada correctament",
-                },
                 pinbal: {
                     label: "Consulta PINBAL...",
                     title: "Nova consulta PINBAL",
@@ -681,6 +676,19 @@ const translationCa = {
                 data: "Data",
                 arxiuUuid: "Arxiu UUID",
             },
+        },
+        carpeta: {
+            title: 'Carpeta',
+            action: {
+                new: {
+                    label: "Carpeta...",
+                    ok: "Carpeta '{{carpeta}}' creada correctament",
+                },
+                update: {
+                    label: "Modificar...",
+                    ok: "Carpeta '{{carpeta}}' modificada correctament",
+                }
+            }
         },
         dada: {
             title: "valor per al dada '{{metaDada}}'",

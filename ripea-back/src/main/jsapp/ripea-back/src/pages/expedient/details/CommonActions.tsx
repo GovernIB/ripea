@@ -14,6 +14,7 @@ import {useExportarDocuments} from "../actions/ExportarDocuments.tsx";
 import useHistoric from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
+import useModifyExpedient from "../actions/ModifyExpedient.tsx";
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
@@ -212,6 +213,8 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
     const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments(refresh);
 
+    const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
+
     const isTancat = (row:any) :boolean => {
         return row?.estat != "OBERT"
     }
@@ -239,7 +242,7 @@ export const useCommonActions = (refresh?: () => void) => {
             title: t('page.expedient.action.update.label'),
             icon: 'edit',
             showInMenu: true,
-            clickShowUpdateDialog: true,
+            onClick: handleModifyExpedient,
             hidden: isTancat,
         },
         {
@@ -431,6 +434,7 @@ export const useCommonActions = (refresh?: () => void) => {
         {contentExportDoc}
         {contentTancar}
         {contentDescargarDocuments}
+        {contentModifyExpedient}
     </>;
 
     return {

@@ -55,7 +55,8 @@ const Accions = (props:any) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             // paginationActive
-            height={162 + 52 * 4}
+            height={58 + 52 * 4}
+            // autoHeight
             toolbarHide
             readOnly
         />

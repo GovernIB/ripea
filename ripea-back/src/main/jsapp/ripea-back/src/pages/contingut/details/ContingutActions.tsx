@@ -17,8 +17,9 @@ import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useFirmaNavegador from "../actions/FirmaNavegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
-import useCrearCarpeta from "../actions/CrearCarpeta.tsx";
+import useCrearCarpeta from "../../carpeta/actions/CrearCarpeta.tsx";
 import useImportar from "../actions/Importar.tsx";
+import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -111,7 +112,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
     const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(potModificar(entity), refresh);
-    const {handleOpen: arxiuhandleOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
+    const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
     const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
     const {handleShow: handleCopiarShow, content: contentCopiar} = useCopiar(refresh);
     const {handleShow: handleVincularShow, content: contentVincular} = useVincular(refresh);
@@ -153,7 +154,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             disabled: !entity?.ambDocumentsPinbal,
         },
         {
-            title: t('page.document.action.crearCarpets.label'),
+            title: t('page.carpeta.action.new.label'),
             icon: "folder",
             onClick: handleCrearCarpeta,
             disabled: !user?.sessionScope?.isCreacioCarpetesActiva,
@@ -187,7 +188,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             clickShowUpdateDialog: true,
             disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
-            hidden: (row:any) => !potMod || !isDocument(row) || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
+            hidden: (row:any) => !potMod || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
             title: t('page.document.action.move.label'),
@@ -341,7 +342,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('page.contingut.action.infoArxiu.label'),
             icon: "info",
             showInMenu: true,
-            onClick: arxiuhandleOpen,
+            onClick: handleArxiuOpen,
             disabled: (row:any) => !row?.arxiuUuid,
         },
     ]
@@ -350,6 +351,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || !isDocument(row)
         }));
 
+    const {actions: carpetaActions, components: componentsActions} = useCarpetaActions(entity, refresh)
     const {actions: expedientActions, components: expedientComponents} = useCommonActions(refresh);
 
     const components = <>
@@ -371,12 +373,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentEnviarViaFirma}
         {contentCrearCarpeta}
         {contentImportar}
+        {componentsActions}
     </>;
     return {
         createActions: createDocumentActions,
         actions: [
             ...documentActions,
-            ...expedientActions
+            ...carpetaActions,
+            ...expedientActions,
         ],
         hiddenDelete: (row:any) => !potMod || !isDocument(row) || row?.estat == 'DEFINITIU',
         components

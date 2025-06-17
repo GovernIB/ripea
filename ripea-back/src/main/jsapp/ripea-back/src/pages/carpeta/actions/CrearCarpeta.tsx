@@ -15,7 +15,7 @@ const CrearCarpeta = (props:any) => {
 
     return <MuiFormDialog
         resourceName={"carpetaResource"}
-        title={t('page.document.action.crearCarpets.title')}
+        resourceTitle={t('page.carpeta.title')}
         onClose={(reason?: string) => reason !== 'backdropClick'}
         {...props}
     >
@@ -35,7 +35,17 @@ const useCrearCarpeta = (entity:any, refresh?: () => void) => {
         })
             .then((result:any) => {
                 refresh?.()
-                temporalMessageShow(null, t('page.document.action.crearCarpets.ok', {carpeta: result?.nom}), 'success');
+                temporalMessageShow(null, t('page.carpeta.action.new.ok', {carpeta: result?.nom}), 'success');
+            })
+            .catch((error:any) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+    const handelChange = (id:any) => {
+        apiRef.current?.show(id)
+            .then((result:any) => {
+                refresh?.()
+                temporalMessageShow(null, t('page.carpeta.action.update.ok', {carpeta: result?.nom}), 'success');
             })
             .catch((error:any) => {
                 temporalMessageShow(null, error.message, 'error');
@@ -44,6 +54,7 @@ const useCrearCarpeta = (entity:any, refresh?: () => void) => {
 
     return {
         handleShow,
+        handelChange,
         content: <CrearCarpeta apiRef={apiRef}/>,
     }
 }
