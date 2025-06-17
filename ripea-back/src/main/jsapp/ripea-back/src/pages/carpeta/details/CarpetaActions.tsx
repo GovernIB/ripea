@@ -73,6 +73,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             ...rest,
             hidden: (row: any) => (typeof hidden === 'function' ? hidden(row) : !!hidden) || row?.tipus!="CARPETA"
         }));
+
     const components = <>
         {dialogHistoric}
         {contentCrearCarpeta}

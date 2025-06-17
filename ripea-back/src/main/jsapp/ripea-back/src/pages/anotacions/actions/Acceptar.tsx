@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {GridPage, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -8,6 +8,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import FormFieldEnum from "../../../../lib/components/mui/form/FormFieldEnum.tsx";
+import useVisualitzar from "./Visualitzar.tsx";
 
 const AcceptarTabExpedient = () => {
     const {data} =useFormContext();
@@ -77,7 +78,7 @@ const AcceptarTabAnnexos = () => {
                             [params.id]: value,
                         })
                     }}
-                    componentProps={{ size: "small", border: 'none' }}
+                    componentProps={{ size: "small" }}
                     requestParams={{ metaExpedientId: data?.metaExpedient?.id, annexos }}
                     required
                 />
@@ -85,24 +86,30 @@ const AcceptarTabAnnexos = () => {
         },
     ]
 
+    const {handleOpen, dialog} = useVisualitzar()
+
     const actions = [
         {
             title: t('page.document.action.view.label'),
             icon: "search",
-            showInMenu: true,
-            // onClick: handleOpen,
+            showInMenu: false,
+            onClick: handleOpen,
+            hidden: (row:any) => row?.fitxerExtension != 'pdf',
         },
     ]
 
-    return <StyledMuiGrid
-        resourceName={'registreAnnexResource'}
-        filter={filter}
-        columns={columnsAnnexos}
-        rowAdditionalActions={actions}
+    return <GridPage>
+        <StyledMuiGrid
+            resourceName={'registreAnnexResource'}
+            filter={filter}
+            columns={columnsAnnexos}
+            rowAdditionalActions={actions}
 
-        height={162 + 52 * 4}
-        readOnly
-    />
+            height={162 + 52 * 4}
+            readOnly
+        />
+        {dialog}
+    </GridPage>
 }
 
 const columnsInteressats = [

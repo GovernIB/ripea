@@ -49,4 +49,14 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
     private ResourceReference<RegistreResource, Long> registre;
     private ResourceReference<DocumentResource, Long> document;
+
+    public String getFitxerExtension() {
+        if (nom != null) {
+            return nom.substring(
+                    nom.lastIndexOf('.') + 1,
+                    nom.length());
+        } else {
+            return "";
+        }
+    }
 }
