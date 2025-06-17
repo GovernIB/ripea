@@ -29,7 +29,6 @@ export const ToolbarButton = (props:any) => {
 type StyledMuiGridProps = MuiDataGridProps & {
     toolbarCreateTitle?: string,
     toolbarMassiveActions?: MassiveActionProps[],
-    onRowCountChange?: (count:number) => void,
     rowProps?: any,
     formInitOnChange?:boolean,
     rowExpansionChange?: ( params:any, event:any, details:any ) => void,
@@ -56,7 +55,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         staticSortModel,
         readOnly,
         onRowsChange,
-        onRowCountChange,
         onRowSelectionModelChange,
         rowProps,
         formInitOnChange,
@@ -186,10 +184,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             onRowsChange={(rows, info) => {
                 setGridRows([...rows]);
                 onRowsChange?.(rows, info);
-                onRowCountChange?.(info?.totalElements);
             }}
             onRowSelectionModelChange={(newSelection, details) => {
-                // console.log('Selection changed:', newSelection);
                 setSelectedRows([...newSelection]);
                 onRowSelectionModelChange?.(newSelection, details);
             }}

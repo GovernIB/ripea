@@ -125,7 +125,7 @@ const columnsInteressats = [
 ]
 const AcceptarTabInteressats = () => {
     const {data, apiRef} = useFormContext();
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
+    const [selectedRows, setSelectedRows] = useState<any[]>(data?.interessats || []);
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("interessats", selectedRows)
@@ -138,6 +138,7 @@ const AcceptarTabInteressats = () => {
         filter={filter}
         columns={columnsInteressats}
         selectionActive
+        rowSelectionModel={selectedRows}
         onRowSelectionModelChange={(newSelection) => {
             setSelectedRows([...newSelection]);
         }}
@@ -193,7 +194,8 @@ const useAcceptar = (refresh?: () => void) => {
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id, {
             metaExpedient: row?.metaExpedient,
-            registre: {id: row?.registreInfo?.id}
+            registre: row?.registre,
+            interessats: row?.registreInfo?.interessats?.map((i:any)=>i.id) || [],
         })
     }
     const onSuccess = () :void => {
