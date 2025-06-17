@@ -236,20 +236,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 					}
 				}
-				String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
-				if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-					try {
-						expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-						expedientHelper.crearDocFromUuid(
-								expedient.getId(),
-								arxiuUuid,
-								expedientPeticioEntity.getId(),
-								justificantIdMetaDoc);
-					} catch (Exception e) {
-						processatOk = false;
-						logger.error("Error crear doc from uuid", e);
+				if (justificantIdMetaDoc!=null) {
+					String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+					if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+						try {
+							expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+							expedientHelper.crearDocFromUuid(
+									expedient.getId(),
+									arxiuUuid,
+									expedientPeticioEntity.getId(),
+									justificantIdMetaDoc);
+						} catch (Exception e) {
+							processatOk = false;
+							logger.error("Error crear doc from uuid", e);
+						}
+	
 					}
-
 				}
 				if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 					throw new DocumentAlreadyImportedException();
@@ -337,16 +339,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.updateRegistreAnnexError(annexId, ExceptionUtils.getStackTrace(e));
 			}
 		}
-		String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
-		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-			try {
-				expedientHelper.crearDocFromUuid(
-						expedientId,
-						arxiuUuid, 
-						expedientPeticioId,
-						justificantIdMetaDoc);
-			} catch (Exception e) {
-				logger.error(ExceptionUtils.getStackTrace(e));
+		if (justificantIdMetaDoc!=null) {
+			String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
+			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+				try {
+					expedientHelper.crearDocFromUuid(
+							expedientId,
+							arxiuUuid, 
+							expedientPeticioId,
+							justificantIdMetaDoc);
+				} catch (Exception e) {
+					logger.error(ExceptionUtils.getStackTrace(e));
+				}
 			}
 		}
 		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
@@ -375,17 +379,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	public void notificarICanviEstatToProcessatNotificat(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
-		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
-		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 		try {
-			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			pluginHelper.canviEstatAnotacio(anotacioRegistreId, Estat.PROCESSADA, "");
-			expedientPeticioEntity.setEstatCanviatDistribucio(true);
-			// change state of expedient peticion to processat and notificat to DISTRIBUCIO
-			expedientPeticioHelper.canviEstatExpedientPeticioNewTransaction(
-					expedientPeticioEntity.getId(),
-					ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT);
+			expedientHelper.notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
 		} catch (Exception e) {
 			logger.error("Error al canviar estat de anotació a processat notificat: " + expedientPeticioId, e);
 			expedientPeticioEntity.setEstatCanviatDistribucio(false);

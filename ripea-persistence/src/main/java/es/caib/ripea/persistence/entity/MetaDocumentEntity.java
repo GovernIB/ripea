@@ -212,6 +212,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
 	}
 	
+	public boolean isMultiple() {
+		return this.multiplicitat!=null && (MultiplicitatEnumDto.M_0_N.equals(this.multiplicitat) || MultiplicitatEnumDto.M_1_N.equals(this.multiplicitat));
+	}
+	
 	public void update(
 			String codi,
 			String nom,

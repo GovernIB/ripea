@@ -3,13 +3,14 @@ package es.caib.ripea.service.resourceservice;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.intf.base.model.FieldOption;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +20,25 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.RegistreInteressatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
+import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PermisosPerAnotacions;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -37,12 +48,14 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
@@ -67,11 +80,18 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final ConfigHelper configHelper;
 	private final PluginHelper pluginHelper;
 	private final EventHelper eventHelper;
+	private final EmailHelper emailHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ExpedientPeticioHelper expedientPeticioHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
+	private final MetaDocumentHelper metaDocumentHelper;
+	private final ExpedientHelper expedientHelper;
 	
 	private final OrganGestorRepository organGestorRepository;
+	private final MetaExpedientRepository metaExpedientRepository;
+	private final ExpedientPeticioRepository expedientPeticioRepository;
+	
+	private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
 	
     @PostConstruct
     public void init() {
@@ -279,25 +299,155 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
-            List<FieldOption> reslult = new ArrayList<>();
+            List<FieldOption> resultat = new ArrayList<>();
             if (ExpedientPeticioResource.AcceptarAnotacioForm.Fields.tipusDocument.equals(fieldName)){
-                reslult.add(new FieldOption("test", "Prueba"));
+                String entitatActualCodi = configHelper.getEntitatActualCodi();
+                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+                MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findById(Long.parseLong(requestParameterMap.get("metaExpedientId")[0])).get();
+            	List<MetaDocumentEntity>  metaDocsPermesos = metaDocumentHelper.findMetaDocumentsDisponiblesPerCreacio(
+            			entitat,
+                        null,
+                        metaExpedientEntity,
+                        false);
+            	if (metaDocsPermesos!=null) {
+            		//Rebem per parametre els ids dels metadocuments ja utilitzats per algun dels annexes
+            		String[] metaDocsJaExistents = requestParameterMap.get("metaDocsIdsUtilitzats");
+            		for (MetaDocumentEntity metaDoc: metaDocsPermesos) {
+            			if (metaDocUtilitzable(metaDocsJaExistents, metaDoc)) {
+            				resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
+            			}
+            		}
+            	}                
             }
-            return reslult;
+            return resultat;
         }
 
+        private boolean metaDocUtilitzable(String[] metaDocsJaUtilitzats, MetaDocumentEntity metaDocActual) {
+        	if (metaDocsJaUtilitzats==null || metaDocsJaUtilitzats.length==0) return true;
+        	if (metaDocActual.isMultiple()) return true;
+        	for (String doc : metaDocsJaUtilitzats) {
+        		if (doc.equals(metaDocActual.getId().toString())) {
+        			return false;
+        		}
+        	}
+        	return true;
+        }
+        
         @Override
 		public void onChange(Serializable id, AcceptarAnotacioForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, AcceptarAnotacioForm target) {}
 
 		@Override
 		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, AcceptarAnotacioForm params) throws ActionExecutionException {
 			try {
+
+				Long expedientPeticioId = entity.getId();
+				String rolActual = configHelper.getRolActual();
+                String entitatActualCodi = configHelper.getEntitatActualCodi();
+                EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+                boolean expCreatArxiuOk = true;
+                Long expedientId = null;
+                
+                Map<Long, Long> anexosIdsMetaDocsIdsMap = new HashMap<Long, Long>();
+                if (params.getAnnexos()!=null) {
+                	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
+                		anexosIdsMetaDocsIdsMap.put(entry.getKey(), Long.parseLong(entry.getValue()));
+                	}
+                }
+                
+                Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap = new HashMap<>();
+                if (params.getInteressats()!=null && entity.getRegistre().getInteressats()!=null) {
+                	for(Long interessatId: params.getInteressats()) {
+                		for(RegistreInteressatResourceEntity registreInteressatResourceEntity: entity.getRegistre().getInteressats()) {
+                			if (registreInteressatResourceEntity.getId().equals(interessatId)) {
+                				interessatsAccionsMap.put(registreInteressatResourceEntity.getDocumentNumero(), InteressatAssociacioAccioEnum.ASSOCIAR);
+                			}
+                		}
+                	}
+                }
+				
 				if (ExpedientPeticioAccioEnumDto.CREAR.equals(params.getAccio())) {
-					//TODO: ExpedientServiceImpl.create
+	                /**
+	                 * ExpedientServiceImpl.create
+	                 */	                
+					expedientId = expedientHelper.create(
+							entitatEntity.getId(),
+							params.getMetaExpedient().getId(),
+							null,
+							params.getOrganGestor().getId(),
+							Integer.valueOf(params.getAny()),
+							params.getNewExpedientTitol(),
+							expedientPeticioId,
+							params.isAssociarInteressats(),
+							interessatsAccionsMap,
+							entity.getGrup()!=null?entity.getGrup().getId():null,
+							rolActual,
+							params.getPrioritat(),
+							params.getPrioritatMotiu());
 				} else {
-					//TODO: ExpedientServiceImpl.incorporar
+	                /**
+	                 * ExpedientServiceImpl.incorporar
+	                 */
+					expedientId = params.getExpedient().getId();
+					expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
+							expedientPeticioId,
+							params.getExpedient().getId(),
+							rolActual,
+							entitatEntity.getId(),
+							params.isAssociarInteressats(),
+							interessatsAccionsMap,
+							params.isAgafarExpedient());
 				}
+					
+				/**
+				 * Accions comunes, tant per l'acció de crear com de importar.
+				 */
+				expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
+				
+				if (expCreatArxiuOk) {
+					
+					expedientHelper.inicialitzarExpedientsWithImportacio();
+					
+					for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
+						try {
+							expedientHelper.crearDocFromAnnex(
+									expedientId,
+									entry.getKey(),
+									expedientPeticioId,
+									Long.parseLong(entry.getValue()),
+									rolActual);
+							
+						} catch (Exception e) {
+							expedientHelper.updateRegistreAnnexError(
+									entry.getKey(),
+									ExceptionUtils.getStackTrace(e));
+						}
+					}
+					
+					ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+					try {
+						expedientHelper.notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
+					} catch (Exception e) {
+						expedientPeticioEntity.setEstatCanviatDistribucio(false);
+						expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e)); // this will be replaced by expedientPeticioEntity.setPendentCanviarEstatDistribucio(true, false);
+					}
+					
+					expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
+					
+					try {
+						eventHelper.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
+					} catch (Exception ex) {}
+					
+				} else {
+	                if (params.getAnnexos()!=null) {
+	                	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
+	                		registreAnnexResourceRepository.findById(entry.getKey()).get().setError(
+	                				"Annex no s'ha processat perque l'expedient no s'ha creat en arxiu");
+	                	}
+	                }
+				}
+				
 				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+				
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/AcceptarAnotacioActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al acceptar la anotació: "+e.getMessage());

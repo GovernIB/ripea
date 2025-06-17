@@ -43,7 +43,9 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
 import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
@@ -883,6 +885,19 @@ public class ExpedientHelper {
 		}
 	}
 
+	public void notificarICanviEstatToProcessatNotificat(ExpedientPeticioEntity expedientPeticioEntity) {
+		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
+		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
+		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
+		// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
+		pluginHelper.canviEstatAnotacio(anotacioRegistreId, Estat.PROCESSADA, "");
+		expedientPeticioEntity.setEstatCanviatDistribucio(true);
+		// change state of expedient peticion to processat and notificat to DISTRIBUCIO
+		expedientPeticioHelper.canviEstatExpedientPeticioNewTransaction(
+				expedientPeticioEntity.getId(),
+				ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT);
+	}
+	
 	@Transactional
 	public void updateNotificarError(Long expedientPeticioId, String error) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
