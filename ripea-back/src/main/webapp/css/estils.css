@@ -229,6 +229,7 @@
 	background: #5f5d5d;
     color: white;
     font-size: medium;
+    z-index: 1050;
 }
 
 .app-version {

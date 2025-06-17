@@ -871,39 +871,41 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return Long.valueOf(configHelper.getConfig(PropertyConfig.PERIODE_ACTUALITZACIO_ANOTACIO_PENDENT, "150"));
 	}
 
+	@Override
+	@Transactional
+	public void crearExpedientPeticion(String clauAcces, String itentificador) {
+		long t3 = System.currentTimeMillis();
+		
+		try {
+		
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotació start: " + itentificador);
+				
+			Long peticioId = expedientPeticioRepository.findIdByIdentificador(itentificador);
+			
+			if (peticioId == null) {
+				expedientPeticioHelper.crearExpedientPeticion(clauAcces, itentificador);
+			} else {
+				synchronized (SynchronizationHelper.get0To99Lock(peticioId, SynchronizationHelper.locksAnnotacions)) {
+					expedientPeticioHelper.resetExpedientPeticion(peticioId);
+				}
+			}
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotació end: " + itentificador + ":  " + (System.currentTimeMillis() - t3) + " ms");
+		
+		} catch (Throwable e) {
+			logger.error("Error comunicant anotació:" + itentificador + ":  " + (System.currentTimeMillis() - t3) + " ms", e);
+			throw e;
+		}
+	}
 
 	@Override
 	@Transactional
 	public void crearExpedientPeticion(List<es.caib.distribucio.ws.backoffice.AnotacioRegistreId> anotacioRegistreIds) {
-		
 		if (anotacioRegistreIds!=null) {
-		
 			for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : anotacioRegistreIds) {
-	
-				long t3 = System.currentTimeMillis();
-				
-				try {
-				
-					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-						logger.info("Comunicant anotació start: " + anotacioRegistreId.getIndetificador());
-						
-					Long peticioId = expedientPeticioRepository.findIdByIdentificador(anotacioRegistreId.getIndetificador());
-					
-					if (peticioId == null) {
-						expedientPeticioHelper.crearExpedientPeticion(anotacioRegistreId);
-					} else {
-						synchronized (SynchronizationHelper.get0To99Lock(peticioId, SynchronizationHelper.locksAnnotacions)) {
-							expedientPeticioHelper.resetExpedientPeticion(peticioId);
-						}
-					}
-					
-					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-						logger.info("Comunicant anotació end: " + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms");
-				
-				} catch (Throwable e) {
-					logger.error("Error comunicant anotació:" + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms", e);
-					throw e;
-				}
+				crearExpedientPeticion(anotacioRegistreId.getClauAcces(), anotacioRegistreId.getIndetificador());
 			}
 		}
 	}

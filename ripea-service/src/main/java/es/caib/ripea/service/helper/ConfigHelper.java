@@ -340,7 +340,7 @@ public class ConfigHelper {
         for (ConfigEntity configGeneral: configsGeneral) {
         	String propVal = null;
         	if (configGeneral.isJbossProperty() || configGeneral.getValue()==null) {
-        		propVal = PropertiesHelper.getProperties().getProperty(configGeneral.getKey());        		
+        		propVal = getConfig(configGeneral.getKey());//PropertiesHelper.getProperties().getProperty(configGeneral.getKey());        		
         	} else {
         		propVal = configGeneral.getValue();
         	}

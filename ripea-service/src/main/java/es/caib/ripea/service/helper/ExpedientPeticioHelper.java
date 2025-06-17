@@ -69,16 +69,13 @@ public class ExpedientPeticioHelper {
     @Autowired private GrupRepository grupRepository;    
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
-			
-		logger.info("Creant comunicació de l'anotació: " + anotacioRegistreId.getIndetificador());
-		
+	public void crearExpedientPeticion(String clauAcces, String itentificador) {
+		logger.info("Creant comunicació de l'anotació: " + itentificador);
 		ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
-				anotacioRegistreId.getIndetificador(),
-				anotacioRegistreId.getClauAcces(),
+				itentificador,
+				clauAcces,
 				new Date(),
 				ExpedientPeticioEstatEnumDto.CREAT).build();
-
 		expedientPeticioRepository.save(expedientPeticioEntity);
 	}
 	

@@ -27,6 +27,9 @@ public interface ExpedientPeticioService {
 
 	@PreAuthorize("hasRole('IPA_BSTWS')")
 	public void crearExpedientPeticion(List<AnotacioRegistreId> anotacioRegistreIds);
+
+	@PreAuthorize("isAuthenticated()")
+	public void crearExpedientPeticion(String clauAcces, String itentificador);
 	
 	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(

@@ -202,6 +202,22 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
     	return dr;
 	}
 
+	@RequestMapping(value = "/{identificador}/acceptar", method = RequestMethod.GET)
+	@ResponseBody
+	public String testAcceptar(
+			HttpServletRequest request,
+			@PathVariable String identificador,
+			Model model) {
+		try {
+			String clauAcces = "1234";
+			identificador = "4567";
+			expedientPeticioService.crearExpedientPeticion(clauAcces, identificador);
+			return "OK";
+		}catch (Exception ex) {
+			return ex.getMessage();
+		}
+	}
+	
 	@RequestMapping(value = "/{registreAnnexId}/{expedientPeticioId}/reintentar", method = RequestMethod.GET)
 	public String retryCreateDocFromAnnex(HttpServletRequest request, @PathVariable Long registreAnnexId, @PathVariable Long expedientPeticioId, Model model) {
 

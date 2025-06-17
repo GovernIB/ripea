@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.model;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.registre.RegistreAnnexFirmaTipusEnum;
@@ -12,14 +14,32 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@ResourceConfig(quickFilterFields = { "nom" }, descriptionField = "observacions")
+@ResourceConfig(
+		quickFilterFields = { "nom" },
+		descriptionField = "observacions",
+		artifacts = {
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = RegistreAnnexResource.PERSPECTIVE_FIRMES),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
+                        formClass = Serializable.class,
+                        requiresId = true),           
+		}
+)
 public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
+	public static final String REPORT_DOWNLOAD_ANNEX	= "DOWNLOAD_ANNEX";
+	public static final String PERSPECTIVE_FIRMES 		= "FIRMES";
+	
     private String firmaPerfil;
     private long firmaTamany;
     private RegistreAnnexFirmaTipusEnum firmaTipus;
@@ -49,6 +69,8 @@ public class RegistreAnnexResource extends BaseAuditableResource<Long> {
 
     private ResourceReference<RegistreResource, Long> registre;
     private ResourceReference<DocumentResource, Long> document;
+    
+    @Transient private List<ArxiuFirmaDto> firmes;
 
     public String getFitxerExtension() {
         if (nom != null) {

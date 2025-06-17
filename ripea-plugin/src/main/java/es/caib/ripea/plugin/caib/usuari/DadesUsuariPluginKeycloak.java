@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
+import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant el plugin de Keycloak. Les propietats necessàries són les següents a partir
@@ -117,7 +118,7 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		try {
 			RolesInfo ri = getRolesByUsername(usuariCodi);
 			if (ri!=null && ri.getRoles()!=null) {
-				return Arrays.asList(ri.getRoles());
+				return Utils.eliminarDuplicados(Arrays.asList(ri.getRoles()));
 			}
 		} catch (Exception ex) {
 			log.error("Error al consultar els rols del usuari "+usuariCodi, ex);

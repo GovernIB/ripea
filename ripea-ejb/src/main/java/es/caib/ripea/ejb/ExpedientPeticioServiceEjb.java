@@ -46,6 +46,12 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 	
 	@Override
 	@RolesAllowed("**")
+	public void crearExpedientPeticion(String clauAcces, String itentificador) {
+		delegateService.crearExpedientPeticion(clauAcces, itentificador);
+	}
+	
+	@Override
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,

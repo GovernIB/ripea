@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -613,6 +614,11 @@ public class Utils {
 		} catch (Exception ex) {
 			return data;
 		}
+    }
+	
+	public static List<String> eliminarDuplicados(List<String> lista) {
+		if (lista==null) return null;
+        return new ArrayList<>(new LinkedHashSet<>(lista)); // Set elimina duplicados y mantiene el orden
     }
 	
 	public static String desencripta(String encryptedData, String key) {
