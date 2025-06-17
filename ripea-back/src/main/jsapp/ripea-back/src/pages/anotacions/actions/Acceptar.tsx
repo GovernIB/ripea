@@ -79,7 +79,11 @@ const AcceptarTabAnnexos = () => {
                         })
                     }}
                     componentProps={{ size: "small" }}
-                    requestParams={{ metaExpedientId: data?.metaExpedient?.id, annexos }}
+                    requestParams={{
+                        metaExpedientId: data?.metaExpedient?.id,
+                        annex: params.id,
+                        annexos
+                    }}
                     required
                 />
             }
