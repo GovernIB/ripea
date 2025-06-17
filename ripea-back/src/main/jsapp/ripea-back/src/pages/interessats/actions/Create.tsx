@@ -12,7 +12,7 @@ const CreateForm = (props:any) => {
         <InteressatsGridForm/>
     </MuiFormDialog>
 }
-const useCreate = (title:any, refresh?: () => void) => {
+const useCreate = (refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
@@ -29,8 +29,29 @@ const useCreate = (title:any, refresh?: () => void) => {
                 }
             });
     }
+    const update = (id: any) => {
+        apiRef.current?.show(id)
+            .then(() => {
+                refresh?.();
+                temporalMessageShow(null, t('page.interessat.action.updateRep.ok'), 'success');
+            })
+            .catch((error:any) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
-    const createRepresentent = (id: any, row:any) => {
+    return {
+        create,
+        update,
+        content: <CreateForm resourceTitle={t('page.interessat.title')} apiRef={apiRef}/>,
+    }
+}
+export const useCreateRepresentant = (refresh?: () => void) => {
+    const { t } = useTranslation();
+    const apiRef = useRef<MuiFormDialogApi>();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const create = (id: any, row:any) => {
         apiRef.current?.show(undefined, {
             expedient: row?.expedient,
             representat: { id: id },
@@ -44,7 +65,7 @@ const useCreate = (title:any, refresh?: () => void) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
     }
-    const updateRepresentent = (id: any, row: any) => {
+    const update = (id: any, row: any) => {
         apiRef.current?.show(row?.representant?.id)
             .then(() => {
                 refresh?.();
@@ -57,9 +78,8 @@ const useCreate = (title:any, refresh?: () => void) => {
 
     return {
         create,
-        createRepresentent,
-        updateRepresentent,
-        content: <CreateForm title={title} apiRef={apiRef}/>,
+        update,
+        content: <CreateForm resourceTitle={t('page.interessat.rep')} apiRef={apiRef}/>,
     }
 }
 export default useCreate;

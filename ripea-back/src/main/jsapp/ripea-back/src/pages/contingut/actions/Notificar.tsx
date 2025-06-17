@@ -90,7 +90,7 @@ const NotificarForm = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
 
-    const { create, content } = useCreate(t('page.interessat.title'))
+    const { create, content } = useCreate()
     const onCreateInteressat = (result?:any)=> {
         formApiRef?.current?.setFieldValue('interessats', [...data?.interessats, {
             id: result?.id,
