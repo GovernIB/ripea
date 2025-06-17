@@ -6,7 +6,7 @@ import {
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
-import useCreate from "../actions/Create.tsx";
+import {useCreateRepresentant} from "../actions/Create.tsx";
 import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import {potModificar as potModificarExpedient} from "../../expedient/details/Expedient.tsx";
 
@@ -109,7 +109,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
 
     const {deleteRepresentent, deleteInteressat} = useActions(refresh);
     const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
-    const {createRepresentent, updateRepresentent, content} = useCreate(t('page.interessat.rep'), refresh)
+    const {create: createRepresentent, update: updateRepresentent, content} = useCreateRepresentant(refresh)
 
     const potModificar:boolean = potModificarExpedient(entity)
 

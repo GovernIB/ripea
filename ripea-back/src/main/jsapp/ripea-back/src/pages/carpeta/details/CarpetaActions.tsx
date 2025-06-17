@@ -43,7 +43,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             hidden: !potMod || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
-            title: t('page.document.action.vincular.label'),
+            title: t('page.document.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             // onClick: ,
