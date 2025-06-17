@@ -6,10 +6,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
+import es.caib.ripea.service.intf.base.model.FieldOption;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -86,13 +91,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final MetaDocumentHelper metaDocumentHelper;
 	private final ExpedientHelper expedientHelper;
-	
+
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
 	private final ExpedientPeticioRepository expedientPeticioRepository;
-	
+
 	private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
-	
+
+	private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
+	private final MetaExpedientResourceRepository metaExpedientResourceRepository;
+
     @PostConstruct
     public void init() {
         register(ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE, new RegistrePerspectiveApplicator());
@@ -295,7 +303,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
     }
     
-    private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, ExpedientPeticioResource.AcceptarAnotacioForm, Serializable> {
+    private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, AcceptarAnotacioForm, Serializable> {
 
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
@@ -317,7 +325,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
             				resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
             			}
             		}
-            	}                
+            	}
             }
             return resultat;
         }
@@ -332,9 +340,64 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         	}
         	return true;
         }
-        
+
         @Override
-		public void onChange(Serializable id, AcceptarAnotacioForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, AcceptarAnotacioForm target) {}
+		public void onChange(Serializable id, AcceptarAnotacioForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, AcceptarAnotacioForm target) {
+            if (fieldName!=null){
+                switch (fieldName){
+                    case AcceptarAnotacioForm.Fields.metaExpedient:
+                        if (fieldValue != null) {
+                            ResourceReference<MetaExpedientResource, Long> reference =
+                                    (ResourceReference<MetaExpedientResource, Long>) fieldValue;
+                            Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional =
+                                    metaExpedientResourceRepository.findById(reference.getId());
+
+                            metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
+                                MetaExpedientResource metaExpedientResource =
+                                        objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+                                if (metaExpedientResource.getOrganGestor() != null) {
+                                    target.setOrganGestor(metaExpedientResource.getOrganGestor());
+                                    if (previous.getAny() != null) {
+                                        Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
+                                                .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, previous.getAny());
+
+                                        sequencia.ifPresentOrElse(
+                                                (value) -> target.setSequencia(value + 1),
+                                                () -> target.setSequencia(1L)
+                                        );
+                                    }
+                                }
+                            });
+                        } else {
+                            target.setOrganGestor(null);
+                            target.setSequencia(null);
+                        }
+                        break;
+                    case AcceptarAnotacioForm.Fields.any:
+                        if (fieldValue != null && previous.getMetaExpedient() != null) {
+                            Optional<MetaExpedientResourceEntity> metaExpedientResourceOptional =
+                                    metaExpedientResourceRepository.findById(previous.getMetaExpedient().getId());
+
+                            metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
+                                MetaExpedientResource metaExpedientResource =
+                                        objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+                                if (metaExpedientResource.getOrganGestor() != null) {
+                                    Optional<Long> sequencia = metaExpedientSequenciaResourceRepository
+                                            .findValorByMetaExpedientAndAny(metaExpedientResourceEntity, (Integer) fieldValue);
+
+                                    sequencia.ifPresentOrElse(
+                                            (value) -> target.setSequencia(value + 1),
+                                            () -> target.setSequencia(1L)
+                                    );
+                                }
+                            });
+                        } else {
+                            target.setSequencia(null);
+                        }
+                        break;
+                }
+            }
+        }
 
 		@Override
 		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, AcceptarAnotacioForm params) throws ActionExecutionException {
@@ -346,14 +409,14 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
                 boolean expCreatArxiuOk = true;
                 Long expedientId = null;
-                
+
                 Map<Long, Long> anexosIdsMetaDocsIdsMap = new HashMap<Long, Long>();
                 if (params.getAnnexos()!=null) {
                 	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
                 		anexosIdsMetaDocsIdsMap.put(entry.getKey(), Long.parseLong(entry.getValue()));
                 	}
                 }
-                
+
                 Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap = new HashMap<>();
                 if (params.getInteressats()!=null && entity.getRegistre().getInteressats()!=null) {
                 	for(Long interessatId: params.getInteressats()) {
@@ -364,11 +427,11 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 		}
                 	}
                 }
-				
+
 				if (ExpedientPeticioAccioEnumDto.CREAR.equals(params.getAccio())) {
 	                /**
 	                 * ExpedientServiceImpl.create
-	                 */	                
+	                 */
 					expedientId = expedientHelper.create(
 							entitatEntity.getId(),
 							params.getMetaExpedient().getId(),
@@ -397,16 +460,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							interessatsAccionsMap,
 							params.isAgafarExpedient());
 				}
-					
+
 				/**
 				 * Accions comunes, tant per l'acció de crear com de importar.
 				 */
 				expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
-				
+
 				if (expCreatArxiuOk) {
-					
+
 					expedientHelper.inicialitzarExpedientsWithImportacio();
-					
+
 					for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
 						try {
 							expedientHelper.crearDocFromAnnex(
@@ -415,14 +478,14 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 									expedientPeticioId,
 									Long.parseLong(entry.getValue()),
 									rolActual);
-							
+
 						} catch (Exception e) {
 							expedientHelper.updateRegistreAnnexError(
 									entry.getKey(),
 									ExceptionUtils.getStackTrace(e));
 						}
 					}
-					
+
 					ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 					try {
 						expedientHelper.notificarICanviEstatToProcessatNotificat(expedientPeticioEntity);
@@ -430,13 +493,13 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 						expedientPeticioEntity.setEstatCanviatDistribucio(false);
 						expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e)); // this will be replaced by expedientPeticioEntity.setPendentCanviarEstatDistribucio(true, false);
 					}
-					
+
 					expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
-					
+
 					try {
 						eventHelper.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
 					} catch (Exception ex) {}
-					
+
 				} else {
 	                if (params.getAnnexos()!=null) {
 	                	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
@@ -445,9 +508,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	                	}
 	                }
 				}
-				
+
 				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
-				
+
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/AcceptarAnotacioActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "Error al acceptar la anotació: "+e.getMessage());

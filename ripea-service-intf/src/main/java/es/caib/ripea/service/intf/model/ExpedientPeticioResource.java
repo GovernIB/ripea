@@ -117,13 +117,14 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static class AcceptarAnotacioForm implements Serializable {
         @NotNull
     	private ExpedientPeticioAccioEnumDto accio = ExpedientPeticioAccioEnumDto.CREAR;
-        @NotNull
+        @NotNull @ResourceField(onChangeActive = true)
     	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     	private ResourceReference<ExpedientResource, Long> expedient;
     	private String newExpedientTitol;
     	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     	private String prioritatMotiu;
-    	private int any;
+        @ResourceField(onChangeActive = true)
+    	private Integer any;
     	private Long sequencia;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;

@@ -33,7 +33,9 @@ const useCambiarDataLimit = (refresh?: () => void) => {
 
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id, {
-            dataInici: row?.dataInici
+            dataInici: row?.dataInici,
+            duracio: row?.duracio,
+            dataLimit: row?.dataLimit,
         })
     }
     const onSuccess = () :void => {

@@ -35,6 +35,7 @@ const useCambiarPrioritat = (refresh?: () => void) => {
         apiRef.current?.show?.(id, {
             titol: row?.titol,
             metaExpedientTasca: row?.metaExpedientTasca,
+            prioritat: row?.prioritat,
         })
     }
     const onSuccess = () :void => {
