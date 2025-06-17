@@ -305,6 +305,23 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     
     private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, AcceptarAnotacioForm, Serializable> {
 
+        private Map<String, String> parseToMap(String input){
+            String[] tokens = input.split(",", -1); // split preservando vacíos
+
+            Map<String, String> map = new HashMap<>();
+            for (int i = 0; i < tokens.length - 1; i += 2) {
+                String key = tokens[i].trim();
+                String value = tokens[i + 1].trim();
+                map.put(key, value);
+            }
+
+            // Mostrar el resultado
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                System.out.println(entry.getKey() + " = " + entry.getValue());
+            }
+            return map;
+        }
+
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<>();
@@ -319,26 +336,22 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                         false);
             	if (metaDocsPermesos!=null) {
             		//Rebem per parametre els ids dels metadocuments ja utilitzats per algun dels annexes
-            		String[] metaDocsJaExistents = requestParameterMap.get("metaDocsIdsUtilitzats");
+                    Map<String, String> additionalOption = parseToMap(requestParameterMap.get("annexos")[0]);
+                    String annex = requestParameterMap.get("annex")[0];
+
             		for (MetaDocumentEntity metaDoc: metaDocsPermesos) {
-            			if (metaDocUtilitzable(metaDocsJaExistents, metaDoc)) {
-            				resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
-            			}
+                        if ( metaDoc.isMultiple() ||
+                                (
+                                    !additionalOption.containsValue(String.valueOf(metaDoc.getId())) ||
+                                    String.valueOf(metaDoc.getId()).equals(additionalOption.get(annex))
+                                )
+                        ) {
+                            resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
+                        }
             		}
             	}
             }
             return resultat;
-        }
-
-        private boolean metaDocUtilitzable(String[] metaDocsJaUtilitzats, MetaDocumentEntity metaDocActual) {
-        	if (metaDocsJaUtilitzats==null || metaDocsJaUtilitzats.length==0) return true;
-        	if (metaDocActual.isMultiple()) return true;
-        	for (String doc : metaDocsJaUtilitzats) {
-        		if (doc.equals(metaDocActual.getId().toString())) {
-        			return false;
-        		}
-        	}
-        	return true;
         }
 
         @Override
