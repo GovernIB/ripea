@@ -738,6 +738,15 @@ const translationEs = {
                 interessats: "Interesados",
                 annexos: "Anexos",
             },
+            justificatn: {
+                ntiFechaCaptura: "Fecha de captura (ENI)",
+                ntiOrigen: "Origen (ENI)",
+                ntiTipoDocumental: "Tipo documental (ENI)",
+                uuid: "Identificador",
+                titol: "Fichero",
+                firmaTipus: "Tipo firma",
+                firmaPerfil: "Perfil firma",
+            }
         },
         notificacio: {
             title: "Notificación",

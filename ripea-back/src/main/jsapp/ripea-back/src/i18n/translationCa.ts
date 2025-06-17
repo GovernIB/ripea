@@ -738,6 +738,15 @@ const translationCa = {
                 interessats: "Interessats",
                 annexos: "Annexos",
             },
+            justificatn: {
+                ntiFechaCaptura: "Data de captura (ENI)",
+                ntiOrigen: "Origen (ENI)",
+                ntiTipoDocumental: "Tipus documental (ENI)",
+                uuid: "Identificador",
+                titol: "Fitxer",
+                firmaTipus: "Tipus de signatura",
+                firmaPerfil: "Perfil de signatura",
+            }
         },
         notificacio: {
             title: "Notificació",

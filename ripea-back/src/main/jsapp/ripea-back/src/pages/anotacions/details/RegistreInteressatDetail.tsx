@@ -20,7 +20,7 @@ const RegistreInteressatDetail = (props:any) => {
             <ContenidoData title={t('page.interessat.detall.direccio')}>{entity?.pais} {entity?.provincia} {entity?.municipi} {entity?.codiPostal} {entity?.adresa}</ContenidoData>
         </CardData>
         <CardData title={t('page.interessat.rep')} hidden={!representant}>
-            <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNum}</ContenidoData>
+            <ContenidoData title={t('page.interessat.detall.nif')}>{representant?.documentNumero}</ContenidoData>
             <ContenidoData title={`${t('page.interessat.detall.nom')} / ${t('page.interessat.detall.raoSocial')}`}>{representant?.nom} {representant?.raoSocial}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.llinatges')}>{representant?.llinatge1} {representant?.llinatge2}</ContenidoData>
             <ContenidoData title={t('page.interessat.detall.email')}>{representant?.email}</ContenidoData>
