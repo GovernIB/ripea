@@ -1161,11 +1161,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 String value = tokens[i + 1].trim();
                 map.put(key, value);
             }
-
-            // Mostrar el resultado
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            }
             return map;
         }
 
