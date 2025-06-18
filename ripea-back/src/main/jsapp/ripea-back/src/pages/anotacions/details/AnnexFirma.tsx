@@ -5,7 +5,8 @@ import {Grid} from "@mui/material";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 
 const AnnexFirma = (props:any) => {
-    const {entity} = props
+    const {entity} = props;
+    const { t } = useTranslation();
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
         {
