@@ -269,15 +269,15 @@ const Justificant = (props:any) => {
              }
          ]}
     >
-        <ContenidoData title={t('page.registre.detall.justificant.ntiFechaCaptura')}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
-        <ContenidoData title={t('page.registre.detall.justificant.ntiOrigen')}>{entity?.ntiOrigen}</ContenidoData>
-        <ContenidoData title={t('page.registre.detall.justificant.ntiTipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
-        <ContenidoData title={t('page.registre.detall.justificant.uuid')}>{entity?.uuid}</ContenidoData>
-        <ContenidoData title={t('page.registre.detall.justificant.titol')}>{entity?.titol}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.ntiFechaCaptura')}>{formatDate(entity?.ntiFechaCaptura)}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.ntiOrigen')}>{entity?.ntiOrigen}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.ntiTipoDocumental')}>{entity?.ntiTipoDocumental}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.uuid')}>{entity?.uuid}</ContenidoData>
+        <ContenidoData title={t('page.registre.justificant.titol')}>{entity?.titol}</ContenidoData>
 
-        <CardData title={<>{entity?.validacioFirmaCorrecte && <Icon>verified</Icon>}{t('page.arxiu.firma.title')}</>}>
-            <ContenidoData title={t('page.registre.detall.justificant.firmaTipus')}>{entity?.firmaTipus}</ContenidoData>
-            <ContenidoData title={t('page.registre.detall.justificant.firmaPerfil')}>{entity?.firmaPerfil}</ContenidoData>
+        <CardData title={t('page.arxiu.firma.title')}>
+            <ContenidoData title={t('page.registre.justificant.firmaTipus')}>{entity?.firmaTipus}</ContenidoData>
+            <ContenidoData title={t('page.registre.justificant.firmaPerfil')}>{entity?.firmaPerfil}</ContenidoData>
         </CardData>
     </CardData>
 }

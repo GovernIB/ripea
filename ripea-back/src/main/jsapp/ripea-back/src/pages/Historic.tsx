@@ -164,7 +164,7 @@ const Moviment = (props:any) => {
             columns={columnsMoviment}
             onRowCountChange={onRowCountChange}
             // paginationActive
-            height={162 + 52 * 4}
+            height={58 + 52 * 4}
             toolbarHide
             readOnly
         />

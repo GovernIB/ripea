@@ -746,7 +746,7 @@ const translationEs = {
                 interessats: "Interesados",
                 annexos: "Anexos",
             },
-            justificatn: {
+            justificant: {
                 ntiFechaCaptura: "Fecha de captura (ENI)",
                 ntiOrigen: "Origen (ENI)",
                 ntiTipoDocumental: "Tipo documental (ENI)",
