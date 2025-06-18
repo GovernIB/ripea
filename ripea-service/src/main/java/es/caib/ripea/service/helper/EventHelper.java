@@ -16,8 +16,10 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.AvisRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.intf.dto.AvisDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -34,9 +36,9 @@ public class EventHelper {
 	@Autowired private AvisRepository avisRepository;
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private CacheHelper cacheHelper;
-	@Autowired private ConfigHelper configHelper;
 	@Autowired private EmailHelper emailHelper;
 
     public void notifyAvisosActius() {
@@ -50,18 +52,18 @@ public class EventHelper {
     }
 
     public void notifyAnotacionsPendents(Long anotacioId) {
-    	notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(anotacioId));
+    	notifyAnotacionsPendents(emailHelper.dadesUsuarisAfectatsAnotacio(anotacioId));
     }
     
-    public void notifyAnotacionsPendents(List<String> usuarisAfectats) {
+    public void notifyAnotacionsPendents(List<UsuariAnotacioDto> usuarisAfectats) {
     	//Aquesta funció es crida desde EmailHelper. Notificam als mateixos que rebràn el mail. TODO: ¿eliminar enviament de mail?  
     	//Grup, organ gestor i tenint en compte rols.
     	try {
     		log.debug("notifyTasquesPendents a clients");
     		Map<String, Long> anotacioUsuaris = new HashMap<String, Long>();
     		if (usuarisAfectats!=null) {
-    			for (String usuari: usuarisAfectats) {
-    				anotacioUsuaris.put(usuari, getAnotacionsPendents(usuari));
+    			for (UsuariAnotacioDto usuari: usuarisAfectats) {
+    				anotacioUsuaris.put(usuari.getCodi(), getAnotacionsPendents(usuari));
     			}
     		}
     		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacioUsuaris);
@@ -111,19 +113,33 @@ public class EventHelper {
     	}
     }
     
-	public long getAnotacionsPendents(String usuariCodi) {
+	public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi) {
 		try {
-			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+			EntitatEntity entitatEntity = null;
+			if (usuariCodi.getEntitatId()!=null) {
+				entitatEntity = entitatRepository.findById(usuariCodi.getEntitatId()).get();
+			} else {
+				entitatEntity = metaExpedientRepository.findById(usuariCodi.getMetaExpedientId()).get().getEntitat();				
+			}
 			if (entitatEntity!=null) {
 				
 				OrganGestorEntity organGestorEntity = null;
-				if (configHelper.getOrganActualCodi()!=null)
-					organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
+				if (usuariCodi.getOrganId()!=null)
+					organGestorRepository.findById(usuariCodi.getOrganId()).get();
+				
+				String rolActual = "IPA_USER";
+				if (UsuariAnotacioDto.TipoUsuario.ADMIN.equals(usuariCodi.getTipusUsuari())) {
+					rolActual = "IPA_ADMIN";
+				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG.equals(usuariCodi.getTipusUsuari())) {
+					rolActual = "IPA_ORGAN_ADMIN";
+				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN.equals(usuariCodi.getTipusUsuari())) {
+					rolActual = "IPA_ORGAN_ADMIN";
+				}
 				
 				return cacheHelper.countAnotacionsPendents(
 						entitatEntity,
-						configHelper.getRolActual(),
-						SecurityContextHolder.getContext().getAuthentication().getName(),
+						rolActual,
+						usuariCodi.getCodi(),
 						organGestorEntity!=null?organGestorEntity.getId():null);
 			}
 		} catch (Exception ex) {}

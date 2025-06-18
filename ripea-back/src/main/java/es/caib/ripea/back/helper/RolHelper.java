@@ -4,6 +4,7 @@
 package es.caib.ripea.back.helper;
 
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
@@ -60,8 +61,13 @@ public class RolHelper {
 					aplicacioService.setRolUsuariActual(canviRol);
 				}
 				
-				if (eventService!=null)
-					eventService.notifyAnotacionsPendents(List.of(SecurityContextHolder.getContext().getAuthentication().getName()));
+				if (eventService!=null) {
+		            Long entitatActualId = aplicacioService.getEntitatActualId();
+		            Long organActualId = aplicacioService.getOrganActualId();
+		            String rolActualCodi = aplicacioService.getRolActualCodi();
+		            UsuariAnotacioDto uaDto = new UsuariAnotacioDto(SecurityContextHolder.getContext().getAuthentication().getName(), rolActualCodi, organActualId, entitatActualId);
+					eventService.notifyAnotacionsPendents(List.of(uaDto));
+				}
 			
 			} catch (Exception ex) {
 				ex.printStackTrace();

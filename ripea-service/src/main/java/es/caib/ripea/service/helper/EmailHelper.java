@@ -300,14 +300,14 @@ public class EmailHelper {
 
 		metaExpComnt.updateEmailEnviat(true);
 	}
-
-	public List<String> getCodisUsuarisAfectatsAnotacio(Long expedientPeticioId) {
-		List<UsuariAnotacioDto> aux = dadesUsuarisAfectatsAnotacio(expedientPeticioId);
-		List<String> resultat = new ArrayList<String>();
-		for (UsuariAnotacioDto u: aux) {
-			resultat.add(u.getCodi());
+	
+	public boolean usuariJaDinsLlista(List<UsuariAnotacioDto> llista, String usuariCodi) {
+		if (llista!=null && usuariCodi!=null) {
+			for (UsuariAnotacioDto usuList: llista) {
+				if (usuariCodi.equals(usuList.getCodi())) return true;
+			}
 		}
-		return resultat;
+		return false;
 	}
 	
 	public List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio(Long expedientPeticioId) {
@@ -333,8 +333,10 @@ public class EmailHelper {
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
 			if (granted) {
-				UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADMIN, null, null);
-				resultat.add(aux);
+				UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADMIN, null, metaExpedient.getId());
+				if (!usuariJaDinsLlista(resultat, dadesUsuari.getCodi())) {
+					resultat.add(aux);
+				}
 			}
 		}
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -361,8 +363,10 @@ public class EmailHelper {
 								new Permission[] { ExtendedPermission.ADMINISTRATION },
 								dadesUsuari.getCodi());
 						if (granted) {
-							UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADM_ORG, orgId, null);
-							resultat.add(aux);
+							UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADM_ORG, orgId, metaExpedient.getId());
+							if (!usuariJaDinsLlista(resultat, dadesUsuari.getCodi())) {
+								resultat.add(aux);
+							}
 						}
 					}
 
@@ -376,8 +380,10 @@ public class EmailHelper {
 									new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU },
 									dadesUsuari.getCodi());
 							if (granted) {
-								UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, orgId, null);
-								resultat.add(aux);
+								UsuariAnotacioDto aux = new UsuariAnotacioDto(dadesUsuari.getCodi(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, orgId, metaExpedient.getId());
+								if (!usuariJaDinsLlista(resultat, dadesUsuari.getCodi())) {
+									resultat.add(aux);
+								}
 							}
 						}
 					}
@@ -461,7 +467,9 @@ public class EmailHelper {
 
 			for (PermisDto permisDto : usuarisAmbPermis) {
 				UsuariAnotacioDto aux = new UsuariAnotacioDto(permisDto.getPrincipalNom(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, null, metaExpedient.getId());
-				resultat.add(aux);
+				if (!usuariJaDinsLlista(resultat, permisDto.getPrincipalNom())) {
+					resultat.add(aux);
+				}
 			}
 		}
 		
@@ -475,8 +483,6 @@ public class EmailHelper {
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("novaAnotacioPendent start (id=" + expedientPeticioId + ")");
 
-		//Usuaris per notificar SSE
-		List<String> usuarisAfectats = new ArrayList<String>();
 		//Usuaris per enviar mail
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
@@ -506,7 +512,6 @@ public class EmailHelper {
 				break;
 			}
 			addDestinatari(userAnotacio.getCodi(), emailsNoAgrupats, emailsAgrupats, EventTipusEnumDto.NOVA_ANOTACIO, logMsg);
-			usuarisAfectats.add(userAnotacio.getCodi());
 		}
 
 		String subject = getPrefixRipea() + " Nova anotació pendent";
@@ -522,7 +527,7 @@ public class EmailHelper {
 			text += "\tProcediment: " + metaExpedient.getCodiSiaINom() + "\n";
 		}
 
-		eventService.notifyAnotacionsPendents(usuarisAfectats);
+		eventService.notifyAnotacionsPendents(dadesUsuarisAfectatsAnotacio);
 		
 		sendOrSaveEmail(
 				emailsNoAgrupats,

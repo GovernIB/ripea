@@ -191,11 +191,22 @@ public interface AplicacioService {
 	public boolean mostrarLogsRendiment();
 
 	@PreAuthorize("isAuthenticated()")
-	public void actualitzarOrganCodi(
-			String organCodi);
+	public void actualitzarOrganCodi(String organCodi);
 
 	@PreAuthorize("isAuthenticated()")
 	public String getEntitatActualCodi();
+	
+	@PreAuthorize("isAuthenticated()")
+	public Long getEntitatActualId();
+	
+	@PreAuthorize("isAuthenticated()")
+	public String getOrganActualCodi();
+	
+	@PreAuthorize("isAuthenticated()")
+	public String getRolActualCodi();
+	
+	@PreAuthorize("isAuthenticated()")
+	public Long getOrganActualId();
 
 	@PreAuthorize("isAuthenticated()")
 	public String getValueForOrgan(String entitatCodi,

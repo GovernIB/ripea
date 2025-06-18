@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.NotFoundException;
@@ -21,7 +23,11 @@ import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.RolesResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.ClientMappingsRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.MappingsRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +114,6 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		}
 		return resultat;
 	}
-	
 
 	@Override
 	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
@@ -127,6 +132,46 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 		return resultat;
 	}
 	
+   @Override
+    public RolesInfo getRolesByUsername(String username) throws Exception {
+
+        UsersResource usersResource = getKeyCloakConnectionForUsers();
+
+        List<UserRepresentation> users = usersResource.search(username);
+
+        if (users == null || users.size() == 0) {
+            return null;
+        }
+
+        UserRepresentation user = users.get(0);
+
+        MappingsRepresentation mr = usersResource.get(user.getId()).roles().getAll();
+        Set<String> roles = new TreeSet<String>();
+        {
+            Map<String, ClientMappingsRepresentation> rolesClient = mr.getClientMappings();
+            if (rolesClient!=null) {
+	            for (Entry<String, ClientMappingsRepresentation> entry : rolesClient.entrySet()) {
+	
+	                List<RoleRepresentation> rolesRepre = entry.getValue().getMappings();
+	
+	                for (RoleRepresentation rr : rolesRepre) {
+	                    roles.add(rr.getName());
+	                }
+	            }
+            }
+        }
+
+        List<RoleRepresentation> rolesRepre = mr.getRealmMappings();
+        if (rolesRepre!=null) {
+        	for (RoleRepresentation rr : rolesRepre) {
+        		roles.add(rr.getName());
+        	}
+        }
+
+        RolesInfo ri = new RolesInfo(username, roles.toArray(new String[roles.size()]));
+
+        return ri;
+    }
 
 	@Override
 	public String[] getUsernamesByRol(String rol) throws Exception {

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -33,7 +33,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void notifyAnotacionsPendents(List<String> usuarisAfectats) {
+    public void notifyAnotacionsPendents(List<UsuariAnotacioDto> usuarisAfectats) {
     	eventHelper.notifyAnotacionsPendents(usuarisAfectats);
     }
     
@@ -58,7 +58,7 @@ public class EventServiceImpl implements EventService {
     }
     
 	@Override
-	public long getAnotacionsPendents(String usuariCodi) {
+	public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi) {
 		return eventHelper.getAnotacionsPendents(usuariCodi);
 	}
 

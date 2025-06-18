@@ -157,12 +157,12 @@ public class EntityComprovarHelper {
 			throw new NotFoundException(entitatId, EntitatEntity.class);
 		}
 		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		//Per processos en segon pla, aquest usuari no té permisos ACL sobre objectes
-		if("SYSTEM_RIPEA".equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+		if(auth!=null && "SYSTEM_RIPEA".equals(auth.getName())) {
 			return entitat;
 		}
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisUsuari) {
 			boolean esLectorEntitat = auth != null && permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
 			        new Permission[] { ExtendedPermission.READ }, auth);

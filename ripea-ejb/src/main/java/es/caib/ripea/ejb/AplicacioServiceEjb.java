@@ -218,6 +218,30 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 	@Override
 	@RolesAllowed("**")
+	public Long getEntitatActualId() {
+		return delegateService.getEntitatActualId();
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public String getOrganActualCodi() {
+		return delegateService.getOrganActualCodi();
+	}
+	
+	@Override
+	@RolesAllowed("**")
+	public Long getOrganActualId() {
+		return delegateService.getOrganActualId();
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public String getRolActualCodi() {
+		return delegateService.getRolActualCodi();
+	}
+	
+	@Override
+	@RolesAllowed("**")
 	public String getValueForOrgan(
 			String entitatCodi,
 			String organCodi,

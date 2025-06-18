@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.Formula;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -98,8 +101,8 @@ public class RegistreResourceEntity extends BaseAuditableEntity<RegistreResource
     private String destiDescripcio;
     @Column(name = "justificant_arxiu_uuid", length = 256)
     private String justificantArxiuUuid;
-
-
+    @Formula("DESTI_CODI||' - '||DESTI_DESCRIPCIO")
+    private String destiCodiINom;
 
     @OneToMany(
             mappedBy = "registre",

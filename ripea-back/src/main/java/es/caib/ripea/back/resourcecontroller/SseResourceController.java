@@ -26,6 +26,7 @@ import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -136,7 +137,11 @@ public class SseResourceController {
                     .id(String.valueOf(System.currentTimeMillis())));
             // Un cop renviat el missatge de connexió correctament, enviem un missatge amb les dades inicials
             var avisosActius = eventService.getAvisosActiusEvent();
-            var anotacionsPendents = eventService.getAnotacionsPendents(usuariCodi);
+            Long entitatActualId = aplicacioService.getEntitatActualId();
+            Long organActualId = aplicacioService.getOrganActualId();
+            String rolActualCodi = aplicacioService.getRolActualCodi();
+            UsuariAnotacioDto uaDto = new UsuariAnotacioDto(usuariCodi, rolActualCodi, organActualId, entitatActualId);
+            var anotacionsPendents = eventService.getAnotacionsPendents(uaDto);
             var tasquesPendents = eventService.getTasquesPendents(usuariCodi);
             emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisosActius));
             emitter.send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));

@@ -13,12 +13,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.helper.CacheHelper;
@@ -46,7 +49,6 @@ import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -68,7 +70,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntitatRepository entitatRepository;
-    
+    @Autowired private OrganGestorRepository organGestorRepository;
 
 	@Override
 	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
@@ -90,6 +92,38 @@ public class AplicacioServiceImpl implements AplicacioService {
     public String getEntitatActualCodi() {
         return configHelper.getEntitatActualCodi();
     }
+	
+	@Override
+    @Transactional(readOnly = true)
+    public String getOrganActualCodi() {
+        return configHelper.getOrganActualCodi();
+    }
+	
+	@Override
+	public Long getEntitatActualId() {
+		if (configHelper.getEntitatActualCodi()!=null) {
+			EntitatEntity ee = entitatRepository.findByCodi(getEntitatActualCodi());
+			return ee==null?null:ee.getId();
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public String getRolActualCodi() {
+		return configHelper.getRolActual();
+	}
+
+	@Override
+	public Long getOrganActualId() {
+		Long entitatActualId = getEntitatActualId();
+		if (configHelper.getOrganActualCodi()!=null && entitatActualId!=null) {
+			OrganGestorEntity oge = organGestorRepository.findByEntitatIdAndCodi(entitatActualId, configHelper.getOrganActualCodi());
+			return oge==null?null:oge.getId();
+		} else {
+			return null;
+		}
+	}
 	
 	@Transactional
 	@Override

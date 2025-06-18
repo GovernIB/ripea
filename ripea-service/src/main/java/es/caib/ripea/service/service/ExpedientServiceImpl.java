@@ -18,15 +18,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -85,12 +82,9 @@ import es.caib.ripea.service.intf.dto.ExpedientComentariDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
-import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
-import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -263,7 +257,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientDto.setProcessatOk(processatOk);
 				
 				try {
-					eventService.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
+					eventService.notifyAnotacionsPendents(emailHelper.dadesUsuarisAfectatsAnotacio(expedientPeticioId));
 				} catch (Exception ex) {
 					logger.error("Error al actualitzar les anotacions pendents a travers del Socket", ex);
 				}
@@ -361,7 +355,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
 			
 			try {
-				eventService.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
+				eventService.notifyAnotacionsPendents(emailHelper.dadesUsuarisAfectatsAnotacio(expedientPeticioId));
 			} catch (Exception ex) {
 				logger.error("Error al actualitzar les anotacions pendents a travers del Socket", ex);
 			}

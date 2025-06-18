@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.security.PermitAll;
 
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
@@ -18,12 +19,12 @@ import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 @PermitAll
 public interface EventService {
     public void notifyAvisosActius();
-    public void notifyAnotacionsPendents(List<String> usuarisAfectats);
+    public void notifyAnotacionsPendents(List<UsuariAnotacioDto> usuarisAfectats);
     public void notifyTasquesPendents(List<String> usuarisAfectats);
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent);
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent);
     public void notifyScanFinalitzat(ScanFinalitzatEvent firmaEvent);
     public AvisosActiusEvent getAvisosActiusEvent();
-    public long getAnotacionsPendents(String usuariCodi);
+    public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi);
     public long getTasquesPendents(String usuariCodi);
 }

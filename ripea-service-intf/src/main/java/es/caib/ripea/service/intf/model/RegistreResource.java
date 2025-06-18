@@ -55,13 +55,11 @@ public class RegistreResource extends BaseAuditableResource<Long> {
     private String destiCodi;
     private String destiDescripcio;
     private String justificantArxiuUuid;
+    @SuppressWarnings("unused")
+	private String destiCodiINom;
 
     private List<ResourceReference<RegistreInteressatResource, Long>> interessats;
     private List<ResourceReference<RegistreAnnexResource, Long>> annexos;
     
     @Transient private RegistreAnnexResource justificant;
-    
-    public String getDestiCodiINom() {
-        return destiCodi + " - " + destiDescripcio;
-    }
 }

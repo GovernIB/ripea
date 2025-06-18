@@ -11,10 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
-import es.caib.ripea.service.intf.base.model.FieldOption;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -30,7 +26,10 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreInteressatResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -505,7 +504,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 					expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
 
 					try {
-						eventHelper.notifyAnotacionsPendents(emailHelper.getCodisUsuarisAfectatsAnotacio(expedientPeticioId));
+						eventHelper.notifyAnotacionsPendents(emailHelper.dadesUsuarisAfectatsAnotacio(expedientPeticioId));
 					} catch (Exception ex) {}
 
 				} else {
