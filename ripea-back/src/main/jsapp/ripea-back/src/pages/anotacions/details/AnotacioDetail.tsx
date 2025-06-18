@@ -247,9 +247,6 @@ const Annexos = (props:any) => {
             readOnly
             autoHeight
 
-            onRowDoubleClick={(row: any) => {
-                if (row?.fitxerExtension == 'pdf') { handleOpen(row?.id) }
-            }}
             onRowCountChange={onRowCountChange}
         />
         {dialogAnnexFirma}
