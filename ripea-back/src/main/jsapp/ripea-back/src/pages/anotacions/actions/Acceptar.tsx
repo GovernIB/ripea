@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Grid} from "@mui/material";
-import {GridPage, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -102,7 +102,7 @@ const AcceptarTabAnnexos = () => {
         },
     ]
 
-    return <GridPage>
+    return <>
         <StyledMuiGrid
             resourceName={'registreAnnexResource'}
             filter={filter}
@@ -113,7 +113,7 @@ const AcceptarTabAnnexos = () => {
             readOnly
         />
         {dialog}
-    </GridPage>
+    </>
 }
 
 const columnsInteressats = [

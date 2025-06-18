@@ -187,6 +187,14 @@ const translationEn = {
                     label: "Change status to distribution",
                     ok: "The status has been changed successfully",
                 },
+                descargarAnnex: {
+                    label: "Download Annex",
+                    ok: "Annex downloaded successfully",
+                },
+                firma: {
+                    label: "Signatures",
+                    title: "Signatures",
+                }
             }
         },
         tasca: {

@@ -187,6 +187,14 @@ const translationCa = {
                     label: "Canviar estat a distribució",
                     ok: "L'estat ha canviat correctament",
                 },
+                descargarAnnex: {
+                    label: "Descarregar annex",
+                    ok: "Annex descarregat correctament",
+                },
+                firma: {
+                    label: "Signatures",
+                    title: "Signatures",
+                }
             }
         },
         tasca: {

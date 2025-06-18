@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -131,7 +132,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private ResourceReference<OrganGestorResource, Long> organGestor;
     	
     	private List<Long> interessats;
-        private Map<Long, String> annexos;
+        private Map<Long, String> annexos = new HashMap<>();
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;
     }

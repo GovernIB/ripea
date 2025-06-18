@@ -31,8 +31,7 @@ import java.util.List;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX,
-                        formClass = Serializable.class,
-                        requiresId = true),           
+                        requiresId = true),
 		}
 )
 public class RegistreAnnexResource extends BaseAuditableResource<Long> {

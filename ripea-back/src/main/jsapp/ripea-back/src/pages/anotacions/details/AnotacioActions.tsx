@@ -47,6 +47,31 @@ export const useActions = (refresh?: () => void) => {
         canviEstatDistribucio,
     }
 }
+export const useAnexxActions = () => {
+    const { t } = useTranslation();
+
+    const {
+        artifactReport: apiReport,
+    } = useResourceApiService('registreAnnexResource');
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const report = (id:any, code:any, mssg:any, fileType:any) => {
+        apiReport(id, {code, fileType})
+            .then((result) => {
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, mssg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
+
+    const download = (id:any) => report(id, 'DOWNLOAD_ANNEX', t('page.anotacio.action.descargarAnnex.ok'), 'PDF')
+
+    return {
+        download
+    }
+}
 
 const useAnotacioActions = (refresh?: () => void) => {
     const { t } = useTranslation();

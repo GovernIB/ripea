@@ -152,7 +152,7 @@ const translationEs = {
                 estat: "Estado",
                 registre: "Información registro",
                 interessats: "Interesados",
-                annexos: "Annexos",
+                annexos: "Anexos",
                 justificant: "Justificante",
             },
             detall: {
@@ -187,6 +187,14 @@ const translationEs = {
                     label: "Cambiar estado a distribución",
                     ok: "El estado ha cambiado correctamente",
                 },
+                descargarAnnex: {
+                    label: "Descargar Anexo",
+                    ok: "Anexo descargado correctamente",
+                },
+                firma: {
+                    label: "Firmas",
+                    title: "Firmas",
+                }
             }
         },
         tasca: {

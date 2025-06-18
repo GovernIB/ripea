@@ -85,7 +85,6 @@ const AnotacionsGrid = () => {
     const {actions, components} = useAnotacioActions(refresh);
 
     return <GridPage>
-
         <CardPage title={t('page.anotacio.filter.title')}>
             <AnotacioFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)
@@ -103,6 +102,8 @@ const AnotacionsGrid = () => {
                     namedQueries={namedQueries}
                     apiRef={apiRef}
 
+                    paginationActive
+
                     popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
                     popupEditUpdateActive
                     popupEditFormContent={<AnotacionsGridForm/>}
@@ -110,9 +111,8 @@ const AnotacionsGrid = () => {
                     toolbarHideCreate
                 />
             </Load>
+            {components}
         </CardPage>
-
-        {components}
     </GridPage>
 }
 

@@ -6,11 +6,12 @@ import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {useActions as useDocumentActions} from "../../contingut/details/ContingutActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
-import {useActions} from "./AnotacioActions.tsx";
+import {useActions, useAnexxActions} from "./AnotacioActions.tsx";
 import useRegistreInteressatDetail from "./RegistreInteressatDetail.tsx";
+import useVisualitzar from "../actions/Visualitzar.tsx";
+import useAnnexFirma from "./AnnexFirma.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -199,36 +200,61 @@ const annexosColumns = [
     },
 ];
 
+const annexosPerspective = ['FIRMES'];
 const annexosSortModel:any = [{field: 'id', sort: 'asc'}];
 const Annexos = (props:any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
 
-    const {apiDownload} = useDocumentActions()
+    const { handleOpen: handleAnnexFirma, dialog: dialogAnnexFirma } = useAnnexFirma();
+    const { handleOpen: handleVisualitzar, dialog: dialogVisualitzar } = useVisualitzar()
+    const {download} = useAnexxActions()
 
     const actions = [
         {
-            title: t('common.download'),
+            title: t('page.document.action.view.label'),
+            icon: "search",
+            showInMenu: true,
+            onClick: handleVisualitzar,
+            hidden: (row:any) => row?.fitxerExtension != 'pdf',
+        },
+        {
+            title: t('page.anotacio.action.firma.label'),
+            icon: "edit",
+            showInMenu: true,
+            onClick: handleAnnexFirma,
+            hidden: (row:any) => row?.firmaTipus == null,
+        },
+        {
+            title: t('page.anotacio.action.descargarAnnex.label'),
             icon: "download",
             showInMenu: true,
-            onClick: (id:any, row:any) => apiDownload(row?.document?.id,'adjunt', t('page.expedient.results.actionOk')),
-            hidden: (row:any) => !row?.document?.id,
+            onClick: download,
+            hidden: (row:any) => !row?.uuid,
         },
     ]
 
-    return <StyledMuiGrid
-        resourceName="registreAnnexResource"
-        columns={annexosColumns}
-        filter={builder.and(builder.eq('registre.id',entity?.id))}
-        staticSortModel={annexosSortModel}
-        toolbarHide
-        disableColumnSorting
-        rowAdditionalActions={actions}
-        readOnly
-        autoHeight
+    return <>
+        <StyledMuiGrid
+            resourceName="registreAnnexResource"
+            columns={annexosColumns}
+            filter={builder.and(builder.eq('registre.id',entity?.id))}
+            perspectives={annexosPerspective}
+            staticSortModel={annexosSortModel}
+            toolbarHide
+            disableColumnSorting
+            rowAdditionalActions={actions}
+            readOnly
+            autoHeight
 
-        onRowCountChange={onRowCountChange}
-    />
+            onRowDoubleClick={(row: any) => {
+                if (row?.fitxerExtension == 'pdf') { handleOpen(row?.id) }
+            }}
+            onRowCountChange={onRowCountChange}
+        />
+        {dialogAnnexFirma}
+        {dialogVisualitzar}
+    </>
 }
 
 const Justificant = (props:any) => {
