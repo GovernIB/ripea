@@ -1694,6 +1694,13 @@ public class ContingutHelper {
 				contingutOrigen,
 				contingutDesti,
 				recursiu);
+		
+		if (contingutDesti.getExpedient() == null) {
+			contingutCopia.updateExpedient((ExpedientEntity) contingutDesti);
+		} else {
+			contingutCopia.updateExpedient(contingutDesti.getExpedient());
+		}
+		
 		contingutLogHelper.log(
 				contingutCopia,
 				LogTipusEnumDto.COPIA,
