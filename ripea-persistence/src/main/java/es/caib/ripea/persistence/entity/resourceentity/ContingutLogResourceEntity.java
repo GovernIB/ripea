@@ -35,7 +35,7 @@ public class ContingutLogResourceEntity extends BaseAuditableEntity<ContingutLog
     private String param2;
 
     @Column(name = "objecte_id", length = 64)
-    private Long objecteId;
+    private String objecteId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "contingut_id")

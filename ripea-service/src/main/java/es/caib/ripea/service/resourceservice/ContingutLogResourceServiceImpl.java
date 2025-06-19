@@ -21,8 +21,8 @@ public class ContingutLogResourceServiceImpl extends BaseMutableResourceService<
 
     @Override
     protected void afterConversion(ContingutLogResourceEntity entity, ContingutLogResource resource) {
-        if(entity.getObjecteId()!=null) {
-            contingutRepository.findById(entity.getObjecteId())
+        if(entity.getObjecteId()!=null && !entity.getObjecteId().contains("#")) {
+            contingutRepository.findById(Long.valueOf(entity.getObjecteId()))
                     .ifPresent(contingut -> resource.setObjecteNom(contingut.getNom()));
         }
 

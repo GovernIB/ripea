@@ -15,7 +15,7 @@ import org.springframework.data.annotation.Transient;
 public class ContingutLogResource extends BaseAuditableResource<Long> {
 
     private LogTipusEnumDto tipus;
-    private Long objecteId;
+    private String objecteId;
     private LogObjecteTipusEnumDto objecteTipus;
     private LogTipusEnumDto objecteLogTipus;
     private String param1;
