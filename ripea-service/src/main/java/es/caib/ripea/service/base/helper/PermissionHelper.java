@@ -92,7 +92,6 @@ public class PermissionHelper {
 			if (targetType.endsWith(".EntitatResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".PinbalServeiResource")) { return userPermissions.isSuperAdmin(); }
 			if (targetType.endsWith(".AvisResource")) { return userPermissions.isSuperAdmin(); }
-			if (targetType.endsWith(".UsuariResource")) { return userPermissions.isSuperAdmin(); }
 			//Exclusius administradors
 			if (targetType.endsWith(".OrganGestorResource")) { return userPermissions.isAdmin(); }
 			if (targetType.endsWith(".GrupResource")) { return userPermissions.isAdmin(); }
@@ -109,6 +108,7 @@ public class PermissionHelper {
 			if (targetType.endsWith(".MetaExpedientResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			if (targetType.endsWith(".MetaExpedientTascaResource")) { return userPermissions.isAdmin() || userPermissions.isDisseny() || userPermissions.isRevisio(); }
 			//Usuari
+			if (targetType.endsWith(".UsuariResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".AlertaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".CarpetaResource")) { return userPermissions.isConsulta(); }
 			if (targetType.endsWith(".ContingutLogResource")) { return userPermissions.isConsulta(); }
