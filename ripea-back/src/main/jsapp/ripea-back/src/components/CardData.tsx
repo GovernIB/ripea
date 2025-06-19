@@ -24,7 +24,6 @@ const CardButton = (props:any) => {
 }
 
 const isEmpty = (value:any[]) => {
-    console.log("hiddenIfEmpty", value)
     return !value || value?.length === 0 || value?.every?.((item:any) => !item)
 }
 

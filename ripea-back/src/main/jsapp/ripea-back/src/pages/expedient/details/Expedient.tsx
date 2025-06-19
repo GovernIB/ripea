@@ -140,6 +140,7 @@ const ExpedientAlert = (props:any) => {
     </Load>
 }
 
+/* TODO: cambiar a parametro de expediente */
 export const potModificar = (entity:any) :boolean => {
     const { value: user, permisos } = useUserSession()
     const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';

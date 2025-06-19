@@ -16,10 +16,6 @@ const ExpedientFilterForm = () => {
         builder.eq('revisioEstat', "'REVISAT'"),
     );
 
-    // const filtErestatAdditional = builder.and(
-    //     builder.eq('metaExpedient.id', data?.metaExpedient?.id),
-    // );
-
     return <>
         <GridFormField xs={3} name="numero"/>
         <GridFormField xs={3} name="nom"/>
@@ -98,7 +94,7 @@ const ExpedientFilter = (props: any) => {
         springFilterBuilder={(data: any)=>springFilterBuilder(data, user)}
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
-        >
+    >
         <ExpedientFilterForm/>
     </StyledMuiFilter>
 }

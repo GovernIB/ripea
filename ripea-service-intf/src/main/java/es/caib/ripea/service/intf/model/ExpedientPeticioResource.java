@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
+import java.time.Year;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +126,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     	private String prioritatMotiu;
         @ResourceField(onChangeActive = true)
-    	private Integer any;
+    	private Integer any = Year.now().getValue();
     	private Long sequencia;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;

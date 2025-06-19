@@ -192,6 +192,7 @@ const Acceptar = (props:any) => {
         resourceName={"expedientPeticioResource"}
         action={"ACCEPTAR_ANOTACIO"}
         title={t('page.anotacio.action.acceptar.title')}
+        initialOnChange
         {...props}
     >
         <AcceptarForm/>
@@ -212,7 +213,7 @@ const useAcceptar = (refresh?: () => void) => {
     }
     const onSuccess = () :void => {
         refresh?.();
-        temporalMessageShow(null, t('page.anotacio.acceptar.rebutjar.ok'), 'success');
+        temporalMessageShow(null, t('page.anotacio.action.acceptar.ok'), 'success');
     }
 
     return {

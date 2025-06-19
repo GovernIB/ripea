@@ -7,6 +7,7 @@ import {formatDate} from "../util/dateUtils.ts";
 import StyledMuiGrid from "../components/StyledMuiGrid.tsx";
 import * as builder from "../util/springFilterUtils.ts";
 import {CardData, ContenidoData} from "../components/CardData.tsx";
+import Load from "../components/Load.tsx";
 
 const columnsAccions = [
     {
@@ -248,13 +249,15 @@ const useHistoric = () => {
                 }
             }}
         >
-            <TabComponent
-                indicatorColor={"primary"}
-                textColor={"primary"}
-                aria-label="scrollable force tabs"
-                tabs={tabs}
-                variant="scrollable"
-            />
+            <Load value={entity}>
+                <TabComponent
+                    indicatorColor={"primary"}
+                    textColor={"primary"}
+                    aria-label="scrollable force tabs"
+                    tabs={tabs}
+                    variant="scrollable"
+                />
+            </Load>
         </MuiDialog>
 
     return {

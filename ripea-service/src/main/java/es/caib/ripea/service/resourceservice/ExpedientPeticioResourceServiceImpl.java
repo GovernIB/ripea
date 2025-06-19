@@ -403,6 +403,10 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                         }
                         break;
                 }
+            } else {
+                if (previous.getAny() != null) {
+                    onChange(id, previous, AcceptarAnotacioForm.Fields.any, previous.getAny(), answers, previousFieldNames, target);
+                }
             }
         }
 
