@@ -47,7 +47,6 @@ public class EventHelper {
     	try {
     		AvisosActiusEvent event = getAvisosActiusEvent();
 	        log.debug("notifyAvisosActius a clients");
-//	        eventPublisher.publishEvent(event);
 	        jmsTemplate.convertAndSend("avisos", event);
     	} catch (Exception ex) {
     		log.error("Error al notifyAvisosActius a clients", ex);
@@ -71,7 +70,6 @@ public class EventHelper {
     		}
     		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacioUsuaris);
     		jmsTemplate.convertAndSend("anotacions", resultat);
-//    		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
     		log.error("Error al notifyAnotacionsPendents a clients", ex);
     	}
@@ -87,7 +85,6 @@ public class EventHelper {
     			}
     		}
     		TasquesPendentsEvent resultat = new TasquesPendentsEvent(tasquesUsuaris);
-//    		eventPublisher.publishEvent(resultat);
     		jmsTemplate.convertAndSend("tasques", resultat);
     	} catch (Exception ex) {
     		log.error("Error al notifyTasquesPendents a clients", ex);
@@ -97,7 +94,6 @@ public class EventHelper {
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
     	try {
     		jmsTemplate.convertAndSend("flux", fluxEvent);
-//    		eventPublisher.publishEvent(fluxEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
     	}
@@ -106,7 +102,6 @@ public class EventHelper {
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
     		jmsTemplate.convertAndSend("firma", firmaEvent);
-//    		eventPublisher.publishEvent(firmaEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
     	}
@@ -115,7 +110,6 @@ public class EventHelper {
     public void notifyScanFinalitzat(ScanFinalitzatEvent scanEvent) {
     	try {
     		jmsTemplate.convertAndSend("scan", scanEvent);
-//    		eventPublisher.publishEvent(scanEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyScanFinalitzat a expedients suscrits", ex);
     	}
@@ -136,16 +130,7 @@ public class EventHelper {
 					organGestorRepository.findById(usuariCodi.getOrganId()).get();
 				
 				UsuariEntity usuari = usuariRepository.getOne(usuariCodi.getCodi());
-				
-//				String rolActual = "IPA_USER";
-//				if (UsuariAnotacioDto.TipoUsuario.ADMIN.equals(usuariCodi.getTipusUsuari())) {
-//					rolActual = "IPA_ADMIN";
-//				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG.equals(usuariCodi.getTipusUsuari())) {
-//					rolActual = "IPA_ORGAN_ADMIN";
-//				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN.equals(usuariCodi.getTipusUsuari())) {
-//					rolActual = "IPA_ORGAN_ADMIN";
-//				}
-				
+
 				return cacheHelper.countAnotacionsPendents(
 						entitatEntity,
 						usuari.getRolActual(),

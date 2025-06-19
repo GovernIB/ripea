@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -131,21 +133,24 @@ public class SseResourceController {
     private void onSubscribeEmisorGlobal(String usuariCodi, SseEmitter emitter) {
         // Al moment de subscriure enviem un missatge de connexió
         try {
-            emitter.send(SseEmitter.event()
-                    .name(UserEventType.USER_CONNECT.getEventName())
-                    .data("Connexió establerta a " + LocalDateTime.now())
-                    .id(String.valueOf(System.currentTimeMillis())));
-            // Un cop renviat el missatge de connexió correctament, enviem un missatge amb les dades inicials
-            var avisosActius = eventService.getAvisosActiusEvent();
-            Long entitatActualId = aplicacioService.getEntitatActualId();
-            Long organActualId = aplicacioService.getOrganActualId();
-            String rolActualCodi = aplicacioService.getRolActualCodi();
-            UsuariAnotacioDto uaDto = new UsuariAnotacioDto(usuariCodi, rolActualCodi, organActualId, entitatActualId);
-            var anotacionsPendents = eventService.getAnotacionsPendents(uaDto);
-            var tasquesPendents = eventService.getTasquesPendents(usuariCodi);
-            emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisosActius));
-            emitter.send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));
-            emitter.send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(tasquesPendents));
+        	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        	if (auth!=null && !"anonymousUser".equals(auth.getName())) {
+	            emitter.send(SseEmitter.event()
+	                    .name(UserEventType.USER_CONNECT.getEventName())
+	                    .data("Connexió establerta a " + LocalDateTime.now())
+	                    .id(String.valueOf(System.currentTimeMillis())));
+	            // Un cop renviat el missatge de connexió correctament, enviem un missatge amb les dades inicials
+	            var avisosActius = eventService.getAvisosActiusEvent();
+	            Long entitatActualId = aplicacioService.getEntitatActualId();
+	            Long organActualId = aplicacioService.getOrganActualId();
+	            String rolActualCodi = aplicacioService.getRolActualCodi();
+	            UsuariAnotacioDto uaDto = new UsuariAnotacioDto(usuariCodi, rolActualCodi, organActualId, entitatActualId);
+	            var anotacionsPendents = eventService.getAnotacionsPendents(uaDto);
+	            var tasquesPendents = eventService.getTasquesPendents(usuariCodi);
+	            emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(avisosActius));
+	            emitter.send(SseEmitter.event().name(UserEventType.NOTIFICACIONS.getEventName()).data(anotacionsPendents));
+	            emitter.send(SseEmitter.event().name(UserEventType.TASQUES.getEventName()).data(tasquesPendents));
+        	}
         } catch (IOException e) {
             log.error("Error enviant esdeveniment inicial SSE", e);
             emitter.complete();
@@ -201,7 +206,6 @@ public class SseResourceController {
      */
 
     @Async
-//    @EventListener
     @JmsListener(destination = "avisos")
     public void handleEventAvisos(AvisosActiusEvent avisos) {
     	if (avisos!=null) {
@@ -223,7 +227,6 @@ public class SseResourceController {
     }
     
     @Async
-//    @EventListener
     @JmsListener(destination = "tasques")
     public void handleEventTasques(TasquesPendentsEvent tasques) {
     	if (tasques!=null && tasques.getTasquesPendentsUsuaris()!=null) {
@@ -249,7 +252,6 @@ public class SseResourceController {
     }
     
     @Async
-//    @EventListener
     @JmsListener(destination = "anotacions")
     public void handleEventNotificacions(AnotacionsPendentsEvent anotacions) {
     	if (anotacions!=null && anotacions.getAnotacionsPendentsUsuaris()!=null) {
@@ -276,7 +278,6 @@ public class SseResourceController {
     
     @Async
     @JmsListener(destination = "flux")
-//    @EventListener
     public void handleEventFlux(CreacioFluxFinalitzatEvent fluxEvent) {
     	if (fluxEvent!=null && fluxEvent.getExpedientId()!=null) {
     		logger.debug("Actualització de CreacioFluxFinalitzatEvent a expedients...");
@@ -309,7 +310,6 @@ public class SseResourceController {
     }
     
     @Async
-//    @EventListener
     @JmsListener(destination = "firma")
     public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
     	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
@@ -343,7 +343,6 @@ public class SseResourceController {
     }
     
     @Async
-//    @EventListener
     @JmsListener(destination = "scan")
     public void handleEventScan(ScanFinalitzatEvent scanEvent) {
     	if (scanEvent!=null && scanEvent.getExpedientId()!=null) {
