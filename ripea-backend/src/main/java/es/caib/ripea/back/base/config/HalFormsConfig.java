@@ -224,17 +224,20 @@ public class HalFormsConfig {
 							metadata -> {
 								// Aquí hem de tornar a calcular el remoteOptionsLink perquè si no ho feim
 								// l'enllaç no inclou el prefix 'http://localhost:8080/webcontext'
+								Map<String, Object> newResourceValues = HalFormsUtil.getNewResourceValues(optionsResourceClass);
 								Link repeatedRemoteOptionsLink = getRemoteFieldEnumOptionsLink(
 										resourceClass,
 										artifact,
 										resourceField,
 										resourceControllerClasses);
+								System.out.println(">>> " + optionsResourceClass);
 								return HalFormsOptions.
 										remote(repeatedRemoteOptionsLink).
 										withValueField("value").
 										withPromptField("description").
 										withMinItems(TypeUtil.isNotNullField(resourceField) ? 1L : 0L).
-										withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L);
+										withMaxItems(TypeUtil.isCollectionFieldType(resourceField) ? null : 1L).
+										withSelectedValue(newResourceValues.get(resourceField.getName()));
 							}));
 		}
 	}
