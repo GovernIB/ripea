@@ -59,7 +59,7 @@ const PerfilFrom = () =>{
 
 const usePerfil = () => {
     const { t } = useTranslation();
-    const { value: user } = useUserSession();
+    const { value: user, refresh } = useUserSession();
 
     const formApiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
@@ -67,7 +67,7 @@ const usePerfil = () => {
     const handleOpen = () => {
         formApiRef.current?.show(user?.codi)
             .then(() => {
-                // refresh?.()
+                refresh?.()
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {

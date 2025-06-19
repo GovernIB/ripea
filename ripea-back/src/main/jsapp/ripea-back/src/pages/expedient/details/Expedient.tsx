@@ -70,22 +70,20 @@ const ExpedientInfo = (props:any) => {
     const { t } = useTranslation();
 
     return <CardData title={t('page.expedient.detall.title')} direction={'column'} xs={xs}>
-        <Load value={expedient} noEffect>
-            <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
-            <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
-            <Contenido title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</Contenido>
-            <Contenido title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</Contenido>
-            <Contenido title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
-            <Contenido title={t('page.contingut.detalle.estat')}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></Contenido>
-            <Contenido title={t('page.contingut.detalle.prioritat')}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></Contenido>
-            <Contenido title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</Contenido>
+        <Contenido title={t('page.contingut.detalle.numero')}>{expedient?.numero}</Contenido>
+        <Contenido title={t('page.contingut.detalle.titol')}>{expedient?.nom}</Contenido>
+        <Contenido title={t('page.contingut.detalle.metaExpedient')}>{expedient?.metaExpedient?.description}</Contenido>
+        <Contenido title={t('page.contingut.detalle.organGestor')}>{expedient?.organGestor?.description}</Contenido>
+        <Contenido title={t('page.contingut.detalle.fechaApertura')}>{formatDate(expedient?.ntiFechaApertura)}</Contenido>
+        <Contenido title={t('page.contingut.detalle.estat')}><StyledEstat entity={expedient}>{t(`enum.estat.${expedient?.estat}`)}</StyledEstat></Contenido>
+        <Contenido title={t('page.contingut.detalle.prioritat')}><StyledPrioritat entity={expedient}>{t(`enum.prioritat.${expedient?.prioritat}`)}</StyledPrioritat></Contenido>
+        <Contenido title={t('page.contingut.detalle.clasificacio')}>{expedient?.ntiClasificacionSia}</Contenido>
 
-            <ExpedientsRelacionats entity={expedient}/>
+        <ExpedientsRelacionats entity={expedient}/>
 
-            <Grid item xs={12} display={'flex'} justifyContent={'end'}>
-                <ExpedientActionButton entity={expedient}/>
-            </Grid>
-        </Load>
+        <Grid item xs={12} display={'flex'} justifyContent={'end'}>
+            <ExpedientActionButton entity={expedient}/>
+        </Grid>
     </CardData>
 }
 
@@ -103,7 +101,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
-    return <Load value={expedient} noEffect>
+    return <>
         {expedient?.agafatPer?.id != user?.codi &&
             <Alert severity="info"
                    action={
@@ -137,7 +135,7 @@ const ExpedientAlert = (props:any) => {
         }
         {dialogAlert}
         {dialogErrorValidacio}
-    </Load>
+    </>
 }
 
 /* TODO: cambiar a parametro de expediente */
@@ -246,6 +244,7 @@ const Expedient = () => {
     return <GridPage>
         <SseExpedient id={id}/>
 
+        <Load value={expedient} noEffect>
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
                 <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
@@ -286,6 +285,7 @@ const Expedient = () => {
                 />
             </Grid>
         </CardData>
+        </Load>
     </GridPage>
 }
 

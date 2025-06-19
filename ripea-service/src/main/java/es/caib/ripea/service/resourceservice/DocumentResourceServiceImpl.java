@@ -8,7 +8,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,6 @@ import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
@@ -95,13 +93,11 @@ import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaSimple;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
-import es.caib.ripea.service.intf.model.DocumentResource.ParentPath;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
 import es.caib.ripea.service.intf.model.ExpedientResource;
@@ -182,7 +178,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi, new ViaFirmaDispositiuOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
-    
+
     public class InitialOnChangeDocumentResourceLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
 		@Override
 		public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
@@ -294,53 +290,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            if (entity.getPare()!=null){
-                List<ParentPath> parentPaths = getPath(entity).stream()
-                        .filter((a)-> !Objects.equals(a.getId(), entity.getExpedient().getId()))
-                        .collect(Collectors.toList());
-                parentPaths.forEach(
-                        (a)->setTreePath(a, parentPaths)
-                );
-
-                resource.setParentPath(parentPaths);
-                resource.setTreePath(parentPaths.stream()
-                        .map(ParentPath::getId)
-                        .collect(Collectors.toList()));
-            }
-        }
-
-        public <E extends ContingutResourceEntity> List<ParentPath> getPath(E entity) {
-            List<ParentPath> path = new ArrayList<ParentPath>();
-            getPathPare(entity, path);
-            Collections.reverse(path);
-            return path;
-        }
-        public <E extends ContingutResourceEntity> void getPathPare(E entity, List<ParentPath> path) {
-            if (entity != null) {
-                ParentPath pathEntry = new ParentPath(
-                        entity.getId(),
-                        entity.getNom(),
-                        entity.getCreatedBy(),
-                        entity.getCreatedDate(),
-                        entity.getTipus(),
-                        entity.getArxiuUuid(),
-                        new ArrayList<>()
-                );
-                pathEntry.setId(entity.getId());
-                path.add(pathEntry);
-                getPathPare(entity.getPare(), path);
-            }
-        }
-        public void setTreePath(ParentPath entity, List<ParentPath> path){
-            Boolean notFound = true;
-            int arrayIndex = 0;
-            List<Long> result = new ArrayList<>();
-            while (notFound && path.size()>arrayIndex){
-                result.add(path.get(arrayIndex).getId());
-                notFound = !Objects.equals(entity.getId(), path.get(arrayIndex).getId());
-                arrayIndex++;
-            }
-            entity.setTreePath(result);
+            resource.setTreePath(contingutResourceHelper.getTreePath(entity));
         }
     }
     private class ArxiuDocumentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {

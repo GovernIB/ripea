@@ -2,13 +2,16 @@ package es.caib.ripea.service.resourceservice;
 
 import java.util.Map;
 
+import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.model.CarpetaResource;
+import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CarpetaHelper;
@@ -16,12 +19,13 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.model.CarpetaResource;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
 
 @Slf4j
 @Service
@@ -33,6 +37,12 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final CarpetaHelper carpetaHelper;
 	private final ConfigHelper configHelper;
+	private final ContingutResourceHelper contingutResourceHelper;
+
+    @PostConstruct
+    public void init() {
+        register(CarpetaResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
+    }
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
@@ -69,5 +79,12 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/create", ex);
     	}
     	return null;
+    }
+
+    private class PathPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
+        @Override
+        public void applySingle(String code, CarpetaResourceEntity entity, CarpetaResource resource) throws PerspectiveApplicationException {
+            resource.setTreePath(contingutResourceHelper.getTreePath(entity));
+        }
     }
 }

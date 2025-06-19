@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -22,6 +23,8 @@ import org.springframework.data.annotation.Transient;
 @ResourceConfig(quickFilterFields = { "nom" }, descriptionField = "nom")
 public class ContingutResource extends BaseAuditableResource<Long> {
 
+    public static final String PERSPECTIVE_PATH_CODE = "PATH";
+
 	@NotNull
 	@Size(max = 1024)
 	protected String nom;
@@ -41,6 +44,7 @@ public class ContingutResource extends BaseAuditableResource<Long> {
 
     @Transient
     private boolean conteDocumentsDefinitius;
+    @Transient public List<Long> treePath;
 	
 //	@NotNull
 	protected ResourceReference<EntitatResource, Long> entitat;

@@ -120,7 +120,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             // onClick: ,
             disabled: !entity?.arxiuPropagat,
-            hidden: (row:any) => row?.arxiuPropagat && row?.representantInfo?.arxiuPropagat,
+            hidden: (row:any) => row?.arxiuPropagat && ( !row?.representant || row?.representantInfo?.arxiuPropagat ),
         },
         {
             title: t('common.detail'),

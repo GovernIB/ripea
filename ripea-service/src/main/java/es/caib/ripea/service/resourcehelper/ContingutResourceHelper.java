@@ -2,6 +2,7 @@ package es.caib.ripea.service.resourcehelper;
 
 import es.caib.plugins.arxiu.api.*;
 import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -337,5 +339,18 @@ public class ContingutResourceHelper {
             }
         }
         return versions;
+    }
+
+    public <E extends ContingutResourceEntity> List<Long> getTreePath(E entity) {
+        List<Long> path = new ArrayList<Long>();
+        getPathPare(entity, path);
+        Collections.reverse(path);
+        return path;
+    }
+    private <E extends ContingutResourceEntity> void getPathPare(E entity, List<Long> path) {
+        if (entity != null) {
+            path.add(entity.getId());
+            getPathPare(entity.getPare(), path);
+        }
     }
 }

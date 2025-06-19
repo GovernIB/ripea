@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
 import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -196,6 +196,45 @@ const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
 
+    const {
+        isReady: apiExpedientIsReady,
+        find: apiExpedientFindAll,
+    } = useResourceApiService('expedientResource');
+    const [expedients, setExpedients] = useState<any[]>([]);
+
+    const findExpedients = () => {
+        apiExpedientFindAll({perspectives, unpaged: true,
+            filter: builder.and(
+                builder.eq('expedient.id', entity?.id),
+                builder.eq('esborrat', 0),
+            )})
+            .then((result)=> setExpedients(result.rows))
+            .catch(()=> setExpedients([]))
+    }
+    useEffect(() => {
+        if (apiExpedientIsReady) {findExpedients()}
+    }, [apiExpedientIsReady]);
+
+    const {
+        isReady: apiCarpetaIsReady,
+        find: apiCarpetaFindAll,
+    } = useResourceApiService('carpetaResource');
+    const [carpetes, setCarpetes] = useState<any[]>([]);
+
+    const findCarpetas = () => {
+        apiCarpetaFindAll({perspectives, unpaged: true,
+            filter: builder.and(
+                builder.eq('expedient.id', entity?.id),
+                builder.eq('esborrat', 0),
+            )})
+            .then((result)=> setCarpetes(result.rows))
+            .catch(()=> setCarpetes([]))
+    }
+
+    useEffect(() => {
+        if (apiCarpetaIsReady) {findCarpetas()}
+    }, [apiCarpetaIsReady]);
+
     const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
 
     const gridApiRef = useMuiDataGridApiRef();
@@ -205,6 +244,8 @@ const DocumentsGrid = (props: any) => {
     const [vista, setVista] = useState<string>("carpeta");
 
     const refresh = () => {
+        findExpedients()
+        findCarpetas()
         gridApiRef?.current?.refresh?.();
     }
     const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, gridApiRef, refresh);
@@ -223,7 +264,7 @@ const DocumentsGrid = (props: any) => {
     }, [expand]);
 
     return <GridPage>
-        <Load value={entity}>
+        <Load value={entity && apiExpedientIsReady && apiCarpetaIsReady}>
             <DropZone onDrop={onDrop} disabled={!potModificar(entity)}>
                 <StyledMuiGrid
                     resourceName="documentResource"
@@ -263,13 +304,13 @@ const DocumentsGrid = (props: any) => {
                     treeDataAdditionalRows={(_rows: any) => {
                         const additionalRows: any[] = [];
 
-                        if (_rows != null && vista == "carpeta") {
-                            for (const row of _rows) {
-                                const aditionalRow = row.parentPath
-                                    ?.filter((a: any) => a.id != row.id
-                                        && !additionalRows.map((b) => b.id).includes(a.id))
-                                aditionalRow && additionalRows.push(...aditionalRow);
+                        if (vista == "carpeta") {
+                            for (const contingut of [...carpetes, ...expedients]) {
+                                if (entity?.id!= contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
+                                    additionalRows.push(contingut)
+                                }
                             }
+
                             setTreeView(additionalRows?.length > 0)
                         } else {
                             setTreeView(true)
@@ -281,7 +322,7 @@ const DocumentsGrid = (props: any) => {
                         switch (vista) {
                             case "estat": return [`${row.estat}`, `${row.nom}`];
                             case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
-                            default: return row.treePath;
+                            default: return row.treePath.filter((id:any)=>id!=entity?.id);
                         }
                     }}
 
