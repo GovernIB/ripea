@@ -47,7 +47,7 @@ import lombok.experimental.FieldNameConstants;
                         code = DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
-                        code = DocumentResource.PERSPECTIVE_PATH_CODE),
+                        code = ContingutResource.PERSPECTIVE_PATH_CODE),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
@@ -56,12 +56,10 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_GET_CSV_LINK,
-                        formClass = Serializable.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = DocumentResource.ACTION_CONVERTIR_DEFINITIU,
-                        formClass = Serializable.class,
                         requiresId = true),                
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -123,7 +121,6 @@ public class DocumentResource extends NodeResource {
 	public static final String PERSPECTIVE_COUNT_CODE = "COUNT";
     public static final String PERSPECTIVE_VERSIONS_CODE = "VERSIONS";
     public static final String PERSPECTIVE_ARXIU_DOCUMENT_CODE = "ARXIU_DOCUMENT";
-    public static final String PERSPECTIVE_PATH_CODE = "PATH";
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
     public static final String ACTION_RESUM_IA = "RESUM_IA";
@@ -247,8 +244,6 @@ public class DocumentResource extends NodeResource {
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	private ResourceReference<ExpedientEstatResource, Long> expedientEstatAdditional;
 
-    @Transient private List<ParentPath> parentPath;
-    @Transient public List<Long> treePath;
     @NotNull
     @Transient
     @ResourceField(onChangeActive = true)
@@ -268,20 +263,6 @@ public class DocumentResource extends NodeResource {
     @Transient private String digitalitzacioPerfil;
     @Transient private String digitalitzacioProcesUrl;
     @Transient private MetaDocumentResource metaDocumentInfo;
-    
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class ParentPath {
-        private Long id;
-        private String nom;
-        private String createdBy;
-        private LocalDateTime createdDate;
-        private ContingutTipusEnumDto tipus;
-        private String arxiuUuid;
-
-        public List<Long> treePath;
-    }
 
     public String getFitxerExtension() {
         if (fitxerNom != null) {

@@ -8,16 +8,17 @@ import java.util.Map;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AvisRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.AvisDto;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
@@ -32,8 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class EventHelper {
 
-	@Autowired private ApplicationEventPublisher eventPublisher;
+	@Autowired private JmsTemplate jmsTemplate;
 	@Autowired private AvisRepository avisRepository;
+	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
@@ -43,9 +45,10 @@ public class EventHelper {
 
     public void notifyAvisosActius() {
     	try {
-	        var event = getAvisosActiusEvent();
+    		AvisosActiusEvent event = getAvisosActiusEvent();
 	        log.debug("notifyAvisosActius a clients");
-	        eventPublisher.publishEvent(event);
+//	        eventPublisher.publishEvent(event);
+	        jmsTemplate.convertAndSend("avisos", event);
     	} catch (Exception ex) {
     		log.error("Error al notifyAvisosActius a clients", ex);
     	}
@@ -67,7 +70,8 @@ public class EventHelper {
     			}
     		}
     		AnotacionsPendentsEvent resultat = new AnotacionsPendentsEvent(anotacioUsuaris);
-    		eventPublisher.publishEvent(resultat);
+    		jmsTemplate.convertAndSend("anotacions", resultat);
+//    		eventPublisher.publishEvent(resultat);
     	} catch (Exception ex) {
     		log.error("Error al notifyAnotacionsPendents a clients", ex);
     	}
@@ -83,7 +87,8 @@ public class EventHelper {
     			}
     		}
     		TasquesPendentsEvent resultat = new TasquesPendentsEvent(tasquesUsuaris);
-    		eventPublisher.publishEvent(resultat);
+//    		eventPublisher.publishEvent(resultat);
+    		jmsTemplate.convertAndSend("tasques", resultat);
     	} catch (Exception ex) {
     		log.error("Error al notifyTasquesPendents a clients", ex);
     	}
@@ -91,7 +96,8 @@ public class EventHelper {
     
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
     	try {
-    		eventPublisher.publishEvent(fluxEvent);
+    		jmsTemplate.convertAndSend("flux", fluxEvent);
+//    		eventPublisher.publishEvent(fluxEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
     	}
@@ -99,7 +105,8 @@ public class EventHelper {
     
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
-    		eventPublisher.publishEvent(firmaEvent);
+    		jmsTemplate.convertAndSend("firma", firmaEvent);
+//    		eventPublisher.publishEvent(firmaEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyFirmaNavegadorFinalitzada a expedients suscrits", ex);
     	}
@@ -107,7 +114,8 @@ public class EventHelper {
     
     public void notifyScanFinalitzat(ScanFinalitzatEvent scanEvent) {
     	try {
-    		eventPublisher.publishEvent(scanEvent);
+    		jmsTemplate.convertAndSend("scan", scanEvent);
+//    		eventPublisher.publishEvent(scanEvent);
     	} catch (Exception ex) {
     		log.error("Error al notifyScanFinalitzat a expedients suscrits", ex);
     	}
@@ -127,18 +135,20 @@ public class EventHelper {
 				if (usuariCodi.getOrganId()!=null)
 					organGestorRepository.findById(usuariCodi.getOrganId()).get();
 				
-				String rolActual = "IPA_USER";
-				if (UsuariAnotacioDto.TipoUsuario.ADMIN.equals(usuariCodi.getTipusUsuari())) {
-					rolActual = "IPA_ADMIN";
-				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG.equals(usuariCodi.getTipusUsuari())) {
-					rolActual = "IPA_ORGAN_ADMIN";
-				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN.equals(usuariCodi.getTipusUsuari())) {
-					rolActual = "IPA_ORGAN_ADMIN";
-				}
+				UsuariEntity usuari = usuariRepository.getOne(usuariCodi.getCodi());
+				
+//				String rolActual = "IPA_USER";
+//				if (UsuariAnotacioDto.TipoUsuario.ADMIN.equals(usuariCodi.getTipusUsuari())) {
+//					rolActual = "IPA_ADMIN";
+//				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG.equals(usuariCodi.getTipusUsuari())) {
+//					rolActual = "IPA_ORGAN_ADMIN";
+//				} else if (UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN.equals(usuariCodi.getTipusUsuari())) {
+//					rolActual = "IPA_ORGAN_ADMIN";
+//				}
 				
 				return cacheHelper.countAnotacionsPendents(
 						entitatEntity,
-						rolActual,
+						usuari.getRolActual(),
 						usuariCodi.getCodi(),
 						organGestorEntity!=null?organGestorEntity.getId():null);
 			}

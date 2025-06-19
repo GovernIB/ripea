@@ -3,13 +3,15 @@ package es.caib.ripea.service.intf.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-public class FirmaResultatDto {
-	
+public class FirmaResultatDto implements Serializable {
+
+	private static final long serialVersionUID = 2565695781220244304L;
 	private StatusEnumDto status;
 	private String msg;
 	private List<FirmaSignatureStatus> signatures = new ArrayList<>();
@@ -26,7 +28,8 @@ public class FirmaResultatDto {
 	
 	@Getter
 	@Setter
-	public static class FirmaSignatureStatus {
+	public static class FirmaSignatureStatus implements Serializable {
+		private static final long serialVersionUID = 7762792722135945578L;
 		public FirmaSignatureStatus(
 				String signID,
 				StatusEnumDto status,

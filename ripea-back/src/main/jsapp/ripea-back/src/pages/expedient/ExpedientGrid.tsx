@@ -36,7 +36,7 @@ export const ExpedientGridForm = () => {
         <GridFormField xs={12} name="sequencia" disabled/>
         <GridFormField xs={12} name="any" thousandSeparator={false}/>
         <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" hidden={data?.prioritat == 'B_NORMAL'} required/>
+        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
     </Grid>
 }
 

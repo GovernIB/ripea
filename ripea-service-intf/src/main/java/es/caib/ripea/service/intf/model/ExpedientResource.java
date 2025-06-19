@@ -42,6 +42,9 @@ import lombok.experimental.FieldNameConstants;
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,
 						formClass = ExpedientResource.ExportarDocumentMassiu.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = ContingutResource.PERSPECTIVE_PATH_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_NOTIFICACIONS_CADUCADES),

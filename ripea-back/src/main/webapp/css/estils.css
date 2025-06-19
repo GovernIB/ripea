@@ -11,7 +11,7 @@
 	position: absolute;
     display: none; /* Oculto por defecto */
     background-color: white;
-/*     border: 1px solid; */
+    border: 1px solid #707070;
     z-index: 1050;
     width: fit-content;
 	min-height: 295px;

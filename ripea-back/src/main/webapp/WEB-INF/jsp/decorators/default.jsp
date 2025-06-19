@@ -436,30 +436,33 @@ body {
 		<div class="menuPrincipalCos">
 			<c:choose>
 				<c:when test="${isRolActualSuperusuari}">
-					
-					<%---- Entitats ----%>
-					<a href="<c:url value="/entitat"/>" ><spring:message code="decorator.menu.entitats"/></a>
-					<div class="btn-group">
-						<a data-toggle="dropdown" class="dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<%---- Integracions ----%>
+				<ul>
+					<li>
+						<a href="<c:url value="/entitat"/>" ><spring:message code="decorator.menu.entitats"/></a>
+					</li>
+					<li>
+						<a href="<c:url value="/avis"/>"><spring:message code="decorator.menu.avisos"/></a>
+					</li>
+					<li style="display: inline-table;width: 100%;">
+						<span class="fa fa-caret-right"></span>
+						<a href="#" class="capMenuDesplegable"><spring:message code="decorator.menu.monitoritzar"/></a>
+						<ul class="ul_capMenuDesplegable" style="display:none;">					
 							<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
-							<%---- Excepcions ----%>
 							<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>				
 							<li><a href="<c:url value="/monitor"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.monitor"/></a></li>											
 						</ul>
-					</div>
-					<div class="btn-group">
-						<a data-toggle="dropdown" class="dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></a>
-						<ul class="dropdown-menu">
+					</li>
+					<li style="display: inline-table;width: 100%;">
+						<span class="fa fa-caret-right"></span>
+						<a href="#" class="capMenuDesplegable"><spring:message code="decorator.menu.config"/></a>
+						<ul class="ul_capMenuDesplegable" style="display:none;">	
 							<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
 							<li><a href="<c:url value="/pinbalServei"/>"><spring:message code="decorator.menu.pinbal.servei"/></a></li>
 							<li><a href="<c:url value="/scheduled"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.reinici.scheduler"/> ...</a></li>
 							<li><a href="<c:url value="/plugin"/>" data-toggle="modal"><spring:message code="decorator.menu.reinici.plugin"/> ...</a></li>
 						</ul>
-					</div>
-					
-					<a href="<c:url value="/avis"/>"><spring:message code="decorator.menu.avisos"/></a>
+					</li>
+				</ul>
 				</c:when>
 				<c:when test="${isRolActualAdministrador}">
 					<%---- Expedients ----%>
@@ -639,7 +642,7 @@ body {
 	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
 		<div class="container container-caib">
 
-			<div class="navbar-header" style="width: 25%;">
+			<div class="navbar-header" style="width: 40%;">
 				<div class="navbar-collapse collapse">
 					<div class="navbar-brand" style="padding: 0px !important;width: 100%;">
 						<div id="govern-logo" class="pull-left">
@@ -660,7 +663,7 @@ body {
 				</div>
 			</div>
 	
-			<div class="navbar-header" style="width: 70%;">
+			<div class="navbar-header" style="width: 55%;">
 				<div class="navbar-collapse collapse">
 					<div class="navbar-brand" style="padding: 0px !important; width: 100%;">
 						<ul class="navbar-brand-ul pull-right">

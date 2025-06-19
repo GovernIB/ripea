@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -201,7 +201,8 @@ public class SseResourceController {
      */
 
     @Async
-    @EventListener
+//    @EventListener
+    @JmsListener(destination = "avisos")
     public void handleEventAvisos(AvisosActiusEvent avisos) {
     	if (avisos!=null) {
     		logger.debug("Actualització de AvisosActiusEvent a usuaris...");
@@ -222,7 +223,8 @@ public class SseResourceController {
     }
     
     @Async
-    @EventListener
+//    @EventListener
+    @JmsListener(destination = "tasques")
     public void handleEventTasques(TasquesPendentsEvent tasques) {
     	if (tasques!=null && tasques.getTasquesPendentsUsuaris()!=null) {
     		logger.debug("Actualització de TasquesPendentsEvent a usuaris...");
@@ -247,7 +249,8 @@ public class SseResourceController {
     }
     
     @Async
-    @EventListener
+//    @EventListener
+    @JmsListener(destination = "anotacions")
     public void handleEventNotificacions(AnotacionsPendentsEvent anotacions) {
     	if (anotacions!=null && anotacions.getAnotacionsPendentsUsuaris()!=null) {
     		logger.debug("Actualització de AnotacionsPendentsEvent a usuaris...");
@@ -272,7 +275,8 @@ public class SseResourceController {
     }
     
     @Async
-    @EventListener
+    @JmsListener(destination = "flux")
+//    @EventListener
     public void handleEventFlux(CreacioFluxFinalitzatEvent fluxEvent) {
     	if (fluxEvent!=null && fluxEvent.getExpedientId()!=null) {
     		logger.debug("Actualització de CreacioFluxFinalitzatEvent a expedients...");
@@ -305,7 +309,8 @@ public class SseResourceController {
     }
     
     @Async
-    @EventListener
+//    @EventListener
+    @JmsListener(destination = "firma")
     public void handleEventFirma(FirmaFinalitzadaEvent firmaEvent) {
     	if (firmaEvent!=null && firmaEvent.getExpedientId()!=null) {
     		logger.debug("Actualització de FirmaFinalitzadaEvent a expedients...");
@@ -338,7 +343,8 @@ public class SseResourceController {
     }
     
     @Async
-    @EventListener
+//    @EventListener
+    @JmsListener(destination = "scan")
     public void handleEventScan(ScanFinalitzatEvent scanEvent) {
     	if (scanEvent!=null && scanEvent.getExpedientId()!=null) {
     		logger.debug("Actualització de ScanFinalitzatEvent a expedients...");

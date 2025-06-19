@@ -1,5 +1,17 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Formula;
+
 import es.caib.ripea.persistence.base.entity.BaseAuditableEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.RegistreInteressatResource;
@@ -8,8 +20,6 @@ import es.caib.ripea.service.intf.registre.RegistreInteressatTipusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "registre_interessat")
@@ -68,5 +78,6 @@ public class RegistreInteressatResourceEntity extends BaseAuditableEntity<Regist
     private RegistreResourceEntity registre;
     @Column(name = "organ_codi", length = 9)
     private String organCodi;
-
+    @Formula("DOC_NUMERO||' - '||COALESCE(NOM, RAO_SOCIAL)||' '||COALESCE(LLINATGE1, '')||' '||COALESCE(LLINATGE2, '')")
+    private String codiNom;
 }
