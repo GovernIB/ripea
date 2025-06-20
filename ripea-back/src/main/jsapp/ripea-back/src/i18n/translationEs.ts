@@ -613,6 +613,10 @@ const translationEs = {
                     title: "Enviar documento a portafirmas",
                     ok: "Documento '{{document}}' enviado a portafirmas",
                 },
+                toPDF: {
+                    description: "Se cambiará el formato del documento antes de enviarlo al portafirmas",
+                    title: "Visualizar versión PDF",
+                },
                 firmar: {
                     label: "Firma desde el navegador...",
                 },
@@ -859,7 +863,7 @@ const translationEs = {
                 logout: "Desconectar"
             },
             menu: {
-                entitat: "Entidad",
+                entitat: "Entidades",
                 expedient: "Expedientes",
                 monitoritzar: "Monitorizar",
                 integracions: "Integraciones",
