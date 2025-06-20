@@ -1411,7 +1411,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     }
                     break;
                 case ExpedientFilterForm.Fields.agafat:
-                    if(previous.getAgafatPer()!=null && (Boolean) fieldValue){
+                    if(previous.getAgafatPer()!=null && fieldValue!=null && (Boolean) fieldValue){
                         target.setAgafatPer(null);
                     }
                     break;
