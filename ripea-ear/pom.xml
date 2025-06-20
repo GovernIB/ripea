@@ -71,6 +71,9 @@
 							<build>
 								<from>280421/jboss-eap-caib-7.2</from>
 								<maintainer>limit@limit.es</maintainer>
+								<args>
+									<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
+								</args>
 								<ports>
 									<port>8080</port>
 									<port>8787</port>
