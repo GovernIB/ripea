@@ -131,7 +131,6 @@
 										<targetDir>/</targetDir>
 										<user>jboss:nogroup</user>
 									</assembly>
-
 									<assembly>
 										<descriptorRef>artifact</descriptorRef>
 										<targetDir>$JBOSS_HOME/standalone/deployments</targetDir>
