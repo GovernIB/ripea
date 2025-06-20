@@ -61,7 +61,7 @@ public class EventHelper {
     	//Aquesta funció es crida desde EmailHelper. Notificam als mateixos que rebràn el mail. TODO: ¿eliminar enviament de mail?  
     	//Grup, organ gestor i tenint en compte rols.
     	try {
-    		log.debug("notifyTasquesPendents a clients");
+    		log.debug("notifyAnotacionsPendents a clients");
     		Map<String, Long> anotacioUsuaris = new HashMap<String, Long>();
     		if (usuarisAfectats!=null) {
     			for (UsuariAnotacioDto usuari: usuarisAfectats) {

@@ -383,51 +383,26 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				"redirect:../../../contingut/" + documentId,
 				"document.controller.viafirma.reintentar.ok");
 	}
-//	
-//	@RequestMapping(value = "/{documentId}/custodia/reintentar", method = RequestMethod.GET)
-//	public String custodiaReintentar(
-//			HttpServletRequest request,
-//			@PathVariable Long documentId,
-//			Model model) {
-//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-//		documentService.portafirmesReintentar(
-//				entitatActual.getId(),
-//				documentId, 
-//				RolHelper.getRolActual(request), 
-//				null);
-//		return this.getAjaxControllerReturnValueSuccess(
-//				request,
-//				"redirect:../../../../../../../contingut/" + documentId,
-//				"document.controller.custodia.reintentar.ok");
-//	}
-//
-//	@RequestMapping(value = "/{documentId}/custodia/info", method = RequestMethod.GET)
-//	public String custodiaInfo(
-//			HttpServletRequest request,
-//			@PathVariable Long documentId,
-//			Model model) {
-//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-//		DocumentDto document = documentService.findById(
-//				entitatActual.getId(),
-//				documentId, 
-//				null);
-//		return "redirect:" + document.getCustodiaUrl();
-//	}
 
 	@RequestMapping(value = "/{documentId}/pdf", method = RequestMethod.GET)
-	public String convertirPdf(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long documentId) throws IOException {
+	public String convertirPdf(HttpServletRequest request, HttpServletResponse response, @PathVariable Long documentId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		FitxerDto convertit = documentService.convertirPdfPerFirmaClient(
-				entitatActual.getId(),
-				documentId);
-		writeFileToResponse(
-				convertit.getNom(),
-				convertit.getContingut(),
-				response);
+		FitxerDto convertit = documentService.convertirPdfPerFirmaClient(entitatActual.getId(),documentId);
+		writeFileToResponse(convertit.getNom(), convertit.getContingut(),response);
 		return null;
+	}
+	
+	@RequestMapping(value = "/convertir/pdf/{documentId}", method = RequestMethod.GET)
+	public void convertirPdfPrevisualitzar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long documentId) throws Exception {
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FitxerDto fitxer = documentService.convertirPdfPerFirmaClient(entitatActual.getId(), documentId);
+			response.setContentType("application/pdf");
+			response.setHeader("Content-Disposition", "inline; filename=\""+fitxer.getNom()+"\"");
+			response.getOutputStream().write(fitxer.getContingut());
+		} catch (Exception e) {
+			logger.error("Errol al descarregarBase64", e);
+		}
 	}
 
 	@RequestMapping(value = "/{documentId}/firmaSimpleWeb", method = RequestMethod.GET)
