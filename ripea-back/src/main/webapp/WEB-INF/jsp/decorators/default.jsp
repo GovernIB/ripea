@@ -438,10 +438,10 @@ body {
 				<c:when test="${isRolActualSuperusuari}">
 				<ul>
 					<li>
-						<a href="<c:url value="/entitat"/>" ><spring:message code="decorator.menu.entitats"/></a>
+						<span class="fa fa-institution"></span><a href="<c:url value="/entitat"/>" ><spring:message code="decorator.menu.entitats"/></a>
 					</li>
 					<li>
-						<a href="<c:url value="/avis"/>"><spring:message code="decorator.menu.avisos"/></a>
+						<span class="fa fa-bullhorn"></span><a href="<c:url value="/avis"/>"><spring:message code="decorator.menu.avisos"/></a>
 					</li>
 					<li style="display: inline-table;width: 100%;">
 						<span class="fa fa-caret-right"></span>

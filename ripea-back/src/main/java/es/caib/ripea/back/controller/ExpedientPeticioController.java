@@ -1148,20 +1148,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
 	public void descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
 		try {
-
 			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, true);
-
-//			String fileNameTractat = URLEncoder.encode(fitxer.getNom(), "UTF-8").replace("+", " ");
-//			response.setHeader("Content-Disposition", "inline; filename=\""+fileNameTractat+"\"");
-//			response.getOutputStream().write(fitxer.getContingut());
-//			response.setHeader("X-Frame-Options", "ALLOW"); //Permet carregar la resposta en un Iframe
-//			response.setContentLength(fitxer.getContingut().length);
-//			response.setContentType("application/pdf");
-			
 			response.setContentType("application/pdf");
 			response.setHeader("Content-Disposition", "inline; filename=\""+fitxer.getNom()+"\"");
 			response.getOutputStream().write(fitxer.getContingut());
-			
 		} catch (Exception e) {
 			logger.error("Errol al descarregarBase64", e);
 		}
