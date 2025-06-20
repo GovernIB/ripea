@@ -3,6 +3,7 @@ package es.caib.ripea;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
@@ -42,8 +43,8 @@ import java.util.jar.Manifest;
 		TransactionAutoConfiguration.class,
 		LiquibaseAutoConfiguration.class,
 		FreeMarkerAutoConfiguration.class,
-		WebSocketServletAutoConfiguration.class
-//		JerseyServerMetricsAutoConfiguration.class
+		WebSocketServletAutoConfiguration.class,
+		JerseyServerMetricsAutoConfiguration.class
 })
 @ComponentScan(
 		basePackages = { BaseConfig.BASE_PACKAGE },

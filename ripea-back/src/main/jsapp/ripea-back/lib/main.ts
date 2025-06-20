@@ -42,6 +42,7 @@ export { numberFormat, numberFormatCurrency } from './util/numberFormat';
 export { dateFormatLocale, timeFormatLocale, isoDateToDate, isoDateTimeToDate } from './util/dateFormat';
 export { parseIsoDuration } from './util/durationFormat';
 export { toolbarBackgroundStyle } from './util/toolbar';
+export { useSmallScreen, useSmallHeader } from './util/useSmallScreen';
 export { toBase64 } from './util/files';
 export * as springFilterBuilder from './util/springFilterBuilder';
 

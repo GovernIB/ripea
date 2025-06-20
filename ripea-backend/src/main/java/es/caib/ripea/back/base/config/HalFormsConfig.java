@@ -230,7 +230,6 @@ public class HalFormsConfig {
 										artifact,
 										resourceField,
 										resourceControllerClasses);
-								System.out.println(">>> " + optionsResourceClass);
 								return HalFormsOptions.
 										remote(repeatedRemoteOptionsLink).
 										withValueField("value").

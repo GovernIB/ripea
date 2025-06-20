@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.ejb.base;
 
+import es.caib.ripea.service.intf.base.util.I18nUtil;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
@@ -10,10 +11,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
@@ -32,10 +30,12 @@ import java.util.Locale;
 		FreeMarkerAutoConfiguration.class,
 		JerseyServerMetricsAutoConfiguration.class
 })
-@ComponentScan({
-	BaseConfig.BASE_PACKAGE + ".service",
-	BaseConfig.BASE_PACKAGE + ".persistence"
-})
+@ComponentScan(
+		basePackages = {
+				BaseConfig.BASE_PACKAGE + ".service",
+				BaseConfig.BASE_PACKAGE + ".persistence"
+		}
+)
 //@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 @PropertySource(ignoreResourceNotFound = true, value = {
 		"classpath:application.properties",
