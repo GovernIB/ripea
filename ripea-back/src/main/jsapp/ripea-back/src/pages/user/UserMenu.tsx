@@ -11,6 +11,7 @@ import MenuButton from "../../components/MenuButton.tsx";
 import {TextAvatar, useBaseAppContext} from "reactlib";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Load from "../../components/Load.tsx";
+import {toProgramaAntic} from "./UserHeadToolbar.tsx";
 
 const MenuSelect = (props:any) => {
     const {icon, value, onChange, color = "#000", children, ...other} = props
@@ -206,8 +207,10 @@ const UserMenuButton = () => {
             <UserMenu/>
             <Divider/>
 
-            {/* TODO: revisar borrar sessión */}
-            <MenuItem onClick={() => {signOut?.()}}>
+            <MenuItem onClick={() => {
+                signOut?.()
+                toProgramaAntic('usuari/logout')
+            }}>
                 <ListItemIcon>
                     <Icon fontSize="small">logout</Icon>
                 </ListItemIcon>

@@ -143,7 +143,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
 
     const createDocumentActions = [
         {
-            title: t('common.create')+"...",
+            title: t('page.document.title')+"...",
             icon: "description",
             onClick: () => apiRef?.current?.showCreateDialog?.(),
         },

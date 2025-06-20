@@ -859,6 +859,7 @@ const translationEs = {
                 logout: "Desconectar"
             },
             menu: {
+                entitat: "Entidad",
                 expedient: "Expedientes",
                 monitoritzar: "Monitorizar",
                 integracions: "Integraciones",

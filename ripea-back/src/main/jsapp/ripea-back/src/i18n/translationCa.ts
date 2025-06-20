@@ -859,6 +859,7 @@ const translationCa = {
                 logout: "Desconnectar"
             },
             menu: {
+                entitat: "Entitat",
                 expedient: "Expedients",
                 monitoritzar: "Monitoritzar",
                 integracions: "Integracions",

@@ -859,6 +859,7 @@ const translationEn = {
                 logout: "Log out"
             },
             menu: {
+                entitat: "Entity",
                 expedient: "Cases",
                 monitoritzar: "Monitor",
                 integracions: "Integrations",

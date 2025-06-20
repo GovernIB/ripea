@@ -196,6 +196,14 @@ const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
 
+    const commonFilter = builder.and(
+        builder.or(
+            builder.eq('expedient.id', entity?.id),
+            builder.eq('pare.id', entity?.id),
+        ),
+        builder.eq('esborrat', 0),
+    )
+
     const {
         isReady: apiExpedientIsReady,
         find: apiExpedientFindAll,
@@ -203,11 +211,7 @@ const DocumentsGrid = (props: any) => {
     const [expedients, setExpedients] = useState<any[]>([]);
 
     const findExpedients = () => {
-        apiExpedientFindAll({perspectives, unpaged: true,
-            filter: builder.and(
-                builder.eq('expedient.id', entity?.id),
-                builder.eq('esborrat', 0),
-            )})
+        apiExpedientFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setExpedients(result.rows))
             .catch(()=> setExpedients([]))
     }
@@ -222,11 +226,7 @@ const DocumentsGrid = (props: any) => {
     const [carpetes, setCarpetes] = useState<any[]>([]);
 
     const findCarpetas = () => {
-        apiCarpetaFindAll({perspectives, unpaged: true,
-            filter: builder.and(
-                builder.eq('expedient.id', entity?.id),
-                builder.eq('esborrat', 0),
-            )})
+        apiCarpetaFindAll({perspectives, unpaged: true, filter: commonFilter})
             .then((result)=> setCarpetes(result.rows))
             .catch(()=> setCarpetes([]))
     }
@@ -271,10 +271,7 @@ const DocumentsGrid = (props: any) => {
                     popupEditFormDialogResourceTitle={t('page.document.title')}
                     columns={columns}
                     // paginationActive
-                    filter={builder.and(
-                        builder.eq('expedient.id', entity?.id),
-                        builder.eq('esborrat', 0),
-                    )}
+                    filter={commonFilter}
                     perspectives={perspectives}
                     staticSortModel={sortModel}
                     popupEditCreateActive

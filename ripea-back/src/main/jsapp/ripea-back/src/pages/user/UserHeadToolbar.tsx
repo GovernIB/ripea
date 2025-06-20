@@ -19,7 +19,7 @@ export const icons = {
     consulta: 'search',
 }
 
-const toProgramaAntic = (ref:string) => {
+export const toProgramaAntic = (ref:string) => {
     window.location.href = (`${import.meta.env.VITE_BASE_URL}${ref}`)
 }
 
@@ -132,10 +132,16 @@ const useMenuSupAdmin = () => {
     ];
     const entries = [
         {
-            id: 'expedient',
-            title: t('page.user.menu.expedient'),
-            icon: icons.expedient,
-            to: '/expedient',
+            id: 'entitat',
+            title: t('page.user.menu.entitat'),
+            icon: 'account_balance',
+            to: '/entitat',
+        },
+        {
+            id: 'avisos',
+            title: t('page.user.menu.avisos'),
+            icon: 'campaign',
+            onClick: () => toProgramaAntic('avis'),
         },
         {
             id: 'monitoritzar',
@@ -192,12 +198,6 @@ const useMenuSupAdmin = () => {
                     onClick: () => toProgramaAntic('plugin'),
                 },
             ],
-        },
-        {
-            id: 'avisos',
-            title: t('page.user.menu.avisos'),
-            // icon: '',
-            onClick: () => toProgramaAntic('avis'),
         },
     ]
     const content = <>
