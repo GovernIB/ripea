@@ -112,10 +112,10 @@ const useMenuSupAdmin = () => {
 
     const appEntries:any[] = [
         {
-            id: 'expedient',
-            title: t('page.user.menu.expedient'),
-            icon: icons.expedient,
-            to: '/expedient',
+            id: 'entitat',
+            title: t('page.user.menu.entitat'),
+            icon: 'account_balance',
+            to: '/entitat',
         },
         {
             id: 'integracions',
