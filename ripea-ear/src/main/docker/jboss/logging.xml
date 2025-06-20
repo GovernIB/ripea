@@ -36,6 +36,9 @@
             <logger category="es.caib.${env.JBOSS_APP_NAME}">
                 <level name="INFO"/>
             </logger>
+            <logger category="org.apache.activemq.audit">
+                <level name="WARN"/>
+            </logger>
             <!-- <logger category="org.springframework.transaction.jta">
                 <level name="DEBUG"/>
             </logger>
