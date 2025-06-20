@@ -1,6 +1,6 @@
 import {useRef, useState} from "react";
-import {Grid, Icon} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {Alert, Grid, Icon} from "@mui/material";
+import {MuiDialog, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -8,6 +8,56 @@ import {useFluxCreateSession} from "../../../components/SseExpedient.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
+import IconButton from "@mui/material/IconButton";
+import Load from "../../../components/Load.tsx";
+
+const useConverdedToPDF = () => {
+    const { t } = useTranslation();
+
+    const [open, setOpen] = useState(false);
+    const [entityId, setEntityId] = useState<any>();
+
+    const handleOpen = (id:any) => {
+        setEntityId(id);
+        setOpen(true);
+    }
+
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setEntityId(undefined);
+            setOpen(false);
+        }
+    };
+
+    const dialog =
+        <MuiDialog
+            open={open}
+            closeCallback={handleClose}
+            title={t('page.document.action.toPDF.title')}
+            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            buttons={[
+                {
+                    value: 'close',
+                    text: t('common.close')
+                },
+            ]}
+            buttonCallback={(value :any) :void=>{
+                if (value=='close') {
+                    handleClose();
+                }
+            }}
+        >
+            <Load value={entityId}>
+                <Iframe src={`${import.meta.env.VITE_BASE_URL}document/convertir/pdf/${entityId}`}/>
+            </Load>
+        </MuiDialog>
+
+    return {
+        handleOpen,
+        handleClose,
+        dialog
+    }
+}
 
 const EnviarPortafirmesForm = () => {
     const { t } = useTranslation();
@@ -16,6 +66,8 @@ const EnviarPortafirmesForm = () => {
     const { value: user } = useUserSession()
     const [open, setOpen] = useState<boolean>(true);
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
+
+    const {handleOpen, dialog} = useConverdedToPDF();
 
     onChange((flux) => {
         if(!flux?.error && user?.codi==flux?.usuari) {
@@ -33,6 +85,22 @@ const EnviarPortafirmesForm = () => {
     )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+
+        { data?.extension != 'pdf' &&
+            <Grid xs={12}>
+                <Alert severity={'warning'}
+                       action={
+                           <IconButton onClick={()=>handleOpen(apiRef?.current?.getId())}>
+                               <Icon sx={{ m: 0 }}>info</Icon>
+                           </IconButton>
+                       }
+                >
+                    {t('page.document.action.toPDF.description')}
+                </Alert>
+            </Grid>
+        }
+        {dialog}
+
         <GridFormField xs={12} name="motiu"/>
         <GridFormField xs={12} name="prioritat" required/>
 
@@ -96,7 +164,7 @@ const EnviarPortafirmes = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}
-        title={t('page.document.action.enviarPortafirmes.title')}
+        title={t('page.document.action.portafirmes.title')}
         initialOnChange
         {...props}
     >
@@ -114,11 +182,12 @@ const useEnviarPortafirmes = (refresh?: () => void) => {
             motiu: `Tramitació de l'expedient [${row?.expedient?.description}]`,
             expedient: row?.expedient,
             metaDocument: row?.metaDocument,
+            extension: row?.fitxerExtension,
         })
     }
     const onSuccess = (result:any) :void => {
         refresh?.()
-        temporalMessageShow(null, t('page.document.action.enviarPortafirmes.ok', {document: result?.nom}), 'success');
+        temporalMessageShow(null, t('page.document.action.portafirmes.ok', {document: result?.nom}), 'success');
     }
 
     return {

@@ -613,6 +613,10 @@ const translationEn = {
                     title: "Send document to signature inbox",
                     ok: "Document '{{document}}' sent to signature inbox",
                 },
+                toPDF: {
+                    description: "The document format will be changed before sending it to the signature platform",
+                    title: "View PDF version",
+                },
                 firmar: {
                     label: "Sign from browser...",
                 },
@@ -859,7 +863,7 @@ const translationEn = {
                 logout: "Log out"
             },
             menu: {
-                entitat: "Entity",
+                entitat: "Entities",
                 expedient: "Cases",
                 monitoritzar: "Monitor",
                 integracions: "Integrations",
