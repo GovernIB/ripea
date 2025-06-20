@@ -22,9 +22,9 @@ import Footer from './Footer';
 import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import UserMenuButton, {UserMenu} from "../pages/user/UserMenu.tsx";
-import {Alert} from "@mui/material";
 import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
+import AlertExpand from "./AlertExpand.tsx";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -210,10 +210,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         <CustomLocalizationProvider>
             <div>
                 {
-                    value?.avisos?.map((avis:any) => (
-                        <Alert key={avis.id} severity={getAlertSeverity(avis.avisNivell)}>
-                            <strong>{avis.assumpte}</strong>: {avis.missatge}
-                        </Alert>
+                    value?.avisosUsuari?.map((avis:any) => (
+                        <AlertExpand key={avis.id} title={avis.assumpte} severity={getAlertSeverity(avis.avisNivell)}>
+                            {avis.missatge}
+                        </AlertExpand>
                     ))
                 }
             </div>

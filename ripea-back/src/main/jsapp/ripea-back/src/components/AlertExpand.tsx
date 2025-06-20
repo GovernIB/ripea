@@ -19,7 +19,7 @@ const AlertExpand = (props:any) => {
                     size="small"
                     onClick={toggleDetalles}
                 >
-                    <Icon>{verDetalles ? 'expand_less' : 'expand_more'}</Icon>
+                    <Icon sx={{ m: 0 }}>{verDetalles ? 'expand_less' : 'expand_more'}</Icon>
                 </IconButton>
             }
         >

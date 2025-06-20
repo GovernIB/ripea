@@ -23,6 +23,5 @@ import javax.validation.constraints.NotNull;
         }
 )
 public class CarpetaResource extends ContingutResource {
-    @NotNull
 	private ResourceReference<ExpedientResource, Long> expedientRelacionat;
 }
