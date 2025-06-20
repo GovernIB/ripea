@@ -1,12 +1,8 @@
 package es.caib.ripea.service.intf.base.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
@@ -15,15 +11,12 @@ import java.lang.reflect.Field;
  * 
  * @author Límit Tecnologies
  */
-@Component
-public class I18nUtil implements ApplicationContextAware {
+public class I18nUtil {
 
-	@Autowired
-	private MessageSource messageSource;
-
-	public String getI18nEnumDescription(
+	public static String getI18nEnumDescription(
 			Field field,
-			String enumValue) {
+			String enumValue,
+			MessageSource messageSource) {
 		try {
 			String i18nKey = field.getDeclaringClass().getName() + "." + field.getName() + "." + enumValue;
 			return messageSource.getMessage(
@@ -47,15 +40,6 @@ public class I18nUtil implements ApplicationContextAware {
 				return enumValue;
 			}
 		}
-	}
-
-	private static ApplicationContext applicationContext;
-	public static I18nUtil getInstance() {
-		return applicationContext.getBean(I18nUtil.class);
-	}
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		I18nUtil.applicationContext = applicationContext;
 	}
 
 }

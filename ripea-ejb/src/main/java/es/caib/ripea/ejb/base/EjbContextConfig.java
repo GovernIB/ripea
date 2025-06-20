@@ -30,12 +30,10 @@ import java.util.Locale;
 		FreeMarkerAutoConfiguration.class,
 		JerseyServerMetricsAutoConfiguration.class
 })
-@ComponentScan(
-		basePackages = {
-				BaseConfig.BASE_PACKAGE + ".service",
-				BaseConfig.BASE_PACKAGE + ".persistence"
-		}
-)
+@ComponentScan({
+		BaseConfig.BASE_PACKAGE + ".service",
+		BaseConfig.BASE_PACKAGE + ".persistence"
+})
 //@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 @PropertySource(ignoreResourceNotFound = true, value = {
 		"classpath:application.properties",

@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.hateoas.*;
@@ -45,6 +46,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL_FORMS)
 public class HalFormsConfig {
 
+	@Autowired
+	private MessageSource messageSource;
 	@Autowired(required = false)
 	private Set<ReadonlyResourceController> resourceControllers;
 
@@ -262,9 +265,10 @@ public class HalFormsConfig {
 		return Arrays.stream(enumConstants).
 				map(e -> new FieldOption(
 						e.toString(),
-						I18nUtil.getInstance().getI18nEnumDescription(
+						I18nUtil.getI18nEnumDescription(
 								field,
-								e.toString()))).
+								e.toString(),
+								messageSource))).
 				toArray(FieldOption[]::new);
 	}
 
