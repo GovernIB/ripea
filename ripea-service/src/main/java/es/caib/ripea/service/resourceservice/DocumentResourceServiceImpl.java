@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
 import org.hibernate.Hibernate;
@@ -33,10 +34,12 @@ import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaDocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
@@ -52,6 +55,7 @@ import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
@@ -121,6 +125,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final ConfigHelper configHelper;
     private final PinbalHelper pinbalHelper;
     private final EmailHelper emailHelper;
+    private final ExpedientHelper expedientHelper;
     private final CacheHelper cacheHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
@@ -137,6 +142,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final DocumentResourceRepository documentResourceRepository;
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
+    private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
     private final ContingutRepository contingutRepository;
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
@@ -166,7 +172,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
-        register(DocumentResource.ACTION_CONVERTIR_DEFINITIU, new ConvertirDefinitiuActionExecutor());        
+        register(DocumentResource.ACTION_CONVERTIR_DEFINITIU, new ConvertirDefinitiuActionExecutor());
+        register(DocumentResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         //Flux de firma, firma en navegador, document PINBAL, viaFirma (formularis modals)
         register(DocumentResource.ACTION_FIRMA_WEB_INI, new IniciarFirmaWebActionExecutor());
         register(DocumentResource.ACTION_NEW_DOC_PINBAL, new NouDocumentPinbalActionExecutor());
@@ -242,6 +249,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
     	}
     	return null;
+    }
+    
+    @Override
+    public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	try {
+    		EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+    		contingutHelper.deleteReversible(entitatEntity.getId(), id, null, configHelper.getRolActual());
+    	} catch (Exception ex) {
+    		excepcioLogHelper.addExcepcio("/document/"+id+"/delete", ex);
+    		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
+    	}
     }
     
     @Override
@@ -715,6 +733,49 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
     
+    private class GuardarArxiuActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				Long registreAnnexId = annexPendentMourerArxiu(entity.getId());
+				Exception errorGuardant = null;
+				if (entity.getArxiuUuid() == null) {
+					errorGuardant = documentHelper.guardarDocumentArxiu(entity.getId());
+				} else if (registreAnnexId!=null) {
+					errorGuardant = expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
+				} else if (!StringUtils.isEmpty(entity.getGesDocFirmatId())) {
+					EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+					errorGuardant = firmaPortafirmesHelper.portafirmesReintentar(entitatEntity.getId(), entity.getId());
+				}
+				
+				if (errorGuardant!=null) {
+					throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
+				} else {
+					return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+				}
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/GuardarArxiuActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e);
+			}
+		}
+		
+		private Long annexPendentMourerArxiu(Long documentId) {
+			List<RegistreAnnexResourceEntity> annexosDoc = registreAnnexResourceRepository.findByDocumentId(documentId);
+			if (annexosDoc!=null) {
+				for (RegistreAnnexResourceEntity rare: annexosDoc) {
+					if (rare.getError() != null && !rare.getError().isEmpty()) {
+						return rare.getId();
+					}
+				}
+			}
+			return null;
+		}
+    }
+    
     private class ConvertirDefinitiuActionExecutor implements ActionExecutor<DocumentResourceEntity, Serializable, Serializable> {
 
 		@Override
@@ -732,8 +793,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				documentHelper.actualitzarEstat(document, DocumentEstatEnumDto.DEFINITIU);
                 return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/document/ConvertirDefinitiuActionExecutor", e);
-				return "";
+				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/ConvertirDefinitiuActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e);
 			}
 		}
     	
@@ -748,14 +809,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		public Serializable exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-
                 Map<String, String> result = new HashMap<>();
                 result.put("url", documentHelper.getEnllacCsv(entitatEntity.getId(), entity.getId()));
-
                 return (Serializable)result;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/CsvLinkActionExecutor", e);
-				return "";
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e);
 			}
 		}
     }

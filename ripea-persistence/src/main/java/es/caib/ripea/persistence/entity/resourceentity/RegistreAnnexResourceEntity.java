@@ -89,10 +89,8 @@ public class RegistreAnnexResourceEntity extends BaseAuditableEntity<RegistreAnn
     @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "annex_registre_fk")
     private RegistreResourceEntity registre;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "document_id")
     @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "annex_document_fk")
     private DocumentResourceEntity document;
-
 }

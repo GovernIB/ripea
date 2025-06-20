@@ -916,17 +916,8 @@ public class DocumentServiceImpl implements DocumentService {
 					documentId);
 		}
 		
-		
-		
-		
-		return firmaPortafirmesHelper.portafirmesReintentar(
-				entitatId,
-				document);
+		return firmaPortafirmesHelper.portafirmesReintentar(entitatId, document);
 	}
-	
-
-	
-	
 
 	@Transactional(readOnly = true)
 	@Override

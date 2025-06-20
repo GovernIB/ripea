@@ -34,6 +34,7 @@ import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
@@ -79,6 +80,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
+        register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
@@ -247,6 +249,28 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
+    private class GuardarArxiuActionExecutor implements ActionExecutor<InteressatResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, InteressatResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				Exception errorGuardant = expedientInteressatHelper.guardarInteressatsArxiu(entity.getExpedient().getId());
+				if (errorGuardant!=null) {
+					excepcioLogHelper.addExcepcio("/expedient/interessat/"+entity.getId()+"ImportarInteressatsActionExecutor.onChange", errorGuardant);
+					throw new ActionExecutionException(getResourceClass(), entity.getId(), code, errorGuardant);
+				}
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/interessats/"+entity.getId()+"ImportarInteressatsActionExecutor.onChange", e);
+                throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+            }
+			return objectMappingHelper.newInstanceMap(entity, InteressatResource.class);
+		}
+    	
+    }
+    
     private class ImportarActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.ImportarInteressatsFormAction, Serializable> {
 
         @Override

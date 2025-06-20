@@ -2643,14 +2643,45 @@ public class ExpedientHelper {
 		}
 		return carpetaId;
 	}
-	
+
+	public void importarExpedient(Long entitatId, Long pareId, Long expedientId, String rolActual) {
+		if (!isImportacioRelacionatsActiva()) {
+			throw new ValidationException("La importació d'expedients relacionats no està activa");
+		}
+		ContingutEntity contingutPare = entityComprovarHelper.comprovarContingut(
+				pareId);
+		ExpedientEntity expedientFill = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				null);
+		CarpetaEntity expedientFillExists = carpetaRepository.findByPareAndExpedientRelacionatAndEsborrat(contingutPare, expedientFill, 0);
+		if (expedientFillExists != null) {
+			throw new ValidationException("L'expedient " + expedientFillExists.getNom() + " s'ha importat prèviament");
+		}
+		// Crear l'expedient a importar com una carpeta de l'expedient pare
+		CarpetaDto expedientFillImported = carpetaHelper.create(
+				entitatId, 
+				pareId, 
+				expedientFill.getNom(),
+				false,
+				null,
+				false,
+				null,
+				false,
+				rolActual, true);
+		CarpetaEntity expedientFillImportedEntity = carpetaRepository.getOne(expedientFillImported.getId());
+		expedientFillImportedEntity.updateExpedientRelacionat(expedientFill);
+	}
 	
 	public void concurrencyCheckExpedientJaTancat(ExpedientEntity expedient) {
 		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) { 
 			throw new RuntimeException("L'expedient ja ha estat tancat per una altre persona. No és possible fer cap canvi");
 		}
 	}
-	
 	
 	//crea les carpetes per defecte definides al procediment
 	private void crearCarpetesMetaExpedient(
@@ -2883,6 +2914,8 @@ public class ExpedientHelper {
 		}
 		return listLong;
 	}
+	
+	private boolean isImportacioRelacionatsActiva() { return configHelper.getAsBoolean(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA);}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 }

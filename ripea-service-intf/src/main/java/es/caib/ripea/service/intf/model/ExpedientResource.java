@@ -110,6 +110,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_IMPORTAR_CODE,
+                        formClass = ExpedientResource.ImportarExpedientFormAction.class,
+                        requiresId = true),                
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_SYNC_ARXIU,
                         formClass = ExpedientResource.MassiveAction.class),                
                 @ResourceConfigArtifact(
@@ -186,6 +191,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_REOBRIR_CODE = "REOBRIR";
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
+	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
 	public static final String ACTION_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
@@ -387,6 +393,13 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull
         private String motiu;
         private List<Long> documentsPerFirmar;
+    }
+    
+    @Getter
+    @Setter
+    public static class ImportarExpedientFormAction implements Serializable {
+        @NotNull
+        private ResourceReference<ExpedientResource, Long> expedientOrigen;
     }
     
     @Getter

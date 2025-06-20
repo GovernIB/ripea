@@ -3125,8 +3125,6 @@ public class ContingutHelper {
 			expedientEntity.updateNumeroRegistre(numeroRegistre);
 			isCarpeta= false;
 		}
-
-		// ###
 		
 		for (ContingutArxiu contingutArxiu : documentsTrobats) {
 			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(

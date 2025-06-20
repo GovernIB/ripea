@@ -18,17 +18,22 @@ import es.caib.ripea.persistence.entity.ExpedientCarpetaArbreEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientCarpetaArbreRepository;
 import es.caib.ripea.service.intf.dto.ArbreDto;
 import es.caib.ripea.service.intf.dto.ArbreJsonDto;
 import es.caib.ripea.service.intf.dto.ArbreNodeDto;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 
 @Component
 public class CarpetaHelper {
 
+	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private CarpetaRepository carpetaRepository;
 	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
@@ -56,6 +61,12 @@ public class CarpetaHelper {
 				+ "carpetaId=" + carpetaId + ", "
 				+ "alreadyCreatedInArxiu=" + alreadyCreatedInArxiu + ", "
 				+ "arxiuUuid=" + arxiuUuid + ")");
+		
+		ContingutEntity pare = pareId != null ? contingutRepository.getOne(pareId) : null;
+		if (! checkCarpetaUniqueContraint(nom, pare, entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
+		
 		CarpetaEntity carpetaEntity;
 		boolean throwException = false;
 		if (throwException) {
@@ -65,7 +76,7 @@ public class CarpetaHelper {
 			carpetaEntity = carpetaRepository.getOne(carpetaId);
 		} else {
 			// TODO: això causa problemes al intentar obtenir el pare d'un metaexpedient sense pare
-			ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
+			pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 					entitatId,
 					pareId,
 					false,
@@ -113,6 +124,32 @@ public class CarpetaHelper {
 		return dto;
 	}
 
+	public void modificarNomCarpeta(Long entitatId, Long id, String nom) {
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				id,
+				false,
+				false,
+				false,
+				false, false, true, null);
+		if (! checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)) {
+			throw new ContingutNotUniqueException();
+		}
+		CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(contingut.getEntitat(), id);
+		contingutHelper.comprovarNomValid(carpeta.getPare(), nom, id, CarpetaEntity.class);
+		String nomOriginal = carpeta.getNom();
+		carpeta.updateNom(nom);
+		// Registra al log la modificació de la carpeta
+		contingutLogHelper.log(
+				carpeta,
+				LogTipusEnumDto.MODIFICACIO,
+				(!nomOriginal.equals(carpeta.getNom())) ? carpeta.getNom() : null,
+				null,
+				true,
+				true);
+		contingutHelper.arxiuPropagarModificacio(carpeta);
+	}
+	
 	public CarpetaDto toCarpetaDto(
 			CarpetaEntity carpeta) {
 		return (CarpetaDto) contingutHelper.toContingutDto(
@@ -276,7 +313,10 @@ public class CarpetaHelper {
 				ExpedientCarpetaArbreDto.class);
 	}
 
+	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
+		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.CARPETA);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);
-
-
 }

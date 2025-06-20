@@ -53,6 +53,10 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_IMPORTAR_CODE,
                         formClass = InteressatResource.ImportarInteressatsFormAction.class),
+                @ResourceConfigArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = InteressatResource.ACTION_GUARDAR_ARXIU,
+                        requiresId = true),                
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
@@ -60,6 +64,7 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
     public static final String ACTION_EXPORTAR_CODE = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
+    public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";
 
 	@NotNull
 	protected InteressatTipusEnum tipus = InteressatTipusEnum.InteressatPersonaFisicaEntity;

@@ -206,17 +206,16 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"Aquest document no te enviaments a portafirmes");
 		}
-		return conversioTipusHelper.convertir(
-				enviaments.get(0),
-				DocumentPortafirmesDto.class);
+		return conversioTipusHelper.convertir(enviaments.get(0), DocumentPortafirmesDto.class);
 	}	
 	
-	public Exception portafirmesReintentar(
-			Long entitatId,
-			DocumentEntity document) {
-		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + document.getId() + ")");
+	public Exception portafirmesReintentar(Long entitatId, Long documentId) {
+		return portafirmesReintentar(entitatId, documentRepository.findById(documentId).get());
+	}
+	
+	public Exception portafirmesReintentar(Long entitatId, DocumentEntity document) {
+		
+		logger.debug("Reintentant processament d'enviament a portafirmes amb error (entitatId=" + entitatId + ", id=" + document.getId() + ")");
 
 		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInAndErrorOrderByCreatedDateDesc(
 				document,

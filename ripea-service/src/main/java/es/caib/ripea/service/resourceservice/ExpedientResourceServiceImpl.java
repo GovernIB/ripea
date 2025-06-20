@@ -84,6 +84,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
 import es.caib.ripea.service.intf.model.ExpedientResource.ImportarDocumentsForm;
+import es.caib.ripea.service.intf.model.ExpedientResource.ImportarExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAction;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
@@ -157,6 +158,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_MASSIVE_REOBRIR_CODE, new ReobrirActionExecutor());
         
         register(ExpedientResource.ACTION_TANCAR_CODE, new TancarActionExecutor());
+        register(ExpedientResource.ACTION_IMPORTAR_CODE, new ImportarActionExecutor());
         register(ExpedientResource.ACTION_SYNC_ARXIU, new SincronitzarArxiuActionExecutor());
         register(ExpedientResource.ACTION_IMPORT_DOCS, new ImportarDocumentsArxiuActionExecutor());
         
@@ -699,6 +701,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al tancar l'expedient: "+e.getMessage(), e);
 			}				
+		}
+    }
+    
+    private class ImportarActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.ImportarExpedientFormAction, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, ImportarExpedientFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ImportarExpedientFormAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, ImportarExpedientFormAction params) throws ActionExecutionException {
+			try {
+            	String rolActual = configHelper.getRolActual();
+            	String entitatActual = configHelper.getEntitatActualCodi();
+				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
+				expedientHelper.importarExpedient(entitatEntity.getId(), entity.getId(), params.getExpedientOrigen().getId(), rolActual);
+				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al tancar l'expedient: "+e.getMessage(), e);
+			}	
 		}
     }
 

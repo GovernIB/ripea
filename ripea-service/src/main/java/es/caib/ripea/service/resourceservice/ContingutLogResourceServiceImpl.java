@@ -1,7 +1,9 @@
 package es.caib.ripea.service.resourceservice;
 
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
+
 import es.caib.ripea.persistence.entity.resourceentity.ContingutLogResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.intf.model.ContingutLogResource;
@@ -9,8 +11,6 @@ import es.caib.ripea.service.intf.model.ContingutMovimentResource;
 import es.caib.ripea.service.intf.resourceservice.ContingutLogResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

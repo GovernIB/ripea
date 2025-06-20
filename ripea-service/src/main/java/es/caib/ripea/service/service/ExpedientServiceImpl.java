@@ -1740,47 +1740,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void importarExpedient(
-			Long entitatId, 
-			Long pareId, 
-			Long expedientId, 
-			String rolActual)
-			throws NotFoundException {
-		logger.debug("Important un expedient relacionat a la llista de documents (" +
-				"entitatId=" + entitatId + ", " +
-				"pareId=" + pareId + "," + 
-				"expedientId=" + expedientId + ")");
-		if (!isImportacioRelacionatsActiva()) {
-			throw new ValidationException("La importació d'expedients relacionats no està activa");
-		}
+	public void importarExpedient(Long entitatId, Long pareId, Long expedientId, String rolActual) throws NotFoundException {
+		logger.debug("Important un expedient relacionat a la llista de documents (entitatId=" + entitatId + ", pareId=" + pareId + ",expedientId=" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		ContingutEntity contingutPare = entityComprovarHelper.comprovarContingut(
-				pareId);
-		ExpedientEntity expedientFill = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				true,
-				false,
-				false,
-				false,
-				null);
-		CarpetaEntity expedientFillExists = carpetaRepository.findByPareAndExpedientRelacionatAndEsborrat(contingutPare, expedientFill, 0);
-		if (expedientFillExists != null) {
-			throw new ValidationException("L'expedient " + expedientFillExists.getNom() + " s'ha importat prèviament");
-		}
-		// Crear l'expedient a importar com una carpeta de l'expedient pare
-		CarpetaDto expedientFillImported = carpetaHelper.create(
-				entitatId, 
-				pareId, 
-				expedientFill.getNom(),
-				false,
-				null,
-				false,
-				null,
-				false,
-				rolActual, true);
-		CarpetaEntity expedientFillImportedEntity = carpetaRepository.getOne(expedientFillImported.getId());
-		expedientFillImportedEntity.updateExpedientRelacionat(expedientFill);
+		expedientHelper.importarExpedient(entitatId, pareId, expedientId, rolActual);
 	}
 	
 	@Override
@@ -1835,10 +1798,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	private boolean isIncorporacioJustificantActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT);
-	}
-	
-	private boolean isImportacioRelacionatsActiva() {
-		return configHelper.getAsBoolean(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);
