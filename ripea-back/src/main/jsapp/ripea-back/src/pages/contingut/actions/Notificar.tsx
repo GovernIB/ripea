@@ -115,7 +115,7 @@ const NotificarForm = () => {
                 create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
             }}
         >
-            <Icon>add</Icon>{t('page.interessat.actions.new')}
+            <Icon>add</Icon>{t('page.interessat.action.new.label')}
         </GridButton>
         {content}
 

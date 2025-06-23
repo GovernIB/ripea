@@ -75,7 +75,6 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-//                ,FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", organActualCodi)
         );
         String resultat = filtreResultat.generate();
         return resultat;

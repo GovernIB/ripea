@@ -130,8 +130,8 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private Long sequencia;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;
-    	private ResourceReference<OrganGestorResource, Long> organGestor;
-    	
+    	@NotNull
+    	private ResourceReference<OrganGestorResource, Long> organGestor;    	
     	private List<Long> interessats;
         private Map<Long, String> annexos = new HashMap<>();
         @Transient @ResourceField(enumType = true)

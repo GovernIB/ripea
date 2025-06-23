@@ -657,14 +657,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    		
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-        		
-        		//TODO
-//        		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();        		
+        		ContingutEntity pare = contingutRepository.findById(params.getExpedient().getId()).get();
         		DocumentDto documentDto = new DocumentDto();
             	MetaNodeDto metaNode = new MetaNodeDto();
             	metaNode.setId(params.getMetaDocument().getId());
             	documentDto.setMetaNode(metaNode);
-            	documentDto.setPareId(null); //TODO
+            	documentDto.setPareId(null);
             	documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
             	documentDto.setNom(fitxerDto.getNom());
             	documentDto.setData(Calendar.getInstance().getTime());
@@ -675,8 +673,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             	documentDto.setFitxerTamany((long)fitxerDto.getContentType().length());
             	documentDto.setAmbFirma(false);
             	documentDto.setData(Calendar.getInstance().getTime());
-            	//TODO falta passar-li el pare
-            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, null, true, false);
+            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, pare, true, false);
             	
             	DocumentResourceEntity newZipFile = new DocumentResourceEntity();
         		newZipFile.setId(documentDto.getId());

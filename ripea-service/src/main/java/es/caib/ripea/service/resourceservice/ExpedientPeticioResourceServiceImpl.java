@@ -407,6 +407,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 if (previous.getAny() != null) {
                     onChange(id, previous, AcceptarAnotacioForm.Fields.any, previous.getAny(), answers, previousFieldNames, target);
                 }
+                if (previous.getMetaExpedient() != null) {
+                    onChange(id, previous, AcceptarAnotacioForm.Fields.metaExpedient, previous.getMetaExpedient(), answers, previousFieldNames, target);
+                }
             }
         }
 

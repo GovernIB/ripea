@@ -4,6 +4,7 @@
 	<deployment>
 		<dependencies>
 <!-- 			<module name="org.keycloak.keycloak-core" export="true"/> -->
+			<!-- Llibreries mínimes (4) perque funcionin els WS securitzats -->
 			<module name="org.apache.cxf.impl"/>
 			<module name="org.apache.ws.security"/>
 			<module name="org.apache.santuario.xmlsec"/>
