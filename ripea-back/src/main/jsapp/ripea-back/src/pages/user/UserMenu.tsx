@@ -179,7 +179,7 @@ export const UserMenu = () => {
     </>
 }
 const UserMenuButton = () => {
-    const { t } = useBaseAppContext();
+    const { t } = useTranslation();
     const { value: user, remove: signOut } = useUserSession();
 
     return <Load value={user} noEffect>
@@ -214,7 +214,7 @@ const UserMenuButton = () => {
                 <ListItemIcon>
                     <Icon fontSize="small">logout</Icon>
                 </ListItemIcon>
-                <ListItemText>{t('app.auth.logout')}</ListItemText>
+                <ListItemText>{t('page.user.options.logout')}</ListItemText>
             </MenuItem>
         </div>
         </MenuButton>

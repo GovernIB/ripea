@@ -857,7 +857,7 @@ const translationCa = {
         },
         user: {
             options: {
-                perfil: "Perfil",
+                perfil: "El meu perfil",
                 manual: "Manual d'usuari",
                 manualAdmin: "Manual d'administrador",
                 logout: "Desconnectar"

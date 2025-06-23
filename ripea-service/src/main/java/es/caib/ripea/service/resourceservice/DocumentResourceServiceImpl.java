@@ -514,7 +514,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
     }
 
-    // ActionExecutor
     private class EnviarViaEmailActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarViaEmailFormAction, DocumentResource> {
 
         @Override
@@ -533,10 +532,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         }
 
         @Override
-        public void onChange(Serializable id, DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {
-
-        }
+        public void onChange(Serializable id, DocumentResource.EnviarViaEmailFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarViaEmailFormAction target) {}
     }
+    
     private class CanviTipusDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.UpdateTipusDocumentFormAction, DocumentResource> {
 
 		@Override
@@ -558,7 +556,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             					false);
                 	}
                 }
-    			return null;
+                
+                return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+                
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/CanviTipusDocumentsActionExecutor", e);
 				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al canviar el tipus dels documents seleccionats.");
@@ -657,7 +657,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    		
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-        		DocumentResourceEntity newZipFile = new DocumentResourceEntity();
+        		
         		//TODO
 //        		ContingutEntity pare = contingutRepository.findById(resource.getExpedient().getId()).get();        		
         		DocumentDto documentDto = new DocumentDto();
@@ -676,8 +676,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             	documentDto.setAmbFirma(false);
             	documentDto.setData(Calendar.getInstance().getTime());
             	//TODO falta passar-li el pare
-            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, null, true, false);        		
+            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, null, true, false);
+            	
+            	DocumentResourceEntity newZipFile = new DocumentResourceEntity();
         		newZipFile.setId(documentDto.getId());
+        		newZipFile.setNom(documentDto.getNom());
+        		
         		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);
         		
 			} catch (Exception e) {
@@ -1156,7 +1160,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				throw new ActionExecutionException(DocumentResource.class, entity.getId(), code, e.getMessage());
 			}
         	
-        	return null;
+        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 		}
     }
     private class EnviarPortafirmesActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.EnviarPortafirmesFormAction, DocumentResource> {

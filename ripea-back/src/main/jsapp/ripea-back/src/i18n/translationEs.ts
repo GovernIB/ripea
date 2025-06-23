@@ -857,7 +857,7 @@ const translationEs = {
         },
         user: {
             options: {
-                perfil: "Perfil",
+                perfil: "Mi perfil",
                 manual: "Manual de usuario",
                 manualAdmin: "Manual de administrador",
                 logout: "Desconectar"

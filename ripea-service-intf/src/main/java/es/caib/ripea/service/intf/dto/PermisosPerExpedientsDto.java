@@ -154,4 +154,16 @@ public class PermisosPerExpedientsDto  {
 		return Utils.getNullIfEmpty(list.get(index));
 	}
 	
+	public boolean capPermis() {
+		if ((this.idsMetaExpedientsPermesos==null || this.idsMetaExpedientsPermesos.size()==0) &&
+			(this.idsOrgansPermesos==null || this.idsOrgansPermesos.size()==0) &&
+			(this.idsOrganActualAndDescendents==null || this.idsOrganActualAndDescendents.size()==0) &&
+			(this.idsMetaExpedientOrganPairsPermesos==null || this.idsMetaExpedientOrganPairsPermesos.size()==0) &&
+			(this.idsOrgansAmbProcedimentsComunsPermesos==null || this.idsOrgansAmbProcedimentsComunsPermesos.size()==0) &&
+			(this.idsProcedimentsComuns==null || this.idsProcedimentsComuns.size()==0) &&
+			(this.idsGrupsPermesos==null || this.idsGrupsPermesos.size()==0)) {
+			return true;
+		}
+		return false;
+	}
 }

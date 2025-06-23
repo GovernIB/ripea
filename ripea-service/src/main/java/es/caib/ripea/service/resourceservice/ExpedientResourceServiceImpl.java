@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -197,11 +196,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				rolActual,
 				ogEntity!=null?ogEntity.getId():null);
 
+		//Si no es té permis per cap banda, no retornam resultats
+		if (permisosPerExpedients.capPermis()) {
+			return FilterBuilder.equal("id", 0).generate();
+		}
+		
         Filter filtreEntitatSessio = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-//                ,FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", organActualCodi)
         );
 
         /**
@@ -525,7 +528,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             		expedientHelper.agafar(params.getIds().get(0), auth.getName());
             	}
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
         }
 
         @Override
@@ -554,7 +557,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             		expedientHelper.alliberar(params.getIds().get(0));
             	}
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
         }
 
         @Override
@@ -584,7 +587,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             		expedientHelper.retornar(params.getIds().get(0));
             	}
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 		}
 
 		@Override
@@ -606,7 +609,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             		expedientHelper.follow(params.getIds().get(0), auth.getName());
             	}
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
         }
 
         @Override
@@ -628,7 +631,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             		expedientHelper.unfollow(params.getIds().get(0), auth.getName());
             	}
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
         }
 
         @Override
@@ -651,7 +654,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        	} else {
 	        		expedientHelper.reobrir(entitatEntity.getId(), params.getIds().get(0));
 	        	}
-	        	return null;
+	        	return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {
 				excepcioLogHelper.addExcepcio("/expedient/ReobrirActionExecutor", ex);
 				throw new ActionExecutionException(getResourceClass(), null, code, ex.getMessage());
@@ -681,7 +684,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					}
             	}
             }
-            return null;
+            return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
         }
 
         @Override
@@ -696,7 +699,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public Serializable exec(String code, ExpedientResourceEntity entity, TancarExpedientFormAction params) throws ActionExecutionException {
 			try {
 				expedientHelper.tancar(entity.getEntitat().getId(), entity.getId(), params.getMotiu(), params.getDocumentsPerFirmar().toArray(new Long[0]), false);
-				return null;
+				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al tancar l'expedient: "+e.getMessage(), e);
@@ -909,7 +912,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				}
 				ImportacioDto importacioDto = new ImportacioDto();
 				contingutHelper.importarDocuments(entitatEntity.getId(), destiId, importacioDto, new HashMap<String, String>(), new ArrayList<DocumentDto>());
-				return null;
+				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception ex) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"ImportarDocumentsArxiuActionExecutor", ex);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, ex.getMessage());

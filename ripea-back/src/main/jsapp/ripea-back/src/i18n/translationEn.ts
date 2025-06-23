@@ -857,7 +857,7 @@ const translationEn = {
         },
         user: {
             options: {
-                perfil: "Profile",
+                perfil: "My profile",
                 manual: "User manual",
                 manualAdmin: "Administrator manual",
                 logout: "Log out"
