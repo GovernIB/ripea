@@ -19,6 +19,7 @@ import org.hibernate.annotations.JoinColumnsOrFormulas;
 import org.hibernate.query.criteria.internal.path.PluralAttributePath;
 import org.hibernate.query.criteria.internal.path.SingularAttributePath;
 import org.springframework.core.GenericTypeResolver;
+import org.springframework.core.ResolvableType;
 import org.springframework.data.domain.Persistable;
 import org.springframework.util.ReflectionUtils;
 
@@ -207,18 +208,30 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 			Map<String, Join<?, ?>> joins,
 			Object payload) {
 		String path = ctx.getParent().getChild(0).getText();
-		Expression<?> databasePath;
+		Class<?> pathJavaType;
 		if ("id".equals(path)) {
-			databasePath = root;
+			pathJavaType = root.getJavaType();
 		} else {
-			databasePath = getDatabasePath(
+			Expression<?> databasePath = getDatabasePath(
 					root,
 					joins,
 					payload,
 					path.substring(0, path.length() - ".id".length()),
 					ExpressionGeneratorParameters.FILTERING_AUTHORIZATION);
+			pathJavaType = databasePath.getJavaType();
+			if (Collection.class.isAssignableFrom(pathJavaType)) {
+				String fieldName = path.substring(0, path.length() - ".id".length());
+				Field collectionField = Objects.requireNonNull(ReflectionUtils.findField(root.getJavaType(), fieldName));
+				pathJavaType = ResolvableType.forField(collectionField).getGeneric(0).resolve();
+			}
 		}
-		return GenericTypeResolver.resolveTypeArguments(databasePath.getJavaType(), Persistable.class)[0];
+		if (Persistable.class.isAssignableFrom(Objects.requireNonNull(pathJavaType))) {
+			return Objects.requireNonNull(GenericTypeResolver.resolveTypeArguments(
+					pathJavaType,
+					Persistable.class))[0];
+		} else {
+			throw new InternalFilterException("Couldn't determine type for pk path " + path);
+		}
 	}
 
 	private static Object processInputValue(
