@@ -32,6 +32,7 @@ type StyledMuiGridProps = MuiDataGridProps & {
     rowProps?: (row:any) => any,
     formInitOnChange?:boolean,
     rowExpansionChange?: ( params:any, event:any, details:any ) => void,
+    onRefresh?: () => any,
 }
 
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
@@ -63,12 +64,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         rowHideUpdateButton = true,
         rowHideDeleteButton = true,
         rowExpansionChange,
+        onRefresh,
         ...others
     } = props
     const [gridRows, setGridRows] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
     const refresh = () => {
+        onRefresh?.()
         apiRef?.current?.refresh?.();
     }
     const create = () => {

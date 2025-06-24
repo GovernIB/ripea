@@ -38,7 +38,7 @@ const ExpedientFilterForm = () => {
     </>
 }
 
-const springFilterBuilder = (data: any, user: any): string => {
+export const springFilterBuilder = (data: any, user?: any): string => {
     let filterStr: string = '';
     filterStr += builder.and(
         builder.like("numero", data.numero),

@@ -17,9 +17,10 @@ import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useFirmaNavegador from "../actions/FirmaNavegador.tsx";
 import useDocPinbal from "../actions/DocPinbal.tsx";
 import useEnviarViaFirma from "../actions/EnviarViaFirma.tsx";
-import useCrearCarpeta from "../../carpeta/actions/CrearCarpeta.tsx";
+import useCrearCarpeta from "../../carpeta/actions/Crear.tsx";
 import useImportar from "../actions/Importar.tsx";
 import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
+import useImportarExpedient from "../../expedient/actions/ImportarExpedient.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -32,6 +33,17 @@ export const useActions = (refresh?: () => void) => {
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons();
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
+    const action = (id:any, code:string, mssg:string) => {
+        apiAction(id, {code})
+            .then(()=>{
+                refresh?.()
+                temporalMessageShow(null, mssg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
     const downloadAdjunt = (id:any, fieldName:string, mssg:string) :void => {
         apiDownload(id,{fieldName})
@@ -91,11 +103,14 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
+    const guardarArxiu = (id:any) => action(id, 'GUARDAR_ARXIU', t('page.contingut.action.guardarArxiu.ok'))
+
     return {
         apiDownload: downloadAdjunt,
         getLinkCSV: enllacCSV,
         descarregarVersio,
-        definitiu
+        definitiu,
+        guardarArxiu,
     }
 }
 
@@ -106,8 +121,9 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
     const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
+    const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(refresh)
 
-    const {apiDownload, getLinkCSV, definitiu} = useActions()
+    const {apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions()
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
@@ -165,6 +181,12 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleImportar,
             disabled: !user?.sessionScope?.isMostrarImportacio,
         },
+        {
+            title: t('page.contingut.action.importarExpedient.label'),
+            icon: "link",
+            onClick: () => handleImportarExpedient(entity?.id, entity),
+            // hidden: !user?.sessionScope?.isImportacioRelacionatsActiva,
+        },
     ];
 
     const documentActions = [
@@ -172,9 +194,9 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             title: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',
             showInMenu: true,
-            // onClick: ,
+            onClick: guardarArxiu,
             disabled: !entity?.arxiuUuid,
-            hidden: (row:any) => row?.arxiuUuid,
+            hidden: (row:any) => !row?.arxiuUuid /* TODO: && row.gesDocFirmatId*/,
         },
         {
             title: t('page.document.action.detall.label'),
@@ -191,7 +213,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !potMod || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
-            title: t('page.document.action.move.label'),
+            title: t('page.contingut.action.move.label'),
             icon: "open_with",
             showInMenu: true,
             onClick: handleMoureShow,
@@ -199,14 +221,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: !potMod,
         },
         {
-            title: t('page.document.action.copy.label'),
+            title: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiarShow,
             hidden: !potMod || !user?.sessionScope?.isMostrarCopiar,
         },
         {
-            title: t('page.document.action.vincular.label'),
+            title: t('page.contingut.action.vincular.label'),
             icon: "link",
             showInMenu: true,
             onClick: handleVincularShow,
@@ -355,6 +377,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {actions: expedientActions, components: expedientComponents} = useCommonActions(refresh);
 
     const components = <>
+        {componentsActions}
         {expedientComponents}
         {dialogDetall}
         {dialogHistoric}
@@ -373,7 +396,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {contentEnviarViaFirma}
         {contentCrearCarpeta}
         {contentImportar}
-        {componentsActions}
+        {dialogImportarExpedient}
     </>;
     return {
         createActions: createDocumentActions,

@@ -21,8 +21,20 @@ export const useActions = (refresh?: () => void) => {
         delete: apiDelete,
         patch: apiPatch,
         getOne,
+        artifactAction: apiAction,
         artifactReport: apiReport,
     } = useResourceApiService('interessatResource');
+
+    const guardarArxiu = (id:any) => {
+        apiAction(id, {code: 'GUARDAR_ARXIU'})
+            .then(()=>{
+                refresh?.()
+                temporalMessageShow(null, t('page.contingut.action.guardarArxiu.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
 
     const exportar = (ids:any[], entity:any) => {
         return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
@@ -98,6 +110,7 @@ export const useActions = (refresh?: () => void) => {
     }
 
     return {
+        guardarArxiu,
         exportar,
         deleteRepresentent,
         deleteInteressat,
@@ -107,7 +120,7 @@ export const useActions = (refresh?: () => void) => {
 const useInteressatActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const {deleteRepresentent, deleteInteressat} = useActions(refresh);
+    const {guardarArxiu, deleteRepresentent, deleteInteressat} = useActions(refresh);
     const {handleOpen: handleDetail, dialog: dialogDetail} = useInteressatDetail();
     const {create: createRepresentent, update: updateRepresentent, content} = useCreateRepresentant(refresh)
 
@@ -118,7 +131,7 @@ const useInteressatActions = (entity:any, refresh?: () => void) => {
             title: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',
             showInMenu: true,
-            // onClick: ,
+            onClick: guardarArxiu,
             disabled: !entity?.arxiuPropagat,
             hidden: (row:any) => row?.arxiuPropagat && ( !row?.representant || row?.representantInfo?.arxiuPropagat ),
         },
