@@ -1,12 +1,14 @@
 import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi} from "reactlib";
+import {MuiFormDialog, useBaseAppContext, MuiFormDialogApi, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
+import * as builder from '../../../util/springFilterUtils';
 
 const PerfilFrom = () =>{
+    const {data} = useFormContext();
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
@@ -33,9 +35,11 @@ const PerfilFrom = () =>{
         </CardData>
 
         <CardData title={t('page.user.perfil.generic')}>
-            <GridFormField xs={12} name="numElementsPagina"/>
+            {/* <GridFormField xs={12} name="numElementsPagina"/> */}
             <GridFormField xs={12} name="entitatPerDefecte"/>
-            <GridFormField xs={12} name="procediment"/>
+            <GridFormField xs={12} name="procediment" filter={builder.and(
+                           builder.eq('entitat.id', data?.entitatPerDefecte?.id)
+                       )}/>
         </CardData>
 
         <CardData title={t('page.user.perfil.column')}>
@@ -51,9 +55,9 @@ const PerfilFrom = () =>{
             <GridFormField xs={12} name="expedientExpandit"/>
         </CardData>
 
-        <CardData title={t('page.user.perfil.moure')}>
+        {/* <CardData title={t('page.user.perfil.moure')}>
             <GridFormField xs={12} name="vistaMoureActual" required/>
-        </CardData>
+        </CardData> */}
     </Grid>
 }
 

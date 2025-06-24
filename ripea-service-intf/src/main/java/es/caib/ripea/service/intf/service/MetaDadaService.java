@@ -258,4 +258,6 @@ public interface MetaDadaService {
 			Long entitatId,
 			Long nodeId);
 
+	@PreAuthorize("isAuthenticated()")
+	public int normalitzaDadesDomini();
 }

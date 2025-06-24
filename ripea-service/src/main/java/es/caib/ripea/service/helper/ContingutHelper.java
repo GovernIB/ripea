@@ -113,6 +113,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
@@ -394,12 +395,52 @@ public class ContingutHelper {
 	}
 
 	private void setDades(NodeDto resposta, NodeEntity node) {
+		
 		long t1 = System.currentTimeMillis();
+		
 		List<DadaEntity> dades = dadaRepository.findByNode(node);
 		resposta.setDades(conversioTipusHelper.convertirList(dades, DadaDto.class));
-		for (int i = 0; i < dades.size(); i++) {
-			resposta.getDades().get(i).setValor(dades.get(i).getValor());
+		
+		Map<Long, List<DadaDto>> dadesDominiPresents = new HashMap<Long, List<DadaDto>>();
+		
+		for (int i=dades.size()-1; i>=0 ; i--) {
+			
+			DadaDto aux = resposta.getDades().get(i);
+			aux.setValor(dades.get(i).getValor());
+			
+			Long idMetaDada = aux.getMetaDada().getId();
+			if (MetaDadaTipusEnumDto.DOMINI.equals(aux.getMetaDada().getTipus())) {
+				List<DadaDto> mdd = null;
+				if (dadesDominiPresents.containsKey(idMetaDada)) {
+					mdd = dadesDominiPresents.get(idMetaDada);
+				} else {
+					mdd = new ArrayList<DadaDto>();
+				}
+				mdd.add(aux);
+				dadesDominiPresents.put(idMetaDada, mdd);
+				resposta.getDades().remove(aux);
+			}
 		}
+		
+		//Les dades de tipus domini, s'han d'agrupar per mostrarse correctament a la select múltiple:
+		if (dadesDominiPresents.size()>0) {
+			DadaDto dadaDominiFinal = null;
+			for (Map.Entry<Long, List<DadaDto>> entry : dadesDominiPresents.entrySet()) {
+			    List<DadaDto> lista = entry.getValue();
+			    
+				String dominiJoined = "";
+				dadaDominiFinal = lista.get(0);
+				for (DadaDto dadaDom: lista) {
+					dominiJoined += dadaDom.getValor()+",";
+				}
+				if (dominiJoined.endsWith(",")) {
+					dominiJoined = dominiJoined.substring(0, dominiJoined.length() - 1);
+				}
+				dadaDominiFinal.setValor(dominiJoined);
+				resposta.getDades().add(dadaDominiFinal);
+			}
+		}
+		
 		logMsg("setDades time (" + node.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 

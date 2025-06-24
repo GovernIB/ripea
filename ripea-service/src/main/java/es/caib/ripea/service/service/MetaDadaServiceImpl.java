@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.persistence.entity.DadaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaDadaEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
@@ -15,6 +16,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.NodeEntity;
+import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
@@ -25,14 +27,17 @@ import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.service.MetaDadaService;
+import liquibase.pro.packaged.de;
 
 @Service
 public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Autowired private MetaDadaRepository metaDadaRepository;
+	@Autowired private DadaRepository dadaRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
@@ -222,6 +227,47 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 
 	@Transactional
 	@Override
+	public int normalitzaDadesDomini() {
+		List<DadaEntity> dadaEntity = dadaRepository.findByMetaDadaTipus(MetaDadaTipusEnumDto.DOMINI);
+		if (dadaEntity!=null && dadaEntity.size()>0) {
+			for (DadaEntity de: dadaEntity) {
+				if (de.getValor()!=null && !"".equals(de.getValor().toString()) && de.getValor().toString().indexOf(",")>0) {
+					String[] valors = de.getValor().toString().split(",");
+					int ordreActual = de.getOrdre();
+					if (valors.length>1) {
+						for (int i = 0; i < valors.length; i++) {
+							String valorActual = valors[i];
+							if (i==0) {
+								//El primer valor es queda en el registre actual
+								de.update(valorActual, ordreActual);
+							} else {
+								int ordreNovaDada = ordreActual+i; //per no repetir ordre;
+								DadaEntity novaDada = dadaRepository.findByNodeAndMetaDadaAndOrdre(de.getNode(), de.getMetaDada(), ordreNovaDada);
+								if (novaDada==null)
+									novaDada = DadaEntity.getBuilder(de.getMetaDada(), de.getNode(), valorActual, ordreActual+i).build();
+								if (de.getCreatedBy()!=null)
+									novaDada.setCreatedBy(de.getCreatedBy().get());
+								if (de.getCreatedDate()!=null)
+									novaDada.setCreatedDate(de.getCreatedDate().get());
+								if (de.getLastModifiedBy()!=null)
+									novaDada.setLastModifiedBy(de.getLastModifiedBy().get());
+								if (de.getLastModifiedDate()!=null)
+									novaDada.setLastModifiedDate(de.getLastModifiedDate().get());
+								dadaRepository.save(novaDada);
+							}
+						}
+					}
+				}
+			}
+			return dadaEntity.size();	
+		} else {
+			return 0;
+		}
+		
+	}
+	
+	@Transactional
+	@Override
 	public void moveTo(
 			Long entitatId,
 			Long metaNodeId,
@@ -374,5 +420,4 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MetaDadaServiceImpl.class);
-
 }

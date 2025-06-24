@@ -146,15 +146,9 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional
 	@Override
-	public void dadaSave(
-			Long entitatId,
-			Long contingutId,
-			Map<String, Object> valors, 
-			Long tascaId) throws NotFoundException {
-		logger.debug("Guardant dades del node (" +
-				"entitatId=" + entitatId + ", " +
-				"contingutId=" + contingutId + ", " +
-				"valors=" + valors + ")");
+	public void dadaSave(Long entitatId, Long contingutId, Map<String, Object> valors, Long tascaId) throws NotFoundException {
+		
+		logger.debug("Guardant dades del node (entitatId=" + entitatId + ", contingutId=" + contingutId + ", valors=" + valors + ")");
 		
 		NodeEntity node = null;
 		if (tascaId == null) {
@@ -171,7 +165,7 @@ public class ContingutServiceImpl implements ContingutService {
 					contingutId);
 		}
 
-		// Esborra les dades no especificades
+		// Esborra les dades no especificades 
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {
 				dadaRepository.delete(dada);
@@ -185,6 +179,7 @@ public class ContingutServiceImpl implements ContingutService {
 				}
 			}
 		}
+
 		// Modifica les dades existents
 		for (String dadaCodi: valors.keySet()) {
 			nodeDadaGuardar(
@@ -194,6 +189,96 @@ public class ContingutServiceImpl implements ContingutService {
 					entitatId);
 		}
 		cacheHelper.evictErrorsValidacioPerNode(node);
+	}
+	
+	private void nodeDadaGuardar(
+			NodeEntity node,
+			String dadaCodi,
+			Object dadaValor,
+			Long entitatId) {
+		MetaDadaEntity metaDada = metaDadaRepository.findByMetaNodeAndCodi(
+				node.getMetaNode(),
+				dadaCodi);
+		if (metaDada == null) {
+			throw new ValidationException(
+					node.getId(),
+					NodeEntity.class,
+					"No s'ha trobat la metaDada amb el codi " + dadaCodi);
+		}
+		List<DadaEntity> dades = dadaRepository.findByNodeAndMetaDadaOrderByOrdreAsc(
+				node,
+				metaDada);
+		Object[] valors = (dadaValor instanceof Object[]) ? (Object[])dadaValor : new Object[] {dadaValor};
+		// Esborra els valors nulls
+		List<Object> valorsSenseNull = new ArrayList<Object>();
+		for (Object o: valors) {
+			if (o != null)
+				valorsSenseNull.add(o);
+		}
+		// Esborra les dades ja creades que sobren
+		if (dades.size() > valorsSenseNull.size()) {
+			for (int i = valorsSenseNull.size(); i < dades.size(); i++) {
+				dadaRepository.delete(dades.get(i));
+			}
+		}
+		//Els valors de tipus domini, es guarden en un sol valor separat per comes. Diferent a la resta.
+//		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+//			String valorsDomini = StringUtils.join(valorsSenseNull, ",");
+//		    valorsSenseNull.clear();
+//		    valorsSenseNull.add(valorsDomini);
+//		}
+		// Modifica o crea les dades
+		for (int i = 0; i < valorsSenseNull.size(); i++) {
+			DadaEntity dada = (i < dades.size()) ? dades.get(i) : null;
+			if (dada != null) {
+				dada.update(
+						valorsSenseNull.get(i),
+						i);
+				contingutLogHelper.log(
+						node,
+						LogTipusEnumDto.MODIFICACIO,
+						dada,
+						LogObjecteTipusEnumDto.DADA,
+						LogTipusEnumDto.MODIFICACIO,
+						dadaCodi,
+						dada.getValorComString(),
+						false,
+						false);
+			} else {
+				if (valorsSenseNull.get(i)!=null && !"".equals(valorsSenseNull.get(i))) {
+					dada = DadaEntity.getBuilder(
+							metaDada,
+							node,
+							valorsSenseNull.get(i),
+							i).build();
+					dadaRepository.save(dada);
+					contingutLogHelper.log(
+							node,
+							LogTipusEnumDto.MODIFICACIO,
+							dada,
+							LogObjecteTipusEnumDto.DADA,
+							LogTipusEnumDto.CREACIO,
+							dadaCodi,
+							dada.getValorComString(),
+							false,
+							false);
+				}
+			}
+			
+			if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {
+				// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
+				if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+					DominiDto domini = dominiService.findByCodiAndEntitat(metaDada.getCodi(), entitatId);
+					String valorDomini = dada.getValorComString();
+					
+					String idsDomini = buildIdsDominiString(valorDomini, entitatId, domini);
+					
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, idsDomini);
+				} else {
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, dada.getValorComString());
+				}
+			}
+		}
 	}
 
 	@Transactional
@@ -1695,100 +1780,6 @@ public class ContingutServiceImpl implements ContingutService {
 			contingut.updateOrdre(ordre);
 		}
 	}
-
-	private void nodeDadaGuardar(
-			NodeEntity node,
-			String dadaCodi,
-			Object dadaValor,
-			Long entitatId) {
-		MetaDadaEntity metaDada = metaDadaRepository.findByMetaNodeAndCodi(
-				node.getMetaNode(),
-				dadaCodi);
-		if (metaDada == null) {
-			throw new ValidationException(
-					node.getId(),
-					NodeEntity.class,
-					"No s'ha trobat la metaDada amb el codi " + dadaCodi);
-		}
-		List<DadaEntity> dades = dadaRepository.findByNodeAndMetaDadaOrderByOrdreAsc(
-				node,
-				metaDada);
-		Object[] valors = (dadaValor instanceof Object[]) ? (Object[])dadaValor : new Object[] {dadaValor};
-		// Esborra els valors nulls
-		List<Object> valorsSenseNull = new ArrayList<Object>();
-		for (Object o: valors) {
-			if (o != null)
-				valorsSenseNull.add(o);
-		}
-		// Esborra les dades ja creades que sobren
-		if (dades.size() > valorsSenseNull.size()) {
-			for (int i = valorsSenseNull.size(); i < dades.size(); i++) {
-				dadaRepository.delete(dades.get(i));
-			}
-		}
-		if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-			String valorsDomini = StringUtils.join(valorsSenseNull, ",");
-		    valorsSenseNull.clear();
-		    valorsSenseNull.add(valorsDomini);
-		}
-		// Modifica o crea les dades
-		for (int i = 0; i < valorsSenseNull.size(); i++) {
-			DadaEntity dada = (i < dades.size()) ? dades.get(i) : null;
-			if (dada != null) {
-				dada.update(
-						valorsSenseNull.get(i),
-						i);
-				contingutLogHelper.log(
-						node,
-						LogTipusEnumDto.MODIFICACIO,
-						dada,
-						LogObjecteTipusEnumDto.DADA,
-						LogTipusEnumDto.MODIFICACIO,
-						dadaCodi,
-						dada.getValorComString(),
-						false,
-						false);
-			} else {
-				if (valorsSenseNull.get(i)!=null && !"".equals(valorsSenseNull.get(i))) {
-					dada = DadaEntity.getBuilder(
-							metaDada,
-							node,
-							valorsSenseNull.get(i),
-							i).build();
-					dadaRepository.save(dada);
-					contingutLogHelper.log(
-							node,
-							LogTipusEnumDto.MODIFICACIO,
-							dada,
-							LogObjecteTipusEnumDto.DADA,
-							LogTipusEnumDto.CREACIO,
-							dadaCodi,
-							dada.getValorComString(),
-							false,
-							false);
-				}
-			}
-			
-			if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {
-				// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
-				if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-					DominiDto domini = dominiService.findByCodiAndEntitat(metaDada.getCodi(), entitatId);
-					String valorDomini = dada.getValorComString();
-					
-					String idsDomini = buildIdsDominiString(valorDomini, entitatId, domini);
-					
-					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, idsDomini);
-				} else {
-					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, dada.getValorComString());
-				}
-			}
-		}
-	}
-
-
-
-	// Mètodes per evitar errors al tenir continguts orfes en base de dades
-	// ////////////////////////////////////////////////////////////////////
 
 	@Override
 	@Transactional

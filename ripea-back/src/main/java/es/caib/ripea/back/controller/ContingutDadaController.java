@@ -1,32 +1,35 @@
-/**
- * 
- */
 package es.caib.ripea.back.controller;
+
+import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.helper.AjaxHelper;
 import es.caib.ripea.back.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.back.helper.BeanGeneratorHelper;
-import es.caib.ripea.back.helper.CustomDatesEditor;
 import es.caib.ripea.back.helper.MissatgesHelper;
-import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.dto.ContingutDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.MetaDadaDto;
+import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.NodeDto;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.MetaDadaService;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.CustomNumberEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre

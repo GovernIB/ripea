@@ -61,11 +61,15 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		
 		Permission permis = ExtendedPermission.READ;
 		
-        Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-        );
+		Filter filtreBase = null;
+		//Si ja ve un filtre definit per entitat, no aplicarem el filtre de entitat actual.
+		if (currentSpringFilter==null || !currentSpringFilter.contains("entitat.id")) {
+	        filtreBase = FilterBuilder.and(
+	                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
+	                FilterBuilder.equal(MetaExpedientResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+	        );
+		}
         
         if (organActualCodi!=null) {
         	Filter filtreOrganGestor = FilterBuilder.equal(MetaExpedientResource.Fields.organGestor+"."+OrganGestorResource.Fields.codi, organActualCodi);
