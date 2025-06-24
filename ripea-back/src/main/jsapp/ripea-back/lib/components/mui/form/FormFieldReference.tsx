@@ -227,7 +227,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             setIgnoreOnInputChangeEvent(false);
             return;
         }
-        if (isEmptyValue || newValue?.length == 0) {
+        if (isEmptyValue || multiple || newValue?.length == 0) {
             setInputValue(newValue);
             setOptionsQuickFilter(newValue);
         } else {
