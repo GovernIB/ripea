@@ -169,15 +169,12 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const [inputValue, setInputValue] = React.useState<string>('');
     const [optionsQuickFilter, setOptionsQuickFilter] = React.useState<string>('');
-    const changeValue = (value: any) => {
+    const [ignoreOnInputChangeEvent, setIgnoreOnInputChangeEvent] = React.useState<boolean>(false);
+    const processValueChange = (value: any) => {
         onChange(value);
         setInputValue(value?.description ?? '');
         setOptionsQuickFilter('');
     }
-    React.useEffect(() => {
-        setInputValue(value?.description ?? '');
-        setOptionsQuickFilter('');
-    }, [value]);
     const optionsRequest = React.useCallback((q: string) => {
         if (optionsRequestProp != null) {
             return optionsRequestProp(q);
@@ -223,12 +220,27 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         if (reason === 'clear') {
             setOpen(true);
         }
-        changeValue(value);
+        processValueChange(value);
     }
     const handleOnInputChange = (_event: any, newValue: string) => {
-        if (isEmptyValue || multiple) {
+        if (ignoreOnInputChangeEvent) {
+            setIgnoreOnInputChangeEvent(false);
+            return;
+        }
+        if (isEmptyValue || newValue?.length == 0) {
             setInputValue(newValue);
             setOptionsQuickFilter(newValue);
+        } else {
+            setIgnoreOnInputChangeEvent(true);
+            onChange(null);
+            if (newValue.startsWith(value.description) && newValue.length > value.description.length) {
+                const newChar = newValue.slice(-1);
+                setInputValue(newChar);
+                setOptionsQuickFilter(newChar);
+            } else {
+                setInputValue(newValue);
+                setOptionsQuickFilter(newValue);
+            }
         }
     }
     const handleAdvancedSearchClick = () => {
@@ -243,9 +255,9 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             if (multiple) {
                 const currentValues = Array.isArray(value) ? value : [value];
                 const currentValueFound = currentValues.find(v => v.id === valueReferenceWithData?.id);
-                changeValue(currentValueFound ? currentValues : [...currentValues, valueReferenceWithData]);
+                processValueChange(currentValueFound ? currentValues : [...currentValues, valueReferenceWithData]);
             } else {
-                changeValue(valueReferenceWithData);
+                processValueChange(valueReferenceWithData);
             }
         }).catch(() => { });
     }
@@ -270,9 +282,12 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
     } = useFormFieldCommon(field, fieldError, inline, componentProps, startAdornmentIcons);
     const loadingElement = <CircularProgress color="inherit" size={20} />;
     const endAdornment = optionsLoading ? loadingElement : componentProps?.slotProps?.input?.endAdornment;
-    const valueMultipleAdapted = React.useMemo(() => {
+    const valueAdapted = React.useMemo(() => {
         return multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? null);
     }, [multiple, value]);
+    const inputValueAdapted = React.useMemo(() => {
+        return multiple ? inputValue : (value != null ? value.description : inputValue);
+    }, [multiple, value, inputValue]);
     return <>
         {advancedSearchButtonActive && <AdvancedSearchDialog
             title={t('form.field.reference.advanced.title')}
@@ -287,19 +302,19 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             dialogComponentProps={dialogComponentProps} />}
         <Autocomplete
             name={name}
-            value={valueMultipleAdapted}
-            readOnly={readOnly}
-            inputValue={inputValue}
+            value={valueAdapted}
+            onChange={handleOnChange}
+            inputValue={inputValueAdapted}
+            onInputChange={handleOnInputChange}
             options={options}
             multiple={multiple}
+            readOnly={readOnly}
             open={open}
             onOpen={() => setOpen(true)}
             onClose={(event: Event, reason) => {
                 reason === 'escape' && handleOnInputChange(event, value?.description ?? '');
                 setOpen(false);
             }}
-            onChange={handleOnChange}
-            onInputChange={handleOnInputChange}
             getOptionLabel={(option: any) => option?.description}
             isOptionEqualToValue={(option: any, value: any) => option.id === value?.id}
             renderOption={(props, option: any, { selected }) => {
