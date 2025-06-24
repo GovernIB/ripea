@@ -118,6 +118,21 @@ const translationCa = {
                     label: "Desar a l'arxiu",
                     ok: "Element desat a l'arxiu",
                 },
+                move: {
+                    label: "Moure...",
+                    title: "Moure contingut",
+                    ok: "Document '{{document}}' mogut correctament",
+                },
+                copy: {
+                    label: "Copiar...",
+                    title: "Copiar contingut",
+                    ok: "Document '{{document}}' copiat correctament",
+                },
+                vincular: {
+                    label: "Vincular...",
+                    title: "Vincular contingut",
+                    ok: "Document '{{document}}' vinculat correctament",
+                },
                 create: {
                     label: "Crear contingut",
                 },
@@ -129,6 +144,10 @@ const translationCa = {
                 infoArxiu: {
                     title: "Informació obtinguda de l'arxiu",
                     label: "Informació de l'arxiu",
+                },
+                importarExpedient: {
+                    label: "Importar expedient relacionat...",
+                    title: "Expedients relacionats",
                 },
             },
             history: {
@@ -359,6 +378,10 @@ const translationCa = {
                     label: "Agafar",
                     ok: "L'expedient '{{expedient}}' ha estat agafat per l'usuari '{{user}}'",
                 },
+                importar: {
+                    label: "Importar expedient",
+                    ok: "L'expedient s'ha importat correctament",
+                },
                 follow: {
                     label: "Seguir",
                     ok: "L'usuari '{{user}}' ha començat a seguir l'expedient '{{expedient}}'.",
@@ -572,21 +595,6 @@ const translationCa = {
                 detall: {
                     label: "Detalls",
                 },
-                move: {
-                    label: "Moure...",
-                    title: "Moure contingut",
-                    ok: "Document '{{document}}' mogut correctament",
-                },
-                copy: {
-                    label: "Copiar...",
-                    title: "Copiar contingut",
-                    ok: "Document '{{document}}' copiat correctament",
-                },
-                vincular: {
-                    label: "Vincular...",
-                    title: "Vincular contingut",
-                    ok: "Document '{{document}}' vinculat correctament",
-                },
                 imprimible: {
                     label: "Versió imprimible",
                     ok: "La versió imprimible s'ha descarregat correctament",
@@ -699,6 +707,12 @@ const translationCa = {
                 update: {
                     label: "Modificar...",
                     ok: "Carpeta '{{carpeta}}' modificada correctament",
+                },
+                delete: {
+                    label: "Esborrar...",
+                    check: "Esteu segur que voleu continuar amb aquesta acció?",
+                    description: "Un cop esborrat no es podrà recuperar",
+                    ok: "Element esborrat",
                 }
             }
         },

@@ -118,6 +118,21 @@ const translationEs = {
                     label: "Guardar en archivo",
                     ok: "Elemento guardado en archivo",
                 },
+                move: {
+                    label: "Mover...",
+                    title: "Mover contenido",
+                    ok: "Documento '{{document}}' movido correctamente",
+                },
+                copy: {
+                    label: "Copiar...",
+                    title: "Copiar contenido",
+                    ok: "Documento '{{document}}' copiado correctamente",
+                },
+                vincular: {
+                    label: "Vincular...",
+                    title: "Vincular contenido",
+                    ok: "Documento '{{document}}' vinculado correctamente",
+                },
                 create: {
                     label: "Crear contenido",
                 },
@@ -129,6 +144,10 @@ const translationEs = {
                 infoArxiu: {
                     title: "Información obtenida del archivo",
                     label: "Información archivo",
+                },
+                importarExpedient: {
+                    label: "Importar expediente relacionado...",
+                    title: "Expedientes relacionados",
                 },
             },
             history: {
@@ -355,6 +374,10 @@ const translationEs = {
                 detall: {
                     label: "Gestionar",
                 },
+                importar: {
+                    label: "Importar expediente",
+                    ok: "El expediente se ha importado correctamente",
+                },
                 agafar: {
                     label: "Coger",
                     ok: "El expediente '{{expedient}}' ha sido cogido por el usuario '{{user}}'",
@@ -572,21 +595,6 @@ const translationEs = {
                 detall: {
                     label: "Detalles",
                 },
-                move: {
-                    label: "Mover...",
-                    title: "Mover contenido",
-                    ok: "Documento '{{document}}' movido correctamente",
-                },
-                copy: {
-                    label: "Copiar...",
-                    title: "Copiar contenido",
-                    ok: "Documento '{{document}}' copiado correctamente",
-                },
-                vincular: {
-                    label: "Vincular...",
-                    title: "Vincular contenido",
-                    ok: "Documento '{{document}}' vinculado correctamente",
-                },
                 imprimible: {
                     label: "Versión imprimible",
                     ok: "La versión imprimible se ha descargado correctamente",
@@ -699,6 +707,12 @@ const translationEs = {
                 update: {
                     label: "Modificar...",
                     ok: "Carpeta '{{carpeta}}' modificada correctamente",
+                },
+                delete: {
+                    label: "Borrar...",
+                    check: "Esta seguro de que quiere seguir con esta acción?",
+                    description: "Una vez borrado no se prodra recuperar",
+                    ok: "Elemento borrado",
                 }
             }
         },

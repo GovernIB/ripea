@@ -51,7 +51,7 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
             hidden: !potModificar(entity),
         },
         {
-            title: t('page.document.action.move.title'),
+            title: t('page.contingut.action.move.title'),
             icon: "open_with",
             onClick: (ids:any[])=>handleMoure(ids, entity),
             hidden: !potModificar(entity),

@@ -118,6 +118,21 @@ const translationEn = {
                     label: "Save to archive",
                     ok: "Item saved to archive",
                 },
+                move: {
+                    label: "Move...",
+                    title: "Move content",
+                    ok: "Document '{{document}}' moved successfully",
+                },
+                copy: {
+                    label: "Copy...",
+                    title: "Copy content",
+                    ok: "Document '{{document}}' copied successfully",
+                },
+                vincular: {
+                    label: "Link...",
+                    title: "Link content",
+                    ok: "Document '{{document}}' linked successfully",
+                },
                 create: {
                     label: "Create content",
                 },
@@ -129,6 +144,10 @@ const translationEn = {
                 infoArxiu: {
                     title: "Information obtained from the file",
                     label: "File information",
+                },
+                importarExpedient: {
+                    label: "Import related case file...",
+                    title: "Related case files",
                 },
             },
             history: {
@@ -355,6 +374,10 @@ const translationEn = {
                 detall: {
                     label: "Manage",
                 },
+                importar: {
+                    label: "Import case file",
+                    ok: "The case file has been successfully imported",
+                },
                 agafar: {
                     label: "Take",
                     ok: "The expedient '{{expedient}}' has been taken by the user '{{user}}'.",
@@ -572,21 +595,6 @@ const translationEn = {
                 detall: {
                     label: "Details",
                 },
-                move: {
-                    label: "Move...",
-                    title: "Move content",
-                    ok: "Document '{{document}}' moved successfully",
-                },
-                copy: {
-                    label: "Copy...",
-                    title: "Copy content",
-                    ok: "Document '{{document}}' copied successfully",
-                },
-                vincular: {
-                    label: "Link...",
-                    title: "Link content",
-                    ok: "Document '{{document}}' linked successfully",
-                },
                 imprimible: {
                     label: "Printable version",
                     ok: "The printable version has been downloaded successfully",
@@ -699,6 +707,12 @@ const translationEn = {
                 update: {
                     label: "Edit...",
                     ok: "Folder '{{carpeta}}' updated successfully",
+                },
+                delete: {
+                    label: "Delete...",
+                    check: "Are you sure you want to proceed with this action?",
+                    description: "Once deleted, it cannot be recovered",
+                    ok: "Item deleted",
                 }
             }
         },

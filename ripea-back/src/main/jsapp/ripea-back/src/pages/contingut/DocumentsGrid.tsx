@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
-import { GridTreeDataGroupingCell } from "@mui/x-data-grid-pro";
+import {GridTreeDataGroupingCell, useGridApiRef} from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -248,6 +248,7 @@ const DocumentsGrid = (props: any) => {
         findCarpetas()
         gridApiRef?.current?.refresh?.();
     }
+
     const { createActions, actions, hiddenDelete, components } = useContingutActions(entity, gridApiRef, refresh);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
@@ -284,6 +285,7 @@ const DocumentsGrid = (props: any) => {
                     apiRef={gridApiRef}
                     rowAdditionalActions={actions}
                     onRowCountChange={onRowCountChange}
+                    onRefresh={refresh}
 
                     groupingColDef={{
                         headerName: t('page.contingut.grid.nom'),

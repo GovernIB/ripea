@@ -1,13 +1,12 @@
 import {useEffect, useRef, useState} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {FormField, MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
-import FormFieldEnum from "../../../../lib/components/mui/form/FormFieldEnum.tsx";
 import useVisualitzar from "./Visualitzar.tsx";
 
 const AcceptarTabExpedient = () => {
@@ -67,7 +66,7 @@ const AcceptarTabAnnexos = () => {
             sortable: false,
             flex: 0.5,
             renderCell: (params:any) => {
-                return <FormFieldEnum
+                return <FormField
                     name={"annexos"}
                     label={fieldTipusDocument?.label}
                     value={annexos[params.id]}

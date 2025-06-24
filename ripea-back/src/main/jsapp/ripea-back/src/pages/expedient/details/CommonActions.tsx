@@ -163,6 +163,17 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
+    const importarExpedient = (id:any, additionalData:any,) => {
+        return apiAction(id, { code: 'IMPORTAR', data: additionalData })
+            .then(() => {
+                refresh?.()
+                temporalMessageShow(null, t('page.expedient.action.importar.ok'), 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
     return {
         reobrir,
         follow,
@@ -179,6 +190,7 @@ export const useActions = (refresh?: () => void) => {
         syncArxiu,
         eliminarRelacio,
         excelInteressats,
+        importarExpedient,
     }
 }
 
