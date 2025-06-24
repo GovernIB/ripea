@@ -227,7 +227,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             setIgnoreOnInputChangeEvent(false);
             return;
         }
-        if (isEmptyValue || newValue?.length == 0) {
+        if (isEmptyValue || multiple || newValue?.length == 0) {
             setInputValue(newValue);
             setOptionsQuickFilter(newValue);
         } else {
@@ -253,9 +253,13 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
             };
             const valueReferenceWithData = valueReference ? { ...valueReference, data: row } : null;
             if (multiple) {
-                const currentValues = Array.isArray(value) ? value : [value];
-                const currentValueFound = currentValues.find(v => v.id === valueReferenceWithData?.id);
-                processValueChange(currentValueFound ? currentValues : [...currentValues, valueReferenceWithData]);
+                if (value != null) {
+                    const currentValues = Array.isArray(value) ? value : [value];
+                    const currentValueFound = currentValues.find(v => v.id === valueReferenceWithData?.id);
+                    processValueChange(currentValueFound ? currentValues : [...currentValues, valueReferenceWithData]);
+                } else {
+                    processValueChange([valueReferenceWithData]);
+                }
             } else {
                 processValueChange(valueReferenceWithData);
             }
