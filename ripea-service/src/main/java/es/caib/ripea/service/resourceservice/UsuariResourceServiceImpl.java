@@ -66,6 +66,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
         return UserPermissionInfo.builder()
                 .codi(usuariCodi)
                 .nom(usuariNom)
+                .conf(objectMappingHelper.newInstanceMap(usuari, UsuariResource.class))
                 .superusuari(superusuari)
                 .permisosEntitat(permisosEntitat)
                 .build();

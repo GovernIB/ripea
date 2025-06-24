@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
-import {GridTreeDataGroupingCell, useGridApiRef} from "@mui/x-data-grid-pro";
+import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
@@ -18,6 +18,13 @@ import { useScanFinalitzatSession } from "../../components/SseExpedient.tsx";
 import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
+
+const View = {
+    estat: 'TREETABLE_PER_ESTAT',
+    tipus: 'TREETABLE_PER_TIPUS_DOCUMENT',
+    carpeta: 'TREETABLE_PER_CARPETA',
+    icona: 'GRID',
+}
 
 const ScanerTabForm = () => {
     const { data, apiRef } = useFormContext();
@@ -158,9 +165,9 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
             >
-                <MenuItem value={"estat"}>{t('page.document.view.estat')}</MenuItem>
-                <MenuItem value={"tipus"}>{t('page.document.view.tipus')}</MenuItem>
-                <MenuItem value={"carpeta"} selected>{t('page.document.view.carpeta')}</MenuItem>
+                <MenuItem value={View.estat}>{t('page.document.view.estat')}</MenuItem>
+                <MenuItem value={View.tipus}>{t('page.document.view.tipus')}</MenuItem>
+                <MenuItem value={View.carpeta} selected>{t('page.document.view.carpeta')}</MenuItem>
             </Select>
         </FormControl>
     </Grid>
@@ -195,6 +202,7 @@ const columns = [
 const DocumentsGrid = (props: any) => {
     const { entity, onRowCountChange } = props;
     const { t } = useTranslation();
+    const {value: user} = useUserSession();
 
     const commonFilter = builder.and(
         builder.or(
@@ -239,9 +247,9 @@ const DocumentsGrid = (props: any) => {
 
     const gridApiRef = useMuiDataGridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
-    const [expand, setExpand] = useState<boolean>(false);
+    const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
     const isFirstRender = useRef(true);
-    const [vista, setVista] = useState<string>("carpeta");
+    const [vista, setVista] = useState<string>(user?.conf?.vistaActual);
 
     const refresh = () => {
         findExpedients()
@@ -303,7 +311,7 @@ const DocumentsGrid = (props: any) => {
                     treeDataAdditionalRows={(_rows: any) => {
                         const additionalRows: any[] = [];
 
-                        if (vista == "carpeta") {
+                        if (vista == View.carpeta || vista == View.icona) {
                             for (const contingut of [...carpetes, ...expedients]) {
                                 if (entity?.id!= contingut.id && !additionalRows.map((b) => b.id).includes(contingut.id)) {
                                     additionalRows.push(contingut)
@@ -319,8 +327,8 @@ const DocumentsGrid = (props: any) => {
                     }}
                     getTreeDataPath={(row: any): string[] => {
                         switch (vista) {
-                            case "estat": return [`${row.estat}`, `${row.nom}`];
-                            case "tipus": return [`${row.metaNode?.description}`, `${row.nom}`];
+                            case View.estat: return [`${row.estat}`, `${row.id}`];
+                            case View.tipus: return [`${row.metaNode?.description}`, `${row.id}`];
                             default: return row.treePath.filter((id:any)=>id!=entity?.id);
                         }
                     }}

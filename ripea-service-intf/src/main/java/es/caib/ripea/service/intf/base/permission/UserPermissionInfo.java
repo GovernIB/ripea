@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.base.permission;
 
+import es.caib.ripea.service.intf.model.UsuariResource;
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class UserPermissionInfo {
     private List<String> rols;
     private List<String> auth;
     private Map<String, Object> sessionScope;
+    private UsuariResource conf;
 
     @Data
     @Builder
