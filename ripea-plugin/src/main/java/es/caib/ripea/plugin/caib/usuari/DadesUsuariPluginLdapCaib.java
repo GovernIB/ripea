@@ -112,7 +112,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 			}
 			return resultat;
 		} catch (Exception ex) {
-			if (ex.getMessage().contains("Do not implemented")) {
+			if (ex.getMessage()!=null && ex.getMessage().contains("Do not implemented")) {
 				return null;
 			} else {
 				throw new SistemaExternException("Error al consultar els usuaris per filtre " + filtre, ex);
