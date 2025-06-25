@@ -8,7 +8,6 @@ import * as builder from "../../../util/springFilterUtils.ts";
 
 const MoureForm = () => {
     const { data } = useFormContext();
-    console.log("data", data)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="contingut" readOnly disabled hidden={data?.massivo}/>
