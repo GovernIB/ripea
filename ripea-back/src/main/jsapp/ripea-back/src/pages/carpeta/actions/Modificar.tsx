@@ -7,7 +7,7 @@ import GridFormField from "../../../components/GridFormField.tsx";
 
 const ModificarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="motiu" type={"textarea"} required/>
+        <GridFormField xs={12} name="nom" required/>
     </Grid>
 }
 
@@ -29,8 +29,8 @@ const useModificar = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id)
+    const handleShow = (id:any, row:any) :void => {
+        apiRef.current?.show?.(id, row)
     }
     const onSuccess = ((result:any) => {
         refresh?.()

@@ -18,7 +18,7 @@ const MoureForm = () => {
                        filter={builder.and(
                            builder.eq('expedient.id', data?.expedient?.id)
                        )}/>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField xs={12} name="motiu" type={"textarea"}/>
         {/*<GridFormField xs={12} name="action" required/>*/}
     </Grid>
 }

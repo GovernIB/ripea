@@ -39,15 +39,15 @@ const DocumentIcon = (props:any) => {
         :isInOptions(extension, 'doc', 'docx', 'odt') ?<Icon>description</Icon>
         :isInOptions(extension, 'xls', 'xlsx', 'ods') ?<Icon>description</Icon>
         :isInOptions(extension, 'zip') ?<Icon>folder_zip</Icon>
-        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon>folder_code</Icon>
+        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon>code</Icon>
         :isInOptions(extension, 'jpeg', 'png', 'bmp', 'jpg') ?<Icon>image</Icon>
         :isInOptions(extension, 'txt') ?<Icon>description</Icon>
         :isInOptions(extension, 'mp3', 'wav') ?<Icon>audio_file</Icon>
         :isInOptions(extension, 'mpeg', 'avi') ?<Icon>video_file</Icon>
         :<Icon title={t('page.document.title')} >description</Icon>}
 
-        {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')}>info</Icon>}
-        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')}>B</Icon>}
+        {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')} color={"info"}>info</Icon>}
+        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')} color={"warning"}>B</Icon>}
         {isInOptions(entity?.estat, 'CUSTODIAT', 'FIRMAT', 'ADJUNT_FIRMAT') && <Icon title={t('page.document.alert.firma')} color={"success"}>edit</Icon>}
 
         {entity?.gesDocOriginalId && <Icon title={t('page.document.alert.original')} color={"warning"}>file_copy</Icon>}
