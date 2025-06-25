@@ -2265,7 +2265,7 @@ public class PluginHelper {
 		}
 	}
 
-	public void arxiuDocumentCopiar(
+	public String arxiuDocumentCopiar(
 			DocumentEntity document,
 			String arxiuUuidDesti) {
 
@@ -2286,7 +2286,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		try {
-			arxiuPluginWrapper.getPlugin().documentCopiar(
+			ContingutArxiu docCopiat = arxiuPluginWrapper.getPlugin().documentCopiar(
 					document.getArxiuUuid(),
 					arxiuUuidDesti);
 			integracioHelper.addAccioOk(
@@ -2296,6 +2296,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			return docCopiat.getIdentificador();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -2733,7 +2734,7 @@ public class PluginHelper {
 		}
 	}
 
-	public void arxiuCarpetaCopiar(
+	public String arxiuCarpetaCopiar(
 			CarpetaEntity carpeta,
 			String arxiuUuidDesti) {
 
@@ -2757,7 +2758,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		try {
-			arxiuPluginWrapper.getPlugin().carpetaCopiar(
+			ContingutArxiu carpetaCopiada = arxiuPluginWrapper.getPlugin().carpetaCopiar(
 					carpeta.getArxiuUuid(),
 					arxiuUuidDesti);
 			integracioHelper.addAccioOk(
@@ -2767,6 +2768,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			return carpetaCopiada.getIdentificador();
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(

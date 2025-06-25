@@ -1750,7 +1750,8 @@ public class ContingutHelper {
 				true,
 				true);
 		ContingutDto dto = toContingutDto(contingutOrigen, false, false);
-		arxiuPropagarCopia(contingutOrigen,contingutDesti);
+		String uuidCopia = arxiuPropagarCopia(contingutOrigen,contingutDesti);
+		contingutCopia.setArxiuUuid(uuidCopia);
 		return dto;
 	}
 	
@@ -2146,18 +2147,19 @@ public class ContingutHelper {
 		}
 	}
 
-	public void arxiuPropagarCopia(
+	private String arxiuPropagarCopia(
 			ContingutEntity contingut,
 			ContingutEntity desti) {
 		if (contingut instanceof DocumentEntity) {
-			pluginHelper.arxiuDocumentCopiar(
+			return pluginHelper.arxiuDocumentCopiar(
 					(DocumentEntity)contingut,
 					desti.getArxiuUuid());
 		} else if (contingut instanceof CarpetaEntity) {
-			pluginHelper.arxiuCarpetaCopiar(
+			return pluginHelper.arxiuCarpetaCopiar(
 					(CarpetaEntity)contingut,
 					desti.getArxiuUuid());
 		}
+		return null;
 	}
 
 	public ContingutArxiu arxiuPropagarLink(

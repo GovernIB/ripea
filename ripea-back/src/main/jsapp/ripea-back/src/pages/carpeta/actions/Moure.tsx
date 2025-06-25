@@ -17,7 +17,7 @@ const MoureForm = () => {
                        disabled={!data?.expedient}
                        filter={builder.and(
                            builder.eq('expedient.id', data?.expedient?.id),
-                           builder.eq('actiu', true),
+                           builder.eq('esborrat', false),
                        )}/>
         <GridFormField xs={12} name="motiu"/>
         {/*<GridFormField xs={12} name="action" required/>*/}

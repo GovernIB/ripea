@@ -32,6 +32,7 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.dto.CarpetaDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.CarpetaResource;
@@ -85,7 +86,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     	try {
 			//La entitat ja es comprova a pinbalHelper
 			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-			carpetaHelper.create(
+			CarpetaDto carpetaCreada = carpetaHelper.create(
 					entitatEntity.getId(),
 					resource.getExpedient().getId(),
 					resource.getNom(),
@@ -96,12 +97,13 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 					false, 
 					null, 
 					true);
+			resource.setId(carpetaCreada.getId());
     	} catch (ValidationException ex) {
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/create", ex);
     	}
-    	return null;
+    	return resource;
     }
     
     @Override
