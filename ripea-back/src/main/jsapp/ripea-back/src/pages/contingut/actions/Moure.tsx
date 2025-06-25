@@ -19,7 +19,7 @@ const MoureForm = () => {
                            builder.eq('expedient.id', data?.expedient?.id),
 						   builder.eq('esborrat', false),
                        )}/>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField xs={12} name="motiu" type={"textarea"}/>
         {/*<GridFormField xs={12} name="action" required/>*/}
     </Grid>
 }

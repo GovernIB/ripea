@@ -706,6 +706,7 @@ const translationCa = {
                 },
                 update: {
                     label: "Modificar...",
+                    title: "Modificar carpeta",
                     ok: "Carpeta '{{carpeta}}' modificada correctament",
                 },
                 delete: {

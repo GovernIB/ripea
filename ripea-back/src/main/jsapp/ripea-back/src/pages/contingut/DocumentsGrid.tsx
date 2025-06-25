@@ -285,7 +285,6 @@ const DocumentsGrid = (props: any) => {
                     staticSortModel={sortModel}
                     popupEditCreateActive
                     popupEditFormContent={<DocumentsGridForm />}
-                    formInitOnChange
                     formAdditionalData={{
                         expedient: { id: entity?.id },
                         metaExpedient: entity?.metaExpedient,
