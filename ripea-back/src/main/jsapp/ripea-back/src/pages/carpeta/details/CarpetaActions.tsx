@@ -118,6 +118,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             title: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
+            hidden: !potMod || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
             title: t('page.contingut.action.history.label'),
