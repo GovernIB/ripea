@@ -359,7 +359,6 @@ const translationEs = {
             detall: {
                 title: "Información del expediente",
                 agafatPer: "Cogido por",
-                dataDarrerEnviament: "Fecha del último envío",
                 avisos: "Avisos",
             },
             action: {

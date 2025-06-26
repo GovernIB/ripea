@@ -359,7 +359,6 @@ const translationEn = {
             detall: {
                 title: "Case Information",
                 agafatPer: "Taken by",
-                dataDarrerEnviament: "Last delivery date",
                 avisos: "Warnings",
             },
             action: {
