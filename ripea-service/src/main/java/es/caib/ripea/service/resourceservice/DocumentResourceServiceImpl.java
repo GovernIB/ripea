@@ -275,7 +275,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		resource.setId(documentCreat.getId());
     		return resource;
     	} catch (Exception ex) {
-    		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
+    		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
     	return null;
     }

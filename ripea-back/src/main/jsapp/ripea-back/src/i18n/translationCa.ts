@@ -159,7 +159,7 @@ const translationCa = {
             alert: {
                 valid: "Aquest contingut té errors de validació",
                 metaNode: "Aquest document no té assignat un tipus de document",
-                guardarPendent: "Pendent de gordar en arxivo",
+                guardarPendent: "Pendent de guardar a l'arxiu",
             },
         },
         anotacio: {
@@ -706,6 +706,7 @@ const translationCa = {
                 },
                 update: {
                     label: "Modificar...",
+                    title: "Modificar carpeta",
                     ok: "Carpeta '{{carpeta}}' modificada correctament",
                 },
                 delete: {

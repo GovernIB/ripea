@@ -2845,7 +2845,8 @@ public class ExpedientHelper {
 			    Row row = sheet.createRow(i);
 			    for (int j = 0; j < tableModel.getColumnCount(); j++) {
 			        Cell cell = row.createCell(j);
-			        cell.setCellValue(tableModel.getValueAt(i, j).toString());
+			        Object aux = tableModel.getValueAt(i, j);
+			        cell.setCellValue(aux!=null?aux.toString():"");
 			    }
 			}
 			workbook.write(baos);

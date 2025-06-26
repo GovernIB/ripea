@@ -65,7 +65,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const { value: user } = useUserSession()
     const potMod = potModificar(entity)
 
-    const { eliminar, exportarPDF, exportarEXCEL } = useActions()
+    const { eliminar, exportarPDF, exportarEXCEL } = useActions(refresh)
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleShow: handleModifyCarpeta, content: contentModifyCarpeta} = useModificar(refresh)
     const {handleShow: handleMoure, content: contentMoure} = useMoure(refresh)
@@ -118,6 +118,7 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
             title: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
+            hidden: !potMod || !user?.sessionScope?.isCreacioCarpetesActiva,
         },
         {
             title: t('page.contingut.action.history.label'),

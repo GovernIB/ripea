@@ -17,8 +17,7 @@ import {
     Theme,
     CSSObject
 } from '@mui/material/styles';
-import {useBaseAppContext} from "reactlib";
-import { useSmallScreen, useSmallHeader } from '../../lib/util/useSmallScreen';
+import {useBaseAppContext, useSmallScreen, useSmallHeader} from "reactlib";
 import logo from '../assets/goib_escut_logo.png';
 import SideWrapper from "./SideWrapper";
 

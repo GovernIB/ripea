@@ -16,9 +16,10 @@ const MoureForm = () => {
                        readOnly={!data?.expedient}
                        disabled={!data?.expedient}
                        filter={builder.and(
-                           builder.eq('expedient.id', data?.expedient?.id)
+                           builder.eq('expedient.id', data?.expedient?.id),
+						   builder.eq('esborrat', false),
                        )}/>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField xs={12} name="motiu" type={"textarea"}/>
         {/*<GridFormField xs={12} name="action" required/>*/}
     </Grid>
 }
@@ -35,7 +36,6 @@ const Moure = (props:any) => {
 
 const useAction = (code:string, title:string, onSuccess?: (result:any) => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
-    const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {
         const carpeta = row?.expedient?.id != row?.pare?.id ?row?.pare :null
@@ -56,7 +56,6 @@ const useAction = (code:string, title:string, onSuccess?: (result:any) => void) 
 }
 const useMassiveAction = (code:string, title:string, onSuccess?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
-    const {temporalMessageShow} = useBaseAppContext();
 
     const handleMassiveShow = (ids:any[], entity:any) :void => {
         apiRef.current?.show?.(undefined, {

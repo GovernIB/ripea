@@ -23,7 +23,7 @@ const ContingutIcon = (props:any) => {
         {entity?.nom}
 
         {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
-            <Icon title={t('page.contingut.alert.guardarPendent')} color={"error"}>warning</Icon>}
+            <Icon title={t('page.contingut.alert.guardarPendent')} color={"warning"}>warning</Icon>}
     </Grid>
 }
 const DocumentIcon = (props:any) => {
@@ -39,15 +39,15 @@ const DocumentIcon = (props:any) => {
         :isInOptions(extension, 'doc', 'docx', 'odt') ?<Icon>description</Icon>
         :isInOptions(extension, 'xls', 'xlsx', 'ods') ?<Icon>description</Icon>
         :isInOptions(extension, 'zip') ?<Icon>folder_zip</Icon>
-        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon>folder_code</Icon>
+        :isInOptions(extension, 'xsig', 'xml', 'json', 'html') ?<Icon>code</Icon>
         :isInOptions(extension, 'jpeg', 'png', 'bmp', 'jpg') ?<Icon>image</Icon>
         :isInOptions(extension, 'txt') ?<Icon>description</Icon>
         :isInOptions(extension, 'mp3', 'wav') ?<Icon>audio_file</Icon>
         :isInOptions(extension, 'mpeg', 'avi') ?<Icon>video_file</Icon>
         :<Icon title={t('page.document.title')} >description</Icon>}
 
-        {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')}>info</Icon>}
-        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')}>B</Icon>}
+        {isInOptions(entity?.documentTipus, 'IMPORTAT') && <Icon title={t('page.document.alert.import')} color={"info"}>info</Icon>}
+        {isInOptions(entity?.estat, 'REDACCIO') && <Icon title={t('page.document.alert.delete')} color={"warning"}>B</Icon>}
         {isInOptions(entity?.estat, 'CUSTODIAT', 'FIRMAT', 'ADJUNT_FIRMAT') && <Icon title={t('page.document.alert.firma')} color={"success"}>edit</Icon>}
 
         {entity?.gesDocOriginalId && <Icon title={t('page.document.alert.original')} color={"warning"}>file_copy</Icon>}
@@ -62,17 +62,20 @@ const DocumentIcon = (props:any) => {
         {isInOptions(entity?.estat, 'DEFINITIU') && <Icon title={t('page.document.alert.definitiu')} color={"success"}>check_box</Icon>}
 
         {/*—------------------- INICI ICONES DE NOTIFICACIO —----------------------*/}
-        {entity?.ambNotificacions && !entity?.errorDarreraNotificacio && isInOptions(entity?.estatDarreraNotificacio, 'PENDENT', 'REGISTRADA') &&
-            <Icon color={"warning"}>mail</Icon>}
+        {entity?.ambNotificacions && (
+            !entity?.errorDarreraNotificacio
+                ?<>
+                    {isInOptions(entity?.estatDarreraNotificacio, 'PENDENT', 'REGISTRADA') &&
+                        <Icon color={"warning"}>mail</Icon>}
 
-        {entity?.ambNotificacions && !entity?.errorDarreraNotificacio && isInOptions(entity?.estatDarreraNotificacio, 'ENVIADA_AMB_ERRORS', 'FINALITZADA_AMB_ERRORS') &&
-            <Icon color={"error"}>mail</Icon>}
+                    {isInOptions(entity?.estatDarreraNotificacio, 'ENVIADA_AMB_ERRORS', 'FINALITZADA_AMB_ERRORS') &&
+                        <Icon color={"error"}>mail</Icon>}
 
-        {entity?.ambNotificacions && !entity?.errorDarreraNotificacio && isInOptions(entity?.estatDarreraNotificacio, 'PROCESSADA', 'FINALITZADA') &&
-            <Icon color={"info"}>mail</Icon>}
-
-        {entity?.ambNotificacions && entity?.errorDarreraNotificacio &&
-            <Icon color={"success"}>mail</Icon>}
+                    {isInOptions(entity?.estatDarreraNotificacio, 'PROCESSADA', 'FINALITZADA') &&
+                        <Icon color={"info"}>mail</Icon>}
+                </>
+                :<Icon color={"error"}>mail</Icon>
+        )}
         {/*—------------------- FI ICONES DE NOTIFICACIO —----------------------*/}
 
         {isInOptions(entity?.estat, 'FIRMA_PENDENT_VIAFIRMA', 'FIRMA_PENDENT') &&

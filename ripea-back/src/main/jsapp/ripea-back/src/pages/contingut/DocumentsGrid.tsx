@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -248,7 +248,6 @@ const DocumentsGrid = (props: any) => {
     const gridApiRef = useMuiDataGridApiRef();
     const [treeView, setTreeView] = useState<boolean>(true);
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
-    const isFirstRender = useRef(true);
     const [vista, setVista] = useState<string>(user?.conf?.vistaActual);
 
     const refresh = () => {
@@ -264,14 +263,6 @@ const DocumentsGrid = (props: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
 
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-        removeAll()
-    }, [expand]);
-
     return <GridPage>
         <Load value={entity && apiExpedientIsReady && apiCarpetaIsReady}>
             <DropZone onDrop={onDrop} disabled={!potModificar(entity)}>
@@ -285,7 +276,6 @@ const DocumentsGrid = (props: any) => {
                     staticSortModel={sortModel}
                     popupEditCreateActive
                     popupEditFormContent={<DocumentsGridForm />}
-                    formInitOnChange
                     formAdditionalData={{
                         expedient: { id: entity?.id },
                         metaExpedient: entity?.metaExpedient,
@@ -351,7 +341,10 @@ const DocumentsGrid = (props: any) => {
                     toolbarElementsWithPositions={[
                         {
                             position: 0,
-                            element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView} />,
+                            element: <ExpandButton value={expand} onChange={(value:any)=>{
+                                setExpand(value)
+                                removeAll()
+                            }} hidden={!treeView} />,
                         },
                         {
                             position: 1,

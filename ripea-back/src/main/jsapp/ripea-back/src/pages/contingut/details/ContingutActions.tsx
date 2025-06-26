@@ -123,7 +123,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(refresh)
 
-    const {apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions()
+    const {apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
@@ -196,7 +196,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: guardarArxiu,
             disabled: !entity?.arxiuUuid,
-            hidden: (row:any) => !row?.arxiuUuid /* TODO: && row.gesDocFirmatId*/,
+            hidden: (row:any) => !row?.arxiuUuid && row.gesDocFirmatId,
         },
         {
             title: t('page.document.action.detall.label'),

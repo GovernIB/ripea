@@ -706,6 +706,7 @@ const translationEs = {
                 },
                 update: {
                     label: "Modificar...",
+                    title: "Modificar carpeta",
                     ok: "Carpeta '{{carpeta}}' modificada correctamente",
                 },
                 delete: {

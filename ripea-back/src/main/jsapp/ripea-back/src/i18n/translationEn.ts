@@ -706,7 +706,8 @@ const translationEn = {
                 },
                 update: {
                     label: "Edit...",
-                    ok: "Folder '{{carpeta}}' updated successfully",
+                    title: "Edit folder",
+                    ok: "Folder '{{carpeta}}' successfully updated",
                 },
                 delete: {
                     label: "Delete...",

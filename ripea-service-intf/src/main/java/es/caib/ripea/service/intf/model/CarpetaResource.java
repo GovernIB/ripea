@@ -40,7 +40,7 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = CarpetaResource.ACTION_MOURE_COPIAR,
-                        formClass = DocumentResource.MoureFormAction.class,
+                        formClass = CarpetaResource.MoureCopiarFormAction.class,
                         requiresId = true),		
         }
 )
