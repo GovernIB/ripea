@@ -1,0 +1,25 @@
+    <subsystem xmlns="urn:jboss:domain:keycloak:1.2">
+        <realm name="${env.JBOSS_AUTH_REALM}">
+            <auth-server-url>${env.JBOSS_AUTH_URL}</auth-server-url>
+            <ssl-required>EXTERNAL</ssl-required>
+        </realm>
+        <secure-deployment name="ripea-back.war">
+            <auth-server-url>${env.JBOSS_AUTH_URL}</auth-server-url>
+            <realm>${env.JBOSS_AUTH_REALM}</realm>
+            <resource>${env.JBOSS_AUTH_CLIENTID}</resource>
+            <use-resource-role-mappings>false</use-resource-role-mappings>
+            <public-client>true</public-client>
+            <principal-attribute>preferred_username</principal-attribute>
+            <verify-token-audience>true</verify-token-audience>
+        </secure-deployment>
+        <secure-deployment name="ripea-api-interna.war">
+            <auth-server-url>${env.JBOSS_AUTH_URL}</auth-server-url>
+            <realm>${env.JBOSS_AUTH_REALM}</realm>
+            <resource>${env.JBOSS_AUTH_CLIENTID_REST}</resource>
+            <use-resource-role-mappings>true</use-resource-role-mappings>
+            <bearer-only>true</bearer-only>
+            <enable-basic-auth>true</enable-basic-auth>
+            <principal-attribute>preferred_username</principal-attribute>
+            <credential name="secret">${env.JBOSS_AUTH_SECRET}</credential>
+        </secure-deployment>
+    </subsystem>

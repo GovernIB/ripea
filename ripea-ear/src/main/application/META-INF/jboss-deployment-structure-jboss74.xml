@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!-- https://github.com/wildfly/wildfly-core/blob/main/server/src/main/resources/schema/jboss-deployment-structure-1_2.xsd -->
+	<deployment>
+		<exclusions>
+			<module name="org.slf4j.impl" />
+			<module name="ch.qos.logback" />
+		</exclusions>
+		<dependencies>
+			<module name="javax.servlet.api" />
+			<module name="javax.servlet.jsp.api" />
+<!-- 			<module name="org.keycloak.keycloak-core" export="true"/> -->
+			<!-- Llibreries mínimes (4) perque funcionin els WS securitzats -->
+			<module name="org.apache.cxf.impl"/>
+			<module name="org.apache.ws.security"/>
+			<module name="org.apache.santuario.xmlsec"/>
+			<module name="org.bouncycastle"/>
+<!-- 			<module name="io.undertow.core" export="true"/> -->
+<!-- 			<module name="io.undertow.servlet" export="true"/> -->
+<!-- 			<module name="io.undertow.websocket" export="true"/> -->
+<!-- 			<module name="jdk.management"/> -->
+		</dependencies>
+		<exclude-subsystems>
+			<!-- Excloent aquest subsystem fa que s'utilitzin els jars de jackson que venen amb el projecte i evitam errors -->
+			<subsystem name="jaxrs"/>
+		</exclude-subsystems>
+	</deployment>
+	<ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+</jboss-deployment-structure>

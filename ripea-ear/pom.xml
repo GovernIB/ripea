@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>es.caib.ripea</groupId>
@@ -9,9 +9,9 @@
 	<artifactId>ripea-ear</artifactId>
 	<packaging>ear</packaging>
 	<properties>
-		<docker.base.image>${project.parent.artifactId}</docker.base.image>
+		<docker.image.name>${project.parent.artifactId}</docker.image.name>
+		<docker.image.from>280421/jboss-eap-caib-7.2</docker.image.from>
 		<docker.jboss.userhome>/home/jboss</docker.jboss.userhome>
-		<docker.jboss.dir>jboss-eap-7.2</docker.jboss.dir>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -66,10 +66,10 @@
 					<verbose>true</verbose>
 					<images>
 						<image>
-							<name>${docker.base.image}</name>
+							<name>${docker.image.name}</name>
 							<alias>${project.parent.artifactId}</alias>
 							<build>
-								<from>280421/jboss-eap-caib-7.2</from>
+								<from>${docker.image.from}</from>
 								<maintainer>limit@limit.es</maintainer>
 								<args>
 									<VITE_APP_VERSION>${project.version}</VITE_APP_VERSION>
@@ -177,7 +177,7 @@
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>
-<!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory>-->
+					<!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory>-->
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
@@ -208,19 +208,19 @@
 					</modules>
 				</configuration>
 			</plugin>
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-resources-plugin</artifactId>-->
-<!--				<version>2.6</version>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<goals>-->
-<!--							<goal>resources</goal>-->
-<!--							<goal>testResources</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
+			<!--			<plugin>-->
+			<!--				<groupId>org.apache.maven.plugins</groupId>-->
+			<!--				<artifactId>maven-resources-plugin</artifactId>-->
+			<!--				<version>2.6</version>-->
+			<!--				<executions>-->
+			<!--					<execution>-->
+			<!--						<goals>-->
+			<!--							<goal>resources</goal>-->
+			<!--							<goal>testResources</goal>-->
+			<!--						</goals>-->
+			<!--					</execution>-->
+			<!--				</executions>-->
+			<!--			</plugin>-->
 		</plugins>
 		<finalName>${project.parent.artifactId}</finalName>
 	</build>
