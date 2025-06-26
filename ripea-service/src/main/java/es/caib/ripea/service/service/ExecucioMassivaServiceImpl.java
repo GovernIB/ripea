@@ -278,13 +278,12 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			}
 			
 			String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR);
-			String documentNom = "/exportZip/documentsExpedients_" + Calendar.getInstance().getTimeInMillis() + ".zip";
-			File fContent = new File(directoriDesti + documentNom);
+			File fContent = new File(directoriDesti + resultat.getNom());
 			fContent.getParentFile().mkdirs();
 			FileOutputStream outContent = new FileOutputStream(fContent);
 			outContent.write(resultat.getContingut());
 			outContent.close();
-			execucioMassiva.setDocumentNom(documentNom);
+			execucioMassiva.setDocumentNom(resultat.getNom());
 			
 			//Marcam tots els elements de la exec massiva com a finalitzats
 			if(execucioMassiva.getContinguts()!=null) {

@@ -359,6 +359,7 @@ const translationCa = {
             detall: {
                 title: "Informació de l'expedient",
                 agafatPer: "Agafat per",
+                dataDarrerEnviament: "Data darrer enviament",
                 avisos: "Avisos",
             },
             action: {
