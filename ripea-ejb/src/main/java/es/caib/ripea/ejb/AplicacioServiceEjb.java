@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Stateless
+@RolesAllowed("**")
 public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> implements AplicacioService {
 
 	@Delegate private AplicacioService delegateService;

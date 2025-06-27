@@ -11,6 +11,7 @@ import es.caib.ripea.service.intf.service.MonitorTasquesService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class MonitorTasquesServiceEjb extends AbstractServiceEjb<MonitorTasquesService> implements MonitorTasquesService {
 
 	@Delegate private MonitorTasquesService delegateService;

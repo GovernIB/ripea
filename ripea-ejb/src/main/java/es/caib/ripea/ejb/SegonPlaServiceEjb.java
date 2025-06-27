@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import javax.annotation.security.RolesAllowed;
@@ -11,6 +8,7 @@ import es.caib.ripea.service.intf.service.SegonPlaService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> implements SegonPlaService {
 
 	@Delegate private SegonPlaService delegateService;

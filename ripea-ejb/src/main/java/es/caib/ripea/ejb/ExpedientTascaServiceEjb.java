@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.io.IOException;
@@ -23,6 +20,7 @@ import es.caib.ripea.service.intf.service.ExpedientTascaService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ExpedientTascaServiceEjb extends AbstractServiceEjb<ExpedientTascaService> implements ExpedientTascaService {
 
 	@Delegate private ExpedientTascaService delegateService;

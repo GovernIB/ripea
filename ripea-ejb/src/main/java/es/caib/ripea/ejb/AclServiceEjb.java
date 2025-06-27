@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
@@ -17,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
+@RolesAllowed("**")
 public class AclServiceEjb extends AbstractServiceEjb<AclService> implements AclService {
 
 	@Delegate private AclService delegateService = null;

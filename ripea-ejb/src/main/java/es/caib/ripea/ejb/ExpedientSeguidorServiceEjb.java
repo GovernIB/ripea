@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -14,6 +11,7 @@ import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ExpedientSeguidorServiceEjb extends AbstractServiceEjb<ExpedientSeguidorService> implements ExpedientSeguidorService {
 
  	@Delegate private ExpedientSeguidorService delegateService;

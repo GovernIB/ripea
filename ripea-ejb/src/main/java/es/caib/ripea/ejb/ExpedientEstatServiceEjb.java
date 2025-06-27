@@ -18,6 +18,7 @@ import es.caib.ripea.service.intf.service.ExpedientEstatService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ExpedientEstatServiceEjb extends AbstractServiceEjb<ExpedientEstatService> implements ExpedientEstatService {
 
 	@Delegate private ExpedientEstatService delegateService;

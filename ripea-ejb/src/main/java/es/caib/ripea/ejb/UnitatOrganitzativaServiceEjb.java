@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -14,6 +11,7 @@ import es.caib.ripea.service.intf.service.UnitatOrganitzativaService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class UnitatOrganitzativaServiceEjb extends AbstractServiceEjb<UnitatOrganitzativaService> implements UnitatOrganitzativaService {
 
 	@Delegate private UnitatOrganitzativaService delegateService;

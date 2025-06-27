@@ -5,8 +5,6 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -15,6 +13,7 @@ import es.caib.ripea.service.intf.service.PinbalServeiService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class PinbalServeiServiceEjb extends AbstractServiceEjb<PinbalServeiService> implements PinbalServeiService {
 
 	@Delegate private PinbalServeiService delegateService;

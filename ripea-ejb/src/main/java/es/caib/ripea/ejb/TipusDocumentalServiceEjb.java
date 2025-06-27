@@ -14,6 +14,7 @@ import es.caib.ripea.service.intf.service.TipusDocumentalService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class TipusDocumentalServiceEjb extends AbstractServiceEjb<TipusDocumentalService> implements TipusDocumentalService {
 
 	@Delegate private TipusDocumentalService delegateService;

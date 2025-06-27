@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -35,6 +32,7 @@ import es.caib.ripea.service.intf.service.MetaExpedientService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class MetaExpedientServiceEjb extends AbstractServiceEjb<MetaExpedientService> implements MetaExpedientService {
 
 	@Delegate private MetaExpedientService delegateService;

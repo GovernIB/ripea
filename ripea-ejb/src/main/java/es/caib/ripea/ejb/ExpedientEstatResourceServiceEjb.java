@@ -1,4 +1,5 @@
 package es.caib.ripea.ejb;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +10,11 @@ import javax.ejb.Stateless;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.model.ExpedientEstatResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
 import lombok.experimental.Delegate;
 

@@ -13,6 +13,7 @@ import es.caib.ripea.service.intf.service.DigitalitzacioService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class DigitalitzacioServiceEjb extends AbstractServiceEjb<DigitalitzacioService> implements DigitalitzacioService {
 
 	@Delegate private DigitalitzacioService delegateService;

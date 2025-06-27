@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.io.IOException;
@@ -21,6 +18,7 @@ import es.caib.ripea.service.intf.service.CarpetaService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class CarpetaServiceEjb extends AbstractServiceEjb<CarpetaService> implements CarpetaService {
 
 	@Delegate private CarpetaService delegateService;

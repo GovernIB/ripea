@@ -15,6 +15,7 @@ import es.caib.ripea.service.intf.service.URLInstruccioService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class URLInstruccioServiceEjb extends AbstractServiceEjb<URLInstruccioService> implements URLInstruccioService {
 
 	@Delegate private URLInstruccioService delegateService;

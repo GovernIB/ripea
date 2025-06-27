@@ -34,6 +34,7 @@ import es.caib.ripea.service.intf.service.ContingutService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> implements ContingutService {
 
 	@Delegate private ContingutService delegateService;

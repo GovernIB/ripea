@@ -18,6 +18,7 @@ import es.caib.ripea.service.intf.service.GrupService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class GrupServiceEjb extends AbstractServiceEjb<GrupService> implements GrupService {
 
 	@Delegate private GrupService delegateService;

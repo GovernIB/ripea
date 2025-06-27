@@ -16,6 +16,7 @@ import es.caib.ripea.service.intf.service.ConfigService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ConfigServiceEjb extends AbstractServiceEjb<ConfigService> implements ConfigService {
 
 	@Delegate private ConfigService delegateService;

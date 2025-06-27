@@ -22,6 +22,7 @@ import es.caib.ripea.service.intf.service.SeguimentService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public  class SeguimentServiceEjb extends AbstractServiceEjb<SeguimentService> implements SeguimentService {
 
 	@Delegate private SeguimentService delegateService;
