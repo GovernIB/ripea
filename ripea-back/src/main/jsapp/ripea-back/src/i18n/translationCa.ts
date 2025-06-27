@@ -14,6 +14,10 @@ const translationCa = {
         clear: "Netejar",
         search: "Cercar",
         options: "Opcions",
+        select: {
+            all: "Seleccionar tots",
+            clear: "Netejar selecció",
+        },
         import: "Importar",
         export: "Exportar",
         consult: "Consultar",

@@ -14,6 +14,10 @@ const translationEn = {
         clear: "Clear",
         search: "Search",
         options: "Options",
+        select: {
+            all: "Select all",
+            clear: "Clear selection",
+        },
         import: "Import",
         export: "Export",
         consult: "Consult",

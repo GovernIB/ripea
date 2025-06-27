@@ -14,6 +14,10 @@ const translationEs = {
         clear: "Limpiar",
         search: "Buscar",
         options: "Opciones",
+        select: {
+            all: "Seleccionar todos",
+            clear: "Limpiar selección",
+        },
         import: "Importar",
         export: "Exportar",
         consult: "Consultar",
