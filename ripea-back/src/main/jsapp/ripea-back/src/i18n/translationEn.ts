@@ -939,6 +939,7 @@ const translationEn = {
                     label: "View massive actions",
                     title: "{{name}} mass executions",
                     detail: "Detail of the mass action",
+                    ok: "The document has been downloaded successfully",
                 },
             },
             perfil: {

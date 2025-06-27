@@ -19,7 +19,7 @@ const useActions = () => {
         apiDownload(id, {fieldName: 'documentNom'})
             .then((result) => {
                 iniciaDescargaBlob(result);
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.user.action.massives.title'), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');

@@ -939,6 +939,7 @@ const translationCa = {
                     label: "Consultar accions massives",
                     title: "Execucions massives de {{name}}",
                     detail: "Detall de l'acció massiva",
+                    ok: "El document s'ha baixat correctament",
                 },
             },
             perfil: {
