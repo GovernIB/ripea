@@ -311,27 +311,27 @@ const translationEs = {
                 },
                 new: {
                     label: "Nuevo Interesado",
-                    ok: "Elemento creado",
+                    ok: "El interesado se ha creado correctamente",
                 },
                 delete: {
                     label: "Borrar Interesado",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
-                    ok: "Elemento borrado",
+                    ok: "El interesado se ha borrado correctamente",
                 },
                 createRep: {
                     label: "Añadir Representante",
-                    ok: "Elemento creado",
+                    ok: "El representante se ha creado correctamente",
                 },
                 updateRep: {
                     label: "Modificar Representante",
-                    ok: "Elemento modificado",
+                    ok: "El representante se ha modificar correctamente",
                 },
                 deleteRep: {
                     label: "Borrar Representante",
                     check: "Esta seguro de que quiere seguir con esta acción?",
                     description: "Una vez borrado no se prodra recuperar",
-                    ok: "Elemento borrado",
+                    ok: "El representante se ha borrado correctamente",
                 },
                 importar: {
                     label: "Importar...",

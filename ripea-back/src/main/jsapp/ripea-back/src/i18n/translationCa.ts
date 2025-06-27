@@ -311,27 +311,27 @@ const translationCa = {
                 },
                 new: {
                     label: "Nou Interessat",
-                    ok: "Element creat",
+                    ok: "L'interessat s'ha creat correctament",
                 },
                 delete: {
                     label: "Esborrar Interessat",
-                    check: "Estàs segur que vols continuar amb aquesta acció?",
+                    check: "Està segur que vol continuar amb aquesta acció?",
                     description: "Un cop esborrat no es podrà recuperar",
-                    ok: "Element esborrat",
+                    ok: "L'interessat s'ha esborrat correctament",
                 },
                 createRep: {
                     label: "Afegir Representant",
-                    ok: "Element creat",
+                    ok: "El representant s'ha creat correctament",
                 },
                 updateRep: {
                     label: "Modificar Representant",
-                    ok: "Element modificat",
+                    ok: "El representant s'ha modificat correctament",
                 },
                 deleteRep: {
                     label: "Esborrar Representant",
-                    check: "Estàs segur que vols continuar amb aquesta acció?",
+                    check: "Està segur que vol continuar amb aquesta acció?",
                     description: "Un cop esborrat no es podrà recuperar",
-                    ok: "Element esborrat",
+                    ok: "El representant s'ha esborrat correctament",
                 },
                 importar: {
                     label: "Importar...",

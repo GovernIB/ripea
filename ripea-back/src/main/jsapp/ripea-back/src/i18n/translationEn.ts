@@ -310,28 +310,28 @@ const translationEn = {
                     title: "Details of the interested party",
                 },
                 new: {
-                    label: "New Stakeholder",
-                    ok: "Item created",
+                    label: "New Interested Party",
+                    ok: "The interested party has been successfully created",
                 },
                 delete: {
-                    label: "Delete Stakeholder",
+                    label: "Delete Interested Party",
                     check: "Are you sure you want to proceed with this action?",
                     description: "Once deleted, it cannot be recovered",
-                    ok: "Item deleted",
+                    ok: "The interested party has been successfully deleted",
                 },
                 createRep: {
                     label: "Add Representative",
-                    ok: "Item created",
+                    ok: "The representative has been successfully created",
                 },
                 updateRep: {
                     label: "Edit Representative",
-                    ok: "Item updated",
+                    ok: "The representative has been successfully updated",
                 },
                 deleteRep: {
                     label: "Delete Representative",
                     check: "Are you sure you want to proceed with this action?",
                     description: "Once deleted, it cannot be recovered",
-                    ok: "Item deleted",
+                    ok: "The representative has been successfully deleted",
                 },
                 importar: {
                     label: "Import...",
