@@ -209,22 +209,29 @@ public class AplicacioServiceImpl implements AplicacioService {
 					usuariHelper.getUsuariByCodiDades(codi, true, true),
 					UsuariDto.class);
 		} catch (NotFoundException ex) {
-			logger.error("No s'ha trobat cap usuari amb el codi " + codi + ". Procedim a cercar si és un càrrec.");
-			usuariDto = new UsuariDto();
-			PortafirmesCarrecDto carrec = pluginHelper.portafirmesRecuperarCarrec(codi);
-			
-			if (carrec != null) {
-				String nom = carrec.getCarrecName();
-			    if (!Utils.isBlank(carrec.getUsuariPersonaNom())) {
-			        nom += " - " + carrec.getUsuariPersonaNom();
-			    }
-				usuariDto.setCodi(carrec.getCarrecId());
-				usuariDto.setNom(nom);
-				usuariDto.setNif(carrec.getUsuariPersonaNif());
+			if (configHelper.getAsBoolean(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)) {
+				logger.error("No s'ha trobat cap usuari amb el codi " + codi + ". Procedim a cercar si és un càrrec.");
+				usuariDto = new UsuariDto();
+				PortafirmesCarrecDto carrec = pluginHelper.portafirmesRecuperarCarrec(codi);
+				
+				if (carrec != null) {
+					String nom = carrec.getCarrecName();
+				    if (!Utils.isBlank(carrec.getUsuariPersonaNom())) {
+				        nom += " - " + carrec.getUsuariPersonaNom();
+				    }
+					usuariDto.setCodi(carrec.getCarrecId());
+					usuariDto.setNom(nom);
+					usuariDto.setNif(carrec.getUsuariPersonaNif());
+				} else {
+					throw new NotFoundException(
+							codi,
+							DadesUsuari.class);
+				}
 			} else {
-				throw new NotFoundException(
-						codi,
-						DadesUsuari.class);
+				usuariDto = new UsuariDto();
+				usuariDto.setCodi(codi);
+				usuariDto.setNif(codi);
+				usuariDto.setNom(codi);
 			}
 		}
 		return usuariDto;
