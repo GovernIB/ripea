@@ -939,6 +939,7 @@ const translationCa = {
                     label: "Consultar accions massives",
                     title: "Execucions massives de {{name}}",
                     detail: "Detall de l'acció massiva",
+                    ok: "El document s'ha baixat correctament",
                 },
             },
             perfil: {
@@ -953,8 +954,12 @@ const translationCa = {
         },
         alert: {
             title: "Alertes d'expedient",
-            acciones: {
-                read: "Marcar com a llegida",
+            action: {
+                read: {
+                    label: "Marcar com a llegida",
+                    ok: "L'alerta s'ha marcat com a llegida",
+                    massiveOk: "Les alertes s'han marcat com a llegides",
+                },
             },
             errors: {
                 metaDada: "Falten les dades següents:",

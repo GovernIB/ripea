@@ -13,6 +13,7 @@ import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 /**
  * Entitat de base de dades que representa un contingut.
@@ -88,5 +89,6 @@ public abstract class ContingutResourceEntity<R> extends BaseAuditableEntity<R> 
             fetch = FetchType.LAZY,
             cascade = {CascadeType.REMOVE}
     )
+    @Where(clause = "llegida = false")
     protected List<AlertaResourceEntity> alertes = new ArrayList<>();
 }

@@ -10,6 +10,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
 const useActions = () => {
+    const { t } = useTranslation()
     const {
         fieldDownload: apiDownload
     } = useResourceApiService('execucioMassivaResource');
@@ -19,7 +20,7 @@ const useActions = () => {
         apiDownload(id, {fieldName: 'documentNom'})
             .then((result) => {
                 iniciaDescargaBlob(result);
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.user.action.massives.ok'), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
