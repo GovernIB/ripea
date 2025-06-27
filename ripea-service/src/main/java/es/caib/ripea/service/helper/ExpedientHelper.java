@@ -1777,7 +1777,7 @@ public class ExpedientHelper {
 			if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
 				if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
 				for (Long metaExpId: idsMetaExpedientsPermesos) {
-					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElseGet(null);
+					MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
 					if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
 						aux.add(metaExpId);
 					}
@@ -1792,7 +1792,7 @@ public class ExpedientHelper {
 						ExtendedPermission.READ));
 				
 				for (Long metaExpComId: meComuns) {
-					MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElseGet(null);
+					MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
 
 					if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
 						aux.add(metaExpComId);
