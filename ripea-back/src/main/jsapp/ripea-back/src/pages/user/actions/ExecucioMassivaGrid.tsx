@@ -10,6 +10,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
 const useActions = () => {
+    const { t } = useTranslation()
     const {
         fieldDownload: apiDownload
     } = useResourceApiService('execucioMassivaResource');
