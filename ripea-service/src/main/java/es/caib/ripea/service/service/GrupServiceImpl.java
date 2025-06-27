@@ -525,7 +525,7 @@ public class GrupServiceImpl implements GrupService {
 	@Override
 	public GrupDto findGrupById(Long grupId) {
 		return conversioTipusHelper.convertir(
-				grupRepository.findById(grupId),
+				grupRepository.findById(grupId).get(),
 				GrupDto.class);
 	}
 	
