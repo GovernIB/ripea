@@ -576,11 +576,9 @@ public class GrupServiceImpl implements GrupService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public GrupDto findGrupById(
-			Long grupId) {
-		
+	public GrupDto findGrupById(Long grupId) {
 		return conversioTipusHelper.convertir(
-				grupRepository.findById(grupId),
+				grupRepository.findById(grupId).get(),
 				GrupDto.class);
 	}
 	
