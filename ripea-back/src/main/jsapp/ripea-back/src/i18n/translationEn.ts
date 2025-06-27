@@ -953,8 +953,12 @@ const translationEn = {
         },
         alert: {
             title: "Case Alerts",
-            acciones: {
-                read: "Mark as read",
+            action: {
+                read: {
+                    label: "Mark as read",
+                    ok: "The alert has been marked as read",
+                    massiveOk: "The alerts have been marked as read",
+                },
             },
             errors: {
                 metaDada: "The following data is missing:",

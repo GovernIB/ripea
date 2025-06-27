@@ -7,7 +7,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 
 const useActions = (refresh?: () => void) => {
-    // const { t } = useTranslation();
+    const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
     const {
         artifactAction: apiAction,
@@ -35,8 +35,8 @@ const useActions = (refresh?: () => void) => {
             })
     }
 
-    const llegit = (id: any): void => { action(id, 'LLEGIT'); }
-    const massiveLlegit = (ids: any): void => { massiveAction(ids, 'LLEGIT'); }
+    const llegit = (id: any): void => action(id, 'LLEGIT', t('page.alert.action.read.ok'))
+    const massiveLlegit = (ids: any): void => massiveAction(ids, 'LLEGIT', t('page.alert.action.read.massiveOk'))
 
     return {
         llegit,
@@ -68,7 +68,7 @@ const Alerta = (props:any) => {
     const {llegit, massiveLlegit} = useActions(refresh);
     const actions =[
         {
-            title: t('page.alert.acciones.read'),
+            title: t('page.alert.action.read.label'),
             icon: "mail",
             showInMenu: false,
             onClick: llegit,
@@ -76,7 +76,7 @@ const Alerta = (props:any) => {
     ]
     const massiveActions =[
         {
-            title: t('page.alert.acciones.read'),
+            title: t('page.alert.action.read.label'),
             icon: "mail",
             onClick: massiveLlegit,
         },

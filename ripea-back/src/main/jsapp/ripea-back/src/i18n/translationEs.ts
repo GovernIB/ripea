@@ -953,8 +953,12 @@ const translationEs = {
         },
         alert: {
             title: "Alertas de expediente",
-            acciones: {
-                read: "Marcar como leido",
+            action: {
+                read: {
+                    label: "Marcar como leído",
+                    ok: "La alerta se ha marcado como leida",
+                    massiveOk: "Las alertas se ha marcado como leídas",
+                },
             },
             errors: {
                 metaDada: "Faltan los siguientes datos:",

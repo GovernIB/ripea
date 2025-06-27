@@ -953,8 +953,12 @@ const translationCa = {
         },
         alert: {
             title: "Alertes d'expedient",
-            acciones: {
-                read: "Marcar com a llegida",
+            action: {
+                read: {
+                    label: "Marcar com a llegida",
+                    ok: "L'alerta s'ha marcat com a llegida",
+                    massiveOk: "Les alertes s'han marcat com a llegides",
+                },
             },
             errors: {
                 metaDada: "Falten les dades següents:",
