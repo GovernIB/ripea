@@ -4,7 +4,8 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import { TemporalMessageSeverity, TemporalMessageShowFn } from '../BaseAppContext';
 
-const TEMPORALMSG_DURATION_DEFAULT = 2000;
+const TEMPORALMSG_DURATION_DEFAULT = 5000;
+const TEMPORALMSG_DURATION_ERROR = 10000;
 
 type TemporalMessageProps = {
     open: boolean;
@@ -51,10 +52,12 @@ export const TemporalMessage: React.FC<TemporalMessageProps> = (props) => {
         severity,
         additionalComponents,
     } = props;
+    const autoHideDuration =
+        severity === 'error' ? TEMPORALMSG_DURATION_ERROR : TEMPORALMSG_DURATION_DEFAULT;
     return <Snackbar
         open={open}
         onClose={() => setOpen(false)}
-        autoHideDuration={TEMPORALMSG_DURATION_DEFAULT}
+        autoHideDuration={autoHideDuration}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert onClose={() => setOpen(false)} severity={severity ?? 'info'} sx={{ width: '100%' }}>
             {title && <AlertTitle>{title}</AlertTitle>}
