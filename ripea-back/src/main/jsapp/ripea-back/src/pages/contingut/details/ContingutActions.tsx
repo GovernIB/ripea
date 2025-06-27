@@ -196,7 +196,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: guardarArxiu,
             disabled: !entity?.arxiuUuid,
-            hidden: (row:any) => !row?.arxiuUuid && row.gesDocFirmatId,
+            hidden: (row:any) => row?.arxiuUuid && !row?.gesDocFirmatId,
         },
         {
             title: t('page.document.action.detall.label'),

@@ -131,7 +131,6 @@ const RemesaGrid = (props:any) => {
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate
-            rowHideDeleteButton
         />
         {components}
     </GridPage>

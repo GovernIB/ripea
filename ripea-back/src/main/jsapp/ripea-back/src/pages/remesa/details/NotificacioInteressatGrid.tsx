@@ -72,9 +72,7 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
                 filter={builder.and(
                     builder.eq('notificacio.id', entity?.id)
                 )}
-                titleDisabled
                 staticSortModel={[{field: 'id', sort: 'asc'}]}
-                disableColumnMenu
                 disableColumnSorting
                 readOnly
                 autoHeight

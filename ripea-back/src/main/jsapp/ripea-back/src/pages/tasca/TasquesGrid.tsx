@@ -92,7 +92,6 @@ const TasquesGrid = (props: any) => {
             field: 'numComentaris',
             headerName: '',
             sortable: false,
-            disableColumnMenu: true,
             flex: 0.25,
             renderCell: (params: any) => <CommentDialog
                 entity={params?.row}
@@ -125,7 +124,6 @@ const TasquesGrid = (props: any) => {
             }}
             rowAdditionalActions={actions}
             toolbarHideCreate={!potModificar(entity)}
-            rowHideDeleteButton
         />
         {components}
     </GridPage>

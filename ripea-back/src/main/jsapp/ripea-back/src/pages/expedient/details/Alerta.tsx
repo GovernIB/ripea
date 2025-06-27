@@ -100,8 +100,6 @@ const Alerta = (props:any) => {
         onRowCountChange={onRowCountChange}
 
         toolbarHideCreate
-        rowHideUpdateButton
-        rowHideDeleteButton
     />
 }
 const useAlerta = () => {

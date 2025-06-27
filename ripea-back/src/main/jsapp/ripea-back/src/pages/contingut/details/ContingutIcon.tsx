@@ -23,7 +23,7 @@ const ContingutIcon = (props:any) => {
         {entity?.nom}
 
         {!entity?.arxiuUuid && !user?.sessionScope?.isCreacioCarpetesLogica &&
-            <Icon title={t('page.contingut.alert.guardarPendent')} color={"warning"}>warning</Icon>}
+            <Icon title={t('page.contingut.alert.guardarPendent')} color={"error"}>warning</Icon>}
     </Grid>
 }
 const DocumentIcon = (props:any) => {

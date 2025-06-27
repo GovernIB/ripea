@@ -103,7 +103,6 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             onRowCountChange={onRowCountChange}
             toolbarCreateTitle={t('page.interessat.action.new.label')}
             toolbarHideCreate={!potModificar(entity)}
-            rowHideDeleteButton
 
             selectionActive
             onRowSelectionModelChange={(newSelection) => {
@@ -132,6 +131,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             variant={'contained'}
                                             title={t('page.expedient.action.excelInteressats.title')}
                                             onClick={()=>excelInteressats(entity?.id)}
+                                            disabled={selectedRows?.length==0}
                                             hidden={!potModificar(entity) || !num || num==0}
                     />,
                 },
