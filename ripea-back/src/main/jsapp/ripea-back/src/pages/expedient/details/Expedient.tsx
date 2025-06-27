@@ -115,7 +115,7 @@ const ExpedientAlert = (props:any) => {
         { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
             <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
         }
-        { expedient?.numAlert!=0 && count!=0 &&
+        { expedient?.numAlert!=0 && (count === null || count !== 0) &&
             <Alert severity="error" color="warning"
                    action={
                        <Button sx={{py: 0}} color={"inherit"} onClick={() => handelAlert(expedient?.id, expedient)}>
