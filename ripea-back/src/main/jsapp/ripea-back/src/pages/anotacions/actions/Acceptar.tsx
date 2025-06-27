@@ -161,21 +161,22 @@ const AcceptarTabInteressats = () => {
 
 const AcceptarForm = () => {
     const {data} =useFormContext();
+    const { t } = useTranslation();
 
     const tabs = [
         {
             value: 'expedient',
-            label: 'Expedient',
+            label: t('page.expedient.title'),
             content: <AcceptarTabExpedient/>,
         },
         {
             value: 'annexos',
-            label: 'Annexos',
+            label: t('page.anotacio.tabs.annexos'),
             content: <AcceptarTabAnnexos/>,
         },
         {
             value: 'interessats',
-            label: 'Interessats',
+            label: t('page.anotacio.tabs.interessats'),
             content: <AcceptarTabInteressats/>,
             hidden: !data?.associarInteressats
         },
