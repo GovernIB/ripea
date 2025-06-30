@@ -578,7 +578,7 @@ function removeCookie(cname) {
 				</div>
 			</div>
 			<c:if test="${hasCreatePermissionForAnyProcediment}">
-				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" data-maximized="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
+				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 			</c:if>
 		</div>
 	</script>

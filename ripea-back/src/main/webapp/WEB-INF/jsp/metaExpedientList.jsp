@@ -1,4 +1,4 @@
-﻿<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
+<%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
@@ -278,23 +278,22 @@
                 <c:if test="${(not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan) && not isRolDissenyadorOrgan}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 						<script id="cellPermisosTemplate" type="text/x-jsrender">
-							<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+							<a href="<c:url value="/metaExpedient/{{:id}}/permis"/>" target="_blank" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 						</script>
 					</th>
 				</c:if>
-
 				
 				<th data-col-name="id" data-template="#cellElementsTemplate" data-orderable="false" width="1%">
 					<script id="cellElementsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-default" data-toggle="dropdown"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.elements"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="metaExpedient/{{:id}}/metaDocument"><span class="badge">{{:metaDocumentsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.documents"/></a></li>
-								<li><a href="metaExpedient/{{:id}}/metaDada"><span class="badge">{{:metaDadesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/></a></li>
-								<li><a href="expedientEstat/{{:id}}"><span class="badge">{{:expedientEstatsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.estats"/></a></li>
-								<li><a href="metaExpedient/{{:id}}/tasca"><span class="badge">{{:expedientTasquesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.tasques"/></a></li>
+								<li><a href="<c:url value="/metaExpedient/{{:id}}/metaDocument"/>"	target="_blank"><span class="badge">{{:metaDocumentsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.documents"/></a></li>
+								<li><a href="<c:url value="/metaExpedient/{{:id}}/metaDada"/>"		target="_blank"><span class="badge">{{:metaDadesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.meta.dades"/></a></li>
+								<li><a href="<c:url value="/expedientEstat/{{:id}}"/>"				target="_blank"><span class="badge">{{:expedientEstatsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.estats"/></a></li>
+								<li><a href="<c:url value="/metaExpedient/{{:id}}/tasca"/>"			target="_blank"><span class="badge">{{:expedientTasquesCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.tasques"/></a></li>
 								{{if gestioAmbGrupsActiva}}
-									<li><a href="metaExpedient/{{:id}}/grup"><span class="badge">{{:grupsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.grups"/></a></li>
+									<li><a href="<c:url value="/metaExpedient/{{:id}}/grup"/>"		target="_blank"><span class="badge">{{:grupsCount}}</span>&nbsp;<spring:message code="metaexpedient.list.boto.grups"/></a></li>
 								{{/if}}
 							</ul>
 						</div>					
@@ -308,8 +307,8 @@
 								<c:if test="${not isRolActualDissenyadorOrgan}">
 									<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
 								</c:if>
-								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
+								<li><a href="metaExpedient/{{:id}}"			data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="metaExpedient/{{:id}}/export"	data-toggle="ajax" ><span class="fa fa-upload"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
 								<c:if test="${isRolAdmin || isRolAdminOrgan}">
 									<li><a href="metaExpedient/{{:id}}/regla" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.regla"/></a></li>
 								</c:if>
