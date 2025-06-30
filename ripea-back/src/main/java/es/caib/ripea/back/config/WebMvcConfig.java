@@ -87,6 +87,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
 
+	public static final int MAX_UPLOAD_SIZE = 52428800;
+	
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {
 		FilterRegistrationBean<SiteMeshFilter> registrationBean = new FilterRegistrationBean<>();
@@ -117,7 +119,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Bean(name = "multipartResolver")
 	public CommonsMultipartResolver multipartResolver() {
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-		multipartResolver.setMaxUploadSize(15728640l);
+		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
 		return multipartResolver;
 	}
 	
