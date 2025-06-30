@@ -17,10 +17,11 @@ const useCreate = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const create = (id:any, additionalData?:any, after?: (result?:any) => void) => {
-        apiRef.current?.show(id, additionalData)
+    const create = (additionalData?:any, after?: (result?:any) => void) => {
+        apiRef.current?.show(undefined, additionalData)
             .then((result:any) => {
                 after?.(result);
+                refresh?.();
                 temporalMessageShow(null, t('page.interessat.action.new.ok'), 'success');
             })
             .catch((error:any) => {
@@ -29,20 +30,9 @@ const useCreate = (refresh?: () => void) => {
                 }
             });
     }
-    const update = (id: any) => {
-        apiRef.current?.show(id)
-            .then(() => {
-                refresh?.();
-                temporalMessageShow(null, t('page.interessat.action.updateRep.ok'), 'success');
-            })
-            .catch((error:any) => {
-                temporalMessageShow(null, error?.message, 'error');
-            });
-    }
 
     return {
         create,
-        update,
         content: <CreateForm resourceTitle={t('page.interessat.title')} apiRef={apiRef}/>,
     }
 }

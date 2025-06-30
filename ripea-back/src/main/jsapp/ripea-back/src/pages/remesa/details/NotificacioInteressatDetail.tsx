@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import {useActions} from "./NotificacioInteressatActions.tsx";
 
 const Dades = (props:any) => {
     const {entity} = props;

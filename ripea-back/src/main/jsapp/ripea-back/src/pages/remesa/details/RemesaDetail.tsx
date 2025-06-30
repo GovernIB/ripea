@@ -6,6 +6,7 @@ import {CardData, ContenidoData} from "../../../components/CardData.tsx";
 import AlertExpand from "../../../components/AlertExpand.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useActions} from "./RemesaActions.tsx";
+import Load from "../../../components/Load.tsx";
 
 const Dades = (props:any) => {
     const {entity} = props;
@@ -87,10 +88,12 @@ const useRemesaDetail = () => {
                 }
             }}
         >
-            {entity?.error &&
-                <AlertExpand severity={"error"} label={t('page.notificacio.detall.error')}>{entity?.errorDescripcio}</AlertExpand>
-            }
-            <Dades entity={entity}/>
+            <Load value={entity}>
+                {entity?.error &&
+                    <AlertExpand severity={"error"} label={t('page.notificacio.detall.error')}>{entity?.errorDescripcio}</AlertExpand>
+                }
+                <Dades entity={entity}/>
+            </Load>
         </MuiDialog>
 
     return {

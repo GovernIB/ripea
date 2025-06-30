@@ -3,6 +3,7 @@ import {Grid} from "@mui/material";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData, ContenidoData} from "../../../components/CardData.tsx";
+import Load from "../../../components/Load.tsx";
 
 const InteressatDetail = (props: any) => {
     const {entity} = props;
@@ -67,7 +68,9 @@ const useInteressatDetail = () => {
                 }
             }}
         >
-            <InteressatDetail entity={entity}/>
+            <Load value={entity}>
+                <InteressatDetail entity={entity}/>
+            </Load>
         </MuiDialog>
 
     return {

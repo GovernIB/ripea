@@ -57,7 +57,7 @@ export const useActions = (refresh?: () => void) => {
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 	
     const action = (id:any, code:string, msg:string) => {
-        return apiAction(undefined, {code: code, data:{ ids: [id], massivo: false }})
+        apiAction(undefined, {code: code, data:{ ids: [id], massivo: false }})
 			.then(() => {
 			    refresh?.()
 			    temporalMessageShow(null, msg, 'success');
@@ -68,7 +68,7 @@ export const useActions = (refresh?: () => void) => {
     }
 	
 	const report = (id:any, code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
+	    apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');

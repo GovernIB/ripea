@@ -112,7 +112,7 @@ const NotificarForm = () => {
         <GridButton
             xs={2}
             onClick={()=> {
-                create(undefined, {expedient: data?.expedient,}, onCreateInteressat)
+                create({expedient: data?.expedient}, onCreateInteressat)
             }}
         >
             <Icon>add</Icon>{t('page.interessat.action.new.label')}
