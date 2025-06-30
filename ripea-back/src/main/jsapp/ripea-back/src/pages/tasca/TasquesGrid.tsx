@@ -28,7 +28,7 @@ const TasquesGridForm = () => {
         <GridFormField xs={12} name="responsables" multiple />
         <GridFormField xs={12} name="observadors" multiple />
         <GridFormField xs={6} name="duracio" />
-        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{ disablePast: true }} />
+        <GridFormField xs={6} name="dataLimit" type={"date"} />
         <GridFormField xs={12} name="titol" />
         <GridFormField xs={12} name="observacions" type={"textarea"} />
         <GridFormField xs={12} name="prioritat" required />

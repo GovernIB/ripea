@@ -10,6 +10,8 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
 import Load from "../../../components/Load.tsx";
+import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
+import {Grid} from "@mui/material";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
@@ -40,14 +42,29 @@ const columns = [
 ]
 
 const springFilterBuilder = (data: any) :string => {
-    const filterStr = builder.and(
-        builder.eq('metaExpedient.id', data?.metaExpedient?.id),
-        builder.like('numero', data?.numero),
-        builder.like('nom', data?.nom),
-        data.estat && builder.equals("estat",`'TANCAT'`, (data.estat==='TANCAT')),
+    const processedData = {
+        metaExpedient: data?.metaExpedient,
+        numero: data?.numero,
+        nom: data?.nom,
+        estat: data?.estat,
+    }
+    return expedientFilterBuilder(processedData);
+}
+
+const ActionFilterFrom = () => {
+    const {data} = useFormContext()
+
+    const filterMetaExpedient = builder.and(
+        builder.eq('actiu', true),
+        builder.eq('revisioEstat', "'REVISAT'"),
     );
-    // console.log('>>> springFilterBuilder:', filterStr)
-    return filterStr;
+
+    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField xs={3} name="numero"/>
+        <GridFormField xs={3} name="nom"/>
+        <GridFormField xs={3} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+    </Grid>
 }
 
 const ActionFilter = (props:any) => {
@@ -59,10 +76,7 @@ const ActionFilter = (props:any) => {
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
     >
-        <GridFormField xs={3} name="metaExpedient"/>
-        <GridFormField xs={3} name="numero"/>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="estat"/>
+        <ActionFilterFrom/>
     </StyledMuiFilter>
 }
 
@@ -86,9 +100,11 @@ const RelacionarForm= () => {
             columns={columns}
             filter={builder.and(
                 builder.neq('id', apiRef?.current?.getId()),
-                // builder.exists(
-                //     builder.neq('relacionatsAmb.id', 1)
-                // ),
+                builder.not(
+                    builder.exists(
+                        builder.eq('relacionatsAmb.id', apiRef?.current?.getId())
+                    )
+                ),
                 springFilter
             )}
             sortModel={sortModel}

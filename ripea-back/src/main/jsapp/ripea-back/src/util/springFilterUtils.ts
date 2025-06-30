@@ -30,6 +30,9 @@ export const concat = (...options :any[]) :string => {
 export const exists = (value :string) :string => {
     return value.length>0 ?`exists(${value})` :'';
 }
+export const not = (value :string) :string => {
+    return value.length>0 ?`not(${value})` :'';
+}
 export const inside = (value :string, ...options :any[]) :string => {
     return options.length>0 ?`${value} in (${ filter(options).join(",") })` :'';
 }

@@ -24,11 +24,11 @@ const useActions = (refresh?: () => void) => {
         artifactAction: apiAction
     } = useResourceApiService('expedientTascaResource');
 
-    const changeEstat = (id:any, estat:string, mssg?:string) => {
+    const changeEstat = (id:any, estat:string, mssg:string) => {
         apiAction(id,{code:'CHANGE_ESTAT', data:{estat}})
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, mssg ?? '', 'success');
+                temporalMessageShow(null, mssg, 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');

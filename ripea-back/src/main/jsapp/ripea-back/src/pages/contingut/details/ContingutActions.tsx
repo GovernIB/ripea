@@ -209,7 +209,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
-            disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
+            disabled: (row:any) => row?.arxiuUuid == null || row?.gesDocFirmatId != null,
             hidden: (row:any) => !potMod || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
