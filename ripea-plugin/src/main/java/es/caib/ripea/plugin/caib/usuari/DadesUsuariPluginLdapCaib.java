@@ -105,7 +105,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 		try {
 			List<DadesUsuari> resultat = new ArrayList<DadesUsuari>();
 			SearchUsersResult sur = getUsersByPartialValuesOr(filtre, filtre, filtre, filtre, filtre);
-			if (sur!=null) {
+			if (sur!=null && sur.getUsers()!=null) {
 				for (UserInfo userInfo: sur.getUsers()) {
 					resultat.add(toDadesUsuari(userInfo));
 				}

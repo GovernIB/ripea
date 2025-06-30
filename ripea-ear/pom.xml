@@ -55,6 +55,17 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
+		<dependency>
+		    <groupId>commons-fileupload</groupId>
+		    <artifactId>commons-fileupload</artifactId>
+		    <version>1.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -175,7 +186,7 @@
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>
-					<!--outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory -->
+<!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory> -->
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
