@@ -45,7 +45,12 @@ const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
 const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
-    const {eliminarRelacio} = useActions(()=>window.location.reload())
+
+    const refresh = () => {
+        window.location.reload();
+    }
+
+    const {eliminarRelacio} = useActions(refresh)
 
     const relacionats :any[] = [...new Set([
         ...expedient?.relacionatsPer ?? [],
@@ -138,22 +143,6 @@ const ExpedientAlert = (props:any) => {
     </>
 }
 
-/* TODO: cambiar a parametro de expediente */
-export const potModificar = (entity:any) :boolean => {
-    const { value: user, permisos } = useUserSession()
-    const isRolActualAdmin = user?.rolActual == 'IPA_ADMIN';
-    const isRolActualOrganAdmin = user?.rolActual == 'IPA_ORGAN_ADMIN';
-
-    // Expedient
-    const isTancat= () => entity?.estat != "OBERT"
-    const isAgafatUsuariActual = () => entity?.agafatPer?.id == user?.codi
-    const isAdminOAdminOrgan = () => (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == entity?.organGestor?.id) )
-    const isUsuariActualWrite = () => entity?.usuariActualWrite
-    // //
-
-    return (isAgafatUsuariActual() && isUsuariActualWrite() || isAdminOAdminOrgan()) && !isTancat();
-}
-
 const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL']
 const Expedient = () => {
     const { t } = useTranslation();
@@ -186,9 +175,9 @@ const Expedient = () => {
     const [numRemeses, setNumRemeses] = useState<number>(expedient?.numRemeses);
     const [numPublicacions, setNumPublicacions] = useState<number>(expedient?.numPublicacions);
 
-    const isExperientOrCarpeta=(row:any)=>{
-        return row?.tipus=="EXPEDIENT" || row?.tipus=="CARPETA"
-    }
+    // const isExperientOrCarpeta=(row:any)=>{
+    //     return row?.tipus=="EXPEDIENT" || row?.tipus=="CARPETA"
+    // }
 
     const tabs = [
         {
@@ -209,35 +198,33 @@ const Expedient = () => {
             label: t('page.contingut.tabs.interessats'),
             content: <InteressatsGrid entity={expedient} num={numInteressats ?? expedient?.numInteressats} onRowCountChange={setNumInteressats}/>,
             badge: numInteressats ?? expedient?.numInteressats,
-            hidden: !isExperientOrCarpeta(expedient),
         },
         {
             value: "remeses",
             label: t('page.contingut.tabs.remeses'),
             content: <RemesaGrid id={id} onRowCountChange={setNumRemeses}/>,
             badge: numRemeses ?? expedient?.numRemeses,
-            hidden: !isExperientOrCarpeta(expedient) || !expedient?.numRemeses,
+            hidden: !expedient?.numRemeses,
         },
         {
             value: "publicacions",
             label: t('page.contingut.tabs.publicacions'),
             content: <PublicacioGrid id={id} onRowCountChange={setNumPublicacions}/>,
             badge: numPublicacions ?? expedient?.numPublicacions,
-            hidden: !isExperientOrCarpeta(expedient) || !expedient?.numPublicacions,
+            hidden: !expedient?.numPublicacions,
         },
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
             content: <AnotacionsExpedientGrid id={id} onRowCountChange={setNumAnotacions}/>,
             badge: numAnotacions ?? expedient?.numAnotacions,
-            hidden: !isExperientOrCarpeta(expedient) || !expedient?.numAnotacions,
+            hidden: !expedient?.numAnotacions,
         },
         {
             value: "tasques",
             label: t('page.contingut.tabs.tasques'),
             content: <TasquesGrid entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
-            hidden: !isExperientOrCarpeta(expedient),
         },
     ]
 

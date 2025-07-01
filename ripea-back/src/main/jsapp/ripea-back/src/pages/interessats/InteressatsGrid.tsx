@@ -10,7 +10,6 @@ import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
-import {potModificar} from "../expedient/details/Expedient.tsx";
 import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
 
 export const InteressatsGridForm = () => {
@@ -102,7 +101,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             toolbarCreateTitle={t('page.interessat.action.new.label')}
-            toolbarHideCreate={!potModificar(entity)}
+            toolbarHideCreate={!entity?.potModificar}
 
             selectionActive
             onRowSelectionModelChange={(newSelection) => {
@@ -121,7 +120,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                     position: 0,
                     element: <ToolbarButton icon={'download'}
                                             onClick={()=>handleImport()}
-                                            hidden={!potModificar(entity)}
+                                            hidden={!entity?.potModificar}
                     >{t('page.interessat.action.importar.label')}</ToolbarButton>
                 },
                 {
@@ -132,7 +131,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             title={t('page.expedient.action.excelInteressats.title')}
                                             onClick={()=>excelInteressats(entity?.id)}
                                             disabled={selectedRows?.length==0}
-                                            hidden={!potModificar(entity) || !num}
+                                            hidden={!entity?.potModificar || !num}
                     />,
                 },
             ]}

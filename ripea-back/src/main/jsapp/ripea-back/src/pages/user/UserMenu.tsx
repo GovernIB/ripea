@@ -8,7 +8,7 @@ import usePerfil from "./detail/Perfil.tsx";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import MenuButton from "../../components/MenuButton.tsx";
-import {TextAvatar, useBaseAppContext} from "reactlib";
+import {TextAvatar} from "reactlib";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Load from "../../components/Load.tsx";
 import {toProgramaAntic} from "./UserHeadToolbar.tsx";

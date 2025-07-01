@@ -4,7 +4,6 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import useNotificarMassive from "../actions/NotificarMassive.tsx";
 import useCanviTipus from "../actions/CanviTipus.tsx";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
-import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const useMassiveActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -48,19 +47,19 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
             title: t('page.document.action.notificarMasiva.title'),
             icon: "mail",
             onClick: handleNotificar,
-            hidden: !potModificar(entity),
+            hidden: !entity?.potModificar,
         },
         {
             title: t('page.contingut.action.move.title'),
             icon: "open_with",
             onClick: (ids:any[])=>handleMoure(ids, entity),
-            hidden: !potModificar(entity),
+            hidden: !entity?.potModificar,
         },
         {
             title: t('page.document.action.changeType.title'),
             icon: "edit",
             onClick: handleCanviTipus,
-            hidden: !potModificar(entity),
+            hidden: !entity?.potModificar,
         },
     ]
 

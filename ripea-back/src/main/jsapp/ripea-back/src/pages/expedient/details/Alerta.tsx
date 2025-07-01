@@ -14,7 +14,7 @@ const useActions = (refresh?: () => void) => {
     } = useResourceApiService('alertaResource');
 
     const action = (id:any, code:string, msg:string = '') => {
-        return apiAction(undefined, {code :code, data:{ ids: [id], massivo: false }})
+        apiAction(undefined, {code :code, data:{ ids: [id], massivo: false }})
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, msg, 'success');
@@ -25,7 +25,7 @@ const useActions = (refresh?: () => void) => {
     }
 
     const massiveAction = (ids:any[], code:string, msg:string = '') => {
-        return apiAction(undefined, {code :code, data:{ ids: ids, masivo: true }})
+        apiAction(undefined, {code :code, data:{ ids: ids, masivo: true }})
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, msg, 'info');

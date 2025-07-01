@@ -12,7 +12,6 @@ import useTascaActions from "./details/TascaActions.tsx";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
-import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -120,10 +119,10 @@ const TasquesGrid = (props: any) => {
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
                 expedient: {id: entity?.id},
-                metaExpedient: {id: entity?.metaExpedient?.id},
+                metaExpedient: entity?.metaExpedient,
             }}
             rowAdditionalActions={actions}
-            toolbarHideCreate={!potModificar(entity)}
+            toolbarHideCreate={!entity?.potModificar}
         />
         {components}
     </GridPage>
