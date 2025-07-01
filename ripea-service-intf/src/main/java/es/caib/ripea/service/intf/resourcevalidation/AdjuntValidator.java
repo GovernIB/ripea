@@ -20,7 +20,7 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
             return false;
         }
 
-        if ((long) maxLength < resource.getFirmaAdjunt().getContentLength()) {
+        if (resource.getFirmaAdjunt()!=null && (long) maxLength < resource.getFirmaAdjunt().getContentLength()) {
             context
                 .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.AdjuntValid.firma}")
                 .addPropertyNode(DocumentResource.Fields.firmaAdjunt)
