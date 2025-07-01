@@ -93,7 +93,6 @@ const ExpedientFilter = (props: any) => {
         code={"EXPEDIENT_FILTER"}
         springFilterBuilder={(data: any)=>springFilterBuilder(data, user)}
         onSpringFilterChange={onSpringFilterChange}
-        filterOnFieldEnterKeyPressed
     >
         <ExpedientFilterForm/>
     </StyledMuiFilter>

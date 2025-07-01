@@ -92,6 +92,7 @@ const StyledMuiFilter = (props:any) => {
         commonFieldComponentProps={{size: 'small', ...commonFieldComponentProps}}
         componentProps={{...filterStyle, ...componentProps}}
         buttonControlled
+        filterOnFieldEnterKeyPressed
 
         initialData={filterData}
         springFilterBuilder={springFilterBuilder}

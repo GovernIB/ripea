@@ -70,7 +70,7 @@ const columns = [
                 <StyledLinearProgress
                     color={'success'}
                     value={value}
-                    sx={{height: '15px'}}
+                    sx={{height: '20px'}}
                 >
                     {value}%
                 </StyledLinearProgress>

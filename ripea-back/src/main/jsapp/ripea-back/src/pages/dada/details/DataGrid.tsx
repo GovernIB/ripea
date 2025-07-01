@@ -5,7 +5,6 @@ import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {potModificar} from "../../expedient/details/Expedient.tsx";
 
 const DadaForm = () => {
     const { t } = useTranslation()
@@ -42,7 +41,6 @@ const DataGrid = (props:any) => {
     const { t } = useTranslation();
 
     const [numDades, setNumDades] = useState<number>(0);
-    const potMod = potModificar(contingut);
 
     return <StyledMuiGrid
         resourceName={"dadaResource"}
@@ -69,9 +67,9 @@ const DataGrid = (props:any) => {
         }}
         autoHeight
         formInitOnChange
-        toolbarHideCreate={ !potMod || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
-        rowHideUpdateButton={!potMod}
-        rowHideDeleteButton={!potMod}
+        toolbarHideCreate={ !contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N') }
+        rowHideUpdateButton={!contingut?.potModificar}
+        rowHideDeleteButton={!contingut?.potModificar}
     />
 }
 const useDataGrid = (contingut:any, refresh?:() => void) => {

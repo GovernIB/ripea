@@ -9,7 +9,6 @@ import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
 import GridFormField, { GridButton } from "../../components/GridFormField.tsx";
 import StyledMuiGrid, { ToolbarButton } from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
-import { potModificar } from "../expedient/details/Expedient.tsx";
 import { MenuActionButton } from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
 import TabComponent from "../../components/TabComponent.tsx";
@@ -265,7 +264,7 @@ const DocumentsGrid = (props: any) => {
 
     return <GridPage>
         <Load value={entity && apiExpedientIsReady && apiCarpetaIsReady}>
-            <DropZone onDrop={onDrop} disabled={!potModificar(entity)}>
+            <DropZone onDrop={onDrop} disabled={!entity?.potModificar}>
                 <StyledMuiGrid
                     resourceName="documentResource"
                     popupEditFormDialogResourceTitle={t('page.document.title')}
@@ -357,7 +356,7 @@ const DocumentsGrid = (props: any) => {
                             position: 3,
                             element: <MenuActionButton
                                 id={'createDocument'}
-                                hidden={!potModificar(entity)}
+                                hidden={!entity?.potModificar}
                                 buttonLabel={t('page.contingut.action.create.label')}
                                 buttonProps={{
                                     startIcon: <Icon>add</Icon>,
