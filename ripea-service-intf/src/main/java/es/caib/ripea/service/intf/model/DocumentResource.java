@@ -11,7 +11,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.resourcevalidation.AdjuntValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -120,6 +122,7 @@ import lombok.experimental.FieldNameConstants;
                         formClass = DocumentResource.DescarregarVersionFormAction.class,
                         requiresId = true),
         })
+@AdjuntValid(groups = {Resource.OnCreate.class, Resource.OnUpdate.class})
 public class DocumentResource extends NodeResource {
 
 	public static final String PERSPECTIVE_COUNT_CODE = "COUNT";
