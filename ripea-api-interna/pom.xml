@@ -120,6 +120,19 @@
 					<artifactId>tomcat-embed-jasper</artifactId>
 					<scope>provided</scope>
 				</dependency>
+				<dependency>
+					<!-- En Jboss, la llibreria ha de estar a la api interna i al war, així el EAR la mourá per els skinny wars -->
+					<!-- En Spring, basta que estigui al back, així la inclourà al WAR -->
+				    <groupId>commons-fileupload</groupId>
+				    <artifactId>commons-fileupload</artifactId>
+				    <version>1.5</version>
+					<exclusions>
+						<exclusion>
+							<groupId>commons-io</groupId>
+							<artifactId>commons-io</artifactId>
+						</exclusion>
+					</exclusions>
+				</dependency>
 			</dependencies>
 			<build>
 				<plugins>

@@ -45,6 +45,7 @@ public class ContingutResource extends BaseAuditableResource<Long> {
     @Transient
     private boolean conteDocumentsDefinitius;
     @Transient public List<Long> treePath;
+    @Transient public boolean hasDocumentsFills;
 	
 //	@NotNull
 	protected ResourceReference<EntitatResource, Long> entitat;

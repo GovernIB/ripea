@@ -339,6 +339,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
 		resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity));
 		resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
+		resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
+		resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
 	}
 
     @Override
