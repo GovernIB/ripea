@@ -11,7 +11,7 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
 	public boolean isValid(DocumentResource resource, ConstraintValidatorContext context) {
         int maxLength = 52428800; //es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE;
 
-        if ((long) maxLength < resource.getAdjunt().getContentLength()) {
+        if (resource.getAdjunt()!=null && (long) maxLength < resource.getAdjunt().getContentLength()) {
             context
                 .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.AdjuntValid.adjunt}")
                 .addPropertyNode(DocumentResource.Fields.adjunt)
