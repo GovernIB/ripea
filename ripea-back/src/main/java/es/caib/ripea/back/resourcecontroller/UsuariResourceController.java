@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
-import es.caib.ripea.back.helper.AnotacionsPendentsHelper;
 import es.caib.ripea.back.helper.ContingutEstaticHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.ExpedientHelper;
@@ -35,19 +33,18 @@ import es.caib.ripea.back.helper.FluxFirmaHelper;
 import es.caib.ripea.back.helper.MetaExpedientHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.helper.SeguimentEnviamentsUsuariHelper;
-import es.caib.ripea.back.helper.TasquesPendentsHelper;
 import es.caib.ripea.service.intf.base.permission.UserPermissionInfo;
-import es.caib.ripea.service.intf.base.util.SyncStoredSessionData;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.AvisService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import es.caib.ripea.service.intf.service.EventService;
+import es.caib.ripea.service.intf.service.GrupService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,6 +72,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     private final OrganGestorService organGestorService;
     private final AplicacioService aplicacioService;
     private final EventService eventService;
+    private final GrupService grupService;
 
     @Hidden
     @GetMapping("/actual/securityInfo")
@@ -121,7 +119,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         userPermissionInfo.setRolActual(rolActual);
         userPermissionInfo.setRols(roles);
         userPermissionInfo.setAuth(rolesAuth);
-        userPermissionInfo.setSessionScope(getUsuariActualAdditionalInfo(request));
+        userPermissionInfo.setSessionScope(getUsuariActualAdditionalInfo(request, userPermissionInfo, organActual));
         
         aplicacioService.actualitzarRolThreadLocal(rolActual);
         
@@ -146,7 +144,11 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     }
 
     @Hidden
-    private Map<String, Object> getUsuariActualAdditionalInfo(HttpServletRequest request) {
+    private Map<String, Object> getUsuariActualAdditionalInfo(
+    		HttpServletRequest request,
+    		UserPermissionInfo userPermissionInfo,
+    		OrganGestorDto organActual) {
+    	
         Map<String, Object> response = new HashMap<>();
 
 //        response.put("countAnotacionsPendents", AnotacionsPendentsHelper.countAnotacionsPendents(request));
@@ -178,6 +180,11 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_ACTIVA)));
         response.put("isIncorporacioJustificantActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.INCORPORAR_JUSTIFICANT)));
         response.put("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
+        List<GrupDto> grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
+        		userPermissionInfo.getEntitatActualId(),
+        		userPermissionInfo.getRolActual(),
+        		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
+        response.put("isFiltreGrupsVisible", (grupsPermesos!=null && grupsPermesos.size()>0));
         return response;
     }
 }

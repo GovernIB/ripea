@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.io.InputStream;
@@ -19,6 +16,7 @@ import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ExpedientInteressatServiceEjb extends AbstractServiceEjb<ExpedientInteressatService> implements ExpedientInteressatService {
 
 	@Delegate private ExpedientInteressatService delegateService;

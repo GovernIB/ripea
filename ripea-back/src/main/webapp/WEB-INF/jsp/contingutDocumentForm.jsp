@@ -9,6 +9,7 @@
 	<c:when test="${empty documentCommand.id}"><c:set var="titol"><spring:message code="contingut.document.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="contingut.document.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
+<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <c:set var="isTasca" value="${not empty tascaId}"/>
 <c:set var="isCreate" value="${empty documentCommand.id}"/>
@@ -106,6 +107,9 @@ body.loading .rmodal {
 
 </style>
 <script>
+
+var maxTamanyFitxerUpload = ${maxFileSize};
+
 function mostrarDocument(fileName) {
 	$fileinput = $('#arxiu').closest('.fileinput');
 	$fileinput.removeClass('fileinput-new');
@@ -168,16 +172,35 @@ $(document).ready(function() {
 		mostrarFrima(fileName);
 	}
 
+	$('#firma').on('change', function() {
+		let tamany = $(this)[0].files[0].size;
+		if (tamany>maxTamanyFitxerUpload) {
+			$('#input-firma-arxiu').find('div.alert.alert-danger').remove();
+			$('#input-firma-arxiu').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+		} else {
+			$('#input-firma-arxiu').find('div.alert.alert-danger').remove();
+		}
+	});
+	
     const submitValidation = (e) => {
-    	<c:if test="${isDeteccioFirmaAutomaticaActiva}">
-	        $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
-	        $('#onlyFileSubmit').val(true);
-	        $('#loading').show();
-	        $('#arxiuInput').hide();
-	        $('#inputAmbFirma').removeClass('hidden');
-	        $("#documentCommand").prop("target", 'target_iframe');
-	        $('#documentCommand').submit();
-		</c:if>
+
+		let tamany = $("#arxiu")[0].files[0].size;
+		
+		if (tamany>maxTamanyFitxerUpload) {
+			$('#inputDoc').find('div.alert.alert-danger').remove();
+			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+		} else {
+			$('#inputDoc').find('div.alert.alert-danger').remove();
+    		<c:if test="${isDeteccioFirmaAutomaticaActiva}">
+		        $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+		        $('#onlyFileSubmit').val(true);
+		        $('#loading').show();
+		        $('#arxiuInput').hide();
+		        $('#inputAmbFirma').removeClass('hidden');
+		        $("#documentCommand").prop("target", 'target_iframe');
+		        $('#documentCommand').submit();
+			</c:if>
+		}
     }
 
 	// METADOCUMENT CHANGE
@@ -468,6 +491,8 @@ $(document).ready(function() {
 	
 	$('#ntiEstadoElaboracion').trigger('change');
 	
+	$("#inputDoc .fileinput").on("change.bs.fileinput", submitValidation);
+	
 	<c:if test="${isDeteccioFirmaAutomaticaActiva}">
 	
 		$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
@@ -489,10 +514,8 @@ $(document).ready(function() {
 			console.log('after reset');
 		});
 		
-		$("#inputDoc .fileinput").on("change.bs.fileinput", submitValidation);
-		
 		$('#target_iframe').load(function() {
-			
+
 		    $("#documentCommand").prop("target", '');
 		    $('#unselect').val(false);
 			$('#onlyFileSubmit').val(false);
@@ -671,7 +694,9 @@ function removeLoading() {
 								</div>
 							</c:when>
 							<c:otherwise>
-								<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+								<div id="inputDoc">
+									<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+								</div>
 								<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
 								<div id="input-firma" class="hidden">
 									<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>

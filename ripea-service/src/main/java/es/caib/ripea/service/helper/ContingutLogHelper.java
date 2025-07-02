@@ -364,7 +364,7 @@ public class ContingutLogHelper {
 			dto.setCreatedDate(
 					Date.from(log.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
 		
-		if (log.getCreatedBy().isPresent()) {
+		if (log.getCreatedBy()!=null && log.getCreatedBy().isPresent()) {
 			UsuariEntity ue = usuariRepository.findByCodi(log.getCreatedBy().get());
   			UsuariDto target = new UsuariDto();
   			target.setCodi(ue.getCodi());
@@ -375,15 +375,13 @@ public class ContingutLogHelper {
 		}
 
 		if (log.getLastModifiedDate() != null)
-			dto.setLastModifiedDate(
-					Date.from(log.getLastModifiedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
-		dto.setLastModifiedBy(
-				conversioTipusHelper.convertir(
-						log.getLastModifiedBy(),
-						UsuariDto.class));
-		dto.setTipus(
-				LogTipusEnumDto.valueOf(
-						log.getTipus().name()));
+			dto.setLastModifiedDate(Date.from(log.getLastModifiedDate().get().atZone(ZoneId.systemDefault()).toInstant()));
+		
+		if (log.getLastModifiedBy()!=null && log.getLastModifiedBy().isPresent())
+			dto.setLastModifiedBy(conversioTipusHelper.convertir(log.getLastModifiedBy(), UsuariDto.class));
+
+		dto.setTipus(LogTipusEnumDto.valueOf(log.getTipus().name()));
+
 		if (log.getObjecteId() != null) {
 			dto.setObjecteId(log.getObjecteId());
 			dto.setObjecteTipus(

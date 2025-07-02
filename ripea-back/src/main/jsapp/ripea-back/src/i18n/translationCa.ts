@@ -14,6 +14,10 @@ const translationCa = {
         clear: "Netejar",
         search: "Cercar",
         options: "Opcions",
+        select: {
+            all: "Seleccionar tots",
+            clear: "Netejar selecció",
+        },
         import: "Importar",
         export: "Exportar",
         consult: "Consultar",
@@ -505,7 +509,7 @@ const translationCa = {
                 checkDelete: "Esteu segur que voleu esborrar aquest element?",
                 checkRelacio: "Esteu segur que voleu esborrar aquesta relació?",
                 actionOk: "L'acció s'ha executat correctament.",
-				actionBackgroundOk: "L'acción s'ha preparat per la seva execució en segon plà. Pot consultar l'estat del procés des del llistat de execucions massives.",
+				actionBackgroundOk: "L'acció s'ha preparat per la seva execució en segon plà. Pot consultar l'estat del procés des del llistat d'execucions massives.",
 			}
         },
         arxiu: {
@@ -935,6 +939,7 @@ const translationCa = {
                     label: "Consultar accions massives",
                     title: "Execucions massives de {{name}}",
                     detail: "Detall de l'acció massiva",
+                    ok: "El document s'ha baixat correctament",
                 },
             },
             perfil: {
@@ -949,8 +954,12 @@ const translationCa = {
         },
         alert: {
             title: "Alertes d'expedient",
-            acciones: {
-                read: "Marcar com a llegida",
+            action: {
+                read: {
+                    label: "Marcar com a llegida",
+                    ok: "L'alerta s'ha marcat com a llegida",
+                    massiveOk: "Les alertes s'han marcat com a llegides",
+                },
             },
             errors: {
                 metaDada: "Falten les dades següents:",

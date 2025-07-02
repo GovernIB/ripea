@@ -5,6 +5,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import useNotificacioInteressatActions from "./NotificacioInteressatActions.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import Load from "../../../components/Load.tsx";
 
 const columns = [
     {
@@ -65,22 +66,20 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
                 }
             }}
         >
+            <Load value={entity}>
             <StyledMuiGrid
                 resourceName={'documentEnviamentInteressatResource'}
                 perspectives={['DETAIL']}
                 columns={columns}
-                filter={builder.and(
-                    builder.eq('notificacio.id', entity?.id)
-                )}
-                titleDisabled
+                filter={builder.and(builder.eq('notificacio.id', entity?.id))}
                 staticSortModel={[{field: 'id', sort: 'asc'}]}
-                disableColumnMenu
                 disableColumnSorting
                 readOnly
                 autoHeight
 
                 rowAdditionalActions={actions}
             />
+            </Load>
             {components}
         </MuiDialog>
 

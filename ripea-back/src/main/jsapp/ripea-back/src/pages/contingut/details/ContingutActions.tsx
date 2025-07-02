@@ -6,7 +6,6 @@ import useDocumentDetail from "./DocumentDetail.tsx";
 import useHistoric from "../../Historic.tsx";
 import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/CommonActions.tsx";
-import {potModificar} from "../../expedient/details/Expedient.tsx";
 import {useMoure, useCopiar, useVincular} from "../actions/Moure.tsx";
 import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
@@ -127,7 +126,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
     const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar} = useVisualitzar();
-    const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(potModificar(entity), refresh);
+    const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificar, refresh);
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
     const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
     const {handleShow: handleCopiarShow, content: contentCopiar} = useCopiar(refresh);
@@ -154,8 +153,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const isInOptions = (value:string, ...options:string[]) => {
         return options.includes(value)
     }
-
-    const potMod = potModificar(entity)
 
     const createDocumentActions = [
         {
@@ -196,7 +193,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: guardarArxiu,
             disabled: !entity?.arxiuUuid,
-            hidden: (row:any) => !row?.arxiuUuid && row.gesDocFirmatId,
+            hidden: (row:any) => row?.arxiuUuid && !row?.gesDocFirmatId,
         },
         {
             title: t('page.document.action.detall.label'),
@@ -209,8 +206,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
-            disabled: (row:any) => (row?.arxiuUuid == null || row?.gesDocFirmatId != null),
-            hidden: (row:any) => !potMod || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
+            disabled: (row:any) => row?.arxiuUuid == null || row?.gesDocFirmatId != null,
+            hidden: (row:any) => !entity?.potModificar || (isInOptions(row?.arxiuEstat, 'DEFINITIU') && !isPermesModificarCustodiatsVar(row)) ||  isInOptions(row?.estat, 'FIRMA_PENDENT'),
         },
         {
             title: t('page.contingut.action.move.label'),
@@ -218,21 +215,21 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleMoureShow,
             disabled: (row:any) => row?.gesDocAdjuntId!=null,
-            hidden: !potMod,
+            hidden: !entity?.potModificar,
         },
         {
             title: t('page.contingut.action.copy.label'),
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiarShow,
-            hidden: !potMod || !user?.sessionScope?.isMostrarCopiar,
+            hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarCopiar,
         },
         {
             title: t('page.contingut.action.vincular.label'),
             icon: "link",
             showInMenu: true,
             onClick: handleVincularShow,
-            hidden: !potMod || !user?.sessionScope?.isMostrarVincular,
+            hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarVincular,
         },
         {
             title: <Divider sx={{width: '100%'}} color={"none"}/>,
@@ -289,7 +286,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleEviarPortafirmesShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden : (row:any) => !potMod || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
+            hidden : (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPortafirmesActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.action.firmar.label'),
@@ -297,7 +294,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleFirmaShow,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potMod || !row?.metaDocumentInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaPassarelaActiva || !isFirmaActiva(row),
         },
         {
             title: t('page.document.action.viaFirma.label'),
@@ -305,7 +302,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleEnviarViaFirma,
             disabled: (row:any) => !row?.valid || row?.gesDocAdjuntId!=null,
-            hidden: (row:any) => !potMod || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
+            hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
             title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
@@ -314,14 +311,14 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "mail",
             showInMenu: true,
             onClick: handleNotificarShow,
-            hidden: (row:any) => !potMod || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
+            hidden: (row:any) => !entity?.potModificar || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')),
         },
         {
             title: t('page.document.action.publicar.label'),
             icon: "publish",
             showInMenu: true,
             onClick: handlePublicarShow,
-            hidden: (row:any) => !potMod || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
+            hidden: (row:any) => !entity?.potModificar || !(row?.documentFirmaTipus != 'SENSE_FIRMA' && row?.arxiuUuid || isInOptions(row?.fitxerExtension, 'zip')) || !user?.sessionScope?.isMostrarPublicar
         },
         {
             title: t('page.document.action.mail.label'),
@@ -346,13 +343,13 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "check_circle",
             showInMenu: true,
             onClick: definitiu,
-            hidden: (row:any) => !potMod || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
+            hidden: (row:any) => !entity?.potModificar || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
         },
         {
             title: <Divider sx={{width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row:any) => !potMod || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
+            hidden: (row:any) => !entity?.potModificar || !isInOptions(row?.estat, 'REDACCIO' , 'FIRMA_PARCIAL') || !isInOptions(row?.documentTipus, 'DIGITAL') || !user?.sessionScope?.isConvertirDefinitiuActiu,
         },
         {
             title: t('page.contingut.action.history.label'),
@@ -405,7 +402,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             ...carpetaActions,
             ...expedientActions,
         ],
-        hiddenDelete: (row:any) => !potMod || !isDocument(row) || row?.estat == 'DEFINITIU',
+        hiddenDelete: (row:any) => !entity?.potModificar || !isDocument(row) || row?.estat == 'DEFINITIU',
         components
     }
 }

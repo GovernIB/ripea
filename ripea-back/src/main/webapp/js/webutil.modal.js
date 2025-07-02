@@ -28,7 +28,7 @@
 			$element.click(function(event) {
 				var elementPerEvaluar = $element;
 				if (elementPerEvaluar.prop("tagName") == 'TR' && event.target.tagName != 'TD') {
-					elementPerEvaluar = $(event.target.tagName);
+					elementPerEvaluar = $(event.target);
 				}
 				var obrirNovaFinestra = false;
 				if ((elementPerEvaluar.attr('href') || elementPerEvaluar.data('href')) && elementPerEvaluar.data('toggle') == 'modal') {

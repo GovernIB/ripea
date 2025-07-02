@@ -12,7 +12,6 @@ import useTascaActions from "./details/TascaActions.tsx";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {CommentDialog} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
-import {potModificar} from "../expedient/details/Expedient.tsx";
 
 const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -28,7 +27,7 @@ const TasquesGridForm = () => {
         <GridFormField xs={12} name="responsables" multiple />
         <GridFormField xs={12} name="observadors" multiple />
         <GridFormField xs={6} name="duracio" />
-        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{ disablePast: true }} />
+        <GridFormField xs={6} name="dataLimit" type={"date"} />
         <GridFormField xs={12} name="titol" />
         <GridFormField xs={12} name="observacions" type={"textarea"} />
         <GridFormField xs={12} name="prioritat" required />
@@ -92,7 +91,6 @@ const TasquesGrid = (props: any) => {
             field: 'numComentaris',
             headerName: '',
             sortable: false,
-            disableColumnMenu: true,
             flex: 0.25,
             renderCell: (params: any) => <CommentDialog
                 entity={params?.row}
@@ -121,11 +119,10 @@ const TasquesGrid = (props: any) => {
             popupEditFormContent={<TasquesGridForm/>}
             formAdditionalData={{
                 expedient: {id: entity?.id},
-                metaExpedient: {id: entity?.metaExpedient?.id},
+                metaExpedient: entity?.metaExpedient,
             }}
             rowAdditionalActions={actions}
-            toolbarHideCreate={!potModificar(entity)}
-            rowHideDeleteButton
+            toolbarHideCreate={!entity?.potModificar}
         />
         {components}
     </GridPage>

@@ -14,6 +14,10 @@ const translationEs = {
         clear: "Limpiar",
         search: "Buscar",
         options: "Opciones",
+        select: {
+            all: "Seleccionar todos",
+            clear: "Limpiar selección",
+        },
         import: "Importar",
         export: "Exportar",
         consult: "Consultar",
@@ -668,7 +672,7 @@ const translationEs = {
                 changeType: {
                     label: "Cambiar tipo...",
                     title: "Cambiar tipo",
-                    ok: "Los documentod se han modificado correctamente",
+                    ok: "Los documentos se han modificado correctamente",
                 },
                 definitive: {
                     label: "Convertir a definitivo",
@@ -935,6 +939,7 @@ const translationEs = {
                     label: "Consultar acciones masivas",
                     title: "Ejecuciones masivas de {{name}}",
                     detail: "Detalle de la acción masiva",
+                    ok: "El documento se ha descargado correctamente",
                 },
             },
             perfil: {
@@ -949,8 +954,12 @@ const translationEs = {
         },
         alert: {
             title: "Alertas de expediente",
-            acciones: {
-                read: "Marcar como leido",
+            action: {
+                read: {
+                    label: "Marcar como leído",
+                    ok: "La alerta se ha marcado como leida",
+                    massiveOk: "Las alertas se ha marcado como leídas",
+                },
             },
             errors: {
                 metaDada: "Faltan los siguientes datos:",

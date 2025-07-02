@@ -1,27 +1,5 @@
 package es.caib.ripea.service.helper;
 
-import com.google.common.collect.Lists;
-import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPageEventHelper;
-import com.itextpdf.text.pdf.PdfWriter;
-import es.caib.ripea.persistence.repository.ContingutRepository;
-import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import org.apache.commons.io.IOUtils;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +9,53 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.service.AplicacioService;
 
 @Component
 public class IndexHelper {
@@ -50,6 +75,7 @@ public class IndexHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private DocumentRepository documentRepository;
+	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private IndexBatchHelper indexBatchHelper;
 	
@@ -106,8 +132,14 @@ public class IndexHelper {
 						entitatActual,
 						false);
 				
-	//			## Crear un índex per cada expedient relacionat
-				if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
+				List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
+				List<ExpedientEntity> relacionatsAmb = new ArrayList<ExpedientEntity>();
+				if (indexExpedientsRelacionats()) {
+					relacionatsPer = expedientRepository.findRelacionatsPer(expedient.getId());
+					relacionatsAmb = expedientRepository.findRelacionatsAmb(expedient.getId());
+				}
+
+				if ((!relacionatsPer.isEmpty() || !relacionatsAmb.isEmpty())) {
 	//				## [TAULA QUE CONTÉ EL TÍTOL 'EXPEDIENTS RELACIONATS']
 					PdfPTable titolRelacioTable = new PdfPTable(1);
 					titolRelacioTable.setWidthPercentage(100);
@@ -122,9 +154,9 @@ public class IndexHelper {
 					titolRelacioTable.addCell(relacioTitolCell);
 					index.add(titolRelacioTable);
 					
-					if (!expedient.getRelacionatsAmb().isEmpty()) {
+					if (!relacionatsAmb.isEmpty()) {
 	//					## [TÍTOL I TAULA PER CADA RELACIÓ]
-						for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsAmb()) {
+						for (ExpedientEntity expedient_relacionat: relacionatsAmb) {
 							crearTitol(
 									index, 
 									expedient_relacionat,
@@ -136,9 +168,9 @@ public class IndexHelper {
 									true);
 						}
 					}
-					if (!expedient.getRelacionatsPer().isEmpty()) {
+					if (!relacionatsPer.isEmpty()) {
 	//					## [TÍTOL I TAULA PER CADA RELACIÓ]
-						for (ExpedientEntity expedient_relacionat: expedient.getRelacionatsPer()) {
+						for (ExpedientEntity expedient_relacionat: relacionatsPer) {
 							crearTitol(
 									index, 
 									expedient_relacionat,
@@ -448,16 +480,24 @@ public class IndexHelper {
 	        
 	        int rowNum = 0;
 	        for (ExpedientEntity expedient : expedients) {
-	        	boolean hasRelacions = !expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty();
+	        	
+				List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
+				List<ExpedientEntity> relacionatsAmb = new ArrayList<ExpedientEntity>();
+				if (indexExpedientsRelacionats()) {
+					relacionatsPer = HibernateHelper.deproxy(expedient.getRelacionatsPer());
+					relacionatsAmb = HibernateHelper.deproxy(expedient.getRelacionatsAmb());
+				}
+	        	
+	        	boolean hasRelacions = !relacionatsPer.isEmpty() || !relacionatsAmb.isEmpty();
 		        Sheet sheet = workbook.createSheet(validarNombreHoja(expedient.getNom()));
 	            crearTitol(sheet, expedient);
 	            crearTaulaDocuments(sheet, expedient, entitatActual, workbook, false, hasRelacions, false);
 
-	            if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
-	                crearTitolRelacio(sheet, expedient.getRelacionatsAmb(), expedient.getRelacionatsPer());
+	            if ((!relacionatsPer.isEmpty() || !relacionatsAmb.isEmpty())) {
+	                crearTitolRelacio(sheet, relacionatsAmb, relacionatsPer);
 
-	                if (!expedient.getRelacionatsAmb().isEmpty()) {
-	                    for (ExpedientEntity expedient_relacionat : expedient.getRelacionatsAmb()) {
+	                if (!relacionatsAmb.isEmpty()) {
+	                    for (ExpedientEntity expedient_relacionat : relacionatsAmb) {
 	                    	Sheet sheetRelacio = workbook.createSheet(validarNombreHoja(expedient_relacionat.getNom()));
 	                        crearTitol(sheetRelacio, expedient_relacionat);
 	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions, false);
@@ -466,8 +506,8 @@ public class IndexHelper {
 	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions, false);
 	                    }
 	                }
-	                if (!expedient.getRelacionatsPer().isEmpty()) {
-	                    for (ExpedientEntity expedient_relacionat : expedient.getRelacionatsPer()) {
+	                if (!relacionatsPer.isEmpty()) {
+	                    for (ExpedientEntity expedient_relacionat : relacionatsPer) {
 	                    	Sheet sheetRelacio = workbook.createSheet(validarNombreHoja(expedient_relacionat.getNom()));
 	                        crearTitol(sheetRelacio, expedient_relacionat);
 	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions, false);

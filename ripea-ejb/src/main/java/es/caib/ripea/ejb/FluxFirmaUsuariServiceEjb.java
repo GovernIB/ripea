@@ -16,6 +16,7 @@ import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class FluxFirmaUsuariServiceEjb extends AbstractServiceEjb<FluxFirmaUsuariService> implements FluxFirmaUsuariService {
 
 	@Delegate private FluxFirmaUsuariService delegateService;

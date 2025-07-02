@@ -347,7 +347,7 @@ function refrescarGrups() {
 			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 	
 			<form:hidden path="gestioAmbGrupsActiva"/>
 			<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
-				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" disabled="${rolActual == 'tothom'}"/>
+				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup"/>
 			</div>					
 		</div>
 		

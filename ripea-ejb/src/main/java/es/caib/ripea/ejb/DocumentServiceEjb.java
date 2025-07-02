@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.io.IOException;
@@ -49,6 +46,7 @@ import es.caib.ripea.service.intf.service.DocumentService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> implements DocumentService {
 
 	@Delegate private DocumentService delegateService;

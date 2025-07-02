@@ -14,7 +14,7 @@ const usePublicacioActions = () => {
             onClick: handleDetallOpen,
         },
         {
-            title: t('common.update'),
+            title: t('common.update')+'...',
             icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,

@@ -30,6 +30,7 @@ import es.caib.ripea.service.intf.service.ExpedientService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> implements ExpedientService {
 
 	@Delegate private ExpedientService delegateService;

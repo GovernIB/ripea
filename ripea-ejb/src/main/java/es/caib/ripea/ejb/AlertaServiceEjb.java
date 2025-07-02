@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
@@ -15,6 +12,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 @Stateless
+@RolesAllowed("**")
 public class AlertaServiceEjb extends AbstractServiceEjb<AlertaService> implements AlertaService {
 
 	@Delegate private AlertaService delegateService;

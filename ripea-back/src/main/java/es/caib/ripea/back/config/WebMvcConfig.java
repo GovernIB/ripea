@@ -1,8 +1,9 @@
 package es.caib.ripea.back.config;
 
-import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
-import es.caib.ripea.back.interceptor.*;
-import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -23,15 +24,37 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
+
+import es.caib.ripea.back.interceptor.AccesAdminEntitatInterceptor;
+import es.caib.ripea.back.interceptor.AccesAdminEntitatOAdminOrganORevisorInterceptor;
+import es.caib.ripea.back.interceptor.AccesAdminEntitatORevisorInterceptor;
+import es.caib.ripea.back.interceptor.AccesAdminEntitatOrUsuariInterceptor;
+import es.caib.ripea.back.interceptor.AccesFluxosFirmaUsuariInterceptor;
+import es.caib.ripea.back.interceptor.AccesSuperInterceptor;
+import es.caib.ripea.back.interceptor.AccesURLsInstruccioInterceptor;
+import es.caib.ripea.back.interceptor.AjaxInterceptor;
+import es.caib.ripea.back.interceptor.AnotacionsPendentsInterceptor;
+import es.caib.ripea.back.interceptor.AplicacioInterceptor;
+import es.caib.ripea.back.interceptor.AvisosInterceptor;
+import es.caib.ripea.back.interceptor.ExpedientsInterceptor;
+import es.caib.ripea.back.interceptor.FluxFirmaInterceptor;
+import es.caib.ripea.back.interceptor.LlistaEntitatsInterceptor;
+import es.caib.ripea.back.interceptor.LlistaRolsInterceptor;
+import es.caib.ripea.back.interceptor.MetaExpedientInterceptor;
+import es.caib.ripea.back.interceptor.ModalInterceptor;
+import es.caib.ripea.back.interceptor.NodecoInterceptor;
+import es.caib.ripea.back.interceptor.SeguimentEnviamentsUsuariInterceptor;
+import es.caib.ripea.back.interceptor.SessioInterceptor;
+import es.caib.ripea.back.interceptor.TasquesPendentsInterceptor;
+import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
 
 /**
  * Configuració de Spring MVC.
@@ -64,6 +87,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
 
+	public static final int MAX_UPLOAD_SIZE = 52428800;
+	
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {
 		FilterRegistrationBean<SiteMeshFilter> registrationBean = new FilterRegistrationBean<>();
@@ -91,6 +116,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
 	}
 
+	@Bean(name = "multipartResolver")
+	public CommonsMultipartResolver multipartResolver() {
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
+		return multipartResolver;
+	}
+	
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 		CustomPageableHandlerMethodArgumentResolver resolver = new CustomPageableHandlerMethodArgumentResolver();

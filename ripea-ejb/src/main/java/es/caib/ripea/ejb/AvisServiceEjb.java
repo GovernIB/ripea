@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -16,6 +13,7 @@ import es.caib.ripea.service.intf.service.AvisService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class AvisServiceEjb extends AbstractServiceEjb<AvisService> implements AvisService {
 
 	@Delegate private AvisService delegateService;

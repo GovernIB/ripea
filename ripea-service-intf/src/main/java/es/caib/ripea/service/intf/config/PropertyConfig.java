@@ -103,6 +103,7 @@ public class PropertyConfig {
 	public static final String PORTAFIB_PLUGIN_FLUX_URL			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.url";
 	public static final String PORTAFIB_PLUGIN_FLUX_USR			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.username";
 	public static final String PORTAFIB_PLUGIN_FLUX_PAS			= "es.caib.ripea.plugin.portafirmes.firmasimpleflux.password";
+	public static final String PORTAFIB_PLUGIN_USUARISPF_WS		= "es.caib.ripea.plugin.portafirmes.usuarientitatws.actiu";
 
 	public static final String PORTAFIB_PLUGIN_USUARISPF_URL	= "es.caib.ripea.plugin.portafirmes.usuarientitatws.url";
 	public static final String PORTAFIB_PLUGIN_USUARISPF_USR	= "es.caib.ripea.plugin.portafirmes.usuarientitatws.username";

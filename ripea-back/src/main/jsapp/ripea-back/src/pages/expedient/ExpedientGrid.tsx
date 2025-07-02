@@ -218,7 +218,6 @@ const ExpedientGrid = () => {
                 field: 'grup',
                 flex: 0.5,
                 sortable: false,
-                disableColumnMenu: true,
             },
         )
     }
@@ -271,7 +270,6 @@ const ExpedientGrid = () => {
                 onRowDoubleClick={(row: any) => navigate(`/contingut/${row?.id}`)}
                 rowAdditionalActions={actions}
                 paginationActive
-                rowHideDeleteButton
                 selectionActive
                 toolbarCreateTitle={t('page.expedient.action.new.label')}
                 toolbarMassiveActions={massiveActions}

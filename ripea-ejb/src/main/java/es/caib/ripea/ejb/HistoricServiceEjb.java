@@ -26,6 +26,7 @@ import es.caib.ripea.service.intf.service.HistoricService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class HistoricServiceEjb extends AbstractServiceEjb<HistoricService> implements HistoricService {
 
 	@Delegate private HistoricService delegateService;

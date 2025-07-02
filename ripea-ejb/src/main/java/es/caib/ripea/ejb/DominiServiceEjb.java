@@ -17,6 +17,7 @@ import es.caib.ripea.service.intf.service.DominiService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class DominiServiceEjb extends AbstractServiceEjb<DominiService> implements DominiService {
 
 	@Delegate private DominiService delegateService;

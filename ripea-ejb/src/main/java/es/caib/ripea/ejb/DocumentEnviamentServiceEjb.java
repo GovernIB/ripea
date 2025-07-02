@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -21,6 +18,7 @@ import es.caib.ripea.service.intf.service.DocumentEnviamentService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class DocumentEnviamentServiceEjb extends AbstractServiceEjb<DocumentEnviamentService> implements DocumentEnviamentService {
 
 	@Delegate private DocumentEnviamentService delegateService;

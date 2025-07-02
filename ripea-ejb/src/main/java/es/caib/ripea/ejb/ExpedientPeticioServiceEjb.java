@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -30,6 +27,7 @@ import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeticioService> implements ExpedientPeticioService {
 
 	@Delegate private ExpedientPeticioService delegateService;

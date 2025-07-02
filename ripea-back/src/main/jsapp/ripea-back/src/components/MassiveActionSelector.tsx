@@ -44,33 +44,58 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
         setSelectedRows([]);
     };
 
-    return <Load value={actions.filter(a=>!a?.hidden).length>0} noEffect>
+    {/* Selection buttons */}
+    const buttonActions = [
+        {
+            title: t('common.select.all'),
+            icon: "check_box",
+            onClick: handleSelectAll
+        },
+        {
+            title: t('common.select.clear'),
+            icon: "check_box_outline_blank",
+            onClick: handleClearSelection
+        },
+        // ...actions.filter(action=>!action?.showInMenu)
+    ]
+
+    const menuActions = actions//.filter(action=>action?.showInMenu)
+
+    return <Load value={actions.length>0 && actions.filter(a=>!a?.hidden).length>0} noEffect>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>
-        {/* Selection buttons */}
         <ButtonGroup
             variant="outlined"
             size="small"
             sx={{
                 '& .MuiButton-root': {
                     borderColor: 'rgba(0, 0, 0, 0.23)' // Standard MUI outlined button border color
-                }
+                },
+                '& .MuiButton-root:hover': {
+                    borderColor: 'rgba(0, 0, 0, 0.50)' // Standard MUI outlined button border color
+                },
+                '& .MuiButton-root.Mui-disabled': {
+                    borderColor: 'rgba(0, 0, 0, 0.1)',
+                    color: 'rgba(0, 0, 0, 0.3)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                },
+                '& .MuiButton-root.Mui-disabled .MuiSvgIcon-root': {
+                    color: 'rgba(0, 0, 0, 0.3)',
+                },
             }}>
-            <Tooltip title={t('Seleccionar tots')}>
-                <Button
-                    onClick={handleSelectAll}
-                    sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
-                >
-                    <Icon color="action" sx={{m: 0}}>check_box</Icon>
-                </Button>
-            </Tooltip>
-            <Tooltip title={t('Netejar selecció')}>
-                <Button
-                    onClick={handleClearSelection}
-                    sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
-                >
-                    <Icon color="action" sx={{m: 0}}>check_box_outline_blank</Icon>
-                </Button>
-            </Tooltip>
+            {
+                buttonActions.map((action:any, index:number)=>
+                    !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden)
+                    && <Tooltip title={action?.title} key={`action-${index}`}>
+                        <Button
+                            onClick={()=>action?.onClick?.(selectedRows)}
+                            disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}
+                            sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
+                        >
+                            <Icon color="action" sx={{m: 0}}>{action?.icon}</Icon>
+                        </Button>
+                    </Tooltip>
+                )
+            }
 
             <MenuActionButton
                 id={'massiveOpcions'}
@@ -78,9 +103,9 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                 buttonLabel={t('common.options')}
                 buttonProps={{
                     startIcon: <Chip label={selectedRows?.length} size="small" />,
-                    disabled: selectedRows?.length === 0
+                    disabled: selectedRows?.length === 0 || menuActions?.length === 0
                 }}
-                actions={actions}
+                actions={menuActions}
             />
         </ButtonGroup>
     </Box></Load>;

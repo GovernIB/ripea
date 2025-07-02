@@ -4,7 +4,7 @@ import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import useAmpliarPlac from "../actions/AmpliarPlac.tsx";
 import useNotificacioInteressatDetail from "./NotificacioInteressatDetail.tsx";
 
-const useActions = (refresh?: () => void) => {
+export const useActions = () => {
     const { t } = useTranslation();
 
     const {
@@ -33,7 +33,7 @@ const useActions = (refresh?: () => void) => {
 const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const {certificat} = useActions(refresh);
+    const {certificat} = useActions();
     const {handleOpen, dialog} = useNotificacioInteressatDetail();
     const {handleShow, content} = useAmpliarPlac(refresh);
 

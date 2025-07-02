@@ -34,11 +34,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			String nom,
 			int esborrat);
 	
-	List<ExpedientEntity> findByMetaExpedient(
-			MetaExpedientEntity metaExpedient);
+	List<ExpedientEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient);
 
 	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 
+	@Query(	"select e.relacionatsPer from ExpedientEntity e where e.id = :expedientId")
+	List<ExpedientEntity> findRelacionatsPer(@Param("expedientId") Long expedientId);
+	
+	@Query(	"select e.relacionatsAmb from ExpedientEntity e where e.id = :expedientId")
+	List<ExpedientEntity> findRelacionatsAmb(@Param("expedientId") Long expedientId);
 
 	@Query(	"select " +
 			"    e.id " +

@@ -15,35 +15,35 @@ import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceFieldNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.resourceservice.ExpedientEstatResourceService;
+import es.caib.ripea.service.intf.resourceservice.DominiResourceService;
 import lombok.experimental.Delegate;
 
 @Stateless
 @RolesAllowed("**")
-public class ExpedientEstatResourceServiceEjb extends AbstractServiceEjb<ExpedientEstatResourceService> implements ExpedientEstatResourceService {
+public class DominiResourceServiceEjb extends AbstractServiceEjb<DominiResourceService> implements DominiResourceService {
 
-	@Delegate private ExpedientEstatResourceService delegateService;
+	@Delegate private DominiResourceService delegateService;
 
-	protected void setDelegateService(ExpedientEstatResourceService delegateService) {
+	protected void setDelegateService(DominiResourceService delegateService) {
 		this.delegateService = delegateService;
 	}
-	
+
 	@Override
 	public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params)
 			throws ArtifactNotFoundException, ActionExecutionException {
-		return delegateService.artifactActionExec(id, code, params);
+		return artifactActionExec(id, code, params);
 	}
 
 	@Override
 	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
 			Serializable id, P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
 			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
-		return delegateService.artifactOnChange(type, code, id, previous, fieldName, fieldValue, answers);
+		return artifactOnChange(type, code, id, previous, fieldName, fieldValue, answers);
 	}
 
 	@Override
 	public <P extends Serializable> List<?> artifactReportGenerateData(Long id, String code, P params)
 			throws ArtifactNotFoundException, ReportGenerationException {
-		return delegateService.artifactReportGenerateData(id, code, params);
+		return artifactReportGenerateData(id, code, params);
 	}
 }

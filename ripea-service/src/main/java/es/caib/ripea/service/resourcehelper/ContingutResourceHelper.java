@@ -1,21 +1,50 @@
 package es.caib.ripea.service.resourcehelper;
 
-import es.caib.plugins.arxiu.api.*;
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.exception.ValidationException;
-import es.caib.ripea.service.intf.utils.Utils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.api.ExpedientMetadades;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.ContingutEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
+import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.service.helper.ArxiuConversions;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.dto.ArxiuContingutDto;
+import es.caib.ripea.service.intf.dto.ArxiuContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -23,12 +52,26 @@ public class ContingutResourceHelper {
 
     private final TipusDocumentalRepository tipusDocumentalRepository;
     private final OrganGestorRepository organGestorRepository;
+    private final ContingutResourceRepository contingutResourceRepository;
 
     private final EntityComprovarHelper entityComprovarHelper;
     private final PluginHelper pluginHelper;
     private final ConversioTipusHelper conversioTipusHelper;
     private final ContingutHelper contingutHelper;
 
+    public boolean contingutHasDocumentsFills(Long contingutPareId) {
+//    	return carpetaResourceRepository.contingutHasDocumentsFills(contingutPareId);
+        List<ContingutResourceEntity> hijos = contingutResourceRepository.findByPareId(contingutPareId);
+        for (ContingutResourceEntity hijo : hijos) {
+            if (ContingutTipusEnumDto.DOCUMENT.equals(hijo.getTipus())) {
+                return true;
+            } else if (contingutHasDocumentsFills(hijo.getId())) {
+                return true;
+            }
+        }
+        return false;    	
+    }
+    
     public ArxiuDetallDto getArxiuDetall(Long entitatId, Long contingutId) {
         ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
                 entitatId, contingutId, true, false);

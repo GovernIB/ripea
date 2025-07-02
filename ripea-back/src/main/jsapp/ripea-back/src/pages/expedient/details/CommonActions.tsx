@@ -57,7 +57,7 @@ export const useActions = (refresh?: () => void) => {
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 	
     const action = (id:any, code:string, msg:string) => {
-        return apiAction(undefined, {code: code, data:{ ids: [id], massivo: false }})
+        apiAction(undefined, {code: code, data:{ ids: [id], massivo: false }})
 			.then(() => {
 			    refresh?.()
 			    temporalMessageShow(null, msg, 'success');
@@ -68,7 +68,7 @@ export const useActions = (refresh?: () => void) => {
     }
 	
 	const report = (id:any, code:string, msg:string, fileType:any) => {
-	    return apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
+	    apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
 			.then((result) => {
 				iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
@@ -134,16 +134,15 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const exportIndexPdf= (id:any): void => { report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionOk'), 'PDF');}
-	const exportIndexXls= (id:any): void => { report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionOk'), 'XLSX');}
-	const exportPdfEni= (id:any): void => { report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionOk'), 'ZIP');}
-	const exportEni= (id:any): void => { report(id, 'EXPORT_ENI', t('page.expedient.results.actionOk'), 'ZIP');}
-	const exportInside= (id:any): void => { report(id, 'EXPORT_INSIDE', t('page.expedient.results.actionOk'), 'ZIP');}
-
+    const exportIndexPdf= (id:any) => report(id, 'EXPORT_INDEX_PDF', t('page.expedient.results.actionOk'), 'PDF')
+	const exportIndexXls= (id:any) => report(id, 'EXPORT_INDEX_XLS', t('page.expedient.results.actionOk'), 'XLSX')
+	const exportPdfEni= (id:any) => report(id, 'EXPORT_INDEX_ENI', t('page.expedient.results.actionOk'), 'ZIP')
+	const exportEni= (id:any) => report(id, 'EXPORT_ENI', t('page.expedient.results.actionOk'), 'ZIP')
+	const exportInside= (id:any) => report(id, 'EXPORT_INSIDE', t('page.expedient.results.actionOk'), 'ZIP')
     const eliminarRelacio = (id:any, row:any, relacioId:any) => {
         messageDialogShow(
             '',
-            t('page.expedient.result.checkRelacio', {expedient: row?.nom}),
+            t('page.expedient.results.checkRelacio', {expedient: row?.nom}),
             confirmDialogButtons,
             confirmDialogComponentProps)
             .then((value: any) => {

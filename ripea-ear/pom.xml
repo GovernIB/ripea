@@ -177,7 +177,7 @@
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<skinnyWars>true</skinnyWars>
-					<!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory>-->
+<!--					<outputDirectory>C:\jboss-eap-7.2\standalone\deployments</outputDirectory> -->
 					<archive>
 						<manifestEntries>
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>

@@ -124,6 +124,11 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
         }
     }
     
+    @Override
+    protected void afterConversion(CarpetaResourceEntity entity, CarpetaResource resource) {
+    	resource.setHasDocumentsFills(contingutResourceHelper.contingutHasDocumentsFills(entity.getId()));
+    }
+    
     private class ModificarNomActionExecutor implements ActionExecutor<CarpetaResourceEntity, CarpetaResource.ModificarFormAction, CarpetaResource> {
 
 		@Override

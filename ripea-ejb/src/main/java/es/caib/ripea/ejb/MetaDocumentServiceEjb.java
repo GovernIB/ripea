@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.ejb;
 
 import java.util.List;
@@ -21,6 +18,7 @@ import es.caib.ripea.service.intf.service.MetaDocumentService;
 import lombok.experimental.Delegate;
 
 @Stateless
+@RolesAllowed("**")
 public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentService> implements MetaDocumentService {
 
 	@Delegate private MetaDocumentService delegateService;

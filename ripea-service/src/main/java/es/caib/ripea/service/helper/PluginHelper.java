@@ -3375,7 +3375,14 @@ public class PluginHelper {
 		accioParams.put("carrecId", carrecId);
 		long t0 = System.currentTimeMillis();
 		PortafirmesCarrecDto carrecDto = new PortafirmesCarrecDto();
+		
+		logger.info("portafirmesRecuperarCarrec("+carrecId+")");
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		String organCodi = configHelper.getOrganActualCodi();
+		logger.info("portafirmesRecuperarCarrec > Cridam a getPortafirmesPlugin("+entitatCodi+", "+organCodi+")");
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
+		Properties pps = ((RipeaAbstractPluginProperties) portafirmesPlugin).getPluginProperties();
+		logger.info("portafirmesRecuperarCarrec > properties:"+pps.toString());
 		
 		try {
 			PortafirmesCarrec portafirmesCarrec = portafirmesPlugin.recuperarCarrec(carrecId);

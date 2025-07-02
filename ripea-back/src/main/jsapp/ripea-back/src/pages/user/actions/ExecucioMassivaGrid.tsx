@@ -10,6 +10,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 
 const useActions = () => {
+    const { t } = useTranslation()
     const {
         fieldDownload: apiDownload
     } = useResourceApiService('execucioMassivaResource');
@@ -19,7 +20,7 @@ const useActions = () => {
         apiDownload(id, {fieldName: 'documentNom'})
             .then((result) => {
                 iniciaDescargaBlob(result);
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.user.action.massives.ok'), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -55,11 +56,11 @@ const StyledLinearProgress = (props: any) => {
 const columns = [
     {
         field: 'tipus',
-        flex: 0.5,
+        flex: 0.75,
     },
     {
         field: 'executades',
-        flex: 0.75,
+        flex: 0.5,
         renderCell: (params: any) => {
             const row = params?.row;
             const value = 100 - row?.pendents * 100 / row?.executades
@@ -69,7 +70,7 @@ const columns = [
                 <StyledLinearProgress
                     color={'success'}
                     value={value}
-                    sx={{height: '15px'}}
+                    sx={{height: '20px'}}
                 >
                     {value}%
                 </StyledLinearProgress>
@@ -78,9 +79,9 @@ const columns = [
     },
     {
         field: 'errors',
-        flex: 0.5,
-        renderCell: (params: any) => <Chip label={params?.row?.errors} size="small"
-                                           color={params?.row?.errors ? 'error' : 'default'}/>
+        flex: 0.25,
+        renderCell: (params: any) =>
+            <Chip label={params?.row?.errors} size="small" color={params?.row?.errors ? 'error' : 'default'}/>
     },
     {
         field: 'dataInici',
@@ -319,6 +320,7 @@ const useExecucioMassivaContingut = () => {
                 }
             }}
         >
+            <Load value={entityId}>
             <StyledMuiGrid
                 resourceName={'execucioMassivaContingutResource'}
                 filter={builder.eq('execucioMassiva.id', `'${entityId}'`)}
@@ -326,7 +328,7 @@ const useExecucioMassivaContingut = () => {
                 sortModel={sortModelContingut}
                 columns={columnsContingut}
                 // paginationActive
-                // height={162 + 52 * 4}
+                // height={110 + 52 * 4}
                 autoHeight
                 readOnly
 
@@ -338,6 +340,7 @@ const useExecucioMassivaContingut = () => {
                     }
                 }}
             />
+            </Load>
         </MuiDialog>
 
     return {

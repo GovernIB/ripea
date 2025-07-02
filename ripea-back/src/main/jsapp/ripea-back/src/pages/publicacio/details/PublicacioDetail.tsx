@@ -4,6 +4,7 @@ import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {ContenidoData} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import Load from "../../../components/Load.tsx";
 
 const PublicacioDetail = (props:any) => {
     const {entity} = props
@@ -56,7 +57,9 @@ const usePublicacioDetail = () => {
                 }
             }}
         >
-            <PublicacioDetail entity={entity}/>
+            <Load value={entity}>
+                <PublicacioDetail entity={entity}/>
+            </Load>
         </MuiDialog>
 
     return {
