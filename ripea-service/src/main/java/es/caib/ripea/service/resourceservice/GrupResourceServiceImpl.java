@@ -1,26 +1,5 @@
 package es.caib.ripea.service.resourceservice;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.GrupEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.OrganGestorCacheHelper;
-import es.caib.ripea.service.helper.PermisosHelper;
-import es.caib.ripea.service.intf.dto.OrganismeDto;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.GrupResource;
-import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
-import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.permission.ExtendedPermission;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,29 +10,42 @@ import org.springframework.stereotype.Service;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
-/**
- * Implementació del servei de gestió de grups.
- *
- * @author Límit Tecnologies
- */
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.intf.model.EntitatResource;
+import es.caib.ripea.service.intf.model.GrupResource;
+import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.permission.ExtendedPermission;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupResource, Long, GrupResourceEntity> implements GrupResourceService {
 
-	private final OrganGestorRepository organGestorRepository;
-	
 	private final ConfigHelper configHelper;
-	private final PermisosHelper permisosHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
-	private final OrganGestorCacheHelper organGestorCacheHelper;
 	private final MetaExpedientRepository metaExpedientRepository;
+	private final OrganGestorRepository organGestorRepository;
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
+    		/**
+    		 * S'utilitza en el formulari de acceptar anotació, per obtenir els grups de un procediment
+    		 */
     		if (mapaNamedQueries.containsKey("BY_PROCEDIMENT")) {
     			Long procedimentId = Long.parseLong(mapaNamedQueries.get("BY_PROCEDIMENT"));
     			Filter filtreGrupsProcediment = null;
@@ -86,6 +78,39 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     			
 				return filtreGrupsProcediment.generate();
 				// ----------------> return amb resultats
+    		}
+    		
+    		/**
+    		 * S'utilitza en el filtre de expedient, per obtenir els grups que pot veurer un usuari amb rol determinat
+    		 */
+    		if (mapaNamedQueries.containsKey("BY_PERMISOS_USUARI")) {
+    			
+    			String entitatActualCodi = configHelper.getEntitatActualCodi();
+    			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    			OrganGestorEntity ogEntity = organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
+    			List<GrupEntity> grupsPermesos = entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitat.getId(), configHelper.getRolActual(), ogEntity.getId());
+    			
+    			Filter filtreGrupsProcediment = null;
+    			if (grupsPermesos!=null && grupsPermesos.size()>0) {
+	    			List<Long> grupsIds = new ArrayList<Long>();
+	    			if (grupsPermesos!=null) {
+						for (GrupEntity ge: grupsPermesos) {
+							grupsIds.add(ge.getId());
+						}
+	    			}
+	    			List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
+			        for (String aux: grupsOrgansProcedimentIn) {
+				        if (aux != null && !aux.isEmpty()) {
+				        	filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));
+				        }
+			        }
+			        
+					return filtreGrupsProcediment.generate();
+					// ----------------> return amb resultats
+    			} else {
+    				return FilterBuilder.equal("id", 0).generate();
+    				// ----------------> return sense resultats
+    			}
     		}
     	}
     	

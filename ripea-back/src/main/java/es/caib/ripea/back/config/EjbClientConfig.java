@@ -494,6 +494,12 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(EventService.class);
 	}
 	
+	@Bean
+	@ConditionalOnWarDeployment
+	public LocalStatelessSessionProxyFactoryBean dominiServiceEjb() {
+		return getLocalEjbFactoyBean(DominiService.class);
+	}
+	
 	/*
 	@Bean
 	@ConditionalOnWarDeployment

@@ -366,6 +366,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+        private ResourceReference<DominiResource, Long> domini;
+        @ResourceField(enumType = true)
+        private String dominiValor;
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioInici = LocalDateTime.now().withMonth(LocalDateTime.now().getMonth().getValue()-3);
         @ResourceField(onChangeActive = true)

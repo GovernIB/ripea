@@ -45,6 +45,16 @@ public class DominiHelper {
 
 	public ResultatDominiDto getResultDomini(
 			Long entitatId,
+			Long dominiId,
+			String filter,
+			int page,
+			int resultCount) throws NotFoundException, DominiException {
+		DominiEntity dominiE = dominiRepository.findById(dominiId).get();
+		return getResultDomini(entitatId, conversioTipusHelper.convertir(dominiE, DominiDto.class), filter, page, resultCount);
+	}
+	
+	public ResultatDominiDto getResultDomini(
+			Long entitatId,
 			String metaDadaCodi,
 			String filter,
 			int page,

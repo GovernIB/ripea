@@ -37,6 +37,7 @@ import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEnti
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
@@ -46,6 +47,7 @@ import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
@@ -74,8 +76,10 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
@@ -103,6 +107,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
 
+	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
@@ -114,6 +119,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
+    private final DominiHelper dominiHelper;
     private final ConfigHelper configHelper;
     private final CarpetaHelper carpetaHelper;
     private final ExpedientHelper expedientHelper;
@@ -1413,6 +1419,18 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                         resultat.add(new FieldOption(dsp.getId().toString(), dsp.getNom()));
                     }
                 }
+            } else if(ExpedientResource.ExpedientFilterForm.Fields.dominiValor.equals(fieldName)) {
+            	String nomCampDomini = ExpedientResource.ExpedientFilterForm.Fields.domini;
+            	if (requestParameterMap.containsKey(nomCampDomini) && requestParameterMap.get(nomCampDomini).length>0){
+            		Long dominiId = Long.valueOf(requestParameterMap.get(nomCampDomini)[0]);
+                    EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+                    List<ResultatConsultaDto> dominiValors = dominiHelper.getResultDomini(entitatEntity.getId(), dominiId, "", 1, Integer.MAX_VALUE).getResultat();
+                    if (dominiValors!=null) {
+                        for (ResultatConsultaDto flx: dominiValors) {
+                            resultat.add(new FieldOption(flx.getId(), flx.getText()));
+                        }
+                    }
+            	}
             }
             return resultat;
         }
