@@ -2,6 +2,7 @@ package es.caib.ripea.plugin.caib.usuari;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.fundaciobit.pluginsib.userinformation.SearchUsersResult;
@@ -84,6 +85,13 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 			LOGGER.debug("UserInfo.getName: " + userInfo.getName());
 			LOGGER.debug("UserInfo.getSurname1: " + userInfo.getSurname1());
 			LOGGER.debug("UserInfo.getSurname2: " + userInfo.getSurname2());
+			if (userInfo.getAttributes()!=null && userInfo.getAttributes().size()>0) {
+				for (Map.Entry<String, String> entry : userInfo.getAttributes().entrySet()) {
+					LOGGER.debug("UserInfo.getAttributes: key=" + entry.getKey() + " Valor: " + entry.getValue());
+				}
+			} else {
+				LOGGER.debug("UserInfo.getAttributes: SENSE atributs");
+			}
 			
 			DadesUsuari dadesUsuari = new DadesUsuari();
 			dadesUsuari.setCodi(userInfo.getUsername());
