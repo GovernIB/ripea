@@ -1,3 +1,4 @@
+import {formatEndOfDay, formatStartOfDay} from "./dateUtils.ts";
 
 const filter = (options :any[]) :any[] => {
     return options.filter(a=>a!=null && a.length>0 && !a.includes("undefined") &&
@@ -54,5 +55,11 @@ export const between = (option :string, paramStart :any, paramEnd :any) => {
     return and(
         greaterEq(option, paramStart),
         lessEq(option, paramEnd)
+    );
+}
+export const betweenDates = (option :string, paramStart :any, paramEnd :any) => {
+    return and(
+        greaterEq(option, `'${formatStartOfDay(paramStart)}'`),
+        lessEq(option, `'${formatEndOfDay(paramEnd)}'`)
     );
 }

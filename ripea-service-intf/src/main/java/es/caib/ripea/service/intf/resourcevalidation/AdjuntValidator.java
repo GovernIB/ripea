@@ -26,7 +26,8 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
 
 	@Override
 	public boolean isValid(DocumentResource resource, ConstraintValidatorContext context) {
-        int maxLength = Integer.parseInt(springEnvironment.getProperty("es.caib.ripea.maxUploadSize", "52428800"));
+//        int maxLength = Integer.parseInt(springEnvironment.getProperty("es.caib.ripea.maxUploadSize", "52428800"));
+        int maxLength = 1;
         String formatedMaxLength = formatByteCount(maxLength);
         String message = messageSource.getMessage("es.caib.ripea.service.intf.resourcevalidation.AdjuntValid.adjunt", new Object[]{formatedMaxLength}, LocaleContextHolder.getLocale());
 

@@ -3,7 +3,6 @@ import {useFormContext} from 'reactlib';
 import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
-import {formatIso} from '../../util/dateUtils';
 import * as builder from '../../util/springFilterUtils';
 
 const ExpedientFilterForm = () => {
@@ -26,11 +25,17 @@ const ExpedientFilterForm = () => {
         <GridFormField xs={3} name="dataCreacioInici"/>
         <GridFormField xs={3} name="dataCreacioFinal"/>
 
-        <GridFormField xs={3} name="numeroRegistre"/>
-        <GridFormField xs={3} name="grup"/>
-        <GridFormField xs={3} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
+        <GridFormField xs={3} name="domini"/>
+        <GridFormField xs={3} name="dominiValor"
+                       requestParams={{domini: data?.domini?.id}}
+                       disabled={!data?.domini}
+                       reanOnly={!data?.domini}/>
 
-        <Grid item xs={user?.rolActual == "tothom" ?6 :3}/>
+        <GridFormField xs={2} name="numeroRegistre"/>
+        <GridFormField xs={2} name="grup" hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
+            <Grid item xs={2} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
+        <GridFormField xs={2} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
+            <Grid item xs={2} hidden={user?.rolActual != "tothom"}/>
 
         <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
         <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
@@ -56,7 +61,7 @@ export const springFilterBuilder = (data: any, user?: any): string => {
         builder.eq("organGestor.id", data.organGestor?.id),
         builder.eq("metaExpedient.id", data.metaExpedient?.id),
 
-        builder.between("createdDate", `'${formatIso(data.dataCreacioInici)}'`, `'${formatIso(data.dataCreacioFinal)}'`),
+        builder.betweenDates("createdDate", data.dataCreacioInici, data.dataCreacioFinal),
 
         builder.like("registresImportats", data.numeroRegistre),
         builder.eq("grup.codi", data.grup?.id),
