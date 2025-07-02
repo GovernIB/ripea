@@ -296,8 +296,7 @@ public class PluginHelper {
 		}
 	}
 
-	public DadesUsuari dadesUsuariFindAmbCodi(
-			String usuariCodi) {
+	public DadesUsuari dadesUsuariFindAmbCodi(String usuariCodi) {
 
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta d'usuari amb codi";
@@ -306,8 +305,7 @@ public class PluginHelper {
 		DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 		
 		try {
-			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(
-					usuariCodi);
+			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -6380,6 +6378,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName( pluginClass);
 			Properties props = configHelper.getGroupPropertiesGeneral(IntegracioHelper.INTCODI_USUARIS);
+			logger.debug("getDadesUsuariPlugin propietats: " + props.toString());
 			dadesUsuariPlugin = (DadesUsuariPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance("es.caib.ripea.plugin.dades.usuari.", props);

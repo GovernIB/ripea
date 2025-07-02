@@ -92,14 +92,33 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
+		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
 		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
+
+		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");		
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+		
+		if (dadesUsuari != null) {
+			logger.debug("Dades usuari:");
+			logger.debug("Dades usuari getCodi: "+dadesUsuari.getCodi());
+			logger.debug("Dades usuari getNom: "+dadesUsuari.getNom());
+			logger.debug("Dades usuari getLlinatges: "+dadesUsuari.getLlinatges());
+			logger.debug("Dades usuari getNomSencer: "+dadesUsuari.getNomSencer());
+			logger.debug("Dades usuari getNif: "+dadesUsuari.getNif());
+			logger.debug("Dades usuari getEmail: "+dadesUsuari.getEmail());
+		} else {
+			logger.debug("Dades usuari es null.");
+		}
+		
 		if (usuari == null) {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + auth.getName() + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
+				logger.debug("GUARDAM NOU usuari a BBDD amb les dades de dadesUsuari.");
+				logger.debug("Dades usuari getCodi: "+dadesUsuari.getCodi());
+				logger.debug("Dades usuari getNomSencer: "+dadesUsuari.getNomSencer());
+				logger.debug("Dades usuari getNif: "+dadesUsuari.getNif());
+				logger.debug("Dades usuari getEmail: "+dadesUsuari.getEmail());
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
@@ -111,6 +130,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				if (comprovaAmbUsuariPlugin) {
 					throw new NotFoundException(auth.getName(), DadesUsuari.class);
 				} else {
+					logger.debug("GUARDAM NOU usuari a BBDD amb les dades de auth.");
+					logger.debug("auth.getName(): "+auth.getName());
 					usuari = usuariRepository.save(
 							UsuariEntity.getBuilder(
 									auth.getName(),
@@ -121,10 +142,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 				}
 			}
 		} else {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + auth.getName() + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
+				logger.debug("ACTUALITZAM USUARI "+usuari.getCodi()+" a BBDD amb les dades de dadesUsuari.");
+				logger.debug("Dades usuari getNomSencer: "+dadesUsuari.getNomSencer());
+				logger.debug("Dades usuari getNif: "+dadesUsuari.getNif());
+				logger.debug("Dades usuari getEmail: "+dadesUsuari.getEmail());
 				usuari.update(
 						dadesUsuari.getNomSencer(),
 						dadesUsuari.getNif(),

@@ -299,21 +299,16 @@ public class CacheHelper {
 		return errors;
 	}
 	@CacheEvict(value = "errorsValidacioNode", key = "#node.id")
-	public void evictErrorsValidacioPerNode(
-			NodeEntity node) {
-	}
+	public void evictErrorsValidacioPerNode(NodeEntity node) {}
 	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
-	public DadesUsuari findUsuariAmbCodi(
-			String usuariCodi) {
-		return pluginHelper.dadesUsuariFindAmbCodi(
-				usuariCodi);
+	public DadesUsuari findUsuariAmbCodi(String usuariCodi) {
+		return pluginHelper.dadesUsuariFindAmbCodi(usuariCodi);
 	}
 
 	@CacheEvict(allEntries = true, value = "usuariAmbCodi")
 	@Scheduled(fixedDelay = 86400000)
-	public void evictUsuariAmbCodi() {
-	}
+	public void evictUsuariAmbCodi() {}
 
 	@Cacheable(value = "unitatsOrganitzatives", key="#entitatCodi")
 	public ArbreDto<UnitatOrganitzativaDto> findUnitatsOrganitzativesPerEntitat(
