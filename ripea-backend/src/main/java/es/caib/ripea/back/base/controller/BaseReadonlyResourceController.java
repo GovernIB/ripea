@@ -1705,7 +1705,10 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	private String[] fieldOptionsProcessedNamedQueriesWithFieldAnnotation(Field field, String[] namedQueries) {
-		List<String> processedNamedQueries = Arrays.asList(namedQueries != null ? namedQueries : new String[0]);
+		List<String> processedNamedQueries = new ArrayList<>();
+		if (namedQueries != null) {
+			Collections.addAll(processedNamedQueries, namedQueries);
+		}
 		ResourceField resourceFieldAnnotation = field.getAnnotation(ResourceField.class);
 		if (resourceFieldAnnotation != null) {
 			Collections.addAll(processedNamedQueries, resourceFieldAnnotation.namedQueries());
