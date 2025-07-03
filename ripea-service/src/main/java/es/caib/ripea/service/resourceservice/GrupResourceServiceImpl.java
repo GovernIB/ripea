@@ -88,17 +88,15 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
     			String entitatActualCodi = configHelper.getEntitatActualCodi();
     			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
     			OrganGestorEntity ogEntity = organGestorRepository.findByEntitatAndCodi(entitat, configHelper.getOrganActualCodi());
-    			List<GrupEntity> grupsPermesos = entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitat.getId(), configHelper.getRolActual(), ogEntity.getId());
+    			List<GrupEntity> grupsPermesos = entityComprovarHelper.findGrupsPermesosProcedimentsGestioActiva(entitat.getId(), configHelper.getRolActual(), ogEntity != null ?ogEntity.getId() :null);
     			
     			Filter filtreGrupsProcediment = null;
-    			if (grupsPermesos!=null && grupsPermesos.size()>0) {
+    			if (grupsPermesos!=null && !grupsPermesos.isEmpty()) {
 	    			List<Long> grupsIds = new ArrayList<Long>();
-	    			if (grupsPermesos!=null) {
-						for (GrupEntity ge: grupsPermesos) {
-							grupsIds.add(ge.getId());
-						}
-	    			}
-	    			List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
+                    for (GrupEntity ge : grupsPermesos) {
+                        grupsIds.add(ge.getId());
+                    }
+                    List<String> grupsOrgansProcedimentIn = Utils.getIdsEnGruposMil(grupsIds);
 			        for (String aux: grupsOrgansProcedimentIn) {
 				        if (aux != null && !aux.isEmpty()) {
 				        	filtreGrupsProcediment = FilterBuilder.or(filtreGrupsProcediment, Filter.parse("id IN (" + aux + ")"));

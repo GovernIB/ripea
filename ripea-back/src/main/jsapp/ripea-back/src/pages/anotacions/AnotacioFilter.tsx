@@ -1,7 +1,7 @@
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
-import {formatIso} from "../../util/dateUtils.ts";
+import {formatEndOfDay} from "../../util/dateUtils.ts";
 
 const AnotacioFilterForm = () => {
     return <>
@@ -23,7 +23,7 @@ const springFilterBuilder = (data: any): string => {
         builder.like("registre.extracte", data.extracte),
         builder.like("registre.destiCodiINom", data.destinacio),
         builder.like("metaExpedient", data.metaExpedient),
-        builder.between("registre.data", `'${formatIso(data.dataRecepcioInicial)}'`, `'${formatIso(data.dataRecepcioFinal)}'`),
+        builder.betweenDates("registre.data", data.dataRecepcioInicial, formatEndOfDay(data.dataRecepcioFinal)),
 
         data.estat == 'ACCEPTAT'
             ? builder.like("estat", "PROCESSAT")

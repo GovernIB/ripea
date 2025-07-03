@@ -374,6 +374,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @ResourceField(onChangeActive = true)
         private LocalDateTime dataCreacioFinal;
         private String numeroRegistre;
+        @ResourceField(namedQueries = {"BY_PERMISOS_USUARI"})
         private ResourceReference<GrupResource, Long> grup;
         @ResourceField(onChangeActive = true)
         private ResourceReference<UsuariResource, String> agafatPer;
