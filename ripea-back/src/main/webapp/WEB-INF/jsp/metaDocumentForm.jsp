@@ -7,6 +7,7 @@
 
 <c:set var="charSearch" value='"' />
 <c:set var="charReplace" value='\\"' />
+<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
 
 <%
 	pageContext.setAttribute(
@@ -111,9 +112,24 @@ body.loading .rmodal {
 }
 </style>	
 <script type="text/javascript">
+
+	var maxTamanyFitxerUpload = ${maxFileSize};
+
 	$(document).ready(function() {
+
 		let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 		localStorage.setItem("currentIframeHeight", currentHeight);
+		
+		$('#plantilla').change(function(){
+			let tamany = $(this)[0].files[0].size;
+			var pare = $(this).closest('.fileinput').parent();
+			if (tamany>maxTamanyFitxerUpload) {
+				$(pare).find('div.alert.alert-danger').remove();
+				$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			} else {
+				$(pare).find('div.alert.alert-danger').remove();
+			}
+		});
 		
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
@@ -122,6 +138,7 @@ body.loading .rmodal {
 				$(".callback").addClass("hidden");
 			}
 		});
+		
         if($("#firmaPortafirmesActiva").prop("checked") == true){
         	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
@@ -306,7 +323,11 @@ function removeLoading() {
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio"/>
 				<rip:inputSelect name="multiplicitat" textKey="metadocument.form.camp.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}"/>
+				<rip:inputFile 
+					name="plantilla"
+					textKey="metadocument.form.camp.plantilla"
+					comment="contingut.document.MAX_UPLOAD_SIZE"
+					fileName="${metaDocumentCommand.plantillaNom}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true"

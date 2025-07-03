@@ -177,6 +177,7 @@ $(document).ready(function() {
 		if (tamany>maxTamanyFitxerUpload) {
 			$('#input-firma-arxiu').find('div.alert.alert-danger').remove();
 			$('#input-firma-arxiu').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			window.scrollTo(0, document.body.scrollHeight);
 		} else {
 			$('#input-firma-arxiu').find('div.alert.alert-danger').remove();
 		}
@@ -189,6 +190,7 @@ $(document).ready(function() {
 		if (tamany>maxTamanyFitxerUpload) {
 			$('#inputDoc').find('div.alert.alert-danger').remove();
 			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			window.scrollTo(0, document.body.scrollHeight);
 		} else {
 			$('#inputDoc').find('div.alert.alert-danger').remove();
     		<c:if test="${isDeteccioFirmaAutomaticaActiva}">

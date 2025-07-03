@@ -7,6 +7,7 @@
 
 <c:set var="charSearch" value='"' />
 <c:set var="charReplace" value='\\"' />
+<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
 
 <%
 	pageContext.setAttribute(
@@ -172,15 +173,30 @@ div.dropdown-menu.loading .rmodal_carrecs {
     font-size: 1.5rem;
     background: #dadada;
 }
-</style>	
+</style>
+
 <script type="text/javascript">
 
-//################################################## document ready START ##############################################################
+	var maxTamanyFitxerUpload = ${maxFileSize};
+
 	$(document).ready(function() {
+
 		if (window.frameElement != null) {
 			let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 			localStorage.setItem("currentIframeHeight", currentHeight);
 		}
+
+		$('#plantilla').change(function(){
+			let tamany = $(this)[0].files[0].size;
+			var pare = $(this).closest('.fileinput').parent();
+			if (tamany>maxTamanyFitxerUpload) {
+				$(pare).find('div.alert.alert-danger').remove();
+				$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			} else {
+				$(pare).find('div.alert.alert-danger').remove();
+			}
+		});
+		
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
 				$(".callback").removeClass("hidden");
@@ -514,7 +530,13 @@ function removeLoading() {
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect name="multiplicitat" textKey="metadocument.form.camp.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
-				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}" disabled="${bloquejarCamps}" doNotShowErrors="1"/>
+				<rip:inputFile 
+					name="plantilla"
+					textKey="metadocument.form.camp.plantilla"
+					comment="contingut.document.MAX_UPLOAD_SIZE"
+					fileName="${metaDocumentCommand.plantillaNom}"
+					disabled="${bloquejarCamps}"
+					doNotShowErrors="1"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true" disabled="${bloquejarCamps}"/>
