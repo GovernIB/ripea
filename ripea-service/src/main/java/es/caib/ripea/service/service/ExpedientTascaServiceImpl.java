@@ -2,6 +2,7 @@ package es.caib.ripea.service.service;
 
 import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.helper.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -303,7 +304,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			")");
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
+		UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
+		if (responsableActual==null) throw new NotFoundException(auth.getName(), DadesUsuari.class);
 		ExpedientTascaEntity tasca = expedientTascaRepository.getOne(tascaId);
 
 		try {
@@ -374,7 +376,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi : responsablesCodi) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
+			UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
+			if (responsable==null) throw new NotFoundException(responsableCodi, DadesUsuari.class);
 			responsables.add(responsable);
 		}
 
@@ -400,7 +403,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		String comentari) {
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(expedientTascaId);
 
-		UsuariEntity delegat = usuariHelper.getUsuariByCodiDades(delegatCodi, true, true);
+		UsuariEntity delegat = usuariRepository.findById(delegatCodi).orElse(null);
+		if (delegat==null) throw new NotFoundException(delegatCodi, DadesUsuari.class);
 
 		expedientTascaEntity.updateDelegat(delegat);
 
@@ -469,8 +473,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi : responsablesCodi) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
-			responsables.add(responsable);
+			UsuariEntity responsableActual = usuariRepository.findById(responsableCodi).orElse(null);
+			if (responsableActual==null) throw new NotFoundException(responsableCodi, DadesUsuari.class);
+			responsables.add(responsableActual);
 		}
 
 		expedientTascaEntity.updateResponsables(responsables);
@@ -527,15 +532,17 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.getOne(expedientTasca.getMetaExpedientTascaId());
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi : expedientTasca.getResponsablesCodi()) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
-			responsables.add(responsable);
+			UsuariEntity responsableActual = usuariRepository.findById(responsableCodi).orElse(null);
+			if (responsableActual==null) throw new NotFoundException(responsableCodi, DadesUsuari.class);
+			responsables.add(responsableActual);
 		}
 
 		List<UsuariEntity> observadors = new ArrayList<UsuariEntity>(); // Per coneixement
 
 		if (expedientTasca.getObservadorsCodi() != null) {
 			for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
-				UsuariEntity observador = usuariHelper.getUsuariByCodiDades(observadorCodi, true, true);
+				UsuariEntity observador = usuariRepository.findById(observadorCodi).orElse(null);
+				if (observador==null) throw new NotFoundException(observadorCodi, DadesUsuari.class);
 				observadors.add(observador);
 			}
 		}

@@ -140,28 +140,24 @@ public class UsuariHelper {
 	}
 	
 
-	public UsuariEntity getUsuariByCodiDades(
-			String usuariCodi,
-			boolean checkAlsoByNif,
-			boolean throwException) {
+	public UsuariEntity getUsuariByCodiOrNifDades(String usuariCodiOrNif) {
 		
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
-		if (dadesUsuari == null) {
-			if (throwException) {
-				throw new NotFoundException(
-						usuariCodi,
-						DadesUsuari.class);
-			} else {
-				return null;
-			}
+		//1.- Cerca a BBDD per codi o NIF
+		UsuariEntity usuari = usuariRepository.findById(usuariCodiOrNif).orElse(null);
+		if (usuari == null) {
+			usuari = usuariRepository.findByNif(usuariCodiOrNif);
 		}
 		
-		UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
+		if (usuari != null) {
+			return usuari;
+		}
 		
-		if (usuari == null && checkAlsoByNif)
-			usuari = usuariRepository.findByNif(usuariCodi);
-		
-		if (usuari == null) {
+		//2.- Cerca per plugin usuaris si no ha trobat usuari a BBDD
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodiOrNif);
+		if (dadesUsuari == null) {
+			throw new NotFoundException(usuariCodiOrNif, DadesUsuari.class);
+		} else {
+			//Com que hem de retornar un usuariEntity, el crem si no existeix a BBDD
 			usuari = usuariRepository.save(
 					UsuariEntity.getBuilder(
 							dadesUsuari.getCodi(),
@@ -169,11 +165,6 @@ public class UsuariHelper {
 							dadesUsuari.getNif(),
 							dadesUsuari.getEmail(),
 							getIdiomaPerDefecte()).build());
-		} else {
-			usuari.update(
-					dadesUsuari.getNom(),
-					dadesUsuari.getNif(),
-					dadesUsuari.getEmail());
 		}
 		
 		return usuari;

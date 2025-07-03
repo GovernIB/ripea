@@ -122,8 +122,8 @@ $(document).ready(function() {
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>
 			</div>
 			<div class="col-md-3">					
-				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+				<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
 						name="creador"  
 						urlConsultaInicial="${urlConsultaInicial}"

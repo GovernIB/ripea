@@ -282,15 +282,15 @@
 				<div class="well"> 
 					<form:hidden path="estats[${vs.index}].id" />
 					<rip:inputText name="estats[${vs.index}].codi" textKey="expedient.estat.form.camp.codi" required="true" readonly="true"/>		
-					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 					<rip:inputSuggest 
 						name="estats[${vs.index}].responsableCodi" 
 						urlConsultaInicial="${urlConsultaInicial}" 
 						urlConsultaLlistat="${urlConsultaLlistat}" 
 						textKey="expedient.estat.form.camp.responsable"
 						suggestValue="codi"
-						suggestText="nom"
+						suggestText="codiAndNom"
 						placeholderKey="expedient.estat.form.camp.responsable"/>
 				</div>
 			</c:forEach>
@@ -302,15 +302,15 @@
 					<form:hidden path="tasques[${vs.index}].id" />
 					<rip:inputText name="tasques[${vs.index}].codi" textKey="metaexpedient.tasca.form.camp.codi" required="true" readonly="true"/>	
 
-					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 					<rip:inputSuggest 
 						name="tasques[${vs.index}].responsable" 
 						urlConsultaInicial="${urlConsultaInicial}" 
 						urlConsultaLlistat="${urlConsultaLlistat}" 
 						textKey="metaexpedient.tasca.form.camp.responsable"
 						suggestValue="codi"
-						suggestText="nom"
+						suggestText="codiAndNom"
 						placeholderKey="metaexpedient.tasca.form.camp.responsable"/>							
 				</div>
 			</c:forEach>	

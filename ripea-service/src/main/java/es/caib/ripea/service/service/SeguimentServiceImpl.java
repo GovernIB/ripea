@@ -154,7 +154,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 				!Utils.hasValue(filtre.getServei()), 
 				filtre.getServei(),
 				filtre.getCreatedByCodi() == null,
-				filtre.getCreatedByCodi() != null ? usuariRepository.getOne(filtre.getCreatedByCodi()) : null,
+				filtre.getCreatedByCodi(),
 				filtre.getDataInici() == null, 
 				DateUtil.getLocalDateTimeFromDate(filtre.getDataInici(), true, false), 
 				filtre.getDataFinal() == null, 

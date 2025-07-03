@@ -43,7 +43,7 @@ public interface ConsultaPinbalRepository extends JpaRepository<ConsultaPinbalEn
 			@Param("esNullServei") boolean esNullServei,
 			@Param("servei") String servei,
 			@Param("esNullCreatPer") boolean esNullCreatPer,
-			@Param("creatPer") UsuariEntity creatPer,
+			@Param("creatPer") String creatPer,
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFinal") boolean esNullDataFinal,

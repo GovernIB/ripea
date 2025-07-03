@@ -54,6 +54,7 @@ import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.service.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
@@ -201,7 +202,8 @@ public class DocumentServiceImpl implements DocumentService {
 			if (expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT) {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				expedientTascaEntity.updateEstat(TascaEstatEnumDto.INICIADA);
-				UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
+				UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
+				if (responsableActual==null) throw new NotFoundException(auth.getName(), DadesUsuari.class);
 				expedientTascaEntity.updateResponsableActual(responsableActual);
 			}
 		}

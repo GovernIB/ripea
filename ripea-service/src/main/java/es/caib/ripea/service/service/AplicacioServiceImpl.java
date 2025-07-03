@@ -211,7 +211,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
-		return conversioTipusHelper.convertir(usuariRepository.findById(codi), UsuariDto.class);
+		return conversioTipusHelper.convertir(usuariRepository.findById(codi).get(), UsuariDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -227,8 +227,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Obtenint usuari/càrrec amb codi (codi=" + codi + ")");
 		UsuariDto usuariDto = null;
 		try {
+			//Cercar primer a BBDD, sino al plugin
 			usuariDto = conversioTipusHelper.convertir(
-					usuariHelper.getUsuariByCodiDades(codi, true, true),
+					usuariHelper.getUsuariByCodiOrNifDades(codi),
 					UsuariDto.class);
 		} catch (NotFoundException ex) {
 			if (configHelper.getAsBoolean(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)) {
@@ -265,7 +266,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
 		UsuariDto usuariDto = null;
 		usuariDto = conversioTipusHelper.convertir(
-				usuariHelper.getUsuariByCodiDades(codi, true, true),
+				usuariHelper.getUsuariByCodiOrNifDades(codi),
 				UsuariDto.class);
 
 		return usuariDto;
