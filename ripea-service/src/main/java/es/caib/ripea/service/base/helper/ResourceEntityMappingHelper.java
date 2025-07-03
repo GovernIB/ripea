@@ -91,12 +91,11 @@ public class ResourceEntityMappingHelper {
 			E entity,
 			R resource,
 			Map<String, Persistable<?>> referencedEntities) {
-		List<String> processedFieldNames = new ArrayList<>();
-		// Actualitza els camps de l'entitat que son de tipus Persistable o byte[]
+		Set<String> ignoredFieldNames = new HashSet<>();
+		// Actualitza els camps de l'entitat que son de tipus Persistable, FileReference o Collection
 		ReflectionUtils.doWithFields(entity.getClass(), field -> {
-			// Es modifica el valor de cada camp de l'entitat que és de tipus de Persistable
-			// amb la referencia especificada al resource.
 			if (Persistable.class.isAssignableFrom(field.getType()) && referencedEntities != null) {
+				// Es modifica el valor dels camps de tipus de Persistable amb la referencia especificada al resource.
 				Persistable<?> referencedEntity = referencedEntities.get(field.getName());
 				String setMethodName = "set" + TypeUtil.getMethodSuffixFromField(field);
 				Method setMethod = ReflectionUtils.findMethod(
@@ -109,18 +108,21 @@ public class ResourceEntityMappingHelper {
 							entity,
 							referencedEntity);
 				}
-				processedFieldNames.add(field.getName());
-			}
-			if (FileReference.class.isAssignableFrom(field.getType())) {
+				ignoredFieldNames.add(field.getName());
+			} else if (FileReference.class.isAssignableFrom(field.getType())) {
+				// Es modifica el valor dels camps de tipus de FileReference amb el contingut de l'arxiu.
 				setFileReferenceFieldValue(field, entity);
-				processedFieldNames.add(field.getName());
+				ignoredFieldNames.add(field.getName());
+			} else if (Collection.class.isAssignableFrom(field.getType())) {
+				// Ignora els camps de tipus Collection.
+				ignoredFieldNames.add(field.getName());
 			}
 		});
 		// Actualitza els demés camps de l'entitat
 		objectMappingHelper.map(
 				resource,
 				entity,
-				processedFieldNames.toArray(new String[0]));
+				ignoredFieldNames.toArray(new String[0]));
 	}
 
 	public <E extends ResourceEntity<R, ?>, R extends Resource<?>> R entityToResource(
