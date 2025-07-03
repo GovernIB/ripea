@@ -306,7 +306,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         },
         {
             title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
-                ? t('page.document.action.notifica.labelr')
+                ? t('page.document.action.notificar.label')
                 : t('page.document.action.comunicar.label'),
             icon: "mail",
             showInMenu: true,

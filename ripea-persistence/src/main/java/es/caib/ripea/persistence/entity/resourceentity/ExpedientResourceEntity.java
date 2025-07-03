@@ -96,9 +96,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	@ManyToMany(
 			cascade = {
 					CascadeType.DETACH,
-					CascadeType.MERGE,
-					CascadeType.REFRESH,
-					CascadeType.PERSIST
+//					CascadeType.MERGE,
+//					CascadeType.REFRESH,
+//					CascadeType.PERSIST
 			},
 			fetch = FetchType.LAZY)
 	@JoinTable(
@@ -112,9 +112,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	@ManyToMany(
 			cascade = {
 					CascadeType.DETACH,
-					CascadeType.MERGE,
-					CascadeType.REFRESH,
-					CascadeType.PERSIST
+//					CascadeType.MERGE,
+//					CascadeType.REFRESH,
+//					CascadeType.PERSIST
 			},
 			fetch = FetchType.LAZY)
 	@JoinTable(

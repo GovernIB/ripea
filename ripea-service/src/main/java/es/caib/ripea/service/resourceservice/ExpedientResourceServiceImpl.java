@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
+import es.caib.ripea.service.intf.base.exception.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,11 +56,7 @@ import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
-import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
-import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
-import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -113,6 +111,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	private final ExpedientEstatRepository expedientEstatRepository;
 	
     private final UsuariResourceRepository usuariResourceRepository;
+    private final ExpedientResourceRepository expedientResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
 
@@ -294,8 +293,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         Filter filtreProcedimentPermisDirecte = null;
         if (!rolActual.equals("IPA_ADMIN") && 
         	!rolActual.equals("IPA_SUPER") && 
-        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null && 
-        	permisosPerExpedients.getIdsMetaExpedientsPermesos().size()>0) {
+        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null &&
+                !permisosPerExpedients.getIdsMetaExpedientsPermesos().isEmpty()) {
 	            filtreProcedimentPermisDirecte = FilterBuilder.or(
 	            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
 	            		filtreProcedimentsPermesos
@@ -304,31 +303,25 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         
         Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
         Filter filtreResultat = FilterBuilder.and(filtreNoEliminats, filtreEntitatSessio, combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
-        String resultat = filtreResultat.generate();
-        return resultat;
+        return filtreResultat.generate();
     }
     
     @Override
-    protected void afterUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	//Relacionam els nous expedients seleccionats
-    	if (resource.getRelacionatsAmb()!=null) {
-    		for (ResourceReference<ExpedientResource, Long> relacionatAmb: resource.getRelacionatsAmb()) {
-    			try {
-    				expedientHelper.relacioCreate(entity.getEntitat().getId(), entity.getId(), relacionatAmb.getId(), configHelper.getRolActual());
-    			} catch (ValidationException ex) {
-    				//Ja relacionat 
-    			}
-    		}
-    	}
-    	
-    	//Eliminam els que ja no estan relacionats
-    	if (entity.getRelacionatsAmb()!=null) {
-    		for (ExpedientResourceEntity relacionat: entity.getRelacionatsAmb()) {
-    			if (!resource.estaRelacionatAmb(relacionat.getId())) {
-    				expedientHelper.relacioDelete(entity.getEntitat().getId(), entity.getId(), relacionat.getId(), configHelper.getRolActual());
-    			}
-    		}
-    	}
+    protected void beforeUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerValue> answers) {
+        if(resource.getRelacionatsAmb()!=null) {
+            if(!resource.getRelacionatsAmb().isEmpty()) {
+                entity.setRelacionatsAmb(expedientResourceRepository.findAllById(resource.getRelacionatsAmb().stream().map(ResourceReference::getId).collect(Collectors.toList())));
+            }else {
+                entity.getRelacionatsAmb().clear();
+            }
+        }
+        if(resource.getRelacionatsPer()!=null) {
+            if(!resource.getRelacionatsPer().isEmpty()) {
+                entity.setRelacionatsPer(expedientResourceRepository.findAllById(resource.getRelacionatsPer().stream().map(ResourceReference::getId).collect(Collectors.toList())));
+            }else {
+                entity.getRelacionatsPer().clear();
+            }
+        }
     }
 
     @Override

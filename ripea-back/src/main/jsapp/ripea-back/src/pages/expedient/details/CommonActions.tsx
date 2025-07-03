@@ -153,7 +153,7 @@ export const useActions = (refresh?: () => void) => {
                     apiPatch(id,{data: {relacionatsPer, relacionatsAmb} })
                         .then(() => {
                             refresh?.()
-                            temporalMessageShow(null, t('page.expedient.action.relacio.ok'), 'success');
+                            temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');
@@ -238,9 +238,6 @@ export const useCommonActions = (refresh?: () => void) => {
     const isAdminOAdminOrgan = (row:any) :boolean => {
         return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
     }
-    const potModificar = (row:any) :boolean => {
-        return (isUsuariActualWrite(row) && isAgafatUsuariActual(row)) || (isAdminOAdminOrgan(row) && !isTancat(row));
-    }
 
     const actions = [
         {
@@ -314,21 +311,21 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarPrioridad,
-            hidden: (row:any) => !potModificar(row),
+            hidden: (row:any) => !row?.potModificar,
         },
         {
             title: t('page.expedient.action.changeEstat.label'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarEstado,
-            hidden: (row:any) => isTancat(row) || !potModificar(row),
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },
         {
             title: t('page.expedient.action.relacio.label'),
             icon: "link",
             showInMenu: true,
             onClick: hanldeRelacionar,
-            hidden: (row:any) => !potModificar(row),
+            hidden: (row:any) => !row?.potModificar,
         },
         {
             title: t('page.expedient.action.close.label'),
@@ -336,7 +333,7 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleTancar,
             disabled: (row:any) => !row?.potTancar,
-            hidden: (row:any) => !potModificar(row) || isTancat(row),
+            hidden: (row:any) => !row?.potModificar || isTancat(row),
         },
         {
             title: t('page.expedient.action.open.label'),
@@ -350,7 +347,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !potModificar(row) || row.conteDocumentsDefinitius,
+            hidden: (row:any) => !row?.potModificar || row.conteDocumentsDefinitius,
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,

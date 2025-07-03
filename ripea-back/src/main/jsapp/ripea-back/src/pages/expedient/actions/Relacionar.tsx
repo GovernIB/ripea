@@ -82,12 +82,12 @@ const ActionFilter = (props:any) => {
 
 const RelacionarForm= () => {
     const {data, apiRef} = useFormContext();
-    const [springFilter, setSpringFilter] = useState<string>();
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
     const selectionModel = useMemo(()=>{
         return data?.relacionatsAmb?.map((a:any) => a.id)
     }, [])
+
+    const [springFilter, setSpringFilter] = useState<string>();
+    const [selectedRows, setSelectedRows] = useState<any[]>(selectionModel || []);
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("relacionatsAmb", selectedRows?.map(id => ({ id })))

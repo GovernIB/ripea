@@ -309,9 +309,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean seguidor = false;
     @Transient private int numComentaris;
     @Transient private int numSeguidors;
-    @Transient private int numContingut;
+    @Transient private int numContingut;// TODO: calcular valor
     @Transient private boolean hasEsborranys;
-    @Transient private int numDades;
+    @Transient private int numDades;// TODO: calcular valor
     @Transient private int numMetaDades;
     @Transient private int numInteressats;
     @Transient private int numRemeses;
@@ -331,8 +331,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private Date dataDarrerEnviament;
     @Transient private boolean potModificar;
 
-    private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
-    private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
+    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer;
+    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb;
     @Transient private List<ResourceReference<DocumentResource, Long>> documentObligatorisAlTancar = new ArrayList<>();
 
     @Transient private boolean conteDocuments;
@@ -365,6 +365,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String estat = "0";
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
+        @ResourceField(springFilter = "actiu:true and revisioEstat:'REVISAT'")
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
         private ResourceReference<DominiResource, Long> domini;
         @ResourceField(enumType = true)
@@ -424,14 +425,12 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String novaCarpetaNom;
     }
     
-    public boolean estaRelacionatAmb(Long id) {
-    	if (this.getRelacionatsAmb()!=null) {
-    		for (ResourceReference<ExpedientResource, Long> relacionatAmb: this.getRelacionatsAmb()) {
-    			if (relacionatAmb.getId().equals(id)) {
-    				return true;
-    			}
-    		}
-    	}
-    	return false;
-    }
+//    public boolean estaRelacionatAmb(Long id) {
+//    	if (this.getRelacionatsAmb()!=null) {
+//            return this.getRelacionatsAmb().stream()
+//                    .anyMatch(relacionatAmb -> relacionatAmb.getId().equals(id));
+//    	}
+//
+//    	return false;
+//    }
 }
