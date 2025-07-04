@@ -62,6 +62,7 @@ import es.caib.ripea.service.intf.dto.PrediccioSincronitzacio;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.OrganGestorService;
@@ -924,11 +925,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				PermisOrganGestorDto permisOrgan = conversioTipusHelper.convertir(p, PermisOrganGestorDto.class);
 				permisOrgan.setOrganGestor(o);
 				if (p.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
-					try {
-						permisOrgan.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permisOrgan.getPrincipalNom()).getNom() + " (" + permisOrgan.getPrincipalNom() + ")");
-					} catch (NotFoundException ex) {
-						logger.debug("No s'ha trobat cap usuari amb el codi " + permisOrgan.getPrincipalNom());
-						permisOrgan.setPrincipalCodiNom(permisOrgan.getPrincipalNom());
+					UsuariDto userPermis = usuariHelper.getUsuariByCodiDades(permisOrgan.getPrincipalNom());
+					if (userPermis!=null) {
+						permisOrgan.setPrincipalCodiNom(userPermis.getCodiAndNom());
+					} else {
+						permisOrgan.setPrincipalCodiNom("Usuari NO TROBAT ("+permisOrgan.getPrincipalNom()+")");		
 					}
 				} else {
 					permisOrgan.setPrincipalCodiNom(permisOrgan.getPrincipalNom());
