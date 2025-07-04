@@ -802,6 +802,7 @@ const translationEn = {
                 fitxerNom: "File name",
                 serveiTipusEnum: "Service type",
                 notificacioIdentificador: "Identifier",
+                estatError: "Error processing the notification inside Notib",
             },
             action: {
                 actualitzarEstat: {

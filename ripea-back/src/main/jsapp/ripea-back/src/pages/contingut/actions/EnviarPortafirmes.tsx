@@ -127,6 +127,7 @@ const EnviarPortafirmesForm = () => {
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
 
         <GridButton
+            variant={open ?"contained" :"outlined"}
             xs={1} onClick={()=>{
                 setOpenNewFlux(false)
                 setOpen(!open)
@@ -136,6 +137,7 @@ const EnviarPortafirmesForm = () => {
             <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
         </GridButton>
         <GridButton
+            variant={openNewFlux ?"contained" :"outlined"}
             xs={1} onClick={()=>{
                 setOpen(false)
                 setOpenNewFlux(!openNewFlux)

@@ -92,7 +92,7 @@ const ImportarExpedient = (props:any) => {
             title: t('page.expedient.action.importar.label'),
             icon: "download",
             showInMenu: false,
-            onClick: (id:any) => importarExpedient(entity?.id, {expedientOrigen: {id: id} })
+            onClick: (id:any) => importarExpedient(entity?.id, id)
         }
     ]
 
@@ -124,15 +124,11 @@ const ImportarExpedient = (props:any) => {
     </>
 }
 
-const useImportarExpedient = (refresh?: () => void) => {
+const useImportarExpedient = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-
     const [open, setOpen] = useState(false);
-    const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row);
-        setEntity(row);
+    const handleOpen = () => {
         setOpen(true);
     }
 

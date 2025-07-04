@@ -4,6 +4,7 @@ import {useRef} from "react";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {FormReportDialog} from "../../../components/FormActionDialog.tsx";
 import {useTranslation} from "react-i18next";
+import {iniciaDescargaBlob} from "../details/CommonActions.tsx";
 
 const ExportarDocumentsForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -23,7 +24,7 @@ const ExportarDocuments = (props:any) => {
     </FormReportDialog>
 }
 
-export const useExportarDocuments = (refresh?: () => void) => {
+export const useExportarDocuments = () => {
     const { t } = useTranslation();
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
@@ -31,8 +32,8 @@ export const useExportarDocuments = (refresh?: () => void) => {
     const handleShow = (id:any) :void => {
         apiRef.current?.show?.(undefined, {ids: [id], massivo: false})
     }
-    const onSuccess = () :void => {
-        refresh?.()
+    const onSuccess = (result:any) :void => {
+        iniciaDescargaBlob(result);
         temporalMessageShow(null, t('page.expedient.action.export.ok'), 'success');
     }
 

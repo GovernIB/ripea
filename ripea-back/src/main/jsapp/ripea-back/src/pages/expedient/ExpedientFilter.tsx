@@ -63,6 +63,8 @@ export const springFilterBuilder = (data: any, user?: any): string => {
 
         builder.betweenDates("createdDate", data.dataCreacioInici, data.dataCreacioFinal),
 
+        // TODO: domini
+
         builder.like("registresImportats", data.numeroRegistre),
         builder.eq("grup.id", data.grup?.id),
         (user?.rolActual != "tothom") && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),

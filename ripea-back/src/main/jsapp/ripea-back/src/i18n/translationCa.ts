@@ -802,6 +802,7 @@ const translationCa = {
                 fitxerNom: "Nom del fitxer",
                 serveiTipusEnum: "Tipus de servei",
                 notificacioIdentificador: "Identificador",
+                estatError: "Error en processar la notificació dins de Notib",
             },
             action: {
                 actualitzarEstat: {

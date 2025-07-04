@@ -115,12 +115,13 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 
 		@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-			
+
 			DownloadableFile resultat = null;
 			Long notificacioId = data.get(0)!=null?(Long)data.get(0):null;
 			DocumentNotificacioResource.MassiveAction params = (DocumentNotificacioResource.MassiveAction)data.get(1);
-			
+
 			if (params.isMassivo()) {
+                // TODO: implementar
 				throw new ReportGenerationException(getResourceClass(), notificacioId, code, "La generació de justificants massiu per notificacions no esta implementat.");
 			} else {
 				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(notificacioId).get();
@@ -140,7 +141,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 		@Override
 		public List<Serializable> generateData(String code, DocumentNotificacioResourceEntity entity, MassiveAction params) throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():0l);
+			parametres.add(!params.getIds().isEmpty() ?params.getIds().get(0) :0);
 			parametres.add(params);
 			return parametres;
 		}

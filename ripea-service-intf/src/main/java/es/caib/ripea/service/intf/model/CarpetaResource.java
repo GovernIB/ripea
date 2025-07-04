@@ -8,7 +8,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfigArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.model.DocumentResource.MoureFormAction.Action;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,11 +30,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = CarpetaResource.ACTION_EXPORTAR_INDEX_PDF,
+						code = CarpetaResource.REPORT_EXPORTAR_INDEX_PDF,
                         requiresId = true),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = CarpetaResource.ACTION_EXPORTAR_INDEX_XLS,
+						code = CarpetaResource.REPORT_EXPORTAR_INDEX_XLS,
                         requiresId = true),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
@@ -48,8 +47,8 @@ public class CarpetaResource extends ContingutResource {
 	
 	public static final String ACTION_MODIFICAR_NOM			= "MODIFICAR_NOM";
 	public static final String ACTION_MOURE_COPIAR			= "MOURE_COPIAR";
-	public static final String ACTION_EXPORTAR_INDEX_PDF	= "EXPORTAR_INDEX_PDF";
-	public static final String ACTION_EXPORTAR_INDEX_XLS	= "EXPORTAR_INDEX_XLS";
+	public static final String REPORT_EXPORTAR_INDEX_PDF = "EXPORTAR_INDEX_PDF";
+	public static final String REPORT_EXPORTAR_INDEX_XLS = "EXPORTAR_INDEX_XLS";
 	
 	private ResourceReference<ExpedientResource, Long> expedientRelacionat;
 	

@@ -22,7 +22,7 @@ const AcceptarTabExpedient = () => {
                 <GridFormField xs={12} name="prioritat" required/>
                 <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"}/>
                 <GridFormField xs={12} name="organGestor" required disabled readOnly/>
-                <GridFormField xs={6} name="sequencia" disabled readOnly/>
+                <GridFormField xs={6} name="sequencia" required disabled readOnly/>
                 <GridFormField xs={6} name="any" required/>
             </>
         }
@@ -66,8 +66,15 @@ const AcceptarTabAnnexos = () => {
             sortable: false,
             flex: 0.5,
             renderCell: (params:any) => {
+                if (annexos[params.id] === undefined){
+                    setAnnexos({
+                        ...annexos,
+                        [params.id]: '',
+                    })
+                }
+
                 return <FormField
-                    name={"annexos"}
+                    name={"annexos" + annexos[params.id]}
                     label={fieldTipusDocument?.label}
                     value={annexos[params.id]}
                     field={fieldTipusDocument}

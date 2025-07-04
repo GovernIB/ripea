@@ -1,7 +1,6 @@
 package es.caib.ripea.service.intf.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +13,8 @@ import javax.validation.constraints.Size;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.resourcevalidation.AdjuntValid;
+import es.caib.ripea.service.intf.resourcevalidation.DocPinbalValid;
+import es.caib.ripea.service.intf.resourcevalidation.EnviarPortafirmesValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -24,7 +25,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -114,7 +114,7 @@ import lombok.experimental.FieldNameConstants;
 						formClass = DocumentResource.UpdateTipusDocumentFormAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
-                        code = DocumentResource.ACTION_DESCARREGAR_MASSIU,
+                        code = DocumentResource.REPORT_DESCARREGAR_MASSIU,
                         formClass = DocumentResource.MassiveAction.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
@@ -142,7 +142,7 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_NEW_DOC_PINBAL = "NEW_DOC_PINBAL";
     public static final String ACTION_VIA_FIRMA = "VIA_FIRMA";
 	//Accions massives desde la pipella de contingut
-	public static final String ACTION_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
+	public static final String REPORT_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
     public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
     public static final String REPORT_DESCARREGAR_VERSIO_CODE = "DESCARREGAR_VERSIO";
@@ -331,6 +331,7 @@ public class DocumentResource extends NodeResource {
     @Getter
     @Setter
     @FieldNameConstants
+    @DocPinbalValid
     public static class NewDocPinbalForm implements Serializable {
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
@@ -344,7 +345,7 @@ public class DocumentResource extends NodeResource {
     	private ResourceReference<InteressatResource, Long> titular;
     	@NotNull
     	private PinbalConsentimentEnumDto consentiment;
-    	@Transient
+    	@NotNull
     	private String codiServeiPinbal;
 
     	@ResourceField(enumType = true)
@@ -461,6 +462,7 @@ public class DocumentResource extends NodeResource {
     @Getter
     @Setter
     @FieldNameConstants
+    @EnviarPortafirmesValid
     public static class EnviarPortafirmesFormAction implements Serializable {
 		private static final long serialVersionUID = -763974048421192748L;
 		@NotNull

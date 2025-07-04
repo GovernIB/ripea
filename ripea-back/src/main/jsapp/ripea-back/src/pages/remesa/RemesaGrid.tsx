@@ -5,30 +5,27 @@ import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import * as builder from "../../util/springFilterUtils.ts";
+import {useTranslation} from "react-i18next";
 
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
-const EstatMessage = (props:any) => {
+export const EstatMessage = (props:any) => {
     const {icon, color, children} = props;
 
-    return <Typography variant="caption" sx={{ ...commonStyle, backgroundColor: color }}>
-        <Icon fontSize={"inherit"}>{icon}</Icon>
+    return <Typography variant="caption" title={typeof children === 'string' ?children :''} sx={{ ...commonStyle, backgroundColor: `${color}.main`, color: 'white' }}>
+        <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
         {children}
     </Typography>
 }
 const StyledEstat = (props:any) => {
     const { entity, children } = props;
-
-    const error = '#ef5350';
-    const success = '#4caf50';
-    const warning = '#ff9800';
-    const info = '#03a9f4';
+    const { t } = useTranslation()
 
     switch (entity?.notificacioEstat) {
         case 'PENDENT':
             return <>
-                <EstatMessage icon={"schedule"} color={warning}>{children}</EstatMessage>
+                <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>
                 { entity?.error &&
-                    <EstatMessage icon={"warning"} color={error}>Error procesando la notificación dentro Notib</EstatMessage>
+                    <EstatMessage icon={"warning"} color={'error'}>{t('page.notificacio.detall.estatError')}</EstatMessage>
                 }
             </>
         case 'REGISTRADA':
@@ -36,16 +33,16 @@ const StyledEstat = (props:any) => {
         case 'PROCESSADA':
         case 'ENVIADA_AMB_ERRORS':
             if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={error}>{children}</EstatMessage>
+                return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
             } else {
-                return <EstatMessage icon={"check"} color={success}>{children}</EstatMessage>
+                return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
             }
         case 'ENVIADA':
         case 'FINALITZADA_AMB_ERRORS':
             if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={error}>{children}</EstatMessage>
+                return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
             } else {
-                return <EstatMessage icon={"mail"} color={info}>{children}</EstatMessage>
+                return <EstatMessage icon={"mail"} color={'info'}>{children}</EstatMessage>
             }
     }
 

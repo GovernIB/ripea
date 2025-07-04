@@ -451,7 +451,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							params.getMetaExpedient().getId(),
 							null,
 							params.getOrganGestor().getId(),
-							Integer.valueOf(params.getAny()),
+                            params.getAny(),
 							params.getNewExpedientTitol(),
 							expedientPeticioId,
 							params.isAssociarInteressats(),

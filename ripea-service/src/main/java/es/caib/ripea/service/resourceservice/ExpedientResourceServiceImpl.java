@@ -75,9 +75,7 @@ import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
-import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
@@ -134,24 +132,24 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     public void init() {
         
     	//Exportar docs a ZIP amb formulari previ. Massiu o individual.
-    	register(ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,	new ExportZipGenerator());
+    	register(ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,	new ExportZipGenerator());
     	//Exportar info expedients a EXCEL sense formulari previ. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,	new ExportOdsGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_ODS_CODE,	new ExportOdsGenerator());
         //Exportar info expedients a CSV sense formulari previ. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_CSV_CODE,	new ExportCsvGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_CSV_CODE,	new ExportCsvGenerator());
         //Genera els indexos dels expedients seleccionats i els comprimeix. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ZIP, new ExportIndexZipGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ZIP, new ExportIndexZipGenerator());
         //Genera els indexos dels expedients seleccionats en PDF. Massiu o individual.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
         //Genera els indexos dels expedients seleccionats en EXCEL. Massiu o individual.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
         //Genera els indexos dels expedients seleccionats en PDF i els comprimeix en ZIP. Nomes individual.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ENI, new ExportIndexEniGenerator());
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
-        register(ExpedientResource.ACTION_PLANTILLA_EXCEL_INTERESSATS, 	new PlantillaExcelInteressatsReportGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ENI, new ExportIndexEniGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
+        register(ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS, 	new PlantillaExcelInteressatsReportGenerator());
         //Genera un Zip de los documentos seleccionados para un expediente concreto
-        register(ExpedientResource.ACTION_EXPORT_SELECTED_DOCS, new ExportSelectedDocsGenerator());
+        register(ExpedientResource.REPORT_EXPORT_SELECTED_DOCS, new ExportSelectedDocsGenerator());
         
         register(ExpedientResource.ACTION_MASSIVE_AGAFAR_CODE, new AgafarActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_ALLIBERAR_CODE, new AlliberarActionExecutor());
