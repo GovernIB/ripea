@@ -404,105 +404,111 @@ div.dropdown-menu.loading .rmodal_carrecs {
 
 	});//################################################## document ready END ##############################################################		
 	
-function toggleCarrecs() {
-	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-	if (dropdown.length === 0) {
-		$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
-		$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
-		
-	} else {
-		dropdown.toggle();
-	}
-}
-
-function recuperarCarrecs() {
-	var llistatCarrecs = "<div class='loading dropdown-menu'>";
-	$.ajax({
-		type: 'GET',
-		dataType: "json",
-		url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
-		success: function(carrecs) {
-			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-			dropdown.removeClass('loading');
-			if (carrecs) {
-				llistatCarrecs += '<div class="carrecsList">';
-				$.each(carrecs, function(i, carrec) {
-					var persona = '';
-					if (carrec.usuariPersonaNom) {
-						persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
-					}
-					var nomCarrec = carrec.carrecName + persona;
-					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
-					
-					$('#portafirmesResponsables option').each(function(i, responsable) {
-						if (responsable.value === carrec.carrecId) {
-							llistatCarrecs = llistatCarrecs.replace('carrec_' + carrec.carrecId, 'carrec_' + carrec.carrecId + ' carrec-selected');
-						}
-					});
-				});
-			}
-			dropdown.append(llistatCarrecs);
-		},
-		error: function (error) {
-			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-			dropdown.removeClass('loading');
-			dropdown.empty();
-			dropdown.append("Hi ha hagut un problema recuperant els càrrecs " + error.statusText);
-		},
-		statusCode: {
-	        500: function(error) {
-	        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-				dropdown.removeClass('loading');
-	        	dropdown.empty();
-				dropdown.append("Hi ha hagut un problema recuperant els càrrecs: " + error.statusText);
-	        }
-	   	}
-	});
-	llistatCarrecs += "<div class='rmodal_carrecs'></div></div>";
-	return llistatCarrecs;
-}
-
-function seleccionarCarrec(carrec) {
-	if ($('.carrec_' + carrec.carrecId).hasClass('carrec-selected')) {
-		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
-		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
-	} else {
-		var persona = '';
-		if (carrec.usuariPersonaNif) {
-			persona = ' (' + carrec.usuariPersonaNif + ')';
-		}
-		var nomCarrec = carrec.carrecName + persona;
-		var items = [];
-		items.push({
-			"id": carrec.carrecId,
-			"text": nomCarrec
-		});
-	    var newOption = new Option(items[0].text, items[0].id, true, true);
-	    $("#portafirmesResponsables").append(newOption).trigger('change');
-
-		$('.carrec_' + carrec.carrecId).addClass('carrec-selected');
-	}
-}
+	<c:if test="${isWsUsuariEntitatActiu}">
 	
-function adjustModalPerFlux() {
-	var $iframe = $(window.frameElement);
-	$iframe.css('height', '100%');
-	$iframe.parent().css('height', '600px');
-	$iframe.closest('div.modal-content').css('height',  'auto');
-	$iframe.closest('div.modal-dialog').css({
-		'height':'auto',
-		'height': '100%',
-		'margin': '3% auto',
-		'padding': '0'
-	});
-	$iframe.closest('div.modal-lg').css('width', '95%');
-	$iframe.parent().next().addClass('hidden');
-}
-
-function removeLoading() {
-	$body = $("body");
-	$body.removeClass("loading");
-}
+	<c:set var="carrecsIcon">fa fa-sar</c:set>
+	
+	function toggleCarrecs() {
+		var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+		if (dropdown.length === 0) {
+			$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
+			$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
+			
+		} else {
+			dropdown.toggle();
+		}
+	}
+	
+	function recuperarCarrecs() {
+		var llistatCarrecs = "<div class='loading dropdown-menu'>";
+		$.ajax({
+			type: 'GET',
+			dataType: "json",
+			url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
+			success: function(carrecs) {
+				var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+				dropdown.removeClass('loading');
+				if (carrecs) {
+					llistatCarrecs += '<div class="carrecsList">';
+					$.each(carrecs, function(i, carrec) {
+						var persona = '';
+						if (carrec.usuariPersonaNom) {
+							persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+						}
+						var nomCarrec = carrec.carrecName + persona;
+						llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
+						
+						$('#portafirmesResponsables option').each(function(i, responsable) {
+							if (responsable.value === carrec.carrecId) {
+								llistatCarrecs = llistatCarrecs.replace('carrec_' + carrec.carrecId, 'carrec_' + carrec.carrecId + ' carrec-selected');
+							}
+						});
+					});
+				}
+				dropdown.append(llistatCarrecs);
+			},
+			error: function (error) {
+				var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+				dropdown.removeClass('loading');
+				dropdown.empty();
+				dropdown.append("Hi ha hagut un problema recuperant els càrrecs " + error.statusText);
+			},
+			statusCode: {
+		        500: function(error) {
+		        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+					dropdown.removeClass('loading');
+		        	dropdown.empty();
+					dropdown.append("Hi ha hagut un problema recuperant els càrrecs: " + error.statusText);
+		        }
+		   	}
+		});
+		llistatCarrecs += "<div class='rmodal_carrecs'></div></div>";
+		return llistatCarrecs;
+	}
+	
+	function seleccionarCarrec(carrec) {
+		if ($('.carrec_' + carrec.carrecId).hasClass('carrec-selected')) {
+			$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
+			$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
+		} else {
+			var persona = '';
+			if (carrec.usuariPersonaNif) {
+				persona = ' (' + carrec.usuariPersonaNif + ')';
+			}
+			var nomCarrec = carrec.carrecName + persona;
+			var items = [];
+			items.push({
+				"id": carrec.carrecId,
+				"text": nomCarrec
+			});
+		    var newOption = new Option(items[0].text, items[0].id, true, true);
+		    $("#portafirmesResponsables").append(newOption).trigger('change');
+	
+			$('.carrec_' + carrec.carrecId).addClass('carrec-selected');
+		}
+	}
+	
+	</c:if>
+	
+	function adjustModalPerFlux() {
+		var $iframe = $(window.frameElement);
+		$iframe.css('height', '100%');
+		$iframe.parent().css('height', '600px');
+		$iframe.closest('div.modal-content').css('height',  'auto');
+		$iframe.closest('div.modal-dialog').css({
+			'height':'auto',
+			'height': '100%',
+			'margin': '3% auto',
+			'padding': '0'
+		});
+		$iframe.closest('div.modal-lg').css('width', '95%');
+		$iframe.parent().next().addClass('hidden');
+	}
+	
+	function removeLoading() {
+		$body = $("body");
+		$body.removeClass("loading");
+	}
 </script>
 	
 </head>
@@ -563,10 +569,10 @@ function removeLoading() {
 						urlConsultaLlistat="${urlConsultaLlistat}" 
 						textKey="metadocument.form.camp.portafirmes.responsables"
 						suggestValue="nif"
-						suggestText="nom"
-						suggestTextAddicional="nif"
+						suggestText="codiAndNom"
+						suggestTextAddicional="nifOfuscat"
 						required="${!metaDocumentCommand.comu}"
-						icon="fa fa-star"
+						icon="${carrecsIcon}"
 						disabled="${bloquejarCamps}"/>
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
 				</div>							

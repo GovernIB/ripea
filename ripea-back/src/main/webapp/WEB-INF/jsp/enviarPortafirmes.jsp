@@ -156,7 +156,9 @@
 	</style>
 
 	<script type="text/javascript">
+	
 		$(document).ready(function() {
+
 			var parentIframe = window.frameElement;
 			var idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
 			var currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
@@ -216,12 +218,15 @@
 			$("#portafirmesEnviarFluxId").trigger('change');
 		});
 
+		<c:if test="${isWsUsuariEntitatActiu}">
+		
+		<c:set var="carrecsIcon">fa fa-sar</c:set>
+		
 		function toggleCarrecs() {
 			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
 			if (dropdown.length === 0) {
 				$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
 				$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
-
 			} else {
 				dropdown.toggle();
 			}
@@ -295,6 +300,8 @@
 			}
 		}
 
+		</c:if>
+		
 		function mostrarFluxSeleccionat(urlPlantilla) {
 			adjustModalPerFlux(false);
 			var plantilla = '<hr>' +
@@ -514,10 +521,10 @@
 					urlConsultaLlistat="${urlConsultaLlistat}"
 					textKey="metadocument.form.camp.portafirmes.responsables"
 					suggestValue="nif"
-					suggestText="nom"
-					suggestTextAddicional="nif"
+					suggestText="codiAndNom"
+					suggestTextAddicional="nifOfuscat"
 					required="true"
-					icon="fa fa-star"/>
+					icon="${carrecsIcon}"/>
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSeqtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
 			<c:when test="${fluxTipus == 'PORTAFIB'}">

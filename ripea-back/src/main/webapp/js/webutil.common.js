@@ -717,8 +717,8 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			$(this).empty();
 		}
 		
-		const contieneUsuari = urlActual.includes('usuaris');
-		const contieneUsuariPlugin = urlActual.includes('usuarisDades');
+		const contieneUsuari = urlActual.includes('usuari');
+		const contieneUsuariPlugin = urlActual.includes('usuariDades');
 		
 		let mensajesNoResults;
 		
@@ -727,7 +727,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			  'es': function() { return "No se encontró el usuario en RIPEA o plugin de usuarios"; },
 			  'ca': function() { return "No s'ha trobat l'usuari a RIPEA o plugin d'usuaris"; }
 			};
-		} else {
+		} else if (contieneUsuari) {
 			mensajesNoResults = {
 			  'es': function() { return "No se encontró el usuario o éste nunca accedió a RIPEA"; },
 			  'ca': function() { return "No s'ha trobat l'usuari o aquest no ha accedit mai a RIPEA"; }

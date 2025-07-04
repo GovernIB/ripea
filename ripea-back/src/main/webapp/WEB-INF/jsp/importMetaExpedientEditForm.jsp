@@ -266,9 +266,9 @@
 								urlConsultaInicial="${urlConsultaInicial}" 
 								urlConsultaLlistat="${urlConsultaLlistat}" 
 								textKey="metaexpedient.import.form.camp.portafirmes.responsables"
-								suggestValue="codi"
-								suggestText="nom"
-								suggestTextAddicional="nif"
+								suggestValue="nif"
+								suggestText="codiAndNom"
+								suggestTextAddicional="nifOfuscat"
 								required="${metaExpedientImportEditCommand.metaDocuments[vs.index].firmaPortafirmesActiva}"/>							
 						</c:when>
 						<c:otherwise></c:otherwise>

@@ -42,6 +42,7 @@ import es.caib.ripea.back.helper.EnumHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.ModalHelper;
 import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
@@ -51,6 +52,7 @@ import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DadesExternesService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
@@ -69,6 +71,8 @@ public class BaseController implements MessageSourceAware {
 	@Autowired private DadesExternesService dadesExternesService;
 	@Autowired private PinbalServeiService pinbalServeiService;
 	@Autowired private OrganGestorService organGestorService;
+	@Autowired private AplicacioService aplicacioService;
+	
 	MessageSource messageSource;
 
 	protected String modalUrlTancar() {
@@ -526,6 +530,10 @@ public class BaseController implements MessageSourceAware {
 			resultat.add(aux);
 		}
 		return resultat;
+	}
+	
+	protected void addBotoCarrecsProperty(Model model) {
+		model.addAttribute("isWsUsuariEntitatActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
 	}
 	
 	@InitBinder

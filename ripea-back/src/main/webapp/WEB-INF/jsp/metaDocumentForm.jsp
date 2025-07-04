@@ -278,25 +278,25 @@ body.loading .rmodal {
 		$("#portafirmesFluxId").trigger('change');
 	});
 	
-function adjustModalPerFlux() {
-	var $iframe = $(window.frameElement);
-	$iframe.css('height', '100%');
-	$iframe.parent().css('height', '600px');
-	$iframe.closest('div.modal-content').css('height',  'auto');
-	$iframe.closest('div.modal-dialog').css({
-		'height':'auto',
-		'height': '100%',
-		'margin': '3% auto',
-		'padding': '0'
-	});
-	$iframe.closest('div.modal-lg').css('width', '95%');
-	$iframe.parent().next().addClass('hidden');
-}
-
-function removeLoading() {
-	$body = $("body");
-	$body.removeClass("loading");
-}
+	function adjustModalPerFlux() {
+		var $iframe = $(window.frameElement);
+		$iframe.css('height', '100%');
+		$iframe.parent().css('height', '600px');
+		$iframe.closest('div.modal-content').css('height',  'auto');
+		$iframe.closest('div.modal-dialog').css({
+			'height':'auto',
+			'height': '100%',
+			'margin': '3% auto',
+			'padding': '0'
+		});
+		$iframe.closest('div.modal-lg').css('width', '95%');
+		$iframe.parent().next().addClass('hidden');
+	}
+	
+	function removeLoading() {
+		$body = $("body");
+		$body.removeClass("loading");
+	}
 </script>
 	
 </head>
@@ -364,9 +364,9 @@ function removeLoading() {
 						urlConsultaInicial="${urlConsultaInicial}" 
 						urlConsultaLlistat="${urlConsultaLlistat}" 
 						textKey="metadocument.form.camp.portafirmes.responsables"
-						suggestValue="codi"
-						suggestText="nom"
-						suggestTextAddicional="nif"
+						suggestValue="nif"
+						suggestText="codiAndNom"
+						suggestTextAddicional="nifOfuscat"
 						required="true"/>
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 				</div>									
