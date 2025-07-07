@@ -23,7 +23,7 @@ const springFilterBuilder = (data: any): string => {
         builder.like("registre.extracte", data.extracte),
         builder.like("registre.destiCodiINom", data.destinacio),
         builder.like("metaExpedient", data.metaExpedient),
-        builder.betweenDates("registre.data", data.dataRecepcioInicial, formatEndOfDay(data.dataRecepcioFinal)),
+        builder.betweenDates("registre.data", data.dataRecepcioInicial, data.dataRecepcioFinal),
 
         data.estat == 'ACCEPTAT'
             ? builder.like("estat", "PROCESSAT")

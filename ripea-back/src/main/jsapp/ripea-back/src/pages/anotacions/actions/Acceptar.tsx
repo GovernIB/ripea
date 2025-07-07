@@ -40,13 +40,6 @@ const AcceptarTabExpedient = () => {
 const AcceptarTabAnnexos = () => {
     const {data, fields, apiRef} = useFormContext();
     const  { t } = useTranslation()
-    const [annexos, setAnnexos] = useState<any[]>(data?.annexos || []);
-
-    useEffect(() => {
-        if (!!annexos) {
-            apiRef?.current?.setFieldValue('annexos', annexos)
-        }
-    }, [annexos]);
 
     const fieldTipusDocument = fields?.filter(i=>i.name=='tipusDocument')[0];
 
@@ -65,34 +58,24 @@ const AcceptarTabAnnexos = () => {
             headerName: '',
             sortable: false,
             flex: 0.5,
-            renderCell: (params:any) => {
-                if (annexos[params.id] === undefined){
-                    setAnnexos({
-                        ...annexos,
-                        [params.id]: '',
+            renderCell: (params:any) => <FormField
+                name={"annexos" + (data?.annexos[params.id] ?`#${params.id}`:'')}
+                value={data?.annexos[params.id]}
+                field={fieldTipusDocument}
+                onChange={(value)=>{
+                    apiRef?.current?.setFieldValue('annexos', {
+                        ...data?.annexos,
+                        [params.id]: value,
                     })
-                }
-
-                return <FormField
-                    name={"annexos" + annexos[params.id]}
-                    label={fieldTipusDocument?.label}
-                    value={annexos[params.id]}
-                    field={fieldTipusDocument}
-                    onChange={(value)=>{
-                        setAnnexos({
-                            ...annexos,
-                            [params.id]: value,
-                        })
-                    }}
-                    componentProps={{ size: "small" }}
-                    requestParams={{
-                        metaExpedientId: data?.metaExpedient?.id,
-                        annex: params.id,
-                        annexos
-                    }}
-                    required
-                />
-            }
+                }}
+                componentProps={{ size: "small" }}
+                requestParams={{
+                    metaExpedientId: data?.metaExpedient?.id,
+                    annex: params.id,
+                    annexos: data?.annexos,
+                }}
+                required
+            />
         },
     ]
 
@@ -114,6 +97,15 @@ const AcceptarTabAnnexos = () => {
             filter={filter}
             columns={columnsAnnexos}
             rowAdditionalActions={actions}
+            onRowsChange={(rows) => {
+                if (rows.length > 0 && rows.length != Object.keys(data?.annexos).length) {
+                    const annexos = Object.fromEntries(
+                        rows.map((row) => [row.id, (data?.annexos[row.id] || '')])
+                    );
+
+                    apiRef?.current?.setFieldValue('annexos', annexos)
+                }
+            }}
 
             height={162 + 52 * 4}
             readOnly
