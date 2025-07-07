@@ -164,8 +164,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
 
         response.put("isDocumentsGeneralsEnabled", request.getSession().getAttribute("SessionHelper.isDocumentsGeneralsEnabled"));
         response.put("isTipusDocumentsEnabled", request.getSession().getAttribute("SessionHelper.isTipusDocumentsEnabled"));
-        response.put("isDominisEnabled", request.getSession().getAttribute("SessionHelper.isDominisEnabled"));
-
+        
+        response.put("isDominisEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOMINIS_HABILITATS)));
         response.put("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
         response.put("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
         response.put("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));

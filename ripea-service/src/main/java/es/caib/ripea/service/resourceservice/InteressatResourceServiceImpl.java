@@ -22,9 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
+import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -72,6 +74,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final CacheHelper cacheHelper;
 
     private final ExpedientRepository expedientRepository;
+    private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
 
     @PostConstruct
@@ -274,23 +277,40 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private class ImportarActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.ImportarInteressatsFormAction, Serializable> {
 
         @Override
-        public void onChange(Serializable id, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
+        public void onChange(Serializable expedientId, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
             try {
+            	List<InteressatDto> listaInteressatsFitxer = new ArrayList<InteressatDto>();
             	if (previous.getTipusImportacio().equals(InteressatImportacioTipusDto.JSON)) {
 	                if (InteressatResource.ImportarInteressatsFormAction.Fields.fitxerJsonInteressats.equals(fieldName)) {
 	                    ObjectMapper objectMapper = new ObjectMapper();
 	                    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	                    List<InteressatDto> lista = objectMapper.readValue(
+	                    listaInteressatsFitxer = objectMapper.readValue(
 	                            ((FileReference)fieldValue).getContent(),
 	                            new TypeReference<List<InteressatDto>>() {});
-	                    target.setInteressatsFitxer(lista);
 	                }
             	} else {
-            		List<InteressatDto> interessatsExcel = expedientInteressatHelper.extreureInteressatsExcel(
+            		listaInteressatsFitxer = expedientInteressatHelper.extreureInteressatsExcel(
             				new ByteArrayInputStream(((FileReference)fieldValue).getContent()),
             				previous.getExpedient().getId());
-            		target.setInteressatsFitxer(interessatsExcel);
             	}
+            	
+            	//Abans de retornar la llista de interessats, comprovam si existeixen al expedient actual
+            	if (listaInteressatsFitxer.size()>0) {
+            		//Només fem la consulta en cas necessari
+            		List<InteressatEntity> interessatsExpActual = interessatRepository.findByExpedientId((Long) expedientId);
+	            	for (InteressatDto interessatDto: listaInteressatsFitxer) {
+	            		if (interessatsExpActual!=null) {
+	            			for (InteressatEntity interessatExp: interessatsExpActual) {
+	            				if (interessatExp.getDocumentNum().equalsIgnoreCase(interessatDto.getDocumentNum())) {
+	            					interessatDto.setJaExistentExpedient(true);
+	            					break;
+	            				}
+	            			}
+	            		}
+	            	}
+            	}
+            	
+            	target.setInteressatsFitxer(listaInteressatsFitxer);
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/interessats/ImportarInteressatsActionExecutor.onChange", e);
             }
