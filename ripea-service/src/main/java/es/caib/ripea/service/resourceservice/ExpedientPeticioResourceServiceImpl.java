@@ -246,7 +246,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
             		justificant.setTipusMime(documentDetalls.getContingut().getTipusMime());
             	}
             	justificant.setObservacions(documentDetalls.getDescripcio());
-            	//TODO: Millora: es fan conversions d'enumerats que no farien falta si la classe destí tengues com a tipus d'atribut la clase enum del origen
+            	//Millora: es fan conversions d'enumerats que no farien falta si la classe destí tengues com a tipus d'atribut la clase enum del origen
             	try {
             		ArxiuEstatEnumDto estatArxiu = ArxiuEstatEnumDto.valueOf(documentDetalls.getEstat().toString());
             		justificant.setAnnexArxiuEstat(estatArxiu);

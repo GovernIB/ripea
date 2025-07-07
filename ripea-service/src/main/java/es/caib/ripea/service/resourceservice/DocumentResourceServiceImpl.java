@@ -988,9 +988,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	                consulta.setMunicipiNaixamentSVDDELSEXWS01(params.getMunicipiNaixament());
 	            }
 	
+	            //Com a millora, al crear una petició pinbal, o al crear un document, es podria especificar la carpeta destí.
 				pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
-                        params.getExpedient().getId(), //TODO: El pare pot ser una carpeta
+                        params.getExpedient().getId(),
 						entity.getMetaDocument().getId(),
 						consulta, 
 						configHelper.getRolActual());

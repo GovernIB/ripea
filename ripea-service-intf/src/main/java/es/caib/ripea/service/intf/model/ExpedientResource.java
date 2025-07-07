@@ -310,9 +310,9 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private boolean seguidor = false;
     @Transient private int numComentaris;
     @Transient private int numSeguidors;
-    @Transient private int numContingut;// TODO: calcular valor
+    @Transient private int numContingut;
     @Transient private boolean hasEsborranys;
-    @Transient private int numDades;// TODO: calcular valor
+    @Transient private int numDades;
     @Transient private int numMetaDades;
     @Transient private int numInteressats;
     @Transient private int numRemeses;

@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -12,6 +16,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -27,4 +32,11 @@ public abstract class NodeResourceEntity<R> extends ContingutResourceEntity<R> {
 			name = "metanode_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metanode_node_fk"))
 	protected MetaNodeResourceEntity metaNode;
+	
+	@OneToMany(
+			mappedBy = "node",
+			fetch = FetchType.LAZY,
+            cascade = {CascadeType.REMOVE}
+    )
+	protected List<DadaResourceEntity> dades = new ArrayList<DadaResourceEntity>();
 }

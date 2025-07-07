@@ -22,6 +22,18 @@ import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 @Component
 public interface ContingutRepository extends JpaRepository<ContingutEntity, Long> {
 
+	@Query(value = "SELECT COUNT(1) FROM IPA_CONTINGUT START WITH ID=:pareId CONNECT BY PRIOR ID = PARE_ID", nativeQuery = true)
+	int countByPareIdOracle(@Param("pareId")Long pareId);
+	
+	@Query(value = "WITH RECURSIVE hijos AS ("
+			+ "        SELECT * FROM IPA_CONTINGUT WHERE ID = :pareId"
+			+ "        UNION ALL"
+			+ "        SELECT c.* FROM IPA_CONTINGUT c"
+			+ "        JOIN hijos h ON c.PARE_ID = h.ID"
+			+ "    )"
+			+ "    SELECT COUNT(*) - 1 FROM hijos", nativeQuery = true)
+	int countByPareIdPostgres(@Param("pareId")Long pareId);
+	
 	List<ContingutEntity> findByNomAndTipusAndPareAndEntitatAndEsborrat(
 			String nom,
 			ContingutTipusEnumDto tipus,

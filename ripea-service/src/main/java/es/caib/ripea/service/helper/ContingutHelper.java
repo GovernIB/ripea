@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.env.Environment;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -177,6 +178,8 @@ public class ContingutHelper {
 	@Autowired private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
 	@Autowired private CarpetaHelper carpetaHelper;
 	@Autowired private EntitatRepository entitatRepository;
+	
+	@Autowired private Environment env;
 
 	private static final int NO_ESBORRAT = 0;
 
@@ -205,7 +208,6 @@ public class ContingutHelper {
 			this.level++;
 		}
 	}
-
 
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
@@ -324,10 +326,20 @@ public class ContingutHelper {
 		return null;
 	}
 
-
-	// CONTINGUT
-	// //////////////////////////////////////////////////////////////////////////////////////////
-
+	public int getFillsHierarchicalCount(Long contingutIdBase) {
+		
+		//En JPA no existe soporte directo para consultas recursivas, ya que JPQL no permite expresiones como WITH RECURSIVE o CONNECT BY.
+		
+	    String dialect = env.getProperty("spring.jpa.properties.hibernate.dialect");
+	    boolean isOracle = dialect != null && dialect.toLowerCase().contains("oracle");
+	    
+	    if (isOracle) {
+	    	return contingutRepository.countByPareIdOracle(contingutIdBase);
+	    } else {
+	    	return contingutRepository.countByPareIdPostgres(contingutIdBase);
+	    }
+	}
+	
 	private void setBasicProperties(ContingutDto resposta, ContingutEntity contingut) {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());

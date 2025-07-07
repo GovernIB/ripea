@@ -17,11 +17,18 @@ import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 @Component
 public interface DadaRepository extends JpaRepository<DadaEntity, Long> {
 
+	int countByNodeId(Long nodeId);
+	
 	List<DadaEntity> findByNode(NodeEntity node);
+	
 	DadaEntity findByNodeAndMetaDadaAndOrdre(NodeEntity node, MetaDadaEntity metaDada, int ordre);
+	
 	List<DadaEntity> findByNodeAndMetaDadaOrderByOrdreAsc(NodeEntity node, MetaDadaEntity metaDada);
+	
 	List<DadaEntity> findByMetaDadaTipus(MetaDadaTipusEnumDto tipus);
+	
 	List<DadaEntity> findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(Collection<Long> nodeIds);
+	
 	@Query(	"select" +
 			"    distinct md " +
 			"from" +

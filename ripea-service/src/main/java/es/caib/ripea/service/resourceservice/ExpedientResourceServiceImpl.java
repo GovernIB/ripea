@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,8 +18,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
-import es.caib.ripea.service.intf.base.exception.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,9 +35,12 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
@@ -56,7 +58,11 @@ import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -76,6 +82,7 @@ import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
+import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
@@ -88,6 +95,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAct
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
+import es.caib.ripea.service.intf.model.NodeResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
@@ -107,6 +115,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	private final ExpedientRepository expedientRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
+	private final DadaRepository dadaRepository;
+	private final ContingutRepository contingutRepository;
 	
     private final UsuariResourceRepository usuariResourceRepository;
     private final ExpedientResourceRepository expedientResourceRepository;
@@ -299,6 +309,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	            );
         }
         
+        //Filtre de dominis (expedients amb alguna dada amb el valor indicat del codi de domini indicat)
+        //Aquest filtre arriba desde el front.
+        /*
+        Filter filtreDomini = null;
+        if (namedQueries!=null) {
+	        for (String namedQuery : namedQueries) {
+	            String[] split = namedQuery.split("#");
+	            
+	            switch (split[0]) {
+	            case "EXPEDIENT_DOMINIS":
+	            	String dominiCodi	= split[1];
+	            	String dominiValor	= split[2];
+	            	String campDomini = NodeResource.Fields.dades+"."+DadaResource.Fields.valor;
+	            	filtreDomini = Filter.parse(campDomini+" : '"+dominiValor+"'");
+	                break;
+	            }
+	        }
+        }
+        */
+        
         Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
         Filter filtreResultat = FilterBuilder.and(filtreNoEliminats, filtreEntitatSessio, combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
         return filtreResultat.generate();
@@ -396,6 +426,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumPublicacions(entity.getPublicacions().size());
             resource.setNumRemeses(entity.getNotificacions().size());
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+            resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
+            resource.setNumContingut(contingutHelper.getFillsHierarchicalCount(entity.getId()));
         }
     }
     
@@ -648,7 +680,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				String entitatActual = configHelper.getEntitatActualCodi();
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	if (params.isMassivo()) {
-	        		//TODO: No soportat
+	        		//Reobrir expedient massiu no esta soportada, pero deixam la porta oberta a futures implementacións. Tendria sentit.
 	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de reobrir expedient massiu no esta soportada.");
 	        	} else {
 	        		expedientHelper.reobrir(entitatEntity.getId(), params.getIds().get(0));
@@ -860,19 +892,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		
 	        	//Aprofitam la mateixa funció que la de exportar documents de expedient a ZIP, pero modificada per nomes exportar els IDs seleccionats.
 	    		return getZipFileDocumentsExpedient(expedientEntity, FileNameOption.ORIGINAL, false, true, params.getIds());
-	    		
-//	    		//TODO: Convertir els params en llista de ArbreJsonDto
-//	    		List<ArbreJsonDto> arbreSeleccionats = new ArrayList<ArbreJsonDto>();
-//        		FitxerDto fitxerDto = documentHelper.descarregarAllDocumentsOfExpedientWithSelectedFolders(
-//        				entitatEntity.getId(),
-//        				expedientId,
-//        				arbreSeleccionats, //params.getIds()
-//        				configHelper.getRolActual(),
-//        				null);
-//            	resultat = new DownloadableFile(
-//            			fitxerDto.getNom(),
-//            			fitxerDto.getContentType(),
-//	            		fitxerDto.getContingut());
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
@@ -931,8 +950,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				String entitatActual = configHelper.getEntitatActualCodi();
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	if (params.isMassivo()) {
-	        		//TODO: No soportat
-	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de reobrir expedient massiu no esta soportada.");
+	        		//Sincronitzar expedient amb arxiu massivament no esta soportada, pero deixam la porta oberta a futures implementacions. Tendria sentit.
+	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de sincronitzar expedient amb arxiu massivament no esta soportada.");
 	        	} else {
 	        		resultat = contingutHelper.sincronitzarEstatArxiu(entitatEntity.getId(), params.getIds().get(0));
 	        	}

@@ -121,7 +121,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 			DocumentNotificacioResource.MassiveAction params = (DocumentNotificacioResource.MassiveAction)data.get(1);
 
 			if (params.isMassivo()) {
-                // TODO: implementar
+                //La generació massiva de justificants de notificacions no esta implementat. No pareix probable que la demanin. Pero ho deixam obert a implementació.
 				throw new ReportGenerationException(getResourceClass(), notificacioId, code, "La generació de justificants massiu per notificacions no esta implementat.");
 			} else {
 				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(notificacioId).get();
