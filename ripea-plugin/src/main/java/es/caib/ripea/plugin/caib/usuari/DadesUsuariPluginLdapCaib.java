@@ -2,6 +2,7 @@ package es.caib.ripea.plugin.caib.usuari;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.fundaciobit.pluginsib.userinformation.SearchUsersResult;
@@ -75,6 +76,23 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 
 	private DadesUsuari toDadesUsuari(UserInfo userInfo) {
 		if (userInfo != null) {
+			
+			LOGGER.debug("UserInfo:");
+			LOGGER.debug("UserInfo.getAdministrationID: " + userInfo.getAdministrationID());
+			LOGGER.debug("UserInfo.getEmail: " + userInfo.getEmail());
+			LOGGER.debug("UserInfo.getUsername: " + userInfo.getUsername());
+			LOGGER.debug("UserInfo.getFullName: " + userInfo.getFullName());
+			LOGGER.debug("UserInfo.getName: " + userInfo.getName());
+			LOGGER.debug("UserInfo.getSurname1: " + userInfo.getSurname1());
+			LOGGER.debug("UserInfo.getSurname2: " + userInfo.getSurname2());
+			if (userInfo.getAttributes()!=null && userInfo.getAttributes().size()>0) {
+				for (Map.Entry<String, String> entry : userInfo.getAttributes().entrySet()) {
+					LOGGER.debug("UserInfo.getAttributes: key=" + entry.getKey() + " Valor: " + entry.getValue());
+				}
+			} else {
+				LOGGER.debug("UserInfo.getAttributes: SENSE atributs");
+			}
+			
 			DadesUsuari dadesUsuari = new DadesUsuari();
 			dadesUsuari.setCodi(userInfo.getUsername());
 			dadesUsuari.setNomSencer(userInfo.getFullName());
@@ -84,6 +102,7 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 			dadesUsuari.setEmail(userInfo.getEmail());
 			return dadesUsuari;
 		} else {
+			LOGGER.debug("toDadesUsuari amb userInfo null!");
 			return null;
 		}
 	}
@@ -103,12 +122,16 @@ public class DadesUsuariPluginLdapCaib extends LdapUserInformationPlugin impleme
 	public List<DadesUsuari> findAmbFiltre(String filtre) throws SistemaExternException {
 
 		try {
+			LOGGER.debug("findAmbFiltre --> getUsersByPartialValuesOr ("+filtre+")");
 			List<DadesUsuari> resultat = new ArrayList<DadesUsuari>();
 			SearchUsersResult sur = getUsersByPartialValuesOr(filtre, filtre, filtre, filtre, filtre);
 			if (sur!=null && sur.getUsers()!=null) {
+				LOGGER.debug("findAmbFiltre --> getUsersByPartialValuesOr: "+sur.getUsers().size() +" resultats.");
 				for (UserInfo userInfo: sur.getUsers()) {
 					resultat.add(toDadesUsuari(userInfo));
 				}
+			} else {
+				LOGGER.debug("findAmbFiltre --> getUsersByPartialValuesOr SENSE RESULTATS.");
 			}
 			return resultat;
 		} catch (Exception ex) {

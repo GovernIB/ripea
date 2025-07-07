@@ -7,6 +7,8 @@
 
 <c:set var="potModificar">${potModificar == null || potModificar == true ? true : false}</c:set>
 <c:set var="formAction"><rip:modalUrl value="/expedient/${expedientId}/interessat/importar"/></c:set>
+<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
+
 <html>
 <head>
     <title><spring:message code="contingut.title.importar.interessats" /></title>
@@ -18,6 +20,25 @@
     <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
     <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
     <rip:modalHead />
+    
+	<script type="text/javascript">
+	
+		var maxTamanyFitxerUpload = ${maxFileSize};
+	
+		$(document).ready(function() {
+			  $('#fitxerInteressats').change(function(){
+				    let tamany = $(this)[0].files[0].size;
+				    var pare = $(this).closest('.fileinput').parent();
+					if (tamany>maxTamanyFitxerUpload) {
+						$(pare).find('div.alert.alert-danger').remove();
+						$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+					} else {
+						$(pare).find('div.alert.alert-danger').remove();
+					}
+			  });
+		});
+	</script>    
+    
 </head>
 <body>
 
@@ -27,8 +48,16 @@
     <form:hidden path="accio" />
     
     <c:if test="${interessatImportCommand.accio=='INTERESSATS'}">
+<<<<<<< HEAD
     	<rip:inputSelect name="tipus" optionEnum="InteressatImportacioTipusDto" textKey="contingut.camp.importar.tipus"/>
    		<rip:inputFile name="fitxerInteressats" textKey="contingut.camp.importar.interessats" doNotShowErrors="1"/>
+=======
+   		<rip:inputFile 
+   			name="fitxerInteressats"
+   			comment="contingut.document.MAX_UPLOAD_SIZE"
+   			textKey="contingut.camp.importar.interessats"
+   			doNotShowErrors="1"/>
+>>>>>>> refs/remotes/origin/ripea-1.0-dev
    	</c:if>
 
     <c:if test="${interessatImportCommand.hasInteressats}">

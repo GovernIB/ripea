@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+import es.caib.ripea.service.intf.utils.Utils;
+
 
 /**
  * Informació d'un usuari.
@@ -42,7 +44,15 @@ public class UsuariDto implements Serializable {
 	
 	
 	public String getCodiAndNom() {
-		return nom + " (" + codi + ")";
+		if (codi!=null && codi.equals(nom)) {
+			return nom;
+		} else {
+			return nom + " (" + codi + ")";
+		}
+	}
+	
+	public String getNifOfuscat() {
+		return Utils.nifMask(nif);
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

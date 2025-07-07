@@ -1164,8 +1164,8 @@
 		<form id="form-estadistics-usuaris" class="well">
 			<div class="row">
 				<div class="col-md-8">
-					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 					<c:set var="placeholderText"><spring:message code="historic.filtre.select.usuari"/></c:set>
 					<select name="usuaris" cssClass="form-control" id="input-usuaris"
 								style="width:100%" data-toggle="suggest"

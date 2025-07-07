@@ -38,9 +38,9 @@
 				<rip:inputSelect name="tascaEstat" optionEnum="TascaEstatEnumDto" emptyOption="true" placeholderKey="seguiment.list.filtre.camp.estatEnviament" inline="true"/>
 			</div>
 			<div class="col-md-4">
-				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
-				<rip:inputSuggest name="responsableCodi" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" placeholderKey="seguiment.list.filtre.camp.responsable" suggestValue="codi" suggestText="nom" inline="true"/>
+				<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
+				<rip:inputSuggest name="responsableCodi" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" placeholderKey="seguiment.list.filtre.camp.responsable" suggestValue="codi" suggestText="codiAndNom" inline="true"/>
 			</div>				
 			<div class="col-md-4">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="seguiment.list.filtre.camp.dataIniciInici"/>

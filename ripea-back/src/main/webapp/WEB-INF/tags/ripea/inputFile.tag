@@ -12,6 +12,7 @@
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="fileName" required="false" rtexprvalue="true"%>
 <%@ attribute name="doNotShowErrors" required="false" rtexprvalue="true"%>
+<%@ attribute name="comment" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><c:choose><c:when test="${not empty doNotShowErrors}"></c:when><c:otherwise><form:errors path="${campPath}"/></c:otherwise></c:choose></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}">*</c:if></c:set>
@@ -29,6 +30,7 @@
 					<span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Seleccionar</span><span class="fileinput-exists">Canviar</span><input type="file" id="${campPath}" name="${campPath}" <c:if test="${disabled}">disabled</c:if>></span>
 					<a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Netejar</a>
 				</div>
+				<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 			</div>
 		</div>
@@ -41,6 +43,7 @@
 				<span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Seleccionar</span><span class="fileinput-exists">Canviar</span><input type="file" id="${campPath}" name="${campPath}" <c:if test="${disabled}">disabled</c:if>></span>
 				<a href="#" class="input-group-addon btn btn-default fileinput-exists" style="width:auto" data-dismiss="fileinput">Netejar</a>
 			</div>
+			<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
   		</div>
 	</c:otherwise>
 </c:choose>

@@ -33,6 +33,7 @@ public class TascaHelper {
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private UsuariRepository usuariRepository;
 	
 	@Autowired private EventService eventService;
 	
@@ -41,7 +42,6 @@ public class TascaHelper {
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
-	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private CacheHelper cacheHelper;	
 
@@ -224,7 +224,8 @@ public class TascaHelper {
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.getOne(expedientTasca.getMetaExpedientTascaId());
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi : expedientTasca.getResponsablesCodi()) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
+			UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
+			if (responsable==null) throw new NotFoundException(responsableCodi, UsuariEntity.class);
 			responsables.add(responsable);
 		}
 
@@ -232,7 +233,8 @@ public class TascaHelper {
 
 		if (expedientTasca.getObservadorsCodi() != null) {
 			for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
-				UsuariEntity observador = usuariHelper.getUsuariByCodiDades(observadorCodi, true, true);
+				UsuariEntity observador = usuariRepository.findById(observadorCodi).orElse(null);
+				if (observador==null) throw new NotFoundException(observadorCodi, UsuariEntity.class);
 				observadors.add(observador);
 			}
 		}
@@ -300,7 +302,8 @@ public class TascaHelper {
 		}
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi : responsablesCodi) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
+			UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
+			if (responsable==null) throw new NotFoundException(responsableCodi, UsuariEntity.class);
 			responsables.add(responsable);
 		}
 		expedientTascaEntity.updateResponsables(responsables);
@@ -330,7 +333,8 @@ public class TascaHelper {
 	public ExpedientTascaEntity delegarTasca(Long expedientTascaId, String delegatCodi, String comentari) {
 		
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(expedientTascaId);
-		UsuariEntity delegat = usuariHelper.getUsuariByCodiDades(delegatCodi, true, true);
+		UsuariEntity delegat = usuariRepository.findById(delegatCodi).orElse(null);
+		if (delegat==null) throw new NotFoundException(delegatCodi, UsuariEntity.class);
 		expedientTascaEntity.updateDelegat(delegat);
 
 		if (comentari != null) {
@@ -353,7 +357,8 @@ public class TascaHelper {
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(expedientTascaId);
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi : responsablesCodi) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
+			UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
+			if (responsable==null) throw new NotFoundException(responsableCodi, UsuariEntity.class);
 			responsables.add(responsable);
 		}
 
@@ -373,7 +378,8 @@ public class TascaHelper {
 	public ExpedientTascaEntity canviarEstatTasca(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu, String rolActual) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
+		UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
+		if (responsableActual==null) throw new NotFoundException(auth.getName(), UsuariEntity.class);
 		ExpedientTascaEntity tasca = expedientTascaRepository.getOne(tascaId);
 
 		try {

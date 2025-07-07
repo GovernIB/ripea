@@ -219,8 +219,6 @@ import es.caib.ripea.service.intf.utils.Utils;
 @Component
 public class PluginHelper {
 
-    private final UsuariHelper usuariHelper;
-
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_DOC_TMP = "anotacions_registre_doc_tmp";
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
@@ -269,10 +267,6 @@ public class PluginHelper {
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
 	@Autowired private UsuariRepository usuariRepository;
 
-    PluginHelper(UsuariHelper usuariHelper) {
-        this.usuariHelper = usuariHelper;
-    }
-
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
 		long t0 = System.currentTimeMillis();
@@ -306,8 +300,7 @@ public class PluginHelper {
 		}
 	}
 
-	public DadesUsuari dadesUsuariFindAmbCodi(
-			String usuariCodi) {
+	public DadesUsuari dadesUsuariFindAmbCodi(String usuariCodi) {
 
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta d'usuari amb codi";
@@ -316,8 +309,7 @@ public class PluginHelper {
 		DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 		
 		try {
-			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(
-					usuariCodi);
+			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -398,12 +390,7 @@ public class PluginHelper {
 		DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 		
 		try {
-			List<DadesUsuari> dadesUsuari = dadesUsuariPlugin.findAmbFiltre(filtre);
-			
-			if (dadesUsuari==null) {
-				return usuariHelper.findDadesUsuariAmbText(filtre);
-			}
-			
+			List<DadesUsuari> dadesUsuari = dadesUsuariPlugin.findAmbFiltre(filtre);		
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -6415,6 +6402,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName( pluginClass);
 			Properties props = configHelper.getGroupPropertiesGeneral(IntegracioHelper.INTCODI_USUARIS);
+			logger.debug("getDadesUsuariPlugin propietats: " + props.toString());
 			dadesUsuariPlugin = (DadesUsuariPlugin) clazz.getDeclaredConstructor(
 					String.class,
 					Properties.class).newInstance("es.caib.ripea.plugin.dades.usuari.", props);

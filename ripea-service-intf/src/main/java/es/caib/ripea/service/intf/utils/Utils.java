@@ -663,4 +663,30 @@ public class Utils {
 			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto(camp, PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
 		}
 	}
+	
+	public static String nifMask(String nif) {
+        if (nif == null || nif.length() < 5) return nif;
+        // Buscar la última letra (asumimos que es la última posición del string)
+        char ultimaLetra = nif.charAt(nif.length() - 1);
+        // Extraer la parte numérica antes de la letra
+        String cuerpo = nif.substring(0, nif.length() - 1);
+        // Buscar dígitos de derecha a izquierda para encontrar los últimos 4
+        StringBuilder resultado = new StringBuilder();
+        int contador = 0;
+
+        for (int i = cuerpo.length() - 1; i >= 0; i--) {
+            char c = cuerpo.charAt(i);
+            if (Character.isDigit(c) && contador < 4) {
+                resultado.insert(0, '*');
+                contador++;
+            } else {
+                resultado.insert(0, c);
+            }
+        }
+
+        // Añadir de nuevo la letra
+        resultado.append(ultimaLetra);
+
+        return resultado.toString();
+    }
 }

@@ -41,12 +41,12 @@ public class UsuariEntity implements Serializable {
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
 	@ManyToMany(
-			cascade = CascadeType.ALL,
+			cascade = { CascadeType.MERGE, CascadeType.PERSIST },
 			fetch = FetchType.EAGER)
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "usuari_viafirma_ripea",
-			joinColumns = {@JoinColumn(name = "ripea_user_codi")},
-			inverseJoinColumns = {@JoinColumn(name = "viafirma_user_codi")})
+			joinColumns = {@JoinColumn(name = "ripea_user_codi", referencedColumnName = "codi")},
+			inverseJoinColumns = {@JoinColumn(name = "viafirma_user_codi", referencedColumnName = "codi")})
 	private Set<ViaFirmaUsuariEntity> viaFirmaUsuaris = new HashSet<ViaFirmaUsuariEntity>();
 	
 	@Column(name="rol_actual", length = 64)
@@ -272,7 +272,20 @@ public class UsuariEntity implements Serializable {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+	public void setInicialitzat(
+			boolean inicialitzat) {
+		this.inicialitzat = inicialitzat;
+	}
+
+	public void setRolActual(
+			String rolActual) {
+		this.rolActual = rolActual;
+	}
+
+	public void setVersion(
+			long version) {
+		this.version = version;
+	}
 
 	private static final long serialVersionUID = -6657066865382086237L;
-
 }

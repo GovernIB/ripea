@@ -1,17 +1,19 @@
 package es.caib.ripea.persistence.repository.historic;
 
-import es.caib.ripea.persistence.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.persistence.entity.HistoricUsuariEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.persistence.aggregation.HistoricUsuariAggregation;
+import es.caib.ripea.persistence.entity.HistoricUsuariEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.service.intf.dto.historic.HistoricTipusEnumDto;
 
 @Transactional
 public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsuariEntity> {
@@ -79,4 +81,8 @@ public interface HistoricUsuariRepository extends HistoricRepository<HistoricUsu
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi, 
 			Pageable pageable);
+	
+	 @Modifying
+     @Query(value = "UPDATE IPA_HIST_EXP_USUARI SET USUARI_CODI = :codiNou WHERE USUARI_CODI = :codiAntic", nativeQuery = true)
+	 public int updateUsuariCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

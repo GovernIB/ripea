@@ -509,8 +509,8 @@ function removeCookie(cname) {
 
 		 	<c:if test="${rolActual!='tothom'}">
 				<div class="col-md-2">
-					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 					<rip:inputSuggest 
 						name="agafatPer" 
 						urlConsultaInicial="${urlConsultaInicial}" 

@@ -7,6 +7,7 @@
 
 <c:set var="charSearch" value='"' />
 <c:set var="charReplace" value='\\"' />
+<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
 
 <%
 	pageContext.setAttribute(
@@ -172,15 +173,30 @@ div.dropdown-menu.loading .rmodal_carrecs {
     font-size: 1.5rem;
     background: #dadada;
 }
-</style>	
+</style>
+
 <script type="text/javascript">
 
-//################################################## document ready START ##############################################################
+	var maxTamanyFitxerUpload = ${maxFileSize};
+
 	$(document).ready(function() {
+
 		if (window.frameElement != null) {
 			let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 			localStorage.setItem("currentIframeHeight", currentHeight);
 		}
+
+		$('#plantilla').change(function(){
+			let tamany = $(this)[0].files[0].size;
+			var pare = $(this).closest('.fileinput').parent();
+			if (tamany>maxTamanyFitxerUpload) {
+				$(pare).find('div.alert.alert-danger').remove();
+				$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			} else {
+				$(pare).find('div.alert.alert-danger').remove();
+			}
+		});
+		
 		$("#biometricaCallbackActiu").on('change', function(){
 			if($(this).prop("checked") == true){
 				$(".callback").removeClass("hidden");
@@ -388,105 +404,111 @@ div.dropdown-menu.loading .rmodal_carrecs {
 
 	});//################################################## document ready END ##############################################################		
 	
-function toggleCarrecs() {
-	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-	if (dropdown.length === 0) {
-		$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
-		$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
-		
-	} else {
-		dropdown.toggle();
-	}
-}
-
-function recuperarCarrecs() {
-	var llistatCarrecs = "<div class='loading dropdown-menu'>";
-	$.ajax({
-		type: 'GET',
-		dataType: "json",
-		url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
-		success: function(carrecs) {
-			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-			dropdown.removeClass('loading');
-			if (carrecs) {
-				llistatCarrecs += '<div class="carrecsList">';
-				$.each(carrecs, function(i, carrec) {
-					var persona = '';
-					if (carrec.usuariPersonaNom) {
-						persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
-					}
-					var nomCarrec = carrec.carrecName + persona;
-					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
-					
-					$('#portafirmesResponsables option').each(function(i, responsable) {
-						if (responsable.value === carrec.carrecId) {
-							llistatCarrecs = llistatCarrecs.replace('carrec_' + carrec.carrecId, 'carrec_' + carrec.carrecId + ' carrec-selected');
-						}
-					});
-				});
-			}
-			dropdown.append(llistatCarrecs);
-		},
-		error: function (error) {
-			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-			dropdown.removeClass('loading');
-			dropdown.empty();
-			dropdown.append("Hi ha hagut un problema recuperant els càrrecs " + error.statusText);
-		},
-		statusCode: {
-	        500: function(error) {
-	        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
-				dropdown.removeClass('loading');
-	        	dropdown.empty();
-				dropdown.append("Hi ha hagut un problema recuperant els càrrecs: " + error.statusText);
-	        }
-	   	}
-	});
-	llistatCarrecs += "<div class='rmodal_carrecs'></div></div>";
-	return llistatCarrecs;
-}
-
-function seleccionarCarrec(carrec) {
-	if ($('.carrec_' + carrec.carrecId).hasClass('carrec-selected')) {
-		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
-		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
-	} else {
-		var persona = '';
-		if (carrec.usuariPersonaNif) {
-			persona = ' (' + carrec.usuariPersonaNif + ')';
-		}
-		var nomCarrec = carrec.carrecName + persona;
-		var items = [];
-		items.push({
-			"id": carrec.carrecId,
-			"text": nomCarrec
-		});
-	    var newOption = new Option(items[0].text, items[0].id, true, true);
-	    $("#portafirmesResponsables").append(newOption).trigger('change');
-
-		$('.carrec_' + carrec.carrecId).addClass('carrec-selected');
-	}
-}
+	<c:if test="${isWsUsuariEntitatActiu}">
 	
-function adjustModalPerFlux() {
-	var $iframe = $(window.frameElement);
-	$iframe.css('height', '100%');
-	$iframe.parent().css('height', '600px');
-	$iframe.closest('div.modal-content').css('height',  'auto');
-	$iframe.closest('div.modal-dialog').css({
-		'height':'auto',
-		'height': '100%',
-		'margin': '3% auto',
-		'padding': '0'
-	});
-	$iframe.closest('div.modal-lg').css('width', '95%');
-	$iframe.parent().next().addClass('hidden');
-}
-
-function removeLoading() {
-	$body = $("body");
-	$body.removeClass("loading");
-}
+	<c:set var="carrecsIcon">fa fa-sar</c:set>
+	
+	function toggleCarrecs() {
+		var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+		if (dropdown.length === 0) {
+			$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
+			$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
+			
+		} else {
+			dropdown.toggle();
+		}
+	}
+	
+	function recuperarCarrecs() {
+		var llistatCarrecs = "<div class='loading dropdown-menu'>";
+		$.ajax({
+			type: 'GET',
+			dataType: "json",
+			url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
+			success: function(carrecs) {
+				var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+				dropdown.removeClass('loading');
+				if (carrecs) {
+					llistatCarrecs += '<div class="carrecsList">';
+					$.each(carrecs, function(i, carrec) {
+						var persona = '';
+						if (carrec.usuariPersonaNom) {
+							persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+						}
+						var nomCarrec = carrec.carrecName + persona;
+						llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
+						
+						$('#portafirmesResponsables option').each(function(i, responsable) {
+							if (responsable.value === carrec.carrecId) {
+								llistatCarrecs = llistatCarrecs.replace('carrec_' + carrec.carrecId, 'carrec_' + carrec.carrecId + ' carrec-selected');
+							}
+						});
+					});
+				}
+				dropdown.append(llistatCarrecs);
+			},
+			error: function (error) {
+				var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+				dropdown.removeClass('loading');
+				dropdown.empty();
+				dropdown.append("Hi ha hagut un problema recuperant els càrrecs " + error.statusText);
+			},
+			statusCode: {
+		        500: function(error) {
+		        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+					dropdown.removeClass('loading');
+		        	dropdown.empty();
+					dropdown.append("Hi ha hagut un problema recuperant els càrrecs: " + error.statusText);
+		        }
+		   	}
+		});
+		llistatCarrecs += "<div class='rmodal_carrecs'></div></div>";
+		return llistatCarrecs;
+	}
+	
+	function seleccionarCarrec(carrec) {
+		if ($('.carrec_' + carrec.carrecId).hasClass('carrec-selected')) {
+			$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
+			$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
+		} else {
+			var persona = '';
+			if (carrec.usuariPersonaNif) {
+				persona = ' (' + carrec.usuariPersonaNif + ')';
+			}
+			var nomCarrec = carrec.carrecName + persona;
+			var items = [];
+			items.push({
+				"id": carrec.carrecId,
+				"text": nomCarrec
+			});
+		    var newOption = new Option(items[0].text, items[0].id, true, true);
+		    $("#portafirmesResponsables").append(newOption).trigger('change');
+	
+			$('.carrec_' + carrec.carrecId).addClass('carrec-selected');
+		}
+	}
+	
+	</c:if>
+	
+	function adjustModalPerFlux() {
+		var $iframe = $(window.frameElement);
+		$iframe.css('height', '100%');
+		$iframe.parent().css('height', '600px');
+		$iframe.closest('div.modal-content').css('height',  'auto');
+		$iframe.closest('div.modal-dialog').css({
+			'height':'auto',
+			'height': '100%',
+			'margin': '3% auto',
+			'padding': '0'
+		});
+		$iframe.closest('div.modal-lg').css('width', '95%');
+		$iframe.parent().next().addClass('hidden');
+	}
+	
+	function removeLoading() {
+		$body = $("body");
+		$body.removeClass("loading");
+	}
 </script>
 	
 </head>
@@ -514,7 +536,13 @@ function removeLoading() {
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect name="multiplicitat" textKey="metadocument.form.camp.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
-				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}" disabled="${bloquejarCamps}" doNotShowErrors="1"/>
+				<rip:inputFile 
+					name="plantilla"
+					textKey="metadocument.form.camp.plantilla"
+					comment="contingut.document.MAX_UPLOAD_SIZE"
+					fileName="${metaDocumentCommand.plantillaNom}"
+					disabled="${bloquejarCamps}"
+					doNotShowErrors="1"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true" disabled="${bloquejarCamps}"/>
@@ -541,10 +569,10 @@ function removeLoading() {
 						urlConsultaLlistat="${urlConsultaLlistat}" 
 						textKey="metadocument.form.camp.portafirmes.responsables"
 						suggestValue="nif"
-						suggestText="nom"
-						suggestTextAddicional="nif"
+						suggestText="codiAndNom"
+						suggestTextAddicional="nifOfuscat"
 						required="${!metaDocumentCommand.comu}"
-						icon="fa fa-star"
+						icon="${carrecsIcon}"
 						disabled="${bloquejarCamps}"/>
 					<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSequenciatipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
 				</div>							

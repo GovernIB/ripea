@@ -1,18 +1,20 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.service.intf.dto.OrganEstatEnumDto;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.service.intf.dto.OrganEstatEnumDto;
 
 @Component
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
@@ -130,4 +132,12 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where og.entitat = :entitat " +
 			"and og.estat != es.caib.ripea.service.intf.dto.OrganEstatEnumDto.V ")
 	public List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
+	
+	@Modifying
+ 	@Query(value = "UPDATE IPA_ORGAN_GESTOR " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

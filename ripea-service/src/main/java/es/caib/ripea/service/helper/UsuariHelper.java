@@ -29,6 +29,7 @@ public class UsuariHelper {
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private PluginHelper pluginHelper;
 
 	public Authentication generarUsuariAutenticat(
 			String usuariCodi,
@@ -142,46 +143,56 @@ public class UsuariHelper {
 		return usuari;
 	}
 	
-
-	public UsuariEntity getUsuariByCodiDades(
-			String usuariCodi,
-			boolean checkAlsoByNif,
-			boolean throwException) {
+	/**
+	 * A aquest mètode sempre arriben NIFs, que son els responsables de PF.
+	 * Que es guarden a la taula IPA_METADOCUMENT.PORTAFIRMES_RESPONS separats per comes.
+	 * O bé CARRECS (codis de carrec), que es consultaran al WS de UsuariEntitat
+	 */
+	public UsuariDto getUsuariResponsableByNif(String usuariNif) {
 		
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
+		//1.- Cerca a BBDD NIF (nomes hauria de retornar un resultat)
+		List<UsuariEntity> usuari = usuariRepository.findByNifOrderByVersionDesc(usuariNif);
+		
+		if (usuari != null && usuari.size()>0) {
+			return conversioTipusHelper.convertir(usuari.get(0), UsuariDto.class);
+		}
+		
+		//2.- Cerca per plugin usuaris si no ha trobat usuari a BBDD
+		DadesUsuari dadesUsuari = null;
+		List<DadesUsuari> dadesUsuaris = pluginHelper.findAmbFiltre(usuariNif);
+		if (dadesUsuaris!=null && dadesUsuaris.size()>0) {
+			dadesUsuari = dadesUsuaris.get(0);
+		}
+		
 		if (dadesUsuari == null) {
-			if (throwException) {
-				throw new NotFoundException(
-						usuariCodi,
-						DadesUsuari.class);
-			} else {
-				return null;
-			}
-		}
-		
-		UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
-		
-		if (usuari == null && checkAlsoByNif)
-			usuari = usuariRepository.findByNif(usuariCodi);
-		
-		if (usuari == null) {
-			usuari = usuariRepository.save(
-					UsuariEntity.getBuilder(
-							dadesUsuari.getCodi(),
-							dadesUsuari.getNom(),
-							dadesUsuari.getNif(),
-							dadesUsuari.getEmail(),
-							getIdiomaPerDefecte()).build());
+			throw new NotFoundException(usuariNif, DadesUsuari.class);
 		} else {
-			usuari.update(
-					dadesUsuari.getNom(),
-					dadesUsuari.getNif(),
-					dadesUsuari.getEmail());
+			UsuariDto aux = new UsuariDto();
+			aux.setNif(dadesUsuari.getNif());
+			aux.setNom(dadesUsuari.getNomSencer());
+			aux.setCodi(dadesUsuari.getCodi());
+			aux.setEmail(dadesUsuari.getEmail());
+			return aux;
 		}
-		
-		return usuari;
 	}
 
+	public UsuariDto getUsuariByCodiDades(String codi) {
+		UsuariEntity usuariBD = usuariRepository.findByCodi(codi);
+		if (usuariBD!=null) {
+			return conversioTipusHelper.convertir(usuariBD, UsuariDto.class);
+		}
+		DadesUsuari duPlugin = pluginHelper.dadesUsuariFindAmbCodi(codi);
+		if (duPlugin!=null) {
+			UsuariDto resultat = new UsuariDto();
+			resultat.setCodi(codi);
+			resultat.setEmail(duPlugin.getEmail());
+			resultat.setNif(duPlugin.getNif());
+			resultat.setNom(duPlugin.getNomSencer());
+			return resultat;
+		}
+		return null;
+	}
+	
 	private String getIdiomaPerDefecte() {
 		return configHelper.getConfig(PropertyConfig.IDIOMA_DEFECTE);
 	}

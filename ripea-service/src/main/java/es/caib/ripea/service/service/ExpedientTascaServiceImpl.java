@@ -5,6 +5,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.repository.*;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.service.ExpedientTascaService;
+import es.caib.ripea.service.intf.utils.Utils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -279,16 +288,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		logger.debug("Obtenint la llista de l'expedient tasques (" +
 			"entitatId=" + entitatId + ", " +
 			"metaExpedientId=" + metaExpedientId + ")");
-
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(
-			metaExpedientId);
-
-		List<MetaExpedientTascaEntity> tasques = metaExpedientTascaRepository.findByMetaExpedientAndActivaTrue(
-			metaExpedient);
-
-		return conversioTipusHelper.convertirList(
-			tasques,
-			MetaExpedientTascaDto.class);
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(metaExpedientId);
+		List<MetaExpedientTascaEntity> tasques = metaExpedientTascaRepository.findByMetaExpedientAndActivaTrue(metaExpedient);
+		return conversioTipusHelper.convertirList(tasques, MetaExpedientTascaDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -315,11 +317,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto canviarTascaEstat(
-		Long tascaId,
-		TascaEstatEnumDto tascaEstat,
-		String motiu,
-		String rolActual) {
+	public ExpedientTascaDto canviarTascaEstat(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu, String rolActual) {
 		logger.debug("Canviant estat del tasca " +
 			"tascaId=" + tascaId + ", " +
 			"tascaEstat=" + tascaEstat +
@@ -343,10 +341,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto updateDelegat(
-		Long expedientTascaId,
-		String delegatCodi,
-		String comentari) {
+	public ExpedientTascaDto updateDelegat(Long expedientTascaId, String delegatCodi, String comentari) {
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.delegarTasca(expedientTascaId, delegatCodi, comentari);
 		eventService.notifyTasquesPendents(null);
 		return conversioTipusHelper.convertir(expedientTascaEntity, ExpedientTascaDto.class);
@@ -387,10 +382,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
-	public void deleteTascaReversible(
-		Long entitatId,
-		Long tascaId,
-		Long contingutId) throws IOException {
+	public void deleteTascaReversible(Long entitatId, Long tascaId, Long contingutId) throws IOException {
 		logger.debug("Esborrant el contingut (entitatId=" + entitatId + ", contingutId=" + contingutId + ")");
 		contingutHelper.comprovarContingutPertanyTascaAccesible(tascaId, contingutId);
 		contingutHelper.deleteReversible(entitatId, contingutId, tascaId, null);

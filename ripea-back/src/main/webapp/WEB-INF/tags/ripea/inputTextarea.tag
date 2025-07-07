@@ -14,11 +14,13 @@
 <%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
 <%@ attribute name="showsize" required="false" rtexprvalue="true"%>
 <%@ attribute name="textareaRows" required="false" rtexprvalue="true"%>
+<%@ attribute name="comment" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
 <c:set var="textareaRows"><c:choose><c:when test="${not empty textareaRows}">${textareaRows}</c:when><c:otherwise>6</c:otherwise></c:choose></c:set>
+<c:set var="commentMessage"><c:if test="${not empty comment}"><spring:message code="${comment}"/></c:if></c:set>
 <script>
 $(document).ready(function() {
 	//Comptador
@@ -61,6 +63,7 @@ $(document).ready(function() {
 				<span> ${maxlength}</span>
 			</p>
 		</c:if>
+		<c:if test="${not empty commentMessage}"><p class="comentari">${commentMessage}</p></c:if>
 		<c:if test="${not empty exemple}">
 			<a class="btn btn-default btn-xs exemple_boto"  onclick="webutilMostrarExemple(this)"><spring:message code="${exempleLabel}"/></a>
 			<div class="exemple">

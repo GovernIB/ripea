@@ -136,34 +136,43 @@ public class MetaExpedientPermisController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = RolHelper.getRolActual(request);
-		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		try {
 		
-		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-		
-		comprovarAccesMetaExpedient(request, metaExpedientId);
-		if (bindingResult.hasErrors()) {
-			model.addAttribute("metaExpedient", metaExpedientService.findById(entitatActual.getId(), metaExpedientId));
-			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
-			return "metaExpedientPermisForm";
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+			String rolActual = RolHelper.getRolActual(request);
+			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+			
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+			
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+			if (bindingResult.hasErrors()) {
+				model.addAttribute("metaExpedient", metaExpedientService.findById(entitatActual.getId(), metaExpedientId));
+				request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
+				return "metaExpedientPermisForm";
+			}
+			metaExpedientService.permisUpdate(
+					entitatActual.getId(),
+					metaExpedientId,
+					PermisCommand.asDto(command), 
+					rolActual, organActual != null ? organActual.getId() : null);
+			request.setAttribute(REQUEST_PARAMETER_STATISTICS_EXPEDIENTS, null);
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
+			
+			expedientPeticioService.evictCountAnotacionsPendents(entitatActual.getId());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../metaExpedient/" + metaExpedientId + "/permis",
+					"metaexpedient.controller.permis.modificat.ok",
+					new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
+		} catch (Exception ex) {
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../../metaExpedient/" + metaExpedientId + "/permis",
+					ex.getMessage(),
+					null);
 		}
-		metaExpedientService.permisUpdate(
-				entitatActual.getId(),
-				metaExpedientId,
-				PermisCommand.asDto(command), 
-				rolActual, organActual != null ? organActual.getId() : null);
-		request.setAttribute(REQUEST_PARAMETER_STATISTICS_EXPEDIENTS, null);
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
-			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
-		}
-		
-		expedientPeticioService.evictCountAnotacionsPendents(entitatActual.getId());
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaExpedient/" + metaExpedientId + "/permis",
-				"metaexpedient.controller.permis.modificat.ok",
-				new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/permis/{permisId}/delete", method = RequestMethod.GET)

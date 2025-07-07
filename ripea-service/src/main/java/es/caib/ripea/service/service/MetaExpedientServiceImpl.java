@@ -96,8 +96,6 @@ import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
-import es.caib.ripea.service.intf.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.ripea.service.intf.dto.PermisDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.PrincipalTipusEnumDto;
@@ -105,6 +103,7 @@ import es.caib.ripea.service.intf.dto.ProcedimentDto;
 import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.service.intf.exception.ExisteixenExpedientsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -1486,11 +1485,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		List<PermisDto> permisLlistAmbNom = metaExpedientHelper.permisFind(id);
 		for (PermisDto permis: permisLlistAmbNom) {
 			if (permis.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
-				try {
-					permis.setPrincipalCodiNom(usuariHelper.getUsuariByCodi(permis.getPrincipalNom()).getNom() + " (" + permis.getPrincipalNom() + ")");
-				} catch (NotFoundException ex) {
-					logger.debug("No s'ha trobat cap usuari amb el codi " + permis.getPrincipalNom());
-					permis.setPrincipalCodiNom(permis.getPrincipalNom());
+				UsuariDto userPermis = usuariHelper.getUsuariByCodiDades(permis.getPrincipalNom());
+				if (userPermis!=null) {
+					permis.setPrincipalCodiNom(userPermis.getCodiAndNom());
+				} else {
+					permis.setPrincipalCodiNom("Usuari NO TROBAT ("+permis.getPrincipalNom()+")");		
 				}
 			} else {
 				permis.setPrincipalCodiNom(permis.getPrincipalNom());
@@ -1507,8 +1506,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
 				"permis=" + permis + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
+		if (PrincipalTipusEnumDto.USUARI.equals(permis.getPrincipalTipus())) {
+			UsuariDto aux = usuariHelper.getUsuariByCodiDades(rolActual);
+			if (aux==null) throw new NotFoundException(permis.getPrincipalNom(), UsuariDto.class);
+		}
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(id);
 		if (permis.getOrganGestorId() == null) {

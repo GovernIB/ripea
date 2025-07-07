@@ -231,4 +231,12 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 	@Modifying
 	@Query(value = "update ipa_contingut set pare_id = null where id = :contingutId", nativeQuery = true)
 	void removePare(Long contingutId);
+	
+	@Modifying
+ 	@Query(value = "UPDATE IPA_CONTINGUT " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

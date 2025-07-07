@@ -747,6 +747,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
 		}
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+		addBotoCarrecsProperty(model);
 	}
 
 	private void emplenarModelPortafirmes(
