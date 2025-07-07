@@ -40,7 +40,7 @@ const useCambiarEstat = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.changeEstat.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

@@ -14,15 +14,17 @@ export const ToolbarButton = (props:any) => {
     }
 
     return <Tooltip title={title}>
-        <Button
-            variant="outlined"
-            size="small"
-            startIcon={<Icon sx={{m: 0}}>{icon}</Icon>}
-            {...other}
-            sx={{ borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }}
-        >
-            {children}
-        </Button>
+        <span>
+            <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Icon sx={{m: 0}}>{icon}</Icon>}
+                {...other}
+                sx={{ borderRadius: '4px',  minWidth: '20px', minHeight: '32px' }}
+            >
+                {children}
+            </Button>
+        </span>
     </Tooltip>
 }
 

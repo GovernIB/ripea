@@ -40,7 +40,7 @@ const useCambiarPrioritat = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.changePrioritat.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

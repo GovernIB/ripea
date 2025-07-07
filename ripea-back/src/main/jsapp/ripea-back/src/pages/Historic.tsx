@@ -22,12 +22,7 @@ const columnsAccions = [
     {
         field: 'tipus',
         flex: 0.5,
-        valueFormatter: (value: any, row:any)=> {
-            if(row?.secundari){
-                return row?.objecte
-            }
-            return value
-        }
+        valueFormatter: (value: any, row:any)=> row?.secundari ?row?.objecte :value
     },
 ]
 

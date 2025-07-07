@@ -353,6 +353,7 @@ const translationEn = {
             },
             alert: {
                 incapacitat: "If the holder has a disability, a recipient must be specified.",
+                jaExistentExpedient: "Already exists in the file",
             },
         },
         expedient: {

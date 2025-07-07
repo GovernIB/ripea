@@ -26,7 +26,7 @@ const useCreate = (refresh?: () => void) => {
             })
             .catch((error:any) => {
                 if(error) {
-                    temporalMessageShow(null, error.message, 'error');
+                    error?.message && temporalMessageShow(null, error?.message, 'error');
                 }
             });
     }

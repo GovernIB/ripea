@@ -150,9 +150,7 @@ const useRelacionar= (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error:any) :void => {
-                if (error) {
-                    temporalMessageShow(null, error.message, 'error');
-                }
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

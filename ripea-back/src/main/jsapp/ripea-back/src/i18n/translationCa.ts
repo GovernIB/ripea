@@ -353,6 +353,7 @@ const translationCa = {
             },
             alert: {
                 incapacitat: "En cas de titular amb discapacitat es obligatori indicar un destinatari.",
+                jaExistentExpedient: "Ja existeix a l'expedient",
             },
         },
         expedient: {

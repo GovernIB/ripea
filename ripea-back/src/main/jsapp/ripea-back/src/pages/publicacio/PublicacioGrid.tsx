@@ -80,9 +80,7 @@ const PublicacioGrid = (props:any) => {
             columns={columns}
             rowAdditionalActions={actions}
             // paginationActive
-            filter={builder.and(
-                builder.eq('expedient.id', id)
-            )}
+            filter={builder.eq('expedient.id', id)}
             staticSortModel={sortModel}
             onRowCountChange={onRowCountChange}
             disableColumnSorting

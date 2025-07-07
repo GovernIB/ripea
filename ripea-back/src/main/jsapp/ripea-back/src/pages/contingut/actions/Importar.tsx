@@ -7,12 +7,12 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
 
 const ImportarForm = () => {
-    const {data} = useFormContext();
+    const {data ,apiRef} = useFormContext();
     const { t } = useTranslation();
 
     const filterCarpeta = builder.and(
         builder.eq('esborrat', 0),
-        builder.eq('expedient.id', data?.expedient?.id),
+        builder.eq('expedient.id', apiRef?.current?.getId()),
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>

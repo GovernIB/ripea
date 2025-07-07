@@ -123,7 +123,6 @@ const ExpedientGrid = () => {
     const {t} = useTranslation();
     const navigate = useNavigate();
     const [springFilter, setSpringFilter] = useState<string>();
-    const [namedQueries, setNamedQueries] = useState<string[]>([]);
     const [load, setLoad] = useState<boolean>(false);
     const apiRef = useMuiDataGridApiRef();
 
@@ -252,7 +251,7 @@ const ExpedientGrid = () => {
 
     return <GridPage>
         <CardPage title={t('page.expedient.filter.title')}>
-            <ExpedientFilter onNamedQueryChange={setNamedQueries} onSpringFilterChange={(value:any)=>{
+            <ExpedientFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)
                 setLoad(true)
             }}/>
@@ -260,7 +259,6 @@ const ExpedientGrid = () => {
             <Load value={load} noEffect>
             <StyledMuiGrid
                 resourceName={"expedientResource"}
-                namedQueries={namedQueries}
                 popupEditFormDialogResourceTitle={t('page.expedient.title')}
                 columns={columnsAddition}
                 filter={springFilter}

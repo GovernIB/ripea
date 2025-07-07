@@ -75,7 +75,7 @@ const usePerfil = () => {
                 temporalMessageShow(null, '', 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 
@@ -83,6 +83,7 @@ const usePerfil = () => {
         <MuiFormDialog
             resourceName={'usuariResource'}
             title={t('page.user.perfil.title')}
+            onClose={(reason?: string) => reason !== 'backdropClick'}
             apiRef={formApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg'}}
         >

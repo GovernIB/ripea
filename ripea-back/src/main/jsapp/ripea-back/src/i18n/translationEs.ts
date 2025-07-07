@@ -353,6 +353,7 @@ const translationEs = {
             },
             alert: {
                 incapacitat: "En caso de titular con incapacidad es obligatorio indicar un destinatario.",
+                jaExistentExpedient: "Ya existe en el expediente",
             },
         },
         expedient: {

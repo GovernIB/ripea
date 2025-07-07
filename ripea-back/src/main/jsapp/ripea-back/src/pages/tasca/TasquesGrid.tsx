@@ -110,7 +110,7 @@ const TasquesGrid = (props: any) => {
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={additionalColumns}
             // paginationActive
-            filter={builder.and(builder.eq('expedient.id', entity?.id))}
+            filter={builder.eq('expedient.id', entity?.id)}
             perspectives={perspectives}
             sortModel={sortModel}
             onRowCountChange={onRowCountChange}

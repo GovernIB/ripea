@@ -118,7 +118,7 @@ const RemesaGrid = (props:any) => {
             resourceName="documentNotificacioResource"
             popupEditActive
             popupEditFormContent={<RemesaGridForm/>}
-            filter={builder.and(builder.eq('expedient.id', id))}
+            filter={builder.eq('expedient.id', id)}
             staticSortModel={sortModel}
             // perspectives={['']}
             columns={columns}

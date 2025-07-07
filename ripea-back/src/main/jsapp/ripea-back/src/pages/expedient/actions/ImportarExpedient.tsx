@@ -132,8 +132,10 @@ const useImportarExpedient = (entity:any, refresh?: () => void) => {
         setOpen(true);
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setOpen(false);
+        }
     };
 
     const dialog =

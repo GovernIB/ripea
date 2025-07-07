@@ -38,7 +38,7 @@ const useCrear = (entity:any, refresh?: () => void) => {
                 temporalMessageShow(null, t('page.carpeta.action.new.ok', {carpeta: result?.nom}), 'success');
             })
             .catch((error:any) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

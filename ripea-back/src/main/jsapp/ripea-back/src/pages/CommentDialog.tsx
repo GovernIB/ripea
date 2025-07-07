@@ -88,6 +88,7 @@ export const CommentDialog = (props:any) => {
             <MuiFormDialog
                 resourceName={resourceName}
                 title={title}
+                onClose={(reason?: string) => reason !== 'backdropClick'}
                 apiRef={formApiRef}
             >
                 <Comments

@@ -29,7 +29,7 @@ const useModifyExpedient = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.update.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 
