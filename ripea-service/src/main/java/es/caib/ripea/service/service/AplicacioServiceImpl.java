@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.AclCache;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,10 +17,52 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.persistence.repository.AlertaRepository;
+import es.caib.ripea.persistence.repository.AvisRepository;
+import es.caib.ripea.persistence.repository.ConsultaPinbalRepository;
+import es.caib.ripea.persistence.repository.ContingutLogRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
+import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DominiRepository;
+import es.caib.ripea.persistence.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
+import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
+import es.caib.ripea.persistence.repository.ExpedientOrganPareRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaComentariRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientCarpetaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientSequenciaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
+import es.caib.ripea.persistence.repository.MetaNodeRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.persistence.repository.PortafirmesBlockInfoRepository;
+import es.caib.ripea.persistence.repository.PortafirmesBlockRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.persistence.repository.RegistreInteressatRepository;
+import es.caib.ripea.persistence.repository.RegistreRepository;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
+import es.caib.ripea.persistence.repository.config.ConfigRepository;
+import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
@@ -67,6 +110,52 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntitatRepository entitatRepository;
+
+    //UpdateUsuaris
+    @Autowired private ExpedientRepository expedientRepository;
+    @Autowired private HistoricUsuariRepository historicUsuariRepository;
+    @Autowired private ConfigRepository configRepository;
+    
+    @Autowired private AlertaRepository alertaRepository;
+    @Autowired private AvisRepository avisRepository;
+    @Autowired private ConsultaPinbalRepository consultaPinbalRepository;
+    @Autowired private ContingutRepository contingutRepository; //IPA_CONTINGUT i IPA_CONT_COMMENT
+    @Autowired private ContingutLogRepository contingutLogRepository;
+    @Autowired private ContingutMovimentRepository contingutMovimentRepository;
+    @Autowired private DadaRepository dadaRepository;
+    @Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository; //IPA_DOCUMENT_ENVIAMENT i IPA_DOCUMENT_ENVIAMENT_INTER
+    @Autowired private DispositiuEnviamentRepository dispositiuEnviamentRepository;
+    @Autowired private DominiRepository dominiRepository;
+    @Autowired private EmailPendentEnviarRepository emailPendentEnviarRepository;
+    @Autowired private ExecucioMassivaRepository execucioMassivaRepository;
+    @Autowired private ExpedientComentariRepository expedientComentariRepository;
+    @Autowired private ExpedientEstatRepository expedientEstatRepository; //IPA_EXPEDIENT_ESTAT i IPA_EXPEDIENT_FILTRE
+    @Autowired private ExpedientOrganPareRepository expedientOrganPareRepository;
+    @Autowired private ExpedientPeticioRepository expedientPeticioRepository;
+    @Autowired private ExpedientTascaRepository expedientTascaRepository; 
+    @Autowired private ExpedientTascaComentariRepository expedientTascaComentariRepository;
+    @Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+    @Autowired private InteressatRepository interessatRepository;
+    @Autowired private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+    @Autowired private MetaDadaRepository metaDadaRepository;
+    @Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository; //IPA_METAEXP_COMMENT i IPA_METAEXP_DOMINI
+    @Autowired private MetaExpedientCarpetaRepository metaExpedientCarpetaRepository; //IPA_METAEXPEDIENT_CARPETA i IPA_METAEXPEDIENT_METADOCUMENT
+    @Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+    @Autowired private MetaExpedientSequenciaRepository metaExpedientSequenciaRepository;
+    @Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
+    @Autowired private MetaExpedientTascaValidacioRepository metaExpedientTascaValidacioRepository;
+    @Autowired private MetaNodeRepository metaNodeRepository; //IPA_METANODE i IPA_METANODE_METADADA
+    @Autowired private OrganGestorRepository organGestorRepository;
+    @Autowired private PinbalServeiRepository pinbalServeiRepository;
+    @Autowired private PortafirmesBlockRepository portafirmesBlockRepository;
+    @Autowired private PortafirmesBlockInfoRepository portafirmesBlockInfoRepository;
+    @Autowired private RegistreRepository registreRepository;
+    @Autowired private RegistreAnnexRepository registreAnnexRepository;
+    @Autowired private RegistreInteressatRepository registreInteressatRepository;
+    @Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+    @Autowired private ViaFirmaUsuariRepository viaFirmaUsuariRepository;
+    @Autowired private AclSidRepository aclSidRepository;
+    @Autowired private AclCache aclCache;
 
 	@Override
 	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
@@ -638,6 +727,145 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} else {
 			return new GenericDto("integracio.diag.nf", "fa fa-question-circle taronja", new Object[] {codi});
 		}
+	}
+	
+	 @Override
+	 @Transactional
+	 public Long updateUsuariCodi(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 UsuariEntity usuariAntic = usuariRepository.findByCodi(codiAntic);
+		 if (usuariAntic != null) {
+			 createOrUpdateUsuari(codiNou, usuariAntic);
+			 //Actualitzam la informació de auditoria de les taules:
+			 registresModificats += updateUsuariAuditoria(codiAntic, codiNou);
+			 // Actualitazam els permisos assignats per ACL
+			 registresModificats += updateUsuariPermisos(codiAntic, codiNou);
+			 //Actualitzam les referencis a l'usuari a taules:
+			 registresModificats += updateUsuariReferencies(codiAntic, codiNou);
+			 //Eliminam l'usuari antic
+			 usuariRepository.delete(usuariAntic);
+			 //Netejam caches per que es tornin a consultar les dades la proxima vegada.
+			 cacheHelper.evictEntitatsAccessiblesUsuari(codiAntic);
+			 cacheHelper.evictEntitatsAccessiblesUsuari(codiNou);
+			 cacheHelper.evictAllReadAclById();
+			 cacheHelper.evictFindRolsAmbCodi(codiAntic);
+			 cacheHelper.evictFindRolsAmbCodi(codiNou);
+			 aclCache.clearCache();
+		 }
+		return registresModificats;
+	 }
+	 
+	 private Long updateUsuariAuditoria(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 registresModificats += alertaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ALERTA **
+		 registresModificats += avisRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_AVIS **
+		 registresModificats += configRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONFIG **
+		 registresModificats += consultaPinbalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONSULTA_PINBAL **
+		 registresModificats += contingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONTINGUT **
+		 registresModificats += contingutLogRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_LOG **
+		 registresModificats += contingutMovimentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_CONT_MOV **
+		 registresModificats += dadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DADA **
+		 registresModificats += documentEnviamentInteressatRepository.updateUsuariAuditoriaDocEnv(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT **
+		 registresModificats += dispositiuEnviamentRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT_DIS **
+		 registresModificats += documentEnviamentInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOCUMENT_ENVIAMENT_INTER **
+		 registresModificats += dominiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_DOMINI **
+		 registresModificats += emailPendentEnviarRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EMAIL_PENDENT_ENVIAR **
+		 registresModificats += entitatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ENTITAT **
+		 registresModificats += execucioMassivaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXECUCIO_MASSIVA **
+		 registresModificats += expedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_COMMENT **
+		 registresModificats += expedientEstatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ESTAT **
+		 registresModificats += expedientOrganPareRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_ORGANPARE **
+		 registresModificats += expedientPeticioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_PETICIO **
+		 registresModificats += expedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXPEDIENT_TASCA **
+		 registresModificats += expedientTascaComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_EXP_TASCA_COMMENT **
+		 registresModificats += fluxFirmaUsuariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_FLUX_FIRMA_USUARI **
+		 registresModificats += grupRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_GRUP **
+		 registresModificats += entitatRepository.updateUsuariAuditoriaHistoric(codiAntic, codiNou);//IPA_HISTORIC **
+		 registresModificats += interessatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_INTERESSAT **
+		 registresModificats += execucioMassivaContingutRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_MASSIVA_CONTINGUT **
+		 registresModificats += metaDadaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METADADA **
+		 registresModificats += metaExpedientComentariRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_COMMENT **
+		 registresModificats += metaExpedientCarpetaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXPEDIENT_CARPETA **
+		 registresModificats += metaExpedientOrganGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_ORGAN **
+		 registresModificats += metaExpedientSequenciaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_SEQ **
+		 registresModificats += metaExpedientTascaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA **
+		 registresModificats += metaExpedientTascaValidacioRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METAEXP_TASCA_VALIDACIO **
+		 registresModificats += metaNodeRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_METANODE **
+		 registresModificats += organGestorRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ORGAN_GESTOR **
+		 registresModificats += pinbalServeiRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PINBAL_SERVEI
+		 registresModificats += portafirmesBlockRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK **
+		 registresModificats += portafirmesBlockInfoRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_PORTAFIRMES_BLOCK_INFO **
+		 registresModificats += registreRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE **
+		 registresModificats += registreAnnexRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_ANNEX **
+		 registresModificats += registreInteressatRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_REGISTRE_INTERESSAT **
+		 registresModificats += tipusDocumentalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_TIPUS_DOCUMENTAL **
+		 return registresModificats;
+	 }
+	 
+	 private Long updateUsuariPermisos(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 registresModificats += aclSidRepository.updateUsuariPermis(codiAntic, codiNou);
+	 	return registresModificats;
+	 }
+	 
+	 private Long updateUsuariReferencies(String codiAntic, String codiNou) {
+		 Long registresModificats = 0l;
+		 registresModificats += expedientRepository.updateAgaftPer(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpTasca(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpTascaResponsable(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpTascaObservador(codiAntic, codiNou);
+		 registresModificats += expedientEstatRepository.updateExpEstatResponsable(codiAntic, codiNou);
+		 registresModificats += contingutMovimentRepository.updateRemitentCodi(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpSeguidorCodi(codiAntic, codiNou);
+		 registresModificats += expedientRepository.updateExpPeticio(codiAntic, codiNou);
+		 registresModificats += fluxFirmaUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
+		 registresModificats += historicUsuariRepository.updateUsuariCodi(codiAntic, codiNou);
+		 registresModificats += viaFirmaUsuariRepository.updateUsuariViaFirma(codiAntic, codiNou);
+		 registresModificats += metaExpedientTascaRepository.updateUsuariResponsable(codiAntic, codiNou);
+		 return registresModificats;
+	 }
+	
+	 private String createOrUpdateUsuari(String codiNou, UsuariEntity usuariAntic) {
+		 Long t0 = System.currentTimeMillis();
+		 UsuariEntity usuariNou = usuariRepository.findByCodi(codiNou);
+		 boolean creat = false;
+		 if (usuariNou==null) {
+			 usuariNou = UsuariEntity.getBuilder(
+					 codiNou,
+					 usuariAntic.getNom(),
+					 usuariAntic.getNif(),
+					 usuariAntic.getEmail(),
+					 usuariAntic.getIdioma()).build();
+			 usuariRepository.saveAndFlush(usuariNou);
+			 creat = true;
+		 }
+		 usuariNou.update(
+				 usuariAntic.getEmailAlternatiu(),
+				 usuariAntic.getIdioma(),
+				 usuariAntic.isRebreEmailsAgrupats(),
+				 usuariAntic.isRebreAvisosNovesAnotacions(),
+				 usuariAntic.isRebreEmailsCanviEstatRevisio(),
+				 usuariAntic.getNumElementsPagina(),
+				 usuariAntic.isExpedientListDataDarrerEnviament(),
+				 usuariAntic.isExpedientListAgafatPer(),
+				 usuariAntic.isExpedientListInteressats(),
+				 usuariAntic.isExpedientListComentaris(),
+				 usuariAntic.isExpedientListGrup(),
+				 usuariAntic.getProcediment(),
+				 usuariAntic.getVistaActual(),
+				 usuariAntic.isExpedientExpandit(),
+				 usuariAntic.getEntitatPerDefecte(),
+				 usuariAntic.getVistaMoureActual());
+		 
+		 usuariNou.setInicialitzat(usuariAntic.isInicialitzat());
+		 usuariNou.setRolActual(usuariAntic.getRolActual());
+		 usuariNou.setVersion(usuariAntic.getVersion());
+		
+		 if (creat) {
+			return "<li>Creat nou usuari '"+codiNou+"' en "+(System.currentTimeMillis()-t0)+" ms.</li>";
+		 } else {
+			return "<li>Actualitzat usuari existent '"+codiNou+"' en "+(System.currentTimeMillis()-t0)+" ms.</li>";
+		 }
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);

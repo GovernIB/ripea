@@ -723,11 +723,10 @@ public class CacheHelper {
 	}
 
 	@CacheEvict(value = "readAclById", key="#oid")
-	public void evictReadAclById(ObjectIdentity oid) {
-	}
+	public void evictReadAclById(ObjectIdentity oid) {}
 	
-	
-	
+	@CacheEvict(value = "readAclById", allEntries = true)
+	public void evictAllReadAclById() {}
 
 	@Cacheable(value = "anotacionsUsuari", key="{#usuariCodi}")
 	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {

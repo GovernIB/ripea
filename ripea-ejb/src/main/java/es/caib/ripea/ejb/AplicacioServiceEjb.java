@@ -287,4 +287,9 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 		return delegateService.integracioDiagnostic(codi, filtre);
 	}
 
+	@Override
+	@RolesAllowed({ "IPA_SUPER" })
+	public Long updateUsuariCodi(String codiAntic, String codiNou) {
+		return delegateService.updateUsuariCodi(codiAntic, codiNou);
+	}
 }

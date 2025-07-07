@@ -17,4 +17,16 @@ public interface ContingutMovimentRepository extends JpaRepository<ContingutMovi
 	@Modifying
 	@Query(value = "delete from ipa_cont_mov where contingut_id = :contingutId ", nativeQuery = true)
 	int deleteMovimentsFromContingutsOrfes(@Param("contingutId") Long contingutId);
+	
+	 @Modifying
+     @Query(value = "UPDATE IPA_CONT_MOV SET REMITENT_CODI = :codiNou WHERE REMITENT_CODI = :codiAntic", nativeQuery = true)
+	 public int updateRemitentCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 
+	@Modifying
+ 	@Query(value = "UPDATE IPA_CONT_MOV " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);	
 }

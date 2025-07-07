@@ -554,5 +554,7 @@ public interface ContingutService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			ResultEnumDto resultEnum);
-
+	
+	@PreAuthorize("isAuthenticated()")
+	public String findNtiCsvByDocumentId(Long entitatId, Long documentId) throws NotFoundException;
 }

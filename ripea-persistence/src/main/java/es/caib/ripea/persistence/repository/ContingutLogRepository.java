@@ -181,4 +181,12 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	@Modifying
 	@Query(value = "delete from ipa_cont_log where contingut_id = :contingutId ", nativeQuery = true)
 	int deleteLogsFromContingutsOrfes(@Param("contingutId") Long contingutId);
+	
+	@Modifying
+ 	@Query(value = "UPDATE IPA_CONT_LOG " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

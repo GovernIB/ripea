@@ -2631,4 +2631,11 @@ public class ContingutServiceImpl implements ContingutService {
 		return null;
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public String findNtiCsvByDocumentId(Long entitatId, Long documentId) throws NotFoundException {
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(documentId);
+		if (contingut!=null) return ((DocumentEntity)contingut).getNtiCsv();
+		return null;
+	}
 }

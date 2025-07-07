@@ -94,6 +94,12 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 			Long contingutDestiId, String rolActual) {
 		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
 	}
+	
+	@Override
+	@RolesAllowed("**")
+	public String findNtiCsvByDocumentId(Long entitatId, Long documentId) throws NotFoundException {
+		return delegateService.findNtiCsvByDocumentId(entitatId, documentId);
+	}
 
 	@Override
 	@RolesAllowed("**")

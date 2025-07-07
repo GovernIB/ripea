@@ -54,6 +54,7 @@ import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -650,9 +651,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String getUrlValidacio(HttpServletRequest request, @PathVariable Long documentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String urlValidacio = aplicacioService.propertyFindByNom(PropertyConfig.CONCSV_BASE_URL);
-		DocumentDto documentDto = (DocumentDto)contingutService.findAmbIdAdmin(entitatActual.getId(), documentId);
-		if (documentDto!=null && documentDto.getNtiCsv()!=null) {
-			return urlValidacio + documentDto.getNtiCsv();
+		String ntiCsv = contingutService.findNtiCsvByDocumentId(entitatActual.getId(), documentId);
+		if (Utils.hasValue(ntiCsv)) {
+			return urlValidacio + ntiCsv;
 		}
 		return urlValidacio;
 	}

@@ -229,5 +229,7 @@ public interface AplicacioService {
 
 	@PreAuthorize("isAuthenticated()")
 	public boolean mostrarLogsCercadorAnotacio();
-
+	
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public Long updateUsuariCodi(String codiAntic, String codiNou);
 }

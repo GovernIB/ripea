@@ -1,11 +1,15 @@
 package es.caib.ripea.persistence.entity;
 
-import es.caib.ripea.service.intf.config.BaseConfig;
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Set;
+import es.caib.ripea.service.intf.config.BaseConfig;
 
 @Entity
 @Table(	name = BaseConfig.DB_PREFIX + "viafirma_usuari")
@@ -21,9 +25,6 @@ public class ViaFirmaUsuariEntity implements Serializable {
 	@Column (name = "contrasenya", length = 64)
 	private String contrasenya;
 
-	@ManyToMany(mappedBy = "viaFirmaUsuaris", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private Set<UsuariEntity> usuaris;
-	
 	public String getCodi() {
 		return codi;
 	}
@@ -33,11 +34,7 @@ public class ViaFirmaUsuariEntity implements Serializable {
 	public String getContrasenya() {
 		return contrasenya;
 	}
-	
-	public Set<UsuariEntity> getUsuaris() {
-		return usuaris;
-	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -68,5 +65,4 @@ public class ViaFirmaUsuariEntity implements Serializable {
 	}
 	
 	private static final long serialVersionUID = 8068272346835579789L;
-
 }
