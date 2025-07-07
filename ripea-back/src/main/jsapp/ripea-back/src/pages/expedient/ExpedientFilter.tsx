@@ -63,8 +63,6 @@ export const springFilterBuilder = (data: any, user?: any): string => {
 
         builder.betweenDates("createdDate", data.dataCreacioInici, data.dataCreacioFinal),
 
-        // TODO: domini
-
         builder.like("registresImportats", data.numeroRegistre),
         builder.eq("grup.id", data.grup?.id),
         (user?.rolActual != "tothom") && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
@@ -91,14 +89,26 @@ export const springFilterBuilder = (data: any, user?: any): string => {
     // console.log('>>> springFilterBuilder:', filterStr)
     return filterStr;
 }
+const namedQueryBuilder = (data: any): string[] => {
+    const namedQueries = [];
+
+    if (data?.domini?.id && data?.dominiValor){
+        namedQueries.push(`EXPEDIENT_DOMINIS#${data?.domini?.id}#${data?.dominiValor}`)
+    }
+
+    return namedQueries;
+}
 
 const ExpedientFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
+    const {onSpringFilterChange, onNamedQueryChange} = props;
     const {value: user} = useUserSession();
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        springFilterBuilder={(data: any)=>springFilterBuilder(data, user)}
+        springFilterBuilder={(data: any)=> {
+            springFilterBuilder(data, user)
+            onNamedQueryChange?.(namedQueryBuilder(data))
+        }}
         onSpringFilterChange={onSpringFilterChange}
     >
         <ExpedientFilterForm/>
