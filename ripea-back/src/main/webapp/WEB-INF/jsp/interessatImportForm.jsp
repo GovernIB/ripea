@@ -48,16 +48,12 @@
     <form:hidden path="accio" />
     
     <c:if test="${interessatImportCommand.accio=='INTERESSATS'}">
-<<<<<<< HEAD
     	<rip:inputSelect name="tipus" optionEnum="InteressatImportacioTipusDto" textKey="contingut.camp.importar.tipus"/>
-   		<rip:inputFile name="fitxerInteressats" textKey="contingut.camp.importar.interessats" doNotShowErrors="1"/>
-=======
    		<rip:inputFile 
    			name="fitxerInteressats"
    			comment="contingut.document.MAX_UPLOAD_SIZE"
    			textKey="contingut.camp.importar.interessats"
    			doNotShowErrors="1"/>
->>>>>>> refs/remotes/origin/ripea-1.0-dev
    	</c:if>
 
     <c:if test="${interessatImportCommand.hasInteressats}">
