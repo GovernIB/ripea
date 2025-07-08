@@ -12,13 +12,13 @@ const StyledEstat = (props:any) => {
 
     switch (publicacio?.estat) {
         case 'PENDENT':
-            return <EstatMessage icon={'schedule'} color={'warning'}/>;
+            return <EstatMessage icon={'schedule'} color={'warning'} title={publicacio?.estat}/>;
         case 'ENVIAT':
-            return <EstatMessage icon={'mail'} color={'info'}/>;
+            return <EstatMessage icon={'mail'} color={'info'} title={publicacio?.estat}/>;
         case 'REBUTJAT':
-            return <EstatMessage icon={'close'} color={'disabled'}/>;
+            return <EstatMessage icon={'close'} color={'disabled'} title={publicacio?.estat}/>;
         case 'PROCESSAT':
-            return <EstatMessage icon={'check'} color={'error'}/>;
+            return <EstatMessage icon={'check'} color={'error'} title={publicacio?.estat}/>;
     }
 
     return <></>;

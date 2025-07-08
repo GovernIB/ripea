@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid, Icon} from "@mui/material";
 import {
     GridPage, useFormContext,
     useMuiDataGridApiRef,
@@ -37,26 +37,6 @@ export const InteressatsGridForm = () => {
 const perspectives = ['REPRESENTANT']
 const sortModel:any = [{field: 'id', sort: 'asc'}]
 
-const columns = [
-    {
-        field: 'tipus',
-        flex: 0.5,
-    },
-    {
-        field: 'documentNum',
-        flex: 0.5,
-    },
-    {
-        field: 'nomComplet',//organNom
-        flex: 1,
-        valueFormatter: (value: any, row:any) => row?.organNom ?? value
-    },
-    {
-        field: 'representant',
-        flex: 0.75,
-    },
-];
-
 interface DetailGridProps {
     entity: any,
     num: number,
@@ -67,6 +47,36 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
     const {entity, num, onRowCountChange} = props
     const { t } = useTranslation();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
+
+    const columns = [
+        {
+            field: 'tipus',
+            flex: 0.5,
+        },
+        {
+            field: 'documentNum',
+            flex: 0.5,
+        },
+        {
+            field: 'nomComplet',// organNom
+            flex: 1,
+            valueFormatter: (value: any, row:any) => value ?? row?.organNom,
+            renderCell: (params:any) => <>
+                {params?.formattedValue}
+                {!params?.row?.arxiuPropagat &&
+                    <Icon title={t('page.contingut.alert.guardarPendent')} color={'error'}>warning</Icon>}
+            </>
+        },
+        {
+            field: 'representant',
+            flex: 0.75,
+            renderCell: (params:any) => <>
+                {params?.formattedValue}
+                {params?.row?.representant && !params?.row?.representantInfo?.arxiuPropagat &&
+                    <Icon title={t('page.contingut.alert.guardarPendent')} color={'error'}>warning</Icon>}
+            </>,
+        },
+    ];
 
     const apiRef = useMuiDataGridApiRef()
 
@@ -130,7 +140,7 @@ const InteressatsGrid: React.FC<DetailGridProps> = (props: DetailGridProps) => {
                                             variant={'contained'}
                                             title={t('page.expedient.action.excelInteressats.title')}
                                             onClick={()=>excelInteressats(entity?.id)}
-                                            disabled={selectedRows?.length==0}
+                                            // disabled={selectedRows?.length==0}
                                             hidden={!entity?.potModificar || !num}
                     />,
                 },

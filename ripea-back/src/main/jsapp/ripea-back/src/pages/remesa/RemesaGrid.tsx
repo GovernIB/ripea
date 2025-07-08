@@ -9,9 +9,9 @@ import {useTranslation} from "react-i18next";
 
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
 export const EstatMessage = (props:any) => {
-    const {icon, color, children} = props;
+    const {title, icon, color, children} = props;
 
-    return <Typography variant="caption" title={typeof children === 'string' ?children :''} sx={{ ...commonStyle, backgroundColor: `${color}.main`, color: 'white' }}>
+    return <Typography variant="caption" title={title || (typeof children === 'string' ?children :'')} sx={{ ...commonStyle, backgroundColor: `${color}.main`, color: 'white' }}>
         <Icon fontSize={"inherit"} sx={{ mr: children!=null  ?1 :0 }}>{icon}</Icon>
         {children}
     </Typography>

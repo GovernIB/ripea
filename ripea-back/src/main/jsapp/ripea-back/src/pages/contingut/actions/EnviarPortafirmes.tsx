@@ -82,6 +82,7 @@ const EnviarPortafirmesForm = () => {
     const filterAnnexos = builder.and(
         builder.neq('id', apiRef?.current?.getId()),
         builder.eq('expedient.id', data?.expedient?.id),
+        builder.eq('esborrat', 0),
     )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>

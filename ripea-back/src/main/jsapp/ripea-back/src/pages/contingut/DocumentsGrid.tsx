@@ -244,7 +244,9 @@ const DocumentsGrid = (props: any) => {
                             position: 0,
                             element: <ExpandButton value={expand} onChange={(value:any)=>{
                                 setExpand(value)
-                                removeAll()
+                                if (vista == View.carpeta || vista == View.icona) {
+                                    removeAll()
+                                }
                             }} hidden={!treeView} />,
                         },
                         {

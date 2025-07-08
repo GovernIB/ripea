@@ -251,7 +251,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: 'edit',
             showInMenu: true,
             onClick: handleModifyExpedient,
-            hidden: isTancat,
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },
         {
             title: t('page.expedient.action.follow.label'),

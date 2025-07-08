@@ -124,7 +124,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         
         Filter filtrePermesos = null;
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-    	if (mapaNamedQueries.size()>0) {
+    	if (!mapaNamedQueries.isEmpty()) {
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
     			
     			String organActualCodi	 = configHelper.getOrganActualCodi();
@@ -206,7 +206,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     	}
     	return null;
     }
-    
+
+    // TODO: revisar o borrar
     private class MetaExpedientOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientPeticioResource> {
 		@Override
 		public void onChange(Serializable id, ExpedientPeticioResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ExpedientPeticioResource target) {

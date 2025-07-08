@@ -348,7 +348,7 @@ const translationCa = {
                 },
             },
             grid: {
-                title: "Interessatd del fitxer",
+                title: "Interessats del fitxer",
                 representant: "Representant",
             },
             alert: {

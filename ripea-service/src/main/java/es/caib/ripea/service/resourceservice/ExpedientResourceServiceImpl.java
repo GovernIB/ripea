@@ -967,13 +967,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-    		
     		DownloadableFile resultat = null;
-    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
-    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(0);
 
             if (params.isMassivo()) {
-            	
 	            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 	            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
@@ -984,13 +981,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP: no hi ha cap expedient seleccionat.");
+					throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al generar ZIP: no hi ha cap expedient seleccionat.");
 	            }
-	            
             } else {
-            	
+                Long expedientId = params.getIds().get(0);
             	try {
-            	
 		        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
 		        			expedientId,
 		        			false,
@@ -1020,7 +1015,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}

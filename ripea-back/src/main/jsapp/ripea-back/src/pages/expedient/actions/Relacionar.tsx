@@ -117,6 +117,18 @@ const RelacionarForm= () => {
                 setSelectedRows([...newSelection]);
             }}
 
+            rowProps={(row: any) => {
+                const color = row?.estatAdditionalInfo?.color;
+                return color
+                    ? {
+                        'box-shadow': `${color} -6px 0px 0px`,
+                        'border-left': `6px solid ${color}`,
+                    }
+                    : {
+                        'padding-left': '6px'
+                    }
+            }}
+
             // height={162 + 52 * 4}
             // paginationActive
             autoHeight

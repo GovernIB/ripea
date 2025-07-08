@@ -5,6 +5,7 @@ import GridFormField from "../components/GridFormField.tsx";
 import {formatDate} from "../util/dateUtils.ts";
 import {useUserSession} from "../components/Session.tsx";
 import Load from "../components/Load.tsx";
+import DOMPurify from 'dompurify';
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -55,7 +56,13 @@ const Comments = (props:any) => {
         {comentarios?.map((a:any)=>
             <Grid item key={a?.id} sx={a?.createdBy==user?.codi ?myComment :otherComment}>
                 <Typography variant={"subtitle2"} color={"textDisabled"}>{a?.createdBy}</Typography>
-                <Typography variant={"body2"}>{a?.text}</Typography>
+
+                <Typography
+                    variant="body2"
+                    // sx={{ textAlign: 'justify' }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a?.text) }}
+                />
+
                 <Typography variant={"caption"} color={"textDisabled"}>{formatDate(a?.createdDate)}</Typography>
             </Grid>
         )}

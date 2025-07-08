@@ -25,11 +25,11 @@ const ImportForm = () => {
             renderCell: (params:any) => <>
                 {params?.row?.documentNum}
                 {params?.row?.jaExistentExpedient &&
-                    <Icon color={"warning"} title={"Ya existe en el expediente"}>warning</Icon>}
+                    <Icon color={"warning"} title={t('page.interessat.alert.jaExistentExpedient')}>warning</Icon>}
             </>
         },
         {
-            field: 'nomComplet',//organNom
+            field: 'nomComplet',// organNom
             headerName: '',
             flex: 0.75,
             valueFormatter: (value: any, row:any) => row?.organNom ?? value
@@ -58,6 +58,7 @@ const ImportForm = () => {
                 onRowSelectionModelChange={(newSelection) => {
                     setSelectedRows([...newSelection]);
                 }}
+                isRowSelectable={(params: any) => !params?.row?.jaExistentExpedient}
 
                 style={{
                     maxHeight: 162 + 52 * 4,
@@ -92,10 +93,7 @@ const useImport = (entity:any, refresh?: () => void) => {
 
     const handleShow = (): void => {
         apiRef.current?.show?.(undefined, {
-            expedient: {
-                id: entity?.id,
-                description: entity?.nom,
-            },
+            expedient: {id: entity?.id},
         })
     }
     const onSuccess = (): void => {

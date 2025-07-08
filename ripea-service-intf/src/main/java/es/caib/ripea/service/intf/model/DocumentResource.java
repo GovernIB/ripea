@@ -427,7 +427,7 @@ public class DocumentResource extends NodeResource {
     @Setter
     @FieldNameConstants
     public static class NotificarFormAction implements Serializable {
-
+        @NotNull
         private DocumentNotificacioTipusEnumDto tipus;
         @NotNull
         private DocumentNotificacioEstatEnumDto estat = DocumentNotificacioEstatEnumDto.PENDENT;
@@ -444,7 +444,7 @@ public class DocumentResource extends NodeResource {
         private Date dataProgramada;
         @NotNull
         @ResourceField(onChangeActive = true)
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone="Europe/Madrid")
+//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone="Europe/Madrid")
         private Date dataCaducitat;
         @NotNull
         @ResourceField(onChangeActive = true)

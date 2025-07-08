@@ -87,7 +87,6 @@ const Metadatos = (props:any) => {
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             {
                 metadades && Object.entries(metadades).map(([key, value]:any[]) =>
-                    // key.substring(key.indexOf(":") + 1)
                     <ContenidoData key={key} title={key} hiddenIfEmpty>
                         {
                             key.includes("fecha")
@@ -147,7 +146,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             label: t('page.arxiu.tabs.firmes'),
             content: <Firmes firmes={entity?.firmes}/>,
             badge: entity?.firmes?.length,
-            hidden: !entity?.firmes,
+            hidden: !entity?.firmes || entity?.firmes?.length == 0,
         },
         {
             value: "data",
@@ -177,13 +176,15 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
                 }
             }}
         >
-            <TabComponent
-                indicatorColor={"primary"}
-                textColor={"primary"}
-                aria-label="scrollable force tabs"
-                tabs={tabs}
-                variant="scrollable"
-            />
+            <Load value={entity}>
+                <TabComponent
+                    indicatorColor={"primary"}
+                    textColor={"primary"}
+                    aria-label="scrollable force tabs"
+                    tabs={tabs}
+                    variant="scrollable"
+                />
+            </Load>
         </MuiDialog>
 
     return {

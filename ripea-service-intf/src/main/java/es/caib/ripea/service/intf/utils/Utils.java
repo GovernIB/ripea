@@ -91,7 +91,7 @@ public class Utils {
      * Utils.hasValue("  bob  ") = true
      * </pre>
      *
-     * @param st  the String to check, may be null
+     * @param str  the String to check, may be null
      * @return <code>true</code> if the String is not empty and not null
      */
     public static boolean hasValue(String str) {
@@ -556,11 +556,11 @@ public class Utils {
     
     public static List<String> getCodisEnGruposMil(List<String> codis) {
     	int maxSize = 1000;
-    	if (codis!=null && codis.size()>0) {
+    	if (codis!=null && !codis.isEmpty()) {
     		List<String> result = new ArrayList<>();
     		for (int i = 0; i < codis.size(); i += maxSize) {
                 List<String> subList = codis.subList(i, Math.min(i + maxSize, codis.size()));
-                String concatenated = subList.stream().map(String::valueOf).collect(Collectors.joining(","));
+                String concatenated = subList.stream().map(value->"'"+value+"'").collect(Collectors.joining(","));
                 result.add(concatenated);
             }
     		return result;

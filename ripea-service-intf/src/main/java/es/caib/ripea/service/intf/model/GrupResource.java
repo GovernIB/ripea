@@ -15,7 +15,7 @@ import lombok.experimental.FieldNameConstants;
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
-@ResourceConfig(quickFilterFields = { "codi", "rol", "descripcio" }, descriptionField = "codi")
+@ResourceConfig(quickFilterFields = { "codi", "rol", "descripcio" }, descriptionField = "descripcio")
 public class GrupResource extends BaseAuditableResource<Long> {
 	private static final long serialVersionUID = 4151677501429687311L;
 	@NotNull

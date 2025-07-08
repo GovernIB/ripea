@@ -107,10 +107,10 @@ const NotificarForm = () => {
         <GridFormField xs={12} name="tipus"/>
         <GridFormField xs={12} name="estat" required disabled/>
 
-        <GridFormField xs={10} name="interessats" multiple filter={interessatsFilter}/>
+        <GridFormField xs={9.5} name="interessats" multiple filter={interessatsFilter}/>
 
         <GridButton
-            xs={2}
+            xs={2.5}
             onClick={()=> {
                 create({expedient: data?.expedient}, onCreateInteressat)
             }}
@@ -141,7 +141,7 @@ const Notificar = (props:any) => {
         resourceName={"documentResource"}
         action={"NOTIFICAR"}
         title={t('page.document.action.notificar.title')}
-        formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
+        // formDialogComponentProps={{fullWidth: true, maxWidth: 'md'}}
         {...props}
         initialOnChange
     >
