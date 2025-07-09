@@ -895,7 +895,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats: "+e.getMessage());
 			}
     	}
     }
@@ -1004,7 +1004,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 				} catch (Exception e) {
 					excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP per els expedients seleccionats.");
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP per els expedients seleccionats: "+e.getMessage());
 				}
             }
             

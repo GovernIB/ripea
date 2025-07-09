@@ -384,7 +384,7 @@ const translationEs = {
                     ok: "El expediente se ha importado correctamente",
                 },
                 agafar: {
-                    label: "Coger",
+                    label: "Bloquear",
                     ok: "El expediente '{{expedient}}' ha sido cogido por el usuario '{{user}}'",
                 },
                 follow: {
@@ -464,16 +464,15 @@ const translationEs = {
                     label: "Sincronizar estado con archivo",
                     ok: "El estado del archivo ha sido sincronizado",
                 },
-
                 changePrioritat: {
                     label: "Cambiar prioridad...",
                     title: "Modificar prioridad del expediente",
-                    ok: "El expediente '{{expedient}}' se ha modificado correctamente.",
+                    ok: "La prioridad del expediente '{{expedient}}' se ha modificado correctamente.",
                 },
                 changeEstat: {
                     label: "Cambiar estado...",
                     title: "Modificar estado del expediente",
-                    ok: "El expediente '{{expedient}}' se ha modificado correctamente.",
+                    ok: "El estado del expediente '{{expedient}}' se ha modificado correctamente.",
                 },
                 assignar: {
                     label: "Assignar",

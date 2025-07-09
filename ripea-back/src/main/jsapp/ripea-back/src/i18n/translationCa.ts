@@ -464,16 +464,15 @@ const translationCa = {
                     label: "Sincronitzar estat amb arxiu",
                     ok: "L'estat de l'arxiu s'ha sincronitzat",
                 },
-
                 changePrioritat: {
                     label: "Canviar prioritat...",
                     title: "Modificar prioritat de l'expedient",
-                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                    ok: "La prioritat de l'expedient '{{expedient}}' s'ha modificat correctament.",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
                     title: "Modificar estat de l'expedient",
-                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                    ok: "L'estat de l'expedient '{{expedient}}' s'ha modificat correctament.",
                 },
                 assignar: {
                     label: "Assignar",
