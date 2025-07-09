@@ -139,7 +139,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             label: t('page.arxiu.tabs.fills'),
             content: <Hijos fills={entity?.fills}/>,
             badge: entity?.fills?.length,
-            disabled: !entity?.fills,
+            disabled: !entity?.fills || entity?.fills?.length == 0,
             showZero: true,
         },
         {

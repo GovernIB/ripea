@@ -63,7 +63,7 @@ const ExpedientsRelacionats = (props:any) => {
             relacionats?.map((relacionat:any) =>
                 <Grid key={relacionat?.id} container alignItems="center">
                     <Grid item xs={1}>
-                        <Icon sx={{ fontSize: "1.3rem" }}>drive_file_move</Icon>
+                        <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                     </Grid>
                     <Grid item xs={10}>
                         <Link sx={{ fontSize: "0.9rem" }} href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
