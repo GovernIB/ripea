@@ -181,7 +181,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         		userPermissionInfo.getEntitatActualId(),
         		userPermissionInfo.getRolActual(),
         		RolHelper.isRolActualAdministradorOrgan(request) ? organActual.getId() : null);
-        response.put("isFiltreGrupsVisible", (grupsPermesos!=null && grupsPermesos.size()>0));
+        response.put("isFiltreGrupsVisible", (grupsPermesos!=null && !grupsPermesos.isEmpty()));
         return response;
     }
 }

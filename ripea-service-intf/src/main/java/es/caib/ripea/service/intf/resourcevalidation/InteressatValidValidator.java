@@ -2,35 +2,59 @@ package es.caib.ripea.service.intf.resourcevalidation;
 
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
+@RequiredArgsConstructor
 public class InteressatValidValidator implements ConstraintValidator<InteressatValid, InteressatResource> {
 
-    @Override
-    public void initialize(InteressatValid constraintAnnotation) {}
+    private final InteressatResourceService interessatResourceService;
 
     @Override
-    public boolean isValid(InteressatResource value, ConstraintValidatorContext context) {
-        context
-            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
-            .addPropertyNode("documentNum")
-            .addConstraintViolation()
-            .disableDefaultConstraintViolation();
+    public boolean isValid(InteressatResource resource, ConstraintValidatorContext context) {
+        boolean valid = true;
+
+        if (!resource.isEsRepresentant()) {
+            List<InteressatResource> interesados = interessatResourceService.findBySpringFilter(
+                    "expedient.id : " + resource.getExpedient().getId() + " and esRepresentant : false"
+            );
+
+            for (InteressatResource interesado : interesados) {
+                if (Objects.equals(resource.getDocumentNum(), interesado.getDocumentNum())) {
+                    context
+                            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists}")
+                            .addPropertyNode(InteressatResource.Fields.documentNum)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
         if (
-                value.getRepresentat()!=null && Objects.equals(value.getRepresentat().getId(), value.getId())
-                || value.getRepresentant()!=null && Objects.equals(value.getRepresentant().getId(), value.getId())
+                (resource.getRepresentat()!=null && Objects.equals(resource.getRepresentat().getId(), resource.getId()))
+                || (resource.getRepresentant()!=null && Objects.equals(resource.getRepresentant().getId(), resource.getId()))
+                || (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF && !validarNIF(resource.getDocumentNum()))
         ) {
-            return false;
+            context
+                    .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
+                    .addPropertyNode(InteressatResource.Fields.documentNum)
+                    .addConstraintViolation()
+                    .disableDefaultConstraintViolation();
+            valid = false;
         }
-        if (value.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF){
-            return validarNIF(value.getDocumentNum());
-        }
-        return true;
+
+        return valid;
     }
 
     public static boolean validarNIF(String nif) {

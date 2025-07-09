@@ -38,7 +38,7 @@ const ImportForm = () => {
             field: 'representant',
             headerName: t('page.interessat.grid.representant'),
             flex: 0.75,
-            valueFormatter: (value: any) => value ?value?.documentNum + " - " + value?.nom :'',
+            valueFormatter: (value: any) => value?.organNom ?? value?.nomComplet,
         },
     ];
 
@@ -58,7 +58,7 @@ const ImportForm = () => {
                 onRowSelectionModelChange={(newSelection) => {
                     setSelectedRows([...newSelection]);
                 }}
-                isRowSelectable={(params: any) => !params?.row?.jaExistentExpedient}
+                // isRowSelectable={(params: any) => !params?.row?.jaExistentExpedient}
 
                 style={{
                     maxHeight: 162 + 52 * 4,

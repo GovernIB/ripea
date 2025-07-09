@@ -49,17 +49,23 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
         {
             title: t('common.select.all'),
             icon: "check_box",
+            showInMenu: true,
             onClick: handleSelectAll
         },
         {
             title: t('common.select.clear'),
             icon: "check_box_outline_blank",
+            showInMenu: true,
             onClick: handleClearSelection
         },
-        // ...actions.filter(action=>!action?.showInMenu)
+        ...actions.filter(action=>!action?.showInMenu)
+            .map(({ disabled, ...rest }) => ({
+                ...rest,
+                disabled: (row: any) => (typeof disabled === 'function' ? disabled(row) : !!disabled) || selectedRows?.length === 0
+            }))
     ]
 
-    const menuActions = actions//.filter(action=>action?.showInMenu)
+    const menuActions = actions.filter(action=>action?.showInMenu && !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden));
 
     return <Load value={actions.length>0 && actions.filter(a=>!a?.hidden).length>0} noEffect>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', ml: 1 }}>
@@ -88,7 +94,7 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                     && <Tooltip title={action?.title} key={`action-${index}`}>
                         <Button
                             onClick={()=>action?.onClick?.(selectedRows)}
-                            disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}
+                            disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}
                             sx={{ minWidth: '40px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0.75 }}
                         >
                             <Icon color="action" sx={{m: 0}}>{action?.icon}</Icon>
@@ -97,16 +103,19 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                 )
             }
 
-            <MenuActionButton
-                id={'massiveOpcions'}
-                entity={selectedRows}
-                buttonLabel={t('common.options')}
-                buttonProps={{
-                    startIcon: <Chip label={selectedRows?.length} size="small" />,
-                    disabled: selectedRows?.length === 0 || menuActions?.length === 0
-                }}
-                actions={menuActions}
-            />
+            {menuActions?.length === 0
+                ? <Button disabled><Chip label={selectedRows?.length} size="small"/></Button>
+                : <MenuActionButton
+                    id={'massiveOpcions'}
+                    entity={selectedRows}
+                    buttonLabel={t('common.options')}
+                    buttonProps={{
+                        startIcon: <Chip label={selectedRows?.length} size="small"/>,
+                        disabled: selectedRows?.length === 0
+                    }}
+                    actions={menuActions}
+                />
+            }
         </ButtonGroup>
     </Box></Load>;
 };

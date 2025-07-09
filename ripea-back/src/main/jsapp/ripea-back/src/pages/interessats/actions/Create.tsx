@@ -51,8 +51,8 @@ export const useCreateRepresentant = (refresh?: () => void) => {
                 refresh?.();
                 temporalMessageShow(null, t('page.interessat.action.createRep.ok'), 'success');
             })
-            .catch((error:any) => {
-                temporalMessageShow(null, error?.message, 'error');
+            .catch((error) => {
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
     const update = (id: any, row: any) => {
@@ -61,8 +61,8 @@ export const useCreateRepresentant = (refresh?: () => void) => {
                 refresh?.();
                 temporalMessageShow(null, t('page.interessat.action.updateRep.ok'), 'success');
             })
-            .catch((error:any) => {
-                temporalMessageShow(null, error?.message, 'error');
+            .catch((error) => {
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

@@ -139,7 +139,8 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             label: t('page.arxiu.tabs.fills'),
             content: <Hijos fills={entity?.fills}/>,
             badge: entity?.fills?.length,
-            hidden: !entity?.fills,
+            disabled: !entity?.fills,
+            showZero: true,
         },
         {
             value: "firmes",

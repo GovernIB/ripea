@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.resourcevalidation;
 
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,16 @@ public class ExpedientValidator implements ConstraintValidator<ExpedientValid, E
             context
                     .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
                     .addPropertyNode(ExpedientResource.Fields.grup)
+                    .addConstraintViolation()
+                    .disableDefaultConstraintViolation();
+            valid = false;
+        }
+
+        if (!PrioritatEnumDto.B_NORMAL.equals(resource.getPrioritat())
+                && (resource.getPrioritatMotiu() == null || resource.getPrioritatMotiu().isBlank())){
+            context
+                    .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.ExpedientValidator.prioritat}")
+                    .addPropertyNode(ExpedientResource.Fields.prioritatMotiu)
                     .addConstraintViolation()
                     .disableDefaultConstraintViolation();
             valid = false;

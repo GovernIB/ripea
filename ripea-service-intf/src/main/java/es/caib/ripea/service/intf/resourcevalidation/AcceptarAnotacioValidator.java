@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.resourcevalidation;
 
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
+import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,15 @@ public class AcceptarAnotacioValidator implements ConstraintValidator<AcceptarAn
                 context
                         .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
                         .addPropertyNode(AcceptarAnotacioForm.Fields.prioritat)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+            if (!PrioritatEnumDto.B_NORMAL.equals(resource.getPrioritat())
+                    && (resource.getPrioritatMotiu() == null || resource.getPrioritatMotiu().isBlank())){
+                context
+                        .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.ExpedientValidator.prioritat}")
+                        .addPropertyNode(ExpedientResource.Fields.prioritatMotiu)
                         .addConstraintViolation()
                         .disableDefaultConstraintViolation();
                 valid = false;

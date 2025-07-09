@@ -36,7 +36,9 @@ export const ExpedientGridForm = () => {
                        readOnly={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}/>
         <GridFormField xs={6} name="sequencia" disabled/>
         <GridFormField xs={6} name="any" thousandSeparator={false}/>
-        <GridFormField xs={12} name="grup" namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id}`]} hidden={!data?.gestioAmbGrupsActiva} required/>
+        <GridFormField xs={12} name="grup"
+                       namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
+                       hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
         <GridFormField xs={12} name="prioritat" required/>
         <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
     </Grid>
@@ -74,7 +76,7 @@ export const StyledPrioritat = (props: any) => {
             style = {backgroundColor: '#ffebae'}
             break;
         case "B_NORMAL":
-            style = {border: '1px dashed #AAA'}
+            style = obertStyle
             break;
         case "A_BAIXA":
             style = {backgroundColor: '#c3e8d1'}

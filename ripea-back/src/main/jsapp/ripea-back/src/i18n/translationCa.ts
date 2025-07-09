@@ -945,6 +945,7 @@ const translationCa = {
             },
             perfil: {
                 title: "El meu perfil",
+                ok: "Les dades de l'usuari '{{nom}}' s'han modificat correctament",
                 dades: "Dades d'usuari",
                 correu: "Enviament de correus",
                 generic: "Configuració genèrica",

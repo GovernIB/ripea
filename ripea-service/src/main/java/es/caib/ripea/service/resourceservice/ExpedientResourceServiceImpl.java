@@ -354,6 +354,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
+        resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
         resource.setNumComentaris(entity.getComentaris().size());
         resource.setNumSeguidors(entity.getSeguidors().size());
         resource.setNumAlert(entity.getAlertes().size());

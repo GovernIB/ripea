@@ -945,6 +945,7 @@ const translationEs = {
             },
             perfil: {
                 title: "Mi perfil",
+                ok: "Los datos del usuario '{{nom}}' se han modificado correctamente",
                 dades: "Datos de usuario",
                 correu: "Envio de correos",
                 generic: "Configuración genérica",

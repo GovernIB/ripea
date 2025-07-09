@@ -10,7 +10,7 @@ const CambiarPrioritatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
         <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" hidden={data?.prioritat=='B_NORMAL'} required/>
+        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
     </Grid>
 }
 

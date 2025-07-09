@@ -20,7 +20,7 @@ const AcceptarTabExpedient = () => {
             <>
                 <GridFormField xs={12} name="newExpedientTitol" required/>
                 <GridFormField xs={12} name="prioritat" required/>
-                <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"}/>
+                <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
                 <GridFormField xs={12} name="organGestor" required disabled readOnly/>
                 <GridFormField xs={6} name="sequencia" required disabled readOnly/>
                 <GridFormField xs={6} name="any" required/>

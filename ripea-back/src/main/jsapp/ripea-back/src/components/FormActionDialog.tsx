@@ -37,6 +37,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
     } = props;
 
     const {
+        initialized,
         formDialogComponent,
         exec: actionExecutor,
         close,
@@ -57,8 +58,10 @@ const FormActionDialog = (props:FormActionDialogProp) => {
     )
 
     const exec = (id: any, formAdditionalData?: any) :void => {
-        const customTitle = (typeof title === 'function') ?title?.(formAdditionalData) :title;
-        actionExecutor(id, customTitle, formAdditionalData)
+        if(initialized) {
+            const customTitle = (typeof title === 'function') ? title?.(formAdditionalData) : title;
+            actionExecutor(id, customTitle, formAdditionalData)
+        }
     }
 
     if (apiRef != null) {
@@ -84,6 +87,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
     } = props;
 
     const {
+        initialized,
         formDialogComponent,
         exec: reportExecutor,
         close,
@@ -104,8 +108,10 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
     )
 
     const exec = (id: any, formAdditionalData?: any) :void => {
-        const customTitle = (typeof title === 'function') ?title?.(formAdditionalData) :title;
-        reportExecutor(id, customTitle, formAdditionalData)
+        if(initialized) {
+            const customTitle = (typeof title === 'function') ? title?.(formAdditionalData) : title;
+            reportExecutor(id, customTitle, formAdditionalData)
+        }
     }
 
     if (apiRef != null) {
