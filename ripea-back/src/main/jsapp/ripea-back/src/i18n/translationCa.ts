@@ -484,6 +484,10 @@ const translationCa = {
                     title: "Relacionar expedient",
                     ok: "Les relacions de l'expedient '{{expedient}}' han canviat correctament.",
                 },
+                eliminarRelacio: {
+                    label: "Eliminar relació",
+                    ok: "La relació entre els 2 expedients s'ha eliminat correctament.",
+                },
                 excelInteressats: {
                     title: "Exportar interessats a EXCEL",
                     ok: "Els interessats s'han exportat correctament"

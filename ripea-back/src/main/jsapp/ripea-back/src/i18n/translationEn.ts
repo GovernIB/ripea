@@ -485,6 +485,10 @@ const translationEn = {
                     title: "Relate expedient",
                     ok: "The relations of the expedient '{{expedient}}' have changed successfully.",
                 },
+                eliminarRelacio: {
+                    label: "Delete relation",
+                    ok: "The relation of the 2 expedients has been removed successfully.",
+                },                
                 excelInteressats: {
                     title: "Export interested parties to EXCEL",
                     ok: "The interested parties have been successfully exported"

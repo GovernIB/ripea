@@ -484,6 +484,10 @@ const translationEs = {
                     title: "Relacionar expediente",
                     ok: "Las relaciones del expediente '{{expedient}}' han cambiado correctamente.",
                 },
+                eliminarRelacio: {
+                    label: "Eliminar relación",
+                    ok: "La relación entre los 2 expedientes se ha eliminado correctamente.",
+                },
                 excelInteressats: {
                     title: "Exportar interesados a EXCEL",
                     ok: "Los interesados se han exportado correctamente",

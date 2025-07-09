@@ -45,6 +45,7 @@ const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
 const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
+    const { t } = useTranslation();
 
     const refresh = () => {
         window.location.reload();
@@ -60,11 +61,22 @@ const ExpedientsRelacionats = (props:any) => {
     return <CardData title={'Expedients relacionats'} display={'flex'} flexDirection={'column'} hidden={relacionats?.length==0}>
         {
             relacionats?.map((relacionat:any) =>
-                <Typography key={relacionat?.id} variant={"caption"} display={"flex"} alignItems={"center"}>
-                    <Icon fontSize={"inherit"}>{icons.expedient}</Icon>
-                    <Link href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
-                    <IconButton onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}><Icon>delete</Icon></IconButton>
-                </Typography>
+                <Grid key={relacionat?.id} container alignItems="center">
+                    <Grid item xs={1}>
+                        <Icon sx={{ fontSize: "1.3rem" }}>drive_file_move</Icon>
+                    </Grid>
+                    <Grid item xs={10}>
+                        <Link sx={{ fontSize: "0.9rem" }} href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
+                    </Grid>
+                    <Grid item xs={1}>
+                        <IconButton 
+                            onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
+                            title={t('page.expedient.action.eliminarRelacio.label')}
+                            sx={{ color: 'black'}}>
+                                <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
+                        </IconButton>
+                    </Grid>
+                </Grid>
             )
         }
     </CardData>
@@ -235,7 +247,7 @@ const Expedient = () => {
         <CardData header={
             <Grid container direction={'row'} columnSpacing={1} sx={{justifyContent: "space-between", alignItems: "center"}}>
                 <Grid item xs={8}><Typography variant="h5" display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                    <Icon>{icons.expedient}</Icon>{expedient?.nom}</Typography>
+                    <Icon sx={{ fontSize: "2rem" }}>{icons.expedient}</Icon>{expedient?.nom}</Typography>
                 </Grid>
                 <Grid item xs={4} display={'flex'} justifyContent={'end'}>
                     <Typography variant={"subtitle1"} bgcolor={"white"} sx={{border}} px={1} hidden={!expedient?.agafatPer}>
