@@ -24,6 +24,9 @@ const AcceptarTabExpedient = () => {
                 <GridFormField xs={12} name="organGestor" required disabled readOnly/>
                 <GridFormField xs={6} name="sequencia" required disabled readOnly/>
                 <GridFormField xs={6} name="any" required/>
+                <GridFormField xs={12} name="grup"
+                               namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
+                               hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
             </>
         }
         {data?.accio == "INCORPORAR" &&
@@ -208,6 +211,7 @@ const useAcceptar = (refresh?: () => void) => {
             metaExpedient: row?.metaExpedient,
             registre: row?.registre,
             interessats: row?.registreInfo?.interessats?.map((i:any)=>i.id) || [],
+            grup: row?.grup,
         })
     }
     const onSuccess = () :void => {

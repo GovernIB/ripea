@@ -34,8 +34,9 @@ export const ExpedientGridForm = () => {
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}
                        disabled={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}
                        readOnly={!!data?.id || !data?.metaExpedient || data?.disableOrganGestor}/>
-        <GridFormField xs={12} name="sequencia" disabled/>
-        <GridFormField xs={12} name="any" thousandSeparator={false}/>
+        <GridFormField xs={6} name="sequencia" disabled/>
+        <GridFormField xs={6} name="any" thousandSeparator={false}/>
+        <GridFormField xs={12} name="grup" namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id}`]} hidden={!data?.gestioAmbGrupsActiva} required/>
         <GridFormField xs={12} name="prioritat" required/>
         <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
     </Grid>

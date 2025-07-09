@@ -10,6 +10,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
 import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
 import org.springframework.data.annotation.Transient;
 
@@ -169,6 +170,7 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS,
                         requiresId = true),
 		})
+@ExpedientValid
 public class ExpedientResource extends NodeResource implements Serializable {
 
 	private static final long serialVersionUID = 7440910672703796468L;
@@ -236,6 +238,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+    @Transient boolean gestioAmbGrupsActiva;
 	private ResourceReference<GrupResource, Long> grup;
 	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
 

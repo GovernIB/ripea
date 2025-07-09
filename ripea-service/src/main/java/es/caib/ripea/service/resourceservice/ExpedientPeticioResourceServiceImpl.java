@@ -363,6 +363,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                             metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
                                 MetaExpedientResource metaExpedientResource =
                                         objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+
+                                target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
                                 if (metaExpedientResource.getOrganGestor() != null) {
                                     target.setOrganGestor(metaExpedientResource.getOrganGestor());
                                     if (previous.getAny() != null) {
@@ -377,6 +379,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                                 }
                             });
                         } else {
+                            target.setGestioAmbGrupsActiva(false);
                             target.setOrganGestor(null);
                             target.setSequencia(null);
                         }

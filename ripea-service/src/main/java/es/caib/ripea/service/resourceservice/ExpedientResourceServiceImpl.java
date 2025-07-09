@@ -1352,6 +1352,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
                     MetaExpedientResource metaExpedientResource =
                             objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+
+                    target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
                     if (metaExpedientResource.getOrganGestor() != null) {
                         target.setOrganGestor(metaExpedientResource.getOrganGestor());
                         target.setDisableOrganGestor(true);
@@ -1367,6 +1369,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     }
                 });
             } else {
+                target.setGestioAmbGrupsActiva(false);
                 target.setOrganGestor(null);
                 target.setSequencia(null);
             }
