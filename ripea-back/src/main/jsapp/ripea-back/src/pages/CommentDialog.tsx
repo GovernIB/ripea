@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Badge, Grid, Icon, IconButton, Typography} from "@mui/material";
-import {MuiFormDialog, useResourceApiService, MuiFormDialogApi} from "reactlib";
+import {MuiFormDialog, useResourceApiService, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import GridFormField from "../components/GridFormField.tsx";
 import {formatDate} from "../util/dateUtils.ts";
 import {useUserSession} from "../components/Session.tsx";
@@ -22,6 +22,7 @@ const Comments = (props:any) => {
 
     const { value: user } = useUserSession();
     const [comentarios, setComentarios] = useState<any[]>([]);
+    const {temporalMessageShow} = useBaseAppContext();
 
     const {
         isReady: appApiIsReady,
@@ -36,10 +37,13 @@ const Comments = (props:any) => {
                 unpaged: true,
                 sorts: ['createdDate', 'desc']
             })
-                .then((app) => {
+                .then((result) => {
                     // console.log(">>>> rows", app.rows)
-                    setComentarios(app.rows);
+                    setComentarios(result.rows);
                 })
+                .catch((error) => {
+                    error?.message && temporalMessageShow(null, error?.message, 'error');
+                });
         }
     }, [appApiIsReady]);
 
@@ -73,6 +77,7 @@ export const CommentDialog = (props:any) => {
     const { entity, title, resourceName, resourceReference } = props;
     const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
     const formApiRef = useRef<MuiFormDialogApi>()
+    const {temporalMessageShow} = useBaseAppContext();
 
     const handleOpen = () => {
         formApiRef.current?.show(undefined, {
@@ -83,6 +88,9 @@ export const CommentDialog = (props:any) => {
             .then(() => {
                 setNumComm((numComm ?? entity?.numComentaris) + 1);
             })
+            .catch((error) => {
+                error?.message && temporalMessageShow(null, error?.message, 'error');
+            });
     }
 
     return <>

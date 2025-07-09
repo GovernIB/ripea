@@ -72,7 +72,7 @@ const usePerfil = () => {
         formApiRef.current?.show(user?.codi)
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.user.perfil.ok', {nom: user.nom}), 'success');
             })
             .catch((error) => {
                 error?.message && temporalMessageShow(null, error?.message, 'error');

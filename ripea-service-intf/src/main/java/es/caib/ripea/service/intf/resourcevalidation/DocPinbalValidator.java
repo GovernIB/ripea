@@ -42,11 +42,10 @@ public class DocPinbalValidator implements ConstraintValidator<DocPinbalValid, N
         if (codisRequereixenCamp.contains(codiActual)) {
             boolean isEmpty = false;
 
-
             if (valor == null) {
                 isEmpty = true;
             } else if (valor instanceof String) {
-                isEmpty = ((String) valor).isBlank();  // Java 11+, detecta espacios también
+                isEmpty = ((String) valor).isBlank();
             } else if (valor instanceof Collection<?>) {
                 isEmpty = ((Collection<?>) valor).isEmpty();
             } else if (valor.getClass().isArray()) {

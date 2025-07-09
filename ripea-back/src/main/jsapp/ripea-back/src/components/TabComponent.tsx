@@ -9,7 +9,9 @@ type TabProps = {
     title?: string;
     badge?: string;
     badgeColor?: 'primary' | 'secondary' | 'default' | 'error' | 'info' | 'success' | 'warning' | undefined;
+    disabled?: boolean;
     hidden?: boolean;
+    showZero?: boolean;
 };
 
 const TabPanel = (props:any) => {
@@ -62,10 +64,10 @@ const TabComponent = (props :any) => {
                 sx={{px: 1}}
             >
                 {tabs.filter((tab:TabProps)=>!tab.hidden).map((tab:TabProps) => {
-                    const {title, value, label , content, badge, badgeColor= 'primary'} = tab;
+                    const {title, value, label, disabled, showZero = false, content, badge = 0, badgeColor= 'primary'} = tab;
 
-                    return <Tab value={value} title={title} content={content} key={"tab-" + value} label={
-                        <StyledBadge badgeContent={badge} badgecolor={badgeColor}>{label}</StyledBadge>}/>
+                    return <Tab value={value} disabled={disabled} title={title} content={content} key={"tab-" + value} label={
+                        <StyledBadge badgeContent={badge} badgecolor={badgeColor} showZero={showZero}>{label}</StyledBadge>}/>
                 })}
             </Tabs>
             {headerAdditionalData}

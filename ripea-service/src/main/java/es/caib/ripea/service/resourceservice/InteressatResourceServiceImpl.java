@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -88,6 +90,14 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
+    }
+
+    @Override
+    public List<InteressatResource> findBySpringFilter(String springFilter) {
+        FilterSpecification<InteressatResourceEntity> spec = new FilterSpecification<>(springFilter);
+        return interessatResourceRepository.findAll(spec).stream()
+                   .map(interesatEntity -> objectMappingHelper.newInstanceMap(interesatEntity, InteressatResource.class))
+                   .collect(Collectors.toList());
     }
 
     public class PaisFieldOptionsProvider implements FieldOptionsProvider {

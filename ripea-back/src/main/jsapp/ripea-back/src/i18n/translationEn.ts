@@ -950,6 +950,7 @@ const translationEn = {
             },
             perfil: {
                 title: "My profile",
+                ok: "The user's data '{{nom}}' has been successfully updated",
                 dades: "User data",
                 correu: "Email sending",
                 generic: "General settings",

@@ -63,7 +63,7 @@ export const useActions = (refresh?: () => void) => {
                                         temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
                                     })
                                     .catch((error) => {
-                                        temporalMessageShow(null, error.message, 'error');
+                                        error?.message && temporalMessageShow(null, error?.message, 'error');
                                     });
                             } else {
                                 apiPatch(id, {
@@ -73,6 +73,9 @@ export const useActions = (refresh?: () => void) => {
                                         refresh?.();
                                         temporalMessageShow(null, t('page.interessat.action.deleteRep.ok'), 'success');
                                     })
+                                    .catch((error) => {
+                                        error?.message && temporalMessageShow(null, error?.message, 'error');
+                                    });
                             }
                         }
                     });
@@ -94,6 +97,9 @@ export const useActions = (refresh?: () => void) => {
                                 refresh?.();
                                 temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
                             })
+                            .catch((error) => {
+                                error?.message && temporalMessageShow(null, error?.message, 'error');
+                            });
                     } else {
                         apiDelete(id)
                             .then(() => {
@@ -101,7 +107,7 @@ export const useActions = (refresh?: () => void) => {
                                 temporalMessageShow(null, t('page.interessat.action.delete.ok'), 'success');
                             })
                             .catch((error) => {
-                                temporalMessageShow(null, error.message, 'error');
+                                error?.message && temporalMessageShow(null, error?.message, 'error');
                             });
                     }
                 }
