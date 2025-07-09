@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.caib.ripea.back.base.controller.BaseMutableResourceController;
-import es.caib.ripea.back.helper.ContingutEstaticHelper;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.back.helper.ExpedientHelper;
 import es.caib.ripea.back.helper.FluxFirmaHelper;
@@ -131,14 +130,12 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
 
-        if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-            EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
-            EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-            EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
-            EntitatHelper.findEntitatsAccessibles(request, entitatService);
-            RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService, eventService);
-            RolHelper.setRolActualFromDb(request, aplicacioService);
-        }
+        EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
+        EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
+        EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
+        EntitatHelper.findEntitatsAccessibles(request, entitatService);
+        RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService, eventService);
+        RolHelper.setRolActualFromDb(request, aplicacioService);
 
         return getUsuariActualSecurityInfo(request);
     }
