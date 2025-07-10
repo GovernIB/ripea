@@ -39,7 +39,7 @@ public class DocPinbalValidator implements ConstraintValidator<DocPinbalValid, N
             Set<String> codisRequereixenCamp,
             AtomicBoolean valid
     ) {
-        if (codisRequereixenCamp.contains(codiActual)) {
+        if (codiActual!=null && codisRequereixenCamp.contains(codiActual)) {
             boolean isEmpty = false;
 
             if (valor == null) {
@@ -114,8 +114,7 @@ public class DocPinbalValidator implements ConstraintValidator<DocPinbalValid, N
                 context,
                 codi,
                 Set.of(
-                        CodiServeiPinbal.SVDDELSEXWS01.name(),
-                        CodiServeiPinbal.SVDDGPRESIDENCIALEGALDOCWS01.name()
+                        CodiServeiPinbal.SVDDELSEXWS01.name()
                 ),
                 valid
         );
@@ -143,16 +142,156 @@ public class DocPinbalValidator implements ConstraintValidator<DocPinbalValid, N
         );
 
         validarCampObligatori(
+                resource.getMunicipi(),
+                NewDocPinbalForm.Fields.municipi,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SCDCPAJU.name(),
+                        CodiServeiPinbal.SCDHPAJU.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
                 resource.getMunicipiNaixament(),
                 NewDocPinbalForm.Fields.municipiNaixament,
                 context,
                 codi,
                 Set.of(
-                        CodiServeiPinbal.SVDDELSEXWS01.name(),
-                        CodiServeiPinbal.SVDRRCCNACIMIENTOWS01.name()
+                        CodiServeiPinbal.SVDDELSEXWS01.name()
                 ),
                 valid
         );
+
+        validarCampObligatori(
+                resource.getDataNaixement(),
+                NewDocPinbalForm.Fields.dataNaixement,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SVDDELSEXWS01.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
+                resource.getRegistreCivil(),
+                NewDocPinbalForm.Fields.registreCivil,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SVDRRCCNACIMIENTOWS01.name(),
+                        CodiServeiPinbal.SVDRRCCMATRIMONIOWS01.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
+                resource.getTom(),
+                NewDocPinbalForm.Fields.tom,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SVDRRCCNACIMIENTOWS01.name(),
+                        CodiServeiPinbal.SVDRRCCMATRIMONIOWS01.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
+                resource.getPagina(),
+                NewDocPinbalForm.Fields.pagina,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SVDRRCCNACIMIENTOWS01.name(),
+                        CodiServeiPinbal.SVDRRCCMATRIMONIOWS01.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
+                resource.getDataRegistre(),
+                NewDocPinbalForm.Fields.dataRegistre,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SVDRRCCNACIMIENTOWS01.name(),
+                        CodiServeiPinbal.SVDRRCCMATRIMONIOWS01.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
+                resource.getCurs(),
+                NewDocPinbalForm.Fields.curs,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.SVDBECAWS01.name()
+                ),
+                valid
+        );
+
+        validarCampObligatori(
+                resource.getExercici(),
+                NewDocPinbalForm.Fields.exercici,
+                context,
+                codi,
+                Set.of(
+                        CodiServeiPinbal.NIVRENTI.name()
+                ),
+                valid
+        );
+
+        if(CodiServeiPinbal.SVDDGPRESIDENCIALEGALDOCWS01.name().equals(codi)){
+            if (resource.getTipusPassaport()==null && (resource.getNumeroSoporte()==null || resource.getNumeroSoporte().isBlank())){
+                context.buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(NewDocPinbalForm.Fields.numeroSoporte)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(NewDocPinbalForm.Fields.tipusPassaport)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid.set(false);
+            }
+
+            if (resource.getTipusPassaport()!=null){
+                if(resource.getNacionalitat()==null || resource.getNacionalitat().isBlank()){
+                    context.buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                            .addPropertyNode(NewDocPinbalForm.Fields.nacionalitat)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                    valid.set(false);
+                }
+                if(resource.getDataCaducidad()==null){
+                    context.buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                            .addPropertyNode(NewDocPinbalForm.Fields.dataCaducidad)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                    valid.set(false);
+                }
+            }
+        }
+        if(CodiServeiPinbal.SVDDELSEXWS01.name().equals(codi)){
+            if (
+                    (resource.getNomPare()==null || resource.getNomPare().isBlank())
+                    && (resource.getNomMare()==null || resource.getNomMare().isBlank())
+            ){
+                context.buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(NewDocPinbalForm.Fields.nomPare)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+
+                context.buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(NewDocPinbalForm.Fields.nomMare)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid.set(false);
+            }
+        }
 
         return valid.get();
 	}

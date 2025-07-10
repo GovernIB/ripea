@@ -8,6 +8,7 @@ import Load from "./Load.tsx";
 export type MassiveActionProps = {
     title?: string;
     icon?: string;
+    showInMenu?: boolean;
     disabled?: boolean | ((ids: any[]) => void);
     hidden?: boolean | ((ids: any[]) => void);
     onClick?: (ids: any[]) => void;

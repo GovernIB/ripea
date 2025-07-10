@@ -25,9 +25,7 @@ const useCreate = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.interessat.action.new.ok'), 'success');
             })
             .catch((error:any) => {
-                if(error) {
-                    error?.message && temporalMessageShow(null, error?.message, 'error');
-                }
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

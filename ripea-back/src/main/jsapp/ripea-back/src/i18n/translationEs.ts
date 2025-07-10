@@ -587,6 +587,11 @@ const translationEs = {
                 documentOrigenFormat: "Formato: ES_<Órgano>_<AAAA>_<ID_específico>",
                 dataBasic: "Datos básicos",
                 dataInteressat: "Datos interesado",
+                dataEspecific: "Datos específicos",
+                dadesRegistrals: "Datos registrales",
+                fetRegistral: "Hecho registral",
+                naixement: "Nacimiento",
+                dadesAdicionals: "Datos adicionales",
                 dataOther: "Otros datos",
             },
             action: {

@@ -1,5 +1,5 @@
 import {Button, Grid, Icon} from "@mui/material";
-import {FormField, useFormContext} from "reactlib";
+import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
 
 export const GridButton = (props:any) => {
@@ -33,8 +33,14 @@ export const GridButtonField = (props:any) => {
     </GridButton></Load>
 }
 
-const GridFormField = (props:any) => {
-    const { xs, hidden, componentProps, ...other} = props;
+type GridFormField = FormFieldProps & {
+    xs: number,
+    hidden?: boolean,
+}
+
+const GridFormField = (props:GridFormField) => {
+    const { xs, hidden, componentProps = {}, ...other} = props;
+
     return <Grid item xs={xs} hidden={hidden}><FormField {...other} componentProps={{...componentProps, sx: {backgroundColor: 'white'}}}/></Grid>
 }
 export default GridFormField;

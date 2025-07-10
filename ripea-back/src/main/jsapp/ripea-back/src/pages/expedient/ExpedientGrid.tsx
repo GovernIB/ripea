@@ -162,87 +162,64 @@ const ExpedientGrid = () => {
                     <Icon color={"error"} title={t('page.contingut.alert.guardarPendent')}>warning</Icon>}
             </>),
         },
-        ...afterAvis
-    ];
-
-    if (user?.conf?.expedientListDataDarrerEnviament) {
-        columnsAddition.push(
-            {
-                field: 'dataDarrerEnviament',
-                flex: 0.75,
-                valueFormatter: (value: any) => formatDate(value)
-            },
-        )
-    }
-
-    if (user?.conf?.expedientListAgafatPer) {
-        columnsAddition.push(
-            {
-                field: 'agafatPer',
-                flex: 0.75,
-            },
-        )
-    }
-
-    if (user?.conf?.expedientListInteressats) {
-        columnsAddition.push(
-            {
-                field: 'interessats',
-                flex: 1,
-                valueFormatter: (value: any) => {
-                    let resum = '';
-                    for (const interessat of value) {
-                        switch (interessat.tipus) {
-                            case 'InteressatPersonaFisicaEntity':
-                                resum += interessat?.nom == null ? "" : interessat?.nom + " ";
-                                resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
-                                resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
-                                resum += "(" + interessat?.documentNum + ")" + "\n";
-                                break;
-                            case 'InteressatPersonaJuridicaEntity':
-                                resum += interessat?.raoSocial + " ";
-                                resum += "(" + interessat?.documentNum + ")" + "\n";
-                                break;
-                            case 'InteressatAdministracioEntity':
-                                resum += interessat?.nomComplet + " ";
-                                resum += "(" + interessat?.documentNum + ")" + "\n";
-                                break;
-                        }
+        ...afterAvis,
+        {
+            field: 'dataDarrerEnviament',
+            flex: 0.75,
+            valueFormatter: (value: any) => formatDate(value),
+            hidden: !user?.conf?.expedientListDataDarrerEnviament,
+        },
+        {
+            field: 'agafatPer',
+            flex: 0.75,
+            hidden: !user?.conf?.expedientListAgafatPer,
+        },
+        {
+            field: 'interessats',
+            flex: 1,
+            valueFormatter: (value: any) => {
+                let resum = '';
+                for (const interessat of value) {
+                    switch (interessat.tipus) {
+                        case 'InteressatPersonaFisicaEntity':
+                            resum += interessat?.nom == null ? "" : interessat?.nom + " ";
+                            resum += interessat?.llinatge1 == null ? "" : interessat?.llinatge1 + " ";
+                            resum += interessat?.llinatge2 == null ? "" : interessat?.llinatge2 + " ";
+                            resum += "(" + interessat?.documentNum + ")" + "\n";
+                            break;
+                        case 'InteressatPersonaJuridicaEntity':
+                            resum += interessat?.raoSocial + " ";
+                            resum += "(" + interessat?.documentNum + ")" + "\n";
+                            break;
+                        case 'InteressatAdministracioEntity':
+                            resum += interessat?.nomComplet + " ";
+                            resum += "(" + interessat?.documentNum + ")" + "\n";
+                            break;
                     }
-                    return resum;
                 }
+                return resum;
             },
-        )
-    }
-
-    if (user?.conf?.expedientListGrup) {
-        columnsAddition.push(
-            {
-                field: 'grup',
-                flex: 0.5,
-                sortable: false,
-            },
-        )
-    }
-
-    if (user?.conf?.expedientListComentaris) {
-        columnsAddition.push(
-            {
-                field: 'numComentaris',
-                headerName: '',
-                sortable: false,
-                flex: 0.25,
-                renderCell: (params: any) => <CommentDialog
-                    entity={params?.row}
-                    title={`${t('page.comment.expedient')}: ${params?.row?.nom}`}
-                    resourceName={'expedientComentariResource'}
-                    resourceReference={'expedient'}
-                />
-            },
-        )
-    }
-
-    columnsAddition.push(
+            hidden: !user?.conf?.expedientListInteressats,
+        },
+        {
+            field: 'grup',
+            flex: 0.5,
+            sortable: false,
+            hidden: !user?.conf?.expedientListGrup,
+        },
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            renderCell: (params: any) => <CommentDialog
+                entity={params?.row}
+                title={`${t('page.comment.expedient')}: ${params?.row?.nom}`}
+                resourceName={'expedientComentariResource'}
+                resourceReference={'expedient'}
+            />,
+            hidden: !user?.conf?.expedientListComentaris,
+        },
         {
             field: 'numSeguidors',
             headerName: '',
@@ -250,7 +227,8 @@ const ExpedientGrid = () => {
             flex: 0.25,
             renderCell: (params: any) => <FollowersDialog entity={params?.row}/>
         },
-    )
+    ]
+        .filter((col:any)=>!col?.hidden);
 
     return <GridPage>
         <CardPage title={t('page.expedient.filter.title')}>

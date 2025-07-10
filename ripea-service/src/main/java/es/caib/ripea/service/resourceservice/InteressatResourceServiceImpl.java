@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
+import es.caib.ripea.service.intf.dto.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -46,11 +47,6 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
-import es.caib.ripea.service.intf.dto.InteressatDto;
-import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
-import es.caib.ripea.service.intf.dto.MunicipiDto;
-import es.caib.ripea.service.intf.dto.PaisDto;
-import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
@@ -87,6 +83,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         
+        register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
+
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
@@ -98,6 +96,29 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         return interessatResourceRepository.findAll(spec).stream()
                    .map(interesatEntity -> objectMappingHelper.newInstanceMap(interesatEntity, InteressatResource.class))
                    .collect(Collectors.toList());
+    }
+
+    private class TipusOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
+        @Override
+        public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
+            if (fieldValue!=null) {
+//                target.setPais();
+//                target.setProvincia();
+//                target.setMunicipi();
+
+                switch ((InteressatTipusEnum)fieldValue){
+                    case InteressatPersonaJuridicaEntity:
+                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
+                        break;
+                    case InteressatAdministracioEntity:
+                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
+                        target.setDocumentNum(null);
+                        target.setCodiPostal(null);
+                        target.setAdresa(null);
+                        break;
+                }
+            }
+        }
     }
 
     public class PaisFieldOptionsProvider implements FieldOptionsProvider {

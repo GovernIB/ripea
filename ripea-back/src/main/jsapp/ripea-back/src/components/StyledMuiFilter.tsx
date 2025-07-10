@@ -15,7 +15,8 @@ export type FilterButtonProps = {
 
 // type StyledMuiFormProps = MuiFilterProps & {
 //     buttons?: FilterButtonProps[],
-//     buttonCallback?: (code:any) => void
+//     buttonCallback?: (code:any) => void,
+//     key?: string,
 // }
 
 const StyledMuiFilter = (props:any) => {
@@ -63,6 +64,7 @@ const StyledMuiFilter = (props:any) => {
         componentProps,
         children,
         code,
+        key = code,
         ...other
     } = props
 
@@ -75,7 +77,7 @@ const StyledMuiFilter = (props:any) => {
         apiRef?.current?.clear?.()
     }
 
-    const { value: filterData, save: saveFilterData } = useSession(code);
+    const { value: filterData, save: saveFilterData } = useSession(key);
 
     useEffect(() => {
         if (!!filterData) {

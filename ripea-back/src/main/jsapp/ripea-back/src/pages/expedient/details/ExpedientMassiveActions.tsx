@@ -89,7 +89,7 @@ const useExpedientMassiveActions = (refresh?: () => void)=> {
         {
             title: t('page.expedient.action.agafar.label'),
             icon: "lock",
-            // showInMenu: true,
+            showInMenu: true,
             onClick: agafar,
         },
         {

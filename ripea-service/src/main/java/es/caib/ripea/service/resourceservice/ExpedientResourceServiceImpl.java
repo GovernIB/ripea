@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.helper.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,18 +46,6 @@ import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.CarpetaHelper;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.ContingutHelper;
-import es.caib.ripea.service.helper.DocumentHelper;
-import es.caib.ripea.service.helper.DominiHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.ExecucioMassivaHelper;
-import es.caib.ripea.service.helper.ExpedientHelper;
-import es.caib.ripea.service.helper.MetaDocumentHelper;
-import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -82,7 +70,6 @@ import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
@@ -95,7 +82,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAct
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
-import es.caib.ripea.service.intf.model.NodeResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
@@ -137,6 +123,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final MetaDocumentHelper metaDocumentHelper;
+    private final MessageHelper messageHelper;
 
     @PostConstruct
     public void init() {
@@ -1416,8 +1403,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
             if(ExpedientResource.ExpedientFilterForm.Fields.estat.equals(fieldName)) {
-                resultat.add(new FieldOption("0", "Obert"));
-                resultat.add(new FieldOption("-1", "Tancat"));
+                resultat.add(new FieldOption("0", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT")));
+                resultat.add(new FieldOption("-1", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.TANCAT")));
 
                 if (requestParameterMap.containsKey("metaExpedientId") && requestParameterMap.get("metaExpedientId").length>0){
                     Long metaExpedientId = Long.valueOf(requestParameterMap.get("metaExpedientId")[0]);

@@ -464,7 +464,6 @@ const translationEn = {
                     label: "Synchronize status with file",
                     ok: "The archive status has been synchronized",
                 },
-
                 changePrioritat: {
                     label: "Change priority...",
                     title: "Modify expedient priority",
@@ -588,6 +587,11 @@ const translationEn = {
                 documentOrigenFormat: "Format: ES_<Body>_<AAAA>_<Specific_ID>",
                 dataBasic: "Basic data",
                 dataInteressat: "Interested party data",
+                dataEspecific: "Specific data",
+                dadesRegistrals: "Registry data",
+                fetRegistral: "Registry fact",
+                naixement: "Birth",
+                dadesAdicionals: "Additional data",
                 dataOther: "Other data",
             },
             action: {

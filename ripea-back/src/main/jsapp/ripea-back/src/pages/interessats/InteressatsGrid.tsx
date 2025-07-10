@@ -17,20 +17,50 @@ export const InteressatsGridForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus" required/>
-        <GridFormField xs={12} name="documentTipus" required/>
-        <GridFormField xs={12} name="documentNum"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={6} name="llinatge1"/>
-        <GridFormField xs={6} name="llinatge2"/>
-        <GridFormField xs={6} name="pais"/>
-        <GridFormField xs={6} name="provincia" requestParams={{pais: data?.pais}}/>
-        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
-        <GridFormField xs={6} name="codiPostal"/>
-        <GridFormField xs={12} name="adresa" type={"textarea"}/>
-        <GridFormField xs={6} name="email"/>
+
+        {/* TODO */}
+        <GridFormField xs={12} name="organCodi"
+                       hidden={data?.tipus != 'InteressatAdministracioEntity'}
+                       required/>
+
+        <GridFormField xs={12} name="documentTipus"
+                       disabled={data?.tipus != 'InteressatPersonaFisicaEntity'}
+                       readOnly={data?.tipus != 'InteressatPersonaFisicaEntity'}
+                       required/>
+        <GridFormField xs={12} name="documentNum"
+                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}
+                       required={data?.tipus != 'InteressatAdministracioEntity'}/>
+
+        {data?.tipus == 'InteressatPersonaFisicaEntity' && <>
+            <GridFormField xs={12} name="nom"/>
+            <GridFormField xs={6} name="llinatge1"/>
+            <GridFormField xs={6} name="llinatge2"/>
+        </>}
+
+        <GridFormField xs={6} name="pais"
+                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+        <GridFormField xs={6} name="provincia" requestParams={{pais: data?.pais}}
+                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}
+                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+        <GridFormField xs={6} name="codiPostal"
+                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+        <GridFormField xs={12} name="adresa" type={"textarea"}
+                       disabled={data?.tipus == 'InteressatAdministracioEntity'}
+                       readOnly={data?.tipus == 'InteressatAdministracioEntity'}/>
+
+        <GridFormField xs={6} name="email" required={data?.entregaDeh}/>
         <GridFormField xs={6} name="telefon"/>
         <GridFormField xs={12} name="observacions" type={"textarea"}/>
         <GridFormField xs={12} name="preferenciaIdioma" required/>
+
+        <GridFormField xs={6} name="entregaDeh"/>
+        <GridFormField xs={6} name="entregaDehObligat" hidden={!data?.entregaDeh}/>
     </Grid>
 }
 

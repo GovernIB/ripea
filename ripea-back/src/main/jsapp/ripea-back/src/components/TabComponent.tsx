@@ -8,7 +8,7 @@ type TabProps = {
     content: any;
     title?: string;
     badge?: string;
-    badgeColor?: 'primary' | 'secondary' | 'default' | 'error' | 'info' | 'success' | 'warning' | undefined;
+    badgeColor?: 'primary' | 'secondary' | 'default' | 'error' | 'info' | 'success' | 'warning' | string;
     disabled?: boolean;
     hidden?: boolean;
     showZero?: boolean;

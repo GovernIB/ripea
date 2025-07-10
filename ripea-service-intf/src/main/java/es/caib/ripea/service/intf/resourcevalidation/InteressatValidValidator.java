@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.resourcevalidation;
 
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,69 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
     public boolean isValid(InteressatResource resource, ConstraintValidatorContext context) {
         boolean valid = true;
 
+        if(resource.getEntregaDeh()!=null && resource.getEntregaDeh()){
+            if (resource.getEmail() == null || resource.getEmail().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.email)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+        }
+        if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(resource.getTipus())) {
+            if (resource.getNom() == null || resource.getNom().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.nom)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+            if (resource.getLlinatge1() == null || resource.getLlinatge1().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.llinatge1)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+        }
+        if (InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            {/* TODO: revisar */}
+            if (resource.getOrganCodi() == null) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.organCodi)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+        }
+        if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            if (resource.getDocumentNum() == null || resource.getDocumentNum().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.documentNum)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            } else {
+                if (
+                        (resource.getRepresentat() != null && Objects.equals(resource.getRepresentat().getId(), resource.getId()))
+                                || (resource.getRepresentant() != null && Objects.equals(resource.getRepresentant().getId(), resource.getId()))
+                                || (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF && !validarNIF(resource.getDocumentNum()))
+                ) {
+                    context
+                            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
+                            .addPropertyNode(InteressatResource.Fields.documentNum)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                    valid = false;
+                }
+            }
+        }
+
         if (!resource.isEsRepresentant()) {
             List<InteressatResource> interesados = interessatResourceService.findBySpringFilter(
                     "expedient.id : " + resource.getExpedient().getId() + " and esRepresentant : false"
@@ -39,19 +103,6 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
                     break;
                 }
             }
-        }
-
-        if (
-                (resource.getRepresentat()!=null && Objects.equals(resource.getRepresentat().getId(), resource.getId()))
-                || (resource.getRepresentant()!=null && Objects.equals(resource.getRepresentant().getId(), resource.getId()))
-                || (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF && !validarNIF(resource.getDocumentNum()))
-        ) {
-            context
-                    .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
-                    .addPropertyNode(InteressatResource.Fields.documentNum)
-                    .addConstraintViolation()
-                    .disableDefaultConstraintViolation();
-            valid = false;
         }
 
         return valid;

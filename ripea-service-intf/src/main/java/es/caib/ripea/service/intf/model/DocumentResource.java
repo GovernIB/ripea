@@ -344,7 +344,7 @@ public class DocumentResource extends NodeResource {
     	@NotNull
     	private ResourceReference<InteressatResource, Long> titular;
     	@NotNull
-    	private PinbalConsentimentEnumDto consentiment;
+    	private PinbalConsentimentEnumDto consentiment = PinbalConsentimentEnumDto.SI;
     	@NotNull
     	private String codiServeiPinbal;
 
