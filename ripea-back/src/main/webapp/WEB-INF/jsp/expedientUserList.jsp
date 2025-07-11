@@ -634,7 +634,6 @@ function removeCookie(cname) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>								
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 				<c:if test="${usuariActual.expedientListDataDarrerEnviament}">
 					<th data-col-name="dataDarrerEnviament" data-type="datetime" data-converter="datetime" nowrap data-orderable="false"><spring:message code="expedient.list.user.columna.data.enviament"/></th>

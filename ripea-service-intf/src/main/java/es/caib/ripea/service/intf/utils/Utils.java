@@ -569,13 +569,7 @@ public class Utils {
     }
     
 	public static String getCodiNom(InteressatTipusEnum tipus, String documentNum, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
-		String resultat = null;
-        switch (tipus) {
-            case InteressatPersonaFisicaEntity:
-            	resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
-            default:
-            	resultat = getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
-        }
+		String resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
         return (" - ".equals(resultat)?null:resultat);
     }
 

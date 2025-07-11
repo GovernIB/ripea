@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.helper.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,13 +38,26 @@ import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepo
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
-import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.CarpetaHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DominiHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaDocumentHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -102,7 +114,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
 	private final DadaRepository dadaRepository;
-	private final ContingutRepository contingutRepository;
+	private final ContingutMovimentRepository contingutMovimentRepository;
 	
     private final UsuariResourceRepository usuariResourceRepository;
     private final ExpedientResourceRepository expedientResourceRepository;
@@ -416,6 +428,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
             resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
             resource.setNumContingut(contingutHelper.getFillsHierarchicalCount(entity.getId()));
+            resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
         }
     }
     

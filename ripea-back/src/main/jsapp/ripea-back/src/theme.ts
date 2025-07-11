@@ -90,7 +90,11 @@ const theme = createTheme({
                 },
                 input: {
                     fontSize: '14px',
-                }
+                },
+				readOnly: {
+					backgroundColor: '#e7e5e5',
+					opacity: 0.6
+				}
             }
         },
         MuiFormLabel: {
@@ -149,7 +153,7 @@ const theme = createTheme({
 					alignItems: "center",
                 }
             }
-        }
+        }		
     }
 });
 

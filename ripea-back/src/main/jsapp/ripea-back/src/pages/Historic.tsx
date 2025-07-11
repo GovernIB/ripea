@@ -217,6 +217,7 @@ const useHistoric = () => {
             label: t('page.contingut.tabs.move'),
             content: <Moviment id={entity?.id} onRowCountChange={setMoviment}/>,
             badge: numMoviment,
+            showZero: true,
         },
         {
             value: "auditoria",

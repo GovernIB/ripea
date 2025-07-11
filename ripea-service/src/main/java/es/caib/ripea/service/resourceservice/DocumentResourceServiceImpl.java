@@ -41,6 +41,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRep
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -143,6 +144,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
+    private final ContingutMovimentRepository contingutMovimentRepository;
     private final ContingutRepository contingutRepository;
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
@@ -333,6 +335,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+            resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
         }
     }
 

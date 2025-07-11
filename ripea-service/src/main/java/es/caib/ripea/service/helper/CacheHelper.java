@@ -11,8 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,6 @@ import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -121,8 +118,27 @@ public class CacheHelper {
 	@CacheEvict(value = "tasquesUsuari", key="#usuariCodi")
 	public void evictCountTasquesPendents(String usuariCodi) {}
 
+	@Cacheable(value = "entitatsUsuariIds", key="#usuariCodi")
+	public List<Long> findEntitatsIdsAccessiblesUsuari(String usuariCodi) {
+		List<EntitatEntity> entitats = findEntitatsPermisosUsuari(usuariCodi);
+		List<Long> resultat = new ArrayList<Long>();
+		if (entitats!=null) {
+			for (EntitatEntity entitat: entitats) {
+				resultat.add(entitat.getId());
+			}
+		}
+		return resultat;
+	}
+	
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(String usuariCodi) {
+		List<EntitatEntity> entitats = findEntitatsPermisosUsuari(usuariCodi);
+		List<EntitatDto> resposta = conversioTipusHelper.convertirList(entitats, EntitatDto.class);
+		permisosEntitatHelper.omplirPermisosPerEntitats(resposta, false);
+		return resposta;
+	}
+	
+	private List<EntitatEntity> findEntitatsPermisosUsuari(String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
 		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
 		permisosHelper.filterGrantedAny(
@@ -146,22 +162,14 @@ public class CacheHelper {
 			// remove duplicates
 			entitats = new ArrayList<EntitatEntity>(new HashSet<EntitatEntity>(entitats));
 		}
-		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-				entitats,
-				EntitatDto.class);
-		permisosEntitatHelper.omplirPermisosPerEntitats(
-				resposta,
-				false);
-		return resposta;
-	}
-	@CacheEvict(value = "entitatsUsuari", key="#usuariCodi")
-	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
-	}
-
-	@CacheEvict(value = "entitatsUsuari", allEntries=true)
-	public void evictEntitatsAccessiblesAllUsuaris() {
+		return entitats;
 	}
 	
+	@CacheEvict(value = {"entitatsUsuari", "entitatsUsuariIds"}, key="#usuariCodi")
+	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {}
+
+	@CacheEvict(value = {"entitatsUsuari", "entitatsUsuariIds"}, allEntries=true)
+	public void evictEntitatsAccessiblesAllUsuaris() {}
 	
 	@Cacheable(value = "findOrganismesEntitatAmbPermis", key="{#entitatId, #usuariCodi}")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
@@ -752,20 +760,6 @@ public class CacheHelper {
 				permisosPerAnotacions.getIdsGrupsPermesos());
 		return numAnotacionsPendents;
 	}
-
-	private static <T> List<T> getList(List<List<T>> list, int index) {
-		if (list == null) {
-			throw new NullPointerException("La llista és nul·la.");
-		}
-		if (index < 0) {
-			throw new IndexOutOfBoundsException("Index " + index + ". L'índex no pot ser negatiu.");
-		}
-		if (index > list.size()) {
-			throw new IndexOutOfBoundsException("Index " + index + ". La llista només té " + list.size() + " elements.");
-		}
-		return Utils.getNullIfEmpty(list.get(index));
-	}
-	
 	
 	@CacheEvict(value = "anotacionsUsuari", key="{#usuariCodi}")
 	public void evictCountAnotacionsPendents(String usuariCodi) {
