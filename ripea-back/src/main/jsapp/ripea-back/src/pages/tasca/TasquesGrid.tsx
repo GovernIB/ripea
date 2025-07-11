@@ -22,15 +22,15 @@ const TasquesGridForm = () => {
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter} />
-        <GridFormField xs={12} name="metaExpedientTascaDescription" readOnly disabled />
-        <GridFormField xs={12} name="responsables" multiple />
-        <GridFormField xs={12} name="observadors" multiple />
-        <GridFormField xs={6} name="duracio" />
-        <GridFormField xs={6} name="dataLimit" type={"date"} />
-        <GridFormField xs={12} name="titol" />
-        <GridFormField xs={12} name="observacions" type={"textarea"} />
-        <GridFormField xs={12} name="prioritat" required />
+        <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter}/>
+        <GridFormField xs={12} name="metaExpedientTascaDescription" type={"textarea"} readOnly disabled/>
+        <GridFormField xs={12} name="responsables" multiple required/>
+        <GridFormField xs={12} name="observadors" multiple/>
+        <GridFormField xs={6} name="duracio"/>
+        <GridFormField xs={6} name="dataLimit" type={"date"}/>
+        <GridFormField xs={12} name="titol"/>
+        <GridFormField xs={12} name="observacions" type={"textarea"}/>
+        <GridFormField xs={12} name="prioritat" required/>
     </Grid>
 }
 

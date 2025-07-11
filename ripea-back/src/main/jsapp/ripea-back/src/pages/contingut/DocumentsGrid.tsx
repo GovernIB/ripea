@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import { FormControl, Grid, InputLabel, Select, MenuItem, Icon } from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import { GridPage, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
@@ -54,7 +54,7 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
             >
                 <MenuItem value={View.estat}>{t('page.document.view.estat')}</MenuItem>
                 <MenuItem value={View.tipus}>{t('page.document.view.tipus')}</MenuItem>
-                <MenuItem value={View.carpeta} selected>{t('page.document.view.carpeta')}</MenuItem>
+                <MenuItem value={View.carpeta}>{t('page.document.view.carpeta')}</MenuItem>
             </Select>
         </FormControl>
     </Grid>
@@ -136,13 +136,13 @@ const DocumentsGrid = (props: any) => {
     const { t } = useTranslation();
     const {value: user} = useUserSession();
 
-    const commonFilter = builder.and(
+    const commonFilter = useMemo(() => builder.and(
         builder.or(
             builder.eq('expedient.id', entity?.id),
             builder.eq('pare.id', entity?.id),
         ),
         builder.eq('esborrat', 0),
-    )
+    ), [entity?.id]);
 
     const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
 

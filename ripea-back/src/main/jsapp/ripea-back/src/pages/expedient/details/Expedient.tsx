@@ -119,7 +119,7 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
     return <>
-        {expedient?.agafatPer?.id != user?.codi &&
+        {expedient?.agafatPer?.id != user?.codi && !expedient?.potModificar &&
             <Alert severity="info"
                    action={
                        <IconButton sx={{py:0}} onClick={()=>agafar(expedient?.id, expedient)} color={"inherit"}>
@@ -186,10 +186,6 @@ const Expedient = () => {
     const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numAnotacions);
     const [numRemeses, setNumRemeses] = useState<number>(expedient?.numRemeses);
     const [numPublicacions, setNumPublicacions] = useState<number>(expedient?.numPublicacions);
-
-    // const isExperientOrCarpeta=(row:any)=>{
-    //     return row?.tipus=="EXPEDIENT" || row?.tipus=="CARPETA"
-    // }
 
     const tabs = [
         {

@@ -2,7 +2,7 @@ import {Button, Grid, Icon} from "@mui/material";
 import {MuiFilter, useFilterApiRef, useFormApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 
 const filterStyle = { sx: {mb: 2, p: 2, backgroundColor: '#f5f5f5', border: '1px solid #e3e3e3', borderRadius: '4px'} };
 
@@ -16,7 +16,7 @@ export type FilterButtonProps = {
 // type StyledMuiFormProps = MuiFilterProps & {
 //     buttons?: FilterButtonProps[],
 //     buttonCallback?: (code:any) => void,
-//     key?: string,
+//     sessionKey?: string,
 // }
 
 const StyledMuiFilter = (props:any) => {
@@ -24,14 +24,14 @@ const StyledMuiFilter = (props:any) => {
     const filterRef = useFilterApiRef();
     const formRef = useFormApiRef();
 
-    const defaultButtons = [
+    const defaultButtons = useMemo<FilterButtonProps[]>(() => [
         {
             value: 'clear',
             text: t('common.clear'),
             componentProps: {
                 variant: "outlined",
-                sx: {borderRadius: '4px'}
-            }
+                sx: { borderRadius: '4px' },
+            },
         },
         {
             value: 'search',
@@ -39,19 +39,15 @@ const StyledMuiFilter = (props:any) => {
             icon: 'filter_alt',
             componentProps: {
                 variant: "contained",
-                sx: {borderRadius: '4px'}
-            }
-        }
-    ];
+                sx: { borderRadius: '4px' },
+            },
+        },
+    ], [filterRef]);
 
-    const callback = (value:string) :void => {
-        if (value=='clear') {
-            netejar()
-        }
-        if (value=='search') {
-            cercar()
-        }
-    }
+    const callback = (value: string) => {
+        if (value === 'clear') netejar();
+        if (value === 'search') cercar();
+    };
 
     const {
         buttons = defaultButtons,
@@ -64,7 +60,7 @@ const StyledMuiFilter = (props:any) => {
         componentProps,
         children,
         code,
-        key = code,
+        sessionKey = code,
         ...other
     } = props
 
@@ -77,13 +73,11 @@ const StyledMuiFilter = (props:any) => {
         apiRef?.current?.clear?.()
     }
 
-    const { value: filterData, save: saveFilterData } = useSession(key);
+    const { value: filterData, save: saveFilterData } = useSession(sessionKey);
 
     useEffect(() => {
-        if (!!filterData) {
-            onSpringFilterChange?.(
-                springFilterBuilder(filterData)
-            )
+        if (filterData && onSpringFilterChange && springFilterBuilder) {
+            onSpringFilterChange(springFilterBuilder(filterData));
         }
     }, []);
 

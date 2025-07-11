@@ -354,9 +354,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
         resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
-        resource.setNumComentaris(entity.getComentaris().size());
-        resource.setNumSeguidors(entity.getSeguidors().size());
-        resource.setNumAlert(entity.getAlertes().size());
         usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
         resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
@@ -429,6 +426,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
             resource.setNumContingut(contingutHelper.getFillsHierarchicalCount(entity.getId()));
             resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
+            resource.setNumComentaris(entity.getComentaris().size());
+            resource.setNumSeguidors(entity.getSeguidors().size());
+            resource.setNumAlert(entity.getAlertes().size());
         }
     }
     

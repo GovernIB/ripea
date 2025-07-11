@@ -61,7 +61,7 @@ const DocPinbalForm = () => {
         <GridFormField xs={12} name="consentiment" required/>
         <GridFormField xs={12} name="finalitat" type={"textarea"}/>
 
-        <Grid item xs={12} sx={{ my: 1 }} hidden={!data?.codiServeiPinbal}>{data?.codiServeiPinbal}</Grid>
+        {/*<Grid item xs={12} sx={{ my: 1 }} hidden={!data?.codiServeiPinbal}>{data?.codiServeiPinbal}</Grid>*/}
         { values.includes(data?.codiServeiPinbal) &&
             <Grid item xs={12} sx={{ my: 1, borderBottom: '1px solid black' }} hidden={!data?.codiServeiPinbal}>
                 {t('page.document.detall.dataEspecific')}

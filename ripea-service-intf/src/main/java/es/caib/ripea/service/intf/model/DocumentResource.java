@@ -337,7 +337,7 @@ public class DocumentResource extends NodeResource {
         private ResourceReference<ExpedientResource, Long> expedient;
 
     	@NotNull
-        @ResourceField(onChangeActive = true)
+        @ResourceField(onChangeActive = true, springFilter = "actiu : true")
     	private ResourceReference<MetaDocumentResource, Long> tipusDocument;
     	@NotNull
     	private String finalitat;

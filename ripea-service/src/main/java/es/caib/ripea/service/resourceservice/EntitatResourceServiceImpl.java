@@ -1,7 +1,9 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,11 +29,13 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 	
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
+        List<Filter> filters = new ArrayList<>();
+
         Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-        
+        filters.add(filtreBase);
+
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
-    	if (mapaNamedQueries.size()>0) {
+    	if (!mapaNamedQueries.isEmpty()) {
     		/**
     		 * S'utilitza en el perfil del usuari, per nomes mostrar els que tenen permisos
     		 */
@@ -39,7 +43,7 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     			String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
     			List<Long> entitatsPermeses = cacheHelper.findEntitatsIdsAccessiblesUsuari(codiUsuariActual);
 
-    	        Filter filtreEntitatsPermeses = null; 
+    	        Filter filtreEntitatsPermeses = null;
     	        List<String> grupsEntitatsIn = Utils.getIdsEnGruposMil(entitatsPermeses);
     	        if (grupsEntitatsIn!=null) {
     		        for (String aux: grupsEntitatsIn) {
@@ -50,10 +54,14 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     	        }
     	        
     	        //Si no te entitats assignades, no retornarà resultats
-    	        return filtreEntitatsPermeses.generate();
+                filters.add(filtreEntitatsPermeses);
     		}
     	}
-        
-        return filtreBase.generate();
+
+        List<Filter> result = filters.stream()
+                .filter(f -> f!=null && !f.isEmpty())
+                .collect(Collectors.toList());
+
+        return result.isEmpty() ? null : FilterBuilder.and(result).generate();
     }
 }

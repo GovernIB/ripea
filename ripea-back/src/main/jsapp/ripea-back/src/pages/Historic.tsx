@@ -189,8 +189,8 @@ const useHistoric = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const [numAccions, setNumAccions] = useState<number>(0);
-    const [numMoviment, setMoviment] = useState<number>(0);
+    const [numAccions, setNumAccions] = useState<number>();
+    const [numMoviment, setMoviment] = useState<number>();
 
     const handleOpen = (id:any, row:any) => {
         console.log(id, row);
@@ -216,7 +216,8 @@ const useHistoric = () => {
             value: "move",
             label: t('page.contingut.tabs.move'),
             content: <Moviment id={entity?.id} onRowCountChange={setMoviment}/>,
-            badge: numMoviment,
+            badge: numMoviment ?? entity?.numMoviments,
+            disabled: entity?.numMoviments === 0,
             showZero: true,
         },
         {
