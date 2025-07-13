@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.base.springfilter.FilterSpecification;
-import es.caib.ripea.service.intf.dto.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +29,14 @@ import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRep
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -47,6 +47,14 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatDto;
+import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
@@ -64,6 +72,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class InteressatResourceServiceImpl extends BaseMutableResourceService<InteressatResource, Long, InteressatResourceEntity> implements InteressatResourceService {
 
+	private final UnitatOrganitzativaHelper unitatOrganitzativaHelper;
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -83,11 +92,13 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         
-        register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
-
+        register(InteressatResource.Fields.tipus, new InteressatOnchangeLogicProcessor());
+        register(InteressatResource.Fields.organCodi, new InteressatOnchangeLogicProcessor());
+        
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
+        register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOptionsProvider());
     }
 
     @Override
@@ -98,26 +109,49 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                    .collect(Collectors.toList());
     }
 
-    private class TipusOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
+    private class InteressatOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
-            if (fieldValue!=null) {
-//                target.setPais();
-//                target.setProvincia();
-//                target.setMunicipi();
-
-                switch ((InteressatTipusEnum)fieldValue){
-                    case InteressatPersonaJuridicaEntity:
-                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
-                        break;
-                    case InteressatAdministracioEntity:
-                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
-                        target.setDocumentNum(null);
-                        target.setCodiPostal(null);
-                        target.setAdresa(null);
-                        break;
-                }
-            }
+            
+        	if (InteressatResource.Fields.tipus.equals(fieldName)) {
+	        	if (fieldValue!=null) {
+	                switch ((InteressatTipusEnum)fieldValue){
+                    case InteressatPersonaFisicaEntity:
+                        target.setOrganCodi(null);
+                        break;	                
+	                    case InteressatPersonaJuridicaEntity:
+	                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
+	                        target.setOrganCodi(null);
+	                        break;
+	                    case InteressatAdministracioEntity:
+	                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
+	                        target.setDocumentNum(null);
+	                        target.setCodiPostal(null);
+	                        target.setAdresa(null);
+	                        break;
+	                }
+	            }
+        	} else if (InteressatResource.Fields.organCodi.equals(fieldName)) {
+        		if (fieldValue!=null) {
+        			UnitatOrganitzativaDto uoDto = unitatOrganitzativaHelper.findAmbCodiAndAdressafisica(fieldValue.toString());
+        			target.setPais(uoDto.getCodiPais());
+        			target.setProvincia(uoDto.getCodiProvincia());
+        			target.setMunicipi(uoDto.getLocalitat());
+        			target.setCodiPostal(uoDto.getCodiPostal());
+        			target.setAdresa(uoDto.getAdressa());
+        			target.setDocumentNum(uoDto.getNifCif());
+        			target.setEmail("");
+        			target.setTelefon("");
+        			target.setObservacions("");
+        		} else {
+        			target.setPais("");
+        			target.setProvincia("");
+        			target.setMunicipi("");
+        			target.setCodiPostal("");
+        			target.setAdresa("");
+        			target.setDocumentNum("");
+        		}
+        	}
         }
     }
 
@@ -133,6 +167,19 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 			return resultat;
 		}
 	}
+    
+    public class UnitatsOrganitzativesOptionsProvider implements FieldOptionsProvider {
+		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
+			List<UnitatOrganitzativaDto> paisos = cacheHelper.findUnitatsOrganitzativesPerEntitat(configHelper.getEntitatActualCodi()).toDadesList();
+			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			if (paisos!=null) {
+				for (UnitatOrganitzativaDto pais: paisos) {
+					resultat.add(new FieldOption(pais.getCodi(), pais.getDenominacio()));
+				}
+			}
+			return resultat;
+		}
+    }
     
     public class ProvinciaFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {

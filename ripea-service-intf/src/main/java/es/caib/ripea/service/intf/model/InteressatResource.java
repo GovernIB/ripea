@@ -69,10 +69,8 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	@NotNull
     @ResourceField(onChangeActive = true)
 	protected InteressatTipusEnum tipus = InteressatTipusEnum.InteressatPersonaFisicaEntity;
-//    @NotNull
 	@Size(max = 30)
 	protected String nom;
-//    @NotNull
 	@Size(max = 30)
 	protected String llinatge1;
 	@Size(max = 30)
@@ -80,8 +78,8 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	@Size(max = 80)
 	protected String raoSocial;
 
-    // TODO
 	@Size(max = 9)
+	@ResourceField(enumType = true, onChangeActive = true)
 	protected String organCodi;
 	@Size(max = 256)
 	protected String organNom;
@@ -89,7 +87,6 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	
 	@NotNull
 	protected InteressatDocumentTipusEnumDto documentTipus = InteressatDocumentTipusEnumDto.NIF;
-//	@NotNull
 	@Size(max = 17)
     @ResourceField(onChangeActive = true)
 	protected String documentNum;

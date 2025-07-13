@@ -626,8 +626,7 @@ public class PluginHelper {
 		}
 	}
 
-	public UnitatOrganitzativaDto unitatsOrganitzativesFindByCodi(
-			String codi) {
+	public UnitatOrganitzativaDto unitatsOrganitzativesFindByCodi(String codi) {
 
 		String accioDescripcio = "Consulta d'unitat organitzativa donat el seu codi";
 		Map<String, String> accioParams = new HashMap<String, String>();

@@ -18,7 +18,6 @@ export const InteressatsGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus" required/>
 
-        {/* TODO */}
         <GridFormField xs={12} name="organCodi"
                        hidden={data?.tipus != 'InteressatAdministracioEntity'}
                        required/>
