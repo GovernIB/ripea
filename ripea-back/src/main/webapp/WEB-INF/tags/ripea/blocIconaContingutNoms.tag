@@ -12,3 +12,4 @@
 <c:set var="iconaUnitat" value="fa-sitemap" scope="request"/>
 <c:set var="iconaAnotacioRegistre" value="fa-book" scope="request"/>
 <c:set var="iconaTipusDocument" value="fa-edit" scope="request"/>
+<c:set var="iconaImportarZip" value="fa-file-zip-o" scope="request"/>
