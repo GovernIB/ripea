@@ -18,16 +18,13 @@ const InteressatsGridFormFilter = () => {
     const {data} = useFormContext()
 
     return <>
-        {/* TODO: option provider */}
         <GridFormField xs={6} name="nivell"/>
         <GridFormField xs={6} name="comunitatAutonoma"/>
-        <GridFormField xs={6} name="provinciaFilter"/>
-        <GridFormField xs={6} name="municipiFilter" requestParams={{provinciaFilter: data?.provinciaFilter}}/>
-        <GridFormField xs={6} name="nifFilter"/>
-        <GridFormField xs={6} name="nomFilter"/>
+        <GridFormField xs={6} name="provincia" requestParams={{comunitatAutonoma: data?.comunitatAutonoma}}/>
+        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
+        <GridFormField xs={6} name="nif"/>
+        <GridFormField xs={6} name="nom"/>
         <GridFormField xs={6} name="unitatArrel" type={"checkbox"}/>
-        <GridFormField xs={6} name="isInteressatAdministracio"
-            hidden={true} type={"checkbox"} value={data?.tipus != 'InteressatAdministracioEntity'}/>
     </>
 }
 
@@ -43,6 +40,8 @@ export const InteressatsGridForm = () => {
                 <StyledMuiFilter
                     resourceName={"interessatResource"}
                     code={"UNITAT_ORGANITZATIVA_FILTER"}
+                    springFilterBuilder={()=>{}}
+                    onSpringFilterChange={()=>{}}
                 >
                     <InteressatsGridFormFilter/>
                 </StyledMuiFilter>
@@ -50,7 +49,7 @@ export const InteressatsGridForm = () => {
         }
 
         <GridFormField xs={11} name="organCodi"
-                       requestParams={value}
+                       requestParams={{...(value ?? []), isInteressatAdministracio: data?.tipus == 'InteressatAdministracioEntity'}}
                        hidden={data?.tipus != 'InteressatAdministracioEntity'}
                        required/>
         <GridButtonField xs={1} name={"filter"} icon={"search"} hidden={data?.tipus != 'InteressatAdministracioEntity'}/>

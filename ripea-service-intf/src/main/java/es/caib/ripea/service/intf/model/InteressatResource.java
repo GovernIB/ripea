@@ -18,13 +18,10 @@ import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
-import es.caib.ripea.service.intf.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.service.intf.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.resourcevalidation.InteressatValid;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -61,10 +58,6 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_GUARDAR_ARXIU,
                         requiresId = true),
-//                @ResourceConfigArtifact(
-//                        type = ResourceArtifactType.ACTION,
-//                        code = InteressatResource.ACTION_FILTER_UNITATS,
-//                        formClass = InteressatResource.UnitatOrganitzativaFormFilter.class),                  
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
@@ -73,7 +66,6 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE  = "IMPORTAR";
     public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
-//    public static final String ACTION_FILTER_UNITATS = "FILTER_UNITATS";
     public static final String FILTER_CODE = "UNITAT_ORGANITZATIVA_FILTER";
 
 	@NotNull
@@ -182,31 +174,30 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static class UnitatOrganitzativaFormFilter implements Serializable {
         @ResourceField(enumType = true)
         private String nivell;
-        @ResourceField(enumType = true, onChangeActive = true)
-        private String comunitatAutonoma;
-        @ResourceField(enumType = true, onChangeActive = true)
-        private String provinciaFilter;
         @ResourceField(enumType = true)
-        private String municipiFilter;
-        private String nifFilter;
-        private String nomFilter;
+        private String comunitatAutonoma;
+        @ResourceField(enumType = true)
+        private String provincia;
+        @ResourceField(enumType = true)
+        private String municipi;
+        private String nif;
+        private String nom;
         private boolean unitatArrel;
-        private boolean isInteressatAdministracio;
     }
     
-    public InteressatDto toDocumentDto() {
-    	InteressatDto resultat = null;
-    	switch (this.tipus) {
-		case InteressatPersonaFisicaEntity:
-			resultat = new InteressatPersonaFisicaDto();
-			break;
-		case InteressatPersonaJuridicaEntity:
-			resultat = new InteressatPersonaJuridicaDto();
-			break;
-		case InteressatAdministracioEntity:
-			resultat = new InteressatAdministracioDto();
-			break;
-    	}
-        return resultat;
-    }
+//    public InteressatDto toDocumentDto() {
+//    	InteressatDto resultat = null;
+//    	switch (this.tipus) {
+//		case InteressatPersonaFisicaEntity:
+//			resultat = new InteressatPersonaFisicaDto();
+//			break;
+//		case InteressatPersonaJuridicaEntity:
+//			resultat = new InteressatPersonaJuridicaDto();
+//			break;
+//		case InteressatAdministracioEntity:
+//			resultat = new InteressatAdministracioDto();
+//			break;
+//    	}
+//        return resultat;
+//    }
 }
