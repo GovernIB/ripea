@@ -1872,6 +1872,20 @@ public class ContingutHelper {
 				false, 
 				true, rolActual);
 		
+		if (contingutOrigen.equals(contingutDesti)) {
+			throw new ValidationException(
+					contingutDestiId,
+					contingutDesti.getClass(),
+					"No es poden moure elements dins de si mateixos");
+		}
+		
+		if (contingutDesti instanceof DocumentEntity) {
+			throw new ValidationException(
+					contingutDestiId,
+					contingutDesti.getClass(),
+					"Només es poden moure elements dins d'una carpeta");
+		}
+		
 		// Comprova que no es mou dins de un fill
 		if (contingutOrigen instanceof CarpetaEntity && isCarpetaLogica()) {
 			comprovarContingutDesti(contingutOrigen, contingutDesti);

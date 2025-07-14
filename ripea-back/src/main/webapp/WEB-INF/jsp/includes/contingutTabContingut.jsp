@@ -684,7 +684,7 @@
 		});
 		$('.ordre-col').on('mouseleave', function () {
 			$('.element-draggable').draggable("enable");
-			$('.element-draggable').droppable("enable");
+			$('.element-draggable:not(.isDocument)').droppable("enable");
 		});
 
 		if (potModificar) {
