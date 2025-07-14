@@ -150,9 +150,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
 
         @Override
-        public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {
-
-        }
+        public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {}
     }
 
     private class TipusOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
@@ -246,17 +244,28 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     public class ProvinciaFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
+			
 			String[] requestParam = requestParameterMap.get(InteressatResource.Fields.pais);
 			String paisCodi = requestParam!=null?requestParam[0]:"";
+			
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
+			List<ProvinciaDto> provincies = null;
+					
 			if (paisCodi!=null && paisCodi.equals("724")) {
-				List<ProvinciaDto> provincies = cacheHelper.findProvincies();
-				if (provincies!=null) {
-					for (ProvinciaDto prov: provincies) {
-						resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
-					}
+				provincies = cacheHelper.findProvincies();
+			}
+			
+			String[] requestParamCA = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma);
+			if (requestParamCA!=null && requestParamCA.length>0) {
+				provincies = cacheHelper.findProvinciesPerComunitat(requestParamCA[0]);
+			}
+			
+			if (provincies!=null) {
+				for (ProvinciaDto prov: provincies) {
+					resultat.add(new FieldOption(prov.getCodi(), prov.getNom()));
 				}
 			}
+				
 			Collections.sort(resultat, Comparator.comparing(FieldOption::getDescription));
 			return resultat;
 		}
@@ -264,8 +273,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     public class MunicipiFieldOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
+			
 			String[] requestParam = requestParameterMap.get(InteressatResource.Fields.provincia);
 			String provinciaCodi = requestParam!=null?requestParam[0]:"";
+			
+			if (!Utils.hasValue(provinciaCodi)) {
+				String[] provinciaFilter = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.provinciaFilter);
+				provinciaCodi = provinciaFilter!=null?provinciaFilter[0]:"";
+			}
+			
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
 			if (Utils.hasValue(provinciaCodi)) {
 				List<MunicipiDto> municipis = cacheHelper.findMunicipisPerProvincia(provinciaCodi);
@@ -278,47 +294,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 			return resultat;
 		}
 	}
-
-    /*private class CercadorUnitatsActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.UnitatOrganitzativaFormFilter, Serializable> {
-
-		@Override
-		public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {}
-
-		@Override
-		public Serializable exec(String code, InteressatResourceEntity entity, UnitatOrganitzativaFormFilter params) throws ActionExecutionException {
-			return null;
-		}
-
-        @Override
-        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
-            List<FieldOption> resultat = new ArrayList<FieldOption>();
-            switch (fieldName) {
-                case UnitatOrganitzativaFormFilter.Fields.nivell:
-        			List<NivellAdministracioDto> nivells = cacheHelper.findNivellAdministracio();
-        			if (nivells!=null) {
-        				for (NivellAdministracioDto nvl: nivells) {
-        					resultat.add(new FieldOption(nvl.getCodi().toString(), nvl.getDescripcio()));
-        				}
-        			}                	
-                	break;
-                case UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma:
-        			List<ComunitatDto> comunitats = cacheHelper.findComunitats();
-        			if (comunitats!=null) {
-        				for (ComunitatDto cmnt: comunitats) {
-        					resultat.add(new FieldOption(cmnt.getCodi(), cmnt.getNom()));
-        				}
-        			}
-                    break;
-                case UnitatOrganitzativaFormFilter.Fields.provinciaFilter:
-                	resultat = new ProvinciaFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
-                    break;
-                case UnitatOrganitzativaFormFilter.Fields.municipiFilter:
-                	resultat = new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
-                    break;
-            }
-            return resultat;
-        }
-    }*/
     
     @Override
     protected void afterConversion(InteressatResourceEntity entity, InteressatResource resource) {
@@ -356,7 +331,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
-    // PerspectiveApplicator
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
         @Override
         public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
@@ -365,7 +339,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             }
         }
     }
-    // OnChangeLogicProcessor
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 
         public static final String NOT_REPRESENT_HIMSELF = "NOT_REPRESENT_HIMSELF";
