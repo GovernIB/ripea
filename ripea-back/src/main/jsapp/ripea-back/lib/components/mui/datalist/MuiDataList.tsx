@@ -74,6 +74,7 @@ export type MuiDataListProps = {
     popupEditFormDialogTitle?: string;
     popupEditFormDialogResourceTitle?: string;
     popupEditFormDialogComponentProps?: any;
+    popupEditFormDialogOnClose?: (reason?: string) => boolean;
     popupEditFormComponentProps?: any;
 };
 
@@ -182,6 +183,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
         popupEditFormDialogComponentProps,
+        popupEditFormDialogOnClose,
         popupEditFormComponentProps,
     } = props;
     const theme = useTheme();
@@ -239,6 +241,7 @@ export const MuiDataList: React.FC<MuiDataListProps> = (props) => {
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
         popupEditFormDialogComponentProps,
+        popupEditFormDialogOnClose,
         popupEditFormComponentProps,
         apiCurrentActions,
         apiDelete,

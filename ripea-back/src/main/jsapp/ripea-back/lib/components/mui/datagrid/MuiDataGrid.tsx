@@ -109,6 +109,7 @@ export type MuiDataGridProps = {
     popupEditFormDialogTitle?: string;
     popupEditFormDialogResourceTitle?: string;
     popupEditFormDialogComponentProps?: any;
+    popupEditFormDialogOnClose?: (reason?: string) => boolean;
     popupEditFormComponentProps?: any;
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     onRowOrderChange?: GridEventListener<"rowOrderChange">;
@@ -336,6 +337,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
         popupEditFormDialogComponentProps,
+        popupEditFormDialogOnClose,
         popupEditFormComponentProps,
         onRowClick,
         onRowsChange,
@@ -451,6 +453,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         popupEditFormDialogTitle,
         popupEditFormDialogResourceTitle,
         popupEditFormDialogComponentProps,
+        popupEditFormDialogOnClose,
         popupEditFormComponentProps,
         apiCurrentActions,
         apiDelete,

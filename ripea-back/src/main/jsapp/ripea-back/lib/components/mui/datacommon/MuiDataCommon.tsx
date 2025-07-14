@@ -183,6 +183,7 @@ export const useDataCommonEditable = (
     popupEditFormDialogTitle: string | undefined,
     popupEditFormDialogResourceTitle: string | undefined,
     popupEditFormDialogComponentProps: any,
+    popupEditFormDialogOnClose: ((reason?: string) => boolean) | undefined,
     popupEditFormComponentProps: any,
     apiCurrentActions: any,
     apiDelete: (id: any) => Promise<any>,
@@ -286,6 +287,7 @@ export const useDataCommonEditable = (
         resourceTitle={popupEditFormDialogResourceTitle}
         dialogComponentProps={popupEditFormDialogComponentProps}
         formComponentProps={popupEditFormComponentProps}
+        onClose={popupEditFormDialogOnClose}
         apiRef={dataDialogPopupApiRef}>
         {popupEditFormContent}
     </DataFormDialog> : null;
