@@ -24,11 +24,11 @@ export const useActions = (refresh?: () => void) => {
         artifactReport: apiReport,
     } = useResourceApiService('interessatResource');
 
-    const guardarArxiu = (id:any) => {
+    const guardarArxiu = (id:any, row:any) => {
         apiAction(id, {code: 'GUARDAR_ARXIU'})
             .then(()=>{
                 refresh?.()
-                temporalMessageShow(null, t('page.contingut.action.guardarArxiu.ok'), 'success');
+                temporalMessageShow(null, t('page.contingut.action.guardarArxiu.ok', {contingut: row?.codiNom}), 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');

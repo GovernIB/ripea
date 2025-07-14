@@ -120,7 +120,7 @@ const translationCa = {
             action: {
                 guardarArxiu: {
                     label: "Desar a l'arxiu",
-                    ok: "Element desat a l'arxiu",
+                    ok: "Element '{{contingut}}' desat a l'arxiu",
                 },
                 move: {
                     label: "Moure...",

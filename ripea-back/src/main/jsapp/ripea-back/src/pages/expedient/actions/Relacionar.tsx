@@ -88,13 +88,18 @@ const RelacionarForm= () => {
 
     const [springFilter, setSpringFilter] = useState<string>();
     const [selectedRows, setSelectedRows] = useState<any[]>(selectionModel || []);
+    const [load, setLoad] = useState<boolean>(false);
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("relacionatsAmb", selectedRows?.map(id => ({ id })))
     }, [selectedRows]);
 
     return <Load value={selectionModel} noEffect>
-        <ActionFilter onSpringFilterChange={setSpringFilter}/>
+        <ActionFilter onSpringFilterChange={(value:any)=>{
+            setSpringFilter(value)
+            setLoad(true)
+        }}/>
+        <Load value={load} noEffect>
         <StyledMuiGrid
             resourceName={'expedientResource'}
             columns={columns}
@@ -129,11 +134,12 @@ const RelacionarForm= () => {
                     }
             }}
 
-            // height={162 + 52 * 4}
-            // paginationActive
-            autoHeight
+            height={162 + 52 * 10}
+            paginationActive
+            // autoHeight
             readOnly
         />
+        </Load>
     </Load>
 }
 

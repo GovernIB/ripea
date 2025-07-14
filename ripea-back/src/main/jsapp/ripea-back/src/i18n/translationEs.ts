@@ -120,7 +120,7 @@ const translationEs = {
             action: {
                 guardarArxiu: {
                     label: "Guardar en archivo",
-                    ok: "Elemento guardado en archivo",
+                    ok: "Elemento '{{contingut}}' guardado en archivo",
                 },
                 move: {
                     label: "Mover...",

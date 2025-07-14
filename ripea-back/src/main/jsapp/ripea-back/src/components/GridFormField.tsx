@@ -41,6 +41,6 @@ type GridFormField = FormFieldProps & {
 const GridFormField = (props:GridFormField) => {
     const { xs, hidden, componentProps = {}, ...other} = props;
 
-    return <Grid item xs={xs} hidden={hidden}><FormField {...other} componentProps={{...componentProps, sx: {backgroundColor: 'white'}}}/></Grid>
+    return <Grid item xs={xs} hidden={!!hidden}><FormField {...other} componentProps={{...componentProps, sx: {backgroundColor: 'white'}}}/></Grid>
 }
 export default GridFormField;

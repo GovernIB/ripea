@@ -43,6 +43,10 @@ import lombok.experimental.FieldNameConstants;
         descriptionField = "codiNom",
         artifacts = {
                 @ResourceConfigArtifact(
+                        type = ResourceArtifactType.FILTER,
+                        code = InteressatResource.FILTER_CODE,
+                        formClass = InteressatResource.UnitatOrganitzativaFormFilter.class),
+                @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = InteressatResource.PERSPECTIVE_REPRESENTANT_CODE),
                 @ResourceConfigArtifact(
@@ -65,6 +69,8 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String ACTION_EXPORTAR_CODE = "EXPORTAR";
     public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
     public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";
+
+    public static final String FILTER_CODE = "UNITAT_ORGANITZATIVA_FILTER";
 
 	@NotNull
     @ResourceField(onChangeActive = true)
@@ -164,6 +170,25 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static class ExportInteressatsFormAction extends NodeResource.MassiveAction {
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
+    }
+
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class UnitatOrganitzativaFormFilter implements Serializable {
+        // TODO: option provider
+
+        @ResourceField(enumType = true)
+        private String nivell;
+        @ResourceField(enumType = true)
+        private String comunitatAutonoma;
+        @ResourceField(enumType = true)
+        private String provincia;
+        @ResourceField(enumType = true)
+        private String municipi;
+        private String nif;
+        private String nom;
+        private boolean unitatArrel;
     }
     
     public InteressatDto toDocumentDto() {

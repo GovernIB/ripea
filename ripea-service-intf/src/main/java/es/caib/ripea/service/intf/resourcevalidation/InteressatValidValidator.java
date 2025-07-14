@@ -53,7 +53,6 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             }
         }
         if (InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
-            {/* TODO: revisar */}
             if (resource.getOrganCodi() == null) {
                 context
                         .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")

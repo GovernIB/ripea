@@ -57,6 +57,7 @@ import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -92,13 +93,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
         
-        register(InteressatResource.Fields.tipus, new InteressatOnchangeLogicProcessor());
-        register(InteressatResource.Fields.organCodi, new InteressatOnchangeLogicProcessor());
+        register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
+        register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOnchangeLogicProcessor());
         
         register(InteressatResource.Fields.municipi, new MunicipiFieldOptionsProvider());
         register(InteressatResource.Fields.provincia, new ProvinciaFieldOptionsProvider());
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOptionsProvider());
+
+        register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
     }
 
     @Override
@@ -109,49 +112,76 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                    .collect(Collectors.toList());
     }
 
-    private class InteressatOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
+    private class FilterOnchangeLogicProcessor implements FilterProcessor<UnitatOrganitzativaFormFilter> {
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            if(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma.equals(fieldName)) {
+                return new ArrayList<>();
+            }
+            if(UnitatOrganitzativaFormFilter.Fields.municipi.equals(fieldName)) {
+                return new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+            }
+            if(UnitatOrganitzativaFormFilter.Fields.provincia.equals(fieldName)){
+                return new ProvinciaFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+            }
+            return new ArrayList<>();
+        }
+
+        @Override
+        public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {
+
+        }
+    }
+
+    private class TipusOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
-            
-        	if (InteressatResource.Fields.tipus.equals(fieldName)) {
-	        	if (fieldValue!=null) {
-	                switch ((InteressatTipusEnum)fieldValue){
+            if (fieldValue!=null) {
+//                TODO: default values
+//                target.setPais();
+//                target.setProvincia();
+//                target.setMunicipi();
+
+                switch ((InteressatTipusEnum)fieldValue){
                     case InteressatPersonaFisicaEntity:
                         target.setOrganCodi(null);
-                        break;	                
-	                    case InteressatPersonaJuridicaEntity:
-	                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
-	                        target.setOrganCodi(null);
-	                        break;
-	                    case InteressatAdministracioEntity:
-	                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
-	                        target.setDocumentNum(null);
-	                        target.setCodiPostal(null);
-	                        target.setAdresa(null);
-	                        break;
-	                }
-	            }
-        	} else if (InteressatResource.Fields.organCodi.equals(fieldName)) {
-        		if (fieldValue!=null) {
-        			UnitatOrganitzativaDto uoDto = unitatOrganitzativaHelper.findAmbCodiAndAdressafisica(fieldValue.toString());
-        			target.setPais(uoDto.getCodiPais());
-        			target.setProvincia(uoDto.getCodiProvincia());
-        			target.setMunicipi(uoDto.getLocalitat());
-        			target.setCodiPostal(uoDto.getCodiPostal());
-        			target.setAdresa(uoDto.getAdressa());
-        			target.setDocumentNum(uoDto.getNifCif());
-        			target.setEmail("");
-        			target.setTelefon("");
-        			target.setObservacions("");
-        		} else {
-        			target.setPais("");
-        			target.setProvincia("");
-        			target.setMunicipi("");
-        			target.setCodiPostal("");
-        			target.setAdresa("");
-        			target.setDocumentNum("");
-        		}
-        	}
+                        break;
+                    case InteressatPersonaJuridicaEntity:
+                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
+                        target.setOrganCodi(null);
+                        break;
+                    case InteressatAdministracioEntity:
+                        target.setDocumentTipus(InteressatDocumentTipusEnumDto.CODI_ORIGEN);
+                        target.setDocumentNum(null);
+                        target.setCodiPostal(null);
+                        target.setAdresa(null);
+                        break;
+                }
+            }
+        }
+    }
+    private class UnitatsOrganitzativesOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
+        @Override
+        public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
+            if (fieldValue!=null) {
+                UnitatOrganitzativaDto uoDto = unitatOrganitzativaHelper.findAmbCodiAndAdressafisica(fieldValue.toString());
+                target.setPais(uoDto.getCodiPais());
+                target.setProvincia(uoDto.getCodiProvincia());
+                target.setMunicipi(uoDto.getLocalitat());
+                target.setCodiPostal(uoDto.getCodiPostal());
+                target.setAdresa(uoDto.getAdressa());
+                target.setDocumentNum(uoDto.getNifCif());
+                target.setEmail("");
+                target.setTelefon("");
+                target.setObservacions("");
+            } else {
+                target.setPais("");
+                target.setProvincia("");
+                target.setMunicipi("");
+                target.setCodiPostal("");
+                target.setAdresa("");
+                target.setDocumentNum("");
+            }
         }
     }
 

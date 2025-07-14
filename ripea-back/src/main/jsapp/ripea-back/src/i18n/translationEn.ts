@@ -120,7 +120,7 @@ const translationEn = {
             action: {
                 guardarArxiu: {
                     label: "Save to archive",
-                    ok: "Item saved to archive",
+                    ok: "Item '{{contingut}}' saved to archive",
                 },
                 move: {
                     label: "Move...",

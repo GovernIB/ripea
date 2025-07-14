@@ -102,7 +102,7 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const guardarArxiu = (id:any) => action(id, 'GUARDAR_ARXIU', t('page.contingut.action.guardarArxiu.ok'))
+    const guardarArxiu = (id:any, row:any) => action(id, 'GUARDAR_ARXIU', t('page.contingut.action.guardarArxiu.ok', {contingut: row?.nom}))
 
     return {
         apiDownload: downloadAdjunt,

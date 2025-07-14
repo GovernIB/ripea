@@ -5,22 +5,53 @@ import {
     useMuiDataGridApiRef,
 } from 'reactlib';
 import {useTranslation} from "react-i18next";
-import GridFormField from "../../components/GridFormField.tsx";
+import GridFormField, {GridButtonField} from "../../components/GridFormField.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import useInteressatActions, {useActions} from "./details/InteressatActions.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import useImport from "./actions/Import.tsx";
 import {useActions as useExpedientActions} from "../expedient/details/CommonActions.tsx"
+import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
+import {useSession} from "../../components/SessionStorageContext.tsx";
+
+const InteressatsGridFormFilter = () => {
+    const {data} = useFormContext()
+
+    return <>
+        {/* TODO: option provider */}
+        <GridFormField xs={6} name="nivell"/>
+        <GridFormField xs={6} name="comunitatAutonoma"/>
+        <GridFormField xs={6} name="provincia" /* requestParams={{pais: data?.pais}} */ />
+        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
+        <GridFormField xs={6} name="nif"/>
+        <GridFormField xs={6} name="nom"/>
+        <GridFormField xs={6} name="unitatArrel" type={"checkbox"}/>
+    </>
+}
 
 export const InteressatsGridForm = () => {
     const {data} = useFormContext()
+    const { value } = useSession("UNITAT_ORGANITZATIVA_FILTER");
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipus" required/>
 
-        <GridFormField xs={12} name="organCodi"
+        {!!data?.filter &&
+            <Grid item xs={12}>
+                <StyledMuiFilter
+                    resourceName={"interessatResource"}
+                    code={"UNITAT_ORGANITZATIVA_FILTER"}
+                >
+                    <InteressatsGridFormFilter/>
+                </StyledMuiFilter>
+            </Grid>
+        }
+
+        <GridFormField xs={11} name="organCodi"
+                       requestParams={value}
                        hidden={data?.tipus != 'InteressatAdministracioEntity'}
                        required/>
+        <GridButtonField xs={1} name={"filter"} icon={"search"} hidden={data?.tipus != 'InteressatAdministracioEntity'}/>
 
         <GridFormField xs={12} name="documentTipus"
                        disabled={data?.tipus != 'InteressatPersonaFisicaEntity'}
