@@ -21,11 +21,13 @@ const InteressatsGridFormFilter = () => {
         {/* TODO: option provider */}
         <GridFormField xs={6} name="nivell"/>
         <GridFormField xs={6} name="comunitatAutonoma"/>
-        <GridFormField xs={6} name="provincia" /* requestParams={{pais: data?.pais}} */ />
-        <GridFormField xs={6} name="municipi" requestParams={{provincia: data?.provincia}}/>
-        <GridFormField xs={6} name="nif"/>
-        <GridFormField xs={6} name="nom"/>
+        <GridFormField xs={6} name="provinciaFilter"/>
+        <GridFormField xs={6} name="municipiFilter" requestParams={{provinciaFilter: data?.provinciaFilter}}/>
+        <GridFormField xs={6} name="nifFilter"/>
+        <GridFormField xs={6} name="nomFilter"/>
         <GridFormField xs={6} name="unitatArrel" type={"checkbox"}/>
+        <GridFormField xs={6} name="isInteressatAdministracio"
+            hidden={true} type={"checkbox"} value={data?.tipus != 'InteressatAdministracioEntity'}/>
     </>
 }
 

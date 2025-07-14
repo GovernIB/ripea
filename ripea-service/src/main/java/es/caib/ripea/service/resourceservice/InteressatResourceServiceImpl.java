@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,11 +49,13 @@ import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.dto.ComunitatDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.InteressatImportacioTipusDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
 import es.caib.ripea.service.intf.dto.PaisDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
@@ -92,6 +96,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
+//        register(InteressatResource.ACTION_FILTER_UNITATS, new CercadorUnitatsActionExecutor());
         
         register(InteressatResource.Fields.tipus, new TipusOnchangeLogicProcessor());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOnchangeLogicProcessor());
@@ -101,7 +106,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.Fields.pais, new PaisFieldOptionsProvider());
         register(InteressatResource.Fields.organCodi, new UnitatsOrganitzativesOptionsProvider());
 
-        register(ExpedientResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
+        register(InteressatResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
     }
 
     @Override
@@ -115,16 +120,33 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private class FilterOnchangeLogicProcessor implements FilterProcessor<UnitatOrganitzativaFormFilter> {
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
-            if(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma.equals(fieldName)) {
-                return new ArrayList<>();
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            switch (fieldName) {
+                case UnitatOrganitzativaFormFilter.Fields.nivell:
+        			List<NivellAdministracioDto> nivells = cacheHelper.findNivellAdministracio();
+        			if (nivells!=null) {
+        				for (NivellAdministracioDto nvl: nivells) {
+        					resultat.add(new FieldOption(nvl.getCodi().toString(), nvl.getDescripcio()));
+        				}
+        			}                	
+                	break;
+                case UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma:
+        			List<ComunitatDto> comunitats = cacheHelper.findComunitats();
+        			if (comunitats!=null) {
+        				for (ComunitatDto cmnt: comunitats) {
+        					resultat.add(new FieldOption(cmnt.getCodi(), cmnt.getNom()));
+        				}
+        			}
+                    break;
+                case UnitatOrganitzativaFormFilter.Fields.provinciaFilter:
+                	requestParameterMap.put("pais", new String[]{"724"});
+                	resultat = new ProvinciaFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+                    break;
+                case UnitatOrganitzativaFormFilter.Fields.municipiFilter:
+                	resultat = new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+                    break;
             }
-            if(UnitatOrganitzativaFormFilter.Fields.municipi.equals(fieldName)) {
-                return new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
-            }
-            if(UnitatOrganitzativaFormFilter.Fields.provincia.equals(fieldName)){
-                return new ProvinciaFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
-            }
-            return new ArrayList<>();
+            return resultat;
         }
 
         @Override
@@ -137,11 +159,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         @Override
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
             if (fieldValue!=null) {
-//                TODO: default values
-//                target.setPais();
-//                target.setProvincia();
-//                target.setMunicipi();
-
                 switch ((InteressatTipusEnum)fieldValue){
                     case InteressatPersonaFisicaEntity:
                         target.setOrganCodi(null);
@@ -155,6 +172,9 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                         target.setDocumentNum(null);
                         target.setCodiPostal(null);
                         target.setAdresa(null);
+	                    target.setPais(null); //Posam la adreça null ja que es carregarà automaticament al seleccionat una unitat adminsitrativa
+	                    target.setProvincia(null);
+	                    target.setMunicipi(null);
                         break;
                 }
             }
@@ -200,11 +220,24 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     public class UnitatsOrganitzativesOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
-			List<UnitatOrganitzativaDto> paisos = cacheHelper.findUnitatsOrganitzativesPerEntitat(configHelper.getEntitatActualCodi()).toDadesList();
+			List<UnitatOrganitzativaDto> uos = null;
+			Boolean recuperarValors = (requestParameterMap.get("isInteressatAdministracio")!=null && requestParameterMap.get("isInteressatAdministracio").length>0)?Boolean.parseBoolean(requestParameterMap.get("isInteressatAdministracio")[0]):false;
+			if (requestParameterMap==null || requestParameterMap.isEmpty()) {
+				uos = cacheHelper.findUnitatsOrganitzativesPerEntitat(configHelper.getEntitatActualCodi()).toDadesList();
+			} else {
+				String codiDir3 = (requestParameterMap.get("nifFilter")!=null && requestParameterMap.get("nifFilter").length>0)?requestParameterMap.get("nifFilter")[0]:"";
+				String denominacio = (requestParameterMap.get("nomFilter")!=null && requestParameterMap.get("nomFilter").length>0)?requestParameterMap.get("nomFilter")[0]:"";
+				String nivellAdm = (requestParameterMap.get("nivell")!=null && requestParameterMap.get("nivell").length>0)?requestParameterMap.get("nivell")[0]:"";
+				String comunitat = (requestParameterMap.get("comunitatAutonoma")!=null && requestParameterMap.get("comunitatAutonoma").length>0)?requestParameterMap.get("comunitatAutonoma")[0]:"";
+				String provincia = (requestParameterMap.get("provinciaFilter")!=null && requestParameterMap.get("provinciaFilter").length>0)?requestParameterMap.get("provinciaFilter")[0]:"";
+				String municipi = (requestParameterMap.get("municipiFilter")!=null && requestParameterMap.get("municipiFilter").length>0)?requestParameterMap.get("municipiFilter")[0]:"";
+				Boolean arrel = (requestParameterMap.get("unitatArrel")!=null && requestParameterMap.get("unitatArrel").length>0)?Boolean.parseBoolean(requestParameterMap.get("unitatArrel")[0]):false;
+				uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
+			}
 			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (paisos!=null) {
-				for (UnitatOrganitzativaDto pais: paisos) {
-					resultat.add(new FieldOption(pais.getCodi(), pais.getDenominacio()));
+			if (uos!=null) {
+				for (UnitatOrganitzativaDto uo: uos) {
+					resultat.add(new FieldOption(uo.getCodi(), uo.getDenominacio()));
 				}
 			}
 			return resultat;
@@ -224,6 +257,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 					}
 				}
 			}
+			Collections.sort(resultat, Comparator.comparing(FieldOption::getDescription));
 			return resultat;
 		}
 	}
@@ -245,6 +279,47 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 		}
 	}
 
+    /*private class CercadorUnitatsActionExecutor implements ActionExecutor<InteressatResourceEntity, InteressatResource.UnitatOrganitzativaFormFilter, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, UnitatOrganitzativaFormFilter previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UnitatOrganitzativaFormFilter target) {}
+
+		@Override
+		public Serializable exec(String code, InteressatResourceEntity entity, UnitatOrganitzativaFormFilter params) throws ActionExecutionException {
+			return null;
+		}
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            switch (fieldName) {
+                case UnitatOrganitzativaFormFilter.Fields.nivell:
+        			List<NivellAdministracioDto> nivells = cacheHelper.findNivellAdministracio();
+        			if (nivells!=null) {
+        				for (NivellAdministracioDto nvl: nivells) {
+        					resultat.add(new FieldOption(nvl.getCodi().toString(), nvl.getDescripcio()));
+        				}
+        			}                	
+                	break;
+                case UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma:
+        			List<ComunitatDto> comunitats = cacheHelper.findComunitats();
+        			if (comunitats!=null) {
+        				for (ComunitatDto cmnt: comunitats) {
+        					resultat.add(new FieldOption(cmnt.getCodi(), cmnt.getNom()));
+        				}
+        			}
+                    break;
+                case UnitatOrganitzativaFormFilter.Fields.provinciaFilter:
+                	resultat = new ProvinciaFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+                    break;
+                case UnitatOrganitzativaFormFilter.Fields.municipiFilter:
+                	resultat = new MunicipiFieldOptionsProvider().getOptions(fieldName, requestParameterMap);
+                    break;
+            }
+            return resultat;
+        }
+    }*/
+    
     @Override
     protected void afterConversion(InteressatResourceEntity entity, InteressatResource resource) {
         resource.setHasRepresentats(!entity.getRepresentats().isEmpty());

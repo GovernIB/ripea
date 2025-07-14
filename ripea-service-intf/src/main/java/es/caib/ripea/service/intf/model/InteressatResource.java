@@ -60,16 +60,20 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = InteressatResource.ACTION_GUARDAR_ARXIU,
-                        requiresId = true),                
+                        requiresId = true),
+//                @ResourceConfigArtifact(
+//                        type = ResourceArtifactType.ACTION,
+//                        code = InteressatResource.ACTION_FILTER_UNITATS,
+//                        formClass = InteressatResource.UnitatOrganitzativaFormFilter.class),                  
         }
 )
 public class InteressatResource extends BaseAuditableResource<Long> {
 
     public static final String PERSPECTIVE_REPRESENTANT_CODE = "REPRESENTANT";
-    public static final String ACTION_EXPORTAR_CODE = "EXPORTAR";
-    public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
-    public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";
-
+    public static final String ACTION_EXPORTAR_CODE  = "EXPORTAR";
+    public static final String ACTION_IMPORTAR_CODE  = "IMPORTAR";
+    public static final String ACTION_GUARDAR_ARXIU  = "GUARDAR_ARXIU";
+//    public static final String ACTION_FILTER_UNITATS = "FILTER_UNITATS";
     public static final String FILTER_CODE = "UNITAT_ORGANITZATIVA_FILTER";
 
 	@NotNull
@@ -176,19 +180,18 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     @Setter
     @FieldNameConstants
     public static class UnitatOrganitzativaFormFilter implements Serializable {
-        // TODO: option provider
-
         @ResourceField(enumType = true)
         private String nivell;
-        @ResourceField(enumType = true)
+        @ResourceField(enumType = true, onChangeActive = true)
         private String comunitatAutonoma;
+        @ResourceField(enumType = true, onChangeActive = true)
+        private String provinciaFilter;
         @ResourceField(enumType = true)
-        private String provincia;
-        @ResourceField(enumType = true)
-        private String municipi;
-        private String nif;
-        private String nom;
+        private String municipiFilter;
+        private String nifFilter;
+        private String nomFilter;
         private boolean unitatArrel;
+        private boolean isInteressatAdministracio;
     }
     
     public InteressatDto toDocumentDto() {
