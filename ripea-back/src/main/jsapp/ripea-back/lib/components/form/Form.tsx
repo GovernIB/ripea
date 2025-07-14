@@ -173,6 +173,7 @@ export const Form: React.FC<FormProps> = (props) => {
     const [fields, setFields] = React.useState<any[]>();
     const [fieldErrors, setFieldErrors] = React.useState<FormFieldError[] | undefined>();
     const [revertData, setRevertData] = React.useState<any>(undefined);
+    const [isDataInitialized, setIsDataInitialized] = React.useState<boolean>(false);
     const [apiActions, setApiActions] = React.useState<any>(undefined);
     const apiRef = React.useRef<FormApi>(undefined);
     const idFromExternalResetRef = React.useRef<any>(undefined);
@@ -309,21 +310,24 @@ export const Form: React.FC<FormProps> = (props) => {
         setModified(false);
         setRevertData(data);
         setFieldErrors(undefined);
+        setIsDataInitialized(true);
         idFromExternalResetRef.current = null;
     };
     const refresh = () => {
-        if (initialDataProp != null) {
-            reset(initialDataProp);
-        } else if (fields) {
-            getInitialData(id, fields, additionalData, initOnChangeRequest).then(
-                (initialData: any) => {
-                    debug && logConsole.debug('Initial data loaded', initialData);
-                    const { _actions: initialDataActions, ...initialDataWithoutLinks } =
-                        initialData;
-                    id != null && setApiActions(initialDataActions);
-                    reset(initialDataWithoutLinks);
-                }
-            );
+        if (fields && !isDataInitialized) {
+            if (initialDataProp != null) {
+                reset(initialDataProp);
+            } else {
+                getInitialData(id, fields, additionalData, initOnChangeRequest).then(
+                    (initialData: any) => {
+                        debug && logConsole.debug('Initial data loaded', initialData);
+                        const { _actions: initialDataActions, ...initialDataWithoutLinks } =
+                            initialData;
+                        id != null && setApiActions(initialDataActions);
+                        reset(initialDataWithoutLinks);
+                    }
+                );
+            }
         }
     };
     const externalReset = (data?: any, id?: any) => {
