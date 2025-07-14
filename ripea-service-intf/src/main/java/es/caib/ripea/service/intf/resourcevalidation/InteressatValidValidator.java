@@ -1,36 +1,111 @@
 package es.caib.ripea.service.intf.resourcevalidation;
 
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.model.InteressatResource;
+import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
+@RequiredArgsConstructor
 public class InteressatValidValidator implements ConstraintValidator<InteressatValid, InteressatResource> {
 
-    @Override
-    public void initialize(InteressatValid constraintAnnotation) {}
+    private final InteressatResourceService interessatResourceService;
 
     @Override
-    public boolean isValid(InteressatResource value, ConstraintValidatorContext context) {
-        context
-            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
-            .addPropertyNode("documentNum")
-            .addConstraintViolation()
-            .disableDefaultConstraintViolation();
-        if (
-                value.getRepresentat()!=null && Objects.equals(value.getRepresentat().getId(), value.getId())
-                || value.getRepresentant()!=null && Objects.equals(value.getRepresentant().getId(), value.getId())
-        ) {
-            return false;
+    public boolean isValid(InteressatResource resource, ConstraintValidatorContext context) {
+        boolean valid = true;
+
+        if(resource.getEntregaDeh()!=null && resource.getEntregaDeh()){
+            if (resource.getEmail() == null || resource.getEmail().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.email)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
         }
-        if (value.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF){
-            return validarNIF(value.getDocumentNum());
+        if (InteressatTipusEnum.InteressatPersonaFisicaEntity.equals(resource.getTipus())) {
+            if (resource.getNom() == null || resource.getNom().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.nom)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+            if (resource.getLlinatge1() == null || resource.getLlinatge1().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.llinatge1)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
         }
-        return true;
+        if (InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            {/* TODO: revisar */}
+            if (resource.getOrganCodi() == null) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.organCodi)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            }
+        }
+        if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            if (resource.getDocumentNum() == null || resource.getDocumentNum().isBlank()) {
+                context
+                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                        .addPropertyNode(InteressatResource.Fields.documentNum)
+                        .addConstraintViolation()
+                        .disableDefaultConstraintViolation();
+                valid = false;
+            } else {
+                if (
+                        (resource.getRepresentat() != null && Objects.equals(resource.getRepresentat().getId(), resource.getId()))
+                                || (resource.getRepresentant() != null && Objects.equals(resource.getRepresentant().getId(), resource.getId()))
+                                || (resource.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF && !validarNIF(resource.getDocumentNum()))
+                ) {
+                    context
+                            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNum}")
+                            .addPropertyNode(InteressatResource.Fields.documentNum)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                    valid = false;
+                }
+            }
+        }
+
+        if (!resource.isEsRepresentant()) {
+            List<InteressatResource> interesados = interessatResourceService.findBySpringFilter(
+                    "expedient.id : " + resource.getExpedient().getId() + " and esRepresentant : false"
+            );
+
+            for (InteressatResource interesado : interesados) {
+                if (Objects.equals(resource.getDocumentNum(), interesado.getDocumentNum())) {
+                    context
+                            .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists}")
+                            .addPropertyNode(InteressatResource.Fields.documentNum)
+                            .addConstraintViolation()
+                            .disableDefaultConstraintViolation();
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        return valid;
     }
 
     public static boolean validarNIF(String nif) {

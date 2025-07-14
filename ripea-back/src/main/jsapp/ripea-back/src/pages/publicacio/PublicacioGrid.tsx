@@ -1,23 +1,24 @@
-import {Grid, Icon} from "@mui/material";
+import {Grid} from "@mui/material";
 import {GridPage} from "reactlib";
 import * as builder from "../../util/springFilterUtils.ts";
 import {formatDate} from "../../util/dateUtils.ts";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import usePublicacioActions from "./details/PublicacioActions.tsx";
+import {EstatMessage} from "../remesa/RemesaGrid.tsx";
 
 const StyledEstat = (props:any) => {
     const { entity: publicacio } = props;
 
     switch (publicacio?.estat) {
         case 'PENDENT':
-            return <Icon color={'warning'}>schedule</Icon>;
+            return <EstatMessage icon={'schedule'} color={'warning'} title={publicacio?.estat}/>;
         case 'ENVIAT':
-            return <Icon color={'info'}>mail</Icon>;
+            return <EstatMessage icon={'mail'} color={'info'} title={publicacio?.estat}/>;
         case 'REBUTJAT':
-            return <Icon color={'disabled'}>close</Icon>;
+            return <EstatMessage icon={'close'} color={'disabled'} title={publicacio?.estat}/>;
         case 'PROCESSAT':
-            return <Icon color={'error'}>check</Icon>;
+            return <EstatMessage icon={'check'} color={'error'} title={publicacio?.estat}/>;
     }
 
     return <></>;
@@ -60,7 +61,7 @@ const columns = [
     },
     {
         field: 'estat',
-        flex: 0.5,
+        flex: 0.25,
         renderCell: (params: any) => <StyledEstat entity={params?.row}/>
     },
 ]
@@ -79,9 +80,7 @@ const PublicacioGrid = (props:any) => {
             columns={columns}
             rowAdditionalActions={actions}
             // paginationActive
-            filter={builder.and(
-                builder.eq('expedient.id', id)
-            )}
+            filter={builder.eq('expedient.id', id)}
             staticSortModel={sortModel}
             onRowCountChange={onRowCountChange}
             disableColumnSorting

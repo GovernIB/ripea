@@ -82,12 +82,12 @@ const ActionFilter = (props:any) => {
 
 const RelacionarForm= () => {
     const {data, apiRef} = useFormContext();
-    const [springFilter, setSpringFilter] = useState<string>();
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
     const selectionModel = useMemo(()=>{
         return data?.relacionatsAmb?.map((a:any) => a.id)
     }, [])
+
+    const [springFilter, setSpringFilter] = useState<string>();
+    const [selectedRows, setSelectedRows] = useState<any[]>(selectionModel || []);
 
     useEffect(() => {
         apiRef?.current?.setFieldValue("relacionatsAmb", selectedRows?.map(id => ({ id })))
@@ -115,6 +115,18 @@ const RelacionarForm= () => {
 
             onRowSelectionModelChange={(newSelection) => {
                 setSelectedRows([...newSelection]);
+            }}
+
+            rowProps={(row: any) => {
+                const color = row?.estatAdditionalInfo?.color;
+                return color
+                    ? {
+                        'box-shadow': `${color} -6px 0px 0px`,
+                        'border-left': `6px solid ${color}`,
+                    }
+                    : {
+                        'padding-left': '6px'
+                    }
             }}
 
             // height={162 + 52 * 4}
@@ -150,9 +162,7 @@ const useRelacionar= (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error:any) :void => {
-                if (error) {
-                    temporalMessageShow(null, error.message, 'error');
-                }
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

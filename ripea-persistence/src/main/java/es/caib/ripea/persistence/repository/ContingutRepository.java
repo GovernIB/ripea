@@ -22,6 +22,18 @@ import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 @Component
 public interface ContingutRepository extends JpaRepository<ContingutEntity, Long> {
 
+	@Query(value = "SELECT COUNT(1) FROM IPA_CONTINGUT START WITH ID=:pareId CONNECT BY PRIOR ID = PARE_ID", nativeQuery = true)
+	int countByPareIdOracle(@Param("pareId")Long pareId);
+	
+	@Query(value = "WITH RECURSIVE hijos AS ("
+			+ "        SELECT * FROM IPA_CONTINGUT WHERE ID = :pareId"
+			+ "        UNION ALL"
+			+ "        SELECT c.* FROM IPA_CONTINGUT c"
+			+ "        JOIN hijos h ON c.PARE_ID = h.ID"
+			+ "    )"
+			+ "    SELECT COUNT(*) - 1 FROM hijos", nativeQuery = true)
+	int countByPareIdPostgres(@Param("pareId")Long pareId);
+	
 	List<ContingutEntity> findByNomAndTipusAndPareAndEntitatAndEsborrat(
 			String nom,
 			ContingutTipusEnumDto tipus,
@@ -231,4 +243,12 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 	@Modifying
 	@Query(value = "update ipa_contingut set pare_id = null where id = :contingutId", nativeQuery = true)
 	void removePare(Long contingutId);
+	
+	@Modifying
+ 	@Query(value = "UPDATE IPA_CONTINGUT " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

@@ -353,6 +353,7 @@ const translationEn = {
             },
             alert: {
                 incapacitat: "If the holder has a disability, a recipient must be specified.",
+                jaExistentExpedient: "Already exists in the file",
             },
         },
         expedient: {
@@ -463,7 +464,6 @@ const translationEn = {
                     label: "Synchronize status with file",
                     ok: "The archive status has been synchronized",
                 },
-
                 changePrioritat: {
                     label: "Change priority...",
                     title: "Modify expedient priority",
@@ -484,6 +484,10 @@ const translationEn = {
                     title: "Relate expedient",
                     ok: "The relations of the expedient '{{expedient}}' have changed successfully.",
                 },
+                eliminarRelacio: {
+                    label: "Delete relation",
+                    ok: "The relation of the 2 expedients has been removed successfully.",
+                },                
                 excelInteressats: {
                     title: "Export interested parties to EXCEL",
                     ok: "The interested parties have been successfully exported"
@@ -583,6 +587,11 @@ const translationEn = {
                 documentOrigenFormat: "Format: ES_<Body>_<AAAA>_<Specific_ID>",
                 dataBasic: "Basic data",
                 dataInteressat: "Interested party data",
+                dataEspecific: "Specific data",
+                dadesRegistrals: "Registry data",
+                fetRegistral: "Registry fact",
+                naixement: "Birth",
+                dadesAdicionals: "Additional data",
                 dataOther: "Other data",
             },
             action: {
@@ -802,6 +811,7 @@ const translationEn = {
                 fitxerNom: "File name",
                 serveiTipusEnum: "Service type",
                 notificacioIdentificador: "Identifier",
+                estatError: "Error processing the notification inside Notib",
             },
             action: {
                 actualitzarEstat: {
@@ -944,6 +954,7 @@ const translationEn = {
             },
             perfil: {
                 title: "My profile",
+                ok: "The user's data '{{nom}}' has been successfully updated",
                 dades: "User data",
                 correu: "Email sending",
                 generic: "General settings",

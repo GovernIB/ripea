@@ -36,9 +36,19 @@ export const useActions = (refresh?: () => void) => {
                 temporalMessageShow(null, error.message, 'error');
             });
     }
+    const reportMassivo = (id:any, code:any, mssg:any, fileType:any) => {
+        apiReport(undefined, {code, data: { ids: [id], massivo: false }, fileType})
+            .then((result) => {
+                iniciaDescargaBlob(result);
+                temporalMessageShow(null, mssg, 'success');
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error.message, 'error');
+            });
+    }
 
     const actualitzarEstat = (id: any) => action(id, 'ACTUALITZAR_ESTAT', t('page.notificacio.action.actualitzarEstat.ok'));
-    const justificant = (id: any) => report(id, 'DESCARREGAR_JUSTIFICANT', t('page.notificacio.action.justificant.ok'), 'ZIP');
+    const justificant = (id: any) => reportMassivo(id, 'DESCARREGAR_JUSTIFICANT', t('page.notificacio.action.justificant.ok'), 'ZIP');
     const descarregarDocumentEnviat = (id: any) => report(id, 'DESCARREGAR_DOC_ENVIAT', t('page.notificacio.action.documentEnviat.ok'), 'ZIP');
 
     return {

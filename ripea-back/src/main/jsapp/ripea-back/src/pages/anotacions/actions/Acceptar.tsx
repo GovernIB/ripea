@@ -20,10 +20,13 @@ const AcceptarTabExpedient = () => {
             <>
                 <GridFormField xs={12} name="newExpedientTitol" required/>
                 <GridFormField xs={12} name="prioritat" required/>
-                <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"}/>
+                <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == "B_NORMAL"} required/>
                 <GridFormField xs={12} name="organGestor" required disabled readOnly/>
-                <GridFormField xs={6} name="sequencia" disabled readOnly/>
+                <GridFormField xs={6} name="sequencia" required disabled readOnly/>
                 <GridFormField xs={6} name="any" required/>
+                <GridFormField xs={12} name="grup"
+                               namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
+                               hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
             </>
         }
         {data?.accio == "INCORPORAR" &&
@@ -40,13 +43,6 @@ const AcceptarTabExpedient = () => {
 const AcceptarTabAnnexos = () => {
     const {data, fields, apiRef} = useFormContext();
     const  { t } = useTranslation()
-    const [annexos, setAnnexos] = useState<any[]>(data?.annexos || []);
-
-    useEffect(() => {
-        if (!!annexos) {
-            apiRef?.current?.setFieldValue('annexos', annexos)
-        }
-    }, [annexos]);
 
     const fieldTipusDocument = fields?.filter(i=>i.name=='tipusDocument')[0];
 
@@ -65,27 +61,24 @@ const AcceptarTabAnnexos = () => {
             headerName: '',
             sortable: false,
             flex: 0.5,
-            renderCell: (params:any) => {
-                return <FormField
-                    name={"annexos"}
-                    label={fieldTipusDocument?.label}
-                    value={annexos[params.id]}
-                    field={fieldTipusDocument}
-                    onChange={(value)=>{
-                        setAnnexos({
-                            ...annexos,
-                            [params.id]: value,
-                        })
-                    }}
-                    componentProps={{ size: "small" }}
-                    requestParams={{
-                        metaExpedientId: data?.metaExpedient?.id,
-                        annex: params.id,
-                        annexos
-                    }}
-                    required
-                />
-            }
+            renderCell: (params:any) => <FormField
+                name={"annexos" + (data?.annexos[params.id] ?`#${params.id}`:'')}
+                value={data?.annexos[params.id]}
+                field={fieldTipusDocument}
+                onChange={(value)=>{
+                    apiRef?.current?.setFieldValue('annexos', {
+                        ...data?.annexos,
+                        [params.id]: value,
+                    })
+                }}
+                componentProps={{ size: "small" }}
+                requestParams={{
+                    metaExpedientId: data?.metaExpedient?.id,
+                    annex: params.id,
+                    annexos: data?.annexos,
+                }}
+                required
+            />
         },
     ]
 
@@ -107,6 +100,15 @@ const AcceptarTabAnnexos = () => {
             filter={filter}
             columns={columnsAnnexos}
             rowAdditionalActions={actions}
+            onRowsChange={(rows) => {
+                if (rows.length > 0 && rows.length != Object.keys(data?.annexos).length) {
+                    const annexos = Object.fromEntries(
+                        rows.map((row) => [row.id, (data?.annexos[row.id] || '')])
+                    );
+
+                    apiRef?.current?.setFieldValue('annexos', annexos)
+                }
+            }}
 
             height={162 + 52 * 4}
             readOnly
@@ -209,6 +211,7 @@ const useAcceptar = (refresh?: () => void) => {
             metaExpedient: row?.metaExpedient,
             registre: row?.registre,
             interessats: row?.registreInfo?.interessats?.map((i:any)=>i.id) || [],
+            grup: row?.grup,
         })
     }
     const onSuccess = () :void => {

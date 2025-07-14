@@ -55,7 +55,7 @@
 			</label>
 			<div class="controls col-xs-${campInputSize}">
 			<c:choose>
-				<c:when test="${not empty icon}">
+				<c:when test="${not empty icon || not empty icon2}">
 					<div class="input-group select2-bootstrap-append">
 						<form:select path="${campPath}" cssClass="form-control"
 							id="${campId}" disabled="${disabled}" style="width:100%"
@@ -74,8 +74,10 @@
 							data-idioma="${idioma}"/>
 							<c:if test="${not empty icon2}">
 								<a class="input-group-addon btn btn-default ${campPath}_btn2"><i class="${icon2}"></i></a>		
-							</c:if>							
-							<a class="input-group-addon btn btn-default ${campPath}_btn" onclick="toggleCarrecs()"><i class="${icon}"></i></a>
+							</c:if>
+							<c:if test="${not empty icon}">
+								<a class="input-group-addon btn btn-default ${campPath}_btn" onclick="toggleCarrecs()"><i class="${icon}"></i></a>
+							</c:if>
 					</div>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				</c:when>

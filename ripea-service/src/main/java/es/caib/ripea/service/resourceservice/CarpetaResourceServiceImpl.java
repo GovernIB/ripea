@@ -64,8 +64,8 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     public void init() {
         register(CarpetaResource.PERSPECTIVE_PATH_CODE,	new PathPerspectiveApplicator());
         register(CarpetaResource.ACTION_MODIFICAR_NOM,	new ModificarNomActionExecutor());
-        register(CarpetaResource.ACTION_EXPORTAR_INDEX_PDF,	new ExportIdexPdfGenerator());
-        register(CarpetaResource.ACTION_EXPORTAR_INDEX_XLS,	new ExportIdexXlsGenerator());
+        register(CarpetaResource.REPORT_EXPORTAR_INDEX_PDF,	new ExportIdexPdfGenerator());
+        register(CarpetaResource.REPORT_EXPORTAR_INDEX_XLS,	new ExportIdexXlsGenerator());
         register(CarpetaResource.ACTION_MOURE_COPIAR, new MoureCopiarActionExecutor());
     }
 	

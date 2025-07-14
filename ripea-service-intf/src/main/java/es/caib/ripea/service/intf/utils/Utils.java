@@ -91,7 +91,7 @@ public class Utils {
      * Utils.hasValue("  bob  ") = true
      * </pre>
      *
-     * @param st  the String to check, may be null
+     * @param str  the String to check, may be null
      * @return <code>true</code> if the String is not empty and not null
      */
     public static boolean hasValue(String str) {
@@ -556,11 +556,11 @@ public class Utils {
     
     public static List<String> getCodisEnGruposMil(List<String> codis) {
     	int maxSize = 1000;
-    	if (codis!=null && codis.size()>0) {
+    	if (codis!=null && !codis.isEmpty()) {
     		List<String> result = new ArrayList<>();
     		for (int i = 0; i < codis.size(); i += maxSize) {
                 List<String> subList = codis.subList(i, Math.min(i + maxSize, codis.size()));
-                String concatenated = subList.stream().map(String::valueOf).collect(Collectors.joining(","));
+                String concatenated = subList.stream().map(value->"'"+value+"'").collect(Collectors.joining(","));
                 result.add(concatenated);
             }
     		return result;
@@ -569,13 +569,7 @@ public class Utils {
     }
     
 	public static String getCodiNom(InteressatTipusEnum tipus, String documentNum, String nom, String llinatge1, String llinatge2, String raoSocial, String organCodi) {
-		String resultat = null;
-        switch (tipus) {
-            case InteressatPersonaFisicaEntity:
-            	resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
-            default:
-            	resultat = getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
-        }
+		String resultat = documentNum + " - " + getNomComplet(tipus, nom, llinatge1, llinatge2, raoSocial, organCodi);
         return (" - ".equals(resultat)?null:resultat);
     }
 
@@ -663,4 +657,30 @@ public class Utils {
 			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto(camp, PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
 		}
 	}
+	
+	public static String nifMask(String nif) {
+        if (nif == null || nif.length() < 5) return nif;
+        // Buscar la última letra (asumimos que es la última posición del string)
+        char ultimaLetra = nif.charAt(nif.length() - 1);
+        // Extraer la parte numérica antes de la letra
+        String cuerpo = nif.substring(0, nif.length() - 1);
+        // Buscar dígitos de derecha a izquierda para encontrar los últimos 4
+        StringBuilder resultado = new StringBuilder();
+        int contador = 0;
+
+        for (int i = cuerpo.length() - 1; i >= 0; i--) {
+            char c = cuerpo.charAt(i);
+            if (Character.isDigit(c) && contador < 4) {
+                resultado.insert(0, '*');
+                contador++;
+            } else {
+                resultado.insert(0, c);
+            }
+        }
+
+        // Añadir de nuevo la letra
+        resultado.append(ultimaLetra);
+
+        return resultado.toString();
+    }
 }

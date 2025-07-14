@@ -716,13 +716,38 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		} else {
 			$(this).empty();
 		}
+		
+		const contieneUsuari = urlActual.includes('usuari');
+		const contieneUsuariPlugin = urlActual.includes('usuariDades');
+		
+		let mensajesNoResults;
+		
+		if (contieneUsuariPlugin) {
+			mensajesNoResults = {
+			  'es': function() { return "No se encontró el usuario en RIPEA o plugin de usuarios"; },
+			  'ca': function() { return "No s'ha trobat l'usuari a RIPEA o plugin d'usuaris"; }
+			};
+		} else if (contieneUsuari) {
+			mensajesNoResults = {
+			  'es': function() { return "No se encontró el usuario o éste nunca accedió a RIPEA"; },
+			  'ca': function() { return "No s'ha trobat l'usuari o aquest no ha accedit mai a RIPEA"; }
+			};
+		}
+		
+		var idioma = $(this).data('idioma') || 'es';
+		var idiomaExtendido = $.extend(true, {}, $.fn.select2.defaults.defaults.language[idioma], {
+		  noResults: function() {
+		    return mensajesNoResults[idioma];
+		  }
+		});
+		
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
 		    escapeMarkup: escapeMarkupFn,
 		    templateResult: $(this).data('templateResult'),
 		    templateSelection: $(this).data('templateSelection'),
-		    language: $(this).data('idioma'),
+		    language: (contieneUsuari||contieneUsuariPlugin)?idiomaExtendido:$(this).data('idioma'),
 		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumInputLength: $(this).data('minimumInputLength'),
 		    ajax: {
@@ -779,7 +804,6 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		$(this).on('select2:close', function() {
 			webutilModalAdjustHeight();
 		});
-		
 		// codi per no reordenar els elements de seleccio multiple
 	    $(this).on("select2:select", function (e) {
 			var id = e.params.data.id;

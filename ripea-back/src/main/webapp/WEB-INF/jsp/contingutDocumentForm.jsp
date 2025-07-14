@@ -176,7 +176,8 @@ $(document).ready(function() {
 		let tamany = $(this)[0].files[0].size;
 		if (tamany>maxTamanyFitxerUpload) {
 			$('#input-firma-arxiu').find('div.alert.alert-danger').remove();
-			$('#input-firma-arxiu').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			$('#input-firma-arxiu').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			window.scrollTo(0, document.body.scrollHeight);
 		} else {
 			$('#input-firma-arxiu').find('div.alert.alert-danger').remove();
 		}
@@ -188,7 +189,8 @@ $(document).ready(function() {
 		
 		if (tamany>maxTamanyFitxerUpload) {
 			$('#inputDoc').find('div.alert.alert-danger').remove();
-			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+			window.scrollTo(0, document.body.scrollHeight);
 		} else {
 			$('#inputDoc').find('div.alert.alert-danger').remove();
     		<c:if test="${isDeteccioFirmaAutomaticaActiva}">
@@ -559,7 +561,7 @@ $(document).ready(function() {
 			if (isErrorTrue) {
 				var errorMsg = $('iframe[name=target_iframe]').contents().find('#errorMsg').val();
 				$('#inputDoc').find('div.alert.alert-danger').remove();
-				$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
+				$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -10px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
 			} else {
 				$('#inputDoc').find('div.alert.alert-danger').remove();
 			}
@@ -677,9 +679,14 @@ function removeLoading() {
 								<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
 								<div id="arxiuInput">
 									<div id="inputDoc">
-										<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+										<rip:inputFile 
+											name="arxiu" 
+											textKey="contingut.document.form.camp.arxiu"
+											comment="contingut.document.MAX_UPLOAD_SIZE"
+											required="${empty documentCommand.id}" 
+											fileName="${nomDocument}"/>
 										<c:if test="${!empty documentCommand.id && !documentCommand.validacioFirmaCorrecte}">
-											<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
+											<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -10px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
 										</c:if>
 									</div>
 									<div id="inputAmbFirma" class="hidden">
@@ -688,20 +695,34 @@ function removeLoading() {
 									<div id="input-firma" class="hidden">
 										<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 										<div id="input-firma-arxiu" class="hidden">
-											<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}" fileName="${documentCommand.tipusFirma=='SEPARAT' ? 'firma_separada' : ''}"/>
+											<rip:inputFile 
+												name="firma" 
+												textKey="contingut.document.form.camp.firma" 
+												comment="contingut.document.MAX_UPLOAD_SIZE"
+												required="${empty documentCommand.id}" 
+												fileName="${documentCommand.tipusFirma=='SEPARAT' ? 'firma_separada' : ''}"/>
 										</div>
 									</div>
 								</div>
 							</c:when>
 							<c:otherwise>
 								<div id="inputDoc">
-									<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+									<rip:inputFile 
+										name="arxiu" 
+										textKey="contingut.document.form.camp.arxiu" 
+										comment="contingut.document.MAX_UPLOAD_SIZE"
+										required="${empty documentCommand.id}" 
+										fileName="${nomDocument}"/>
 								</div>
 								<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
 								<div id="input-firma" class="hidden">
 									<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 									<div id="input-firma-arxiu" class="hidden">
-										<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+										<rip:inputFile 
+											name="firma" 
+											textKey="contingut.document.form.camp.firma" 
+											comment="contingut.document.MAX_UPLOAD_SIZE"
+											required="${empty documentCommand.id}"/>
 									</div>
 								</div>
 							</c:otherwise>

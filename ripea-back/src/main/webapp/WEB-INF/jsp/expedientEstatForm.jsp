@@ -56,15 +56,15 @@
 			</div>
 			<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial" disabled="${bloquejarCamps}"/>
 			
-			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-			<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+			<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+			<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 			<rip:inputSuggest 
 				name="responsableCodi" 
 				urlConsultaInicial="${urlConsultaInicial}" 
 				urlConsultaLlistat="${urlConsultaLlistat}" 
 				textKey="expedient.estat.form.camp.responsable"
 				suggestValue="codi"
-				suggestText="nom"
+				suggestText="codiAndNom"
 				disabled="${bloquejarCamps}"
 				placeholderKey="expedient.estat.form.camp.responsable"/>
 				

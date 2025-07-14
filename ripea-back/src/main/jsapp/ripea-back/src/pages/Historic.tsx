@@ -22,12 +22,7 @@ const columnsAccions = [
     {
         field: 'tipus',
         flex: 0.5,
-        valueFormatter: (value: any, row:any)=> {
-            if(row?.secundari){
-                return row?.objecte
-            }
-            return value
-        }
+        valueFormatter: (value: any, row:any)=> row?.secundari ?row?.objecte :value
     },
 ]
 
@@ -42,7 +37,7 @@ const Accions = (props:any) => {
         {
             title: t('common.detail'),
             icon: 'info',
-            showInMenu: true,
+            showInMenu: false, // <-- Esto lo muestra como botón directo en la fila
             onClick: handleOpen,
         }
     ]
@@ -194,8 +189,8 @@ const useHistoric = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const [numAccions, setNumAccions] = useState<number>(0);
-    const [numMoviment, setMoviment] = useState<number>(0);
+    const [numAccions, setNumAccions] = useState<number>();
+    const [numMoviment, setMoviment] = useState<number>();
 
     const handleOpen = (id:any, row:any) => {
         console.log(id, row);
@@ -221,7 +216,9 @@ const useHistoric = () => {
             value: "move",
             label: t('page.contingut.tabs.move'),
             content: <Moviment id={entity?.id} onRowCountChange={setMoviment}/>,
-            badge: numMoviment,
+            badge: numMoviment ?? entity?.numMoviments,
+            disabled: entity?.numMoviments === 0,
+            showZero: true,
         },
         {
             value: "auditoria",

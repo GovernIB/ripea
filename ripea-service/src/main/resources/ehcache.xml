@@ -8,6 +8,7 @@
 	<cache name="aclCache" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="600" overflowToDisk="false" />
 	<cache name="tasquesUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="entitatsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
+	<cache name="entitatsUsuariIds" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="errorsValidacioNode" maxElementsInMemory="1000" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="organismes" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 	<cache name="descendents" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />

@@ -17,11 +17,18 @@ import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 @Component
 public interface DadaRepository extends JpaRepository<DadaEntity, Long> {
 
+	int countByNodeId(Long nodeId);
+	
 	List<DadaEntity> findByNode(NodeEntity node);
+	
 	DadaEntity findByNodeAndMetaDadaAndOrdre(NodeEntity node, MetaDadaEntity metaDada, int ordre);
+	
 	List<DadaEntity> findByNodeAndMetaDadaOrderByOrdreAsc(NodeEntity node, MetaDadaEntity metaDada);
+	
 	List<DadaEntity> findByMetaDadaTipus(MetaDadaTipusEnumDto tipus);
+	
 	List<DadaEntity> findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(Collection<Long> nodeIds);
+	
 	@Query(	"select" +
 			"    distinct md " +
 			"from" +
@@ -40,4 +47,12 @@ public interface DadaRepository extends JpaRepository<DadaEntity, Long> {
 			"	 where n.id not in (select id from ipa_expedient) " +
 			"	   and n.id not in (select id from ipa_document))", nativeQuery = true)
 	int deleteDadesFromNodesOrfes();
+	
+	@Modifying
+ 	@Query(value = "UPDATE IPA_DADA " +
+ 			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +
+ 			"    LASTMODIFIEDBY_CODI = CASE WHEN LASTMODIFIEDBY_CODI = :codiAntic THEN :codiNou ELSE LASTMODIFIEDBY_CODI END " +
+ 			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
+ 			nativeQuery = true)
+	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

@@ -10,6 +10,7 @@
 	<c:when test="${empty entitatCommand.id}"><c:set var="titol"><spring:message code="entitat.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="entitat.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
+<c:set var="maxFileSize"><%=es.caib.ripea.back.config.WebMvcConfig.MAX_UPLOAD_SIZE%></c:set>
 
 <html>
 
@@ -25,6 +26,9 @@
 	<rip:modalHead/>
 	
 	<script type="text/javascript">
+	
+		var maxTamanyFitxerUpload = ${maxFileSize};
+	
 		$(document).ready(function() {
 		  $('#logoImg').change(function(){
 			    var path = $(this).val();
@@ -32,6 +36,14 @@
 			     	$('#logo').val(true);
 				} else {
 					$('#logo').val(false);
+				}
+			    let tamany = $(this)[0].files[0].size;
+			    var pare = $(this).closest('.fileinput').parent();
+				if (tamany>maxTamanyFitxerUpload) {
+					$(pare).find('div.alert.alert-danger').remove();
+					$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+				} else {
+					$(pare).find('div.alert.alert-danger').remove();
 				}
 		  });
 		});
@@ -45,7 +57,12 @@
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>
-		<rip:inputFile name="logoImg" textKey="entitat.form.camp.logoImg" fileName="${entitatCommand.logo ? 'logo' : ''}" doNotShowErrors="1"/>
+		<rip:inputFile 
+			name="logoImg" 
+			textKey="entitat.form.camp.logoImg"
+			comment="entitat.form.MAX_UPLOAD_SIZE" 
+			fileName="${entitatCommand.logo ? 'logo' : ''}" 
+			doNotShowErrors="1"/>
 		<form:hidden path="logo"/>
 		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>

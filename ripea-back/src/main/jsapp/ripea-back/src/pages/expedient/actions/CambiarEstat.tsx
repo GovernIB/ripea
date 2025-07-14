@@ -9,7 +9,7 @@ const CambiarEstatForm = () => {
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
-        <GridFormField xs={12} name="estat" disabled readOnly/>
+        {/*<GridFormField xs={12} name="estat" disabled readOnly/>*/}
         <GridFormField xs={12} name="estatAdditional" hidden={data?.estat == "TANCAT"}/>
     </Grid>
 }
@@ -40,7 +40,7 @@ const useCambiarEstat = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.changeEstat.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

@@ -19,7 +19,7 @@ const useActions = (refresh?:()=>void) => {
     const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
 
     const report = (id:any, code:string, msg:string, fileType:any) => {
-        apiReport(undefined, {code: code, data:{ ids: [id], massivo: false }, fileType})
+        apiReport(id, {code: code, fileType})
             .then((result) => {
                 iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
@@ -50,7 +50,7 @@ const useActions = (refresh?:()=>void) => {
     }
 
     const exportarPDF = (id:any) => report(id, 'EXPORTAR_INDEX_PDF', t('page.expedient.action.exportPDF.ok'),'PDF')
-    const exportarEXCEL = (id:any) => report(id, 'EXPORTAR_INDEX_XLS', t('page.expedient.action.exportEXCEL.ok'),'XLS')
+    const exportarEXCEL = (id:any) => report(id, 'EXPORTAR_INDEX_XLS', t('page.expedient.action.exportEXCEL.ok'),'XLSX')
 
     return {
         eliminar,

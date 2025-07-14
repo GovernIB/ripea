@@ -30,7 +30,6 @@ import javax.validation.constraints.NotNull;
             @ResourceConfigArtifact(
                     type = ResourceArtifactType.ACTION,
                     code = DocumentNotificacioResource.ACTION_ELIMINAR,
-                    formClass = Serializable.class,
                     requiresId = true),
 			@ResourceConfigArtifact(
 					type = ResourceArtifactType.REPORT,
@@ -39,7 +38,6 @@ import javax.validation.constraints.NotNull;
             @ResourceConfigArtifact(
                     type = ResourceArtifactType.REPORT,
                     code = DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT,
-                    formClass = Serializable.class,
                     requiresId = true),
         }
 )

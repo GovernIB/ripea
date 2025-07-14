@@ -509,8 +509,8 @@ function removeCookie(cname) {
 
 		 	<c:if test="${rolActual!='tothom'}">
 				<div class="col-md-2">
-					<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-					<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+					<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+					<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 					<rip:inputSuggest 
 						name="agafatPer" 
 						urlConsultaInicial="${urlConsultaInicial}" 
@@ -634,7 +634,6 @@ function removeCookie(cname) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>								
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 				<c:if test="${usuariActual.expedientListDataDarrerEnviament}">
 					<th data-col-name="dataDarrerEnviament" data-type="datetime" data-converter="datetime" nowrap data-orderable="false"><spring:message code="expedient.list.user.columna.data.enviament"/></th>

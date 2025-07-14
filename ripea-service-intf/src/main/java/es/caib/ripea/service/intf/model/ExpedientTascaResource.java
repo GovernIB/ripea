@@ -14,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -119,6 +120,8 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     private ResourceReference<UsuariResource, String> responsableActual;
     private ResourceReference<UsuariResource, String> delegat;
     private List<ResourceReference<UsuariResource, String>> observadors = new ArrayList<>();
+    @NotNull
+    @NotEmpty
     private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
 
     @Getter

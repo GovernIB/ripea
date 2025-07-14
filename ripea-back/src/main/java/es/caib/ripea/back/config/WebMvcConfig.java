@@ -150,8 +150,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			"/api-docs/**",
 			"/**/api-docs/",
 			"/public/**",
-			"/api",
-			"/error"
+			"/reactapp/**",
+			"/**/artifacts",
+			"/**/enumOptions",
+			"/error",
+			"/sysenv",
+			"/manifest"
 	);
 
 	private static final List<String> ADDITIONAL_EXCLUDED_PATHS = List.of(
@@ -169,8 +173,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);
+		//Per processar autenticacio, no excloem /api/**
 		registry.addInterceptor(sessioInterceptor).excludePathPatterns(excludedSessionPathPatterns);
-		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedPathPatterns);
+		//Per actualitzar entitat i organ gestor a l threadLocal, no excloem /api/**
+		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedSessionPathPatterns); 
 		registry.addInterceptor(llistaRolsInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(modalInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(nodecoInterceptor).excludePathPatterns(excludedPathPatterns);

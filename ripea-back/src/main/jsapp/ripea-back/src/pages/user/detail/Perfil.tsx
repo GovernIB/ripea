@@ -36,10 +36,10 @@ const PerfilFrom = () =>{
 
         <CardData title={t('page.user.perfil.generic')}>
             {/* <GridFormField xs={12} name="numElementsPagina"/> */}
-            <GridFormField xs={12} name="entitatPerDefecte"/>
+            <GridFormField xs={12} name="entitatPerDefecte" namedQueries={[`BY_USUARI`]}/>
             <GridFormField xs={12} name="procediment" filter={builder.and(
-                           builder.eq('entitat.id', data?.entitatPerDefecte?.id)
-                       )}/>
+                builder.eq('entitat.id', data?.entitatPerDefecte?.id)
+            )}/>
         </CardData>
 
         <CardData title={t('page.user.perfil.column')}>
@@ -72,10 +72,10 @@ const usePerfil = () => {
         formApiRef.current?.show(user?.codi)
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, '', 'success');
+                temporalMessageShow(null, t('page.user.perfil.ok', {nom: user.nom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 
@@ -83,6 +83,7 @@ const usePerfil = () => {
         <MuiFormDialog
             resourceName={'usuariResource'}
             title={t('page.user.perfil.title')}
+            onClose={(reason?: string) => reason !== 'backdropClick'}
             apiRef={formApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg'}}
         >

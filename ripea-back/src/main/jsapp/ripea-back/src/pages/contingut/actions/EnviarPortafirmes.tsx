@@ -82,6 +82,7 @@ const EnviarPortafirmesForm = () => {
     const filterAnnexos = builder.and(
         builder.neq('id', apiRef?.current?.getId()),
         builder.eq('expedient.id', data?.expedient?.id),
+        builder.eq('esborrat', 0),
     )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -127,6 +128,7 @@ const EnviarPortafirmesForm = () => {
                        hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
 
         <GridButton
+            variant={open ?"contained" :"outlined"}
             xs={1} onClick={()=>{
                 setOpenNewFlux(false)
                 setOpen(!open)
@@ -136,6 +138,7 @@ const EnviarPortafirmesForm = () => {
             <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
         </GridButton>
         <GridButton
+            variant={openNewFlux ?"contained" :"outlined"}
             xs={1} onClick={()=>{
                 setOpen(false)
                 setOpenNewFlux(!openNewFlux)

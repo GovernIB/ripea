@@ -83,16 +83,24 @@ const theme = createTheme({
                 },
             },
         },
+        MuiFormControl: {
+            styleOverrides: {
+                root: {
+                    // Si algún hijo input/select está readonly o disabled
+                    '&:has(.MuiInputBase-input[readonly][aria-hidden="false"]), &:has(.MuiInputBase-input.Mui-disabled), &:has(.MuiSelect-select[readonly]), &:has(.MuiSelect-select.Mui-disabled)': {
+                        backgroundColor: '#e7e5e5',
+                        opacity: 0.6,
+                    }
+                }
+            }
+        },
         MuiInputBase: {
             styleOverrides: {
                 root: {
                     fontSize: '14px',
                 },
-                input: {
-                    fontSize: '14px',
-                }
             }
-        },
+        },     
         MuiFormLabel: {
             styleOverrides: {
                 root: {
@@ -149,7 +157,7 @@ const theme = createTheme({
 					alignItems: "center",
                 }
             }
-        }
+        }		
     }
 });
 

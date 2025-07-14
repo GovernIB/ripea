@@ -67,18 +67,19 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";
 
 	@NotNull
+    @ResourceField(onChangeActive = true)
 	protected InteressatTipusEnum tipus = InteressatTipusEnum.InteressatPersonaFisicaEntity;
-    @NotNull
 	@Size(max = 30)
 	protected String nom;
-    @NotNull
 	@Size(max = 30)
 	protected String llinatge1;
 	@Size(max = 30)
 	protected String llinatge2;
 	@Size(max = 80)
 	protected String raoSocial;
+
 	@Size(max = 9)
+	@ResourceField(enumType = true, onChangeActive = true)
 	protected String organCodi;
 	@Size(max = 256)
 	protected String organNom;
@@ -86,7 +87,6 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	
 	@NotNull
 	protected InteressatDocumentTipusEnumDto documentTipus = InteressatDocumentTipusEnumDto.NIF;
-	@NotNull
 	@Size(max = 17)
     @ResourceField(onChangeActive = true)
 	protected String documentNum;
@@ -109,14 +109,15 @@ public class InteressatResource extends BaseAuditableResource<Long> {
 	protected String telefon;
 	@Size(max = 160)
 	protected String observacions;
+    @NotNull
 	protected InteressatIdiomaEnumDto preferenciaIdioma = InteressatIdiomaEnumDto.CA;
 	@NotNull
 	protected boolean notificacioAutoritzat;
 	@NotNull
-	protected boolean esRepresentant;	
+	protected boolean esRepresentant;
 	protected Boolean entregaDeh;
-	protected Boolean entregaDehObligat;	
-	protected Boolean incapacitat;	
+	protected Boolean entregaDehObligat;
+	protected Boolean incapacitat;
 	protected boolean arxiuPropagat;
 	protected Date arxiuIntentData;
 	protected int arxiuReintents;

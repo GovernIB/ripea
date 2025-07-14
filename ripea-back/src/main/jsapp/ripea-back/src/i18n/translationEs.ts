@@ -353,6 +353,7 @@ const translationEs = {
             },
             alert: {
                 incapacitat: "En caso de titular con incapacidad es obligatorio indicar un destinatario.",
+                jaExistentExpedient: "Ya existe en el expediente",
             },
         },
         expedient: {
@@ -383,7 +384,7 @@ const translationEs = {
                     ok: "El expediente se ha importado correctamente",
                 },
                 agafar: {
-                    label: "Coger",
+                    label: "Bloquear",
                     ok: "El expediente '{{expedient}}' ha sido cogido por el usuario '{{user}}'",
                 },
                 follow: {
@@ -463,16 +464,15 @@ const translationEs = {
                     label: "Sincronizar estado con archivo",
                     ok: "El estado del archivo ha sido sincronizado",
                 },
-
                 changePrioritat: {
                     label: "Cambiar prioridad...",
                     title: "Modificar prioridad del expediente",
-                    ok: "El expediente '{{expedient}}' se ha modificado correctamente.",
+                    ok: "La prioridad del expediente '{{expedient}}' se ha modificado correctamente.",
                 },
                 changeEstat: {
                     label: "Cambiar estado...",
                     title: "Modificar estado del expediente",
-                    ok: "El expediente '{{expedient}}' se ha modificado correctamente.",
+                    ok: "El estado del expediente '{{expedient}}' se ha modificado correctamente.",
                 },
                 assignar: {
                     label: "Assignar",
@@ -483,6 +483,10 @@ const translationEs = {
                     label: "Relacionar...",
                     title: "Relacionar expediente",
                     ok: "Las relaciones del expediente '{{expedient}}' han cambiado correctamente.",
+                },
+                eliminarRelacio: {
+                    label: "Eliminar relación",
+                    ok: "La relación entre los 2 expedientes se ha eliminado correctamente.",
                 },
                 excelInteressats: {
                     title: "Exportar interesados a EXCEL",
@@ -583,6 +587,11 @@ const translationEs = {
                 documentOrigenFormat: "Formato: ES_<Órgano>_<AAAA>_<ID_específico>",
                 dataBasic: "Datos básicos",
                 dataInteressat: "Datos interesado",
+                dataEspecific: "Datos específicos",
+                dadesRegistrals: "Datos registrales",
+                fetRegistral: "Hecho registral",
+                naixement: "Nacimiento",
+                dadesAdicionals: "Datos adicionales",
                 dataOther: "Otros datos",
             },
             action: {
@@ -802,6 +811,7 @@ const translationEs = {
                 fitxerNom: "Nombre de archivo",
                 serveiTipusEnum: "Tipo de servicio",
                 notificacioIdentificador: "Identificador",
+                estatError: "Error procesando la notificación dentro de Notib",
             },
             action: {
                 actualitzarEstat: {
@@ -944,6 +954,7 @@ const translationEs = {
             },
             perfil: {
                 title: "Mi perfil",
+                ok: "Los datos del usuario '{{nom}}' se han modificado correctamente",
                 dades: "Datos de usuario",
                 correu: "Envio de correos",
                 generic: "Configuración genérica",

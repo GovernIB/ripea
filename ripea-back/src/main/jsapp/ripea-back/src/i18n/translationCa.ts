@@ -348,11 +348,12 @@ const translationCa = {
                 },
             },
             grid: {
-                title: "Interessatd del fitxer",
+                title: "Interessats del fitxer",
                 representant: "Representant",
             },
             alert: {
                 incapacitat: "En cas de titular amb discapacitat es obligatori indicar un destinatari.",
+                jaExistentExpedient: "Ja existeix a l'expedient",
             },
         },
         expedient: {
@@ -463,16 +464,15 @@ const translationCa = {
                     label: "Sincronitzar estat amb arxiu",
                     ok: "L'estat de l'arxiu s'ha sincronitzat",
                 },
-
                 changePrioritat: {
                     label: "Canviar prioritat...",
                     title: "Modificar prioritat de l'expedient",
-                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                    ok: "La prioritat de l'expedient '{{expedient}}' s'ha modificat correctament.",
                 },
                 changeEstat: {
                     label: "Canviar estat...",
                     title: "Modificar estat de l'expedient",
-                    ok: "L'expedient '{{expedient}}' s'ha modificat correctament.",
+                    ok: "L'estat de l'expedient '{{expedient}}' s'ha modificat correctament.",
                 },
                 assignar: {
                     label: "Assignar",
@@ -483,6 +483,10 @@ const translationCa = {
                     label: "Relacionar...",
                     title: "Relacionar expedient",
                     ok: "Les relacions de l'expedient '{{expedient}}' han canviat correctament.",
+                },
+                eliminarRelacio: {
+                    label: "Eliminar relació",
+                    ok: "La relació entre els 2 expedients s'ha eliminat correctament.",
                 },
                 excelInteressats: {
                     title: "Exportar interessats a EXCEL",
@@ -583,6 +587,11 @@ const translationCa = {
                 documentOrigenFormat: "Format: ES_<Òrgan>_<AAAA>_<ID_específic>",
                 dataBasic: "Dades bàsiques",
                 dataInteressat: "Dades de l'interessat",
+                dataEspecific: "Dades específiques",
+                dadesRegistrals: "Dades registrals",
+                fetRegistral: "Fet registral",
+                naixement: "Naixement",
+                dadesAdicionals: "Dades addicionals",
                 dataOther: "Altres dades",
             },
             action: {
@@ -802,6 +811,7 @@ const translationCa = {
                 fitxerNom: "Nom del fitxer",
                 serveiTipusEnum: "Tipus de servei",
                 notificacioIdentificador: "Identificador",
+                estatError: "Error en processar la notificació dins de Notib",
             },
             action: {
                 actualitzarEstat: {
@@ -944,6 +954,7 @@ const translationCa = {
             },
             perfil: {
                 title: "El meu perfil",
+                ok: "Les dades de l'usuari '{{nom}}' s'han modificat correctament",
                 dades: "Dades d'usuari",
                 correu: "Enviament de correus",
                 generic: "Configuració genèrica",

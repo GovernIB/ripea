@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
+import es.caib.ripea.service.intf.resourcevalidation.AcceptarAnotacioValid;
 import org.springframework.data.annotation.Transient;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -116,6 +118,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
+    @AcceptarAnotacioValid
     public static class AcceptarAnotacioForm implements Serializable {
         @NotNull
     	private ExpedientPeticioAccioEnumDto accio = ExpedientPeticioAccioEnumDto.CREAR;
@@ -128,11 +131,15 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         @ResourceField(onChangeActive = true)
     	private Integer any = Year.now().getValue();
     	private Long sequencia;
+        @Transient boolean gestioAmbGrupsActiva;
+        private ResourceReference<GrupResource, Long> grup;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;
     	@NotNull
-    	private ResourceReference<OrganGestorResource, Long> organGestor;    	
+    	private ResourceReference<OrganGestorResource, Long> organGestor;
+        @NotNull
     	private List<Long> interessats;
+        @NotNull @NotEmpty
         private Map<Long, String> annexos = new HashMap<>();
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;

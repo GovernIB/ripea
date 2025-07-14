@@ -460,6 +460,7 @@ body {
 							<li><a href="<c:url value="/pinbalServei"/>"><spring:message code="decorator.menu.pinbal.servei"/></a></li>
 							<li><a href="<c:url value="/scheduled"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.reinici.scheduler"/> ...</a></li>
 							<li><a href="<c:url value="/plugin"/>" data-toggle="modal"><spring:message code="decorator.menu.reinici.plugin"/> ...</a></li>
+							<li><a href="<c:url value="/modal/usuari/username"/>" data-toggle="modal"><spring:message code="decorator.menu.canvi.usuari.codi"/> ...</a></li>
 						</ul>
 					</li>
 				</ul>

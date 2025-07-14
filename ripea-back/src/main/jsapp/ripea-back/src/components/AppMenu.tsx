@@ -28,7 +28,7 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries }) => {
         // sx={{ mr: 2 }}
         style={{ color: entitat?.capsaleraColorLletra ?? '#000' }}
       >
-        <Icon sx={{ fontSize: '24px'}} fontSize={'medium'}>{menuIcon}</Icon>
+        <Icon sx={{ fontSize: '24px', m: 0 }} fontSize={'medium'}>{menuIcon}</Icon>
       </IconButton>
       {open && <SideMenu
           entries={menuEntries}

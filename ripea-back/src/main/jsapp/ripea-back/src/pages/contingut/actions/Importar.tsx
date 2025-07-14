@@ -7,19 +7,19 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import * as builder from '../../../util/springFilterUtils.ts';
 
 const ImportarForm = () => {
-    const {data} = useFormContext();
+    const {data ,apiRef} = useFormContext();
     const { t } = useTranslation();
 
     const filterCarpeta = builder.and(
         builder.eq('esborrat', 0),
-        builder.eq('expedient.id', data?.expedient?.id),
+        builder.eq('expedient.id', apiRef?.current?.getId()),
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="tipusImportacio" required/>
-        <GridFormField xs={12} name="codiEni" hidden={data?.tipusImportacio!="CODI_ENI"}/>
-        <GridFormField xs={6} name="numeroRegistre" hidden={data?.tipusImportacio!="NUMERO_REGISTRE"}/>
-        <GridFormField xs={6} name="dataPresentacio" type={"date"} hidden={data?.tipusImportacio!="NUMERO_REGISTRE"}/>
+        <GridFormField xs={12} name="codiEni" hidden={data?.tipusImportacio!="CODI_ENI"} required/>
+        <GridFormField xs={6} name="numeroRegistre" hidden={data?.tipusImportacio!="NUMERO_REGISTRE"} required/>
+        <GridFormField xs={6} name="dataPresentacio" type={"date"} hidden={data?.tipusImportacio!="NUMERO_REGISTRE"} required/>
         <GridFormField xs={12} name="carpeta"
                        filter={filterCarpeta}
                        disabled={data?.novaCarpetaNom}/>
@@ -49,10 +49,8 @@ const useImportar = (entity:any, refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id,{
-            expedient: {id: entity?.id}
-        })
+    const handleShow = () :void => {
+        apiRef.current?.show?.(entity?.id)
     }
     const onSuccess = () :void => {
         refresh?.()

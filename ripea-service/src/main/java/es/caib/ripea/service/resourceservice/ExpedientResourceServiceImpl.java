@@ -34,9 +34,12 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
@@ -52,6 +55,7 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -77,9 +81,7 @@ import es.caib.ripea.service.intf.dto.ImportacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
-import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientEstatResource;
@@ -111,8 +113,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	private final ExpedientRepository expedientRepository;
 	private final OrganGestorRepository organGestorRepository;
 	private final ExpedientEstatRepository expedientEstatRepository;
+	private final DadaRepository dadaRepository;
+	private final ContingutMovimentRepository contingutMovimentRepository;
 	
     private final UsuariResourceRepository usuariResourceRepository;
+    private final ExpedientResourceRepository expedientResourceRepository;
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
 
@@ -130,29 +135,30 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ExcepcioLogHelper excepcioLogHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final MetaDocumentHelper metaDocumentHelper;
+    private final MessageHelper messageHelper;
 
     @PostConstruct
     public void init() {
         
     	//Exportar docs a ZIP amb formulari previ. Massiu o individual.
-    	register(ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,	new ExportZipGenerator());
+    	register(ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,	new ExportZipGenerator());
     	//Exportar info expedients a EXCEL sense formulari previ. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,	new ExportOdsGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_ODS_CODE,	new ExportOdsGenerator());
         //Exportar info expedients a CSV sense formulari previ. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_CSV_CODE,	new ExportCsvGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_CSV_CODE,	new ExportCsvGenerator());
         //Genera els indexos dels expedients seleccionats i els comprimeix. Nomes massiu de moment.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ZIP, new ExportIndexZipGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ZIP, new ExportIndexZipGenerator());
         //Genera els indexos dels expedients seleccionats en PDF. Massiu o individual.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_PDF, new ExportIdexPdfGenerator());
         //Genera els indexos dels expedients seleccionats en EXCEL. Massiu o individual.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_XLS, new ExportIdexXlsGenerator());
         //Genera els indexos dels expedients seleccionats en PDF i els comprimeix en ZIP. Nomes individual.
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ENI, new ExportIndexEniGenerator());
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
-        register(ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
-        register(ExpedientResource.ACTION_PLANTILLA_EXCEL_INTERESSATS, 	new PlantillaExcelInteressatsReportGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ENI, new ExportIndexEniGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_ENI, 		new ExportEniGenerator());
+        register(ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE, 	new ExportIdexInsideGenerator());
+        register(ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS, 	new PlantillaExcelInteressatsReportGenerator());
         //Genera un Zip de los documentos seleccionados para un expediente concreto
-        register(ExpedientResource.ACTION_EXPORT_SELECTED_DOCS, new ExportSelectedDocsGenerator());
+        register(ExpedientResource.REPORT_EXPORT_SELECTED_DOCS, new ExportSelectedDocsGenerator());
         
         register(ExpedientResource.ACTION_MASSIVE_AGAFAR_CODE, new AgafarActionExecutor());
         register(ExpedientResource.ACTION_MASSIVE_ALLIBERAR_CODE, new AlliberarActionExecutor());
@@ -294,48 +300,60 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         Filter filtreProcedimentPermisDirecte = null;
         if (!rolActual.equals("IPA_ADMIN") && 
         	!rolActual.equals("IPA_SUPER") && 
-        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null && 
-        	permisosPerExpedients.getIdsMetaExpedientsPermesos().size()>0) {
+        	permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null &&
+                !permisosPerExpedients.getIdsMetaExpedientsPermesos().isEmpty()) {
 	            filtreProcedimentPermisDirecte = FilterBuilder.or(
 	            		FilterBuilder.equal(ExpedientResource.Fields.metaExpedient+"."+MetaExpedientResource.Fields.permisDirecte, false), //Permis directe
 	            		filtreProcedimentsPermesos
 	            );
         }
         
+        //Filtre de dominis (expedients amb alguna dada amb el valor indicat del codi de domini indicat)
+        //Aquest filtre arriba desde el front.
+        /*
+        Filter filtreDomini = null;
+        if (namedQueries!=null) {
+	        for (String namedQuery : namedQueries) {
+	            String[] split = namedQuery.split("#");
+	            
+	            switch (split[0]) {
+	            case "EXPEDIENT_DOMINIS":
+	            	String dominiCodi	= split[1];
+	            	String dominiValor	= split[2];
+	            	String campDomini = NodeResource.Fields.dades+"."+DadaResource.Fields.valor;
+	            	filtreDomini = Filter.parse(campDomini+" : '"+dominiValor+"'");
+	                break;
+	            }
+	        }
+        }
+        */
+        
         Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
         Filter filtreResultat = FilterBuilder.and(filtreNoEliminats, filtreEntitatSessio, combinedFilterProcedimentsOr, filtreProcedimentPermisDirecte);
-        String resultat = filtreResultat.generate();
-        return resultat;
+        return filtreResultat.generate();
     }
     
     @Override
-    protected void afterUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	//Relacionam els nous expedients seleccionats
-    	if (resource.getRelacionatsAmb()!=null) {
-    		for (ResourceReference<ExpedientResource, Long> relacionatAmb: resource.getRelacionatsAmb()) {
-    			try {
-    				expedientHelper.relacioCreate(entity.getEntitat().getId(), entity.getId(), relacionatAmb.getId(), configHelper.getRolActual());
-    			} catch (ValidationException ex) {
-    				//Ja relacionat 
-    			}
-    		}
-    	}
-    	
-    	//Eliminam els que ja no estan relacionats
-    	if (entity.getRelacionatsAmb()!=null) {
-    		for (ExpedientResourceEntity relacionat: entity.getRelacionatsAmb()) {
-    			if (!resource.estaRelacionatAmb(relacionat.getId())) {
-    				expedientHelper.relacioDelete(entity.getEntitat().getId(), entity.getId(), relacionat.getId(), configHelper.getRolActual());
-    			}
-    		}
-    	}
+    protected void beforeUpdateSave(ExpedientResourceEntity entity, ExpedientResource resource, Map<String, AnswerValue> answers) {
+        if(resource.getRelacionatsAmb()!=null) {
+            if(!resource.getRelacionatsAmb().isEmpty()) {
+                entity.setRelacionatsAmb(expedientResourceRepository.findAllById(resource.getRelacionatsAmb().stream().map(ResourceReference::getId).collect(Collectors.toList())));
+            }else {
+                entity.getRelacionatsAmb().clear();
+            }
+        }
+        if(resource.getRelacionatsPer()!=null) {
+            if(!resource.getRelacionatsPer().isEmpty()) {
+                entity.setRelacionatsPer(expedientResourceRepository.findAllById(resource.getRelacionatsPer().stream().map(ResourceReference::getId).collect(Collectors.toList())));
+            }else {
+                entity.getRelacionatsPer().clear();
+            }
+        }
     }
 
     @Override
     protected void afterConversion(ExpedientResourceEntity entity, ExpedientResource resource) {
-        resource.setNumComentaris(entity.getComentaris().size());
-        resource.setNumSeguidors(entity.getSeguidors().size());
-        resource.setNumAlert(entity.getAlertes().size());
+        resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
         usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
         resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
@@ -405,6 +423,12 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             resource.setNumPublicacions(entity.getPublicacions().size());
             resource.setNumRemeses(entity.getNotificacions().size());
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+            resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
+            resource.setNumContingut(contingutHelper.getFillsHierarchicalCount(entity.getId()));
+            resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
+            resource.setNumComentaris(entity.getComentaris().size());
+            resource.setNumSeguidors(entity.getSeguidors().size());
+            resource.setNumAlert(entity.getAlertes().size());
         }
     }
     
@@ -657,7 +681,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				String entitatActual = configHelper.getEntitatActualCodi();
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	if (params.isMassivo()) {
-	        		//TODO: No soportat
+	        		//Reobrir expedient massiu no esta soportada, pero deixam la porta oberta a futures implementacións. Tendria sentit.
 	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de reobrir expedient massiu no esta soportada.");
 	        	} else {
 	        		expedientHelper.reobrir(entitatEntity.getId(), params.getIds().get(0));
@@ -869,23 +893,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    		
 	        	//Aprofitam la mateixa funció que la de exportar documents de expedient a ZIP, pero modificada per nomes exportar els IDs seleccionats.
 	    		return getZipFileDocumentsExpedient(expedientEntity, FileNameOption.ORIGINAL, false, true, params.getIds());
-	    		
-//	    		//TODO: Convertir els params en llista de ArbreJsonDto
-//	    		List<ArbreJsonDto> arbreSeleccionats = new ArrayList<ArbreJsonDto>();
-//        		FitxerDto fitxerDto = documentHelper.descarregarAllDocumentsOfExpedientWithSelectedFolders(
-//        				entitatEntity.getId(),
-//        				expedientId,
-//        				arbreSeleccionats, //params.getIds()
-//        				configHelper.getRolActual(),
-//        				null);
-//            	resultat = new DownloadableFile(
-//            			fitxerDto.getNom(),
-//            			fitxerDto.getContentType(),
-//	            		fitxerDto.getContingut());
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats.");
+				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar el index en format PDF per els expedients seleccionats: "+e.getMessage());
 			}
     	}
     }
@@ -940,8 +951,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				String entitatActual = configHelper.getEntitatActualCodi();
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	if (params.isMassivo()) {
-	        		//TODO: No soportat
-	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de reobrir expedient massiu no esta soportada.");
+	        		//Sincronitzar expedient amb arxiu massivament no esta soportada, pero deixam la porta oberta a futures implementacions. Tendria sentit.
+	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de sincronitzar expedient amb arxiu massivament no esta soportada.");
 	        	} else {
 	        		resultat = contingutHelper.sincronitzarEstatArxiu(entitatEntity.getId(), params.getIds().get(0));
 	        	}
@@ -957,13 +968,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-    		
     		DownloadableFile resultat = null;
-    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
-    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(1);
+    		ExpedientResource.ExportarDocumentMassiu params = (ExpedientResource.ExportarDocumentMassiu)data.get(0);
 
             if (params.isMassivo()) {
-            	
 	            if (params.getIds()!=null && !params.getIds().isEmpty()) {
 	            	resultat = new DownloadableFile("BACKGROUND", "application/"+fileType, null);
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
@@ -974,13 +982,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.EXPEDIENT);
 	            } else {
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP: no hi ha cap expedient seleccionat.");
+					throw new ReportGenerationException(ExpedientResource.class, null, code, "S'ha produit un error al generar ZIP: no hi ha cap expedient seleccionat.");
 	            }
-	            
             } else {
-            	
+                Long expedientId = params.getIds().get(0);
             	try {
-            	
 		        	ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
 		        			expedientId,
 		        			false,
@@ -999,7 +1005,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 				} catch (Exception e) {
 					excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/exportarZipMassiu", e);
-					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP per els expedients seleccionats.");
+					throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al generar ZIP per els expedients seleccionats: "+e.getMessage());
 				}
             }
             
@@ -1010,7 +1016,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		public List<Serializable> generateData(String code, ExpedientResourceEntity entity, ExpedientResource.ExportarDocumentMassiu params)
 				throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getId():0l);
 			parametres.add(params);
 			return parametres;
 		}
@@ -1348,6 +1353,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 metaExpedientResourceOptional.ifPresent((metaExpedientResourceEntity) -> {
                     MetaExpedientResource metaExpedientResource =
                             objectMappingHelper.newInstanceMap(metaExpedientResourceEntity, MetaExpedientResource.class);
+
+                    target.setGestioAmbGrupsActiva(metaExpedientResource.isGestioAmbGrupsActiva());
                     if (metaExpedientResource.getOrganGestor() != null) {
                         target.setOrganGestor(metaExpedientResource.getOrganGestor());
                         target.setDisableOrganGestor(true);
@@ -1363,6 +1370,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     }
                 });
             } else {
+                target.setGestioAmbGrupsActiva(false);
                 target.setOrganGestor(null);
                 target.setSequencia(null);
             }
@@ -1408,8 +1416,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
             if(ExpedientResource.ExpedientFilterForm.Fields.estat.equals(fieldName)) {
-                resultat.add(new FieldOption("0", "Obert"));
-                resultat.add(new FieldOption("-1", "Tancat"));
+                resultat.add(new FieldOption("0", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT")));
+                resultat.add(new FieldOption("-1", messageHelper.getMessage("es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.TANCAT")));
 
                 if (requestParameterMap.containsKey("metaExpedientId") && requestParameterMap.get("metaExpedientId").length>0){
                     Long metaExpedientId = Long.valueOf(requestParameterMap.get("metaExpedientId")[0]);

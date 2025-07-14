@@ -120,7 +120,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
     const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
-    const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(refresh)
+    const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
 
     const {apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail();
@@ -181,8 +181,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {
             title: t('page.contingut.action.importarExpedient.label'),
             icon: "link",
-            onClick: () => handleImportarExpedient(entity?.id, entity),
-            // hidden: !user?.sessionScope?.isImportacioRelacionatsActiva,
+            onClick: handleImportarExpedient,
+            hidden: !user?.sessionScope?.isImportacioRelacionatsActiva,
         },
     ];
 
@@ -306,7 +306,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         },
         {
             title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
-                ? t('page.document.action.notifica.labelr')
+                ? t('page.document.action.notificar.label')
                 : t('page.document.action.comunicar.label'),
             icon: "mail",
             showInMenu: true,

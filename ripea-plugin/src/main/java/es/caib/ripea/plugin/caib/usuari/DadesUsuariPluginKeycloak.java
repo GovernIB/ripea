@@ -231,7 +231,8 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 	private List<UserInfo> internalSearchUsers(String filter) {
 		List<UserInfo> usernamesFound = new ArrayList<UserInfo>();
 		try {
-			SearchUsersResult sur1 = this.getUsersByPartialNameOrPartialSurnames(filter);
+//			SearchUsersResult sur1 = this.getUsersByPartialNameOrPartialSurnames(filter);
+			SearchUsersResult sur1 = this.getUsersByPartialValuesOr(filter, filter, filter, filter, filter);
 			if (sur1!=null && sur1.getUsers()!=null)
 				usernamesFound.addAll(sur1.getUsers());
 		} catch (Exception ex) {
@@ -297,8 +298,12 @@ public class DadesUsuariPluginKeycloak extends KeyCloakUserInformationPlugin imp
 				} else if (userInfo.getAttributes().containsKey("nif")) {
 					dadesUsuari.setNif(userInfo.getAttributes().get("nif"));
 				} else if (userInfo.getAttributes().containsKey("Nif")) {
-					dadesUsuari.setNif(userInfo.getAttributes().get("Nif"));				
+					dadesUsuari.setNif(userInfo.getAttributes().get("Nif"));
 				}
+			}
+			//Si el NIF no ha arribat per els atributs, intentam recuperarlo per el camp administrationId
+			if (dadesUsuari.getNif()==null) {
+				dadesUsuari.setNif(userInfo.getAdministrationID());	
 			}
 			dadesUsuari.setEmail(userInfo.getEmail());
 			return dadesUsuari;

@@ -1,12 +1,15 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.command.UsuariCommand;
-import es.caib.ripea.back.helper.*;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.EntitatService;
-import es.caib.ripea.service.intf.service.OrganGestorService;
-import es.caib.ripea.service.intf.utils.Utils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,14 +19,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
+import es.caib.ripea.back.command.UsuariCodiCommand;
+import es.caib.ripea.back.command.UsuariCommand;
+import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.back.helper.EnumHelper;
+import es.caib.ripea.back.helper.RequestSessionHelper;
+import es.caib.ripea.back.helper.RolHelper;
+import es.caib.ripea.back.helper.SessioHelper;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.IdNomDto;
+import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.MetaExpedientDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.Utils;
+import lombok.Builder;
+import lombok.Data;
 
 @Controller
 @RequestMapping("/usuari")
@@ -242,4 +255,81 @@ public class UsuariController  extends BaseAdminController {
 		}
 		return "redirect:/";
 	}
+	
+	/**
+	 * CANVI DE CODIS D'USUARI
+	 */
+	@RequestMapping(value = "/username", method = RequestMethod.GET)
+ 	public String canviCodiGet(
+ 			HttpServletRequest request,
+ 			Model model) {
+		UsuariCodiCommand usuariCodiCommand = new UsuariCodiCommand();
+		usuariCodiCommand.setUsuariActualCodi(aplicacioService.getUsuariActual().getCodi());
+ 		model.addAttribute("usuariCodiCommand", usuariCodiCommand);
+ 		return "usuariCodiForm";
+ 	}
+	
+	@RequestMapping(value = "/username/{codiAntic}/validateTo/{codiNou}", method = RequestMethod.POST, produces = "application/json" )
+	@ResponseBody
+	public UsuariChangeValidation validarCodiPost(
+ 			HttpServletRequest request,
+ 			HttpServletResponse response,
+ 			@PathVariable("codiAntic") String codiAntic,
+ 			@PathVariable("codiNou") String codiNou) {
+		UsuariDto usuariAntic = null;
+		UsuariDto usuariNou = null;
+		try {
+			usuariAntic = aplicacioService.findUsuariAmbCodi(codiAntic);
+		} catch (Exception ex) {}
+		try {
+			usuariNou = aplicacioService.findUsuariAmbCodi(codiNou);	
+		} catch (Exception ex) {}
+		
+		return UsuariChangeValidation.builder()
+				.usuariAnticExists(usuariAntic != null)
+				.usuariNouExists(usuariNou != null)
+				.build();
+	}
+	
+	@RequestMapping(value = "/username/{codiAntic}/changeTo/{codiNou}", method = RequestMethod.POST, produces = "application/json" )
+	@ResponseBody
+	public UsuariChangeResponse canviCodiPost(
+ 			HttpServletRequest request,
+ 			HttpServletResponse response,
+ 			@PathVariable("codiAntic") String codiAntic,
+ 			@PathVariable("codiNou") String codiNou) {
+		Long t0 = System.currentTimeMillis();
+		try {
+			Long registresModificats = aplicacioService.updateUsuariCodi(codiAntic, codiNou);
+			return UsuariChangeResponse.builder()
+					.estat(ResultatEstatEnum.OK)
+					.registresModificats(registresModificats)
+					.duracio(System.currentTimeMillis() - t0)
+					.build();
+		} catch (Exception e) {
+			return UsuariChangeResponse.builder()
+					.estat(ResultatEstatEnum.ERROR)
+					.errorMessage(getMessage(request, "usuari.controller.codi.modificat.error", null) + ": " + e.getMessage())
+					.duracio(System.currentTimeMillis() - t0)
+					.build();
+		}
+	}
+	
+	@Data
+	@Builder
+	public static class UsuariChangeValidation {
+		private boolean usuariAnticExists;
+		private boolean usuariNouExists;
+	}
+
+	@Data
+	@Builder
+	public static class UsuariChangeResponse {
+		private ResultatEstatEnum estat;
+		private String errorMessage;
+		private Long registresModificats;
+		private Long duracio;
+	}
+
+	public enum ResultatEstatEnum { OK, ERROR }
 }

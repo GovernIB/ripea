@@ -78,6 +78,7 @@ const Alerta = (props:any) => {
         {
             title: t('page.alert.action.read.label'),
             icon: "mail",
+            showInMenu: true,
             onClick: massiveLlegit,
         },
     ]

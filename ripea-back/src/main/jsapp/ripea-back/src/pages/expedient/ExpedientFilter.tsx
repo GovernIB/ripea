@@ -25,17 +25,19 @@ const ExpedientFilterForm = () => {
         <GridFormField xs={3} name="dataCreacioInici"/>
         <GridFormField xs={3} name="dataCreacioFinal"/>
 
-        <GridFormField xs={3} name="domini"/>
+        <GridFormField xs={3} name="domini" hidden={!user?.sessionScope?.isDominisEnabled}/>
         <GridFormField xs={3} name="dominiValor"
                        requestParams={{domini: data?.domini?.id}}
                        disabled={!data?.domini}
-                       reanOnly={!data?.domini}/>
+                       reanOnly={!data?.domini}
+                       hidden={!user?.sessionScope?.isDominisEnabled}/>
 
         <GridFormField xs={2} name="numeroRegistre"/>
         <GridFormField xs={2} name="grup" hidden={!user?.sessionScope?.isFiltreGrupsVisible}/>
-            <Grid item xs={2} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
         <GridFormField xs={2} name="agafatPer" hidden={user?.rolActual == "tothom"}/>
+            <Grid item xs={2} hidden={user?.sessionScope?.isFiltreGrupsVisible}/>
             <Grid item xs={2} hidden={user?.rolActual != "tothom"}/>
+            <Grid item xs={6} hidden={user?.sessionScope?.isDominisEnabled}/>
 
         <GridButtonField xs={1} name={'agafat'} icon={'lock'}/>
         <GridButtonField xs={1} name={'pendentFirmar'} icon={'edit'}/>
@@ -63,8 +65,12 @@ export const springFilterBuilder = (data: any, user?: any): string => {
 
         builder.betweenDates("createdDate", data.dataCreacioInici, data.dataCreacioFinal),
 
+        data?.dominiValor && builder.exists(
+            builder.like("dades.valor", data?.dominiValor)
+        ),
+
         builder.like("registresImportats", data.numeroRegistre),
-        builder.eq("grup.codi", data.grup?.id),
+        builder.eq("grup.id", data.grup?.id),
         (user?.rolActual != "tothom") && builder.eq("agafatPer.codi", `'${data.agafatPer?.id}'`),
 
         data.pendentFirmar && (
@@ -96,7 +102,7 @@ const ExpedientFilter = (props: any) => {
     return <StyledMuiFilter
         resourceName={"expedientResource"}
         code={"EXPEDIENT_FILTER"}
-        springFilterBuilder={(data: any)=>springFilterBuilder(data, user)}
+        springFilterBuilder={(data: any)=> springFilterBuilder(data, user)}
         onSpringFilterChange={onSpringFilterChange}
     >
         <ExpedientFilterForm/>

@@ -134,8 +134,8 @@
 			disabled="true"
 			required="true"
 			textareaRows="2"/> 
-		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
 			name="responsablesCodi" 
 			urlConsultaInicial="${urlConsultaInicial}" 

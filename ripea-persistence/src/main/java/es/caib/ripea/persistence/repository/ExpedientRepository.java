@@ -790,7 +790,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("isAdmin") boolean isAdmin,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
-	
 
 	@Query(	"select" +
 			"    e " +
@@ -819,7 +818,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("organsCodisPermitted") List<String> organsCodisPermitted,
 			@Param("metaNode") MetaNodeEntity metaNode);
 	
-	
 	@Query(	"select" +
 			"    max(e.sequencia) " +
 			"from" +
@@ -830,11 +828,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	Long findMaxSequencia(
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("any") int any);
-	
 
 	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
-
 
 	@Query(	"from" +
 			"    ExpedientEntity e "
@@ -877,5 +873,35 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	ExpedientEntity findByNumeroExpedientAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("numeroExpedient") String numeroExpedient);
+
+	/**
+	 * ACTUALITZACIO CODU USUARI
+	 */
 	
+	 @Modifying
+     @Query(value = "UPDATE IPA_EXPEDIENT SET AGAFAT_PER_CODI = :codiNou WHERE AGAFAT_PER_CODI = :codiAntic", nativeQuery = true)
+	 public int updateAgaftPer(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 
+	 @Modifying
+	 @Query(value = "UPDATE IPA_EXPEDIENT_TASCA " +
+	 			"SET RESPONSABLE_ACTUAL_CODI = CASE WHEN RESPONSABLE_ACTUAL_CODI = :codiAntic THEN :codiNou ELSE RESPONSABLE_ACTUAL_CODI END, " +
+	 			"    DELEGAT = CASE WHEN DELEGAT = :codiAntic THEN :codiNou ELSE DELEGAT END " +
+	 			"WHERE RESPONSABLE_ACTUAL_CODI = :codiAntic OR DELEGAT = :codiAntic", nativeQuery = true)
+	 public int updateExpTasca(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 
+	 @Modifying
+     @Query(value = "UPDATE IPA_EXPEDIENT_TASCA_RESP SET RESPONSABLE_CODI = :codiNou WHERE RESPONSABLE_CODI = :codiAntic", nativeQuery = true)
+	 public int updateExpTascaResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 
+	 @Modifying
+     @Query(value = "UPDATE IPA_EXPEDIENT_TASCA_OBSE SET OBSERVADOR_CODI = :codiNou WHERE OBSERVADOR_CODI = :codiAntic", nativeQuery = true)
+	 public int updateExpTascaObservador(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 
+	 @Modifying
+     @Query(value = "UPDATE IPA_EXPEDIENT_SEGUIDOR SET SEGUIDOR_CODI = :codiNou WHERE SEGUIDOR_CODI = :codiAntic", nativeQuery = true)
+	 public int updateExpSeguidorCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+	 
+	 @Modifying
+     @Query(value = "UPDATE IPA_EXPEDIENT_PETICIO SET USUARI_ACTUALITZACIO = :codiNou WHERE USUARI_ACTUALITZACIO = :codiAntic", nativeQuery = true)
+	 public int updateExpPeticio(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 }

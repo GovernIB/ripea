@@ -138,7 +138,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				model.addAttribute("isRolActualRevisor", true);
 			}
 		}
-		
+		addBotoCarrecsProperty(model);
 		return "metaExpedientMetaDocumentForm";
 	}
 

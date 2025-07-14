@@ -10,6 +10,8 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
+import es.caib.ripea.service.intf.resourcevalidation.ImportarDocumentValid;
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -40,7 +42,7 @@ import lombok.experimental.FieldNameConstants;
 		artifacts = {
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_PDF_CODE,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,
 						formClass = ExpedientResource.ExportarDocumentMassiu.class),
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
@@ -119,7 +121,7 @@ import lombok.experimental.FieldNameConstants;
                         formClass = ExpedientResource.MassiveAction.class),                
                 @ResourceConfigArtifact(
                         type = ResourceArtifactType.REPORT,
-                        code = ExpedientResource.ACTION_EXPORT_SELECTED_DOCS,
+                        code = ExpedientResource.REPORT_EXPORT_SELECTED_DOCS,
                         formClass = ExpedientResource.MassiveAction.class,
                         requiresId = true),
                 @ResourceConfigArtifact(
@@ -133,54 +135,55 @@ import lombok.experimental.FieldNameConstants;
                         formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ODS_CODE,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ODS_CODE,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_CSV_CODE,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_CSV_CODE,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ZIP,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ZIP,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_PDF,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_PDF,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_XLS,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_XLS,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INDEX_ENI,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INDEX_ENI,
 						formClass = ExpedientResource.MassiveAction.class),				
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_ENI,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_ENI,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_MASSIVE_EXPORT_INSIDE,
+						code = ExpedientResource.REPORT_MASSIVE_EXPORT_INSIDE,
 						formClass = ExpedientResource.MassiveAction.class),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.REPORT,
-						code = ExpedientResource.ACTION_PLANTILLA_EXCEL_INTERESSATS,
+						code = ExpedientResource.REPORT_PLANTILLA_EXCEL_INTERESSATS,
                         requiresId = true),
 		})
+@ExpedientValid
 public class ExpedientResource extends NodeResource implements Serializable {
 
 	private static final long serialVersionUID = 7440910672703796468L;
 	
-	public static final String ACTION_MASSIVE_EXPORT_PDF_CODE 	= "EXPORT_DOC";
-	public static final String ACTION_MASSIVE_EXPORT_ODS_CODE 	= "EXPORT_EXCEL";
-	public static final String ACTION_MASSIVE_EXPORT_CSV_CODE 	= "EXPORT_CSV";
-	public static final String ACTION_MASSIVE_EXPORT_INDEX_ZIP 	= "EXPORT_INDEX_ZIP";
-	public static final String ACTION_MASSIVE_EXPORT_INDEX_PDF 	= "EXPORT_INDEX_PDF";
-	public static final String ACTION_MASSIVE_EXPORT_INDEX_XLS 	= "EXPORT_INDEX_XLS";
-	public static final String ACTION_MASSIVE_EXPORT_INDEX_ENI 	= "EXPORT_INDEX_ENI";
-	public static final String ACTION_MASSIVE_EXPORT_ENI 		= "EXPORT_ENI";
-	public static final String ACTION_MASSIVE_EXPORT_INSIDE 	= "EXPORT_INSIDE";
+	public static final String REPORT_MASSIVE_EXPORT_PDF_CODE  = "EXPORT_DOC";
+	public static final String REPORT_MASSIVE_EXPORT_ODS_CODE  = "EXPORT_EXCEL";
+	public static final String REPORT_MASSIVE_EXPORT_CSV_CODE  = "EXPORT_CSV";
+	public static final String REPORT_MASSIVE_EXPORT_INDEX_ZIP = "EXPORT_INDEX_ZIP";
+	public static final String REPORT_MASSIVE_EXPORT_INDEX_PDF = "EXPORT_INDEX_PDF";
+	public static final String REPORT_MASSIVE_EXPORT_INDEX_XLS = "EXPORT_INDEX_XLS";
+	public static final String REPORT_MASSIVE_EXPORT_INDEX_ENI = "EXPORT_INDEX_ENI";
+	public static final String REPORT_MASSIVE_EXPORT_ENI       = "EXPORT_ENI";
+	public static final String REPORT_MASSIVE_EXPORT_INSIDE    = "EXPORT_INSIDE";
 	
 	public static final String ACTION_MASSIVE_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_MASSIVE_UNFOLLOW_CODE = "UNFOLLOW";
@@ -192,10 +195,10 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
-	public static final String ACTION_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
+	public static final String REPORT_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
-	public static final String ACTION_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
+	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
 	public static final String PERSPECTIVE_ARXIU_EXPEDIENT = "ARXIU_EXPEDIENT";
@@ -235,6 +238,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
 	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
+    @Transient boolean gestioAmbGrupsActiva;
 	private ResourceReference<GrupResource, Long> grup;
 	private ResourceReference<MetaExpedientOrganGestorResource, Long> metaexpedientOrganGestorPares;
 
@@ -331,8 +335,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private Date dataDarrerEnviament;
     @Transient private boolean potModificar;
 
-    private List<ResourceReference<ExpedientResource, Long>> relacionatsPer = new ArrayList<>();
-    private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = new ArrayList<>();
+    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer;
+    @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb;
     @Transient private List<ResourceReference<DocumentResource, Long>> documentObligatorisAlTancar = new ArrayList<>();
 
     @Transient private boolean conteDocuments;
@@ -365,6 +369,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String estat = "0";
         private String interessat;
         private ResourceReference<OrganGestorResource, Long> organGestor;
+        @ResourceField(springFilter = "actiu:true and revisioEstat:'REVISAT'")
         private ResourceReference<MetaExpedientResource, Long> metaExpedient;
         private ResourceReference<DominiResource, Long> domini;
         @ResourceField(enumType = true)
@@ -413,6 +418,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
+    @ImportarDocumentValid
     public static class ImportarDocumentsForm implements Serializable {
     	@NotNull
     	private TipusImportEnumDto tipusImportacio = TipusImportEnumDto.NUMERO_REGISTRE;
@@ -424,14 +430,12 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String novaCarpetaNom;
     }
     
-    public boolean estaRelacionatAmb(Long id) {
-    	if (this.getRelacionatsAmb()!=null) {
-    		for (ResourceReference<ExpedientResource, Long> relacionatAmb: this.getRelacionatsAmb()) {
-    			if (relacionatAmb.getId().equals(id)) {
-    				return true;
-    			}
-    		}
-    	}
-    	return false;
-    }
+//    public boolean estaRelacionatAmb(Long id) {
+//    	if (this.getRelacionatsAmb()!=null) {
+//            return this.getRelacionatsAmb().stream()
+//                    .anyMatch(relacionatAmb -> relacionatAmb.getId().equals(id));
+//    	}
+//
+//    	return false;
+//    }
 }

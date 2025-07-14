@@ -4,6 +4,8 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+
 import org.springframework.data.annotation.Transient;
 
 import java.io.Serializable;
@@ -15,11 +17,13 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
+@FieldNameConstants
 public class NodeResource extends ContingutResource {
     
 	@Transient private boolean valid;
     @Transient private List<ValidacioErrorResource> errors;
-	protected ResourceReference<MetaNodeResource, Long> metaNode;
+    private ResourceReference<MetaNodeResource, Long> metaNode;
+	private ResourceReference<DadaResource, Long> dades;
 	
     @Getter
     @Setter

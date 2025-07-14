@@ -71,36 +71,37 @@ const TancarForm = () => {
 
     return <Load value={entity}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <Grid item xs={12} hidden={!rowsCount}>
-            <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
-        </Grid>
-        <Grid item xs={12}>
-            <Load value={selectedModel} noEffect>
-                <StyledMuiGrid
-                    resourceName={"documentResource"}
-                    columns={columns}
-                    filter={filter}
-                    selectionActive
-                    rowSelectionModel={selectedModel}
-                    isRowSelectable={(params) => !selectedModel.includes(params.row?.id)}
-                    onRowCountChange={setRowsCount}
-                    onRowSelectionModelChange={(newSelection) => {
-                        setSelectedRows([...newSelection]);
-                    }}
-                    height={162 + 52 * 4}
-                    readOnly
-                /></Load>
-        </Grid>
+            <Grid item xs={12} hidden={!rowsCount}>
+                <Alert severity={"info"}>{t('page.expedient.alert.borradors')}</Alert>
+            </Grid>
+            <Grid item xs={12}>
+                <Load value={selectedModel} noEffect>
+                    <StyledMuiGrid
+                        resourceName={"documentResource"}
+                        columns={columns}
+                        filter={filter}
+                        selectionActive
+                        rowSelectionModel={selectedModel}
+                        isRowSelectable={(params) => !selectedModel.includes(params.row?.id)}
+                        onRowCountChange={setRowsCount}
+                        onRowSelectionModelChange={(newSelection) => {
+                            setSelectedRows([...newSelection]);
+                        }}
+                        height={162 + 52 * 4}
+                        readOnly
+                    /></Load>
+            </Grid>
 
-        <Grid item xs={12} hidden={!entity?.conteNotificacionsCaducades}>
-            <Alert severity={"warning"}>{t('page.expedient.alert.notificacio')}</Alert>
-        </Grid>
-        <Grid item xs={12} hidden={!entity?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
-            <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
-        </Grid>
+            <Grid item xs={12} hidden={!entity?.conteNotificacionsCaducades}>
+                <Alert severity={"warning"}>{t('page.expedient.alert.notificacio')}</Alert>
+            </Grid>
+            <Grid item xs={12} hidden={!entity?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
+                <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
+            </Grid>
 
-        <GridFormField xs={12} name="motiu" type={"textarea"} required/>
-    </Grid></Load>
+            <GridFormField xs={12} name="motiu" type={"textarea"} required/>
+        </Grid>
+    </Load>
 }
 
 const Tancar = (props: any) => {

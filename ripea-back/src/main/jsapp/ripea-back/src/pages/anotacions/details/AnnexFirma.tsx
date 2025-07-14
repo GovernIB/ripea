@@ -11,7 +11,7 @@ const AnnexFirma = (props:any) => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
         {
             entity?.firmes.map((firma:any)=>{
-                return <CardData title={firma?.fitxerNom}>
+                return <CardData key={firma?.id} title={firma?.fitxerNom}>
                     <ContenidoData xs={6} title={t('page.registre.justificant.firmaTipus')}>{firma?.tipus}</ContenidoData>
                     <ContenidoData xs={6} title={t('page.registre.justificant.firmaPerfil')}>{firma?.perfil}</ContenidoData>
                 </CardData>

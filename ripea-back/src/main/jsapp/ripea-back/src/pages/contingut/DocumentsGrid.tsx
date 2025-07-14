@@ -1,137 +1,25 @@
-import React, {useEffect, useState} from "react";
-import { FormControl, Grid, InputLabel, Select, MenuItem, Icon, Alert } from "@mui/material";
+import React, {useEffect, useMemo, useState} from "react";
+import { FormControl, Grid, InputLabel, Select, MenuItem, Icon } from "@mui/material";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
-import { GridPage, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
+import { GridPage, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
 import ContingutIcon from "./details/ContingutIcon.tsx";
 import { useContingutActions } from "./details/ContingutActions.tsx";
 import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
-import GridFormField, { GridButton } from "../../components/GridFormField.tsx";
 import StyledMuiGrid, { ToolbarButton } from "../../components/StyledMuiGrid.tsx";
 import Load from "../../components/Load.tsx";
 import { MenuActionButton } from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
-import TabComponent from "../../components/TabComponent.tsx";
-import Iframe from "../../components/Iframe.tsx";
-import { useScanFinalitzatSession } from "../../components/SseExpedient.tsx";
 import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
+import DocumentsGridForm from "./DocumentGridForm.tsx";
 
 const View = {
     estat: 'TREETABLE_PER_ESTAT',
     tipus: 'TREETABLE_PER_TIPUS_DOCUMENT',
     carpeta: 'TREETABLE_PER_CARPETA',
     icona: 'GRID',
-}
-
-const ScanerTabForm = () => {
-    const { data, apiRef } = useFormContext();
-    const { t } = useTranslation();
-    const { onChange } = useScanFinalitzatSession();
-    const { value: user } = useUserSession()
-
-    onChange((value) => {
-        if (user?.codi == value?.usuari) {
-            apiRef?.current?.setFieldValue("scaned", true)
-            apiRef?.current?.setFieldValue("adjunt", {
-                name: value?.nomDocument,
-                content: value?.contingut,
-                contentType: value?.mimeType
-            });
-        }
-    });
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <Grid item xs={12} hidden={!data?.scaned}>
-            <Alert severity={"success"}>{t('page.document.alert.scaned')}</Alert>
-        </Grid>
-
-        <GridFormField xs={12} name="ntiIdDocumentoOrigen"
-            componentProps={{ title: t('page.document.detall.documentOrigenFormat') }}
-            required />
-        <GridFormField xs={12} name="digitalitzacioPerfil" required />
-
-        <Grid item xs={12}>
-            <Iframe src={data?.digitalitzacioProcesUrl} />
-        </Grid>
-    </Grid>
-}
-const FileTabForm = () => {
-    const { data } = useFormContext();
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="adjunt" type={"file"} required />
-        <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus == "FIRMA_ADJUNTA"} />
-        <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled />
-        <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required />
-    </Grid>
-}
-
-const DocumentsGridForm = () => {
-    const { t } = useTranslation();
-    const { data, apiRef } = useFormContext();
-    const { artifactAction: apiAction } = useResourceApiService('documentResource');
-
-    const actualizarDatos = () => {
-        if (data?.adjunt && data.pluginSummarizeActiu) {
-            apiAction(undefined, { code: "RESUM_IA", data: { adjunt: data?.adjunt } })
-                .then((result) => {
-                    if (result) {
-                        apiRef?.current?.setFieldValue("nom", result.titol)
-                        apiRef?.current?.setFieldValue("descripcio", result.resum)
-                    }
-                });
-        }
-    };
-
-    const metaDocumentFilter: string = builder.and(
-        builder.eq("metaExpedient.id", data?.metaExpedient?.id),
-        builder.eq("actiu", true),
-    );
-
-    const tabs = [
-        {
-            value: "file",
-            label: t('page.document.tabs.file'),
-            content: <FileTabForm />,
-        },
-        {
-            value: "scaner",
-            label: t('page.document.tabs.scaner'),
-            content: !data?.funcionariHabilitatDigitalib
-                ? <ScanerTabForm />
-                : <Alert severity={"warning"} sx={{ width: '100%' }}>{t('page.document.alert.funcionariHabilitatDigitalib')}</Alert>,
-        }
-    ];
-
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument"
-            namedQueries={
-                apiRef?.current?.getId()
-                    ? [`UPDATE_DOC#${apiRef?.current?.getId()}`]
-                    : [`CREATE_NEW_DOC#${data?.expedient?.id}`]
-            }
-            filter={metaDocumentFilter} />
-        <GridFormField xs={data.pluginSummarizeActiu ? 11 : 12} name="nom" />
-        <GridButton xs={1} title={t('page.document.detall.summarize')}
-            onClick={actualizarDatos}
-            disabled={!data?.adjunt}
-            hidden={!data.pluginSummarizeActiu}>
-            <Icon>assistant</Icon>IA
-        </GridButton>
-        <GridFormField xs={12} name="descripcio" type={"textarea"} />
-        <GridFormField xs={12} name="dataCaptura" type={"date"} disabled required />
-        <GridFormField xs={12} name="ntiOrigen" required />
-        <GridFormField xs={12} name="ntiEstadoElaboracion" required />
-
-        <Grid item xs={12}>
-            <TabComponent
-                tabs={tabs}
-                variant="scrollable"
-            />
-        </Grid>
-    </Grid>
 }
 
 const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidden: boolean }) => {
@@ -166,7 +54,7 @@ const TreeViewSelector = (props: { value: any, onChange: (value: any) => void })
             >
                 <MenuItem value={View.estat}>{t('page.document.view.estat')}</MenuItem>
                 <MenuItem value={View.tipus}>{t('page.document.view.tipus')}</MenuItem>
-                <MenuItem value={View.carpeta} selected>{t('page.document.view.carpeta')}</MenuItem>
+                <MenuItem value={View.carpeta}>{t('page.document.view.carpeta')}</MenuItem>
             </Select>
         </FormControl>
     </Grid>
@@ -198,19 +86,7 @@ const columns = [
     },
 ];
 
-const DocumentsGrid = (props: any) => {
-    const { entity, onRowCountChange } = props;
-    const { t } = useTranslation();
-    const {value: user} = useUserSession();
-
-    const commonFilter = builder.and(
-        builder.or(
-            builder.eq('expedient.id', entity?.id),
-            builder.eq('pare.id', entity?.id),
-        ),
-        builder.eq('esborrat', 0),
-    )
-
+export const useTreeView = (commonFilter:string) => {
     const {
         isReady: apiExpedientIsReady,
         find: apiExpedientFindAll,
@@ -242,6 +118,32 @@ const DocumentsGrid = (props: any) => {
         if (apiCarpetaIsReady) {findCarpetas()}
     }, [apiCarpetaIsReady]);
 
+    const refresh = () => {
+        findExpedients()
+        findCarpetas()
+    }
+
+    return {
+        expedients,
+        carpetes,
+        refresh,
+        isReady: apiExpedientIsReady && apiCarpetaIsReady,
+    }
+}
+
+const DocumentsGrid = (props: any) => {
+    const { entity, onRowCountChange } = props;
+    const { t } = useTranslation();
+    const {value: user} = useUserSession();
+
+    const commonFilter = useMemo(() => builder.and(
+        builder.or(
+            builder.eq('expedient.id', entity?.id),
+            builder.eq('pare.id', entity?.id),
+        ),
+        builder.eq('esborrat', 0),
+    ), [entity?.id]);
+
     const { get: getFolderExpand, save: addFolderExpand, removeAll } = useSessionList(`folder_expand#${entity?.id}`)
 
     const gridApiRef = useMuiDataGridApiRef();
@@ -249,9 +151,9 @@ const DocumentsGrid = (props: any) => {
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
     const [vista, setVista] = useState<string>(user?.conf?.vistaActual);
 
+    const {carpetes, expedients, refresh: refreshTree, isReady} = useTreeView(commonFilter)
     const refresh = () => {
-        findExpedients()
-        findCarpetas()
+        refreshTree()
         gridApiRef?.current?.refresh?.();
     }
 
@@ -263,7 +165,7 @@ const DocumentsGrid = (props: any) => {
     }, [])
 
     return <GridPage>
-        <Load value={entity && apiExpedientIsReady && apiCarpetaIsReady}>
+        <Load value={entity && isReady}>
             <DropZone onDrop={onDrop} disabled={!entity?.potModificar}>
                 <StyledMuiGrid
                     resourceName="documentResource"
@@ -342,7 +244,9 @@ const DocumentsGrid = (props: any) => {
                             position: 0,
                             element: <ExpandButton value={expand} onChange={(value:any)=>{
                                 setExpand(value)
-                                removeAll()
+                                if (vista == View.carpeta || vista == View.icona) {
+                                    removeAll()
+                                }
                             }} hidden={!treeView} />,
                         },
                         {

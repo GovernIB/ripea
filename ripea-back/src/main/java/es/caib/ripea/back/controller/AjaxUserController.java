@@ -36,32 +36,38 @@ public class AjaxUserController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable String codi,
 			Model model) {
-		return aplicacioService.findUsuariAmbCodi(codi);
+		UsuariDto aux = aplicacioService.findUsuariAmbCodi(codi);
+		return aux;
 	}
 
+	// CERCA USUARIS a BBDD RIPEA (NO PLUGIN). SUGGEST
 	@RequestMapping(value = "/usuaris/{text}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<UsuariDto> get(
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
-		return aplicacioService.findUsuariAmbText(text);
+		String filter = decodedParam(text);
+		return aplicacioService.findUsuariAmbText(filter);
 	}
 
-	@RequestMapping(value = "/usuariDades/item/{codi}", method = RequestMethod.GET)
+	// CERCA UN USUARI a BBDD RIPEA (NO PLUGIN). VALOR SUGGEST EMPLENAT
+	@RequestMapping(value = "/usuari/item/{codi}", method = RequestMethod.GET)
 	@ResponseBody
-	public UsuariDto getByCodiPluginDadesUsuari(
+	public UsuariDto getByCodiSelector(
 			HttpServletRequest request,
 			@PathVariable String codi,
 			Model model) {
 		try {
-			return aplicacioService.findUsuariCarrecAmbCodiDades(codi);
+			UsuariDto aux = aplicacioService.findUsuariAmbCodi(codi);
+			return aux;
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació de l'usuari " + codi, ex);
 			return null;
 		}
 	}
-
+	
+	// CERCA USUARIS a BBDD RIPEA, ELSE PLUGIN. (SUGGEST)
 	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET, produces= {"application/json; charset=UTF-8"})
 	@ResponseBody
 	public List<UsuariDto> getPluginDadesUsuari(
@@ -69,10 +75,32 @@ public class AjaxUserController extends BaseUserController {
 			@PathVariable String text,
 			Model model) {
 		try {
-			return aplicacioService.findUsuariAmbTextDades(decodedParam(text));
+			String filter = decodedParam(text);
+			List<UsuariDto> resultat = new ArrayList<UsuariDto>();
+			resultat = aplicacioService.findUsuariAmbText(filter);
+			if (resultat==null || resultat.size()==0) {
+				resultat = aplicacioService.findUsuariAmbTextDades(filter);
+			}
+			return resultat;
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
 			return new ArrayList<UsuariDto>();
+		}
+	}
+	
+	// CERCA UN USUARI a BBDD RIPEA, ELSE PLUGIN. VALOR SUGGEST EMPLENAT
+	@RequestMapping(value = "/usuariDades/item/{codi}", method = RequestMethod.GET)
+	@ResponseBody
+	public UsuariDto getByCodiPluginDadesUsuari(
+			HttpServletRequest request,
+			@PathVariable String codi,
+			Model model) {
+		try {
+			UsuariDto aux = aplicacioService.findUsuariCarrecAmbCodiDades(codi);
+			return aux;
+		} catch (Exception ex) {
+			logger.error("Error al consultar la informació de l'usuari " + codi, ex);
+			return null;
 		}
 	}
 

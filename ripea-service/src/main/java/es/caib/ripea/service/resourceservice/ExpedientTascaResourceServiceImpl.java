@@ -179,7 +179,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                     }
                 });
             } else {
-                target.setDuracio(null);
+//                target.setDuracio(null);
                 target.setPrioritat(PrioritatEnumDto.B_NORMAL);
                 target.setResponsableActual(null);
                 target.setMetaExpedientTascaDescription(null);

@@ -19,8 +19,8 @@
 </head>
 <body>
 <form:form action="" method="post" cssClass="form-horizontal" modelAttribute="enviarDocumentCommand">
-    <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-    <c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+    <c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+    <c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
     <rip:inputSelect name="versioDocument" optionEnum="VersioDocumentEnum" emptyOption="false" textKey="contingut.document.form.enviar.versio"></rip:inputSelect>
 	<rip:inputText name="email" textKey="contingut.interessat.info.email"/>
     <rip:inputSuggest

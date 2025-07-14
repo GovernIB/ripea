@@ -41,6 +41,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRep
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDocumentResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
@@ -143,6 +144,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final MetaDocumentResourceRepository metaDocumentResourceRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final RegistreAnnexResourceRepository registreAnnexResourceRepository;
+    private final ContingutMovimentRepository contingutMovimentRepository;
     private final ContingutRepository contingutRepository;
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
@@ -168,7 +170,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_ENVIAR_PORTAFIRMES_CODE, new EnviarPortafirmesActionExecutor());
         register(DocumentResource.ACTION_RESUM_IA, new ResumIaActionExecutor());
         //Accions massives desde la pipella de contingut
-        register(DocumentResource.ACTION_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
+        register(DocumentResource.REPORT_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
         register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
@@ -333,6 +335,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
             resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
+            resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
         }
     }
 
@@ -988,9 +991,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	                consulta.setMunicipiNaixamentSVDDELSEXWS01(params.getMunicipiNaixament());
 	            }
 	
+	            //Com a millora, al crear una petició pinbal, o al crear un document, es podria especificar la carpeta destí.
 				pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
-                        params.getExpedient().getId(), //TODO: El pare pot ser una carpeta
+                        params.getExpedient().getId(),
 						entity.getMetaDocument().getId(),
 						consulta, 
 						configHelper.getRolActual());

@@ -19,6 +19,12 @@ const usePublicacioActions = () => {
             showInMenu: true,
             clickShowUpdateDialog: true,
         },
+        {
+            title: t('common.delete')+'...',
+            icon: 'edit',
+            showInMenu: true,
+            clickTriggerDelete: true,
+        },
     ];
 
     const components = <>

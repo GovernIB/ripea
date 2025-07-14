@@ -168,15 +168,15 @@
 			<div class="tab-pane active in" id="info">
 				<rip:inputText name="codi" textKey="metaexpedient.tasca.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 				<rip:inputText name="nom" textKey="metaexpedient.tasca.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
-				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
-				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+				<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
 					name="responsable" 
 					urlConsultaInicial="${urlConsultaInicial}" 
 					urlConsultaLlistat="${urlConsultaLlistat}" 
 					textKey="metaexpedient.tasca.form.camp.responsable"
 					suggestValue="codi"
-					suggestText="nom"
+					suggestText="codiAndNom"
 					placeholderKey="metaexpedient.tasca.form.camp.responsable"
 					disabled="${bloquejarCamps}"/>	
 				<rip:inputText name="duracio" textKey="tasca.list.column.duracio" comment="tasca.list.column.duracio.tip" tooltip="true" tooltipMsg="tasca.list.column.duracio.tip" readonly="${bloquejarCamps}"/>

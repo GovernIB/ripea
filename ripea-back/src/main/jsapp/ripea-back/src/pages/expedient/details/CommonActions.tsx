@@ -90,11 +90,11 @@ export const useActions = (refresh?: () => void) => {
                 }
             });
     }
-    const follow= (id:any, row:any): void => { action(id, 'FOLLOW', t('page.expedient.action.follow.ok', {user: user?.nom, expedient: row?.nom})); }
-    const unfollow= (id:any, row:any): void => { action(id, 'UNFOLLOW', t('page.expedient.action.unfollow.ok', {user: user?.nom, expedient: row?.nom})); }
-    const agafar= (id:any, row:any): void => { action(id, 'AGAFAR', t('page.expedient.action.agafar.ok', {user: user?.nom, expedient: row?.nom})); }
-    const retornar= (id:any, row:any) :void => { action(id, 'RETORNAR', t('page.expedient.action.retornar.ok', {user: user?.nom, expedient: row?.nom})); }
-	const alliberar= (id:any, row:any) :void => { action(id, 'ALLIBERAR', t('page.expedient.action.lliberar.ok', {expedient: row?.nom})); }
+    const follow= (id:any, row:any): void => action(id, 'FOLLOW', t('page.expedient.action.follow.ok', {user: user?.nom, expedient: row?.nom}));
+    const unfollow= (id:any, row:any): void => action(id, 'UNFOLLOW', t('page.expedient.action.unfollow.ok', {user: user?.nom, expedient: row?.nom}));
+    const agafar= (id:any, row:any): void => action(id, 'AGAFAR', t('page.expedient.action.agafar.ok', {user: user?.nom, expedient: row?.nom}));
+    const retornar= (id:any, row:any) :void => action(id, 'RETORNAR', t('page.expedient.action.retornar.ok', {user: row?.createdBy, expedient: row?.nom}));
+	const alliberar= (id:any, row:any) :void => action(id, 'ALLIBERAR', t('page.expedient.action.lliberar.ok', {expedient: row?.nom}));
     const syncArxiu= (id:any): void => {
         apiAction(undefined, {code: 'SYNC_ARXIU', data:{ ids: [id], massivo: false }})
             .then((result) => {
@@ -153,7 +153,7 @@ export const useActions = (refresh?: () => void) => {
                     apiPatch(id,{data: {relacionatsPer, relacionatsAmb} })
                         .then(() => {
                             refresh?.()
-                            temporalMessageShow(null, t('page.expedient.action.relacio.ok'), 'success');
+                            temporalMessageShow(null, t('page.expedient.action.relacio.ok', {expedient: row?.nom}), 'success');
                         })
                         .catch((error) => {
                             temporalMessageShow(null, error?.message, 'error');
@@ -162,8 +162,8 @@ export const useActions = (refresh?: () => void) => {
             });
     }
 
-    const importarExpedient = (id:any, additionalData:any,) => {
-        return apiAction(id, { code: 'IMPORTAR', data: additionalData })
+    const importarExpedient = (id:any, idOrigen:any) => {
+        return apiAction(id, { code: 'IMPORTAR', data: {expedientOrigen: {id: idOrigen} } })
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, t('page.expedient.action.importar.ok'), 'success');
@@ -220,9 +220,9 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
-    const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments(refresh);
+    const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments();
     const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
-    const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments(refresh);
+    const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments();
 
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
 
@@ -238,9 +238,6 @@ export const useCommonActions = (refresh?: () => void) => {
     const isAdminOAdminOrgan = (row:any) :boolean => {
         return (isRolActualAdmin && permisos?.permisAdministrador) || ( isRolActualOrganAdmin && permisos?.organs?.some((e:any)=>e.id == row?.organGestor?.id) )
     }
-    const potModificar = (row:any) :boolean => {
-        return (isUsuariActualWrite(row) && isAgafatUsuariActual(row)) || (isAdminOAdminOrgan(row) && !isTancat(row));
-    }
 
     const actions = [
         {
@@ -254,7 +251,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: 'edit',
             showInMenu: true,
             onClick: handleModifyExpedient,
-            hidden: isTancat,
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },
         {
             title: t('page.expedient.action.follow.label'),
@@ -314,21 +311,21 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarPrioridad,
-            hidden: (row:any) => !potModificar(row),
+            hidden: (row:any) => !row?.potModificar,
         },
         {
             title: t('page.expedient.action.changeEstat.label'),
             icon: "logout",
             showInMenu: true,
             onClick: hanldeCambiarEstado,
-            hidden: (row:any) => isTancat(row) || !potModificar(row),
+            hidden: (row:any) => isTancat(row) || !row?.potModificar,
         },
         {
             title: t('page.expedient.action.relacio.label'),
             icon: "link",
             showInMenu: true,
             onClick: hanldeRelacionar,
-            hidden: (row:any) => !potModificar(row),
+            hidden: (row:any) => !row?.potModificar,
         },
         {
             title: t('page.expedient.action.close.label'),
@@ -336,7 +333,7 @@ export const useCommonActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleTancar,
             disabled: (row:any) => !row?.potTancar,
-            hidden: (row:any) => !potModificar(row) || isTancat(row),
+            hidden: (row:any) => !row?.potModificar || isTancat(row),
         },
         {
             title: t('page.expedient.action.open.label'),
@@ -350,7 +347,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !potModificar(row) || row.conteDocumentsDefinitius,
+            hidden: (row:any) => !row?.potModificar || row.conteDocumentsDefinitius,
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,

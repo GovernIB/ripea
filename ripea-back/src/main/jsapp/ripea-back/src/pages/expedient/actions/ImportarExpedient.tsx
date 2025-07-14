@@ -92,7 +92,7 @@ const ImportarExpedient = (props:any) => {
             title: t('page.expedient.action.importar.label'),
             icon: "download",
             showInMenu: false,
-            onClick: (id:any) => importarExpedient(entity?.id, {expedientOrigen: {id: id} })
+            onClick: (id:any) => importarExpedient(entity?.id, id)
         }
     ]
 
@@ -115,6 +115,18 @@ const ImportarExpedient = (props:any) => {
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
 
+                rowProps={(row: any) => {
+                    const color = row?.estatAdditionalInfo?.color;
+                    return color
+                        ? {
+                            'box-shadow': `${color} -6px 0px 0px`,
+                            'border-left': `6px solid ${color}`,
+                        }
+                        : {
+                            'padding-left': '6px'
+                        }
+                }}
+
                 // height={162 + 52 * 4}
                 // paginationActive
                 autoHeight
@@ -124,20 +136,18 @@ const ImportarExpedient = (props:any) => {
     </>
 }
 
-const useImportarExpedient = (refresh?: () => void) => {
+const useImportarExpedient = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-
     const [open, setOpen] = useState(false);
-    const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
-        console.log(id, row);
-        setEntity(row);
+    const handleOpen = () => {
         setOpen(true);
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleClose = (reason?: string) => {
+        if(reason !== 'backdropClick') {
+            setOpen(false);
+        }
     };
 
     const dialog =

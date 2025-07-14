@@ -10,7 +10,7 @@ const CambiarPrioritatForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField xs={12} name="nom" disabled readOnly/>
         <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" hidden={data?.prioritat=='B_NORMAL'} required/>
+        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat=='B_NORMAL'} required/>
     </Grid>
 }
 
@@ -40,7 +40,7 @@ const useCambiarPrioritat = (refresh?: () => void) => {
                 temporalMessageShow(null, t('page.expedient.action.changePrioritat.ok', {expedient: row?.nom}), 'success');
             })
             .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
+                error?.message && temporalMessageShow(null, error?.message, 'error');
             });
     }
 

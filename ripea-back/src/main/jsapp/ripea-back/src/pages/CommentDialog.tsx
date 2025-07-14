@@ -1,10 +1,11 @@
 import {useEffect, useRef, useState} from "react";
 import {Badge, Grid, Icon, IconButton, Typography} from "@mui/material";
-import {MuiFormDialog, useResourceApiService, MuiFormDialogApi} from "reactlib";
+import {MuiFormDialog, useResourceApiService, MuiFormDialogApi, useBaseAppContext} from "reactlib";
 import GridFormField from "../components/GridFormField.tsx";
 import {formatDate} from "../util/dateUtils.ts";
 import {useUserSession} from "../components/Session.tsx";
 import Load from "../components/Load.tsx";
+import DOMPurify from 'dompurify';
 
 const CommentForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -21,6 +22,7 @@ const Comments = (props:any) => {
 
     const { value: user } = useUserSession();
     const [comentarios, setComentarios] = useState<any[]>([]);
+    const {temporalMessageShow} = useBaseAppContext();
 
     const {
         isReady: appApiIsReady,
@@ -35,10 +37,13 @@ const Comments = (props:any) => {
                 unpaged: true,
                 sorts: ['createdDate', 'desc']
             })
-                .then((app) => {
+                .then((result) => {
                     // console.log(">>>> rows", app.rows)
-                    setComentarios(app.rows);
+                    setComentarios(result.rows);
                 })
+                .catch((error) => {
+                    error?.message && temporalMessageShow(null, error?.message, 'error');
+                });
         }
     }, [appApiIsReady]);
 
@@ -55,7 +60,13 @@ const Comments = (props:any) => {
         {comentarios?.map((a:any)=>
             <Grid item key={a?.id} sx={a?.createdBy==user?.codi ?myComment :otherComment}>
                 <Typography variant={"subtitle2"} color={"textDisabled"}>{a?.createdBy}</Typography>
-                <Typography variant={"body2"}>{a?.text}</Typography>
+
+                <Typography
+                    variant="body2"
+                    // sx={{ textAlign: 'justify' }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a?.text) }}
+                />
+
                 <Typography variant={"caption"} color={"textDisabled"}>{formatDate(a?.createdDate)}</Typography>
             </Grid>
         )}
@@ -66,6 +77,7 @@ export const CommentDialog = (props:any) => {
     const { entity, title, resourceName, resourceReference } = props;
     const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
     const formApiRef = useRef<MuiFormDialogApi>()
+    const {temporalMessageShow} = useBaseAppContext();
 
     const handleOpen = () => {
         formApiRef.current?.show(undefined, {
@@ -76,6 +88,9 @@ export const CommentDialog = (props:any) => {
             .then(() => {
                 setNumComm((numComm ?? entity?.numComentaris) + 1);
             })
+            .catch((error) => {
+                error?.message && temporalMessageShow(null, error?.message, 'error');
+            });
     }
 
     return <>
@@ -88,6 +103,7 @@ export const CommentDialog = (props:any) => {
             <MuiFormDialog
                 resourceName={resourceName}
                 title={title}
+                onClose={(reason?: string) => reason !== 'backdropClick'}
                 apiRef={formApiRef}
             >
                 <Comments

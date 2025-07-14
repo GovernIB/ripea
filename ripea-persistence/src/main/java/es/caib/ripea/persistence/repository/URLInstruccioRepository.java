@@ -1,15 +1,17 @@
 package es.caib.ripea.persistence.repository;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.URLInstruccioEntity;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.URLInstruccioEntity;
 
 @Component
 public interface URLInstruccioRepository extends JpaRepository<URLInstruccioEntity, Long> {
@@ -40,7 +42,6 @@ public interface URLInstruccioRepository extends JpaRepository<URLInstruccioEnti
 	List<URLInstruccioEntity> findByEntitatAndCodiInOrderByIdAsc(
 			EntitatEntity entitat,
 			List<String> dominiCodis);
-	
 	
 	List<URLInstruccioEntity> findByEntitatAndCodi(
 			EntitatEntity entitat,

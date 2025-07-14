@@ -136,10 +136,7 @@ public class EmailHelper {
 				"\tData Fi: " + em.getDataFi() + "\n" +
 				"\tContinguts: " + em.getContinguts().size() + "\n";
 
-		UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(
-				em.getCreatedBy().get(),
-				false,
-				false);
+		UsuariEntity usuari = usuariRepository.findById(em.getCreatedBy().get()).orElse(null);
 
 		if (usuari != null) {
 			String to = getEmail(usuari);
@@ -1317,7 +1314,7 @@ public class EmailHelper {
 			String logMsg) {
 		boolean addDestinatari = false;
 		String email = null;
-		UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(codi, false, false);
+		UsuariEntity usuari = usuariRepository.findById(codi).orElse(null);
 		if (usuari != null) {
 			email = getEmail(usuari);
 			if (Utils.isNotEmpty(email)) {
