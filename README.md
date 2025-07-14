@@ -17,9 +17,11 @@ Actualment encara es troba en procés però es pot dir que les principals caract
 * Translations : Catalan & Spanish 
 * User Interface: Web-based
 ## <a name="docs"></a> Documentació
-* [Manual d'usuari](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/01_ripea_manual_usuari.pdf)
-* [Manual d'administrador](https://github.com/GovernIB/ripea/raw/ripea-0.9/doc/pdf/02_ripea_manual_administradors.pdf)
+* [Manual d'usuari](https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/01_ripea_manual_usuari.pdf)
+* [Manual d'administrador](https://github.com/GovernIB/ripea/raw/ripea-1.0/doc/pdf/02_ripea_manual_administradors.pdf)
 ## <a name="v_estable"></a> Versió estable
-### [v0.9.110](https://github.com/GovernIB/ripea/releases/tag/v0.9.110)
-## <a name="b_activa"></a> Branca activa
-### [ripea-dev](https://github.com/GovernIB/ripea/tree/ripea-dev)
+### [v0.9.110](https://github.com/GovernIB/ripea/releases/tag/RIPEA_1.0.1_RC13_HOTFIX5)
+## <a name="b_activa"></a> Branques actives
+### [ripea-1.0 Versió estable]([https://github.com/GovernIB/ripea/tree/ripea-1.0](https://github.com/GovernIB/ripea/tree/ripea-1.0))
+### [ripea-1.0-dev Seguent versió candidata]([https://github.com/GovernIB/ripea/tree/ripea-1.0-dev](https://github.com/GovernIB/ripea/tree/ripea-1.0-dev))
+### [ripea-1.0-wip Branca de treball]([https://github.com/GovernIB/ripea/tree/ripea-1.0-wip](https://github.com/GovernIB/ripea/tree/ripea-1.0-wip))
