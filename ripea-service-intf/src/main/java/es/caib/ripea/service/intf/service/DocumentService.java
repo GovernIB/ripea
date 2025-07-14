@@ -747,4 +747,9 @@ public interface DocumentService {
 
     @PreAuthorize("isAuthenticated()")
     public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris, VersioDocumentEnum versioDocument);
+    
+
+    @PreAuthorize("isAuthenticated()")
+    public byte[] getPlantillaImportacioZip();
+    
 }

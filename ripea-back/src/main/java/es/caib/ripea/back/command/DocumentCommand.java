@@ -26,7 +26,7 @@ import java.util.Date;
  */
 
 @ArxiuNoBuit(groups = {CreateDigital.class, CreateFirmaSeparada.class})
-@NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class})
+@NomDocumentNoRepetit(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, CreateDigitalZip.class})
 //@DocumentDigitalExistent(groups = {CreateDigital.class, UpdateDigital.class})
 @ValidIfSeparada(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 @ExpedientODocumentNom(groups = {CreateDigital.class, UpdateDigital.class})
@@ -37,9 +37,9 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotEmpty(groups = {CreateFisic.class, UpdateFisic.class})
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=255)
 	private String ubicacio;
-	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, CreateDigitalZip.class})
 	private Long metaNodeId;
-	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
+	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, CreateDigitalZip.class})
 	@DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
 	private LocalDateTime dataTime;
 	private MultipartFile arxiu;
@@ -314,6 +314,7 @@ public class DocumentCommand extends ContenidorCommand {
 	public interface UpdateDigital {}
 	public interface CreateFisic {}
 	public interface UpdateFisic {}
+	public interface CreateDigitalZip {}
 	
 	public interface CreateFirmaSeparada {}
 	public interface UpdateFirmaSeparada {}

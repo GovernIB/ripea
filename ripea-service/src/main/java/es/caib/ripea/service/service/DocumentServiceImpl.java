@@ -1,6 +1,7 @@
 package es.caib.ripea.service.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.poi.util.IOUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1507,6 +1509,20 @@ public class DocumentServiceImpl implements DocumentService {
 		return documents != null ? documents.size() : 0;
 	}
 	
+	@Transactional
+    @Override
+    public byte[] getPlantillaImportacioZip() {
+    	logger.debug("Descarregant model CSV per importar documents dins un zip");
+        try {
+            InputStream input = this.getClass().getClassLoader().getResourceAsStream("es/caib/ripea/core/templates/model_dades_importacio_zip.csv");
+            assert input != null;
+            return IOUtils.toByteArray(input);
+        } catch (Exception ex) {
+        	String errorDescripcio = "Error descarregant model CSV per importar documents.";
+			logger.error(errorDescripcio, ex);
+			throw new RuntimeException(ex);
+		}
+    }
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {

@@ -647,4 +647,10 @@ public class DocumentServiceEjb extends AbstractServiceEjb<DocumentService> impl
     public void enviarDocument(Long documentId, List<String> emails, List<String> desinataris, VersioDocumentEnum versioDocument){
         delegateService.enviarDocument(documentId, emails, desinataris, versioDocument);
     }
+    
+    @Override
+	@RolesAllowed("**")
+	public byte[] getPlantillaImportacioZip() {
+		return delegateService.getPlantillaImportacioZip();
+	}
 }

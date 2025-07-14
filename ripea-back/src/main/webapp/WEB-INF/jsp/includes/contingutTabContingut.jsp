@@ -684,7 +684,7 @@
 		});
 		$('.ordre-col').on('mouseleave', function () {
 			$('.element-draggable').draggable("enable");
-			$('.element-draggable').droppable("enable");
+			$('.element-draggable:not(.isDocument)').droppable("enable");
 		});
 
 		if (potModificar) {
@@ -1698,6 +1698,13 @@
 								</c:otherwise>
 							</c:choose>
 							
+							<%-- Importar documents de fitxer zip --%>
+							<li>
+								<a id="zip-new" href="<c:url value="/contingut/${contingut.id}/zip/importacio/new?tascaId=${tascaId}&metaExpedientId=${expedient.metaExpedient.id}"/>" data-toggle="modal" data-refresh-pagina="true">
+									<span class="fa ${iconaImportarZip}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document.multiple"/>...
+								</a>
+							</li>
+									
 							<c:if test="${!isTasca}">
 								<%---- Consulta PINBAL... ----%>
 								<c:if test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">

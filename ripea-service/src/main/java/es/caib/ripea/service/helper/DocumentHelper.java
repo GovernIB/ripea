@@ -1339,7 +1339,7 @@ public class DocumentHelper {
 						contingut = isArxiuCaib ? firma.getContingut() : document.getContingut();
 						break;
 					case CADES_DET:
-						contingut = isArxiuCaib ? document.getContingut() : firma.getContingut();
+						contingut = document.getContingut();
 						break;
 					}
 				}
