@@ -133,6 +133,8 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         commonFieldComponentProps,
     } = useFormContext();
     const filterContext = useOptionalFilterContext();
+    const isReady = isFormReady && field !== undefined;
+    const value = dataGetFieldValue(name);
     React.useEffect(() => {
         if (fields) {
             const field = fields.find(f => f.name === name);
@@ -147,8 +149,9 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             setFieldError(undefined);
         }
     }, [fieldErrors, name]);
-    const isReady = isFormReady && field !== undefined;
-    const value = dataGetFieldValue(name);
+    React.useEffect(() => {
+        validationSetFieldErrors(name, validator?.(value) ?? undefined);
+    }, []);
     const handleFieldValueChange = React.useCallback((value: any) => {
         dataDispatchAction({
             type: FormFieldDataActionType.FIELD_CHANGE,

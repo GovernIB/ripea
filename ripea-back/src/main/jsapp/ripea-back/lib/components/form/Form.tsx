@@ -317,6 +317,7 @@ export const Form: React.FC<FormProps> = (props) => {
         setModified(false);
         setRevertData(data);
         setApiFieldErrors(undefined);
+        validateWithValidator(data);
         setIsDataInitialized(true);
         idFromExternalResetRef.current = null;
     };
@@ -375,6 +376,10 @@ export const Form: React.FC<FormProps> = (props) => {
             });
         }
     };
+    const validateWithValidator = (data: any) => {
+        const validatorFieldErrors = dataValidator?.(data);
+        validatorFieldErrors?.length && setValidatorFieldErrors(validatorFieldErrors);
+    }
     const validate = () =>
         new Promise<any>((resolve, reject) => {
             if (resourceType != null) {
@@ -557,8 +562,7 @@ export const Form: React.FC<FormProps> = (props) => {
         if (isReady) {
             setModified(true);
             onDataChange?.(data);
-            const validatorFieldErrors = dataValidator?.(data);
-            validatorFieldErrors?.length && setValidatorFieldErrors(validatorFieldErrors);
+            validateWithValidator(data);
         }
     }, [isReady, data]);
     apiRef.current = {
