@@ -177,6 +177,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_ACTIVA)));
         response.put("isIncorporacioJustificantActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.INCORPORAR_JUSTIFICANT)));
         response.put("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
+        response.put("isWsUsuariEntitatActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
         List<GrupDto> grupsPermesos = grupService.findGrupsPermesosProcedimentsGestioActiva(
         		userPermissionInfo.getEntitatActualId(),
         		userPermissionInfo.getRolActual(),
