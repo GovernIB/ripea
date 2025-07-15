@@ -67,7 +67,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const disableResponsable = (row: any): boolean => {
         return !row?.usuariActualResponsable && !row?.usuariActualDelegat;
     }
-    const hideByEstat = (row: any): boolean => {
+    const hiddenByEstat = (row: any): boolean => {
         return isInOptions(row?.estat, 'CANCELLADA', 'FINALITZADA', 'REBUTJADA');
     }
 
@@ -96,7 +96,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
                 window.location.href = (`${import.meta.env.VITE_BASE_URL}contingut/${row?.expedient?.id}?tascaId=${id}`)
             },
             disabled: disableResponsable,
-            hidden: (row:any)=> !entity?.potModificar || hideByEstat(row),
+            hidden: (row:any)=> !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.iniciar.label'),
@@ -120,7 +120,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: cancelar,
             disabled: disableResponsable,
-            hidden: hideByEstat,
+            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.finalitzar.label'),
@@ -128,54 +128,54 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             showInMenu: true,
             onClick: (id: any)=> changeEstat(id,'FINALITZADA', t('page.tasca.action.finalitzar.ok')),
             disabled: disableResponsable,
-            hidden: (row: any) => !entity?.potModificar || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => !entity?.potModificar || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.reassignar.label'),
             icon: "person",
             showInMenu: true,
             onClick: handleReassignar,
-            hidden: (row: any) => !entity?.potModificar || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.delegar.label'),
             icon: "turn_right",
             showInMenu: true,
             onClick: handleDelegar,
-            hidden: (row: any) => !entity?.potModificar || row?.delegat != null || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || row?.delegat != null || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.retomar.label'),
             icon: "close",
             showInMenu: true,
             onClick: handleRetomar,
-            hidden: (row: any) => !entity?.potModificar || row?.delegat == null || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || row?.delegat == null || row?.usuariActualDelegat || hiddenByEstat(row),
         },
         {
             title: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => !entity?.potModificar || row?.usuariActualDelegat || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || row?.usuariActualDelegat || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.changeDataLimit.label'),
             icon: "info",
             showInMenu: true,
             onClick: handleCambiarDataLimit,
-            hidden: (row: any) => !entity?.potModificar || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.changePrioritat.label'),
             icon: "schedule",
             showInMenu: true,
             onClick: handleCambiarPrioritat,
-            hidden: (row: any) => !entity?.potModificar || hideByEstat(row),
+            hidden: (row: any) => !entity?.potModificar || hiddenByEstat(row),
         },
         {
             title: t('page.tasca.action.reobrir.label'),

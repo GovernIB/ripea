@@ -508,8 +508,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class HasFirmaOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
-
-            if (target.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA){
+            if (previous.getDocumentFirmaTipus()!=DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA){
                 target.setDocumentFirmaTipus((fieldValue != null && (Boolean) fieldValue)
                         ?DocumentFirmaTipusEnumDto.FIRMA_SEPARADA
                         :DocumentFirmaTipusEnumDto.SENSE_FIRMA);

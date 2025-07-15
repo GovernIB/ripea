@@ -66,7 +66,7 @@ const ExpedientsRelacionats = (props:any) => {
                         <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                     </Grid>
                     <Grid item xs={10}>
-                        <Link sx={{ fontSize: "0.9rem" }} href={`/contingut/${relacionat?.id}`}>{relacionat?.description}</Link>
+                        <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.description}</Link>
                     </Grid>
                     <Grid item xs={1}>
                         <IconButton 

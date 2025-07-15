@@ -98,6 +98,7 @@ const beforeAvis = [
     {
         field: 'tipusStr',
         flex: 1,
+        sortable: false,
     },
 ];
 const afterAvis = [
@@ -176,6 +177,7 @@ const ExpedientGrid = () => {
         },
         {
             field: 'interessats',
+            sortable: false,
             flex: 1,
             valueFormatter: (value: any) => {
                 let resum = '';

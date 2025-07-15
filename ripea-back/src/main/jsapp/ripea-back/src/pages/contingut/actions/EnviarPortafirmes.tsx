@@ -106,26 +106,24 @@ const EnviarPortafirmesForm = () => {
         <GridFormField xs={12} name="prioritat" required/>
 
         {/* SIMPLE */}
-        <GridFormField xs={12} name="responsables" multiple
-                       filter={filterResponsables}
-                       hidden={data?.portafirmesFluxTipus!='SIMPLE'}/>
-        <GridFormField xs={12} name={"nifsManuals"} multiple
-                       hidden={data?.portafirmesFluxTipus!='SIMPLE'}/>
-        <GridFormField xs={12} name={"carrecs"} multiple
-                       hidden={data?.portafirmesFluxTipus!='SIMPLE'}/>
-        <GridFormField xs={12} name="portafirmesSequenciaTipus" hidden={data?.portafirmesFluxTipus!='SIMPLE'} required/>
+        {data?.portafirmesFluxTipus=='SIMPLE' && <>
+            <GridFormField xs={12} name="responsables" multiple filter={filterResponsables}/>
+            <GridFormField xs={12} name={"nifsManuals"} multiple/>
+            <GridFormField xs={12} name={"carrecs"} multiple hidden={!user?.sessionScope?.isWsUsuariEntitatActiu}/>
+            <GridFormField xs={12} name="portafirmesSequenciaTipus" required/>
+        </>}
 
         {/* PORTAFIB */}
-        <GridFormField xs={12} name="annexos" multiple
-                       filter={filterAnnexos}
-                       hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
-        <GridFormField xs={10} name="portafirmesEnviarFluxId"
-                       componentProps={{title: t('page.document.detall.flux')}}
-                       requestParams={{additionalOption: {
-                           value: data?.fluxCreat?.fluxId,
-                           description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
-                       }}}
-                       hidden={data?.portafirmesFluxTipus!='PORTAFIB'} required/>
+        {data?.portafirmesFluxTipus=='PORTAFIB' && <>
+            <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos} required/>
+            <GridFormField xs={10} name="portafirmesEnviarFluxId"
+                           componentProps={{title: t('page.document.detall.flux')}}
+                           requestParams={{additionalOption: {
+                               value: data?.fluxCreat?.fluxId,
+                               description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
+                           }}}
+                           required/>
+        </>}
 
         <GridButton
             variant={open ?"contained" :"outlined"}
