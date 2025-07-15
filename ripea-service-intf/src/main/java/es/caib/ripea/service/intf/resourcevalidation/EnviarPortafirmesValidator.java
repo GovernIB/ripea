@@ -28,7 +28,7 @@ public class EnviarPortafirmesValidator implements ConstraintValidator<EnviarPor
             }
             if (Utils.hasValue(resource.getNifsManuals()) && !Utils.esAlfanumericoSeparadoPorComas(resource.getNifsManuals())) {
                 context
-	                .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.nifsFirma}")
+	                .buildConstraintViolationWithTemplate("es.caib.ripea.service.intf.resourcevalidation.nifsFirma")
 	                .addPropertyNode(EnviarPortafirmesFormAction.Fields.nifsManuals)
 	                .addConstraintViolation()
 	                .disableDefaultConstraintViolation();
