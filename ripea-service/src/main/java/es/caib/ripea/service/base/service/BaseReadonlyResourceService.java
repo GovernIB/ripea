@@ -774,6 +774,10 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		return specification;
 	}
 
+	protected Sort processSort(Sort sort) {
+		return sort;
+	}
+
 	protected void beforeGetOne(String[] perspectives) {}
 	protected void beforeFind(
 			String quickFilter,
@@ -961,11 +965,12 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	private Sort toProcessedSort(
 			Sort sort) {
 		Sort resultSort;
-		if (sort != null) {
-			log.debug("\tProcessant ordenació " + sort);
-			if (sort.isSorted()) {
+		Sort protectedProcessedSort = processSort(sort);
+		if (protectedProcessedSort != null) {
+			log.debug("\tProcessant ordenació " + protectedProcessedSort);
+			if (protectedProcessedSort.isSorted()) {
 				List<Sort.Order> orders = new ArrayList<>();
-				for (Sort.Order order: sort) {
+				for (Sort.Order order: protectedProcessedSort) {
 					String[] orderPaths = toProcessedSortPath(
 							order.getProperty().split("\\."),
 							getEntityClass());
@@ -985,7 +990,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				}
 				resultSort = Sort.by(orders);
 			} else {
-				resultSort = sort;
+				resultSort = protectedProcessedSort;
 			}
 		} else {
 			resultSort = Sort.unsorted();
