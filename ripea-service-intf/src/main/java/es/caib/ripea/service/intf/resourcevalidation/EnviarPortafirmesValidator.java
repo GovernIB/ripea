@@ -2,6 +2,7 @@ package es.caib.ripea.service.intf.resourcevalidation;
 
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.model.DocumentResource.EnviarPortafirmesFormAction;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +20,18 @@ public class EnviarPortafirmesValidator implements ConstraintValidator<EnviarPor
         if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(resource.getPortafirmesFluxTipus())){
             if (resource.getPortafirmesSequenciaTipus() == null){
                 context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(EnviarPortafirmesFormAction.Fields.portafirmesSequenciaTipus)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
+                    .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
+                    .addPropertyNode(EnviarPortafirmesFormAction.Fields.portafirmesSequenciaTipus)
+                    .addConstraintViolation()
+                    .disableDefaultConstraintViolation();
+                valid = false;
+            }
+            if (Utils.hasValue(resource.getNifsManuals()) && !Utils.esAlfanumericoSeparadoPorComas(resource.getNifsManuals())) {
+                context
+	                .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.nifsFirma}")
+	                .addPropertyNode(EnviarPortafirmesFormAction.Fields.nifsManuals)
+	                .addConstraintViolation()
+	                .disableDefaultConstraintViolation();
                 valid = false;
             }
         }

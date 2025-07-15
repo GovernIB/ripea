@@ -95,6 +95,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
 import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -745,15 +746,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
-				Long registreAnnexId = annexPendentMourerArxiu(entity.getId());
 				Exception errorGuardant = null;
 				if (entity.getArxiuUuid() == null) {
 					errorGuardant = documentHelper.guardarDocumentArxiu(entity.getId());
-				} else if (registreAnnexId!=null) {
-					errorGuardant = expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
-				} else if (!StringUtils.isEmpty(entity.getGesDocFirmatId())) {
-					EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-					errorGuardant = firmaPortafirmesHelper.portafirmesReintentar(entitatEntity.getId(), entity.getId());
+				} else {
+					Long registreAnnexId = annexPendentMourerArxiu(entity.getId());
+					if (registreAnnexId!=null) {
+						errorGuardant = expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
+					} else if (!StringUtils.isEmpty(entity.getGesDocFirmatId())) {
+						EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+						errorGuardant = firmaPortafirmesHelper.portafirmesReintentar(entitatEntity.getId(), entity.getId());
+					}
 				}
 				
 				if (errorGuardant!=null) {
@@ -1237,7 +1240,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		}
         	}
         	if (params.getNifsManuals()!=null) {
-        		pfResponsables.addAll(params.getNifsManuals());
+        		if(params.getNifsManuals().indexOf(",")>0) {
+        			pfResponsables.addAll(Arrays.asList(params.getNifsManuals().split(",")));
+        		} else {
+        			pfResponsables.add(params.getNifsManuals());
+        		}
         	}
         	if (params.getCarrecs()!=null) {
         		pfResponsables.addAll(params.getCarrecs());
@@ -1287,16 +1294,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         			if (metaDocumentResourceEntity.getPortafirmesResponsables()!=null) {
         				String[] pfResponsables = metaDocumentResourceEntity.getPortafirmesResponsables().split(",");
                         for (String codi : pfResponsables) {
-                            UsuariResourceEntity usuariEntity = usuariResourceRepository.findById(codi).orElse(null);
-                            if (usuariEntity != null) {
-                                responsables.add(ResourceReference.toResourceReference(usuariEntity.getCodi(), usuariEntity.getNom()));
-                            } else {
-                                nifs.add(codi);
+                        	UsuariDto usuariResponsable = usuariHelper.findUsuariCarrecAmbCodiDades(codi);
+                            if (usuariResponsable != null) {
+                            	String txtDisplay = usuariResponsable.getNom() + " (" + Utils.nifMask(usuariResponsable.getNif()) +")";
+                                responsables.add(ResourceReference.toResourceReference(usuariResponsable.getCodi(), txtDisplay));
                             }
                         }
                     }
         			target.setResponsables(responsables);
-        			target.setNifsManuals(nifs);
+        			//Al carregar la modal de enviament a PF, no hi ha NIFs, ja que no es configuren NIFs al procediment
+        			//Aquets els afegeix opcionalment l'usuari en el moment de enviar a firmar
+        			target.setNifsManuals(null);
         		} else {
         			target.setPortafirmesEnviarFluxId(metaDocumentResourceEntity.getPortafirmesFluxId());
         			String dadesURL = documentResourceEntity.getExpedient().getId()+"#"+documentResourceEntity.getId()+"#"+SecurityContextHolder.getContext().getAuthentication().getName();

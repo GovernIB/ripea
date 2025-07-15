@@ -6,6 +6,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -64,6 +65,10 @@ public class UsuariResource extends BaseResource<String> {
         return  codi + " - " + nom;
     }
 
+    public String getNomAndNif() {
+    	return nom + " (" + Utils.nifMask(nif) +")";
+    }
+    
 //	@Size(max = 16)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
 
