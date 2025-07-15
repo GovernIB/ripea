@@ -29,6 +29,7 @@ export type FormFieldCommonProps = {
 
 export type FormFieldProps = FormFieldCommonProps & {
     type?: string;
+    validator?: (value: any) => FormFieldError[] | void;
     debug?: boolean;
     [x: string | number | symbol]: unknown;
 };
@@ -113,6 +114,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         onChange,
         componentProps,
         type,
+        validator,
         debug,
         ...otherProps
     } = props;
@@ -127,6 +129,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         inline: inlineCtx,
         dataGetFieldValue,
         dataDispatchAction,
+        validationSetFieldErrors,
         commonFieldComponentProps,
     } = useFormContext();
     const filterContext = useOptionalFilterContext();
@@ -152,6 +155,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             payload: { fieldName: name, field, value }
         });
         onChange?.(value);
+        validationSetFieldErrors(name, validator?.(value) ?? undefined);
     }, [dataDispatchAction, name, field, onChange]);
     const inline = inlineProp ?? inlineCtx;
     const forceDisabledAndReadonly = filterContext == null && !isSaveActionPresent;

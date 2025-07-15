@@ -101,6 +101,7 @@ const componentsCa = {
         },
         validate: {
             error: 'Error de validació',
+            saveErrors: 'Hi ha errors de validació',
         },
     },
     actionreport: {

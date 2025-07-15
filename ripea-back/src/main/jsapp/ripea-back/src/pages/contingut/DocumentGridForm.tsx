@@ -42,9 +42,13 @@ const ScanerTabForm = () => {
 }
 const FileTabForm = () => {
     const { data } = useFormContext();
-
+    const adjuntValidator = (value: any) => {
+        if (value && value.contentLength > 800) {
+            return [{ field: 'adjunt', message: 'L\'has cagada!' }];
+        }
+    }
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="adjunt" type={"file"} required />
+        <GridFormField xs={12} name="adjunt" type={"file"} required validator={adjuntValidator}/>
         <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus == "FIRMA_ADJUNTA"} />
         <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled />
         <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required />

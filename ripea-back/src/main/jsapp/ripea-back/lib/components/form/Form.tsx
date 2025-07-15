@@ -46,6 +46,8 @@ export type FormProps = React.PropsWithChildren & {
     perspectives?: string[];
     /** Indica si s'ha de fer una petició onChange sense cap camp associat quan es crea el component */
     initOnChangeRequest?: true;
+    /** Indica si s'ha d'aturar l'enviament del formulari si hi ha errors del validador (que no siguin errors de validació de l'API REST) */
+    avoidSubmitIfAnyValidatorErrors?: true;
     /** Indica si s'ha de desar el formulari quan es pitgi la tecla Intro en algun camp */
     saveOnFieldEnterKeyPressed?: true;
     /** Propietats comunes per a tots els components FormField de dins aquest component */
@@ -66,6 +68,8 @@ export type FormProps = React.PropsWithChildren & {
     onUpdateSuccess?: (data: any) => void;
     /** Event que es llença quan es desa un registre (creat o modificat) */
     onSaveSuccess?: (data: any) => void;
+    /** Validador per a les dades del formulari. Es crida en cada canvi i retorna una llista d'errors (o null/undefined si tot es correcte) */
+    dataValidator?: (data: any) => FormFieldError[] | undefined;
     /** Mapeig dels tipus de camp */
     fieldTypeMap?: Map<string, string>;
     /** Indica que és un formulari d'una sola línia (per exemple: formularis que es mostran a una fila de la graella) */
@@ -133,6 +137,7 @@ export const Form: React.FC<FormProps> = (props) => {
         additionalData: additionalDataProp,
         perspectives,
         initOnChangeRequest,
+        avoidSubmitIfAnyValidatorErrors,
         saveOnFieldEnterKeyPressed,
         commonFieldComponentProps,
         createLink,
@@ -143,6 +148,7 @@ export const Form: React.FC<FormProps> = (props) => {
         onCreateSuccess,
         onUpdateSuccess,
         onSaveSuccess,
+        dataValidator,
         fieldTypeMap,
         inline,
         debug = false,
@@ -171,7 +177,8 @@ export const Form: React.FC<FormProps> = (props) => {
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [modified, setModified] = React.useState<boolean>(false);
     const [fields, setFields] = React.useState<any[]>();
-    const [fieldErrors, setFieldErrors] = React.useState<FormFieldError[] | undefined>();
+    const [validatorFieldErrors, setValidatorFieldErrors] = React.useState<FormFieldError[]>();
+    const [apiFieldErrors, setApiFieldErrors] = React.useState<FormFieldError[]>();
     const [revertData, setRevertData] = React.useState<any>(undefined);
     const [isDataInitialized, setIsDataInitialized] = React.useState<boolean>(false);
     const [apiActions, setApiActions] = React.useState<any>(undefined);
@@ -294,7 +301,7 @@ export const Form: React.FC<FormProps> = (props) => {
                         field: e.field,
                         message: e.message,
                     }));
-                setFieldErrors(fieldErrors);
+                setApiFieldErrors(fieldErrors);
             } else {
                 temporalMessageShow(temporalMessageTitle ?? '', error.message, 'error');
                 reject?.(error);
@@ -309,7 +316,7 @@ export const Form: React.FC<FormProps> = (props) => {
         setIsLoading(false);
         setModified(false);
         setRevertData(data);
-        setFieldErrors(undefined);
+        setApiFieldErrors(undefined);
         setIsDataInitialized(true);
         idFromExternalResetRef.current = null;
     };
@@ -372,7 +379,7 @@ export const Form: React.FC<FormProps> = (props) => {
         new Promise<any>((resolve, reject) => {
             if (resourceType != null) {
                 if (resourceTypeCode != null) {
-                    setFieldErrors(undefined);
+                    setApiFieldErrors(undefined);
                     apiArtifactFormValidate({
                         type: resourceType,
                         code: resourceTypeCode,
@@ -393,70 +400,74 @@ export const Form: React.FC<FormProps> = (props) => {
     const save = () =>
         new Promise<any>((resolve, reject) => {
             if (resourceType == null) {
-                const calcId = calculatedId(id);
-                setFieldErrors(undefined);
-                const apiAction =
-                    calcId != null ? apiUpdate(calcId, { data }) : apiCreate({ data });
-                apiAction
-                    .then((savedData: any) => {
-                        const message =
-                            calcId != null ? t('form.update.success') : t('form.create.success');
-                        temporalMessageShow(null, message, 'success');
-                        reset(savedData);
-                        if (calcId != null) {
-                            onUpdateSuccess != null
-                                ? onUpdateSuccess(savedData)
-                                : onSaveSuccess?.(data);
-                            if (updateLink != null || saveLink != null) {
-                                const link = (updateLink ?? saveLink)?.replace(
-                                    '{{id}}',
-                                    '' + savedData.id
-                                );
-                                link &&
-                                    navigate(link, {
-                                        replace: true,
-                                        relative: 'route',
-                                    });
-                            }
-                        } else {
-                            onCreateSuccess != null
-                                ? onCreateSuccess(savedData)
-                                : onSaveSuccess?.(data);
-                            if (createLink || saveLink) {
-                                const link = (createLink ?? saveLink)?.replace(
-                                    '{{id}}',
-                                    '' + savedData.id
-                                );
-                                if (link?.startsWith('.')) {
+                if (avoidSubmitIfAnyValidatorErrors && validatorFieldErrors?.length) {
+                    reject(t('form.validate.saveErrors'));
+                } else {
+                    const calcId = calculatedId(id);
+                    setApiFieldErrors(undefined);
+                    const apiAction =
+                        calcId != null ? apiUpdate(calcId, { data }) : apiCreate({ data });
+                    apiAction
+                        .then((savedData: any) => {
+                            const message =
+                                calcId != null ? t('form.update.success') : t('form.create.success');
+                            temporalMessageShow(null, message, 'success');
+                            reset(savedData);
+                            if (calcId != null) {
+                                onUpdateSuccess != null
+                                    ? onUpdateSuccess(savedData)
+                                    : onSaveSuccess?.(data);
+                                if (updateLink != null || saveLink != null) {
+                                    const link = (updateLink ?? saveLink)?.replace(
+                                        '{{id}}',
+                                        '' + savedData.id
+                                    );
                                     link &&
-                                        navigate(locationPath + '/' + link, {
+                                        navigate(link, {
                                             replace: true,
+                                            relative: 'route',
                                         });
-                                } else if (link?.startsWith('/')) {
-                                    link &&
-                                        navigate(link.substring(1), {
-                                            replace: true,
-                                        });
-                                } else {
-                                    const sli = locationPath?.lastIndexOf('/');
-                                    if (sli != -1) {
+                                }
+                            } else {
+                                onCreateSuccess != null
+                                    ? onCreateSuccess(savedData)
+                                    : onSaveSuccess?.(data);
+                                if (createLink || saveLink) {
+                                    const link = (createLink ?? saveLink)?.replace(
+                                        '{{id}}',
+                                        '' + savedData.id
+                                    );
+                                    if (link?.startsWith('.')) {
                                         link &&
-                                            navigate(locationPath.substring(0, sli + 1) + link, {
+                                            navigate(locationPath + '/' + link, {
+                                                replace: true,
+                                            });
+                                    } else if (link?.startsWith('/')) {
+                                        link &&
+                                            navigate(link.substring(1), {
                                                 replace: true,
                                             });
                                     } else {
-                                        link && navigate(link, { replace: true });
+                                        const sli = locationPath?.lastIndexOf('/');
+                                        if (sli != -1) {
+                                            link &&
+                                                navigate(locationPath.substring(0, sli + 1) + link, {
+                                                    replace: true,
+                                                });
+                                        } else {
+                                            link && navigate(link, { replace: true });
+                                        }
                                     }
                                 }
                             }
-                        }
-                        resolve(savedData);
-                    })
-                    .catch((error: ResourceApiError) => {
-                        const title =
-                            calcId != null ? t('form.update.error') : t('form.create.error');
-                        handleSubmissionErrors(error, title, reject);
-                    });
+                            resolve(savedData);
+                        })
+                        .catch((error: ResourceApiError) => {
+                            const title =
+                                calcId != null ? t('form.update.error') : t('form.create.error');
+                            handleSubmissionErrors(error, title, reject);
+                        });
+                }
             } else {
                 reject(t('form.update.wrong_resource_type', { resourceType }));
             }
@@ -546,6 +557,8 @@ export const Form: React.FC<FormProps> = (props) => {
         if (isReady) {
             setModified(true);
             onDataChange?.(data);
+            const validatorFieldErrors = dataValidator?.(data);
+            validatorFieldErrors?.length && setValidatorFieldErrors(validatorFieldErrors);
         }
     }, [isReady, data]);
     apiRef.current = {
@@ -576,6 +589,7 @@ export const Form: React.FC<FormProps> = (props) => {
             logConsole.warn('apiRef prop must be initialized with an empty object');
         }
     }
+    const fieldErrors = [...(validatorFieldErrors ?? []), ...(apiFieldErrors ?? [])];
     const context = React.useMemo(
         () => ({
             id: calculatedId(id),
@@ -596,6 +610,10 @@ export const Form: React.FC<FormProps> = (props) => {
             apiRef,
             dataGetFieldValue: (fieldName: string) => dataGetValue((state) => state?.[fieldName]),
             dataDispatchAction,
+            validationSetFieldErrors: (fieldName: string, errors?: FormFieldError[]) => setValidatorFieldErrors(errs => [
+                ...(errs?.filter(e => e.field !== fieldName) ?? []),
+                ...(errors ?? [])
+            ]),
             commonFieldComponentProps,
         }),
         [
@@ -605,6 +623,7 @@ export const Form: React.FC<FormProps> = (props) => {
             fieldErrors,
             data,
             dataDispatchAction,
+            setValidatorFieldErrors,
             commonFieldComponentProps,
         ]
     );

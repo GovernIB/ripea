@@ -101,6 +101,7 @@ const componentsEn = {
         },
         validate: {
             error: 'Validation error',
+            saveErrors: 'There are validation errors',
         },
     },
     actionreport: {

@@ -53,12 +53,13 @@ export type FormContextType = {
     apiRef: FormApiRef;
     dataGetFieldValue: (fieldName: string) => any;
     dataDispatchAction: (action: FormFieldDataAction) => void;
+    validationSetFieldErrors: (fieldName: string, errors?: FormFieldError[]) => void;
     commonFieldComponentProps?: any;
 };
 
 export type FormFieldError = {
-    code: string;
     field: string;
+    code?: string;
     message: string;
 };
 

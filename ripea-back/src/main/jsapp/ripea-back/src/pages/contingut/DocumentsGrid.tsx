@@ -277,7 +277,7 @@ const DocumentsGrid = (props: any) => {
                     toolbarHideCreate
                     rowHideDeleteButton={hiddenDelete}
 
-                    popupEditFormComponentProps={{ initOnChangeRequest: true }}
+                    popupEditFormComponentProps={{ initOnChangeRequest: true, avoidSubmitIfAnyValidatorErrors: true }}
                 />
                 {components}
                 {massiveComponents}

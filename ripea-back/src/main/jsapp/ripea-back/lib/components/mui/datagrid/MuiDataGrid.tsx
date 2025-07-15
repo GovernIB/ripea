@@ -6,6 +6,7 @@ import {
     GridRowClassNameParams,
     GridColDef,
     GridSortModel,
+    GridSortDirection,
     GridPaginationModel,
     GridRowSelectionModel,
     GridSlots,
@@ -54,6 +55,7 @@ export type MuiDataGridColDef = GridColDef & {
     noTime?: boolean;
     noSeconds?: boolean;
     exportExcluded?: boolean;
+    sortProcessor?: (field: string, sort: GridSortDirection) => GridSortModel | undefined;
 };
 
 export type MuiDataGridProps = {
@@ -112,7 +114,7 @@ export type MuiDataGridProps = {
     popupEditFormDialogOnClose?: (reason?: string) => boolean;
     popupEditFormComponentProps?: any;
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
-    onRowOrderChange?: GridEventListener<"rowOrderChange">;
+    onRowOrderChange?: GridEventListener<'rowOrderChange'>;
     onRowSelectionModelChange?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails) => void;
     apiRef?: MuiDataGridApiRef;
     datagridApiRef?: React.MutableRefObject<GridApiPro>;
@@ -123,6 +125,22 @@ export type MuiDataGridProps = {
     sx?: any;
     debug?: boolean;
 } & Omit<DataGridProps, 'apiRef'>;
+
+const processFindSortModel = (sortModel: GridSortModel, columns: MuiDataGridColDef[]) => {
+    const result: any[] = [];
+    sortModel.forEach(({ field, sort }) => {
+        const columnForCurrentField = columns.find((c) => c.field === field);
+        const mappedFields = columnForCurrentField?.sortProcessor
+            ? columnForCurrentField.sortProcessor(field, sort)
+            : undefined;
+        if (mappedFields) {
+            mappedFields.forEach((mappedField) => result.push(mappedField));
+        } else {
+            result.push({ field, sort });
+        }
+    });
+    return result as GridSortModel;
+};
 
 const rowLinkFind = (rowLink: string | undefined, rowLinks: any[] | undefined) => {
     if (rowLink != null) {
@@ -373,7 +391,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const findArgs = React.useMemo(() => {
         const filter = staticFilter ? (internalFilter ? '(' + staticFilter + ') and (' + internalFilter + ')' : staticFilter) : internalFilter;
         const findSortModel = staticSortModel ?? internalSortModel;
-        const sorts = findSortModel && findSortModel.length ? findSortModel.map(sm => sm.field + ',' + sm.sort) : undefined;
+        const processedFindSortModel = processFindSortModel(findSortModel, columns);
+        const sorts = processedFindSortModel?.length ? processedFindSortModel.map(({ field, sort }) => `${field},${sort}`) : undefined;
         const paginationArgs = paginationActive ? {
             page: paginationModel?.page,
             size: paginationModel?.pageSize,
@@ -393,7 +412,8 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         internalFilter,
         staticFilter,
         namedQueries,
-        perspectives
+        perspectives,
+        columns,
     ]);
     const {
         loading,
