@@ -592,7 +592,7 @@ public class Utils {
 		case InteressatPersonaJuridicaEntity:
 			return raoSocial;
 		case InteressatAdministracioEntity:
-			return organCodi;
+			return Utils.hasValue(nom)?nom:organCodi;
 		default:
 			return null;
 		}

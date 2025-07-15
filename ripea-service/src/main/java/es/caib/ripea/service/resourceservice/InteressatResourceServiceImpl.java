@@ -178,6 +178,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         public void onChange(Serializable id, InteressatResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, InteressatResource target) {
             if (fieldValue!=null) {
                 UnitatOrganitzativaDto uoDto = unitatOrganitzativaHelper.findAmbCodiAndAdressafisica(fieldValue.toString());
+                target.setNom(Utils.abbreviate(uoDto.getDenominacio(), 30));
                 target.setPais(uoDto.getCodiPais());
                 target.setProvincia(uoDto.getCodiProvincia());
                 target.setMunicipi(uoDto.getLocalitat());
@@ -188,6 +189,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                 target.setTelefon("");
                 target.setObservacions("");
             } else {
+            	target.setNom("");
                 target.setPais("");
                 target.setProvincia("");
                 target.setMunicipi("");
@@ -212,33 +214,42 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 	}
     
     public class UnitatsOrganitzativesOptionsProvider implements FieldOptionsProvider {
-        private String getFromMap(String param, Map<String,String[]> requestParameterMap){
+        
+    	private String getFromMap(String param, Map<String,String[]> requestParameterMap){
             return (requestParameterMap.containsKey(param) && requestParameterMap.get(param).length>0)
                     ? requestParameterMap.get(param)[0]
                     : "";
         }
 
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
+			
 			List<UnitatOrganitzativaDto> uos = null;
             boolean recuperarValors = Boolean.parseBoolean(getFromMap("isInteressatAdministracio", requestParameterMap));
-			if (!recuperarValors || requestParameterMap.isEmpty()) {
-				uos = cacheHelper.findUnitatsOrganitzativesPerEntitat(configHelper.getEntitatActualCodi()).toDadesList();
-			} else {
-				String codiDir3 = getFromMap(UnitatOrganitzativaFormFilter.Fields.nif, requestParameterMap);
-				String denominacio = getFromMap(UnitatOrganitzativaFormFilter.Fields.nom, requestParameterMap);
-				String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, requestParameterMap);
-				String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, requestParameterMap);
-				String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, requestParameterMap);
-				String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipi, requestParameterMap);
-                Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, requestParameterMap));
-				uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
-			}
-			List<FieldOption> resultat = new ArrayList<FieldOption>();
-			if (uos!=null) {
-				for (UnitatOrganitzativaDto uo: uos) {
-					resultat.add(new FieldOption(uo.getCodi(), uo.getDenominacio()));
+            requestParameterMap.remove("isInteressatAdministracio");
+            List<FieldOption> resultat = new ArrayList<FieldOption>();
+            
+            if (recuperarValors) {
+				if (requestParameterMap.isEmpty()) {
+					String entitatActual = configHelper.getEntitatActualCodi();
+					if (Utils.hasValue(entitatActual)) {
+						uos = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatActual).toDadesList();
+					}
+				} else {
+					String codiDir3 = getFromMap(UnitatOrganitzativaFormFilter.Fields.nif, requestParameterMap);
+					String denominacio = getFromMap(UnitatOrganitzativaFormFilter.Fields.nom, requestParameterMap);
+					String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, requestParameterMap);
+					String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, requestParameterMap);
+					String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, requestParameterMap);
+					String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipi, requestParameterMap);
+	                Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, requestParameterMap));
+					uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
 				}
-			}
+				if (uos!=null) {
+					for (UnitatOrganitzativaDto uo: uos) {
+						resultat.add(new FieldOption(uo.getCodi(), uo.getDenominacio()));
+					}
+				}
+            }
 			return resultat;
 		}
     }
@@ -257,7 +268,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 			}
 			
 			String[] requestParamCA = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma);
-			if (requestParamCA!=null && requestParamCA.length>0) {
+			if (requestParamCA!=null && requestParamCA.length>0 && Utils.hasValue(requestParamCA[0])) {
 				provincies = cacheHelper.findProvinciesPerComunitat(requestParamCA[0]);
 			}
 			
@@ -279,7 +290,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 			String provinciaCodi = requestParam!=null?requestParam[0]:"";
 			
 			if (!Utils.hasValue(provinciaCodi)) {
-				String[] provinciaFilter = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.provinciaFilter);
+				String[] provinciaFilter = requestParameterMap.get(InteressatResource.UnitatOrganitzativaFormFilter.Fields.provincia);
 				provinciaCodi = provinciaFilter!=null?provinciaFilter[0]:"";
 			}
 			
@@ -311,8 +322,10 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     @Override
     protected void afterCreateSave(InteressatResourceEntity entity, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
-    	ExpedientEntity expedient = expedientRepository.findById(entity.getExpedient().getId()).get();
-    	pluginHelper.arxiuExpedientActualitzar(expedient);
+    	ExpedientEntity expedient 	= expedientRepository.findById(entity.getExpedient().getId()).get();
+    	InteressatEntity interessat = interessatRepository.findById(entity.getId()).get();
+    	expedientInteressatHelper.arxiuPropagarInteressats(expedient, interessat);
+    	cacheHelper.evictErrorsValidacioPerNode(expedient);
     }
 
     @Override
