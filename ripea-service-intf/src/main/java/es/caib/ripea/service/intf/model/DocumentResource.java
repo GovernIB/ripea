@@ -480,8 +480,9 @@ public class DocumentResource extends NodeResource {
         private boolean mostrarAvisFirmaParcial;
 
         // SIMPLE
+        @ResourceField(descriptionField = "nomAndNif")
         private List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
-        private List<String> nifsManuals = new ArrayList<>();
+        private String nifsManuals;
         @ResourceField(enumType = true)
         private List<String> carrecs = new ArrayList<>();
         private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;

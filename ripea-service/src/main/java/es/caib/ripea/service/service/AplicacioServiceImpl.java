@@ -350,38 +350,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariCarrecAmbCodiDades(String nifOrCarrec) {
-		logger.debug("Obtenint usuari/càrrec amb codi (codi=" + nifOrCarrec + ")");
-		UsuariDto usuariDto = null;
-		try {
-			//Cercar primer a BBDD, sino al plugin, sempre per NIF, y sense guardarlo a BBDD RIPEA.
-			usuariDto = usuariHelper.getUsuariResponsableByNif(nifOrCarrec);
-		} catch (NotFoundException ex) {
-			if (configHelper.getAsBoolean(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)) {
-				logger.error("No s'ha trobat cap usuari amb el codi " + nifOrCarrec + ". Procedim a cercar si és un càrrec.");
-				usuariDto = new UsuariDto();
-				PortafirmesCarrecDto carrec = pluginHelper.portafirmesRecuperarCarrec(nifOrCarrec);
-				
-				if (carrec != null) {
-					String nom = carrec.getCarrecName();
-				    if (!Utils.isBlank(carrec.getUsuariPersonaNom())) {
-				        nom += " - " + carrec.getUsuariPersonaNom();
-				    }
-					usuariDto.setCodi(carrec.getCarrecId());
-					usuariDto.setNom(nom);
-					usuariDto.setNif(carrec.getUsuariPersonaNif());
-				} else {
-					throw new NotFoundException(
-							nifOrCarrec,
-							DadesUsuari.class);
-				}
-			} else {
-				usuariDto = new UsuariDto();
-				usuariDto.setCodi(nifOrCarrec);
-				usuariDto.setNif(nifOrCarrec);
-				usuariDto.setNom("Usuari o càrrec NO trobat");
-			}
-		}
-		return usuariDto;
+		return usuariHelper.findUsuariCarrecAmbCodiDades(nifOrCarrec);
 	}
 	
 	@Transactional(readOnly = true)

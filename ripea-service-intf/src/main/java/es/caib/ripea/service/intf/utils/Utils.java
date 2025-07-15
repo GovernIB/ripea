@@ -683,4 +683,16 @@ public class Utils {
 
         return resultado.toString();
     }
+	
+	public static boolean esAlfanumericoSeparadoPorComas(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return false;
+        }
+
+        // 1. Eliminar espacios alrededor y entre comas
+        String normalizado = texto.replaceAll("\\s+", "");
+
+        // 2. Validar que contiene solo alfanuméricos y comas (incluso si hay varias comas seguidas)
+        return normalizado.matches("^([a-zA-Z0-9]+)(,[a-zA-Z0-9]+)*$");
+    }
 }
