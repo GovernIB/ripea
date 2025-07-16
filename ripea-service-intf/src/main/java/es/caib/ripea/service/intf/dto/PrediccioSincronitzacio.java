@@ -1,7 +1,9 @@
 package es.caib.ripea.service.intf.dto;
 
 import java.util.List;
-import java.util.Map;
+
+import org.apache.commons.collections4.MultiValuedMap;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,9 +16,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PrediccioSincronitzacio {
-    Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> splitMap;
-    Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeMap;
-    Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> substMap;
+	MultiValuedMap splitMap;
+	MultiValuedMap mergeMap;
+	MultiValuedMap substMap;
     List<UnitatOrganitzativaDto> unitatsVigents;
     List<UnitatOrganitzativaDto> unitatsNew;
     List<UnitatOrganitzativaDto> unitatsExtingides;

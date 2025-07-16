@@ -809,80 +809,86 @@ public class MetaExpedientHelper {
 			Integer organsNoSincronitzats = 0;
 			Integer modificats = 0;
 			Integer fallat = 0;
+			
 			for(MetaExpedientEntity metaExpedient: metaExpedients) {
-				ActualitzacioInfo.ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder()
-						.codiSia(metaExpedient.getClassificacio())
-						.nomAntic(metaExpedient.getNom())
-						.descripcioAntiga(metaExpedient.getDescripcio())
-						.comuAntic(metaExpedient.isComu());
-				if (metaExpedient.getOrganGestor() != null)
-					infoBuilder.organAntic(metaExpedient.getOrganGestor().getCodi());
-
-				ProcedimentDto procedimentGga = null;
-				try {
-					logger.info("Procediment DB: " + metaExpedient);
-					procedimentGga = pluginHelper.procedimentFindByCodiSia(
-							entitat.getUnitatArrel(),
-							metaExpedient.getClassificacio());
-					infoBuilder.exist(procedimentGga != null);
-					
-					logger.info(" Procediment WS: " + procedimentGga);
-				} catch (SistemaExternException se) {
-					logger.error("Error Procediment WS id="+ metaExpedient.getId(), se);
-					infoBuilder.hasError(true);
-					infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
-					progres.addInfo(infoBuilder.build(), true);
-					fallat++;
-					continue;
-				}
-
-				if (procedimentGga == null) {
-					infoBuilder.hasError(true);
-					infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedient.getClassificacio()));
-					progres.addInfo(infoBuilder.build(), true);
-					fallat++;
-					continue;
-				}
-
-				ActualitzacioInfo info = infoBuilder.build();
-				info.setNomNou(procedimentGga.getNom());
-				info.setDescripcioNova(procedimentGga.getResum());
-				info.setComuNou(procedimentGga.isComu());
-				if (!procedimentGga.isComu()) {
-					info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
-				} else {
-					info.setOrganNou(null);
-				}
 				
-				if (!info.hasChange()) {
-					progres.addInfo(info, true);
-					continue;
-				}
-
-				String nom = procedimentGga.getNom();
-				String descripcio = procedimentGga.getResum();
-				OrganGestorEntity organGestor;
-				boolean organNoSincronitzat = false;
+				if (TipusClassificacioEnumDto.SIA.equals(metaExpedient.getTipusClassificacio())) {
 				
-				if (procedimentGga.isComu()) {
-					organGestor = null;
-				} else {
-					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
-					if (organGestor == null) {
-						organNoSincronitzat = true;
-						organsNoSincronitzats++;
-						organGestor = metaExpedient.getOrganGestor();
-						info.setHasError(true);
-						info.setErrorText(msg("procediment.synchronize.error.organ", procedimentGga.getUnitatOrganitzativaCodi()));
+					ActualitzacioInfo.ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder()
+							.codiSia(metaExpedient.getClassificacio())
+							.nomAntic(metaExpedient.getNom())
+							.descripcioAntiga(metaExpedient.getDescripcio())
+							.comuAntic(metaExpedient.isComu());
+					if (metaExpedient.getOrganGestor() != null)
+						infoBuilder.organAntic(metaExpedient.getOrganGestor().getCodi());
+	
+					ProcedimentDto procedimentGga = null;
+					try {
+						logger.info("Procediment DB: " + metaExpedient);
+						procedimentGga = pluginHelper.procedimentFindByCodiSia(
+								entitat.getUnitatArrel(),
+								metaExpedient.getClassificacio());
+						infoBuilder.exist(procedimentGga != null);
+						
+						logger.info(" Procediment WS: " + procedimentGga);
+					} catch (SistemaExternException se) {
+						logger.error("Error Procediment WS id="+ metaExpedient.getId(), se);
+						infoBuilder.hasError(true);
+						infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
+						progres.addInfo(infoBuilder.build(), true);
 						fallat++;
-
-						avisosProcedimentsOrgans.put(nom, new String[] {organGestor.getCodi() + " - " + organGestor.getNom(), procedimentGga.getUnitatOrganitzativaCodi()});
+						continue;
 					}
+	
+					if (procedimentGga == null) {
+						infoBuilder.hasError(true);
+						infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedient.getClassificacio()));
+						progres.addInfo(infoBuilder.build(), true);
+						fallat++;
+						continue;
+					}
+	
+					ActualitzacioInfo info = infoBuilder.build();
+					info.setNomNou(procedimentGga.getNom());
+					info.setDescripcioNova(procedimentGga.getResum());
+					info.setComuNou(procedimentGga.isComu());
+					if (!procedimentGga.isComu()) {
+						info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
+					} else {
+						info.setOrganNou(null);
+					}
+					
+					if (!info.hasChange()) {
+						progres.addInfo(info, true);
+						continue;
+					}
+	
+					String nom = procedimentGga.getNom();
+					String descripcio = procedimentGga.getResum();
+					OrganGestorEntity organGestor;
+					boolean organNoSincronitzat = false;
+					
+					if (procedimentGga.isComu()) {
+						organGestor = null;
+					} else {
+						organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
+						if (organGestor == null) {
+							organNoSincronitzat = true;
+							organsNoSincronitzats++;
+							organGestor = metaExpedient.getOrganGestor();
+							info.setHasError(true);
+							info.setErrorText(msg("procediment.synchronize.error.organ", procedimentGga.getUnitatOrganitzativaCodi()));
+							fallat++;
+	
+							avisosProcedimentsOrgans.put(nom, new String[] {organGestor.getCodi() + " - " + organGestor.getNom(), procedimentGga.getUnitatOrganitzativaCodi()});
+						}
+					}
+	
+					metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
+					metaExpedientRepository.flush();
+					progres.addInfo(info, true);
 				}
-
-				metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
-				metaExpedientRepository.flush();
-				progres.addInfo(info, true);
+								
 				modificats++;
 			}
 
