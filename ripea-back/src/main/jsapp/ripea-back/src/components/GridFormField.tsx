@@ -1,6 +1,8 @@
 import {Button, Grid, Icon} from "@mui/material";
 import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
+import {useTranslation} from "react-i18next";
+import {useUserSession} from "./Session.tsx";
 
 export const GridButton = (props:any) => {
     const { title, xs, children, hidden, ...other} = props;
@@ -36,6 +38,30 @@ export const GridButtonField = (props:any) => {
 type GridFormField = FormFieldProps & {
     xs: number,
     hidden?: boolean,
+}
+
+function formatByteCount(bytes:number) {
+    if (bytes < 1024) return bytes + ' B';
+    const exp = Math.floor(Math.log(bytes) / Math.log(1024));
+    const pre = 'KMGTPE'.charAt(exp - 1) + 'B';
+    const value = bytes / Math.pow(1024, exp);
+    return value.toFixed(2) + ' ' + pre;
+}
+
+export const FileFormField = (props:GridFormField) => {
+    const { t } = useTranslation();
+    const { value: user } = useUserSession()
+    const adjuntValidator = (value: any) => {
+        const maxSize = user?.sessionScope?.maxUploadFileSize || 0;
+
+        if (value && value.contentLength >= maxSize) {
+            return [{
+                field: props.name,
+                message: t('page.contingut.alert.fileSize', {maxSize: formatByteCount(maxSize)})
+            }];
+        }
+    }
+    return <GridFormField {...props} type={"file"} validator={adjuntValidator}/>
 }
 
 const GridFormField = (props:GridFormField) => {

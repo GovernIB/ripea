@@ -18,6 +18,7 @@ import useMassiveActions from "./details/ExpedientMassiveActions.tsx";
 import {CardPage} from "../../components/CardData.tsx";
 import Load from "../../components/Load.tsx";
 import {useUserSession} from "../../components/Session.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
 
 const labelStyle = {padding: '1px 4px', fontSize: '11px', fontWeight: '500', borderRadius: '2px'}
 const commonStyle = {p: 0.5, display: 'flex', alignItems: 'center', borderRadius: '5px', width: 'max-content'}
@@ -110,7 +111,14 @@ const afterAvis = [
     {
         field: 'estat',
         flex: 0.75,
-        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>
+        renderCell: (params: any) => <StyledEstat entity={params?.row} icon={"folder"}>{params.formattedValue}</StyledEstat>,
+        sortProcessor: (field: string, sort: GridSortDirection) => {
+            return [
+                { field: "estatAdditional", sort },
+                { field: field, sort },
+                { field: "id", sort }
+            ]
+        }
     },
     {
         field: 'prioritat',

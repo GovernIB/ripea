@@ -63,6 +63,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         rowProps,
         formInitOnChange,
         popupEditFormDialogComponentProps,
+        popupEditFormComponentProps,
         rowHideUpdateButton = true,
         rowHideDeleteButton = true,
         rowExpansionChange,
@@ -211,6 +212,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             keepNonExistentRowsSelected={selectionActive || !!toolbarMassiveActions}
 
             popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'md', initOnChangeRequest: formInitOnChange, ...popupEditFormDialogComponentProps }}
+            popupEditFormComponentProps={{ ...(popupEditFormComponentProps ?? []), avoidSubmitIfAnyValidatorErrors: true }}
             popupEditFormDialogOnClose={(reason?: string) => reason !== 'backdropClick' }
 
             toolbarHideRefresh

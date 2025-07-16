@@ -164,6 +164,7 @@ const translationEn = {
                 valid: "This content has validation errors",
                 metaNode: "This document lacks a document type",
                 guardarPendent: "Pending to save in archive",
+                fileSize: "The file exceeds the maximum allowed size of {{maxSize}}"
             },
         },
         anotacio: {

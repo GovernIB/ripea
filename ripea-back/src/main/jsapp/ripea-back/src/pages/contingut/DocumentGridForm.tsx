@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {useScanFinalitzatSession} from "../../components/SseExpedient.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {Alert, Grid, Icon} from "@mui/material";
-import GridFormField, {GridButton} from "../../components/GridFormField.tsx";
+import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import TabComponent from "../../components/TabComponent.tsx";
@@ -42,16 +42,12 @@ const ScanerTabForm = () => {
 }
 const FileTabForm = () => {
     const { data } = useFormContext();
-    const adjuntValidator = (value: any) => {
-        if (value && value.contentLength > 800) {
-            return [{ field: 'adjunt', message: 'L\'has cagada!' }];
-        }
-    }
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="adjunt" type={"file"} required validator={adjuntValidator}/>
+        <FileFormField xs={12} name="adjunt" required/>
         <GridFormField xs={6} name="hasFirma" hidden={!data.adjunt} disabled={data.documentFirmaTipus == "FIRMA_ADJUNTA"} />
         <GridFormField xs={6} name="documentFirmaTipus" hidden={!data.adjunt} disabled />
-        <GridFormField xs={12} name="firmaAdjunt" type={"file"} hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required />
+        <FileFormField xs={12} name="firmaAdjunt" hidden={data.documentFirmaTipus != "FIRMA_SEPARADA"} required/>
     </Grid>
 }
 

@@ -164,6 +164,7 @@ const translationCa = {
                 valid: "Aquest contingut té errors de validació",
                 metaNode: "Aquest document no té assignat un tipus de document",
                 guardarPendent: "Pendent de guardar a l'arxiu",
+                fileSize: "El fitxer supera la mida màxima permesa de {{maxSize}}"
             },
         },
         anotacio: {

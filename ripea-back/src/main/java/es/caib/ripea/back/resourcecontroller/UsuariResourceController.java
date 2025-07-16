@@ -162,7 +162,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isDocumentsGeneralsEnabled", request.getSession().getAttribute("SessionHelper.isDocumentsGeneralsEnabled"));
         response.put("isTipusDocumentsEnabled", request.getSession().getAttribute("SessionHelper.isTipusDocumentsEnabled"));
         
-        response.put("maxUploadFileSize", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MAX_UPLOAD_FILE)));
+        response.put("maxUploadFileSize", aplicacioService.propertyFindByNom(PropertyConfig.MAX_UPLOAD_FILE));
         response.put("isDominisEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOMINIS_HABILITATS)));
         response.put("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
         response.put("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
