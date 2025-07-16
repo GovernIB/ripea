@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -379,8 +381,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
 
 			// Distinció entre divisió i (substitució o fusió)
-			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> splitMap 		= new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
-			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeOrSubstMap = new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
+			MultiValuedMap splitMap = new ArrayListValuedHashMap();
+			MultiValuedMap mergeOrSubstMap = new ArrayListValuedHashMap();
 
 			for (UnitatOrganitzativaDto vigentObsolete : unitatsVigentObsoleteDto) {
 				// Comprovam que no estigui extingida
@@ -427,9 +429,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 			// Distinció entre substitució i fusió
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
-			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeMap = new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
-			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> substMap = new HashMap<UnitatOrganitzativaDto, UnitatOrganitzativaDto>();
+			MultiValuedMap mergeMap = new ArrayListValuedHashMap();
+			MultiValuedMap substMap = new ArrayListValuedHashMap();
+			
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
+				
 				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap.get(mergeOrSubstKey);
 
 				// ==================== FUSIONS ===================
@@ -459,7 +463,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
 			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, organsVigents);
-
 			
 			return PrediccioSincronitzacio.builder()
 					.unitatsVigents(unitatsVigents)
@@ -481,19 +484,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean isAlreadyAddedToMap(
-			Map<UnitatOrganitzativaDto, UnitatOrganitzativaDto> mergeMap,
-			UnitatOrganitzativaDto key,
-			UnitatOrganitzativaDto value) {
-
+	private boolean isAlreadyAddedToMap(MultiValuedMap mergeMap, UnitatOrganitzativaDto key, UnitatOrganitzativaDto value) {
 		boolean contains = false;
-		UnitatOrganitzativaDto unitat = (UnitatOrganitzativaDto) mergeMap.get(key);
-		if (unitat != null) {
-			if (unitat.getCodi().equals(value.getCodi())) {
-				contains = true;
+		List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeMap.get(key);
+		if (values != null) {
+			for (UnitatOrganitzativaDto unitat : values) {
+				if (unitat.getCodi().equals(value.getCodi())) {
+					contains = true;
+				}
 			}
 		}
-
 		return contains;
 	}
 
