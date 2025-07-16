@@ -64,7 +64,7 @@ const EnviarPortafirmesForm = () => {
     const {data, apiRef} = useFormContext();
     const { onChange } = useFluxCreateSession();
     const { value: user } = useUserSession()
-    const [open, setOpen] = useState<boolean>(true);
+    const [open, setOpen] = useState<boolean>(!!data?.portafirmesEnviarFluxId);
     const [openNewFlux, setOpenNewFlux] = useState<boolean>(false);
 
     const {handleOpen, dialog} = useConverdedToPDF();
@@ -123,28 +123,27 @@ const EnviarPortafirmesForm = () => {
                                description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
                            }}}
                            required/>
-        </>}
 
-        <GridButton
-            variant={open ?"contained" :"outlined"}
-            xs={1} onClick={()=>{
-                setOpenNewFlux(false)
-                setOpen(!open)
-            }}
-            hidden={data?.portafirmesFluxTipus!='PORTAFIB'}
-        >
-            <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
-        </GridButton>
-        <GridButton
-            variant={openNewFlux ?"contained" :"outlined"}
-            xs={1} onClick={()=>{
-                setOpen(false)
-                setOpenNewFlux(!openNewFlux)
-            }}
-            hidden={data?.portafirmesFluxTipus!='PORTAFIB'}
-        >
-            <Icon sx={{m: 0}}>open_in_new</Icon>
-        </GridButton>
+            <GridButton
+                variant={open ?"contained" :"outlined"}
+                xs={1} onClick={()=>{
+                    setOpenNewFlux(false)
+                    setOpen(!open)
+                }}
+                disabled={!data?.portafirmesEnviarFluxId}
+            >
+                <Icon sx={{m: 0}}>{open ?'visibility_off' :'visibility'}</Icon>
+            </GridButton>
+            <GridButton
+                variant={openNewFlux ?"contained" :"outlined"}
+                xs={1} onClick={()=>{
+                    setOpen(false)
+                    setOpenNewFlux(!openNewFlux)
+                }}
+            >
+                <Icon sx={{m: 0}}>open_in_new</Icon>
+            </GridButton>
+        </>}
 
         <GridFormField xs={12} name="firmaParcial" hidden={!data?.mostrarFirmaParcial}/>
         <GridFormField xs={12} name="avisFirmaParcial" hidden={!data?.mostrarAvisFirmaParcial}/>
