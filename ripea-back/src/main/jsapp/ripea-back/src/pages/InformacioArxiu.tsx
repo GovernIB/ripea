@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Grid} from "@mui/material";
-import {BasePage, useResourceApiService, MuiDialog} from "reactlib";
+import {BasePage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";
 import TabComponent from "../components/TabComponent.tsx";
@@ -103,6 +103,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
+    const {temporalMessageShow} = useBaseAppContext();
 
     // expedientResource 'ARXIU_EXPEDIENT'
     // documentResource 'ARXIU_DOCUMENT'
@@ -114,9 +115,14 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
 
     const handleOpen = (id:any) => {
         if (apiIsReady && id) {
-            appGetOne(id, {perspectives: [perspective]}).then((app) => {
-                setEntity(app?.arxiu)
-            })
+            appGetOne(id, {perspectives: [perspective]})
+                .then((app) => {
+                    setEntity(app?.arxiu)
+                })
+                .catch((error)=>{
+                    temporalMessageShow(null, error?.message, 'error');
+                    handleClose()
+                })
         }
         setOpen(true);
     }
