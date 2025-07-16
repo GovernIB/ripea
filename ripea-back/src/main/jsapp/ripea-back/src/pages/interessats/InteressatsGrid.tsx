@@ -48,10 +48,9 @@ export const InteressatsGridForm = () => {
             </Grid>
         }
 
-        <GridFormField xs={11} name="organCodi"
+        {data?.tipus === 'InteressatAdministracioEntity' && <GridFormField xs={11} name="organCodi"
                        requestParams={{...(value ?? []), isInteressatAdministracio: data?.tipus == 'InteressatAdministracioEntity'}}
-                       hidden={data?.tipus != 'InteressatAdministracioEntity'}
-                       required/>
+                       required/>}
         <GridButtonField xs={1} name={"filter"} icon={"search"} hidden={data?.tipus != 'InteressatAdministracioEntity'}/>
 
         <GridFormField xs={12} name="documentTipus"

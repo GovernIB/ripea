@@ -340,6 +340,18 @@
 			<version>1.5.3</version>
 		</dependency>		
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>ide</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.sun.xml.ws</groupId>
+					<artifactId>jaxws-ri</artifactId>
+					<version>2.3.7</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 <!--			<plugin>-->
