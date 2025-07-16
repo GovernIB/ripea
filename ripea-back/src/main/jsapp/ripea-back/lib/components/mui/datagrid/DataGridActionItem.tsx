@@ -10,7 +10,8 @@ type DataGridActionItemProps = {
     icon?: string;
     linkTo?: string;
     linkState?: any;
-    onClick?: DataGridActionItemOnClickFn;
+    onClick?: any;
+    onClickCustom?: DataGridActionItemOnClickFn;
     showInMenu?: boolean;
     disabled?: boolean;
 };
@@ -34,7 +35,7 @@ export const toDataGridActionItem = (
         icon={icon}
         linkTo={linkTo}
         linkState={linkState}
-        onClick={onClick}
+        onClickCustom={onClick}
         showInMenu={showInMenu}
         disabled={disabled} />;
 }
@@ -48,6 +49,7 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
         linkTo,
         linkState,
         onClick,
+        onClickCustom,
         showInMenu,
         disabled,
     } = props;
@@ -60,7 +62,9 @@ const DataGridActionItem: React.FC<DataGridActionItemProps> = (props) => {
         label={title}
         title={!showInMenu ? title : undefined}
         icon={icon ? <Icon>{icon}</Icon> : undefined}
-        onClick={event => onClick?.(id, row, event)}
+        onClick={event => {
+            onClickCustom ? onClickCustom?.(id, row, event) : onClick(event);
+        }}
         disabled={disabled}
         {...additionalProps} />;
 }
