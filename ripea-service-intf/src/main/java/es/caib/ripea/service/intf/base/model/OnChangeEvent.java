@@ -18,9 +18,9 @@ import java.util.Map;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OnChangeEvent {
+public class OnChangeEvent<ID extends Serializable> {
 
-	private Serializable id;
+	private ID id;
 	private JsonNode previous;
 	private String fieldName;
 	private JsonNode fieldValue;

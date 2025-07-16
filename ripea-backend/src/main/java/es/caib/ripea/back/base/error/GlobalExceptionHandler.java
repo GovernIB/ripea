@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.back.base.error;
 
 import es.caib.ripea.service.intf.base.exception.*;
@@ -25,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.ejb.EJBException;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
@@ -94,7 +92,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				Field constraintNameField = ex.getCause().getClass().getDeclaredField("constraintName");
 				constraintNameField.setAccessible(true);
 				constraintName = (String)constraintNameField.get(ex.getCause());
-			} catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
+			} catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException ignored) {
 			}
 			String errorMessage;
 			if (constraintName != null) {
@@ -142,7 +140,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(AnswerRequiredException.class)
 	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-	public ResponseEntity<Object> handleOnChangeAnswerRequiredException(
+	public ResponseEntity<Object> handleAnswerRequiredException(
 			AnswerRequiredException ex,
 			WebRequest request) {
 		return buildOnChangeAnswerRequiredErrorResponse(
@@ -216,10 +214,41 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				request);
 	}
 
-	@ExceptionHandler(RuntimeException.class)
+	@ExceptionHandler(EJBException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ResponseEntity<Object> handleEJBException(
+			EJBException ex,
+			WebRequest request) {
+		Exception causedBy = ex.getCausedByException();
+		if (causedBy instanceof NotFoundException) {
+			return handleNotFoundException((NotFoundException)causedBy, request);
+		} else if (causedBy instanceof ResourceAlreadyExistsException) {
+			return handleResourceAlreadyExistsException((ResourceAlreadyExistsException)causedBy, request);
+		} else if (causedBy instanceof AccessDeniedException) {
+			return handleAccessDeniedException((AccessDeniedException)causedBy, request);
+		} else if (causedBy instanceof DataIntegrityViolationException) {
+			return handleDataIntegrityViolationException((DataIntegrityViolationException)causedBy, request);
+		} else if (causedBy instanceof AnswerRequiredException) {
+			return handleAnswerRequiredException((AnswerRequiredException)causedBy, request);
+		} else if (causedBy instanceof ResourceNotCreatedException) {
+			return handleResourceNotCreatedException((ResourceNotCreatedException)causedBy, request);
+		} else if (causedBy instanceof ResourceNotUpdatedException) {
+			return handleResourceNotUpdatedException((ResourceNotUpdatedException)causedBy, request);
+		} else if (causedBy instanceof ResourceNotDeletedException) {
+			return handleResourceNotDeletedException((ResourceNotDeletedException)causedBy, request);
+		} else if (causedBy instanceof ReportGenerationException) {
+			return handleReportGenerationException((ReportGenerationException)causedBy, request);
+		} else if (causedBy instanceof ActionExecutionException) {
+			return handleActionExecutionException((ActionExecutionException)causedBy, request);
+		} else {
+			return handleAllUncaughtException(causedBy, request);
+		}
+	}
+
+	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<Object> handleAllUncaughtException(
-			RuntimeException ex,
+			Exception ex,
 			WebRequest request) {
 		log.error("Uncaught exception", ex);
 		return buildErrorResponse(

@@ -203,13 +203,13 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	@PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('ONCHANGE'))")
 	public ResponseEntity<String> onChange(
 			@RequestBody @Valid
-			final OnChangeEvent onChangeEvent) throws JsonProcessingException {
+			final OnChangeEvent<ID> onChangeEvent) throws JsonProcessingException {
 		log.debug("Processant canvis en els camps del recurs (onChangeEvent={})", onChangeEvent);
 		R previous = getOnChangePrevious(onChangeEvent, getResourceClass());
 		Object fieldValue = getOnChangeFieldValue(onChangeEvent, getResourceClass());
 		Map<String, AnswerRequiredException.AnswerValue> answers = getAnswersFromHeaderOrRequest(onChangeEvent.getAnswers());
 		Map<String, Object> processat = getMutableResourceService().onChange(
-				(ID)onChangeEvent.getId(),
+				onChangeEvent.getId(),
 				previous,
 				onChangeEvent.getFieldName(),
 				fieldValue,

@@ -143,7 +143,7 @@ public interface ReadonlyResourceController<R extends Resource<? extends Seriali
 	ResponseEntity<String> artifactFormOnChange(
 			final ResourceArtifactType type,
 			final String code,
-			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException;
+			final OnChangeEvent<ID> onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException;
 
 	/**
 	 * Valida el formulari associat a un artefacte.

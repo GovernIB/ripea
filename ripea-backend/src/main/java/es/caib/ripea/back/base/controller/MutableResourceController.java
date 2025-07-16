@@ -102,7 +102,7 @@ public interface MutableResourceController<R extends Resource<? extends Serializ
 	 *            si es produeixen errors al parsejar els camps.
 	 */
 	ResponseEntity<String> onChange(
-			final OnChangeEvent onChangeEvent) throws JsonProcessingException;
+			final OnChangeEvent<ID> onChangeEvent) throws JsonProcessingException;
 
 	/**
 	 * Consulta paginada de les opcions disponibles per a emplenar un camp de tipus ResourceReference.

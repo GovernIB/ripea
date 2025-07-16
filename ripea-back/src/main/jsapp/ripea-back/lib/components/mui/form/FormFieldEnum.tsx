@@ -13,6 +13,11 @@ type FormFieldEnumProps = FormFieldCustomProps & {
     requestParams?: any;
 };
 
+type EnumOption = {
+    value: string;
+    description?: any;
+};
+
 export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
     const {
         name,
@@ -32,7 +37,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
     } = props;
     const { requestHref } = useResourceApiContext();
     const [open, setOpen] = React.useState(false);
-    const [filteredOptions, setFilteredOptions] = React.useState<any>();
+    const [enumOptions, setEnumOptions] = React.useState<EnumOption[]>();
     const multiple = (field?.multiple || multipleProp) ?? false;
     const {
         helperText,
@@ -47,9 +52,12 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
     const valueMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? '');
     React.useEffect(() => {
         if (field.options != null) {
-            const options = field.options;
-            const filteredOptions = options != null ? Object.fromEntries(Object.entries(options).filter(([key]) => hiddenEnumValues ? (Array.isArray(hiddenEnumValues) ? !hiddenEnumValues.includes(key) : hiddenEnumValues !== key) : true)) : null;
-            setFilteredOptions(filteredOptions);
+            const optionsObj = field.options;
+            hiddenEnumValues?.forEach((v: any) => {
+                delete optionsObj[v];
+            });
+            const enumOptions = Object.entries(optionsObj).map(([value, description]) => ({ value, description }));
+            setEnumOptions(enumOptions);
         } else if (field.dataSource != null) {
             const dataSource = field.dataSource;
             const valueField = dataSource.valueField;
@@ -57,18 +65,19 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
             const templateData = requestParams;
             const href = dataSource.href + (templateData != null ? '{?' + Object.keys(templateData).join(',') + '}' : '');
             requestHref(href, templateData).then((state) => {
-                const options: any = {};
-                state.getEmbedded().forEach(e => {
-                    options[e.data[valueField]] = e.data[labelField];
-                });
-                const filteredOptions = options != null ? Object.fromEntries(Object.entries(options).filter(([key]) => hiddenEnumValues ? (Array.isArray(hiddenEnumValues) ? !hiddenEnumValues.includes(key) : hiddenEnumValues !== key) : true)) : null;
-                setFilteredOptions(filteredOptions);
+                const enumOptions = state.getEmbedded().
+                    map((e: any) => ({
+                        value: e.data[valueField],
+                        description: e.data[labelField]
+                    })).
+                    filter(o => !hiddenEnumValues?.includes(o.value));
+                setEnumOptions(enumOptions);
             });
         } else {
-            setFilteredOptions({});
+            setEnumOptions([]);
         }
     }, [field, requestParams]);
-    return filteredOptions && <TextField
+    return enumOptions && <TextField
         select
         name={name}
         label={!inline ? label : undefined}
@@ -95,19 +104,19 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
                 onOpen: () => setOpen(true),
                 renderValue: (value: any) => {
                     const selectedText = (v: any) => {
-                        const found = Object.entries(filteredOptions).find(([key]) => key === v);
-                        return found?.[1];
+                        const found = enumOptions.find(o => o.value === v);
+                        return found?.description ?? found?.value;
                     }
                     return multiple ? value?.map((v: any) => selectedText(v)).join(', ') : selectedText(value);
                 },
             }
         }}>
         {!required && !multiple && <MenuItem key='' value=''>&nbsp;</MenuItem>}
-        {Object.entries(filteredOptions).map(([key]) => {
-            const checked = value?.includes?.(key);
-            return <MenuItem key={key} value={key}>
+        {enumOptions.map(o => {
+            const checked = value?.includes?.(o.value);
+            return <MenuItem key={o.value} value={o.value}>
                 {multiple && <Checkbox checked={!!checked} />}
-                <ListItemText primary={filteredOptions[key] as string} />
+                <ListItemText primary={o.description ?? o.value} />
             </MenuItem>;
         })}
     </TextField>;

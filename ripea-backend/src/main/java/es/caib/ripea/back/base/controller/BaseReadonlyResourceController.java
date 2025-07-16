@@ -351,7 +351,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@Parameter(description = "Codi de l'artefacte")
 			final String code,
 			@RequestBody @Valid
-			final OnChangeEvent onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException {
+			final OnChangeEvent<ID> onChangeEvent) throws ArtifactNotFoundException, JsonProcessingException {
 		log.debug("Validació del formulari d'un artefacte (type={}, code={}, onChangeEvent={})", type, code, onChangeEvent);
 		Class<? extends Serializable> artifactFormClass = getArtifactFormClass(type, code);
 		Serializable previous = getOnChangePrevious(onChangeEvent, artifactFormClass);
@@ -939,7 +939,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	protected <P extends Serializable> P getOnChangePrevious(
-			OnChangeEvent onChangeEvent,
+			OnChangeEvent<ID> onChangeEvent,
 			Class<P> resourceClass) throws JsonProcessingException {
 		P previous = null;
 		if (onChangeEvent.getPrevious() != null && resourceClass != null) {
@@ -954,7 +954,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 	}
 
 	protected <P extends Serializable> Object getOnChangeFieldValue(
-			OnChangeEvent onChangeEvent,
+			OnChangeEvent<ID> onChangeEvent,
 			Class<P> resourceClass) {
 		if (onChangeEvent.getFieldName() != null) {
 			return JsonUtil.getInstance().fillResourceWithFieldsMap(

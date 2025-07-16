@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.service.helper.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,6 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.base.springfilter.FilterSpecification;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.ExpedientInteressatHelper;
-import es.caib.ripea.service.helper.PluginHelper;
-import es.caib.ripea.service.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -78,6 +72,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final ConfigHelper configHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
+    private final MessageHelper messageHelper;
 
     private final ExpedientRepository expedientRepository;
     private final InteressatRepository interessatRepository;
@@ -371,7 +366,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                             (previous.getRepresentat()!=null && Objects.equals(previous.getRepresentat().getId(), interessatResourceEntity.getId()))
                             || (previous.getRepresentant()!=null && Objects.equals(previous.getRepresentant().getId(), interessatResourceEntity.getId()))
                     ){
-                        throw new AnswerRequiredException(getResourceClass(), NOT_REPRESENT_HIMSELF, "Un interesado no puede representarse a si mismo");
+                        throw new AnswerRequiredException(InteressatResource.class, NOT_REPRESENT_HIMSELF, messageHelper.getMessage("es.caib.ripea.service.intf.resourcevalidation.InteressatValid.representHimself"));
                     }
 
 //                    if (!Objects.equals(interessatResourceEntity.getId(), previous.getId())) {

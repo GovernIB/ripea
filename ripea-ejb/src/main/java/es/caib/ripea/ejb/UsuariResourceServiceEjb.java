@@ -36,7 +36,7 @@ public class UsuariResourceServiceEjb extends AbstractServiceEjb<UsuariResourceS
 
 	@Override
 	public <P extends Serializable> Map<String, Object> artifactOnChange(ResourceArtifactType type, String code,
-			Serializable id, P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
+			String id, P previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers)
 			throws ArtifactNotFoundException, ResourceFieldNotFoundException, AnswerRequiredException {
 		return delegateService.artifactOnChange(type, code, id, previous, fieldName, fieldValue, answers);
 	}

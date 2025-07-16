@@ -92,7 +92,10 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             );
 
             for (InteressatResource interesado : interesados) {
-                if (Objects.equals(resource.getDocumentNum(), interesado.getDocumentNum())) {
+                if (
+                    (resource.getId()==null || !Objects.equals(resource.getId(), interesado.getId()))
+                    && Objects.equals(resource.getDocumentNum(), interesado.getDocumentNum())
+                ) {
                     context
                             .buildConstraintViolationWithTemplate("{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.documentNumExists}")
                             .addPropertyNode(InteressatResource.Fields.documentNum)
