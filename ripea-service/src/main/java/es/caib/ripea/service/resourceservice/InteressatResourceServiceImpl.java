@@ -223,25 +223,28 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			
+			//Evitar java.lang.IllegalStateException: No modifications are allowed to a locked ParameterMap
+			Map<String, String[]> mutableMap = new HashMap<>(requestParameterMap);
+			
 			List<UnitatOrganitzativaDto> uos = null;
-            boolean recuperarValors = Boolean.parseBoolean(getFromMap("isInteressatAdministracio", requestParameterMap));
-            requestParameterMap.remove("isInteressatAdministracio");
+            boolean recuperarValors = Boolean.parseBoolean(getFromMap("isInteressatAdministracio", mutableMap));
+            mutableMap.remove("isInteressatAdministracio");
             List<FieldOption> resultat = new ArrayList<FieldOption>();
             
             if (recuperarValors) {
-				if (requestParameterMap.isEmpty()) {
+				if (mutableMap.isEmpty()) {
 					String entitatActual = configHelper.getEntitatActualCodi();
 					if (Utils.hasValue(entitatActual)) {
 						uos = cacheHelper.findUnitatsOrganitzativesPerEntitat(entitatActual).toDadesList();
 					}
 				} else {
-					String codiDir3 = getFromMap(UnitatOrganitzativaFormFilter.Fields.nif, requestParameterMap);
-					String denominacio = getFromMap(UnitatOrganitzativaFormFilter.Fields.nom, requestParameterMap);
-					String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, requestParameterMap);
-					String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, requestParameterMap);
-					String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, requestParameterMap);
-					String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipi, requestParameterMap);
-	                Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, requestParameterMap));
+					String codiDir3 = getFromMap(UnitatOrganitzativaFormFilter.Fields.nif, mutableMap);
+					String denominacio = getFromMap(UnitatOrganitzativaFormFilter.Fields.nom, mutableMap);
+					String nivellAdm = getFromMap(UnitatOrganitzativaFormFilter.Fields.nivell, mutableMap);
+					String comunitat = getFromMap(UnitatOrganitzativaFormFilter.Fields.comunitatAutonoma, mutableMap);
+					String provincia = getFromMap(UnitatOrganitzativaFormFilter.Fields.provincia, mutableMap);
+					String municipi = getFromMap(UnitatOrganitzativaFormFilter.Fields.municipi, mutableMap);
+	                Boolean arrel = Boolean.parseBoolean(getFromMap(UnitatOrganitzativaFormFilter.Fields.unitatArrel, mutableMap));
 					uos = pluginHelper.unitatsOrganitzativesFindByFiltre(codiDir3, denominacio, nivellAdm, comunitat, provincia, municipi, arrel);
 				}
 				if (uos!=null) {

@@ -57,13 +57,13 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
     	}
     }
     
-    private class CancelFirmaActionExecutor implements ActionExecutor<DocumentPortafirmesResourceEntity, Serializable, String> {
+    private class CancelFirmaActionExecutor implements ActionExecutor<DocumentPortafirmesResourceEntity, Serializable, DocumentPortafirmesResource> {
 
 		@Override
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
 
 		@Override
-		public String exec(String code, DocumentPortafirmesResourceEntity entity, Serializable params) throws ActionExecutionException {
+		public DocumentPortafirmesResource exec(String code, DocumentPortafirmesResourceEntity entity, Serializable params) throws ActionExecutionException {
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				String rolActual = configHelper.getRolActual();
@@ -72,7 +72,7 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/documentPortafirmes/CancelFirmaActionExecutor", e);
 			}
-			return null;
+			return objectMappingHelper.newInstanceMap(entity, DocumentPortafirmesResource.class);
 		}
     }
 }

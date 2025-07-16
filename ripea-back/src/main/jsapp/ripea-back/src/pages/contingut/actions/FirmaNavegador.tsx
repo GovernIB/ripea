@@ -19,7 +19,7 @@ const FirmaNavegador = (props: any) => {
 
     return <FormActionDialog
         resourceName={"documentResource"}
-        title={t('page.document.action.firmar.title')}
+        title={t('page.document.action.firma.title')}
         action={"FIRMA_WEB_INI"}
         initialOnChange
         {...props}
