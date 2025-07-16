@@ -114,9 +114,9 @@ public class OrganGestorController extends BaseUserOAdminController {
 						"unitat.controller.synchronize.no.changes");
 			}
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
-			model.addAttribute("splitMap", prediccio.getSplitMap());
-			model.addAttribute("mergeMap", prediccio.getMergeMap());
-			model.addAttribute("substMap", prediccio.getSubstMap());
+			model.addAttribute("splitMap", prediccio.getSplitMap().asMap());
+			model.addAttribute("mergeMap", prediccio.getMergeMap().asMap());
+			model.addAttribute("substMap", prediccio.getSubstMap().asMap());
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
