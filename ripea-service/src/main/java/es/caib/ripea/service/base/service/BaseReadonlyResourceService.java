@@ -289,7 +289,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	public <P extends Serializable> Map<String, Object> artifactOnChange(
 			ResourceArtifactType type,
 			String code,
-			Serializable id,
+			ID id,
 			P previous,
 			String fieldName,
 			Object fieldValue,

@@ -165,7 +165,7 @@ public interface ReadonlyResourceService<R extends Resource<? extends Serializab
 	<P extends Serializable> Map<String, Object> artifactOnChange(
 			ResourceArtifactType type,
 			String code,
-			Serializable id,
+			ID id,
 			P previous,
 			String fieldName,
 			Object fieldValue,
