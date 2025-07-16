@@ -115,7 +115,7 @@ const EnviarPortafirmesForm = () => {
 
         {/* PORTAFIB */}
         {data?.portafirmesFluxTipus=='PORTAFIB' && <>
-            <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos} required/>
+            <GridFormField xs={12} name="annexos" multiple filter={filterAnnexos}/>
             <GridFormField xs={10} name="portafirmesEnviarFluxId"
                            componentProps={{title: t('page.document.detall.flux')}}
                            requestParams={{additionalOption: {

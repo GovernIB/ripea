@@ -1597,7 +1597,7 @@ public class DocumentHelper {
 			logger.info("Guardar document arxiu (id=" + docId + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")");
 		Exception exception = null;
 
-		DocumentEntity documentEntity = documentRepository.getOne(docId);
+ 		DocumentEntity documentEntity = documentRepository.getOne(docId);
 		if (documentEntity.getExpedient().getArxiuUuid() != null) {
 			
 			if (documentEntity.getArxiuUuid() != null) { // concurrency check

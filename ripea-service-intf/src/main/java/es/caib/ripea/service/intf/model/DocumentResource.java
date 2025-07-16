@@ -15,6 +15,8 @@ import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.resourcevalidation.AdjuntValid;
 import es.caib.ripea.service.intf.resourcevalidation.DocPinbalValid;
 import es.caib.ripea.service.intf.resourcevalidation.EnviarPortafirmesValid;
+import es.caib.ripea.service.intf.utils.Utils;
+
 import org.springframework.data.annotation.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -282,6 +284,18 @@ public class DocumentResource extends NodeResource {
         }
     }
 
+    public String getFitxerContentType() {
+    	if (Utils.hasValue(this.fitxerContentType)) { return this.fitxerContentType; }
+    	if (this.adjunt!=null && Utils.hasValue(this.adjunt.getContentType())) { return this.adjunt.getContentType(); }
+    	return "application/octet-stream";
+    }
+    
+    public String getFirmaContentType() {
+    	if (Utils.hasValue(this.firmaContentType)) { return this.firmaContentType; }
+    	if (this.firmaAdjunt!=null && Utils.hasValue(this.firmaAdjunt.getContentType())) { return this.firmaAdjunt.getContentType(); }
+    	return "application/octet-stream";
+    }
+    
     @Getter
     @Setter
     public static class EnviarViaEmailFormAction implements Serializable {
@@ -556,8 +570,8 @@ public class DocumentResource extends NodeResource {
         resultat.setNtiIdDocumentoOrigen(this.getNtiIdDocumentoOrigen());
         resultat.setFitxerNom(this.fitxerNom);
         resultat.setFitxerContingut(this.getFitxerContingut());
-        resultat.setFitxerContentType(this.getFitxerContentType());
-        resultat.setAmbFirma(this.isAmbFirma());
+        resultat.setFitxerContentType(getFitxerContentType());
+        resultat.setAmbFirma(this.hasFirma);
         switch (this.getDocumentFirmaTipus()) {
             case FIRMA_ADJUNTA:
                 resultat.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
@@ -569,7 +583,7 @@ public class DocumentResource extends NodeResource {
                 break;
         }
         resultat.setFirmaContingut(this.getFirmaContingut());
-        resultat.setFirmaContentType(this.getFirmaContentType());
+        resultat.setFirmaContentType(getFirmaContentType());
         return resultat;
     }
 }

@@ -591,7 +591,7 @@ function removeCookie(cname) {
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
 		data-save-state="true" 
-		data-default-order="20"
+		data-default-order="19"
 		data-default-dir="desc"
 		class="table table-bordered table-striped table-hover"
 		style="width:100%">

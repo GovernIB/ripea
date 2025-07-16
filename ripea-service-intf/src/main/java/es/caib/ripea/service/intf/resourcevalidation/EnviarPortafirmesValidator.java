@@ -37,14 +37,6 @@ public class EnviarPortafirmesValidator implements ConstraintValidator<EnviarPor
         }
 
         if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(resource.getPortafirmesFluxTipus())){
-            if (resource.getAnnexos() == null || resource.getAnnexos().isEmpty()){
-                context
-                        .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
-                        .addPropertyNode(EnviarPortafirmesFormAction.Fields.annexos)
-                        .addConstraintViolation()
-                        .disableDefaultConstraintViolation();
-                valid = false;
-            }
             if (resource.getPortafirmesEnviarFluxId() == null || resource.getPortafirmesEnviarFluxId().isBlank()){
                 context
                         .buildConstraintViolationWithTemplate("{javax.validation.constraints.NotNull.message}")
