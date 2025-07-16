@@ -192,6 +192,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				null);
 	}
 
+	@ExceptionHandler(ReportGenerationException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ResponseEntity<Object> handleReportGenerationException(
+			ReportGenerationException ex,
+			WebRequest request) {
+		return buildErrorResponse(
+				ex,
+				ex.getErrorMessage(),
+				HttpStatus.INTERNAL_SERVER_ERROR,
+				request);
+	}
+
+	@ExceptionHandler(ActionExecutionException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ResponseEntity<Object> handleActionExecutionException(
+			ActionExecutionException ex,
+			WebRequest request) {
+		return buildErrorResponse(
+				ex,
+				ex.getErrorMessage(),
+				HttpStatus.INTERNAL_SERVER_ERROR,
+				request);
+	}
+
 	@ExceptionHandler(RuntimeException.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<Object> handleAllUncaughtException(

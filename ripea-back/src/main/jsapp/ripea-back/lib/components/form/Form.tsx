@@ -285,13 +285,13 @@ export const Form: React.FC<FormProps> = (props) => {
         reject?: (reason: any) => void
     ) => {
         // S'ignoren els errors de tipus cancel·lació
-        if (!error.body?.modificationCanceledError) {
+        if (!error.modificationCanceledError) {
             // Quan es produeixen errors es fa un reject de la promesa.
             // Si els errors els tracta el mateix component Form aleshores la
             // cridada a reject es fa amb un valor buit.
             // Si l'error s'ha de mostrar a l'usuari es fa un reject amb l'error.
             if (error.status === 422) {
-                const errors = error.body.errors ?? error.body.validationErrors;
+                const errors = error.errors ?? error.validationErrors;
                 // TODO mostrar globalErrors
                 //const globalErrors = errors?.find((e: any) => e.field == null);
                 const fieldErrors = errors
@@ -303,7 +303,7 @@ export const Form: React.FC<FormProps> = (props) => {
                     }));
                 setApiFieldErrors(fieldErrors);
             } else {
-                temporalMessageShow(temporalMessageTitle ?? '', error.message, 'error');
+                temporalMessageShow(temporalMessageTitle ?? '', error.description ?? error.message, 'error');
                 reject?.(error);
             }
         }

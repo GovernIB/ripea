@@ -2,7 +2,6 @@ import React from 'react';
 import {
     useResourceApiService,
     ResourceApiFindCommonArgs,
-    ResourceApiError,
 } from '../../ResourceApiProvider';
 import { ResourceType, ExportFileType } from '../../ResourceApiContext';
 import { useDataQuickFilter } from './DataQuickFilter';
@@ -237,8 +236,8 @@ export const useDataCommonEditable = (
                             refresh?.();
                             temporalMessageShow(null, t('datacommon.delete.single.success'), 'success');
                         })
-                        .catch((error: ResourceApiError) => {
-                            temporalMessageShow(t('datacommon.delete.single.error'), error.message, 'error');
+                        .catch((error) => {
+                            temporalMessageShow(t('datacommon.delete.single.error'), error.description ?? error.message, 'error');
                         });
                 }
             }).

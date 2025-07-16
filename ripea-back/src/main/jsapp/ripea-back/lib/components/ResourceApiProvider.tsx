@@ -177,9 +177,20 @@ export type ResourceApiProviderProps = React.PropsWithChildren & {
     debugAvailableServices?: boolean;
 };
 
-export type ResourceApiError = Problem & {
+export type ResourceApiError = Error & {
+    /** Codi d'estat HTTP de l'error */
+    status: number;
+    /** Objecte amb informació de la resposta HTTP */
+    response?: Response;
+    /** Descripció detallada de l'error */
+    description?: string;
+    /** Llista d'errors globals */
     errors?: any[];
+    /** Llista d'errors de validació */
     validationErrors?: any[];
+    /** Informació addicional si el missatge d'error és de tipus AnswerRequired */
+    answerRequiredError?: any;
+    /** Indica si l'error és una modificació cancel·lada */
     modificationCanceledError?: boolean;
 };
 
@@ -319,20 +330,35 @@ const callRequestExecFn = (
         });
 }
 
+const toResourceApiError = (problem: Problem): ResourceApiError => {
+    return {
+        name: problem.name,
+        message: problem.message,
+        stack: problem.stack,
+        status: problem.status,
+        response: problem.response,
+        description: problem.body?.title,
+        errors: problem.body?.errors,
+        validationErrors: problem.body?.validationErrors,
+        answerRequiredError: problem.body?.answerRequiredError,
+        modificationCanceledError: problem.body?.modificationCanceledError,
+    };
+}
+
 const processAnswerRequiredError = (
-    error: ResourceApiError,
+    problem: Problem,
     id: any,
     args: ResourceApiRequestArgs | undefined,
     callback: (id: any, args: any) => Promise<any>,
     openAnswerRequiredDialog?: OpenAnswerRequiredDialogFn): Promise<any> => {
-    if (error.body) {
-        if (error.status === 422 && error.body.answerRequiredError && openAnswerRequiredDialog) {
+    if (problem.body) {
+        if (problem.status === 422 && problem.body.answerRequiredError && openAnswerRequiredDialog) {
             const {
                 answerCode,
                 question,
                 trueFalseAnswerRequired,
                 availableAnswers
-            } = error.body.answerRequiredError;
+            } = problem.body.answerRequiredError;
             return new Promise((resolve, reject) => {
                 openAnswerRequiredDialog(
                     undefined,
@@ -355,11 +381,11 @@ const processAnswerRequiredError = (
                     });
             });
         } else {
-            return new Promise((_resolve, reject) => reject(error));
+            return new Promise((_resolve, reject) => reject(toResourceApiError(problem)));
         }
     } else {
         console.error('[' + LOG_PREFIX + '] Error response type not application/problem+json');
-        return new Promise((_resolve, reject) => reject(error));
+        return new Promise((_resolve, reject) => reject(toResourceApiError(problem)));
     }
 }
 
@@ -405,8 +431,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                         resolve(state.data);
                     }
                 }).
-                catch((error: ResourceApiError) => {
-                    reject(error);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
                 });
         });
     }, [request]);
@@ -428,8 +454,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     const page = state.data.page;
                     resolve({ rows, page });
                 }).
-                catch((error: ResourceApiError) => {
-                    reject(error);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
                 });
         });
     }, [request]);
@@ -443,8 +469,8 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then((state: State) => {
                     resolve(stateToBlobResponse(state));
                 }).
-                catch((error: ResourceApiError) => {
-                    reject(error);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
                 });
         });
     }, [request]);
@@ -458,7 +484,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then((state: State) => {
                     resolve(state.data);
                 }).
-                catch((error: ResourceApiError) => {
+                catch((error: Problem) => {
                     processAnswerRequiredError(
                         error,
                         null,
@@ -480,7 +506,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then((state: State) => {
                     resolve(state.data);
                 }).
-                catch((error: ResourceApiError) => {
+                catch((error: Problem) => {
                     processAnswerRequiredError(
                         error,
                         id,
@@ -502,7 +528,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then((state: State) => {
                     resolve(state.data);
                 }).
-                catch((error: ResourceApiError) => {
+                catch((error: Problem) => {
                     processAnswerRequiredError(
                         error,
                         id,
@@ -520,7 +546,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then(() => {
                     resolve();
                 }).
-                catch((error: ResourceApiError) => {
+                catch((error: Problem) => {
                     processAnswerRequiredError(
                         error,
                         id,
@@ -544,7 +570,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then((state: State) => {
                     resolve(state.data);
                 }).
-                catch((error: ResourceApiError) => {
+                catch((error: Problem) => {
                     processAnswerRequiredError(
                         error,
                         id,
@@ -558,38 +584,42 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
     }, [request]);
     const artifacts = React.useCallback((args?: ResourceApiArtifactsArgs): Promise<ResourceApiArtifact[]> => {
         return new Promise((resolve, reject) => {
-            request('artifacts', null, args).then((state: State) => {
-                const getActionRelFromArtifact = (artifact: any) => {
-                    if (artifact?.type === 'ACTION') {
-                        return 'exec_' + artifact.code;
-                    } else if (artifact?.type === 'REPORT') {
-                        return 'generate_' + artifact.code;
-                    } else if (artifact?.type === 'FILTER') {
-                        return 'filter_' + artifact.code;
+            request('artifacts', null, args).
+                then((state: State) => {
+                    const getActionRelFromArtifact = (artifact: any) => {
+                        if (artifact?.type === 'ACTION') {
+                            return 'exec_' + artifact.code;
+                        } else if (artifact?.type === 'REPORT') {
+                            return 'generate_' + artifact.code;
+                        } else if (artifact?.type === 'FILTER') {
+                            return 'filter_' + artifact.code;
+                        }
                     }
-                }
-                const artifacts = state.getEmbedded().map((e: any) => {
-                    const data = e.data;
-                    const actionRel = getActionRelFromArtifact(data);
-                    const fields = data.formClassActive ? e.action(actionRel)?.fields as any[] : undefined;
-                    const artifact = {
-                        type: data.type,
-                        code: data.code,
-                        formClassActive: data.formClassActive,
-                        fields,
-                    };
-                    if (args?.includeLinks) {
-                        return {
-                            ...artifact,
-                            '_links': processStateLinks(e.links),
-                            '_actions': processStateActions(e.actions())
+                    const artifacts = state.getEmbedded().map((e: any) => {
+                        const data = e.data;
+                        const actionRel = getActionRelFromArtifact(data);
+                        const fields = data.formClassActive ? e.action(actionRel)?.fields as any[] : undefined;
+                        const artifact = {
+                            type: data.type,
+                            code: data.code,
+                            formClassActive: data.formClassActive,
+                            fields,
                         };
-                    } else {
-                        return artifact;
-                    }
+                        if (args?.includeLinks) {
+                            return {
+                                ...artifact,
+                                '_links': processStateLinks(e.links),
+                                '_actions': processStateActions(e.actions())
+                            };
+                        } else {
+                            return artifact;
+                        }
+                    });
+                    resolve(artifacts);
+                }).
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
                 });
-                resolve(artifacts);
-            }).catch(reject);
         });
     }, [request]);
     const artifactFormOnChange = React.useCallback((args: ResourceApiArtifactOnChangeArgs): Promise<any> => {
@@ -611,7 +641,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                                     const result = state.data;
                                     resolve(result);
                                 }).
-                                catch((error: ResourceApiError) => {
+                                catch((error: Problem) => {
                                     processAnswerRequiredError(
                                         error,
                                         null,
@@ -624,7 +654,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                         }
                     }
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     const artifactFormValidate = React.useCallback((args: ResourceApiArtifactFormArgs): Promise<void> => {
@@ -640,11 +672,15 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                                     const result = state.data;
                                     resolve(result);
                                 }).
-                                catch(reject);
+                                catch((problem: Problem) => {
+                                    reject(toResourceApiError(problem));
+                                });
                         }
                     }
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     const artifactFieldOptionsFields = React.useCallback((args: ResourceApiArtifactFieldOptionsArgs): Promise<any[]> => {
@@ -660,11 +696,15 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                                     const processedFields = processApiFields(state.action().fields);
                                     resolve(processedFields);
                                 }).
-                                catch(reject);
+                                catch((problem: Problem) => {
+                                    reject(toResourceApiError(problem));
+                                });
                         }
                     }
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     const artifactFieldOptionsFind = React.useCallback((args: ResourceApiArtifactFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
@@ -692,11 +732,15 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                                     const page = state.data.page;
                                     resolve({ rows, page });
                                 }).
-                                catch(reject);
+                                catch((problem: Problem) => {
+                                    reject(toResourceApiError(problem));
+                                });
                         }
                     }
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     const artifactAction = React.useCallback((id: any, args: ResourceApiActionArgs): Promise<any[]> => {
@@ -708,7 +752,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                         const result = state.data;
                         resolve(result);
                     }).
-                    catch((error: ResourceApiError) => {
+                    catch((error: Problem) => {
                         processAnswerRequiredError(
                             error,
                             null,
@@ -741,7 +785,7 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                             resolve(result);
                         }
                     }).
-                    catch((error: ResourceApiError) => {
+                    catch((error: Problem) => {
                         processAnswerRequiredError(
                             error,
                             null,
@@ -763,7 +807,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     const processedFields = processApiFields(state.action().fields);
                     resolve(processedFields);
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     const fieldOptionsFind = React.useCallback((args: ResourceApiFieldOptionsFindArgs): Promise<ResourceApiFindResponse> => {
@@ -785,7 +831,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                     const page = state.data.page;
                     resolve({ rows, page });
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     const fieldDownload = React.useCallback((id: any, args: ResourceApiFieldArgs): Promise<ResourceApiBlobResponse> => {
@@ -799,7 +847,9 @@ const generateResourceApiMethods = (request: Function, getOpenAnswerRequiredDial
                 then((state: State) => {
                     resolve(stateToBlobResponse(state));
                 }).
-                catch(reject);
+                catch((problem: Problem) => {
+                    reject(toResourceApiError(problem));
+                });
         });
     }, [request]);
     return {
@@ -912,7 +962,7 @@ export const useResourceApiService = (resourceName?: string): ResourceApiService
                                 debugRequests,
                                 logConsole);
                         }).
-                        catch((error: Error) => {
+                        catch((error: Problem) => {
                             args?.callbacks?.error?.(error);
                             reject(error);
                         });
