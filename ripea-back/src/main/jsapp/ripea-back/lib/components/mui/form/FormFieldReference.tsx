@@ -111,7 +111,7 @@ const useFieldOptions = (
     const [options, setOptions] = React.useState<any[]>([]);
     const [page, setPage] = React.useState<any>();
     const [error, setError] = React.useState<any>();
-    const debouncedInputValue = useDebounce(inputValue);
+    const debouncedInputValue = useDebounce(inputValue, undefined, true);
     React.useEffect(() => {
         if (open) {
             const q = debouncedInputValue?.length ? debouncedInputValue : null;

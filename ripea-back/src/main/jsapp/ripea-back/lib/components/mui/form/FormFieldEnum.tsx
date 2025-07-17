@@ -52,7 +52,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
     const valueMultipleAdapted = multiple ? (value != null ? (Array.isArray(value) ? value : [value]) : []) : (value ?? '');
     React.useEffect(() => {
         if (field.options != null) {
-            const optionsObj = field.options;
+            const optionsObj = { ...field.options };
             hiddenEnumValues?.forEach((v: any) => {
                 delete optionsObj[v];
             });
@@ -76,7 +76,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         } else {
             setEnumOptions([]);
         }
-    }, [field, requestParams]);
+    }, [field, requestParams, hiddenEnumValues]);
     return enumOptions && <TextField
         select
         name={name}

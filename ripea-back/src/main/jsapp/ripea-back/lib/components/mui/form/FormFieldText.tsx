@@ -1,8 +1,13 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 import Icon from '@mui/material/Icon';
+import { useDebounce } from '../../../util/useDebounce';
 import { FormFieldCustomProps } from '../../form/FormField';
 import { FormFieldError } from '../../form/FormContext';
+
+type FormFieldTextProps = FormFieldCustomProps & {
+    debounce?: true;
+};
 
 export const useFormFieldCommon = (
     field: any,
@@ -29,7 +34,7 @@ export const useFormFieldCommon = (
     };
 }
 
-export const FormFieldText: React.FC<FormFieldCustomProps> = (props) => {
+export const FormFieldText: React.FC<FormFieldTextProps> = (props) => {
     const {
         name,
         label,
@@ -43,7 +48,9 @@ export const FormFieldText: React.FC<FormFieldCustomProps> = (props) => {
         readOnly,
         onChange,
         componentProps,
+        debounce,
     } = props;
+    const [localValue, setLocalValue] = React.useState<string | null>(value);
     const {
         helperText,
         title,
@@ -59,17 +66,24 @@ export const FormFieldText: React.FC<FormFieldCustomProps> = (props) => {
         ...componentProps?.slotProps?.htmlInput,
     };
     const isTextAreaType = type === 'textarea' || field?.type === 'textarea';
+    const changedValue = debounce ? useDebounce(localValue, undefined, true) : localValue;
+    React.useEffect(() => {
+        setLocalValue(value);
+    }, [value]);
+    React.useEffect(() => {
+        onChange?.(changedValue);
+    }, [changedValue]);
     return <TextField
         name={name}
         label={!inline ? label : undefined}
         placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
-        value={value ?? ''}
+        value={localValue ?? ''}
         required={required ?? field?.required}
         disabled={disabled}
         error={fieldError != null}
         title={title}
         helperText={helperText}
-        onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
+        onChange={(e) => setLocalValue(e.target.value === '' ? null : e.target.value)}
         fullWidth
         multiline={isTextAreaType}
         rows={isTextAreaType ? 4 : undefined}
