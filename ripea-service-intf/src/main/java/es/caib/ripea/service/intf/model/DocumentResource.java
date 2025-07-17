@@ -130,6 +130,7 @@ public class DocumentResource extends NodeResource {
 	public static final String PERSPECTIVE_COUNT_CODE = "COUNT";
     public static final String PERSPECTIVE_VERSIONS_CODE = "VERSIONS";
     public static final String PERSPECTIVE_ARXIU_DOCUMENT_CODE = "ARXIU_DOCUMENT";
+    public static final String PERSPECTIVE_FIRMES_CODE = "FIRMES";
     public static final String ACTION_ENVIAR_VIA_EMAIL_CODE = "ENVIAR_VIA_EMAIL";
     public static final String ACTION_ENVIAR_PORTAFIRMES_CODE = "ENVIAR_PORTAFIRMES";
     public static final String ACTION_RESUM_IA = "RESUM_IA";
@@ -264,6 +265,7 @@ public class DocumentResource extends NodeResource {
     public Boolean hasFirma;
     @Transient private ArxiuDetallDto arxiu;
     @Transient private List<DocumentVersioDto> versions;
+    @Transient private List<ArxiuFirmaDto> firmes;
     @Transient private int NumMetaDades;
     @Transient private boolean documentDeAnotacio;
     @Transient private boolean ambNotificacions;
