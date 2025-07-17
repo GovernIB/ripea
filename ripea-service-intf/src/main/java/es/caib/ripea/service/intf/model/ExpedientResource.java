@@ -70,6 +70,9 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.PERSPECTIVE_ESTAT_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_META_EXPEDIENT_CODE),
+				@ResourceConfigArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_RELACIONAT_CODE),
 				@ResourceConfigArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
@@ -205,6 +208,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_COUNT = "COUNT";
 	public static final String PERSPECTIVE_INTERESSATS_CODE = "INTERESSATS_RESUM";
 	public static final String PERSPECTIVE_ESTAT_CODE = "ESTAT";
+	public static final String PERSPECTIVE_META_EXPEDIENT_CODE = "META_EXPEDIENT";
 	public static final String PERSPECTIVE_RELACIONAT_CODE = "RELACIONAT";
 	public static final String PERSPECTIVE_NOTIFICACIONS_CADUCADES = "NOTIFICACIONS_CADUCADES";
 	public static final String PERSPECTIVE_DOCUMENTS_NO_MOGUTS = "DOCUMENTS_NO_MOGUTS";
@@ -236,6 +240,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	@NotNull
 	@ResourceField(onChangeActive = true)
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
+    @Transient private MetaExpedientResource metaExpedientInfo;
 	private ResourceReference<UsuariResource, String> agafatPer;
 	private ResourceReference<ExpedientEstatResource, Long> estatAdditional;
     @Transient boolean gestioAmbGrupsActiva;

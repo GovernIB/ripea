@@ -18,7 +18,7 @@ const myComment = {...comment, bgcolor: '#a5d6a7', alignSelf: 'end'}
 const otherComment = {...comment, bgcolor: '#e0e0e0'}
 
 const Comments = (props:any) => {
-    const { entity, resourceName, resourceReference } = props;
+    const { entity, resourceName, resourceReference, onRowCountChange } = props;
 
     const { value: user } = useUserSession();
     const [comentarios, setComentarios] = useState<any[]>([]);
@@ -40,6 +40,7 @@ const Comments = (props:any) => {
                 .then((result) => {
                     // console.log(">>>> rows", app.rows)
                     setComentarios(result.rows);
+                    onRowCountChange?.(result.rows?.length || 0)
                 })
                 .catch((error) => {
                     error?.message && temporalMessageShow(null, error?.message, 'error');
@@ -75,7 +76,7 @@ const Comments = (props:any) => {
 
 export const CommentDialog = (props:any) => {
     const { entity, title, resourceName, resourceReference } = props;
-    const [numComm, setNumComm] = useState<number>(entity?.numComentaris);
+    const [numComm, setNumComm] = useState<number>(entity?.numComentaris || 0);
     const formApiRef = useRef<MuiFormDialogApi>()
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -86,7 +87,7 @@ export const CommentDialog = (props:any) => {
             },
         })
             .then(() => {
-                setNumComm((numComm ?? entity?.numComentaris) + 1);
+                setNumComm(prev => prev + 1);
             })
             .catch((error) => {
                 error?.message && temporalMessageShow(null, error?.message, 'error');
@@ -110,6 +111,7 @@ export const CommentDialog = (props:any) => {
                     entity={entity}
                     resourceName={resourceName}
                     resourceReference={resourceReference}
+                    onRowCountChange={setNumComm}
                 />
                 <CommentForm/>
             </MuiFormDialog>

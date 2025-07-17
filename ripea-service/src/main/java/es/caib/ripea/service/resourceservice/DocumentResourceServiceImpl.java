@@ -502,6 +502,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 	
                 	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(adjunt.getContent(), adjunt.getContentType());
 
+                    target.setAmbFirma(signatureInfoDto.isSigned());
                     target.setHasFirma(signatureInfoDto.isSigned());
                     target.setValidacioFirmaCorrecte(!signatureInfoDto.isError());
                     target.setValidacioFirmaErrorMsg(signatureInfoDto.getErrorMsg());
@@ -518,9 +519,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 target.setFitxerContingut(null);
                 target.setFitxerTamany(null);
                 target.setFitxerContentType(null);
+                target.setAmbFirma(false);
+                target.setHasFirma(false);
                 target.setValidacioFirmaCorrecte(false);
                 target.setValidacioFirmaErrorMsg("");
-                target.setHasFirma(false);
             }
         }
     }
@@ -530,9 +532,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
             if (fieldValue != null) {
                 FileReference adjunt = (FileReference) fieldValue;
+                target.setAmbFirma(true);
+                target.setHasFirma(true);
                 target.setNomFitxerFirmat(adjunt.getName());
+                target.setFirmaNom(adjunt.getName());
+                target.setFirmaContingut(adjunt.getContent());
+//                target.(adjunt.getContentLength());
+                target.setFirmaContentType(adjunt.getContentType());
+
             } else {
+                target.setAmbFirma(false);
+                target.setHasFirma(false);
                 target.setNomFitxerFirmat(null);
+                target.setFirmaNom(null);
+                target.setFirmaContingut(null);
+//                target.(null);
+                target.setFirmaContentType(null);
             }
         }
     }
