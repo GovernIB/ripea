@@ -29,8 +29,8 @@ const useReassignar = (refresh?: () => void) => {
     const apiRef = useRef<MuiFormDialogApi>();
     const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id:any) :void => {
-        apiRef.current?.show?.(id)
+    const handleShow = (id:any, row:any) :void => {
+        apiRef.current?.show?.(id, {usuaris: row?.responsables})
     }
     const onSuccess = () :void => {
         refresh?.()

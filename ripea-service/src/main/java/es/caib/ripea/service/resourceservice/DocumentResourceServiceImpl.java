@@ -1,5 +1,6 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -156,6 +157,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_VERSIONS_CODE, new ArxiuVersionsPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_ARXIU_DOCUMENT_CODE, new ArxiuDocumentPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_FIRMES_CODE, new FirmesPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
         register(DocumentResource.Fields.imprimible, new ImprimibleFieldDownloader());
@@ -314,6 +316,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             resource.setTreePath(contingutResourceHelper.getTreePath(entity));
         }
     }
+    
     private class ArxiuDocumentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -321,10 +324,36 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     entity.getId(), entity.getNom(), entity.getArxiuUuid(), entity.getEntitat().getCodi(),
                     null, null, true, false);
             ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDocumentDetall(arxiuDocument,entity.getEntitat().getId());
-//            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDetall(entity.getEntitat().getId(), entity.getId());
             resource.setArxiu(arxiu);
         }
     }
+    
+    private class FirmesPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
+        @Override
+        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
+        	if (!DocumentFirmaTipusEnumDto.SENSE_FIRMA.equals(entity.getDocumentFirmaTipus())) {
+        		if (Utils.hasValue(entity.getArxiuUuid())) {
+        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(entity.getArxiuUuid(), false));
+        		} else if (entity.getGesDocAdjuntId()!=null) {
+        			ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
+        			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntId(), null, streamDoc);
+        			
+        			ByteArrayOutputStream streamFirma = null;
+        			if (entity.getGesDocAdjuntFirmaId()!=null) {
+        				streamFirma = new ByteArrayOutputStream();
+            			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntFirmaId(), null, streamFirma);
+        			}
+        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(
+        					entity.getFitxerNom(), 
+        					streamDoc.toByteArray(), 
+        					streamFirma!=null?streamFirma.toByteArray():null, 
+        					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, 
+        					false));
+        		}
+        	}
+        }
+    }
+    
     private class ArxiuVersionsPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -332,6 +361,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             resource.setVersions(versions);
         }
     }
+    
     private class CountPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -472,6 +502,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 	
                 	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(adjunt.getContent(), adjunt.getContentType());
 
+                    target.setAmbFirma(signatureInfoDto.isSigned());
                     target.setHasFirma(signatureInfoDto.isSigned());
                     target.setValidacioFirmaCorrecte(!signatureInfoDto.isError());
                     target.setValidacioFirmaErrorMsg(signatureInfoDto.getErrorMsg());
@@ -488,9 +519,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 target.setFitxerContingut(null);
                 target.setFitxerTamany(null);
                 target.setFitxerContentType(null);
+                target.setAmbFirma(false);
+                target.setHasFirma(false);
                 target.setValidacioFirmaCorrecte(false);
                 target.setValidacioFirmaErrorMsg("");
-                target.setHasFirma(false);
             }
         }
     }
@@ -500,9 +532,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
             if (fieldValue != null) {
                 FileReference adjunt = (FileReference) fieldValue;
+                target.setAmbFirma(true);
+                target.setHasFirma(true);
                 target.setNomFitxerFirmat(adjunt.getName());
+                target.setFirmaNom(adjunt.getName());
+                target.setFirmaContingut(adjunt.getContent());
+//                target.(adjunt.getContentLength());
+                target.setFirmaContentType(adjunt.getContentType());
+
             } else {
+                target.setAmbFirma(false);
+                target.setHasFirma(false);
                 target.setNomFitxerFirmat(null);
+                target.setFirmaNom(null);
+                target.setFirmaContingut(null);
+//                target.(null);
+                target.setFirmaContentType(null);
             }
         }
     }

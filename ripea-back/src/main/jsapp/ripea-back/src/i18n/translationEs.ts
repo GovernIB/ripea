@@ -164,7 +164,7 @@ const translationEs = {
                 valid: "Este contenido tiene errores de validación",
                 metaNode: "Este documento carece de un tipo de documento",
                 guardarPendent: "Pendiente de guardar en archivo",
-                fileSize: "El fichero supera el tamaño máximo permitido de {{maxSize}}",
+                fileSize: "El tamaño máximo permitido para el fichero es de {{maxSize}}",
             },
         },
         anotacio: {

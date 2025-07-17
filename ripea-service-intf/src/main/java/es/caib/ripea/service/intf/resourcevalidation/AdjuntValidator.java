@@ -39,7 +39,7 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
             return false;
 		}
 
-		if (resource.getFirmaAdjunt()!=null && (long) maxLength < resource.getFirmaAdjunt().getContentLength()) {
+		if (resource.getFirmaAdjunt()!=null && resource.getFirmaAdjunt().getContentLength()!=null && (long) maxLength < resource.getFirmaAdjunt().getContentLength()) {
             context
                 .buildConstraintViolationWithTemplate(message)
                 .addPropertyNode(DocumentResource.Fields.firmaAdjunt)

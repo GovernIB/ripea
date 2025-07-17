@@ -3,6 +3,7 @@ import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import Load from "./Load.tsx";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
+import {useMemo} from "react";
 
 export const GridButton = (props:any) => {
     const { title, xs, children, hidden, ...other} = props;
@@ -51,17 +52,18 @@ function formatByteCount(bytes:number) {
 export const FileFormField = (props:GridFormField) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession()
-    const adjuntValidator = (value: any) => {
-        const maxSize = user?.sessionScope?.maxUploadFileSize || 0;
+    const maxSize = useMemo(()=>user?.sessionScope?.maxUploadFileSize || 0,[]);
+    const mssg = useMemo(()=>t('page.contingut.alert.fileSize', {maxSize: formatByteCount(maxSize)}),[t, maxSize]);
 
+    const adjuntValidator = (value: any) => {
         if (value && value.contentLength >= maxSize) {
             return [{
                 field: props.name,
-                message: t('page.contingut.alert.fileSize', {maxSize: formatByteCount(maxSize)})
+                message: mssg
             }];
         }
     }
-    return <GridFormField {...props} type={"file"} validator={adjuntValidator}/>
+    return <GridFormField {...props} componentProps={{title :mssg}} type={"file"} validator={adjuntValidator}/>
 }
 
 const GridFormField = (props:GridFormField) => {

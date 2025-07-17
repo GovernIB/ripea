@@ -305,7 +305,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !entity?.potModificar || !row?.metaDocumentInfo?.firmaBiometricaActiva || !isFirmaActiva(row),
         },
         {
-            title: entity?.metaExpedient?.tipusClassificacio == 'SIA' // notificar/comunicar
+            title: entity?.metaExpedientInfo?.tipusClassificacio == 'SIA' // notificar/comunicar
                 ? t('page.document.action.notificar.label')
                 : t('page.document.action.comunicar.label'),
             icon: "mail",

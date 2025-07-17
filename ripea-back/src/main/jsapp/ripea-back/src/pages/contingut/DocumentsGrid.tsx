@@ -153,7 +153,9 @@ const DocumentsGrid = (props: any) => {
 
     const {carpetes, expedients, refresh: refreshTree, isReady} = useTreeView(commonFilter)
     const refresh = () => {
-        refreshTree()
+        if (vista == View.carpeta || vista == View.icona) {
+            refreshTree()
+        }
         gridApiRef?.current?.refresh?.();
     }
 
@@ -163,6 +165,10 @@ const DocumentsGrid = (props: any) => {
     const onDrop = React.useCallback((adjunt: any) => {
         gridApiRef?.current?.showCreateDialog?.(null, { adjunt })
     }, [])
+
+    useEffect(() => {
+        removeAll()
+    }, [expand, vista]);
 
     return <GridPage>
         <Load value={entity && isReady}>
@@ -218,36 +224,27 @@ const DocumentsGrid = (props: any) => {
                     }}
                     getTreeDataPath={(row: any): string[] => {
                         switch (vista) {
-                            case View.estat: return [`${row.estat}`, `${row.id}`];
-                            case View.tipus: return [`${row.metaNode?.description}`, `${row.id}`];
+                            case View.estat: return [`${row?.expedientEstatAdditional?.description}`, `${row.id}`];
+                            case View.tipus: return [`${row?.metaNode?.description}`, `${row.id}`];
                             default: return row.treePath.filter((id:any)=>id!=entity?.id);
                         }
                     }}
 
                     rowExpansionChange={(params: any) => {
-                        if (typeof params?.id === "number") {
-                            addFolderExpand(params.id, params.childrenExpanded)
-                        }
+                        addFolderExpand(params.id, params.childrenExpanded)
                     }}
                     isGroupExpandedByDefault={(params) => {
-                        if (typeof params?.id === "number") {
-                            const value = getFolderExpand(`${params?.id}`)
-                            if (value !== undefined) {
-                                return value
-                            }
-                            addFolderExpand(`${params?.id}`, expand)
+                        const value = getFolderExpand(`${params?.id}`)
+                        if (value !== undefined) {
+                            return value
                         }
+                        addFolderExpand(`${params?.id}`, expand)
                         return expand
                     }}
                     toolbarElementsWithPositions={[
                         {
                             position: 0,
-                            element: <ExpandButton value={expand} onChange={(value:any)=>{
-                                setExpand(value)
-                                if (vista == View.carpeta || vista == View.icona) {
-                                    removeAll()
-                                }
-                            }} hidden={!treeView} />,
+                            element: <ExpandButton value={expand} onChange={setExpand} hidden={!treeView} />,
                         },
                         {
                             position: 1,
