@@ -331,25 +331,29 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class FirmesPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-        	if (!DocumentFirmaTipusEnumDto.SENSE_FIRMA.equals(entity.getDocumentFirmaTipus())) {
-        		if (Utils.hasValue(entity.getArxiuUuid())) {
-        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(entity.getArxiuUuid(), false));
-        		} else if (entity.getGesDocAdjuntId()!=null) {
-        			ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
-        			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntId(), null, streamDoc);
-        			
-        			ByteArrayOutputStream streamFirma = null;
-        			if (entity.getGesDocAdjuntFirmaId()!=null) {
-        				streamFirma = new ByteArrayOutputStream();
-            			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntFirmaId(), null, streamFirma);
-        			}
-        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(
-        					entity.getFitxerNom(), 
-        					streamDoc.toByteArray(), 
-        					streamFirma!=null?streamFirma.toByteArray():null, 
-        					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, 
-        					false));
-        		}
+        	try {
+	        	if (!DocumentFirmaTipusEnumDto.SENSE_FIRMA.equals(entity.getDocumentFirmaTipus())) {
+	        		if (Utils.hasValue(entity.getArxiuUuid())) {
+	        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(entity.getArxiuUuid(), false));
+	        		} else if (entity.getGesDocAdjuntId()!=null) {
+	        			ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
+	        			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntId(), PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, streamDoc);
+	        			
+	        			ByteArrayOutputStream streamFirma = null;
+	        			if (entity.getGesDocAdjuntFirmaId()!=null) {
+	        				streamFirma = new ByteArrayOutputStream();
+	            			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntFirmaId(), PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, streamFirma);
+	        			}
+	        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(
+	        					entity.getFitxerNom(), 
+	        					streamDoc.toByteArray(), 
+	        					streamFirma!=null?streamFirma.toByteArray():null, 
+	        					entity.getFitxerContentType(), 
+	        					false));
+	        		}
+	        	}
+        	} catch (Exception ex) {
+        		excepcioLogHelper.addExcepcio("/expedient/FirmesPerspectiveApplicator", ex);
         	}
         }
     }
