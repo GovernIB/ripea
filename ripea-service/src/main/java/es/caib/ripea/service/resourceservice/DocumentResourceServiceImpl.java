@@ -631,7 +631,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/CanviTipusDocumentsActionExecutor", e);
-				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al canviar el tipus dels documents seleccionats.");
+				throw new ReportGenerationException(DocumentResource.class, null, code, "document.canviTipus.reject");
 			}
 		}
     }
@@ -651,25 +651,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
 
-    		DownloadableFile resultat = null;
-    		Long expedientId = data.get(0)!=null?(Long)data.get(0):null;
-
     		try {
 
 	    		ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
 	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
         		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-            	resultat = new DownloadableFile(
+                return new DownloadableFile(
             			fitxerDto.getNom(),
             			fitxerDto.getContentType(),
 	            		fitxerDto.getContingut());
 
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/"+expedientId+"/descarregarDocumentsMassiuZip", e);
-				throw new ReportGenerationException(ExpedientResource.class, expedientId, code, "S'ha produit un error al descarregar els documents seleccionats.");
+				excepcioLogHelper.addExcepcio("/expedient/descarregarDocumentsMassiuZip", e);
+				throw new ReportGenerationException(ExpedientResource.class, null, code, "document.descarregar.reject");
 			}
-
-            return resultat;
 		}
     }
     private class DescarregarVersionReportGenerator implements ReportGenerator<DocumentResourceEntity, DocumentResource.DescarregarVersionFormAction, FitxerDto> {
@@ -682,7 +677,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 return parametres;
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/descarregarDocumentsMassiuZip", e);
-                throw new ReportGenerationException(ExpedientResource.class, entity.getId(), code, "S'ha produit un error al descarregar els documents seleccionats.");
+                throw new ReportGenerationException(ExpedientResource.class, entity.getId(), code, "document.descarregar.reject");
             }
         }
 
@@ -753,7 +748,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsZipActionExecutor", e);
-				throw new ReportGenerationException(DocumentResource.class, null, code, "S'ha produit un error al guardar el ZIP per notificar per els documents seleccionats.");
+				throw new ReportGenerationException(DocumentResource.class, null, code, "document.notificarDocuments.reject");
 			}
 		}
     }

@@ -428,18 +428,14 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
             try {
                 Long expedientId = (Long)data.get(0);
                 ExpedientResource.MassiveAction params = (ExpedientResource.MassiveAction)data.get(1);
-                if (params!=null) {
-//                    entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, expedientInteressatHelper.findByIds(params.getIds()));
-                    DownloadableFile resultat = new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());
-                    return resultat;
-                } else {
-                    throw new ReportGenerationException(getResourceClass(), null, code, "No s'han seleccionat interessats.");
-                }
+//                entityComprovarHelper.comprovarExpedient(expedientId, true, true, false, false, false, configHelper.getRolActual());
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, expedientInteressatHelper.findByIds(params.getIds()));
+                DownloadableFile resultat = new DownloadableFile("Interessats_expedient_"+expedientId+".json", "application/json", baos.toByteArray());
+                return resultat;
             } catch (Exception e) {
                 excepcioLogHelper.addExcepcio("/expedient/ExportarInteressatsReportGenerator", e);
-                throw new ReportGenerationException(getResourceClass(), null, code, "S'ha produit un error al exportar els interessats seleccionats.");
+                throw new ReportGenerationException(getResourceClass(), null, code, "interessat.export.reject");
             } finally {
                 try {
                     baos.close();

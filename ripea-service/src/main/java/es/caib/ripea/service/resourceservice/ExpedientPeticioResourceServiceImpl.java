@@ -570,8 +570,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     	@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
     		
-    		DownloadableFile resultat = null;
-    		
     		try {		
 	    		
             	Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
@@ -582,18 +580,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     					false);
             	
         		String extensio = documentDetalls.getMetadades().getExtensio()!=null?documentDetalls.getMetadades().getExtensio().toString():".pdf";
-            	
-            	resultat = new DownloadableFile(
+
+                return new DownloadableFile(
             			documentDetalls.getNom()+extensio,
             			documentDetalls.getContingut().getTipusMime(),
             			documentDetalls.getContingut().getContingut());
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedientPeticio/"+data.get(1)+"/DescarregarJustificantReportGenerator", e);
-				throw new ReportGenerationException(getResourceClass(), data.get(1).toString(), code, "S'ha produit un error al descarregar el jsutificant del registre.");
+				throw new ReportGenerationException(getResourceClass(), data.get(1).toString(), code, "expedientPeticio.justificant.reject");
 			}
-            
-            return resultat;
 		}
 
 		@Override
