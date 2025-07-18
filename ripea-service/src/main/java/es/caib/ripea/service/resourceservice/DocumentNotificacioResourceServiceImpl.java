@@ -95,12 +95,12 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
             	if (document!=null) {
             		documentNotificacioHelper.actualitzarEstat(entity.getId());
             	} else {
-            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar l'estat de la notificació: No es té permis sobre el document.");
+            		throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "documentNotificacio.actualitzarEstat.reject.credential");
             	}
             	return null;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/notificacio/"+entity.getId()+"/DocumentNotificacioResource", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar l'estat de la notificació.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "documentNotificacio.actualitzarEstat.reject");
             }
         }
 

@@ -248,10 +248,10 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     		validacionsPendents = tascaHelper.getValidacionsPendentsTasca(entity.getId());
     	}
 
-		if (validacionsPendents==null || validacionsPendents.size()==0) {
+		if (validacionsPendents==null || validacionsPendents.isEmpty()) {
 			tascaHelper.canviarEstatTasca(entity.getId(), estat, motiu, configHelper.getRolActual());
 		} else {
-			throw new ActionExecutionException(getResourceClass(), entity.getId(), null, "La tasca té validacions pendents, no es pot finalitzar.");
+			throw new ActionExecutionException(getResourceClass(), entity.getId(), null, "expedientTasca.changeEstat.reject.validacionsPendents");
 		}
     }
 
@@ -289,7 +289,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         		return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ChangeDataLimitActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al actualitzar la data límit de la tasca.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "expedientTasca.changeDataLimit.reject");
 			}	
         }
 
@@ -356,11 +356,11 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 						getIdsFromUsuarisResources(params.getResponsables()),
 						params.getMotiu(),
 						configHelper.getRolActual());
+                return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ReobrirActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al reobrir la tasca.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "expedientTasca.reobrir.reject");
 			}
-			return null;
         }
         @Override
         public void onChange(Serializable id, ExpedientTascaResource.ReobrirFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ReobrirFormAction target) {
@@ -374,11 +374,11 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.MotiuFormAction params) throws ActionExecutionException {
 			try {
 				tascaHelper.retomarTasca(entity.getId(), params.getMotiu());
+                return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/RetomarActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al retomar la tasca.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "expedientTasca.retomar.reject");
 			}
-			return null;
         }
 
         @Override
@@ -394,11 +394,11 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 		public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ReassignarTascaFormAction params) throws ActionExecutionException {
 			try {
 				tascaHelper.reassignarTasca(entity.getId(), getIdsFromUsuarisResources(params.getUsuaris()));
+                return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ReassignarActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al reassignar la tasca.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "expedientTasca.reassignar.reject");
 			}
-			return null;
 		}
     }
     
@@ -411,11 +411,11 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 		public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, DelegarTascaFormAction params) throws ActionExecutionException {
 			try {
 				tascaHelper.delegarTasca(entity.getId(), params.getUsuari().getId(), params.getMotiu());
+                return objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/DelegarActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al delegar la tasca.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "expedientTasca.delegar.reject");
 			}
-			return null;
 		}
     }
     

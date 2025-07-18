@@ -84,10 +84,10 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
             	documentEnviamentInteressats.add(documentEnviamentInteressatDto);
             	documentNotificacioDto.setDocumentEnviamentInteressats(documentEnviamentInteressats);
             	pluginHelper.ampliarPlazoEnviament(documentNotificacioDto);
-            	return null;
+            	return objectMappingHelper.newInstanceMap(entity, DocumentEnviamentInteressatResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/notificacioInteressat/"+entity.getId()+"/AmpliarPlacActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "S'ha produit un error al ampliar el plaç per l'enviament del interessat.");
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "documentEnviamentInteressat.ampliarPlac.reject");
             }
         }
 

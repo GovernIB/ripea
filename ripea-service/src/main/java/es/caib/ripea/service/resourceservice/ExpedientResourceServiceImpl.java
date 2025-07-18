@@ -692,7 +692,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	if (params.isMassivo()) {
 	        		//Reobrir expedient massiu no esta soportada, pero deixam la porta oberta a futures implementacións. Tendria sentit.
-	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de reobrir expedient massiu no esta soportada.");
+	        		throw new ActionExecutionException(getResourceClass(), null, code, "expedient.reobrir.massive.notSupported");
 	        	} else {
 	        		expedientHelper.reobrir(entitatEntity.getId(), params.getIds().get(0));
 	        	}
@@ -744,7 +744,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al tancar l'expedient: "+e.getMessage(), e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
 			}				
 		}
     }
@@ -764,7 +764,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/"+entity.getId()+"/TancarActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(),"Error al tancar l'expedient: "+e.getMessage(), e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.importar.reject", new Object[]{e.getMessage()}));
 			}	
 		}
     }
@@ -962,7 +962,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActual, false, false, false, true, false);
 	        	if (params.isMassivo()) {
 	        		//Sincronitzar expedient amb arxiu massivament no esta soportada, pero deixam la porta oberta a futures implementacions. Tendria sentit.
-	        		throw new ActionExecutionException(getResourceClass(), null, code, "L'accio de sincronitzar expedient amb arxiu massivament no esta soportada.");
+	        		throw new ActionExecutionException(getResourceClass(), null, code, "expedient.sincronitzarArxiu.massive.notSupported");
 	        	} else {
 	        		resultat = contingutHelper.sincronitzarEstatArxiu(entitatEntity.getId(), params.getIds().get(0));
 	        	}
